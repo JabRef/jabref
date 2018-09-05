@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
-
     private static final String NAME = "MDL_FETCHER";
     private final String LANGUAGE;
     private final String VERSION;
@@ -57,16 +56,17 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                     parserResult = importer.importDatabase(response);
                 } else {
                     // For displaying An ErrorMessage
+                    String error = importer.getResponseErrorMessage(response);
                     BibEntry errorBibEntry = new BibEntry();
                     errorBibEntry.setField("html_representation",
-                            Localization.lang("Error while fetching from %0", "Mr.DLib"));
+                                           Localization.lang(error));
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);
                 }
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
-                throw new FetcherException("XML Parser IOException.");
+                throw new FetcherException("JSON Parser IOException.");
             }
             return parserResult.getDatabase().getEntries();
         } else {
@@ -104,11 +104,11 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      */
     private String constructQuery(String queryWithTitle) {
         // The encoding does not work for / so we convert them by our own
-        queryWithTitle = queryWithTitle.replaceAll("/", "convbckslsh");
+        queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("https");
-        builder.setHost("api.mr-dlib.org");
-        builder.setPath("/v1/documents/" + queryWithTitle + "/related_documents");
+        builder.setScheme("http");
+        builder.setHost("api-dev.darwingoliath.com");
+        builder.setPath("/v2/related_items/" + queryWithTitle);
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION);
@@ -116,6 +116,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URI uri = null;
         try {
             uri = builder.build();
+            LOGGER.trace("Request: " + uri.toString());
             return uri.toString();
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);

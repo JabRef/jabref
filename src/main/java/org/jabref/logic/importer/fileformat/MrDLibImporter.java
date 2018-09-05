@@ -4,17 +4,12 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -23,11 +18,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -35,27 +30,21 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MrDLibImporter extends Importer {
 
+    private static final MessageFormat HTML_LIST_ITEM_TEMPLATE = new MessageFormat("<a href=''{0}''><font color='#000000' size='4' face='Arial, Helvetica, sans-serif'>{1}</font></a>. <font color='#000000' size='4' face='Arial, Helvetica, sans-serif'>{2} <i>{3}</i> {4}</font>");
+    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = "Error while fetching from Mr.DLib.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
 
+    @SuppressWarnings("unused")
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         String recommendationsAsString = convertToString(input);
-        // check for valid format
         try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser = factory.newSAXParser();
-            DefaultHandler handler = new DefaultHandler() {
-                // No Processing here. Just check for valid xml.
-                // Later here will be the check against the XML schema.
-            };
-
-            try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.getBytes())) {
-                saxParser.parse(stream, handler);
-            } catch (Exception e) {
+            JSONObject jsonObject = new JSONObject(recommendationsAsString);
+            if (!jsonObject.has("recommendations")) {
                 return false;
             }
-        } catch (ParserConfigurationException | SAXException e) {
+        } catch (JSONException ex) {
             return false;
         }
         return true;
@@ -74,18 +63,18 @@ public class MrDLibImporter extends Importer {
 
     @Override
     public StandardFileType getFileType() {
-        return StandardFileType.XML;
+        return StandardFileType.JSON;
     }
 
     @Override
     public String getDescription() {
-        return "Takes valid xml documents. Parses from MrDLib API a BibEntry";
+        return "Takes valid JSON documents from the Mr. DLib API and parses them into a BibEntry";
     }
 
     /**
-     * The SaxParser needs this String. So I convert it here.
-     * @param Takes a BufferedReader with a reference to the XML document delivered by mdl server.
-     * @return Returns an String containing the XML file.
+     * Convert Buffered Reader response to string for JSON parsing.
+     * @param Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
+     * @return Returns an String containing the JSON document.
      * @throws IOException
      */
     private String convertToString(BufferedReader input) throws IOException {
@@ -117,7 +106,7 @@ public class MrDLibImporter extends Importer {
 
     /**
      * Parses the input from the server to a ParserResult
-     * @param input A BufferedReader with a reference to a string with the servers response
+     * @param input A BufferedReader with a reference to a string with the server's response
      * @throws IOException
      */
     private void parse(BufferedReader input) throws IOException {
@@ -126,30 +115,89 @@ public class MrDLibImporter extends Importer {
         // The document to parse
         String recommendations = convertToString(input);
         // The sorted BibEntries gets stored here later
-        List<BibEntry> bibEntries = new ArrayList<>();
-        //Parsing the response with a SAX parser
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser = factory.newSAXParser();
-            MrDlibImporterHandler handler = new MrDlibImporterHandler();
-            try (InputStream stream = new ByteArrayInputStream(recommendations.getBytes())) {
-                saxParser.parse(stream, handler);
-            } catch (SAXException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-            List<RankedBibEntry> rankedBibEntries = handler.getRankedBibEntries();
-            rankedBibEntries.sort((RankedBibEntry rankedBibEntry1,
-                    RankedBibEntry rankedBibEntry2) -> rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank));
-            bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
-        } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error(e.getMessage(), e);
+        List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
+
+        // Get recommendations from response and populate bib entries
+        JSONObject recommendationsJson = new JSONObject(recommendations);
+        recommendationsJson = recommendationsJson.getJSONObject("recommendations");
+        Iterator<String> keys = recommendationsJson.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            JSONObject value = recommendationsJson.getJSONObject(key);
+            rankedBibEntries.add(populateBibEntry(value));
         }
+
+        // Sort bib entries according to rank
+        rankedBibEntries.sort((RankedBibEntry rankedBibEntry1,
+                               RankedBibEntry rankedBibEntry2) -> rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank));
+        List<BibEntry> bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
 
         for (BibEntry bibentry : bibEntries) {
             bibDatabase.insertEntry(bibentry);
         }
-
         parserResult = new ParserResult(bibDatabase);
+    }
+
+    /**
+     * Parses the JSON recommendations into bib entries
+     * @param recommendation JSON object of a single recommendation returned by Mr. DLib
+     * @return A ranked bib entry created from the recommendation input
+     */
+    private RankedBibEntry populateBibEntry(JSONObject recommendation) {
+        BibEntry current = new BibEntry();
+        String authors = "", title = "", year = "", journal = "", url = "";
+        Integer rank = 100;
+
+        // parse each of the relevant fields into variables
+        if (recommendation.has("authors") && !recommendation.isNull("authors")) {
+            authors = getAuthorsString(recommendation);
+        }
+        if (recommendation.has("title") && !recommendation.isNull("title")) {
+            title = recommendation.getString("title");
+        }
+        if (recommendation.has("date_published") && !recommendation.isNull("date_published")) {
+            year = recommendation.getString("date_published");
+        }
+        if (recommendation.has("published_in") && !recommendation.isNull("published_in")) {
+            journal = recommendation.getString("published_in");
+        }
+        if (recommendation.has("url") && !recommendation.isNull("url")) {
+            url = recommendation.getString("url") + ".";
+        }
+        if (recommendation.has("recommendation_id") && !recommendation.isNull("recommendation_id")) {
+            rank = recommendation.getInt("recommendation_id");
+        }
+
+        // Populate bib entry with relevant data
+        current.setField(FieldName.AUTHOR, authors);
+        current.setField(FieldName.TITLE, title);
+        current.setField(FieldName.YEAR, year);
+        current.setField(FieldName.JOURNAL, journal);
+
+        // Create HTML representation of recommendation for display on the UI
+        Object[] args = {url, title, authors, journal, year};
+        String htmlRepresentation = HTML_LIST_ITEM_TEMPLATE.format(args);
+        current.setField("html_representation", htmlRepresentation);
+
+        return new RankedBibEntry(current, rank);
+    }
+
+    /**
+     * Creates an authors string from a JSON recommendation
+     * @param recommendation JSON Object recommendation from Mr. DLib
+     * @return A string of all authors, separated by commas and finished with a full stop.
+     */
+    private String getAuthorsString(JSONObject recommendation) {
+        String authorsString = "";
+        JSONArray array = recommendation.getJSONArray("authors");
+        for (int i = 0; i < array.length(); ++i) {
+            authorsString += array.getString(i) + ", ";
+        }
+        int stringLength = authorsString.length();
+        if (stringLength > 2) {
+            authorsString = authorsString.substring(0, stringLength - 2) + ".";
+        }
+        return authorsString;
     }
 
     public ParserResult getParserResult() {
@@ -157,102 +205,20 @@ public class MrDLibImporter extends Importer {
     }
 
     /**
-     * Handler that parses the response from Mr. DLib to BibEntries
+     * Gets the error message to be returned if there has been an error in returning recommendations.
+     * Returns default error message if there is no message from Mr. DLib.
+     * @param response The response from the MDL server as a string.
+     * @return String error message to be shown to the user.
      */
-    private class MrDlibImporterHandler extends DefaultHandler {
-
-        // The list ob BibEntries with its associated rank
-        private final List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
-
-        private boolean authors;
-        private boolean published_in;
-        private boolean title;
-        private boolean year;
-        private boolean snippet;
-        private boolean rank;
-        private boolean type;
-        private String htmlSnippetSingle;
-        private int htmlSnippetSingleRank = -1;
-        private BibEntry currentEntry;
-
-        public List<RankedBibEntry> getRankedBibEntries() {
-            return rankedBibEntries;
+    public String getResponseErrorMessage(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            if (!jsonObject.has("message")) {
+                return jsonObject.getString("message");
+            }
+        } catch (JSONException ex) {
+            return DEFAULT_MRDLIB_ERROR_MESSAGE;
         }
-
-        @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes)
-                throws SAXException {
-
-            switch (qName.toLowerCase(Locale.ROOT)) {
-            case "related_article":
-                currentEntry = new BibEntry();
-                htmlSnippetSingle = null;
-                htmlSnippetSingleRank = -1;
-                break;
-            case "authors":
-                authors = true;
-                break;
-            case "published_in":
-                published_in = true;
-                break;
-            case "title":
-                title = true;
-                break;
-            case "year":
-                year = true;
-                break;
-            case "type":
-                type = true;
-                break;
-            case "suggested_rank":
-                rank = true;
-                break;
-            default:
-                break;
-            }
-            if (qName.equalsIgnoreCase("snippet")
-                    && attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
-                snippet = true;
-            }
-        }
-
-        @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (qName.equalsIgnoreCase("related_article")) {
-                rankedBibEntries.add(new RankedBibEntry(currentEntry, htmlSnippetSingleRank));
-                currentEntry = new BibEntry();
-            }
-        }
-
-        @Override
-        public void characters(char ch[], int start, int length) throws SAXException {
-
-            if (authors) {
-                currentEntry.setField(FieldName.AUTHOR, new String(ch, start, length));
-                authors = false;
-            }
-            if (published_in) {
-                currentEntry.setField(FieldName.JOURNAL, new String(ch, start, length));
-                published_in = false;
-            }
-            if (title) {
-                currentEntry.setField(FieldName.TITLE, new String(ch, start, length));
-                title = false;
-            }
-            if (year) {
-                currentEntry.setField(FieldName.YEAR, new String(ch, start, length));
-                year = false;
-            }
-            if (rank) {
-                htmlSnippetSingleRank = Integer.parseInt(new String(ch, start, length));
-                rank = false;
-            }
-            if (snippet) {
-                currentEntry.setField("html_representation", new String(ch, start, length));
-                snippet = false;
-            }
-
-        }
-
+        return DEFAULT_MRDLIB_ERROR_MESSAGE;
     }
 }
