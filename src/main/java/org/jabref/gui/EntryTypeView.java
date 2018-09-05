@@ -91,7 +91,16 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         viewModel = new EntryTypeViewModel(prefs, basePanel, dialogService);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
-        idTextField.textProperty().bind(viewModel.idTextProperty());
+        idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
+        idBasedFetchers.valueProperty().bindBidirectional(viewModel.selectedItemProperty());
+
+        EasyBind.subscribe(viewModel.getFocusAndSelectAllProperty(), evt -> {
+            if (evt) {
+                idTextField.requestFocus();
+                idTextField.selectAll();
+            }
+        });
+
         new ViewModelListCellFactory<IdBasedFetcher>().withText(item -> item.getName()).install(idBasedFetchers);
 
         //we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible

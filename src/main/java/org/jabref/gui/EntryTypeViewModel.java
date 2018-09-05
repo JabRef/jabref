@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -40,6 +39,7 @@ public class EntryTypeViewModel {
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
     private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty idText = new SimpleStringProperty();
+    private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final BasePanel basePanel;
     private final DialogService dialogService;
@@ -50,6 +50,7 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
+
     }
 
     public BooleanProperty searchingProperty() {
@@ -62,6 +63,10 @@ public class EntryTypeViewModel {
 
     public StringProperty idTextProperty() {
         return idText;
+    }
+
+    public BooleanProperty getFocusAndSelectAllProperty() {
+        return focusAndSelectAllProperty;
     }
 
     public void storeSelectedFetcher() {
@@ -85,58 +90,11 @@ public class EntryTypeViewModel {
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
 
-        private boolean fetcherException = false;
-        private String fetcherExceptionMessage = "";
         private IdBasedFetcher fetcher = null;
         private String searchID = "";
 
         @Override
-        protected void done() {
-            try {
-                Optional<BibEntry> result = get();
-                if (result.isPresent()) {
-                    final BibEntry bibEntry = result.get();
-                    if ((DuplicateCheck.containsDuplicate(basePanel.getDatabase(), bibEntry, basePanel.getBibDatabaseContext().getMode()).isPresent())) {
-                        //If there are duplicates starts ImportInspectionDialog
-                        final BasePanel panel = basePanel;
-
-                        ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), panel, Localization.lang("Import"), false);
-                        diag.addEntries(Arrays.asList(bibEntry));
-                        diag.entryListComplete();
-                        diag.setVisible(true);
-                        diag.toFront();
-                    } else {
-                        // Regenerate CiteKey of imported BibEntry
-                        new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
-                        // Update Timestamps
-                        if (prefs.getTimestampPreferences().includeCreatedTimestamp()) {
-                            bibEntry.setField(prefs.getTimestampPreferences().getTimestampField(), prefs.getTimestampPreferences().now());
-                        }
-                        basePanel.insertEntry(bibEntry);
-                    }
-
-                    // close();
-                } else if (StringUtil.isBlank(searchID)) {
-                    dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
-                } else if (!fetcherException) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
-                } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
-                }
-                fetcherWorker = new FetcherWorker();
-
-                /* idTextField.requestFocus();
-                idTextField.selectAll();
-                */
-                searchingProperty().setValue(false);
-
-            } catch (ExecutionException | InterruptedException e) {
-                LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
-            }
-        }
-
-        @Override
-        protected Optional<BibEntry> call() throws Exception {
+        protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
             Optional<BibEntry> bibEntry = Optional.empty();
 
             searchingProperty().setValue(true);
@@ -144,19 +102,64 @@ public class EntryTypeViewModel {
             fetcher = selectedItemProperty().getValue();
             searchID = idText.getValue();
             if (!searchID.isEmpty()) {
-                try {
-                    bibEntry = fetcher.performSearchById(searchID);
-                } catch (FetcherException e) {
-                    LOGGER.error(e.getMessage(), e);
-                    fetcherException = true;
-                    fetcherExceptionMessage = e.getMessage();
-                }
+                bibEntry = fetcher.performSearchById(searchID);
             }
             return bibEntry;
         }
+
     }
 
     public void runFetcherWorker() {
         fetcherWorker.run();
+        fetcherWorker.setOnFailed(event -> {
+            Throwable exception = fetcherWorker.getException();
+            String fetcherExceptionMessage = exception.getMessage();
+            String fetcher = selectedItemProperty().getValue().getName();
+            String searchId = idText.getValue();
+            if (exception instanceof FetcherException) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
+
+            } else {
+                dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage));
+            }
+            LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
+
+            searchingProperty.set(false);
+            fetcherWorker = new FetcherWorker();
+        });
+
+        fetcherWorker.setOnSucceeded(evt -> {
+            Optional<BibEntry> result = fetcherWorker.getValue();
+            if (result.isPresent()) {
+                final BibEntry bibEntry = result.get();
+                if ((DuplicateCheck.containsDuplicate(basePanel.getDatabase(), bibEntry, basePanel.getBibDatabaseContext().getMode()).isPresent())) {
+                    //If there are duplicates starts ImportInspectionDialog
+                    final BasePanel panel = basePanel;
+
+                    ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), panel, Localization.lang("Import"), false);
+                    diag.addEntries(Arrays.asList(bibEntry));
+                    diag.entryListComplete();
+                    diag.setVisible(true);
+                    diag.toFront();
+                } else {
+                    // Regenerate CiteKey of imported BibEntry
+                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
+                    // Update Timestamps
+                    if (prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                        bibEntry.setField(prefs.getTimestampPreferences().getTimestampField(), prefs.getTimestampPreferences().now());
+                    }
+                    basePanel.insertEntry(bibEntry);
+                }
+
+                // close();
+            } else if (StringUtil.isBlank(idText.getValue())) {
+                dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
+            }
+            fetcherWorker = new FetcherWorker();
+
+            focusAndSelectAllProperty.set(true);
+            searchingProperty().setValue(false);
+
+        });
     }
 }
