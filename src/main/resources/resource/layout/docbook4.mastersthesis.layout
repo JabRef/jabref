@@ -1,6 +1,6 @@
 <biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
    <authorgroup>
-\begin{author}       \format[CreateDocBookAuthors]{\author} \end{author}
+\begin{author}       \format[CreateDocBook4Authors]{\author} \end{author}
    </authorgroup>
    <citetitle pubwork="manuscript">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
 \begin{school}   <publisher>
