@@ -1119,12 +1119,6 @@ public class BasePanel extends StackPane {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
-        // If the status line states that the base has been saved, we
-        // remove this message, since it is no longer relevant. If a
-        // different message is shown, we leave it.
-        if (frame.getStatusLineText().startsWith(Localization.lang("Saved library"))) {
-            frame.output(" ");
-        }
     }
 
     public void markNonUndoableBaseChanged() {

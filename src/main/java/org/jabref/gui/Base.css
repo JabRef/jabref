@@ -907,3 +907,14 @@ We want to have a look that matches our icons in the tool-bar */
 .sidePaneComponent {
     -fx-background-color: -jr-sidepane-background;
 }
+
+.jfx-snackbar-content {
+    -fx-background-color: -jr-gray-3;
+    -fx-background-radius: 4px;
+    -fx-padding: 0ex 0ex 0ex 0ex;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: -fx-light-text-color;
+    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+}
