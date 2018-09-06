@@ -27,6 +27,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
     public void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.getNumberOfAuthors(); i++) {
             sb.append('<').append(tagName).append('>');
+            sb.append("<personname>");
             Author a = al.getAuthor(i);
             a.getFirst().filter(first -> !first.isEmpty()).ifPresent(first -> sb.append("<firstname>")
                     .append(CreateDocBookAuthors.XML_CHARS.format(first)).append("</firstname>"));
@@ -37,6 +38,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
                 a.getJr().filter(jr -> !jr.isEmpty())
                         .ifPresent(jr -> sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(jr)));
                 sb.append("</surname>");
+                sb.append("</personname>");
             });
 
             if (i < (al.getNumberOfAuthors() - 1)) {
@@ -46,5 +48,4 @@ public class CreateDocBookAuthors implements LayoutFormatter {
             }
         }
     }
-
 }
