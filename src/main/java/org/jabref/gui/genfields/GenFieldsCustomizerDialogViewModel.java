@@ -15,15 +15,15 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-
     private final ObjectProperty<String> initialFieldsText = new SimpleObjectProperty<>();
 
     public GenFieldsCustomizerDialogViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
-        this.preferences = preferences
+        this.preferences = preferences;
+        setInitialFieldsText();
     }
 
-    private void setFieldsText() {
+    private void setInitialFieldsText() {
         StringBuilder sb = new StringBuilder();
 
         for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
@@ -33,7 +33,7 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
             sb.append('\n');
         }
 
-        initialFieldsText.setText(sb.toString());
+        initialFieldsText.set(sb.toString());
     }
 
 }

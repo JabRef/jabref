@@ -21,12 +21,9 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
     @FXML private ButtonType cancelButton; //Double check this
     @FXML private TextArea fieldsTextArea; //generic?
 
-    //dependency injections here - checing github, probably dialogService
-
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-
-    //private GenFieldsDialogViewModel viewModel;
+    private GenFieldsCustomizerDialogViewModel viewModel;
 
     public GenFieldsCustomizerDialogView() {
         this.setTitle(Localization.lang("Set General Fields"));
@@ -36,8 +33,15 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+    }
 
-        //You left off here - next step is to create the ViewModel
+    @FXML
+    private void initialize() {
+        viewModel = new GenFieldsCustomizerDialogViewModel(dialogService, preferences);
+
+        viewModel.initialFieldTextProperty().bind(//see Line 32 in the sample model
+                          //stuff here using EasyBind  )
+
     }
 
     @FXML
