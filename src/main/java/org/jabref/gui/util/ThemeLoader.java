@@ -37,6 +37,10 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
+    private static final String DARK_THEME_PATH_CSS= JabRefFrame.class.getResource("Dark.css").toExternalForm();
+    private static final String DARK_THEME_PREF_BOX= JabRefFrame.class.getResource("DarkPrefBox.css").toExternalForm();
+    private static final String DEFAULT_THEME_PREF_BOX= JabRefFrame.class.getResource("PreferencesDialog.css").toExternalForm();
+
     private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.theme.css");
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -51,6 +55,9 @@ public class ThemeLoader {
      */
     public void installBaseCss(Scene scene, JabRefPreferences preferences) {
         addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
+        addAndWatchForChanges(scene,DARK_THEME_PATH_CSS,0);
+        addAndWatchForChanges(scene,DARK_THEME_PREF_BOX,0);
+        addAndWatchForChanges(scene,DEFAULT_THEME_PREF_BOX,0);
 
         if (StringUtil.isNotBlank(CSS_SYSTEM_PROPERTY)) {
             final Path path = Paths.get(CSS_SYSTEM_PROPERTY);
@@ -93,5 +100,10 @@ public class ThemeLoader {
     @Deprecated
     public void installBaseCss(Parent control) {
         control.getStylesheets().add(0, DEFAULT_PATH_MAIN_CSS);
+        control.getStylesheets().add(1,DARK_THEME_PATH_CSS);
+        control.getStylesheets().add(2,DEFAULT_THEME_PREF_BOX);
+        control.getStylesheets().add(3,DARK_THEME_PREF_BOX);
+
     }
+
 }

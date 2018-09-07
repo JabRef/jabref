@@ -216,6 +216,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String FONT_SIZE = "fontSize";
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    public static final String ACCESS_DARK_THEMES= "accessDarkTheme";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String RECENT_DATABASES = "recentDatabases";
@@ -669,6 +670,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
 
+
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
@@ -689,6 +691,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
+        defaults.put(ACCESS_DARK_THEMES,false);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
