@@ -1,11 +1,15 @@
 package org.jabref.gui.genfields;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -19,6 +23,9 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
 
     //dependency injections here - checing github, probably dialogService
 
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
+
     //private GenFieldsDialogViewModel viewModel;
 
     public GenFieldsCustomizerDialogView() {
@@ -30,7 +37,7 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        //Yo ushould test at this point
+        //You left off here - next step is to create the ViewModel
     }
 
     @FXML
