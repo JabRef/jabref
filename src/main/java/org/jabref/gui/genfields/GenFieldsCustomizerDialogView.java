@@ -21,15 +21,21 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
 
     //private GenFieldsDialogViewModel viewModel;
 
-    public void GenFieldsCustomizerView() {
+    public GenFieldsCustomizerDialogView() {
         this.setTitle(Localization.lang("Set General Fields"));
         this.setResizable(true);
+        this.getDialogPane().setPrefSize(300, 650);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
         //Yo ushould test at this point
+    }
+
+    @FXML
+    private void closeDialog() {
+        close();
     }
 
 }
