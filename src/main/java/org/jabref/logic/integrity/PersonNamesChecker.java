@@ -33,13 +33,16 @@ public class PersonNamesChecker implements ValueChecker {
 
         // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
         value = new RemoveBrackets().format(value);
+
+        // put ' ' after every name, e.g.,L.C. Brand -> L. C. Brand
+        String checkFormat = value.replaceAll("\\.", ". ").replaceAll("\\  ", " ");
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...
         //  First Last and ...
         AuthorList authorList = AuthorList.parse(value);
-        if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
-                && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
-            return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
+        if (!authorList.getAsLastFirstNamesWithAnd(false).equals(checkFormat)
+            && !authorList.getAsFirstLastNamesWithAnd().equals(checkFormat)) {
+            return Optional.of(Localization.lang("Names are not in the standard %0 format", bibMode.getFormattedName()));
         }
 
         return Optional.empty();
