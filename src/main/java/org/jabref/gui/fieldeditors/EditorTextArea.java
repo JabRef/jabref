@@ -9,12 +9,13 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
-public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
+public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     /**
      *  Variable that contains user-defined behavior for paste action.
@@ -30,8 +31,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     public EditorTextArea(final String text) {
         super(text);
 
-        setMinHeight(1);
-        setMinWidth(200);
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
