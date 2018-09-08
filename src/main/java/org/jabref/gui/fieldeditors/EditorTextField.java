@@ -22,8 +22,8 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
     public EditorTextField(final String text) {
         super(text);
 
-        setMinHeight(1);
-        setMinWidth(200);
+        // Always fill out all the available vertical space
+        this.setPrefHeight(Double.POSITIVE_INFINITY);
 
         // Should behave as a normal text field with respect to TAB behaviour
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
