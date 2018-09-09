@@ -5,17 +5,19 @@ import java.util.Map;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.fxml.FXML;
 
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final ObjectProperty<String> initialFieldsText = new SimpleObjectProperty<>();
+    private final ObjectProperty<String> fieldsText = new SimpleObjectProperty<>();
 
     public GenFieldsCustomizerDialogViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -33,7 +35,30 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
             sb.append('\n');
         }
 
-        initialFieldsText.set(sb.toString());
+        fieldsText.set(sb.toString());
+    }
+
+    public ObjectProperty<String> fieldsTextProperty() {
+        return fieldsText;
+    }
+
+    public void saveFields() {
+        String[] lines = fieldsText.get().split("\n");
+        int i = 0;
+        for (; i < lines.length; i++) {
+            String[] parts = lines[i].split(":");
+            if (parts.length != 2) {
+                // Report error and exit.
+                String field = Localization.lang("field");
+                String title = Localization.lang("Error");
+                String content = Localization.lang("Each line must be of the following form") + " '" +
+                    Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'";
+                dialogService.showInformationDialogAndWait(title, content);
+                return;
+            }
+
+
+        //preferences.  INSERT S
     }
 
 }

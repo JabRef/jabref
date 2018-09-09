@@ -39,14 +39,20 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GenFieldsCustomizerDialogViewModel(dialogService, preferences);
 
-        viewModel.initialFieldTextProperty().bind(//see Line 32 in the sample model
-                          //stuff here using EasyBind  )
+        viewModel.fieldsTextProperty().bindBidirectional(fieldsTextArea.textProperty());
+        //stuff here using EasyBind
 
     }
 
     @FXML
     private void closeDialog() {
         close();
+    }
+
+    @FXML
+    private void saveFieldsAndCloseDialog() {
+        viewModel.saveFields();
+        closeDialog();
     }
 
 }
