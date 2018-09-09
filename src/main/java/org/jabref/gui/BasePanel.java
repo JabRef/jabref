@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,7 +109,6 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.LinkedFile;
@@ -762,58 +760,6 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * This method is called from JabRefFrame when the user wants to create a new entry. If the argument is null, the
-     * user is prompted for an entry type.
-     *
-     * @param type The type of the entry to create.
-     * @return The newly created BibEntry or null the operation was canceled by the user.
-     */
-    public BibEntry newEntry(EntryType type) {
-        EntryType actualType = type;
-        if (actualType == null) {
-            // Find out what type is wanted.
-            final EntryTypeDialog etd = new EntryTypeDialog(frame);
-            // We want to center the dialog, to make it look nicer.
-            etd.setVisible(true);
-            actualType = etd.getChoice();
-        }
-        if (actualType != null) { // Only if the dialog was not canceled.
-            final BibEntry be = new BibEntry(actualType.getName());
-            try {
-                bibDatabaseContext.getDatabase().insertEntry(be);
-                // Set owner/timestamp if options are enabled:
-                List<BibEntry> list = new ArrayList<>();
-                list.add(be);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
-
-                // Create an UndoableInsertEntry object.
-                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be));
-                output(Localization.lang("Added new '%0' entry.", actualType.getName().toLowerCase(Locale.ROOT)));
-
-                // We are going to select the new entry. Before that, make sure that we are in
-                // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
-                // mode which makes sure the selection will trigger display of the entry editor
-                // and adjustment of the splitter.
-                if (mode != BasePanelMode.SHOWING_EDITOR) {
-                    mode = BasePanelMode.WILL_SHOW_EDITOR;
-                }
-
-                clearAndSelect(be);
-
-                // The database just changed.
-                markBaseChanged();
-
-                this.showAndEdit(be);
-
-                return be;
-            } catch (KeyCollisionException ex) {
-                LOGGER.info(ex.getMessage(), ex);
-            }
-        }
-        return null;
-    }
-
-    /**
      * This method is called from JabRefFrame when the user wants to create a new entry.
      *
      * @param bibEntry The new entry.
@@ -822,10 +768,10 @@ public class BasePanel extends StackPane {
         if (bibEntry != null) {
             try {
                 bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
-                    // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
-                }
+
+                // Set owner and timestamp
+                UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
+
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
                 output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
