@@ -1022,7 +1022,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      */
     @Deprecated
     public void output(final String s) {
-        statusLine.show(s, 3000);
+        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.show(s, 3000));
     }
 
     private void initActions() {

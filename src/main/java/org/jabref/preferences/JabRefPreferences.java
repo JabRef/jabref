@@ -151,6 +151,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NEWLINE = "newline";
     public static final String COLUMN_WIDTHS = "columnWidths";
     public static final String COLUMN_NAMES = "columnNames";
+    public static final String SORT_COLUMN = "columnSortOrders";
+
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
@@ -536,6 +538,8 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(COLUMN_NAMES, "entrytype;author/editor;title;year;journal/booktitle;bibtexkey");
         defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
+        defaults.put(SORT_COLUMN, "title;ASCENDING");
+
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
@@ -1870,6 +1874,17 @@ public class JabRefPreferences implements PreferencesService {
         return map;
     }
 
+    private Map<String, String> createColumnSortOrder() {
+        List<String> columns = getStringList(COLUMN_NAMES);
+        List<String> sortOrders = getStringList(SORT_COLUMN);
+
+        Map<String, String> map = new TreeMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            map.put(columns.get(i), sortOrders.get(i));
+        }
+        return map;
+    }
+
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
                                      getBoolean(FILE_COLUMN),
@@ -1879,7 +1894,9 @@ public class JabRefPreferences implements PreferencesService {
                                      getStringList(COLUMN_NAMES),
                                      createSpecialFieldColumns(),
                                      createExtraFileColumns(),
-                                     createColumnWidths());
+                                     createColumnWidths(),
+                                     getMainTableColumnSortOrder());
+
     }
 
     public MainTablePreferences getMainTablePreferences() {
@@ -1955,4 +1972,13 @@ public class JabRefPreferences implements PreferencesService {
     public String getIdBasedFetcherForEntryGenerator() {
         return get(ID_ENTRY_GENERATOR);
     }
+
+    public void setMainTableColumnSortOrder(String column, String sortType) {
+        putStringList(SORT_COLUMN, Arrays.asList(column, sortType));
+    }
+
+    public List<String> getMainTableColumnSortOrder() {
+        return getStringList(SORT_COLUMN);
+    }
+
 }

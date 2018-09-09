@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.preferences.JabRefPreferences;
@@ -22,6 +23,30 @@ public class PersistenceVisualStateTable {
         this.preferences = preferences;
 
         mainTable.getColumns().addListener(this::onColumnsChanged);
+        mainTable.getSortOrder().addListener(this::onColumnSortOrderChanged);
+
+    }
+
+    private void onColumnSortOrderChanged(ListChangeListener.Change<? extends TableColumn<BibEntryTableViewModel, ?>> change) {
+        boolean changed = false;
+        while (change.next()) {
+            changed = true;
+        }
+
+        if (changed) {
+            updateSortOrderPreferences(change.getList());
+        }
+    }
+
+    private void updateSortOrderPreferences(ObservableList<? extends TableColumn<BibEntryTableViewModel, ?>> observableList) {
+        if(observableList.isEmpty())
+            return;
+        TableColumn<BibEntryTableViewModel, ?> column = observableList.get(0);
+        if (column instanceof NormalTableColumn) {
+            NormalTableColumn normalColumn = (NormalTableColumn) column;
+            preferences.setMainTableColumnSortOrder(normalColumn.getColumnName(), normalColumn.getSortType().name());
+        }
+
     }
 
     private void onColumnsChanged(ListChangeListener.Change<? extends TableColumn<BibEntryTableViewModel, ?>> change) {
@@ -33,6 +58,7 @@ public class PersistenceVisualStateTable {
         if (changed) {
             updateColumnPreferences();
         }
+
     }
 
     /**
@@ -41,6 +67,7 @@ public class PersistenceVisualStateTable {
     private void updateColumnPreferences() {
         List<String> columnNames = new ArrayList<>();
         List<String> columnsWidths = new ArrayList<>();
+        List<String> columnSortOrders = new ArrayList<>();
 
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
             if (column instanceof NormalTableColumn) {
@@ -48,6 +75,8 @@ public class PersistenceVisualStateTable {
 
                 columnNames.add(normalColumn.getColumnName());
                 columnsWidths.add(String.valueOf(normalColumn.getWidth()));
+                columnSortOrders.add(normalColumn.getSortType().name());
+
             }
         }
 
