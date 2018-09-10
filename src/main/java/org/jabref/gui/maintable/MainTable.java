@@ -62,7 +62,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final NewDroppedFileHandler fileHandler;
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
-
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
@@ -116,11 +115,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         //Set sort order column from preferences, currently only single column suported
-        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType->{
+        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType -> {
             this.getSortOrder().add(col);
             col.setSortType(sortType);
         }));
-
 
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
