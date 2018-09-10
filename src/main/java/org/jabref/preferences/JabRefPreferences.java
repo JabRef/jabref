@@ -1874,17 +1874,6 @@ public class JabRefPreferences implements PreferencesService {
         return map;
     }
 
-    private Map<String, String> createColumnSortOrder() {
-        List<String> columns = getStringList(COLUMN_NAMES);
-        List<String> sortOrders = getStringList(SORT_COLUMN);
-
-        Map<String, String> map = new TreeMap<>();
-        for (int i = 0; i < columns.size(); i++) {
-            map.put(columns.get(i), sortOrders.get(i));
-        }
-        return map;
-    }
-
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
                                      getBoolean(FILE_COLUMN),
