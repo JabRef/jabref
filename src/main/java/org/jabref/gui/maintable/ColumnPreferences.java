@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.model.entry.BibtexSingleField;

@@ -83,6 +83,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         );
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
+
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                                                               .withOnMouseClickedEvent((entry, event) -> {
                                                                   if (event.getClickCount() == 2) {
@@ -113,6 +114,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         pane.setFitToWidth(true);
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
+
+        //Set sort order column from preferences, currently only single column suported
+        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType->{
+            this.getSortOrder().add(col);
+            col.setSortType(sortType);
+        }));
+
 
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);

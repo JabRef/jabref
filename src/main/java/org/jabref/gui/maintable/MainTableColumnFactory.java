@@ -109,7 +109,6 @@ class MainTableColumnFactory {
             columns.add(createSpecialFieldColumn((field)));
         }
 
-
         return columns;
     }
 
@@ -160,9 +159,7 @@ class MainTableColumnFactory {
                     .install(column);
             column.setSortable(true);
             column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
-            preferences.getSortTypeForColumn(columnName).ifPresent(column::setSortType);
             columns.add(column);
-
         }
         return columns;
     }
