@@ -14,7 +14,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
@@ -60,8 +59,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     public PreferencesDialog(JabRefFrame parent) {
         setTitle(Localization.lang("JabRef preferences"));
-        getDialogPane().setPrefSize(1250, 800);
-        getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
 
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
@@ -94,7 +91,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new AppearancePrefsTab(dialogService, prefs));
 
         container = new BorderPane();
-        getDialogPane().setContent(container);
+        ScrollPane scroll = new ScrollPane(container);
+        getDialogPane().setContent(scroll);
         construct();
     }
 

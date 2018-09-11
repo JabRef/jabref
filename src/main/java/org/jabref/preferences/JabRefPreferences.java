@@ -901,14 +901,14 @@ public class JabRefPreferences implements PreferencesService {
 
     public EntryEditorPreferences getEntryEditorPreferences() {
         return new EntryEditorPreferences(getEntryEditorTabList(),
-                getLatexFieldFormatterPreferences(),
-                getImportFormatPreferences(),
-                getCustomTabFieldNames(),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBibtexKeyPatternPreferences(),
-                Globals.getKeyPrefs(),
-                getBoolean(AVOID_OVERWRITING_KEY));
+                                          getLatexFieldFormatterPreferences(),
+                                          getImportFormatPreferences(),
+                                          getCustomTabFieldNames(),
+                                          getBoolean(SHOW_RECOMMENDATIONS),
+                                          getBoolean(DEFAULT_SHOW_SOURCE),
+                                          getBibtexKeyPatternPreferences(),
+                                          Globals.getKeyPrefs(),
+                                          getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
@@ -1354,7 +1354,7 @@ public class JabRefPreferences implements PreferencesService {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                    ex);
+                                      ex);
         }
     }
 
@@ -1427,7 +1427,7 @@ public class JabRefPreferences implements PreferencesService {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                                            getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-               				   isKeywordSyncEnabled());
+                                           isKeywordSyncEnabled());
     }
 
     public SavePreferences loadForExportFromPreferences() {
@@ -1475,13 +1475,13 @@ public class JabRefPreferences implements PreferencesService {
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                getBoolean(KEY_GEN_FIRST_LETTER_A),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
-                getKeyPattern(),
-                getKeywordDelimiter());
+                                               get(KEY_PATTERN_REGEX),
+                                               get(KEY_PATTERN_REPLACEMENT),
+                                               getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                                               getBoolean(KEY_GEN_FIRST_LETTER_A),
+                                               getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                                               getKeyPattern(),
+                                               getKeywordDelimiter());
     }
 
     public TimestampPreferences getTimestampPreferences() {
@@ -1950,5 +1950,13 @@ public class JabRefPreferences implements PreferencesService {
             // Update any defaults that might be language dependent:
             setLanguageDependentDefaultValues();
         }
+    }
+
+    public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
+        put(ID_ENTRY_GENERATOR, fetcherName);
+    }
+
+    public String getIdBasedFetcherForEntryGenerator() {
+        return get(ID_ENTRY_GENERATOR);
     }
 }

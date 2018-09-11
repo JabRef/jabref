@@ -54,7 +54,6 @@ class GeneralTab extends Pane implements PrefsTab {
         this.prefs = prefs;
         this.dialogService = dialogService;
         biblatexMode = new ComboBox<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
-
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
@@ -69,11 +68,8 @@ class GeneralTab extends Pane implements PrefsTab {
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new CheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
         defOwnerField = new TextField();
-        defOwnerField.setPrefSize(80, 20);
         timeStampFormat = new TextField();
-        timeStampFormat.setPrefSize(80, 20);
         timeStampField = new TextField();
-        timeStampField.setPrefSize(80, 20);
         inspectionWarnDupli = new CheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
@@ -102,10 +98,10 @@ class GeneralTab extends Pane implements PrefsTab {
 
         builder.add(useTimeStamp, 1, 13);
         builder.add(timeStampFormat, 2, 13);
-        builder.add(overwriteTimeStamp, 3, 13);
+        builder.add(overwriteTimeStamp, 2, 14);
         Label fieldName = new Label(Localization.lang("Field name") + ':');
-        builder.add(fieldName, 4, 13);
-        builder.add(timeStampField, 5, 13);
+        builder.add(fieldName, 3, 13);
+        builder.add(timeStampField, 4, 13);
 
         Button help1 = new Button("?");
         help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
@@ -132,6 +128,7 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(biblatexMode, 2, 20);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }

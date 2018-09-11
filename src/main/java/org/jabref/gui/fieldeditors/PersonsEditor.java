@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -15,9 +14,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final PersonsEditorViewModel viewModel;
-
-    private TextInputControl textInput;
+    private final PersonsEditorViewModel viewModel;
+    private final TextInputControl textInput;
 
     public PersonsEditor(final String fieldName,
                          final AutoCompleteSuggestionProvider<?> suggestionProvider,
