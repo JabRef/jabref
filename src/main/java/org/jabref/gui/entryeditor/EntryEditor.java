@@ -48,7 +48,6 @@ import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -102,12 +101,10 @@ public class EntryEditor extends BorderPane {
         this.dialogService = dialogService;
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
-                                                Globals.prefs.getFileDirectoryPreferences(),
-                                                Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor(),
-                                                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+                Globals.getFileUpdateMonitor());
 
         ViewLoader.view(this)
                   .root(this)

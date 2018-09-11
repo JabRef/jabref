@@ -8,18 +8,25 @@ import java.util.Optional;
 
 import org.jabref.model.entry.FieldName;
 
-public class FileDirectoryPreferences {
+public class FilePreferences {
     public static final String DIR_SUFFIX = "Directory";
 
     private final String user;
     private final Map<String, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
+    private final String fileNamePattern;
+    private final String fileDirPattern;
 
-
-    public FileDirectoryPreferences(String user, Map<String, String> fieldFileDirectories, boolean bibLocationAsPrimary) {
+    public FilePreferences(String user,
+                           Map<String, String> fieldFileDirectories,
+                           boolean bibLocationAsPrimary,
+                           String fileNamePattern,
+                           String fileDirPattern) {
         this.user = user;
         this.fieldFileDirectories = fieldFileDirectories;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
+        this.fileNamePattern = fileNamePattern;
+        this.fileDirPattern = fileDirPattern;
     }
 
     public String getUser() {
@@ -46,5 +53,13 @@ public class FileDirectoryPreferences {
 
     public boolean isBibLocationAsPrimary() {
         return bibLocationAsPrimary;
+    }
+
+    public String getFileNamePattern() {
+        return fileNamePattern;
+    }
+
+    public String getFileDirPattern() {
+        return fileDirPattern;
     }
 }

@@ -22,7 +22,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -152,7 +152,7 @@ class FileTab extends Pane implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.getAsOptional(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX).orElse(""));
+        fileDir.setText(prefs.getAsOptional(FieldName.FILE + FilePreferences.DIR_SUFFIX).orElse(""));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -193,7 +193,7 @@ class FileTab extends Pane implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + FilePreferences.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());

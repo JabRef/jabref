@@ -53,7 +53,7 @@ public class CleanupPresetPanel {
         cleanUpISSN = new JCheckBox(Localization.lang("Reformat ISSN"));
 
         Optional<Path> firstExistingDir = databaseContext
-                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFileDirectoryPreferences());
+                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFilePreferences());
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
                     firstExistingDir.get().toString()));

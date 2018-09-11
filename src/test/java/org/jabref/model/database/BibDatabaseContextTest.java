@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +20,12 @@ public class BibDatabaseContextTest {
 
     // Store the minimal preferences for the
     // BibDatabaseContext.getFileDirectories(File,
-    // FileDirectoryPreferences) incocation:
-    private FileDirectoryPreferences fileDirPrefs;
+    // FilePreferences) incocation:
+    private FilePreferences fileDirPrefs;
 
     @BeforeEach
     public void setUp() {
-        fileDirPrefs = mock(FileDirectoryPreferences.class);
+        fileDirPrefs = mock(FilePreferences.class);
         currentWorkingDir = Paths.get(System.getProperty("user.dir"));
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
     }

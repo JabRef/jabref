@@ -73,12 +73,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = panel.getUndoManager();
 
         fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
-                                                Globals.prefs.getFileDirectoryPreferences(),
-                                                Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor(),
-                                                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)
+                Globals.getFileUpdateMonitor()
 
         );
 

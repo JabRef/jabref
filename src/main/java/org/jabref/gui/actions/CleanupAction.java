@@ -74,8 +74,6 @@ public class CleanupAction implements BaseAction {
                 Globals.journalAbbreviationLoader));
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
-        unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
-
         if (changes.isEmpty()) {
             return;
         }
@@ -90,11 +88,7 @@ public class CleanupAction implements BaseAction {
         if (isCanceled) {
             return;
         }
-        if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)));
-        }
+
         if (modifiedEntriesCount > 0) {
             panel.updateEntryEditorIfShowing();
             panel.markBaseChanged();
