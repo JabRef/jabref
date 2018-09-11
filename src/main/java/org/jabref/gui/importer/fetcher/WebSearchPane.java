@@ -71,11 +71,12 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Create text field for query input
         TextField query = SearchTextField.create();
+        query.setOnAction(event -> viewModel.search());
         viewModel.queryProperty().bind(query.textProperty());
 
         // Create button that triggers search
         Button search = new Button(Localization.lang("Search"));
-        search.setDefaultButton(true);
+        search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
 
         // Put everything together
