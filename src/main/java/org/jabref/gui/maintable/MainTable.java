@@ -95,6 +95,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                               .setOnDragOver(this::handleOnDragOver)
                                                               .setOnMouseDragEntered(this::handleOnDragEntered)
                                                               .install(this);
+        //Set sort order column from preferences, currently only the sort type of exactly one column is stored
+        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType -> {
+            col.setSortType(sortType);
+            this.getSortOrder().add(col);
+        }));
 
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -102,7 +107,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
-
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
@@ -114,20 +118,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
-        //Set sort order column from preferences, currently only single column suported
-        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType -> {
-            this.getSortOrder().add(col);
-            col.setSortType(sortType);
-        }));
-
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
-
-        // TODO: enable DnD
-        //setDragEnabled(true);
-        //TransferHandler xfer = new EntryTableTransferHandler(this, frame, panel);
-        //setTransferHandler(xfer);
-        //pane.setTransferHandler(xfer);
 
         // TODO: Float marked entries
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));

@@ -19,9 +19,9 @@ public class ColumnPreferences {
     private final List<SpecialField> specialFieldColumns;
     private final List<String> extraFileColumns;
     private final Map<String, Double> columnWidths;
-    private final List<String> columnSortOrder;
+    private final Map<String, SortType> columnSortOrder;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths, List<String> columnSortOrder) {
+    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths, Map<String, SortType> columnSortOrder) {
         this.showFileColumn = showFileColumn;
         this.showUrlColumn = showUrlColumn;
         this.preferDoiOverUrl = preferDoiOverUrl;
@@ -66,12 +66,7 @@ public class ColumnPreferences {
     }
 
     public Optional<SortType> getSortTypeForColumn(String columnName) {
-
-        if (columnName.equals(columnSortOrder.get(0))) {
-            return Optional.of(SortType.valueOf(columnSortOrder.get(1)));
-        }
-        return Optional.empty();
-
+        return Optional.ofNullable(columnSortOrder.get(columnName));
     }
 
 }

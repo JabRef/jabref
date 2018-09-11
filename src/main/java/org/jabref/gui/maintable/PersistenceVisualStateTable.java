@@ -22,7 +22,8 @@ public class PersistenceVisualStateTable {
         this.preferences = preferences;
 
         mainTable.getColumns().addListener(this::onColumnsChanged);
-        mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(observable -> preferences.setMainTableColumnSortOrder(col.getText(), col.getSortType().name())));
+        mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(obs -> preferences.setMainTableColumnSortOrder(col.getText(), col.getSortType())));
+
     }
 
     private void onColumnsChanged(ListChangeListener.Change<? extends TableColumn<BibEntryTableViewModel, ?>> change) {

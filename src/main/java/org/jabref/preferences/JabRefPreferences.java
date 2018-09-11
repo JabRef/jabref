@@ -34,6 +34,8 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.scene.control.TableColumn.SortType;
+
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
@@ -1962,12 +1964,16 @@ public class JabRefPreferences implements PreferencesService {
         return get(ID_ENTRY_GENERATOR);
     }
 
-    public void setMainTableColumnSortOrder(String column, String sortType) {
-        putStringList(SORT_COLUMN, Arrays.asList(column, sortType));
+    public void setMainTableColumnSortOrder(String column, SortType sortType) {
+        putStringList(SORT_COLUMN, Arrays.asList(column, sortType.name()));
     }
 
-    public List<String> getMainTableColumnSortOrder() {
-        return getStringList(SORT_COLUMN);
+    public Map<String, SortType> getMainTableColumnSortOrder() {
+        List<String> columnSortOrder = getStringList(SORT_COLUMN);
+        Map<String, SortType> columnWithSortType = new HashMap<>();
+        columnWithSortType.put(columnSortOrder.get(0), SortType.valueOf(columnSortOrder.get(1)));
+        return columnWithSortType;
+
     }
 
 }
