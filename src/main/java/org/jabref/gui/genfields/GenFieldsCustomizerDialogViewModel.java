@@ -5,12 +5,12 @@ import java.util.Map;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.fxml.FXML;
-
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
@@ -56,9 +56,15 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }
+            String testString = BibtexKeyGenerator.cleanKey(parts[1],
+                    Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
-
-        //preferences.  INSERT S
+            //You're writing too much code without testing
+        }
     }
 
+
+    public void resetFields() {
+
+    }
 }

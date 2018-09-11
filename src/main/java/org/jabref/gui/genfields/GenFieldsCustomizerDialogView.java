@@ -8,6 +8,7 @@ import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -33,6 +34,9 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        ControlHelper.setAction(resetButton, getDialogPane(), event -> resetFields());
+        ControlHelper.setAction(okButton, getDialogPane(), event -> saveFieldsAndCloseDialog());
     }
 
     @FXML
@@ -53,6 +57,10 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
     private void saveFieldsAndCloseDialog() {
         viewModel.saveFields();
         closeDialog();
+    }
+
+    private void resetFields() {
+        viewModel.resetFields();
     }
 
 }
