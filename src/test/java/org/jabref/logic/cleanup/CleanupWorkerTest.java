@@ -36,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -62,7 +63,7 @@ class CleanupWorkerTest {
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabaseFile(bibFolder.resolve("test.bib").toFile());
 
-        FilePreferences fileDirPrefs = mock(FilePreferences.class);
+        FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
         //Biblocation as Primary overwrites all other dirs
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
 

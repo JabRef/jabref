@@ -1,4 +1,4 @@
-package org.jabref.gui.externalfiles;
+package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
 import java.nio.file.Files;

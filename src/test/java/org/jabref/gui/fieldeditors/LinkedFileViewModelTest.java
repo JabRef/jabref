@@ -28,7 +28,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -104,7 +103,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void deleteWhenDeleteChosenAndFileMissingReturnsFalse() {
+    void deleteMissingFileReturnsTrue() {
         linkedFile = new LinkedFile("", "!!nonexistent file!!", "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -117,8 +116,7 @@ class LinkedFileViewModelTest {
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
 
-        verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
-        assertFalse(removed);
+        assertTrue(removed);
     }
 
     @Test

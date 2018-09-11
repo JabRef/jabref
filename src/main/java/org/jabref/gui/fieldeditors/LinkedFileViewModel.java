@@ -27,7 +27,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
-import org.jabref.gui.externalfiles.LinkedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
@@ -35,6 +34,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -272,6 +272,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
         rename();
     }
 
+    /**
+     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link).
+     *
+     * @return true if the linked file should be removed afterwards from the entry (i.e because it was deleted
+     * successfully, does not exist in the first place or the user choose to remove it)
+     */
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
 
@@ -283,9 +289,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                                                                                      Localization.lang("Delete '%0'", file.get().toString()),
-                                                                                      Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                                                                                      removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+                Localization.lang("Delete '%0'", file.get().toString()),
+                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             if (buttonType.get().equals(removeFromEntry)) {
