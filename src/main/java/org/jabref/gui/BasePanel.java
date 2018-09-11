@@ -191,7 +191,7 @@ public class BasePanel extends StackPane {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFileDirectoryPreferences());
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
 
         setupMainPanel();
 
@@ -368,7 +368,7 @@ public class BasePanel extends StackPane {
         actions.put(Actions.OPEN_EXTERNAL_FILE, this::openExternalFile);
 
         actions.put(Actions.OPEN_FOLDER, () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
             for (final Path f : files) {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
@@ -1398,7 +1398,7 @@ public class BasePanel extends StackPane {
             }
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
             final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
             // Run the search operation:

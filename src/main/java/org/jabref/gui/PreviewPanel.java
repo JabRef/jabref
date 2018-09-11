@@ -41,7 +41,6 @@ import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -89,12 +88,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.keyBindingRepository = keyBindingRepository;
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
-                                                Globals.prefs.getFileDirectoryPreferences(),
-                                                Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor(),
-                                                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+                Globals.getFileUpdateMonitor());
 
         // Set up scroll pane for preview pane
         setFitToHeight(true);

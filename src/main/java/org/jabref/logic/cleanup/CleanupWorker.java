@@ -8,26 +8,16 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
-    private final String fileNamePattern;
-    private final String fileDirPattern;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
-    private int unsuccessfulRenames;
-
+    private final FilePreferences filePreferences;
 
     public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
         this.databaseContext = databaseContext;
-        this.fileNamePattern = cleanupPreferences.getFileNamePattern();
-        this.fileDirPattern = cleanupPreferences.getFileDirPattern();
-        this.fileDirectoryPreferences = cleanupPreferences.getFileDirectoryPreferences();
-    }
-
-    public int getUnsuccessfulRenames() {
-        return unsuccessfulRenames;
+        this.filePreferences = cleanupPreferences.getFilePreferences();
     }
 
     public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
@@ -69,16 +59,14 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences));
+            jobs.add(new MoveFilesCleanup(databaseContext, filePreferences));
         }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
+            jobs.add(new RelativePathsCleanup(databaseContext, filePreferences));
         }
         if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                                                            fileNamePattern, fileDirectoryPreferences);
+            RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext, filePreferences);
             jobs.add(cleaner);
-            unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }
 
         return jobs;
