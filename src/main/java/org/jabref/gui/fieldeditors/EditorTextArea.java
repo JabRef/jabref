@@ -31,7 +31,6 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     public EditorTextArea(final String text) {
         super(text);
 
-
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
 
