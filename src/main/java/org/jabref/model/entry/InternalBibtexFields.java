@@ -93,8 +93,8 @@ public class InternalBibtexFields {
             SpecialField.RELEVANCE.getFieldName()
     );
 
-    private static final Set<String> SINGLE_LINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
-            Arrays.asList(FieldName.TITLE, FieldName.AUTHOR, FieldName.YEAR, FieldName.INSTITUTION)
+    private static final Set<String> MULTILINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList(FieldName.NOTE, FieldName.ABSTRACT, FieldName.COMMENT)
     ));
 
     // singleton instance
@@ -481,6 +481,6 @@ public class InternalBibtexFields {
     }
 
     public static boolean isSingleLineField(final String fieldName) {
-        return SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
+        return !MULTILINE_FIELDS.contains(fieldName.toLowerCase());
     }
 }

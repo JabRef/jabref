@@ -150,8 +150,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         });
 
         createKeyBindings();
-        updateLayout(preferences);
-
+        updateLayout(preferences, true);
     }
 
     private void createKeyBindings() {
@@ -208,6 +207,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     public void updateLayout(PreviewPreferences previewPreferences) {
+        updateLayout(previewPreferences, false);
+    }
+
+    private void updateLayout(PreviewPreferences previewPreferences, boolean init) {
         if (fixedLayout) {
             LOGGER.debug("cannot change the layout because the layout is fixed");
             return;
@@ -220,12 +223,16 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                 CitationStyle.createCitationStyleFromFile(style)
                              .ifPresent(citationStyle -> {
                                  basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
-                                 basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                                 if (!init) {
+                                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                                 }
                              });
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
-            basePanel.ifPresent(panel -> panel.output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview"))));
+            if (!init) {
+                basePanel.ifPresent(panel -> panel.output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview"))));
+            }
         }
 
         update();
