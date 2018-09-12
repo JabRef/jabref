@@ -79,6 +79,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
                                                 Globals.getFileUpdateMonitor()
+
         );
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
@@ -96,10 +97,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                               .setOnMouseDragEntered(this::handleOnDragEntered)
                                                               .install(this);
 
-        for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet())
-        {
+        for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
             Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
-            column.ifPresent(col->{
+            column.ifPresent(col -> {
                 col.setSortType(entries.getValue());
                 this.getSortOrder().add(col);
             });
