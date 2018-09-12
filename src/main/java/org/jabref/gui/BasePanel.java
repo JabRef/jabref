@@ -305,11 +305,11 @@ public class BasePanel extends StackPane {
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
-        actions.put(Actions.COPY, mainTable::copy);
+        actions.put(Actions.COPY, this::copy);
 
         actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
-        actions.put(Actions.CUT, mainTable::cut);
+        actions.put(Actions.CUT, this::cut);
 
         actions.put(Actions.DELETE, () -> delete(false));
 
@@ -319,7 +319,7 @@ public class BasePanel extends StackPane {
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, mainTable::paste);
+        actions.put(Actions.PASTE, this::paste);
 
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
@@ -1377,6 +1377,18 @@ public class BasePanel extends StackPane {
 
     public Path getTempFile() {
         return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
+    }
+
+    public void copy() {
+        mainTable.copy();
+    }
+
+    public void paste() {
+        mainTable.paste();
+    }
+
+    public void cut() {
+        mainTable.cut();
     }
 
     private static class SearchAndOpenFile {

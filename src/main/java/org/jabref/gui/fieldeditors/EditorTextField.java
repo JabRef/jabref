@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -15,7 +16,7 @@ import javafx.scene.layout.Priority;
 
 import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
-public class EditorTextField extends javafx.scene.control.TextField implements Initializable, ContextMenuAddable {
+public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     public EditorTextField() {
         this("");

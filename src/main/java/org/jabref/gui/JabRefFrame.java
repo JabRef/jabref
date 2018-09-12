@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +17,6 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -39,6 +37,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.DataFormat;
@@ -284,8 +283,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
             //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-            // TODO: Can't notify focus listener since it is expecting a swing component
-            //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+
             setWindowTitle();
             // Update search autocompleter with information for the correct database:
             currentBasePanel.updateSearchManager();
@@ -1442,10 +1440,36 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            JComponent source = Globals.getFocusListener().getFocused();
-            Action action = source.getActionMap().get(command);
-            if (action != null) {
-                action.actionPerformed(new ActionEvent(source, 0, command.name()));
+            Node focusOwner = mainStage.getScene().getFocusOwner();
+            if (focusOwner != null) {
+                if (focusOwner instanceof TextInputControl) {
+                    // Focus is on text field -> copy/paste/cut selected text
+                    TextInputControl textInput = (TextInputControl) focusOwner;
+                    switch (command) {
+                        case COPY:
+                            textInput.copy();
+                            break;
+                        case CUT:
+                            textInput.cut();
+                            break;
+                        case PASTE:
+                            textInput.paste();
+                            break;
+                    }
+                } else {
+                    // Not sure what is selected -> copy/paste/cut selected entries
+                    switch (command) {
+                        case COPY:
+                            getCurrentBasePanel().copy();
+                            break;
+                        case CUT:
+                            getCurrentBasePanel().cut();
+                            break;
+                        case PASTE:
+                            getCurrentBasePanel().paste();
+                            break;
+                    }
+                }
             }
         }
     }
