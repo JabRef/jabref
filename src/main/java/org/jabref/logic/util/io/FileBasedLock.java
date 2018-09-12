@@ -103,22 +103,18 @@ public class FileBasedLock {
     /**
      * Check if a lock file exists, and create it if it doesn't.
      *
-     * @return true if the lock file already existed
+     * @return false if the lock file already existed
      * @throws IOException if something happens during creation.
      */
     public static boolean createLockFile(Path file) throws IOException {
         Path lockFile = getLockFilePath(file);
         if (Files.exists(lockFile)) {
-            return true;
+            return false;
         }
 
-        try {
-            Files.write(lockFile, "0".getBytes());
-        } catch (IOException ex) {
-            LOGGER.error("Error when creating lock file.", ex);
-        }
+        Files.write(lockFile, "0".getBytes());
         lockFile.toFile().deleteOnExit();
-        return false;
+        return true;
     }
 
     private static Path getLockFilePath(Path file) {
