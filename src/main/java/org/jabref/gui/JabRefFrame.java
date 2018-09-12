@@ -1455,6 +1455,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         case PASTE:
                             textInput.paste();
                             break;
+                        default:
+                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
                     }
                 } else {
                     // Not sure what is selected -> copy/paste/cut selected entries
@@ -1468,6 +1470,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         case PASTE:
                             getCurrentBasePanel().paste();
                             break;
+                        default:
+                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
                     }
                 }
             }
