@@ -197,6 +197,10 @@ public class EntryEditor extends BorderPane {
                         close();
                         event.consume();
                         break;
+                    case CLOSE_ENTRY:
+                        close();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
