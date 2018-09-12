@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -153,7 +154,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NEWLINE = "newline";
     public static final String COLUMN_WIDTHS = "columnWidths";
     public static final String COLUMN_NAMES = "columnNames";
-    public static final String SORT_COLUMN = "columnSortOrders";
+    public static final String COLUMN_IN_SORT_ORDER = "columnInSortOrder";
+    public static final String COlUMN_IN_SORT_ORDER_TYPE = "columnInSortOrderType";
 
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
@@ -540,7 +542,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(COLUMN_NAMES, "entrytype;author/editor;title;year;journal/booktitle;bibtexkey");
         defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
-        defaults.put(SORT_COLUMN, "title;ASCENDING");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -1402,12 +1403,11 @@ public class JabRefPreferences implements PreferencesService {
         Map<String, String> fieldDirectories = Stream.of(FieldName.FILE, FieldName.PDF, FieldName.PS)
                                                      .collect(Collectors.toMap(field -> field, field -> get(field + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
-                getUser(),
-                fieldDirectories,
-                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
-                get(IMPORT_FILENAMEPATTERN),
-                get(IMPORT_FILEDIRPATTERN)
-        );
+                                   getUser(),
+                                   fieldDirectories,
+                                   getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                                   get(IMPORT_FILENAMEPATTERN),
+                                   get(IMPORT_FILEDIRPATTERN));
     }
 
     public UpdateFieldPreferences getUpdateFieldPreferences() {
@@ -1535,7 +1535,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
+                                       Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
                                        fileDirForDatabase);
     }
 
@@ -1630,8 +1630,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         return new CleanupPreferences(
-                getLayoutFormatterPreferences(journalAbbreviationLoader),
-                getFilePreferences());
+                                      getLayoutFormatterPreferences(journalAbbreviationLoader),
+                                      getFilePreferences());
     }
 
     public CleanupPreset getCleanupPreset() {
@@ -1890,8 +1890,7 @@ public class JabRefPreferences implements PreferencesService {
                                      createSpecialFieldColumns(),
                                      createExtraFileColumns(),
                                      createColumnWidths(),
-                                     getMainTableColumnSortOrder());
-
+                                     getMainTableColumnSortTypes());
     }
 
     public MainTablePreferences getMainTablePreferences() {
@@ -1968,16 +1967,20 @@ public class JabRefPreferences implements PreferencesService {
         return get(ID_ENTRY_GENERATOR);
     }
 
-    public void setMainTableColumnSortOrder(String column, SortType sortType) {
-        putStringList(SORT_COLUMN, Arrays.asList(column, sortType.name()));
+    public void setMainTableColumnSortType(Map<String, SortType> sortOrder) {
+        putStringList(COLUMN_IN_SORT_ORDER, new ArrayList<>(sortOrder.keySet()));
+        List<String> sortTypes = sortOrder.values().stream().map(SortType::name).collect(Collectors.toList());
+        putStringList(COlUMN_IN_SORT_ORDER_TYPE, sortTypes);
     }
 
-    public Map<String, SortType> getMainTableColumnSortOrder() {
-        List<String> columnSortOrder = getStringList(SORT_COLUMN);
-        Map<String, SortType> columnWithSortType = new HashMap<>();
-        columnWithSortType.put(columnSortOrder.get(0), SortType.valueOf(columnSortOrder.get(1)));
-        return columnWithSortType;
-
+    public Map<String, SortType> getMainTableColumnSortTypes() {
+        List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
+        List<SortType> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).collect(Collectors.toList());
+        Map<String, SortType> map = new LinkedHashMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            map.put(columns.get(i), sortTypes.get(i));
+        }
+        return map;
     }
 
 }

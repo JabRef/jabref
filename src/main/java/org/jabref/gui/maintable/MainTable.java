@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,6 +14,8 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -72,11 +75,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = panel.getUndoManager();
 
         fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
-                Globals.prefs.getFilePreferences(),
+                                                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                Globals.getFileUpdateMonitor()
-
+                                                Globals.getFileUpdateMonitor()
         );
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
@@ -93,11 +95,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                               .setOnDragOver(this::handleOnDragOver)
                                                               .setOnMouseDragEntered(this::handleOnDragEntered)
                                                               .install(this);
-        //Set sort order column from preferences, currently only the sort type of exactly one column is stored
-        this.getColumns().forEach(col -> preferences.getColumnPreferences().getSortTypeForColumn(col.getText()).ifPresent(sortType -> {
-            col.setSortType(sortType);
-            this.getSortOrder().add(col);
-        }));
+
+        for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet())
+        {
+            Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
+            column.ifPresent(col->{
+                col.setSortType(entries.getValue());
+                this.getSortOrder().add(col);
+            });
+        }
 
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
