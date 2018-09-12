@@ -53,7 +53,6 @@ public class PersistenceVisualStateTable {
     private void updateColumnPreferences() {
         List<String> columnNames = new ArrayList<>();
         List<String> columnsWidths = new ArrayList<>();
-        List<String> columnSortOrders = new ArrayList<>();
 
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
             if (column instanceof NormalTableColumn) {
@@ -61,8 +60,6 @@ public class PersistenceVisualStateTable {
 
                 columnNames.add(normalColumn.getColumnName());
                 columnsWidths.add(String.valueOf(normalColumn.getWidth()));
-                columnSortOrders.add(normalColumn.getSortType().name());
-
             }
         }
 
