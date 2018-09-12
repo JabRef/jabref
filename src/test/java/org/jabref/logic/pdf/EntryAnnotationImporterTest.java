@@ -9,7 +9,7 @@ import java.util.Map;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ public class EntryAnnotationImporterTest {
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
         //when
-        Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FileDirectoryPreferences.class));
+        Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FilePreferences.class));
 
         //then
         int fileCounter = 0;

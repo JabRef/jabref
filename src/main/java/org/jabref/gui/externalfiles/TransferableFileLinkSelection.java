@@ -31,8 +31,8 @@ public class TransferableFileLinkSelection implements Transferable {
         if (!files.isEmpty()) {
             // Find the default directory for this field type, if any:
             LinkedFile firstFile = files.get(0);
-            firstFile.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences())
-                .ifPresent(fileList::add);
+            firstFile.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFilePreferences())
+                     .ifPresent(fileList::add);
         }
     }
 

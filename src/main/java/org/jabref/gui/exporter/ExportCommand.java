@@ -86,8 +86,8 @@ public class ExportCommand extends SimpleCommand {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
-                .getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                                .getBibDatabaseContext()
+                                                .getFileDirectories(Globals.prefs.getFilePreferences());
 
         // Make sure we remember which filter was used, to set
         // the default for next time:

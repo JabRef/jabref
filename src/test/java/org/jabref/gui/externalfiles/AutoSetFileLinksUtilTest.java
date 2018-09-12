@@ -11,10 +11,10 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(TempDirectory.class)
 public class AutoSetFileLinksUtilTest {
 
-    private final FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
+    private final FilePreferences fileDirPrefs = mock(FilePreferences.class);
     private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(false, "", true, ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);

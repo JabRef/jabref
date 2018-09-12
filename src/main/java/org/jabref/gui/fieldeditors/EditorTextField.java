@@ -10,6 +10,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
@@ -22,8 +24,9 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
     public EditorTextField(final String text) {
         super(text);
 
-        // Always fill out all the available vertical space
-        this.setPrefHeight(Double.POSITIVE_INFINITY);
+        // Always fill out all the available space
+        setPrefHeight(Double.POSITIVE_INFINITY);
+        HBox.setHgrow(this, Priority.ALWAYS);
 
         // Should behave as a normal text field with respect to TAB behaviour
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {

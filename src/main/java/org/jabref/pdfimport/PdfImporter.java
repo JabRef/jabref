@@ -164,10 +164,10 @@ public class PdfImporter {
             Path toLink = Paths.get(fileName);
             // Get a list of file directories:
             List<Path> dirsS = panel.getBibDatabaseContext()
-                                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+                                    .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
 
-            tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
-                                             ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
+            tm.addEntry(0, new FileListEntry("", FileUtil.relativize(toLink, dirsS).toString(),
+                    ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
             entry.setField(FieldName.FILE, tm.getStringRepresentation());
             res.add(entry);
         }

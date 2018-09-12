@@ -93,7 +93,7 @@ import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
@@ -1398,13 +1398,16 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FileDirectoryPreferences getFileDirectoryPreferences() {
-        List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
-        Map<String, String> fieldDirectories = new HashMap<>();
-        fields.stream().forEach(
-                                fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileDirectoryPreferences.DIR_SUFFIX)));
-        return new FileDirectoryPreferences(getUser(), fieldDirectories,
-                                            getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
+    public FilePreferences getFilePreferences() {
+        Map<String, String> fieldDirectories = Stream.of(FieldName.FILE, FieldName.PDF, FieldName.PS)
+                                                     .collect(Collectors.toMap(field -> field, field -> get(field + FilePreferences.DIR_SUFFIX, "")));
+        return new FilePreferences(
+                getUser(),
+                fieldDirectories,
+                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                get(IMPORT_FILENAMEPATTERN),
+                get(IMPORT_FILEDIRPATTERN)
+        );
     }
 
     public UpdateFieldPreferences getUpdateFieldPreferences() {
@@ -1532,7 +1535,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                                       Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
+                Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
                                        fileDirForDatabase);
     }
 
@@ -1626,8 +1629,9 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
-        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN), get(IMPORT_FILEDIRPATTERN),
-                                      getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+        return new CleanupPreferences(
+                getLayoutFormatterPreferences(journalAbbreviationLoader),
+                getFilePreferences());
     }
 
     public CleanupPreset getCleanupPreset() {
