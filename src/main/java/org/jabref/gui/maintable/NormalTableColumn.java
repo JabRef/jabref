@@ -77,7 +77,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             return null;
         }
 
-        ObjectBinding[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
+        ObjectBinding<String>[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
         return Bindings.createStringBinding(() -> computeText(entry), dependencies);
     }
 
@@ -99,7 +99,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
-        if (result != null && !bibtexFields.contains(BibEntry.KEY_FIELD)) {
+        if ((result != null) && !bibtexFields.contains(BibEntry.KEY_FIELD)) {
             result = toUnicode.format(result).trim();
         }
         return result;

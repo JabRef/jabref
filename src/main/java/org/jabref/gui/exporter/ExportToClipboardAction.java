@@ -73,7 +73,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()).stream().map(Path::toString).collect(Collectors.toList());
+        Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
 
         Path tmp = null;
         try {

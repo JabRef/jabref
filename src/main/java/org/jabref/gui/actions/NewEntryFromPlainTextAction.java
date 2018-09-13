@@ -1,12 +1,14 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.EntryTypeDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,14 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
 
     private final UpdateFieldPreferences prefs;
     private final JabRefFrame jabRefFrame;
+    private final DialogService dialogService;
+    private final JabRefPreferences preferences;
 
-    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs) {
+    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs, DialogService dialogService, JabRefPreferences preferences) {
         this.jabRefFrame = jabRefFrame;
         this.prefs = prefs;
+        this.dialogService = dialogService;
+        this.preferences = preferences;
 
     }
 
@@ -31,13 +37,12 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
             return;
         }
 
-        EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-        typeChoiceDialog.setVisible(true);
-        EntryType selectedType = typeChoiceDialog.getChoice();
+        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
+        EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
         if (selectedType == null) {
             return;
         }
-        BibEntry bibEntry = new BibEntry(selectedType.getName());
+        BibEntry bibEntry = new BibEntry(selectedType);
 
         TextInputDialog tidialog = new TextInputDialog(jabRefFrame, bibEntry);
         tidialog.setVisible(true);

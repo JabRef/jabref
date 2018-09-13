@@ -18,7 +18,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
 
 import org.slf4j.Logger;
@@ -31,8 +31,8 @@ public class AutoSetFileLinksUtil {
     private AutoLinkPreferences autoLinkPreferences;
     private ExternalFileTypes externalFileTypes;
 
-    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
-        this(databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences), autoLinkPreferences, externalFileTypes);
+    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+        this(databaseContext.getFileDirectoriesAsPaths(filePreferences), autoLinkPreferences, externalFileTypes);
     }
 
     public AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
@@ -68,7 +68,7 @@ public class AutoSetFileLinksUtil {
                         .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-                String relativeFilePath = FileUtil.shortenFileName(foundFile, directories).toString();
+                String relativeFilePath = FileUtil.relativize(foundFile, directories).toString();
                 LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
             }
