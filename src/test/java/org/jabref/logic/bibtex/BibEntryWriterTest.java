@@ -100,13 +100,11 @@ public class BibEntryWriterTest {
                 + OS.NEWLINE
                 + "  file = {test:/home/uers/test.pdf:PDF},"
                 + OS.NEWLINE
-                + "}" + OS.NEWLINE
-                + OS.NEWLINE
-                + "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+                + "}" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
-    public void writeReallyunknownTypeTest() throws Exception {
+    public void writeReallyUnknownTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;

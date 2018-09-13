@@ -3,7 +3,6 @@ package org.jabref.gui.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +32,6 @@ import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -67,23 +65,8 @@ public class SaveDatabaseAction {
             SavePreferences preferences = Globals.prefs.loadForSaveFromPreferences()
                                                        .withEncoding(encoding)
                                                        .withSaveType(saveType);
-            if (preferences.makeBackup()) {
-                try {
-                    makeBackup(file);
-                } catch (IOException exception) {
-                    LOGGER.error("Problems saving during backup creation", exception);
-                    boolean saveWithoutBackup = frame.getDialogService().showConfirmationDialogAndWait(
-                            Localization.lang("Unable to create backup"),
-                            Localization.lang("Save failed during backup creation") + ". " + Localization.lang("Save without backup?"),
-                            Localization.lang("Save without backup"));
 
-                    if (!saveWithoutBackup) {
-                        return false;
-                    }
-                }
-            }
-
-            AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding());
+            AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
 
             if (selectedOnly) {
@@ -104,10 +87,6 @@ public class SaveDatabaseAction {
         }
 
         return true;
-    }
-
-    private void makeBackup(Path file) throws IOException {
-        Files.copy(file, FileUtil.addExtension(file, ".bak"));
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
@@ -138,9 +117,10 @@ public class SaveDatabaseAction {
     }
 
     private boolean doSave() {
+        Path targetPath = panel.getBibDatabaseContext().getDatabasePath().get();
         try {
             // Save the database
-            boolean success = saveDatabase(panel.getBibDatabaseContext().getDatabasePath().get(), false,
+            boolean success = saveDatabase(targetPath, false,
                     panel.getBibDatabaseContext()
                          .getMetaData()
                          .getEncoding()
@@ -172,7 +152,7 @@ public class SaveDatabaseAction {
             }
             return success;
         } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file", ex);
+            LOGGER.error("A problem occurred when trying to save the file " + targetPath, ex);
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         }

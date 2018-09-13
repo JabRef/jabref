@@ -3,9 +3,13 @@ package org.jabref.logic.exporter;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
@@ -22,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * In detail, the strategy is to:
  * <ol>
  * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
- * <li>Create a backup (with .sav suffix) of the original file (if it exists) in the same directory.</li>
+ * <li>Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.</li>
  * <li>Move the temporary file to the correct place, overwriting any file that already exists at that location.</li>
- * <li>Delete the backup file.</li>
+ * <li>Delete the backup file (if configured to do so).</li>
  * </ol>
  * If all goes well, no temporary or backup files will remain on disk after closing the stream.
  *
@@ -44,32 +48,55 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String BACKUP_EXTENSION = ".sav";
+    private static final String BACKUP_EXTENSION = ".bak";
 
     /**
      * The file we want to create/replace.
      */
     private final Path targetFile;
+    private final FileLock targetFileLock;
     /**
      * The file to which writes are redirected to.
      */
     private final Path temporaryFile;
+    private final FileLock temporaryFileLock;
     /**
      * A backup of the target file (if it exists), created when the stream is closed
      */
     private final Path backupFile;
+    private final boolean keepBackup;
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
      *
      * @param path the path of the file to write to or replace
+     * @param keepBackup whether to keep the backup file after a successful write process
      */
-    public AtomicFileOutputStream(Path path) throws IOException {
+    public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         super(Files.newOutputStream(getPathOfTemporaryFile(path)));
 
-        targetFile = path;
-        temporaryFile = getPathOfTemporaryFile(path);
-        backupFile = getPathOfBackupFile(path);
+        this.targetFile = path;
+        this.temporaryFile = getPathOfTemporaryFile(path);
+        this.backupFile = getPathOfBackupFile(path);
+        this.keepBackup = keepBackup;
+
+        try {
+            // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
+            temporaryFileLock = FileChannel.open(temporaryFile, StandardOpenOption.WRITE).lock();
+            targetFileLock = FileChannel.open(targetFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).lock();
+        } catch (OverlappingFileLockException exception) {
+            throw new IOException("Could not obtain write access. Maybe another instance of JabRef is currently writing to the same file?", exception);
+        }
+    }
+
+    /**
+     * Creates a new output stream to write to or replace the file at the specified path. The backup file is deleted
+     * when the write was successful.
+     *
+     * @param path the path of the file to write to or replace
+     */
+    public AtomicFileOutputStream(Path path) throws IOException {
+        this(path, false);
     }
 
     private static Path getPathOfTemporaryFile(Path targetFile) {
@@ -103,7 +130,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /**
      * Closes the write process to the temporary file but does not commit to the target file.
      */
-    public void abort() throws IOException {
+    public void abort() {
         try {
             super.close();
             Files.deleteIfExists(temporaryFile);
@@ -118,6 +145,18 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException exception) {
             LOGGER.debug("Unable to delete file " + temporaryFile, exception);
+        }
+
+        try {
+            temporaryFileLock.release();
+        } catch (IOException exception) {
+            LOGGER.warn("Unable to release lock on file " + temporaryFile, exception);
+        }
+
+        try {
+            targetFileLock.release();
+        } catch (IOException exception) {
+            LOGGER.warn("Unable to release lock on file " + targetFile, exception);
         }
     }
 
@@ -168,8 +207,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 }
             }
 
-            // Remove backup file
-            Files.deleteIfExists(backupFile);
+            if (!keepBackup) {
+                // Remove backup file
+                Files.deleteIfExists(backupFile);
+            }
         } finally {
             // Remove temporary file (but not the backup!)
             cleanup();
