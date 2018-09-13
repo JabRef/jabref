@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,6 +14,8 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -62,7 +65,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final NewDroppedFileHandler fileHandler;
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
-
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
@@ -73,14 +75,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.undoManager = panel.getUndoManager();
 
         fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
-                Globals.prefs.getFilePreferences(),
+                                                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                Globals.getFileUpdateMonitor()
+                                                Globals.getFileUpdateMonitor()
 
         );
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
+
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                                                               .withOnMouseClickedEvent((entry, event) -> {
                                                                   if (event.getClickCount() == 2) {
@@ -94,13 +97,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                               .setOnMouseDragEntered(this::handleOnDragEntered)
                                                               .install(this);
 
+        for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
+            Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
+            column.ifPresent(col -> {
+                col.setSortType(entries.getValue());
+                this.getSortOrder().add(col);
+            });
+        }
+
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
-
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
@@ -114,12 +124,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
-
-        // TODO: enable DnD
-        //setDragEnabled(true);
-        //TransferHandler xfer = new EntryTableTransferHandler(this, frame, panel);
-        //setTransferHandler(xfer);
-        //pane.setTransferHandler(xfer);
 
         // TODO: Float marked entries
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
@@ -346,84 +350,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                   .stream()
                                   .map(BibEntryTableViewModel::getEntry)
                                   .collect(Collectors.toList());
-    }
-
-    /**
-     * This method sets up what Comparators are used for the various table columns.
-     * The ComparatorChooser enables and disables such Comparators as the user clicks
-     * columns, but this is where the Comparators are defined. Also, the ComparatorChooser
-     * is initialized with the sort order defined in Preferences.
-     */
-    private void setupComparatorChooser() {
-        // TODO: Proper sorting
-
-        /*
-        // Set initial sort columns:
-
-        // Default sort order:
-        String[] sortFields = new String[] {
-                Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD)
-        };
-        boolean[] sortDirections = new boolean[] {
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
-        }; // descending
-
-        model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().lock();
-        try {
-            for (int i = 0; i < sortFields.length; i++) {
-                int index = -1;
-
-                // TODO where is this prefix set?
-        //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
-                if (sortFields[i].startsWith("iconcol:")) {
-                    for (int j = 0; j < tableFormat.getColumnCount(); j++) {
-                        if (sortFields[i].equals(tableFormat.getColumnName(j))) {
-                            index = j;
-                            break;
-                        }
-                    }
-                } else {
-                    index = tableFormat.getColumnIndex(sortFields[i]);
-                }
-                if (index >= 0) {
-                    comparatorChooser.appendComparator(index, 0, sortDirections[i]);
-                }
-            }
-        } finally {
-            model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().unlock();
-        }
-
-        // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(e -> {
-            // Get the information about the current sort order:
-            List<String> fields = getCurrentSortFields();
-            List<Boolean> order = getCurrentSortOrder();
-            // Update preferences:
-            int count = Math.min(fields.size(), order.size());
-            if (count >= 1) {
-                Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-            }
-            if (count >= 2) {
-                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-            } else {
-                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-            }
-            if (count >= 3) {
-                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-            } else {
-                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-            }
-        });
-        */
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
