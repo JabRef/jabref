@@ -136,12 +136,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PROXY_USERNAME = "proxyUsername";
     public static final String PROXY_PASSWORD = "proxyPassword";
     public static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
-    public static final String TABLE_PRIMARY_SORT_FIELD = "priSort";
-    public static final String TABLE_PRIMARY_SORT_DESCENDING = "priDescending";
-    public static final String TABLE_SECONDARY_SORT_FIELD = "secSort";
-    public static final String TABLE_SECONDARY_SORT_DESCENDING = "secDescending";
-    public static final String TABLE_TERTIARY_SORT_FIELD = "terSort";
-    public static final String TABLE_TERTIARY_SORT_DESCENDING = "terDescending";
+
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
@@ -512,14 +507,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-
-        // Sorting preferences
-        defaults.put(TABLE_PRIMARY_SORT_FIELD, FieldName.AUTHOR);
-        defaults.put(TABLE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(TABLE_SECONDARY_SORT_FIELD, FieldName.YEAR);
-        defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(TABLE_TERTIARY_SORT_FIELD, FieldName.TITLE);
-        defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
 
@@ -1442,8 +1429,6 @@ public class JabRefPreferences implements PreferencesService {
         if (!saveInOriginalOrder) {
             if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = this.loadExportSaveOrder();
-            } else {
-                saveOrder = this.loadTableSaveOrder();
             }
         }
         Charset encoding = this.getDefaultEncoding();
@@ -1707,18 +1692,6 @@ public class JabRefPreferences implements PreferencesService {
         put(EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
         put(EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
         put(EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
-    }
-
-    public SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-        config.sortCriteria[0].field = get(TABLE_PRIMARY_SORT_FIELD);
-        config.sortCriteria[0].descending = getBoolean(TABLE_PRIMARY_SORT_DESCENDING);
-        config.sortCriteria[1].field = get(TABLE_SECONDARY_SORT_FIELD);
-        config.sortCriteria[1].descending = getBoolean(TABLE_SECONDARY_SORT_DESCENDING);
-        config.sortCriteria[2].field = get(TABLE_TERTIARY_SORT_FIELD);
-        config.sortCriteria[2].descending = getBoolean(TABLE_TERTIARY_SORT_DESCENDING);
-
-        return config;
     }
 
     public SaveOrderConfig loadExportSaveOrder() {

@@ -14,7 +14,6 @@ import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-
 /**
  * Preference tab for file sorting options.
  */
@@ -26,7 +25,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
     private final RadioButton exportInTableOrder;
     private final RadioButton exportInSpecifiedOrder;
     private final SaveOrderConfigDisplay exportOrderPanel;
-    private final  GridPane builder = new GridPane();
+    private final GridPane builder = new GridPane();
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -38,9 +37,9 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
         exportOrderPanel = new SaveOrderConfigDisplay();
 
-        EventHandler<ActionEvent> listener =  (event) -> {
-                boolean selected = event.getSource() == exportInSpecifiedOrder;
-                exportOrderPanel.setEnabled(selected);
+        EventHandler<ActionEvent> listener = (event) -> {
+            boolean selected = event.getSource() == exportInSpecifiedOrder;
+            exportOrderPanel.setEnabled(selected);
         };
 
         exportInOriginalOrder.setOnAction(listener);
@@ -52,9 +51,9 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         // create GUI
         builder.add(exportSortOrder, 1, 1);
         builder.add(new Separator(), 2, 1);
-        builder.add(exportInOriginalOrder,  1, 2);
+        builder.add(exportInOriginalOrder, 1, 2);
         builder.add(new Line(), 2, 3);
-        builder.add(exportInTableOrder,  1, 4);
+        builder.add(exportInTableOrder, 1, 4);
         builder.add(new Line(), 2, 5);
         builder.add(exportInSpecifiedOrder, 1, 6);
         builder.add(new Line(), 2, 7);
@@ -64,6 +63,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
