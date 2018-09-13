@@ -1700,14 +1700,14 @@ public class JabRefPreferences implements PreferencesService {
         put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field);
     }
 
-    public SaveOrderConfig loadTableSaveOrder() {
+    private SaveOrderConfig loadTableSaveOrder() {
         SaveOrderConfig config = new SaveOrderConfig();
-        config.sortCriteria[0].field = get(TABLE_PRIMARY_SORT_FIELD);
-        config.sortCriteria[0].descending = getBoolean(TABLE_PRIMARY_SORT_DESCENDING);
-        config.sortCriteria[1].field = get(TABLE_SECONDARY_SORT_FIELD);
-        config.sortCriteria[1].descending = getBoolean(TABLE_SECONDARY_SORT_DESCENDING);
-        config.sortCriteria[2].field = get(TABLE_TERTIARY_SORT_FIELD);
-        config.sortCriteria[2].descending = getBoolean(TABLE_TERTIARY_SORT_DESCENDING);
+        List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
+        List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING).collect(Collectors.toList());
+
+        for (int i = 0; i < columns.size(); i++) {
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(columns.get(i), sortTypes.get(i)));
+        }
 
         return config;
     }
