@@ -38,11 +38,11 @@ class MSBibExporter extends Exporter {
         if (entries.isEmpty()) {
             return;
         }
-        // forcing to use UTF8 output format for some problems with xml export in other encodings
-        SaveSession session = new FileSaveSession(StandardCharsets.UTF_8, false);
+
         MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
-        try (VerifyingWriter ps = session.getWriter()) {
+        // forcing to use UTF8 output format for some problems with xml export in other encodings
+        try (AtomicFileWriter ps = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             try {
                 DOMSource source = new DOMSource(msBibDatabase.getDomForExport());
                 StreamResult result = new StreamResult(ps);
@@ -52,7 +52,6 @@ class MSBibExporter extends Exporter {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new SaveException(e);
             }
-            session.finalize(file);
         } catch (IOException ex) {
             throw new SaveException(ex);
         }

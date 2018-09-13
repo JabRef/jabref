@@ -2,7 +2,13 @@ package org.jabref.logic.shared;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -24,19 +30,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 @DatabaseTest
 class DBMSProcessorTest {
 
-    private static Stream<Object[]> getTestingDatabaseSystems() {
-        Stream<DBMSType> dbmsTypeStream = TestManager.getDBMSTypeTestParameter().stream();
+    private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
         Collection<Object[]> result = new ArrayList<>();
-        dbmsTypeStream.forEach(dbmsType -> {
-            try {
+        for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
                 result.add(new Object[] {
                         dbmsType,
                         TestConnector.getTestDBMSConnection(dbmsType),
                         DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
-            } catch (SQLException | InvalidDBMSConnectionPropertiesException e) {
-                e.printStackTrace();
-            }
-        });
+        }
         return result.stream();
     }
 

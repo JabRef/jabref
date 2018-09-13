@@ -1376,12 +1376,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES));
+        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
     }
 
     public void storeFileHistory(FileHistory history) {
         if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory());
+            putStringList(RECENT_DATABASES, history.getHistory().stream().map(Path::toAbsolutePath).map(Path::toString).collect(Collectors.toList()));
         }
     }
 
@@ -1433,29 +1433,33 @@ public class JabRefPreferences implements PreferencesService {
                 saveOrder = this.loadTableSaveOrder();
             }
         }
-        Charset encoding = this.getDefaultEncoding();
-        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
-        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
-        Boolean takeMetadataSaveOrderInAccount = false;
-        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern = this.getKeyPattern();
-        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                                   takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+        return new SavePreferences(
+                saveInOriginalOrder,
+                saveOrder,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                false,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getLatexFieldFormatterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public SavePreferences loadForSaveFromPreferences() {
-        Boolean saveInOriginalOrder = false;
-        SaveOrderConfig saveOrder = null;
-        Charset encoding = this.getDefaultEncoding();
-        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
-        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
-        Boolean takeMetadataSaveOrderInAccount = true;
-        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern = this.getKeyPattern();
-        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                                   takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+        return new SavePreferences(
+                false,
+                null,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                true,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getLatexFieldFormatterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
@@ -1687,45 +1691,33 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.sortCriteria[0].descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.sortCriteria[1].descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.sortCriteria[2].descending);
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
 
-        put(EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
-        put(EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
-        put(EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
-    }
-
-    public SaveOrderConfig loadExportSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-        config.sortCriteria[0].field = get(EXPORT_PRIMARY_SORT_FIELD);
-        config.sortCriteria[0].descending = getBoolean(EXPORT_PRIMARY_SORT_DESCENDING);
-        config.sortCriteria[1].field = get(EXPORT_SECONDARY_SORT_FIELD);
-        config.sortCriteria[1].descending = getBoolean(EXPORT_SECONDARY_SORT_DESCENDING);
-        config.sortCriteria[2].field = get(EXPORT_TERTIARY_SORT_FIELD);
-        config.sortCriteria[2].descending = getBoolean(EXPORT_TERTIARY_SORT_DESCENDING);
-
-        return config;
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field);
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field);
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field);
     }
 
     private SaveOrderConfig loadTableSaveOrder() {
         SaveOrderConfig config = new SaveOrderConfig();
         List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
-        List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING ? true : false).collect(Collectors.toList());
+        List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING).collect(Collectors.toList());
 
-        if (columns.size() >= 1) {
-            config.sortCriteria[0].field = columns.get(0);
-            config.sortCriteria[0].descending = sortTypes.get(0);
+        for (int i = 0; i < columns.size(); i++) {
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(columns.get(i), sortTypes.get(i)));
         }
-        if (columns.size() >= 2) {
-            config.sortCriteria[1].field = columns.get(1);
-            config.sortCriteria[1].descending = sortTypes.get(1);
-        }
-        if (columns.size() >= 3) {
-            config.sortCriteria[2].field = columns.get(2);
-            config.sortCriteria[2].descending = sortTypes.get(2);
-        }
+
         return config;
+    }
+
+    public SaveOrderConfig loadExportSaveOrder() {
+        return new SaveOrderConfig(true,
+                new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
     }
 
     public Character getKeywordDelimiter() {

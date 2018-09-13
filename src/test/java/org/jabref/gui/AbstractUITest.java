@@ -49,14 +49,9 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
      * The backlashes are replaced with forwardslashes b/c assertJ can't type the former one on windows
      * @param relativePath the relative path to the resource database
      */
-    protected String getAbsolutePath(String relativePath) {
+    protected String getAbsolutePath(String relativePath) throws URISyntaxException {
         final URL resource = this.getClass().getClassLoader().getResource(relativePath);
-        try {
-            return Paths.get(resource.toURI()).toAbsolutePath().toString().replace("\\", "/");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return Paths.get(resource.toURI()).toAbsolutePath().toString().replace("\\", "/");
     }
 
     /**
