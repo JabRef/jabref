@@ -3,7 +3,6 @@ package org.jabref.gui.importer.actions;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +35,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
@@ -175,7 +173,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 }
             });
             for (Path theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile.toString());
+                frame.getFileHistory().newFile(theFile);
             }
         }
         // If no files are remaining to open, this could mean that a file was
@@ -199,36 +197,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
             frame.output(Localization.lang("Opening") + ": '" + file + "'");
 
-            String fileName = file.getFileName().toString();
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
-
-            if (FileBasedLock.hasLockFile(file)) {
-                Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file);
-                if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
-                        - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
-                    // The lock file is fairly old, so we can offer to "steal" the file:
-
-                    boolean overWriteFileLockPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("File locked"),
-                            Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance.") + "\n"
-                                    + Localization.lang("Do you want to override the file lock?"),
-                            Localization.lang("Overwrite file lock"),
-                            Localization.lang("Cancel"));
-
-                    if (overWriteFileLockPressed) {
-                        FileBasedLock.deleteLockFile(file);
-                    } else {
-                        return;
-                    }
-                } else if (!FileBasedLock.waitForFileLock(file)) {
-
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"),
-                            Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance."));
-
-                    return;
-                }
-            }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
                 BackupUIManager.showRestoreBackupDialog(frame.getDialogService(), fileToLoad);

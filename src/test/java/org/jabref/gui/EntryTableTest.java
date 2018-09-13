@@ -26,7 +26,7 @@ public class EntryTableTest extends AbstractUITest{
     private final static int TITLE_COLUMN_INDEX = 5;
 
     @Test
-    public void scrollThroughEntryList() {
+    public void scrollThroughEntryList() throws Exception {
         String path = getAbsolutePath(TEST_FILE_NAME);
 
         importBibIntoNewDatabase(path);
