@@ -1429,6 +1429,8 @@ public class JabRefPreferences implements PreferencesService {
         if (!saveInOriginalOrder) {
             if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = this.loadExportSaveOrder();
+            } else {
+                saveOrder = this.loadTableSaveOrder();
             }
         }
         Charset encoding = this.getDefaultEncoding();
@@ -1703,6 +1705,26 @@ public class JabRefPreferences implements PreferencesService {
         config.sortCriteria[2].field = get(EXPORT_TERTIARY_SORT_FIELD);
         config.sortCriteria[2].descending = getBoolean(EXPORT_TERTIARY_SORT_DESCENDING);
 
+        return config;
+    }
+
+    private SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
+        List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING ? true : false).collect(Collectors.toList());
+
+        if (columns.size() >= 1) {
+            config.sortCriteria[0].field = columns.get(0);
+            config.sortCriteria[0].descending = sortTypes.get(0);
+        }
+        if (columns.size() >= 2) {
+            config.sortCriteria[1].field = columns.get(1);
+            config.sortCriteria[1].descending = sortTypes.get(1);
+        }
+        if (columns.size() >= 3) {
+            config.sortCriteria[2].field = columns.get(2);
+            config.sortCriteria[2].descending = sortTypes.get(2);
+        }
         return config;
     }
 
