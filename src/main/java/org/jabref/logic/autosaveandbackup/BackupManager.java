@@ -123,11 +123,11 @@ public class BackupManager {
             new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
-            logIfCritical(e);
+            logIfCritical(backupPath, e);
         }
     }
 
-    private void logIfCritical(IOException e) {
+    private void logIfCritical(Path backupPath, IOException e) {
         Throwable innermostCause = e;
         while (innermostCause.getCause() != null) {
             innermostCause = innermostCause.getCause();
@@ -136,7 +136,7 @@ public class BackupManager {
 
         // do not print errors in field values into the log during autosave
         if (!isErrorInField) {
-            LOGGER.error("Error while saving file.", e);
+            LOGGER.error("Error while saving to file" + backupPath, e);
         }
     }
 

@@ -3,13 +3,11 @@ package org.jabref.logic.exporter;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
@@ -54,7 +52,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * The file we want to create/replace.
      */
     private final Path targetFile;
-    private final FileLock targetFileLock;
+
     /**
      * The file to which writes are redirected to.
      */
@@ -82,10 +80,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            temporaryFileLock = FileChannel.open(temporaryFile, StandardOpenOption.WRITE).lock();
-            targetFileLock = FileChannel.open(targetFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).lock();
+            if (out instanceof FileOutputStream) {
+                temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
+            } else {
+                temporaryFileLock = null;
+            }
         } catch (OverlappingFileLockException exception) {
-            throw new IOException("Could not obtain write access. Maybe another instance of JabRef is currently writing to the same file?", exception);
+            throw new IOException("Could not obtain write access to " + temporaryFile + ". Maybe another instance of JabRef is currently writing to the same file?", exception);
         }
     }
 
@@ -148,15 +149,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         }
 
         try {
-            temporaryFileLock.release();
+            if (temporaryFileLock != null) {
+                temporaryFileLock.release();
+            }
         } catch (IOException exception) {
             LOGGER.warn("Unable to release lock on file " + temporaryFile, exception);
-        }
-
-        try {
-            targetFileLock.release();
-        } catch (IOException exception) {
-            LOGGER.warn("Unable to release lock on file " + targetFile, exception);
         }
     }
 

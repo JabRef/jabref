@@ -127,9 +127,6 @@ public class SaveDatabaseAction {
                          .orElse(Globals.prefs.getDefaultEncoding()),
                     SavePreferences.DatabaseSaveType.ALL);
 
-            // release panel from save status
-            panel.setSaving(false);
-
             if (success) {
                 panel.updateTimeStamp();
                 panel.getUndoManager().markUnchanged();
@@ -155,6 +152,9 @@ public class SaveDatabaseAction {
             LOGGER.error("A problem occurred when trying to save the file " + targetPath, ex);
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
+        } finally {
+            // release panel from save status
+            panel.setSaving(false);
         }
     }
 
