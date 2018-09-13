@@ -18,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -64,7 +63,6 @@ public class MSBibExportFormatTestFiles {
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("fileNames")
     void testPerformExport(String filename) throws IOException, SaveException {
