@@ -252,6 +252,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         MenuItem download = new MenuItem(Localization.lang("Download file"));
         download.setOnAction(event -> linkedFile.download());
 
+        //Begin Duplicate Name Checking
+        if(linkedFile.getFile().getLink().equals(linkedFile.getFile().)) {
+
+        }
         MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
         renameFile.setOnAction(event -> linkedFile.rename());
         renameFile.setDisable(linkedFile.getFile().isOnlineLink());
@@ -263,6 +267,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         MenuItem renameAndMoveFile = new MenuItem(Localization.lang("Move file to file directory and rename file"));
         renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
         renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        //End of Duplicate Name Checking
 
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
