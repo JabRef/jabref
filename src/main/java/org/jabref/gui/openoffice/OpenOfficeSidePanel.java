@@ -1,8 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import javax.swing.SwingUtilities;
-
-import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 
@@ -17,8 +14,8 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
 
-    private OpenOfficePreferences preferences;
-    private JabRefFrame frame;
+    private final OpenOfficePreferences preferences;
+    private final JabRefFrame frame;
 
     public OpenOfficeSidePanel(SidePaneManager sidePaneManager, OpenOfficePreferences preferences, JabRefFrame frame) {
         super(sidePaneManager, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
@@ -48,9 +45,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        SwingNode swingNode = new SwingNode();
-        SwingUtilities.invokeLater(() -> swingNode.setContent(new OpenOfficePanel(frame).getContent()));
-        return swingNode;
+        return new OpenOfficePanel(frame).getContent();
     }
 
     @Override
