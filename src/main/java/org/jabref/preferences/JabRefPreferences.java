@@ -1550,6 +1550,7 @@ public class JabRefPreferences implements PreferencesService {
         return this;
     }
 
+    @Override
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);

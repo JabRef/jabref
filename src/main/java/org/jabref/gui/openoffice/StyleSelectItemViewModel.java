@@ -1,6 +1,8 @@
 package org.jabref.gui.openoffice;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -16,12 +18,14 @@ public class StyleSelectItemViewModel {
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<Node> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
     private final OOBibStyle style;
+    private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
     public StyleSelectItemViewModel(String name, String journals, String file, OOBibStyle style) {
         this.name.setValue(name);
         this.journals.setValue(journals);
         this.file.setValue(file);
         this.style = style;
+        this.internalStyle.set(style.isFromResource());
     }
 
     public StringProperty nameProperty() {
@@ -42,6 +46,10 @@ public class StyleSelectItemViewModel {
 
     public OOBibStyle getStyle() {
         return style;
+    }
+
+    public BooleanProperty internalStyleProperty() {
+        return internalStyle;
     }
 
 }

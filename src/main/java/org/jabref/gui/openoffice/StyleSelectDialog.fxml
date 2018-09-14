@@ -9,12 +9,9 @@
 
 <DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="685.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
    <content>
-      <BorderPane prefHeight="342.0" prefWidth="685.0">
-         <bottom>
-            <Button fx:id="add" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="BOTTOM_RIGHT" />
-         </bottom>
-         <center>
-            <TableView fx:id="tvStyles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <BorderPane fx:id="contentPane" prefHeight="342.0" prefWidth="685.0">
+         <top>
+            <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
               <columns>
                 <TableColumn fx:id="colName" prefWidth="75.0" text="Name" />
                 <TableColumn fx:id="colJournals" prefWidth="75.0" text="Jorurnals" />
@@ -22,7 +19,10 @@
                   <TableColumn fx:id="colDeleteIcon" minWidth="60.0" prefWidth="60.0" />
               </columns>
             </TableView>
-         </center>
+         </top>
+         <right>
+            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="CENTER" />
+         </right>
       </BorderPane>
    </content>
       <buttonTypes>

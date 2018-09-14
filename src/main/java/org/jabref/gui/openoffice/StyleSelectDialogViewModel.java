@@ -1,20 +1,32 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 public class StyleSelectDialogViewModel {
@@ -24,6 +36,7 @@ public class StyleSelectDialogViewModel {
     private final OpenOfficePreferences preferences;
     private final PreferencesService preferencesService;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader loader, PreferencesService preferencesService) {
         this.dialogService = dialogService;
@@ -31,7 +44,7 @@ public class StyleSelectDialogViewModel {
         this.loader = loader;
         this.preferencesService = preferencesService;
 
-        styles.addAll(loader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList()));
+        styles.addAll(loadStyles());
 
     }
 
@@ -53,6 +66,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
             if (loader.addStyleIfValid(stylePath)) {
                 preferences.setCurrentStyle(stylePath);
+                styles.setAll(loadStyles());
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"));
             }
@@ -60,8 +74,52 @@ public class StyleSelectDialogViewModel {
 
     }
 
-    public ListProperty<StyleSelectItemViewModel> getStyles() {
+    public List<StyleSelectItemViewModel> loadStyles() {
+        return loader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
+    }
+
+    public ListProperty<StyleSelectItemViewModel> stylesProperty() {
         return styles;
+    }
+
+    public void deleteStyle() {
+
+        OOBibStyle style = selectedItem.getValue().getStyle();
+        if (loader.removeStyle(style)) {
+            styles.remove(selectedItem.get());
+        }
+
+    }
+
+    public void editStyle() {
+        OOBibStyle style = selectedItem.getValue().getStyle();
+
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+        String link = style.getPath();
+
+        try {
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void viewStyle(StyleSelectItemViewModel item) {
+
+        DialogPane pane = new DialogPane();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        TextArea styleView = new TextArea(item.getStyle().getLocalCopy());
+        scrollPane.setContent(styleView);
+        pane.setContent(scrollPane);
+        dialogService.showCustomDialogAndWait(item.getStyle().getName(), pane, ButtonType.OK);
+
+    }
+
+    public ObjectProperty<StyleSelectItemViewModel> selectedItemProperty() {
+        return selectedItem;
     }
 
 }

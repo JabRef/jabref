@@ -25,4 +25,6 @@ public interface PreferencesService {
 
     OpenOfficePreferences getOpenOfficePreferences();
 
+    PreviewPreferences getPreviewPreferences();
+
 }
