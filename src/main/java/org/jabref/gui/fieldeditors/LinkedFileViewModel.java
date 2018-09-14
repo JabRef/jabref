@@ -197,11 +197,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Get the filepath for current linkedFile and truncate it to only have the filename and
         not the filepath. Compare to new suggested filename and return boolean result.
          */
-        Path file = Paths.get(linkedFile.getLink());
-        String oldFileName = file.getFileName().toString();
-        String newFileName = this.linkedFileHandler.getSuggestedFileName();
+        Path file = Paths.get(this.linkedFile.getLink());
+        String currentFileName = file.getFileName().toString();
+        String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
 
-        if(oldFileName.equals(newFileName))
+        if(currentFileName.equals(suggestedFileName))
             return true;
         else
             return false;
