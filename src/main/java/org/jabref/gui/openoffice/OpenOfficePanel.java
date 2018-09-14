@@ -104,7 +104,6 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private final JabRefFrame frame;
     private OOBibStyle style;
-    private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
@@ -167,11 +166,8 @@ public class OpenOfficePanel {
 
         setStyleFile.setOnAction(event -> {
 
-            if (styleDialog == null) {
-                styleDialog = new StyleSelectDialog(frame, preferences, loader);
-            }
-            styleDialog.setVisible(true);
-            styleDialog.getStyle().ifPresent(selectedStyle -> {
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(dialogService, loader);
+            styleDialog.showAndWait().ifPresent(selectedStyle -> {
                 style = selectedStyle;
                 try {
                     style.ensureUpToDate();
@@ -400,18 +396,18 @@ public class OpenOfficePanel {
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                                                                                                               + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode.")));
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                                                                   + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
 
         } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                                                                                             Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
-                                                                                                                                                                        + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                                                                                                                                                                        + Localization.lang("If connecting manually, please verify program and library paths.")
-                                                                                                                                                                        + "\n" + "\n" + Localization.lang("Error message:"),
-                                                                                             e));
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                                                 Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
+                                                                                                                            + "\n"
+                                                                                                                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                                                                                                            + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
+                                                 e);
 
         } finally {
             if (progressDialog != null) {
@@ -543,11 +539,7 @@ public class OpenOfficePanel {
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
         if (!ooBase.isConnectedToDocument()) {
-
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(
-                                                                                             Localization.lang("Error pushing entries"), Localization.lang("Not connected to any Writer document. Please"
-                                                                                                                                                           + " make sure a document is open, and use the 'Select Writer document' button to connect to it.")));
-
+            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"), Localization.lang("Not connected to any Writer document. Please" + " make sure a document is open, and use the 'Select Writer document' button to connect to it."));
             return;
         }
 
@@ -656,32 +648,26 @@ public class OpenOfficePanel {
     }
 
     private void showConnectionLostErrorMessage() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Connection lost"),
-                                                                                         Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
-                                                                                                           + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect.")));
+        dialogService.showErrorDialogAndWait(Localization.lang("Connection lost"),
+                                             Localization.lang("Connection to OpenOffice/LibreOffice has been lost. " + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
 
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
-                                                                                         Localization.lang("Your style file specifies the paragraph format '%0', "
-                                                                                                           + "which is undefined in your current OpenOffice/LibreOffice document.",
-                                                                                                           ex.getFormatName())
-                                                                                                                                          + "\n" +
-                                                                                                                                          Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")));
+        dialogService.showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
+                                             Localization.lang("Your style file specifies the paragraph format '%0', "
+                                                               + "which is undefined in your current OpenOffice/LibreOffice document.",
+                                                               ex.getFormatName()) + "\n" + Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file."));
 
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Undefined character format"),
-                                                                                         Localization.lang(
-                                                                                                           "Your style file specifies the character format '%0', "
-                                                                                                           + "which is undefined in your current OpenOffice/LibreOffice document.",
-                                                                                                           ex.getFormatName())
-                                                                                                                                          + "\n"
-                                                                                                                                          + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
+        dialogService.showErrorDialogAndWait(Localization.lang("Undefined character format"),
+                                             Localization.lang("Your style file specifies the character format '%0', "
+                                                               + "which is undefined in your current OpenOffice/LibreOffice document.",
+                                                               ex.getFormatName()) + "\n" + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
 
-        ));
+        );
     }
 
     private void showSettingsPopup() {

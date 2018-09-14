@@ -4,9 +4,11 @@ import java.nio.file.Path;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.metadata.FilePreferences;
 
 public interface PreferencesService {
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -20,5 +22,7 @@ public interface PreferencesService {
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
+
+    OpenOfficePreferences getOpenOfficePreferences();
 
 }

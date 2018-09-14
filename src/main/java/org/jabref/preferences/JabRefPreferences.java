@@ -1497,6 +1497,7 @@ public class JabRefPreferences implements PreferencesService {
                                   getKeywordDelimiter());
     }
 
+    @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
                                          this.get(JabRefPreferences.OO_JARS_PATH),

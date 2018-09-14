@@ -42,7 +42,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             } else {
                 LOGGER.error("Unhandled exception", exception);
             }
-            return new FailedFuture(exception);
+            return new FailedFuture<V>(exception);
         }
     }
 
