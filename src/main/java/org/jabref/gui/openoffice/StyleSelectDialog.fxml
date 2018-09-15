@@ -20,9 +20,9 @@
               </columns>
             </TableView>
          </top>
-         <right>
-            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="CENTER" />
-         </right>
+         <center>
+            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="TOP_RIGHT" />
+         </center>
       </BorderPane>
    </content>
       <buttonTypes>

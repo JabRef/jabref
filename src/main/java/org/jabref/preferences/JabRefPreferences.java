@@ -1510,6 +1510,7 @@ public class JabRefPreferences implements PreferencesService {
                                          this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
+    @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
         this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
         this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());

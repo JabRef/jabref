@@ -52,4 +52,8 @@ public class StyleSelectItemViewModel {
         return internalStyle;
     }
 
+    public String getStylePath() {
+        return style.getPath();
+    }
+
 }

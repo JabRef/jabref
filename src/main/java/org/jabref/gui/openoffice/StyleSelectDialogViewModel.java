@@ -46,10 +46,19 @@ public class StyleSelectDialogViewModel {
 
         styles.addAll(loadStyles());
 
+        String currentStyle = preferences.getCurrentStyle();
+        Optional<StyleSelectItemViewModel> lastUsedStyle = styles.stream().filter(style -> style.getStylePath().equals(currentStyle)).findFirst();
+
+        if (lastUsedStyle.isPresent()) {
+            selectedItem.setValue(lastUsedStyle.get());
+        } else {
+            selectedItem.setValue(styles.get(0));
+        }
+
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName(), style);
+        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isFromResource() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
     public OOBibStyle toOOBibStyle(StyleSelectItemViewModel item) {
@@ -95,13 +104,11 @@ public class StyleSelectDialogViewModel {
         OOBibStyle style = selectedItem.getValue().getStyle();
 
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-        String link = style.getPath();
 
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath().toString(), type);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            dialogService.showErrorDialogAndWait(e);
         }
     }
 
@@ -120,6 +127,10 @@ public class StyleSelectDialogViewModel {
 
     public ObjectProperty<StyleSelectItemViewModel> selectedItemProperty() {
         return selectedItem;
+    }
+
+    public void storePrefs() {
+        preferencesService.setOpenOfficePreferences(preferences);
     }
 
 }

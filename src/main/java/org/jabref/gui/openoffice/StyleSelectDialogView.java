@@ -1,6 +1,7 @@
 package org.jabref.gui.openoffice;
 
 import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -26,6 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.easybind.EasyBind;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
@@ -55,6 +57,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
+                viewModel.storePrefs();
                 return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
@@ -64,10 +67,12 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
+
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
         preview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
         preview.setEntry(TestEntry.getTestEntry());
+
         contentPane.setBottom(preview);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -95,15 +100,20 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                                                                 }).withContextMenu(item -> createContextMenu())
                                                                 .install(tvStyles);
         tvStyles.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
-            viewModel.selectedItemProperty().setValue(newvalue);
-            //TODO: Fix NPE
-            preview.setLayout(newvalue.getStyle().getReferenceFormat("default"));
+            if (newvalue == null) {
+                viewModel.selectedItemProperty().setValue(oldvalue);
+            } else {
+                viewModel.selectedItemProperty().setValue(newvalue);
+            }
         });
 
         tvStyles.setItems(viewModel.stylesProperty());
 
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
+        EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
+            preview.setLayout(style.getStyle().getReferenceFormat("default"));
+        });
     }
 
     private ContextMenu createContextMenu() {
