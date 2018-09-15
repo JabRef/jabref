@@ -9,7 +9,7 @@
 
 <DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="685.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
    <content>
-      <BorderPane fx:id="contentPane" prefHeight="342.0" prefWidth="685.0">
+      <BorderPane fx:id="contentPane">
          <top>
             <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
               <columns>
@@ -20,9 +20,9 @@
               </columns>
             </TableView>
          </top>
-         <center>
-            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="TOP_RIGHT" />
-         </center>
+         <right>
+            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="CENTER" />
+         </right>
       </BorderPane>
    </content>
       <buttonTypes>
