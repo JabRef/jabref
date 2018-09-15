@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -37,6 +38,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, String> colFile;
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
+    @FXML private VBox vbox;
     @FXML private BorderPane contentPane;
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
@@ -70,10 +72,11 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
+
         preview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
         preview.setEntry(TestEntry.getTestEntry());
 
-        contentPane.setBottom(preview);
+        vbox.getChildren().add(preview);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
@@ -112,6 +115,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
+            tvStyles.getSelectionModel().select(style);
             preview.setLayout(style.getStyle().getReferenceFormat("default"));
         });
     }

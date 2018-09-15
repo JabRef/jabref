@@ -6,8 +6,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
-<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="685.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
+<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
    <content>
       <BorderPane fx:id="contentPane">
          <top>
@@ -23,10 +24,13 @@
          <right>
             <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="add" BorderPane.alignment="CENTER" />
          </right>
+         <bottom>
+            <VBox fx:id="vbox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER" />
+         </bottom>
       </BorderPane>
    </content>
       <buttonTypes>
         <ButtonType fx:constant="CANCEL" />
-        <ButtonType buttonData="OK_DONE" text="%OK" />
+        <ButtonType fx:constant="OK"/>
       </buttonTypes>
 </DialogPane>
