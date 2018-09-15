@@ -59,7 +59,7 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
             String testString = BibtexKeyGenerator.cleanKey(parts[1],
                     Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
-            //You're writing too much code without testing
+            //Unfinished
         }
     }
 
