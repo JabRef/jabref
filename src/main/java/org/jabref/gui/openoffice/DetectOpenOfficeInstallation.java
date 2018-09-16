@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import javafx.concurrent.Task;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -63,15 +64,12 @@ public class DetectOpenOfficeInstallation {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-
-            dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                                                       Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
-            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                                            .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                                                            .build();
-            return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
-
-
+        dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                                                   Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                                                                                                        .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                                                                                                        .build();
+        return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
 
     }
 
@@ -143,7 +141,7 @@ public class DetectOpenOfficeInstallation {
 
     public <V> void showProgressDialog(Task<V> task, String title) {
 
-        dialogService.showCanceableProgressDialogAndWait(task,title);
+        dialogService.showCanceableProgressDialogAndWait(task, title);
 
     }
 
