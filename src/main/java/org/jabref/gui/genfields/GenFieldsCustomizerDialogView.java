@@ -42,8 +42,7 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel = new GenFieldsCustomizerDialogViewModel(dialogService, preferences);
-
-        viewModel.fieldsTextProperty().bindBidirectional(fieldsTextArea.textProperty());
+        fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsTextProperty());
         //No need to use EasyBind here
 
     }

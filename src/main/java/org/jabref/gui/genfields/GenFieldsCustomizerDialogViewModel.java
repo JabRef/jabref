@@ -3,21 +3,21 @@ package org.jabref.gui.genfields;
 import java.util.List;
 import java.util.Map;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.Globals;
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
+public class GenFieldsCustomizerDialogViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final ObjectProperty<String> fieldsText = new SimpleObjectProperty<>();
+    private final StringProperty fieldsText = new SimpleStringProperty("");
 
     public GenFieldsCustomizerDialogViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -28,6 +28,7 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
     private void setInitialFieldsText() {
         StringBuilder sb = new StringBuilder();
 
+        //TODO: add method getEntryEditorTabList to PreferencesService interface
         for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
             sb.append(tab.getKey());
             sb.append(':');
@@ -38,7 +39,7 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
         fieldsText.set(sb.toString());
     }
 
-    public ObjectProperty<String> fieldsTextProperty() {
+    public StringProperty fieldsTextProperty() {
         return fieldsText;
     }
 
@@ -52,17 +53,17 @@ public class GenFieldsCustomizerDialogViewModel extends AbstractViewModel {
                 String field = Localization.lang("field");
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Each line must be of the following form") + " '" +
-                    Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'";
+                                 Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'";
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }
-            String testString = BibtexKeyGenerator.cleanKey(parts[1],
-                    Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+
+            //TODO: create a method in preferences which wraps the get enfore legal keys and add it to preferneces service as well
+            String testString = BibtexKeyGenerator.cleanKey(parts[1], Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
             //Unfinished
         }
     }
-
 
     public void resetFields() {
 
