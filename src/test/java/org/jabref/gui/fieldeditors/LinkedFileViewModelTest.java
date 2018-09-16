@@ -54,6 +54,24 @@ class LinkedFileViewModelTest {
     }
 
     @Test
+    void checkNameConflict() {
+        //Debug Statements
+        System.out.println(tempFile.getFileName());
+        System.out.println(tempFile.toAbsolutePath().toString());
+
+        linkedFile = new LinkedFile("", tempFile.toString(), "");
+
+        //Debug Statements
+        System.out.println(linkedFile.toString());
+        System.out.println(linkedFile.getLink());
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        boolean notEqual = viewModel.performNameConflictCheck();
+
+        assertTrue(!notEqual);
+    }
+
+    @Test
     void deleteWhenFilePathNotPresentReturnsTrue() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
         linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
