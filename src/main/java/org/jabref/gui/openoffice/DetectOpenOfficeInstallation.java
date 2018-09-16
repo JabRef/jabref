@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.awt.BorderLayout;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,19 +8,15 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-import javax.swing.BorderFactory;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import javafx.concurrent.Task;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
@@ -60,24 +55,24 @@ public class DetectOpenOfficeInstallation {
     }
 
     public void init() {
-        progressDialog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
-                Localization.lang("Please wait..."));
+        // progressDialog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
+        //                                   Localization.lang("Please wait..."));
     }
 
     private Optional<Path> selectInstallationPath() {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> {
-            dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                    Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
-            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                    .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                    .build();
-            return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
-        });
 
-        return path;
+            dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                                                       Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
+            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                                                                                                            .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                                                                                                            .build();
+            return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
+
+
+
     }
 
     private boolean autoDetectPaths() {
@@ -138,25 +133,22 @@ public class DetectOpenOfficeInstallation {
         }
 
         String content = Localization.lang("Found more than one OpenOffice/LibreOffice executable.")
-                + "\n" + Localization.lang("Please choose which one to connect to:");
+                         + "\n" + Localization.lang("Please choose which one to connect to:");
 
-        Optional<Path> selectedPath = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showChoiceDialogAndWait(
-                Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                content, Localization.lang("Use selected instance"), installDirs));
+        Optional<Path> selectedPath = dialogService.showChoiceDialogAndWait(Localization.lang("Choose OpenOffice/LibreOffice executable"),
+                                                                            content, Localization.lang("Use selected instance"), installDirs);
 
         return selectedPath;
     }
 
-    public JDialog showProgressDialog(JDialog progressParent, String title, String message) {
-        JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
-        final JDialog progressDialog = new JDialog(progressParent, title, false);
-        bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        bar.setIndeterminate(true);
-        progressDialog.add(new JLabel(message), BorderLayout.NORTH);
-        progressDialog.add(bar, BorderLayout.CENTER);
-        progressDialog.pack();
-        progressDialog.setLocationRelativeTo(null);
-        progressDialog.setVisible(true);
-        return progressDialog;
+    public <V> void showProgressDialog(Task<V> task, String title) {
+
+        dialogService.showCanceableProgressDialogAndWait(task,title);
+
+    }
+
+    public JDialog showProgressDialog(JDialog diag, String lang, String lang2) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

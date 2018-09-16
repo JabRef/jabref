@@ -185,7 +185,7 @@ public interface DialogService {
      *
      * @param task The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showCanceableProgressDialogAndWait(Task<V> task);
+    <V> void showCanceableProgressDialogAndWait(Task<V> task, String title);
 
     /**
      * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).

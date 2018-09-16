@@ -45,7 +45,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        return new OpenOfficePanel(frame).getContent();
+        return new OpenOfficePanel(frame, preferences).getContent();
     }
 
     @Override

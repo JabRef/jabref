@@ -34,7 +34,7 @@ public class CopyFilesAction extends SimpleCommand {
 
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
-        dialogService.showCanceableProgressDialogAndWait(exportService);
+        dialogService.showCanceableProgressDialogAndWait(exportService, Localization.lang("Copy linked files to folder..."));
 
         exportService.run();
         exportService.setOnSucceeded((e) -> {

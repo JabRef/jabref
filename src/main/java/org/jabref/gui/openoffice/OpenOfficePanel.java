@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.awt.BorderLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -14,19 +13,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,16 +36,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -55,16 +49,12 @@ import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyExistException;
@@ -108,11 +98,12 @@ public class OpenOfficePanel {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    public OpenOfficePanel(JabRefFrame jabRefFrame) {
+    public OpenOfficePanel(JabRefFrame jabRefFrame, OpenOfficePreferences preferences) {
         Node connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode();
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
+        this.preferences = preferences;
         connect = new Button();
         connect.setGraphic(connectImage);
         manualConnect = new Button();
@@ -130,7 +121,7 @@ public class OpenOfficePanel {
         update = new Button();
         update.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
-        preferences = Globals.prefs.getOpenOfficePreferences();
+
         loader = new StyleLoader(preferences,
                                  Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                                  Globals.prefs.getDefaultEncoding());
@@ -246,7 +237,9 @@ public class OpenOfficePanel {
             }
 
         });
-        settingsB.setOnAction(e -> showSettingsPopup());
+        ContextMenu settingsMenu = createSettingsPopup();
+        settingsB.setContextMenu(settingsMenu);
+        settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setOnAction(e -> {
             try {
                 CitationManager cm = new CitationManager(ooBase, dialogService);
@@ -456,85 +449,9 @@ public class OpenOfficePanel {
 
     private void showManualConnectionDialog() {
         dialogOkPressed = false;
-        final JDialog cDiag = new JDialog((JFrame) null, Localization.lang("Set connection parameters"), true);
-        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        final DialogService dialogService = this.dialogService;
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                                        .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                                                        .build();
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                                               .build();
-
-        // Path fields
-        final JTextField ooPath = new JTextField(30);
-        JButton browseOOPath = new JButton(Localization.lang("Browse"));
-        ooPath.setText(preferences.getInstallationPath());
-        browseOOPath.addActionListener(e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
-                                                               .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString())));
-
-        final JTextField ooExec = new JTextField(30);
-        JButton browseOOExec = new JButton(Localization.lang("Browse"));
-        ooExec.setText(preferences.getExecutablePath());
-        browseOOExec.addActionListener(e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration))
-                                                               .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString())));
-
-        final JTextField ooJars = new JTextField(30);
-        ooJars.setText(preferences.getJarsPath());
-        JButton browseOOJars = new JButton(Localization.lang("Browse"));
-        browseOOJars.addActionListener(e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
-                                                               .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString())));
-
-        FormBuilder builder = FormBuilder.create()
-                                         .layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
-
-        if (OS.WINDOWS || OS.OS_X) {
-            builder.add(Localization.lang("Path to OpenOffice/LibreOffice directory")).xy(1, 1);
-            builder.add(ooPath).xy(3, 1);
-            builder.add(browseOOPath).xy(5, 1);
-        } else {
-            builder.add(Localization.lang("Path to OpenOffice/LibreOffice executable")).xy(1, 1);
-            builder.add(ooExec).xy(3, 1);
-            builder.add(browseOOExec).xy(5, 1);
-
-            builder.appendRows("4dlu, pref");
-            builder.add(Localization.lang("Path to OpenOffice/LibreOffice library dir")).xy(1, 3);
-            builder.add(ooJars).xy(3, 3);
-            builder.add(browseOOJars).xy(5, 3);
-        }
-        builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
-
-        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
-
-        // Buttons
-        JButton ok = new JButton(Localization.lang("OK"));
-        JButton cancel = new JButton(Localization.lang("Cancel"));
-
-        ok.addActionListener(e -> {
-            if (OS.WINDOWS || OS.OS_X) {
-                preferences.updateConnectionParams(ooPath.getText(), ooPath.getText(), ooPath.getText());
-            } else {
-                preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
-            }
-            dialogOkPressed = true;
-            cDiag.dispose();
-        });
-        cancel.addActionListener(e -> cDiag.dispose());
-
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        bb.addGlue();
-        bb.addRelatedGap();
-        bb.addButton(ok);
-        bb.addButton(cancel);
-        bb.addGlue();
-        bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-
-        // Finish and show dirDialog
-        cDiag.pack();
-        cDiag.setVisible(true);
+        ManualConnectDialogView manualConnect = new ManualConnectDialogView(dialogService);
+        manualConnect.showAndWait();
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
@@ -572,9 +489,9 @@ public class OpenOfficePanel {
                                        preferences.getSyncWhenCiting());
                 } catch (FileNotFoundException ex) {
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(
-                                                                                                     Localization.lang("No valid style file defined"),
-                                                                                                     Localization.lang("You must select either a valid style file, or use one of the default styles.")));
+                    dialogService.showErrorDialogAndWait(
+                                                         Localization.lang("No valid style file defined"),
+                                                         Localization.lang("You must select either a valid style file, or use one of the default styles."));
 
                     LOGGER.warn("Problem with style file", ex);
                 } catch (ConnectionLostException ex) {
@@ -670,49 +587,47 @@ public class OpenOfficePanel {
         );
     }
 
-    private void showSettingsPopup() {
-        JPopupMenu menu = new JPopupMenu();
-        final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
-                                                                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                                                                 preferences.getSyncWhenCiting());
-        final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
-                                                                            Localization.lang("Look up BibTeX entries in the active tab only"));
-        final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
-                                                                          Localization.lang("Look up BibTeX entries in all open libraries"));
-        final JMenuItem clearConnectionSettings = new JMenuItem(Localization.lang("Clear connection settings"));
+    private ContextMenu createSettingsPopup() {
 
-        ButtonGroup lookupButtonGroup = new ButtonGroup();
-        lookupButtonGroup.add(useActiveBase);
-        lookupButtonGroup.add(useAllBases);
+        ContextMenu contextMenu = new ContextMenu();
+
+        CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
+        autoSync.selectedProperty().set(preferences.getSyncWhenCiting());
+
+        ToggleGroup toggleGroup = new ToggleGroup();
+        RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
+        RadioMenuItem useAllBases = new RadioMenuItem(Localization.lang("Look up BibTeX entries in all open libraries"));
+        useActiveBase.setToggleGroup(toggleGroup);
+        useAllBases.setToggleGroup(toggleGroup);
+
+        MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
+
         if (preferences.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(e -> {
+        autoSync.setOnAction(e -> {
             preferences.setSyncWhenCiting(autoSync.isSelected());
             Globals.prefs.setOpenOfficePreferences(preferences);
         });
-        useAllBases.addActionListener(e -> {
+        useAllBases.setOnAction(e -> {
             preferences.setUseAllDatabases(useAllBases.isSelected());
             Globals.prefs.setOpenOfficePreferences(preferences);
         });
-        useActiveBase.addActionListener(e -> {
+        useActiveBase.setOnAction(e -> {
             preferences.setUseAllDatabases(!useActiveBase.isSelected());
             Globals.prefs.setOpenOfficePreferences(preferences);
         });
-        clearConnectionSettings.addActionListener(e -> {
+        clearConnectionSettings.setOnAction(e -> {
             preferences.clearConnectionSettings();
             Globals.prefs.setOpenOfficePreferences(preferences);
         });
 
-        menu.add(autoSync);
-        menu.addSeparator();
-        menu.add(useActiveBase);
-        menu.add(useAllBases);
-        menu.addSeparator();
-        menu.add(clearConnectionSettings);
-        //  menu.show(settingsB, 0, settingsB.getHeight());
+        contextMenu.getItems().addAll(autoSync, new SeparatorMenuItem(), useActiveBase, useAllBases, new SeparatorMenuItem(), clearConnectionSettings);
+
+        return contextMenu;
+
     }
 }

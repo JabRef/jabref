@@ -226,8 +226,9 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public <V> void showCanceableProgressDialogAndWait(Task<V> task) {
+    public <V> void showCanceableProgressDialogAndWait(Task<V> task, String title) {
         ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setTitle(title);
         progressDialog.setOnCloseRequest(evt -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);

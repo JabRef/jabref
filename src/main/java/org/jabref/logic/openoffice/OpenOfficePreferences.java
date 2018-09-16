@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,22 +20,22 @@ public class OpenOfficePreferences {
 
     public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
 
-    private String executablePath;
-    private String installationPath;
-    private Boolean useAllDatabases;
-    private Boolean syncWhenCiting;
-    private Boolean showPanel;
-    private List<String> externalStyles;
-    private String currentStyle;
-    private String jarsPath;
+    private String executablePath = "";
+    private String installationPath = "";
+    private boolean useAllDatabases;
+    private boolean syncWhenCiting;
+    private boolean showPanel;
+    private List<String> externalStyles = new ArrayList<>();
+    private String currentStyle = "";
+    private String jarsPath = "";
 
     public OpenOfficePreferences(
             String jarsPath,
             String executablePath,
             String installationPath,
-            Boolean useAllDatabases,
-            Boolean syncWhenCiting,
-            Boolean showPanel,
+                                 boolean useAllDatabases,
+                                 boolean syncWhenCiting,
+                                 boolean showPanel,
             List<String> externalStyles,
             String currentStyle
     ) {
@@ -93,18 +94,18 @@ public class OpenOfficePreferences {
         return syncWhenCiting;
     }
 
-    public void setSyncWhenCiting(Boolean syncWhenCiting) {
+    public void setSyncWhenCiting(boolean syncWhenCiting) {
         this.syncWhenCiting = syncWhenCiting;
     }
 
     /**
      * true if the OO panel is shown on startup
      */
-    public Boolean getShowPanel() {
+    public boolean getShowPanel() {
         return showPanel;
     }
 
-    public void setShowPanel(Boolean showPanel) {
+    public void setShowPanel(boolean showPanel) {
         this.showPanel = showPanel;
     }
 
@@ -148,9 +149,9 @@ public class OpenOfficePreferences {
     }
 
     public void clearConnectionSettings() {
-        this.installationPath = null;
-        this.executablePath = null;
-        this.jarsPath = null;
+        this.installationPath = "";
+        this.executablePath = "";
+        this.jarsPath = "";
     }
 
 }
