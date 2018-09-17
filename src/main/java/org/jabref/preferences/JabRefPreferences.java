@@ -300,6 +300,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -575,6 +576,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
+        defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
@@ -905,6 +907,7 @@ public class JabRefPreferences implements PreferencesService {
                 getImportFormatPreferences(),
                 getCustomTabFieldNames(),
                 getBoolean(SHOW_RECOMMENDATIONS),
+                                          getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBibtexKeyPatternPreferences(),
                 Globals.getKeyPrefs(),

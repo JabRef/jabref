@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responible to get the recommendations from MDL
+ * This class is responsible for getting the recommendations from Mr. DLib
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
@@ -108,7 +108,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
         builder.setHost("api-dev.darwingoliath.com");
-        builder.setPath("/v2/related_items/" + queryWithTitle);
+        builder.setPath("/v2/items/" + queryWithTitle + "/related_items");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION);

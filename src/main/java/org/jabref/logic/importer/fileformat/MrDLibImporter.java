@@ -25,8 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- *
+ * Handles importing of recommended articles to be displayed in the Related Articles tab.
  */
 public class MrDLibImporter extends Importer {
 
@@ -34,6 +33,7 @@ public class MrDLibImporter extends Importer {
     private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = "Error while fetching from Mr.DLib.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
+
 
     @SuppressWarnings("unused")
     @Override
@@ -155,14 +155,14 @@ public class MrDLibImporter extends Importer {
         if (recommendation.has("title") && !recommendation.isNull("title")) {
             title = recommendation.getString("title");
         }
-        if (recommendation.has("date_published") && !recommendation.isNull("date_published")) {
-            year = recommendation.getString("date_published");
+        if (recommendation.has("year_published") && !recommendation.isNull("year_published")) {
+            year = Integer.toString(recommendation.getInt("year_published"));
         }
         if (recommendation.has("published_in") && !recommendation.isNull("published_in")) {
             journal = recommendation.getString("published_in");
         }
         if (recommendation.has("url") && !recommendation.isNull("url")) {
-            url = recommendation.getString("url") + ".";
+            url = recommendation.getString("url");
         }
         if (recommendation.has("recommendation_id") && !recommendation.isNull("recommendation_id")) {
             rank = recommendation.getInt("recommendation_id");
@@ -173,6 +173,7 @@ public class MrDLibImporter extends Importer {
         current.setField(FieldName.TITLE, title);
         current.setField(FieldName.YEAR, year);
         current.setField(FieldName.JOURNAL, journal);
+        current.setField(FieldName.URL, url);
 
         // Create HTML representation of recommendation for display on the UI
         Object[] args = {url, title, authors, journal, year};
@@ -191,7 +192,7 @@ public class MrDLibImporter extends Importer {
         String authorsString = "";
         JSONArray array = recommendation.getJSONArray("authors");
         for (int i = 0; i < array.length(); ++i) {
-            authorsString += array.getString(i) + ", ";
+            authorsString += array.getString(i) + "; ";
         }
         int stringLength = authorsString.length();
         if (stringLength > 2) {
