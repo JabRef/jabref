@@ -57,28 +57,29 @@ class LinkedFileViewModelTest {
         Files.createFile(tempFile);
     }
 
-      //Failed Implementation for CheckNameConflict
-//    @Test
-//    void checkNameConflict() {
-//        //Debug Statements
-//        System.out.println(tempFile.getFileName());
-//        System.out.println(tempFile.toAbsolutePath().toString());
-//
-//        linkedFile = spy(new LinkedFile("", tempFile.toString(), ""));
-//        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
-//        when(preferences.getFilePreferences()).thenReturn(new FilePreferences(eq("TestUser"), anyMap(), eq(true), eq("TestPattern"), eq("TestDirectoryPattern")));
-//        when(FileUtil.createFileNameFromPattern(any(BibDatabase.class), any(BibEntry.class), any(String.class))).thenReturn("TestFileName.txt");
-//
-//        //Debug Statements
-//        System.out.println(linkedFile.toString());
-//        System.out.println(linkedFile.getLink());
-//
-//        LinkedFileViewModel viewModel = spy(new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences));
-//
-//        boolean notEqual = viewModel.performNameConflictCheck();
-//
-//        assertTrue(!notEqual);
-//    }
+    //In-Progress Implementation for CheckNameConflict
+    @Test
+    void checkNameConflict() {
+        //Debug Statements
+        System.out.println(tempFile.getFileName());
+        System.out.println(tempFile.toAbsolutePath().toString());
+
+        linkedFile = spy(new LinkedFile("", tempFile.toString(), ""));
+        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
+        //when(preferences.getFilePreferences()).thenReturn(new FilePreferences(eq("TestUser"), anyMap(), eq(true), eq("TestPattern"), eq("TestDirectoryPattern")));
+
+        //Debug Statements
+        System.out.println(linkedFile.toString());
+        System.out.println(linkedFile.getLink());
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        //when(FileUtil.createFileNameFromPattern(any(BibDatabase.class), any(BibEntry.class), any(String.class))).thenReturn("TestFileName.txt");
+        when(new LinkedFileHandler(this.linkedFile, this.entry, this.databaseContext, this.preferences.getFilePreferences()).getSuggestedFileName()).thenReturn("temporaryFile");
+
+        boolean equalNames = viewModel.performNameConflictCheck();
+
+        assertTrue(equalNames);
+    }
 
     @Test
     void deleteWhenFilePathNotPresentReturnsTrue() {
