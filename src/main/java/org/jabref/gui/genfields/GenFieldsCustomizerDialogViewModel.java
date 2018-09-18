@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class GenFieldsCustomizerDialogViewModel {
@@ -56,8 +57,19 @@ public class GenFieldsCustomizerDialogViewModel {
             }
 
             String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getEnforceLegalKeys());
+            if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
+                String title = Localization.lang("Error");
+                String content = Localization.lang("Field names are not allowed to contain white space or the following "
+                                                   + "characters")
+                                 + ": # { } ~ , ^ &";
+                dialogService.showInformationDialogAndWait(title, content);
+                return;
+            }
+            preferences.setCustomTabsNameAndFields(parts[0], parts[1], i);
 
-            //Unfinished
+            preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME + "_def", i);
+            preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def", i);
+            preferences.updateEntryEditorTabList();
         }
     }
 

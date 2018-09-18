@@ -29,4 +29,10 @@ public interface PreferencesService {
 
     Map<String, String> getCustomTabsNamesAndFields();
 
+    void setCustomTabsNameAndFields(String name, String fields, int defNumber);
+
+    public void purgeSeries(String prefix, int number);
+
+    public void updateEntryEditorTabList();
+
 }

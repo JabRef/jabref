@@ -962,6 +962,12 @@ public class JabRefPreferences implements PreferencesService {
         return customTabsMap;
     }
 
+    @Override
+    public void setCustomTabsNameAndFields(String name, String fields, int defNumber) {
+        prefs.put(CUSTOM_TAB_NAME + "_def" + defNumber, name);
+        prefs.put(CUSTOM_TAB_FIELDS, fields);
+    }
+
     public List<String> getCustomTabFieldNames() {
         List<String> customFields = new ArrayList<>();
 
@@ -1323,6 +1329,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param number or higher.
      */
+    @Override
     public void purgeSeries(String prefix, int number) {
         int n = number;
         while (get(prefix + n) != null) {
@@ -1344,6 +1351,8 @@ public class JabRefPreferences implements PreferencesService {
         return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
     }
 
+    //Will making this override mess this up?  org.jabref.migrations.FileLinksUpgradeWarning line 240
+    @Override
     public void updateEntryEditorTabList() {
         tabList = EntryEditorTabList.create(this);
     }
