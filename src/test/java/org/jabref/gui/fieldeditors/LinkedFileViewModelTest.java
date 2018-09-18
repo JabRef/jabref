@@ -72,13 +72,13 @@ class LinkedFileViewModelTest {
         System.out.println(linkedFile.toString());
         System.out.println(linkedFile.getLink());
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = spy(new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences));
         //when(FileUtil.createFileNameFromPattern(any(BibDatabase.class), any(BibEntry.class), any(String.class))).thenReturn("TestFileName.txt");
         when(new LinkedFileHandler(this.linkedFile, this.entry, this.databaseContext, this.preferences.getFilePreferences()).getSuggestedFileName()).thenReturn("temporaryFile");
 
         boolean equalNames = viewModel.performNameConflictCheck();
 
-        assertTrue(equalNames);
+        assertTrue(!equalNames);
     }
 
     @Test
