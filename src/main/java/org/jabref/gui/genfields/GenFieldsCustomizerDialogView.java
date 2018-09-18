@@ -7,8 +7,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -35,8 +37,14 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
+        HelpAction helpCommand = new HelpAction(HelpFile.GENERAL_FIELDS);
+        //HelpAction is written with Swing, not JavaFX, so runCommand() cannot be used normally.  Here I am reaching into
+        //the command and running execute.  When HelpAction is converted to JavaFX,
+        //the following will need to be changed.
+        ControlHelper.setAction(helpButton, getDialogPane(), event -> helpCommand.getCommand().execute());
         ControlHelper.setAction(resetButton, getDialogPane(), event -> resetFields());
         ControlHelper.setAction(okButton, getDialogPane(), event -> saveFieldsAndCloseDialog());
+
     }
 
     @FXML

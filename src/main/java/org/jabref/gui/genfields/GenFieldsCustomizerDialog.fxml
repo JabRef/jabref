@@ -18,7 +18,7 @@
         </VBox>
     </content>
     <ButtonType fx:id="okButton" fx:constant="OK" />
-    <ButtonType fx:id="resetButton" buttonData="LEFT" text="%Revert" />
+    <ButtonType fx:id="resetButton" buttonData="LEFT" text="%Default" />
     <ButtonType fx:id="helpButton" text="%Help" />
     <ButtonType fx:constant="CANCEL" />
 </DialogPane>

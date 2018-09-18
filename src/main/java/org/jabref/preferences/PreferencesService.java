@@ -1,6 +1,8 @@
 package org.jabref.preferences;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -20,5 +22,11 @@ public interface PreferencesService {
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
+
+    Map<String, List<String>> getEntryEditorTabList();
+
+    Boolean getEnforceLegalKeys();
+
+    Map<String, String> getCustomTabsNamesAndFields();
 
 }

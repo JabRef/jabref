@@ -941,8 +941,30 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    //TODO: Javadoc explain that the fields value is a string of fields separated by ;
+    @Override
+    public Map<String, String> getCustomTabsNamesAndFields() {
+        Map<String, String> customTabsMap = new HashMap<>();
+
+        int defNumber = 0;
+        while (true) {
+            //Saved as CUSTOMTABNAME_def{number} and ; separated
+            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            //fields may be redundant
+            if ((name == null) || (fields == null) || name.isEmpty() || fields.isEmpty()) {
+                break;
+            }
+            customTabsMap.put(name, fields);
+            defNumber++;
+        }
+        return customTabsMap;
+    }
+
     public List<String> getCustomTabFieldNames() {
         List<String> customFields = new ArrayList<>();
+
 
         int defNumber = 0;
         while (true) {
@@ -1309,11 +1331,17 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
     public Map<String, List<String>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
         }
         return tabList;
+    }
+
+    @Override
+    public Boolean getEnforceLegalKeys() {
+        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
     }
 
     public void updateEntryEditorTabList() {
