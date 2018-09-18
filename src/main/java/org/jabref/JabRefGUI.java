@@ -29,6 +29,7 @@ import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +144,12 @@ public class JabRefGUI {
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
-        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
+        // We create a decoration pane ourselves for performance reasons
+        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
+        DecorationPane root = new DecorationPane();
+        root.getChildren().add(JabRefGUI.mainFrame);
+
+        Scene scene = new Scene(root, 800, 800);
         Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
