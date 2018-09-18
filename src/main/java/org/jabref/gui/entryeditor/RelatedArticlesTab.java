@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -117,17 +118,19 @@ public class RelatedArticlesTab extends EntryEditorTab {
      * @param entry Currently selected BibEntry. (required to allow reloading of pane if accepted)
      * @return StackPane returned to be placed into Related Articles tab.
      */
-    private StackPane getPrivacyDialog(BibEntry entry) {
-        StackPane root = new StackPane();
+    private ScrollPane getPrivacyDialog(BibEntry entry) {
+        ScrollPane root = new ScrollPane();
         VBox vbox = new VBox();
         vbox.getStyleClass().add("gdpr-dialog");
-        vbox.setSpacing(30.0);
+        vbox.setSpacing(20.0);
 
-        Button button = new Button("Accept");
+        Button button = new Button("I Agree");
         button.getStyleClass().add("accept-button");
-        Text line1 = new Text("Data about the selected entry must be sent to the Mr. Dlib external service in order to provide recommendations.");
+        Text line1 = new Text("Mr. DLib is an external service which provides article recommendations based on the currently selected entry. Data about the selected entry must be sent to Mr. DLib in order to provide these recommendations. Do you agree that this data may be sent?");
+
+        line1.setWrappingWidth(1300.0);
         Text line2 = new Text("This setting may be changed in preferences at any time.");
-        Hyperlink mdlLink = new Hyperlink("Further information about Mr DLib.");
+        Hyperlink mdlLink = new Hyperlink("Further information about Mr DLib. for JabRef users.");
         mdlLink.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -149,8 +152,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         });
 
         root.setStyle("-fx-padding: 20 20 20 20");
-        vbox.getChildren().addAll(line1, line2, mdlLink, button);
-        root.getChildren().addAll(vbox);
+        vbox.getChildren().addAll(line1, mdlLink, line2, button);
+        root.setContent(vbox);
 
         return root;
     }
