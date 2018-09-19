@@ -201,7 +201,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         String currentFileName = file.getFileName().toString();
         String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
 
-        if(currentFileName.equals(suggestedFileName))
+        if (currentFileName.equals(suggestedFileName))
             return true;
         else
             return false;

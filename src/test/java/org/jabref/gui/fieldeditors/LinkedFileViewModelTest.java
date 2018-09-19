@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.Map;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -11,8 +10,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -24,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
-import org.mockito.internal.stubbing.BaseStubbing;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,30 +51,6 @@ class LinkedFileViewModelTest {
 
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
-    }
-
-    //In-Progress Implementation for CheckNameConflict
-    @Test
-    void checkNameConflict() {
-        //Debug Statements
-        System.out.println(tempFile.getFileName());
-        System.out.println(tempFile.toAbsolutePath().toString());
-
-        linkedFile = spy(new LinkedFile("", tempFile.toString(), ""));
-        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
-        //when(preferences.getFilePreferences()).thenReturn(new FilePreferences(eq("TestUser"), anyMap(), eq(true), eq("TestPattern"), eq("TestDirectoryPattern")));
-
-        //Debug Statements
-        System.out.println(linkedFile.toString());
-        System.out.println(linkedFile.getLink());
-
-        LinkedFileViewModel viewModel = spy(new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences));
-        //when(FileUtil.createFileNameFromPattern(any(BibDatabase.class), any(BibEntry.class), any(String.class))).thenReturn("TestFileName.txt");
-        when(new LinkedFileHandler(this.linkedFile, this.entry, this.databaseContext, this.preferences.getFilePreferences()).getSuggestedFileName()).thenReturn("temporaryFile");
-
-        boolean equalNames = viewModel.performNameConflictCheck();
-
-        assertTrue(!equalNames);
     }
 
     @Test
