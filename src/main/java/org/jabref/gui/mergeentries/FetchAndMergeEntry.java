@@ -24,13 +24,14 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchAndMergeEntry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
-
     // A list of all field which are supported
     public static List<String> SUPPORTED_FIELDS = Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.ISBN);
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
+
     private final BasePanel panel;
     private DialogService dialogService;
-
+    
     /**
      * Convenience constructor for a single field
      *
