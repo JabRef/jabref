@@ -964,7 +964,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void setCustomTabsNameAndFields(String name, String fields, int defNumber) {
-        prefs.put(CUSTOM_TAB_NAME + "_def" + defNumber, name);
+        prefs.put(CUSTOM_TAB_NAME + defNumber, name);
         prefs.put(CUSTOM_TAB_FIELDS, fields);
     }
 

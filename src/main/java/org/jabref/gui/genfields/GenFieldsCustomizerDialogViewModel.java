@@ -67,10 +67,10 @@ public class GenFieldsCustomizerDialogViewModel {
             }
             preferences.setCustomTabsNameAndFields(parts[0], parts[1], i);
 
-            preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME + "_def", i);
-            preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def", i);
-            preferences.updateEntryEditorTabList();
         }
+        preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
+        preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
+        preferences.updateEntryEditorTabList();
     }
 
     public void resetFields() {
