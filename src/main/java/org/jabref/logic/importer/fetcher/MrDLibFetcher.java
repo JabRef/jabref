@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Globals;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.MrDLibImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -107,7 +109,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost("api-dev.darwingoliath.com");
+        builder.setHost(getMdlUrl());
         builder.setPath("/v2/items/" + queryWithTitle + "/related_items");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
@@ -122,5 +124,14 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             LOGGER.error(e.getMessage(), e);
         }
         return "";
+    }
+
+    private String getMdlUrl() {
+        Version currentVersion = Globals.BUILD_INFO.getVersion();
+        if (currentVersion.isDevelopmentVersion()) {
+            return "api-dev.darwingoliath.com";
+        } else {
+            return "api.darwingoliath.com";
+        }
     }
 }
