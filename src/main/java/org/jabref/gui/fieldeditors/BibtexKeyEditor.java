@@ -23,7 +23,7 @@ public class BibtexKeyEditor extends HBox implements FieldEditorFX {
     private final JabRefPreferences preferences;
     @FXML private BibtexKeyEditorViewModel viewModel;
     @FXML private Button generateCiteKeyButton;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
 
     public BibtexKeyEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
         this.preferences = preferences;
@@ -33,9 +33,9 @@ public class BibtexKeyEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textField.textProperty().bindBidirectional(viewModel.textProperty());
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public BibtexKeyEditorViewModel getViewModel() {

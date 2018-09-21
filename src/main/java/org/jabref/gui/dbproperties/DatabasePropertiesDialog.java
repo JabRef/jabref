@@ -238,7 +238,7 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         } else {
             SaveOrderConfig saveOrderConfig = storedSaveOrderConfig.get();
             oldSaveOrderConfig = saveOrderConfig;
-            if (saveOrderConfig.saveInOriginalOrder) {
+            if (saveOrderConfig.saveInOriginalOrder()) {
                 saveInOriginalOrder.setSelected(true);
                 selected = false;
             } else {

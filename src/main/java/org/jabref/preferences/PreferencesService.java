@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 public interface PreferencesService {
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
@@ -17,7 +17,7 @@ public interface PreferencesService {
 
     void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
 
-    FileDirectoryPreferences getFileDirectoryPreferences();
+    FilePreferences getFilePreferences();
 
     Path getWorkingDir();
 

@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +17,6 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -39,6 +37,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.DataFormat;
@@ -284,8 +283,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
             //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-            // TODO: Can't notify focus listener since it is expecting a swing component
-            //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+
             setWindowTitle();
             // Update search autocompleter with information for the correct database:
             currentBasePanel.updateSearchManager();
@@ -621,7 +619,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
         HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
+                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
@@ -838,9 +836,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences())),
+                factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences(), dialogService, Globals.prefs)),
 
                 new SeparatorMenuItem(),
 
@@ -954,7 +952,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction()),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, prefs.getVersionPreferences(), dialogService, Globals.TASK_EXECUTOR)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
@@ -1022,7 +1020,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      */
     @Deprecated
     public void output(final String s) {
-        statusLine.show(s, 3000);
+        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.show(s, 3000));
     }
 
     private void initActions() {
@@ -1339,8 +1337,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             // The user wants to save.
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
-                saveAction.runCommand();
-                if (saveAction.isCanceled() || !saveAction.isSuccess()) {
+                if (!saveAction.save()) {
                     // The action was either canceled or unsuccessful.
                     output(Localization.lang("Unable to save library"));
                     return false;
@@ -1442,10 +1439,40 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            JComponent source = Globals.getFocusListener().getFocused();
-            Action action = source.getActionMap().get(command);
-            if (action != null) {
-                action.actionPerformed(new ActionEvent(source, 0, command.name()));
+            Node focusOwner = mainStage.getScene().getFocusOwner();
+            if (focusOwner != null) {
+                if (focusOwner instanceof TextInputControl) {
+                    // Focus is on text field -> copy/paste/cut selected text
+                    TextInputControl textInput = (TextInputControl) focusOwner;
+                    switch (command) {
+                        case COPY:
+                            textInput.copy();
+                            break;
+                        case CUT:
+                            textInput.cut();
+                            break;
+                        case PASTE:
+                            textInput.paste();
+                            break;
+                        default:
+                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
+                    }
+                } else {
+                    // Not sure what is selected -> copy/paste/cut selected entries
+                    switch (command) {
+                        case COPY:
+                            getCurrentBasePanel().copy();
+                            break;
+                        case CUT:
+                            getCurrentBasePanel().cut();
+                            break;
+                        case PASTE:
+                            getCurrentBasePanel().paste();
+                            break;
+                        default:
+                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
+                    }
+                }
             }
         }
     }

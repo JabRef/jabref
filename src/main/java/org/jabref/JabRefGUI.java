@@ -15,21 +15,21 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.worker.VersionWorker;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +60,8 @@ public class JabRefGUI {
                                     .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
-        JabRefGUI.checkForNewVersion(false);
-    }
-
-    public static void checkForNewVersion(boolean manualExecution) {
-        Version toBeIgnored = Globals.prefs.getVersionPreferences().getIgnoredVersion();
-        Version currentVersion = Globals.BUILD_INFO.getVersion();
-        new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
+        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
+                .checkForNewVersionAsync(false);
     }
 
     private void openWindow(Stage mainStage) {
@@ -149,7 +144,12 @@ public class JabRefGUI {
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
-        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
+        // We create a decoration pane ourselves for performance reasons
+        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
+        DecorationPane root = new DecorationPane();
+        root.getChildren().add(JabRefGUI.mainFrame);
+
+        Scene scene = new Scene(root, 800, 800);
         Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());

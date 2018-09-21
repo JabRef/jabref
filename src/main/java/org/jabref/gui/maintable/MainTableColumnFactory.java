@@ -120,6 +120,7 @@ class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
+        column.setSortable(true);
         return column;
     }
 
@@ -156,6 +157,7 @@ class MainTableColumnFactory {
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);
+            column.setSortable(true);
             column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
             columns.add(column);
         }
@@ -199,6 +201,7 @@ class MainTableColumnFactory {
             column.setComparator(new RankingFieldComparator());
         }
 
+        column.setSortable(true);
         return column;
     }
 
@@ -374,7 +377,6 @@ class MainTableColumnFactory {
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                         .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList())))
                         .install(column);
-
         return column;
     }
 
