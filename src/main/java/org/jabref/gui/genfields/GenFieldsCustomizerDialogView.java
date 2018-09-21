@@ -20,9 +20,9 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
 
     @FXML private ButtonType resetButton;
     @FXML private ButtonType helpButton;
-    @FXML private ButtonType okButton; // Double checkthis
-    @FXML private ButtonType cancelButton; //Double check this
-    @FXML private TextArea fieldsTextArea; //generic?
+    @FXML private ButtonType okButton;
+    @FXML private ButtonType cancelButton;
+    @FXML private TextArea fieldsTextArea;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
@@ -51,7 +51,6 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GenFieldsCustomizerDialogViewModel(dialogService, preferences);
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsTextProperty());
-        //No need to use EasyBind here
 
     }
 

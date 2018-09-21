@@ -79,11 +79,6 @@ public class GenFieldsCustomizerDialogViewModel {
         String name;
         String fields;
         int i = 0;
-        //threre may be a better var name
-        //You can make getgetCustomTabFieldNames depend on getTabNamesAndFields
-        //but that's refactoring and needs to be tested where it appears
-        //YOu can have a while loop in the preferences method - use a 'for' here
-        //Make the Map a HashMap in preferences
         Map<String,String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
         for (Map.Entry<String,String>entry : customTabNamesFields.entrySet()) {
             sb.append(entry.getKey());

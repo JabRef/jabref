@@ -941,7 +941,15 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    //TODO: Javadoc explain that the fields value is a string of fields separated by ;
+    /**
+     * Get a Map of default tab names to deafult tab fields.
+     * The fields are returned as a String with fields separated by ;
+     * They are combined into one string in order to feed into GenFieldsCustomizerDialogViewModel.resetFields()
+     * so that they do not have to be parsed in order to fit there
+     *
+     * @param kesfjaksd;fjlkasdjflkheck.
+     * @return true sfdjklsdjfklse otherwise.
+     */
     @Override
     public Map<String, String> getCustomTabsNamesAndFields() {
         Map<String, String> customTabsMap = new HashMap<>();
@@ -952,7 +960,6 @@ public class JabRefPreferences implements PreferencesService {
             String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            //fields may be redundant
             if ((name == null) || (fields == null) || name.isEmpty() || fields.isEmpty()) {
                 break;
             }
@@ -1351,7 +1358,6 @@ public class JabRefPreferences implements PreferencesService {
         return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
     }
 
-    //Will making this override mess this up?  org.jabref.migrations.FileLinksUpgradeWarning line 240
     @Override
     public void updateEntryEditorTabList() {
         tabList = EntryEditorTabList.create(this);
