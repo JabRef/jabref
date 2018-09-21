@@ -76,9 +76,6 @@ public class GenFieldsCustomizerDialogViewModel {
     public void resetFields() {
 
         StringBuilder sb = new StringBuilder();
-        String name;
-        String fields;
-        int i = 0;
         Map<String,String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
         for (Map.Entry<String,String>entry : customTabNamesFields.entrySet()) {
             sb.append(entry.getKey());

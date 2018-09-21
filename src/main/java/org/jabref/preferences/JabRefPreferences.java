@@ -972,7 +972,6 @@ public class JabRefPreferences implements PreferencesService {
     public List<String> getCustomTabFieldNames() {
         List<String> customFields = new ArrayList<>();
 
-
         int defNumber = 0;
         while (true) {
             // saved as CUSTOMTABNAME_def{number} and ; separated
