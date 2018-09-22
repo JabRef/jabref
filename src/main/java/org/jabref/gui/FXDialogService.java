@@ -221,6 +221,17 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public FXDialog showCustomDialog(String title, DialogPane contentPane,
+            ButtonType... buttonTypes) {
+        FXDialog alert = new FXDialog(AlertType.NONE, title);
+        alert.setDialogPane(contentPane);
+        alert.getButtonTypes().setAll(buttonTypes);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.setResizable(true);
+        return alert;
+    }
+
+    @Override
     public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
         return dialog.showAndWait();
     }

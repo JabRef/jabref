@@ -13,26 +13,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -74,7 +75,6 @@ public class OpenOfficePanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
     private final DialogService dialogService;
 
-    private JDialog diag;
     private final Button connect;
     private final Button manualConnect;
     private final Button selectDocument;
@@ -94,33 +94,40 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private final JabRefFrame frame;
     private OOBibStyle style;
-    private boolean dialogOkPressed;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, OpenOfficePreferences preferences) {
         Node connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode();
+        Node connectImage2 = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode();
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
         this.preferences = preferences;
         connect = new Button();
-        connect.setGraphic(connectImage);
+        connect.setGraphic(connectImage2);
+        connect.setTooltip(new Tooltip(Localization.lang("Connect")));
+        connect.setMaxWidth(Double.MAX_VALUE);
+
         manualConnect = new Button();
         manualConnect.setGraphic(connectImage);
-        connect.setTooltip(new Tooltip(Localization.lang("Connect")));
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
+        manualConnect.setMaxWidth(Double.MAX_VALUE);
+
         HelpAction helpCommand = new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE);
 
         help = factory.createIconButton(StandardActions.HELP, helpCommand.getCommand());
+        help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
         selectDocument.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select Writer document")));
+        selectDocument.setMaxWidth(Double.MAX_VALUE);
 
         update = new Button();
         update.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
+        update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(preferences,
                                  Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
@@ -155,6 +162,7 @@ public class OpenOfficePanel {
 
         });
 
+        setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
 
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(dialogService, loader);
@@ -172,12 +180,16 @@ public class OpenOfficePanel {
 
         pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
         pushEntries.setOnAction(e -> pushEntries(true, true, false));
+        pushEntries.setMaxWidth(Double.MAX_VALUE);
         pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
         pushEntriesInt.setOnAction(e -> pushEntries(false, true, false));
+        pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
         pushEntriesEmpty.setOnAction(e -> pushEntries(false, false, false));
+        pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
         pushEntriesAdvanced.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
         pushEntriesAdvanced.setOnAction(e -> pushEntries(false, true, true));
+        pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
         update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
 
@@ -224,6 +236,7 @@ public class OpenOfficePanel {
 
         });
 
+        merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
         merge.setOnAction(e -> {
             try {
@@ -238,8 +251,10 @@ public class OpenOfficePanel {
 
         });
         ContextMenu settingsMenu = createSettingsPopup();
+        settingsB.setMaxWidth(Double.MAX_VALUE);
         settingsB.setContextMenu(settingsMenu);
         settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
+        manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(e -> {
             try {
                 CitationManager cm = new CitationManager(ooBase, dialogService);
@@ -249,6 +264,7 @@ public class OpenOfficePanel {
             }
         });
 
+        exportCitations.setMaxWidth(Double.MAX_VALUE);
         exportCitations.setOnAction(event -> exportEntries());
 
         selectDocument.setDisable(true);
@@ -260,10 +276,11 @@ public class OpenOfficePanel {
         merge.setDisable(true);
         manageCitations.setDisable(true);
         exportCitations.setDisable(true);
-        diag = new JDialog((JFrame) null, "OpenOffice/LibreOffice panel", false);
 
         HBox hbox = new HBox();
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
+        hbox.getChildren().forEach(btn -> hbox.setHgrow(btn, Priority.ALWAYS));
+
         vbox.setFillWidth(true);
         vbox.getChildren().addAll(hbox, setStyleFile, pushEntries, pushEntriesInt, pushEntriesAdvanced, pushEntriesEmpty, merge, manageCitations, exportCitations, settingsB);
     }
@@ -322,12 +339,12 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferences, dialogService);
+
         BackgroundTask
                       .wrap(() -> {
-                          DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
-
-                          Boolean installed = officeInstallation.isInstalled().get();
-                          if ((installed == null) || !installed) {
+                          boolean installed = officeInstallation.isInstalled().get();
+                          if (!installed) {
                               throw new IllegalStateException("OpenOffice Installation could not be detected.");
                           }
                           return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
@@ -338,31 +355,23 @@ public class OpenOfficePanel {
     }
 
     private void connectManually() {
-        showManualConnectionDialog();
-        if (!dialogOkPressed) {
-            return;
-        }
-
-        connect();
+        showManualConnectionDialog().ifPresent(ok -> connect());
     }
 
     private void connect() {
-        JDialog progressDialog = null;
+        DialogPane dialogPane = new DialogPane();
+        ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
+        dialogPane.setContent(indicator);
+        FXDialog progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
+        progressDialog.show();
 
         try {
             // Add OO JARs to the classpath
             loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
 
-            // Show progress dialog:
-            progressDialog = new DetectOpenOfficeInstallation(diag, preferences, dialogService)
-                                                                                               .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
-            JDialog finalProgressDialog = progressDialog;
             BackgroundTask
                           .wrap(this::createBibBase)
-                          .onFinished(() -> SwingUtilities.invokeLater(() -> {
-                              finalProgressDialog.dispose();
-                              diag.dispose();
-                          }))
+                          .onFinished(() -> progressDialog.close())
                           .onSuccess(ooBase -> {
                               this.ooBase = ooBase;
 
@@ -384,7 +393,6 @@ public class OpenOfficePanel {
                           })
                           .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
                           .executeWith(Globals.TASK_EXECUTOR);
-            diag.dispose();
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
@@ -404,7 +412,7 @@ public class OpenOfficePanel {
 
         } finally {
             if (progressDialog != null) {
-                progressDialog.dispose();
+                progressDialog.close();
             }
         }
     }
@@ -447,11 +455,10 @@ public class OpenOfficePanel {
         }
     }
 
-    private void showManualConnectionDialog() {
-        dialogOkPressed = false;
+    private Optional<Boolean> showManualConnectionDialog() {
 
         ManualConnectDialogView manualConnect = new ManualConnectDialogView(dialogService);
-        manualConnect.showAndWait();
+        return manualConnect.showAndWait();
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {

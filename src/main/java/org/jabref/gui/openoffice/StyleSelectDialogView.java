@@ -12,7 +12,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -73,7 +72,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
 
-        preview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+        preview = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
         preview.setEntry(TestEntry.getTestEntry());
 
         vbox.getChildren().add(preview);

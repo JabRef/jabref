@@ -8,22 +8,24 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
-
-import javafx.concurrent.Task;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.ProgressIndicator;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
@@ -31,13 +33,10 @@ import org.jabref.logic.util.io.FileUtil;
 public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences preferences;
-    private final JDialog parent;
     private final DialogService dialogService;
+    private FXDialog progressDialog;
 
-    private JDialog progressDialog;
-
-    public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences, DialogService dialogService) {
-        this.parent = parent;
+    public DetectOpenOfficeInstallation(OpenOfficePreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -47,17 +46,21 @@ public class DetectOpenOfficeInstallation {
         if (this.checkAutoDetectedPaths(preferences)) {
             future.complete(true);
         } else {
-            init();
+            DefaultTaskExecutor.runInJavaFXThread(() -> init());
             BackgroundTask.wrap(() -> future.complete(autoDetectPaths()))
-                          .onSuccess(x -> SwingUtilities.invokeLater(progressDialog::dispose))
+                          .onSuccess(x -> progressDialog.close())
                           .executeWith(Globals.TASK_EXECUTOR);
         }
         return future;
     }
 
-    public void init() {
-        // progressDialog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
-        //                                   Localization.lang("Please wait..."));
+    private void init() {
+        DialogPane dialogPane = new DialogPane();
+        ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
+        dialogPane.setContent(indicator);
+
+        progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
+        progressDialog.show();
     }
 
     private Optional<Path> selectInstallationPath() {
@@ -95,7 +98,7 @@ public class DetectOpenOfficeInstallation {
      */
     private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
         String executablePath = openOfficePreferences.getExecutablePath();
-        return ((executablePath != null) && Files.exists(Paths.get(executablePath)));
+        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Paths.get(executablePath));
     }
 
     private boolean setOpenOfficePreferences(Path installDir) {
@@ -139,14 +142,4 @@ public class DetectOpenOfficeInstallation {
         return selectedPath;
     }
 
-    public <V> void showProgressDialog(Task<V> task, String title) {
-
-        dialogService.showCanceableProgressDialogAndWait(task, title);
-
-    }
-
-    public JDialog showProgressDialog(JDialog diag, String lang, String lang2) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

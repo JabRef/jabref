@@ -21,7 +21,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ManualConnectDialogView extends BaseDialog<Void> {
+public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
     @FXML private Label OOPathLabel;
     @FXML private TextField ooPath;
@@ -63,6 +63,9 @@ public class ManualConnectDialogView extends BaseDialog<Void> {
                 } else {
                     preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
                 }
+                preferencesService.setOpenOfficePreferences(preferences);
+
+                return true;
             }
             return null;
         });
@@ -90,16 +93,22 @@ public class ManualConnectDialogView extends BaseDialog<Void> {
         browseOOJars.managedProperty().bind(ooJars.visibleProperty());
 
         if (OS.WINDOWS || OS.OS_X) {
-            ooExec.setVisible(true);
-            ooPath.setVisible(false);
+            ooPath.setVisible(true);
+            ooExec.setVisible(false);
             ooJars.setVisible(false);
         } else {
+            ooPath.setVisible(false);
             ooExec.setVisible(false);
-            ooPath.setVisible(true);
             ooJars.setVisible(true);
         }
 
     }
+
+    @FXML
+    void browseOOPath(ActionEvent event) {
+        dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()));
+    }
+
 
     @FXML
     void browseOOExec(ActionEvent event) {
@@ -111,9 +120,5 @@ public class ManualConnectDialogView extends BaseDialog<Void> {
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()));
     }
 
-    @FXML
-    void browseOOPath(ActionEvent event) {
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()));
-    }
 
 }

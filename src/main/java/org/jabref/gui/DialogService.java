@@ -172,6 +172,15 @@ public interface DialogService {
      */
     Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
 
+
+    /**
+     * This will create and display a new dialog showing a custom {@link DialogPane}
+     * and using custom {@link ButtonType}s.
+     *
+     * @return The created {@link FXDialog}
+     */
+    FXDialog showCustomDialog(String title, DialogPane contentPane, ButtonType... buttonTypes);
+
     /**
      * Shows a custom dialog and returns the result.
      *
@@ -244,5 +253,6 @@ public interface DialogService {
      * @return false if the user opts to cancel printing
      */
     boolean showPrintDialog(PrinterJob job);
+
 
 }
