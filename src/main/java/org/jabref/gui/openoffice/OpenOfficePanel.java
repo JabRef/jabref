@@ -39,6 +39,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
@@ -97,20 +98,19 @@ public class OpenOfficePanel {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    public OpenOfficePanel(JabRefFrame jabRefFrame, OpenOfficePreferences preferences) {
-        Node connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode();
-        Node connectImage2 = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode();
-
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
+    public OpenOfficePanel(JabRefFrame frame, OpenOfficePreferences preferences, KeyBindingRepository keyBindingRepository) {
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        this.frame = frame;
         this.preferences = preferences;
+        dialogService = frame.getDialogService();
+
         connect = new Button();
-        connect.setGraphic(connectImage2);
+        connect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());
         connect.setTooltip(new Tooltip(Localization.lang("Connect")));
         connect.setMaxWidth(Double.MAX_VALUE);
 
         manualConnect = new Button();
-        manualConnect.setGraphic(connectImage);
+        manualConnect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
@@ -133,9 +133,7 @@ public class OpenOfficePanel {
                                  Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                                  Globals.prefs.getDefaultEncoding());
 
-        this.frame = jabRefFrame;
         initPanel();
-        dialogService = frame.getDialogService();
     }
 
     public Node getContent() {

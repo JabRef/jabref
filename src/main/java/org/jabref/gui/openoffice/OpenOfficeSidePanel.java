@@ -10,17 +10,20 @@ import org.jabref.gui.SidePaneType;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
 
     private final OpenOfficePreferences preferences;
     private final JabRefFrame frame;
+    private final KeyBindingRepository keyBindingRepository;
 
-    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, OpenOfficePreferences preferences, JabRefFrame frame) {
+    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, OpenOfficePreferences preferences, JabRefFrame frame, KeyBindingRepository keyBindingRepository) {
         super(sidePaneManager, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
         this.preferences = preferences;
         this.frame = frame;
+        this.keyBindingRepository = keyBindingRepository;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        return new OpenOfficePanel(frame, preferences).getContent();
+        return new OpenOfficePanel(frame, preferences, keyBindingRepository).getContent();
     }
 
     @Override
