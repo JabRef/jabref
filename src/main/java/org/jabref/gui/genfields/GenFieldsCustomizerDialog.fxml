@@ -10,10 +10,10 @@
     <content>
         <VBox prefHeight="300.0" prefWidth="650.0">
             <children>
-                <Label text="General Fields" />
-                <Label text="Create custom fields for each BibTeX entry" />
+                <Label text="%General Fields" />
+                <Label text="%Create custom fields for each BibTeX entry" />
                 <TextArea fx:id="fieldsTextArea" minHeight="200.0" minWidth="628.0" />
-                <Label text="Format: Tab:field;field;... (e.g. General:url;pdf;note...)" />
+                <Label text="%Format: Tab:field;field;... (e.g. General:url;pdf;note...)" />
             </children>
         </VBox>
     </content>
