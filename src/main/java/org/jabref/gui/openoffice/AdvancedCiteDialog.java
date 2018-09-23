@@ -33,7 +33,6 @@ class AdvancedCiteDialog {
     private final JDialog diag;
     private final JTextField pageInfo = new JTextField(15);
 
-
     public AdvancedCiteDialog(JabRefFrame parent) {
         diag = new JDialog((JFrame) null, Localization.lang("Cite special"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -50,7 +49,7 @@ class AdvancedCiteDialog {
         inPar.addChangeListener(changeEvent -> defaultInPar = inPar.isSelected());
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref, 4dlu, pref"));
+                                         .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref, 4dlu, pref"));
         builder.add(inPar).xyw(1, 1, 3);
         builder.add(inText).xyw(1, 3, 3);
         builder.add(Localization.lang("Extra information (e.g. page number)") + ":").xy(1, 5);
@@ -71,8 +70,8 @@ class AdvancedCiteDialog {
         diag.pack();
 
         ActionListener okAction = actionEvent -> {
-                okPressed = true;
-                diag.dispose();
+            okPressed = true;
+            diag.dispose();
         };
 
         ok.addActionListener(okAction);

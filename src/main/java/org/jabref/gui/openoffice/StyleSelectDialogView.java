@@ -71,7 +71,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-
         preview = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
         preview.setEntry(TestEntry.getTestEntry());
 

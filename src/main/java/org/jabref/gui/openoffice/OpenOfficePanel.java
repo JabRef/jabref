@@ -468,8 +468,12 @@ public class OpenOfficePanel {
         Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
+
+            AdvancedCiteDialogView citeDialog = new AdvancedCiteDialogView();
+            citeDialog.showAndWait();
+            /*
             AdvancedCiteDialog citeDialog = new AdvancedCiteDialog(frame);
-            citeDialog.showDialog();
+
             if (citeDialog.canceled()) {
                 return;
             }
@@ -477,7 +481,7 @@ public class OpenOfficePanel {
                 pageInfo = citeDialog.getPageInfo();
             }
             inParenthesis = citeDialog.isInParenthesisCite();
-
+            */
         }
 
         BasePanel panel = frame.getCurrentBasePanel();
