@@ -941,8 +941,8 @@ public class JabRefPreferences implements PreferencesService {
      * They are combined into one string in order to feed into GenFieldsCustomizerDialogViewModel.resetFields()
      * so that they do not have to be parsed in order to fit there
      *
-     * @param ADD PARAMS HERE.
-     * @return ADD RETURN VAL HERE
+     * @return A map of keys with tab names and values as a string containing
+     * fields for the given name separated by ;
      */
     @Override
     public Map<String, String> getCustomTabsNamesAndFields() {
