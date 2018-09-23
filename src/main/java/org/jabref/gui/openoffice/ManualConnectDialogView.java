@@ -10,11 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
@@ -35,10 +31,9 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
     @Inject private PreferencesService preferencesService;
 
-    private final DirectoryDialogConfiguration dirDialogConfiguration;
-    private final FileDialogConfiguration fileDialogConfiguration;
     private final DialogService dialogService;
     private OpenOfficePreferences preferences;
+    private ManualConnectDialogViewModel viewModel;
 
     public ManualConnectDialogView(DialogService dialogService) {
         this.dialogService = dialogService;
@@ -47,22 +42,14 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
                   .load()
                   .setAsDialogPane(this);
 
-        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
-
-        dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                           .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                           .build();
-        fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                       .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                       .build();
-
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 if (OS.WINDOWS || OS.OS_X) {
-                    preferences.updateConnectionParams(ooPath.getText(), ooPath.getText(), ooPath.getText());
+                    preferences.updateConnectionParams(viewModel.ooPathProperty().getValue(), viewModel.ooPathProperty().getValue(), viewModel.ooPathProperty().getValue());
                 } else {
-                    preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+                    preferences.updateConnectionParams(viewModel.ooPathProperty().getValue(), viewModel.ooExecProperty().getValue(), viewModel.ooJarsProperty().getValue());
                 }
+
                 preferencesService.setOpenOfficePreferences(preferences);
 
                 return true;
@@ -74,22 +61,23 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
+        this.preferences = preferencesService.getOpenOfficePreferences();
 
-        preferences = preferencesService.getOpenOfficePreferences();
-        ooPath.setText(preferences.getInstallationPath());
-        ooExec.setText(preferences.getExecutablePath());
-        ooJars.setText(preferences.getJarsPath());
-
-        ooExecLabel.managedProperty().bind(ooExec.visibleProperty());
-        ooExec.managedProperty().bind(ooExec.visibleProperty());
-        browseOOExec.managedProperty().bind(ooExec.visibleProperty());
+        viewModel = new ManualConnectDialogViewModel(preferencesService.getOpenOfficePreferences(), dialogService);
 
         OOPathLabel.managedProperty().bind(ooPath.visibleProperty());
         ooPath.managedProperty().bind(ooPath.visibleProperty());
+        ooPath.textProperty().bindBidirectional(viewModel.ooPathProperty());
         browseOOPath.managedProperty().bind(ooPath.visibleProperty());
+
+        ooExecLabel.managedProperty().bind(ooExec.visibleProperty());
+        ooExec.managedProperty().bind(ooExec.visibleProperty());
+        ooExec.textProperty().bindBidirectional(viewModel.ooExecProperty());
+        browseOOExec.managedProperty().bind(ooExec.visibleProperty());
 
         ooJarsLabel.managedProperty().bind(ooJars.visibleProperty());
         ooJars.managedProperty().bind(ooJars.visibleProperty());
+        ooJars.textProperty().bind(viewModel.ooJarsProperty());
         browseOOJars.managedProperty().bind(ooJars.visibleProperty());
 
         if (OS.WINDOWS || OS.OS_X) {
@@ -106,19 +94,17 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
     @FXML
     void browseOOPath(ActionEvent event) {
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()));
+        viewModel.browseOOPath();
     }
-
 
     @FXML
     void browseOOExec(ActionEvent event) {
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()));
+        viewModel.browseOOExec();
     }
 
     @FXML
     void browseOOJars(ActionEvent event) {
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration).ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()));
+        viewModel.browseOOJars();
     }
-
 
 }

@@ -34,7 +34,7 @@ public class SidePaneManager {
                   new FileUpdatePanel(this),
                   new GroupSidePane(this, preferences, frame.getDialogService()),
                   new WebSearchPane(this, preferences, frame),
-                  new OpenOfficeSidePanel(this, openOfficePreferences, frame, preferences.getKeyBindingRepository()))
+                  new OpenOfficeSidePanel(this, preferences, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {

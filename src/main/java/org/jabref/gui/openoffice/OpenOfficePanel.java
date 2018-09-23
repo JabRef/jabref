@@ -56,6 +56,7 @@ import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -95,13 +96,15 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private final JabRefFrame frame;
     private OOBibStyle style;
-    private final OpenOfficePreferences preferences;
+    private OpenOfficePreferences ooPrefs;
+    private final JabRefPreferences jabRefPreferences;
     private final StyleLoader loader;
 
-    public OpenOfficePanel(JabRefFrame frame, OpenOfficePreferences preferences, KeyBindingRepository keyBindingRepository) {
+    public OpenOfficePanel(JabRefFrame frame, JabRefPreferences jabRefPreferences, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.frame = frame;
-        this.preferences = preferences;
+        this.ooPrefs = ooPrefs;
+        this.jabRefPreferences = jabRefPreferences;
         dialogService = frame.getDialogService();
 
         connect = new Button();
@@ -129,7 +132,7 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new StyleLoader(preferences,
+        loader = new StyleLoader(ooPrefs,
                                  Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                                  Globals.prefs.getDefaultEncoding());
 
@@ -325,7 +328,7 @@ public class OpenOfficePanel {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferences.getUseAllDatabases()) {
+        if (ooPrefs.getUseAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.getDatabase());
             }
@@ -337,7 +340,7 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferences, dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(ooPrefs, dialogService);
 
         BackgroundTask
                       .wrap(() -> {
@@ -364,8 +367,9 @@ public class OpenOfficePanel {
         progressDialog.show();
 
         try {
+            ooPrefs = jabRefPreferences.getOpenOfficePreferences();
             // Add OO JARs to the classpath
-            loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
+            loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
 
             BackgroundTask
                           .wrap(this::createBibBase)
@@ -433,7 +437,7 @@ public class OpenOfficePanel {
         WrappedTargetException, BootstrapException, UnknownPropertyException, NoDocumentException,
         NoSuchElementException, CreationException {
         // Connect
-        return new OOBibBase(preferences.getExecutablePath(), true);
+        return new OOBibBase(ooPrefs.getExecutablePath(), true);
     }
 
     private static void addURL(List<URL> jarList) throws IOException {
@@ -448,6 +452,7 @@ public class OpenOfficePanel {
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
                  InvocationTargetException e) {
             LOGGER.error("Could not add URL to system classloader", e);
+            sysloader.close();
             throw new IOException("Error, could not add URL to system classloader", e);
 
         }
@@ -470,18 +475,17 @@ public class OpenOfficePanel {
         if (addPageInfo) {
 
             AdvancedCiteDialogView citeDialog = new AdvancedCiteDialogView();
-            citeDialog.showAndWait();
-            /*
-            AdvancedCiteDialog citeDialog = new AdvancedCiteDialog(frame);
+            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = citeDialog.showAndWait();
 
-            if (citeDialog.canceled()) {
-                return;
+            if (citeDialogViewModel.isPresent()) {
+                {
+                    AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
+                    if (!model.pageInfoProperty().getValue().isEmpty()) {
+                        pageInfo = model.pageInfoProperty().getValue();
+                    }
+                    inParenthesis = model.citeInParProperty().getValue();
+                }
             }
-            if (!citeDialog.getPageInfo().isEmpty()) {
-                pageInfo = citeDialog.getPageInfo();
-            }
-            inParenthesis = citeDialog.isInParenthesisCite();
-            */
         }
 
         BasePanel panel = frame.getCurrentBasePanel();
@@ -495,7 +499,7 @@ public class OpenOfficePanel {
                         style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                                       preferences.getSyncWhenCiting());
+                                       ooPrefs.getSyncWhenCiting());
                 } catch (FileNotFoundException ex) {
 
                     dialogService.showErrorDialogAndWait(
@@ -552,7 +556,7 @@ public class OpenOfficePanel {
         BasePanel panel = frame.getCurrentBasePanel();
         if (citePressed && (panel != null)) {
             // Generate keys
-            BibtexKeyPatternPreferences prefs = Globals.prefs.getBibtexKeyPatternPreferences();
+            BibtexKeyPatternPreferences prefs = jabRefPreferences.getBibtexKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
@@ -601,7 +605,7 @@ public class OpenOfficePanel {
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
-        autoSync.selectedProperty().set(preferences.getSyncWhenCiting());
+        autoSync.selectedProperty().set(ooPrefs.getSyncWhenCiting());
 
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
@@ -611,27 +615,27 @@ public class OpenOfficePanel {
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
 
-        if (preferences.getUseAllDatabases()) {
+        if (ooPrefs.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
         autoSync.setOnAction(e -> {
-            preferences.setSyncWhenCiting(autoSync.isSelected());
-            Globals.prefs.setOpenOfficePreferences(preferences);
+            ooPrefs.setSyncWhenCiting(autoSync.isSelected());
+            jabRefPreferences.setOpenOfficePreferences(ooPrefs);
         });
         useAllBases.setOnAction(e -> {
-            preferences.setUseAllDatabases(useAllBases.isSelected());
-            Globals.prefs.setOpenOfficePreferences(preferences);
+            ooPrefs.setUseAllDatabases(useAllBases.isSelected());
+            jabRefPreferences.setOpenOfficePreferences(ooPrefs);
         });
         useActiveBase.setOnAction(e -> {
-            preferences.setUseAllDatabases(!useActiveBase.isSelected());
-            Globals.prefs.setOpenOfficePreferences(preferences);
+            ooPrefs.setUseAllDatabases(!useActiveBase.isSelected());
+            jabRefPreferences.setOpenOfficePreferences(ooPrefs);
         });
         clearConnectionSettings.setOnAction(e -> {
-            preferences.clearConnectionSettings();
-            Globals.prefs.setOpenOfficePreferences(preferences);
+            ooPrefs.clearConnectionSettings();
+            jabRefPreferences.setOpenOfficePreferences(ooPrefs);
         });
 
         contextMenu.getItems().addAll(autoSync, new SeparatorMenuItem(), useActiveBase, useAllBases, new SeparatorMenuItem(), clearConnectionSettings);

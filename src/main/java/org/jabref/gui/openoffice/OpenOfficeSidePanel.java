@@ -10,30 +10,30 @@ import org.jabref.gui.SidePaneType;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
 
-    private final OpenOfficePreferences preferences;
+    private final JabRefPreferences preferences;
     private final JabRefFrame frame;
-    private final KeyBindingRepository keyBindingRepository;
+    private final OpenOfficePreferences ooPrefs;
 
-    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, OpenOfficePreferences preferences, JabRefFrame frame, KeyBindingRepository keyBindingRepository) {
+    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
         super(sidePaneManager, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
-        this.preferences = preferences;
         this.frame = frame;
-        this.keyBindingRepository = keyBindingRepository;
+        this.preferences = preferences;
+        this.ooPrefs = preferences.getOpenOfficePreferences();
     }
 
     @Override
     public void beforeClosing() {
-        preferences.setShowPanel(false);
+        ooPrefs.setShowPanel(false);
     }
 
     @Override
     public void afterOpening() {
-        preferences.setShowPanel(true);
+        ooPrefs.setShowPanel(true);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        return new OpenOfficePanel(frame, preferences, keyBindingRepository).getContent();
+        return new OpenOfficePanel(frame, preferences, ooPrefs, preferences.getKeyBindingRepository()).getContent();
     }
 
     @Override
