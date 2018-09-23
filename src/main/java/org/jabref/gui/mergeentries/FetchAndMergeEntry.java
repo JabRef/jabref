@@ -21,15 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for fetching and merging information based on a specific field
- *
+ * Class for fetching and merging bibliographic information
  */
 public class FetchAndMergeEntry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
-
     // A list of all field which are supported
     public static List<String> SUPPORTED_FIELDS = Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.ISBN);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
     private final BasePanel panel;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
