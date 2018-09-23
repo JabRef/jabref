@@ -941,8 +941,8 @@ public class JabRefPreferences implements PreferencesService {
      * They are combined into one string in order to feed into GenFieldsCustomizerDialogViewModel.resetFields()
      * so that they do not have to be parsed in order to fit there
      *
-     * @param kesfjaksd;fjlkasdjflkheck.
-     * @return true sfdjklsdjfklse otherwise.
+     * @param ADD PARAMS HERE.
+     * @return ADD RETURN VAL HERE
      */
     @Override
     public Map<String, String> getCustomTabsNamesAndFields() {
@@ -954,7 +954,7 @@ public class JabRefPreferences implements PreferencesService {
             String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            if ((name == null) || (fields == null) || name.isEmpty() || fields.isEmpty()) {
+            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
                 break;
             }
             customTabsMap.put(name, fields);
@@ -977,7 +977,7 @@ public class JabRefPreferences implements PreferencesService {
             // saved as CUSTOMTABNAME_def{number} and ; separated
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            if ((fields == null) || fields.isEmpty()) {
+            if (StringUtil.isNullOrEmpty(fields)) {
                 break;
             }
 
