@@ -36,9 +36,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
-import org.jabref.gui.mergeentries.MergeFetchedEntryDialog;
+import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -46,7 +45,6 @@ import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -359,21 +357,7 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        // TODO: Merge with org.jabref.gui.mergeentries.FetchAndMergeEntry
-        BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
-                      .onSuccess(fetchedEntry -> {
-                          if (fetchedEntry.isPresent()) {
-                              MergeFetchedEntryDialog dialog = new MergeFetchedEntryDialog(panel, entry, fetchedEntry.get(), fetcher.getName());
-                              dialog.setVisible(true);
-                          } else {
-                              dialogService.notify(Localization.lang("Could not find any bibliographic information."));
-                          }
-                      })
-                      .onFailure(exception -> {
-                          LOGGER.error("Error while fetching entry with " + fetcher.getName(), exception);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
-                      })
-                      .executeWith(taskExecutor);
+        new FetchAndMergeEntry(panel, taskExecutor).fetchAndMerge(entry, fetcher);
     }
 
     void addSearchListener(SearchQueryHighlightListener listener) {
