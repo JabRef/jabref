@@ -938,7 +938,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Get a Map of default tab names to deafult tab fields.
      * The fields are returned as a String with fields separated by ;
-     * They are combined into one string in order to feed into GenFieldsCustomizerDialogViewModel.resetFields()
+     * They are combined into one string in order to feed into CustomizeGeneralFieldsDialogViewModel.resetFields()
      * so that they do not have to be parsed in order to fit there
      *
      * @return A map of keys with tab names and values as a string containing
