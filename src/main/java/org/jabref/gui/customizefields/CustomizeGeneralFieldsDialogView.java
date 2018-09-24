@@ -1,4 +1,4 @@
-package org.jabref.gui.genfields;
+package org.jabref.gui.customizefields;
 
 import javax.inject.Inject;
 
@@ -16,7 +16,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
+public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
 
     @FXML private ButtonType resetButton;
     @FXML private ButtonType helpButton;
@@ -26,9 +26,9 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    private GenFieldsCustomizerDialogViewModel viewModel;
+    private CustomizeGeneralFieldsDialogViewModel viewModel;
 
-    public GenFieldsCustomizerDialogView() {
+    public CustomizeGeneralFieldsDialogView() {
         this.setTitle(Localization.lang("Set General Fields"));
         this.setResizable(true);
         this.getDialogPane().setPrefSize(300, 650);
@@ -49,7 +49,7 @@ public class GenFieldsCustomizerDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new GenFieldsCustomizerDialogViewModel(dialogService, preferences);
+        viewModel = new CustomizeGeneralFieldsDialogViewModel(dialogService, preferences);
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsTextProperty());
 
     }

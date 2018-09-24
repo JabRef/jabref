@@ -1,12 +1,12 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.genfields.GenFieldsCustomizerDialogView;
+import org.jabref.gui.customizefields.CustomizeGeneralFieldsDialogView;
 
 public class SetupGeneralFieldsAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new GenFieldsCustomizerDialogView().show();
+        new CustomizeGeneralFieldsDialogView().show();
 
     }
 

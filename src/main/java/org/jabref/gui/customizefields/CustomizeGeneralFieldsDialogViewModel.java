@@ -1,4 +1,4 @@
-package org.jabref.gui.genfields;
+package org.jabref.gui.customizefields;
 
 import java.util.List;
 import java.util.Map;
@@ -12,13 +12,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class GenFieldsCustomizerDialogViewModel {
+public class CustomizeGeneralFieldsDialogViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final StringProperty fieldsText = new SimpleStringProperty("");
 
-    public GenFieldsCustomizerDialogViewModel(DialogService dialogService, PreferencesService preferences) {
+    public CustomizeGeneralFieldsDialogViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         setInitialFieldsText();
@@ -33,7 +33,6 @@ public class GenFieldsCustomizerDialogViewModel {
             sb.append(String.join(";", tab.getValue()));
             sb.append('\n');
         }
-
         fieldsText.set(sb.toString());
     }
 
@@ -82,7 +81,8 @@ public class GenFieldsCustomizerDialogViewModel {
             sb.append(':');
             sb.append(entry.getValue());
             sb.append('\n');
-        fieldsText.set(sb.toString());
         }
+        fieldsText.set(sb.toString());
+
     }
 }
