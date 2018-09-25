@@ -37,6 +37,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -89,7 +90,7 @@ class GroupDialog extends FXDialog {
     private final RadioButton unionButton = new RadioButton(Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
 
     // for KeywordGroup
-    private final TextField keywordGroupSearchTerm = new TextField(); // Can't find a suitable FieldEditorFX to replace
+    private final TextField keywordGroupSearchTerm = new TextField();
     private final TextField keywordGroupSearchField = new TextField();
     private final CheckBox keywordGroupCaseSensitive = new CheckBox(Localization.lang("Case sensitive"));
     private final CheckBox keywordGroupRegExp = new CheckBox(Localization.lang("regular expression"));

@@ -11,6 +11,7 @@ public enum KeyBinding {
     CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "ctrl+F8", KeyBindingCategory.QUALITY),
     CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "alt+F8", KeyBindingCategory.QUALITY),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
+    CLOSE_ENTRY("Close entry", Localization.lang("Close entry"), "ctrl+E", KeyBindingCategory.VIEW),
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
@@ -86,7 +87,8 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl+alt+shift+A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS);
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS),
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH);
 
     private final String constant;
     private final String localization;

@@ -26,7 +26,6 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
 
     public CopyFilesDialogView(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency results) {
         this.setTitle(Localization.lang("Result"));
-        this.setResizable(true);
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 

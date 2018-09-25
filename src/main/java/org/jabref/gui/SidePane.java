@@ -13,6 +13,7 @@ public class SidePane extends BorderPane {
     private final VBox mainPanel = new VBox();
 
     public SidePane() {
+        setId("sidePane");
         setCenter(mainPanel);
     }
 
@@ -21,6 +22,7 @@ public class SidePane extends BorderPane {
 
         for (SidePaneComponent component : components) {
             BorderPane node = new BorderPane();
+            node.getStyleClass().add("sidePaneComponent");
             node.setTop(component.getHeader());
             node.setCenter(component.getContentPane());
             mainPanel.getChildren().add(node);

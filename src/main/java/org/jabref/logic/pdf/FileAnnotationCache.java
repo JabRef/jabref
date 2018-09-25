@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
 
 import com.google.common.cache.CacheBuilder;
@@ -32,11 +32,11 @@ public class FileAnnotationCache {
 
     }
 
-    public FileAnnotationCache(BibDatabaseContext context, FileDirectoryPreferences fileDirectoryPreferences) {
+    public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<Path, List<FileAnnotation>>>() {
             @Override
             public Map<Path, List<FileAnnotation>> load(BibEntry entry) throws Exception {
-                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, fileDirectoryPreferences);
+                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences);
             }
         });
     }

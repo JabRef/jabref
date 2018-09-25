@@ -53,6 +53,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -134,7 +135,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
+            preview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
             // Use the test entry from the Preview settings tab in Preferences:
             preview.setEntry(prevEntry);
         });
@@ -166,7 +167,7 @@ class StyleSelectDialog {
             public void actionPerformed(ActionEvent event) {
                 if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Style selection"),
-                                                                    Localization.lang("You must select a valid style file."));
+                                                         Localization.lang("You must select a valid style file."));
                     return;
                 }
                 okPressed = true;
@@ -269,9 +270,9 @@ class StyleSelectDialog {
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
 
             if (!style.isFromResource() && dialogService.showConfirmationDialogAndWait(Localization.lang("Remove style"),
-                                                                                                  Localization.lang("Are you sure you want to remove the style?"),
-                                                                                                  Localization.lang("Remove style"),
-                                                                                                  Localization.lang("Cancel"))) {
+                                                                                       Localization.lang("Are you sure you want to remove the style?"),
+                                                                                       Localization.lang("Remove style"),
+                                                                                       Localization.lang("Cancel"))) {
                 if (!loader.removeStyle(style)) {
                     LOGGER.info("Problem removing style");
                 }
@@ -469,14 +470,14 @@ class StyleSelectDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                    .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                    .build();
+                                                                                                   .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                                                                                                   .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                                                                                                   .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                                   .build();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
-                        .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
+                                                         .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 

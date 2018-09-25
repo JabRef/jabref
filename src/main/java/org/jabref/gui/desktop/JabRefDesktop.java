@@ -57,7 +57,7 @@ public class JabRefDesktop {
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFileDirectoryPreferences());
+            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFilePreferences());
 
             Optional<Path> file = FileHelper.expandFilename(link, dir);
 
@@ -128,7 +128,7 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
+        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();

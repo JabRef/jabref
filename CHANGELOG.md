@@ -11,6 +11,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We updated the dialog for setting up general fields.
+- URL field formatting is updated. All whitespace chars, located at the beginning/ending of the url, are trimmed automatically
+- We changed the behavior of the field formatting dialog such that the `bibtexkey` is not changed when formatting all fields or all text fields.
 - We added a "Move file to file directory and rename file" option for simultaneously moving and renaming of document file. [#4166](https://github.com/JabRef/jabref/issues/4166)
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
 - We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [4093](https://github.com/JabRef/jabref/issues/4093)
@@ -28,8 +31,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Files without a defined external file type are now directly opened with the default application of the operating system
 - We streamlined the process to rename and move files by removing the confirmation dialogs.
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
-- We add auto url formatting when user paste link to URL field in Entry editor  [#254](https://github.com/koppor/jabref/issues/254)
-
+- We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
+- We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
+- We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl<kbd> + <kbd>E<kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
 
 
 
@@ -66,6 +70,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where users were vulnerable to XXE attacks during parsing [#4229](https://github.com/JabRef/jabref/issues/4229)
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201) and [#4241](https://github.com/JabRef/jabref/issues/4241)
 - We fixed an issue where author list parser can't generate bibtex for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
+- We fixed an issue where the list of XMP Exclusion fields in the preferences was not be saved [#4072](https://github.com/JabRef/jabref/issues/4072)
 
 
 
@@ -118,9 +123,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ## Older versions
 
-The changelog of JabRef 4.x is available at the [v4.x branch](https://github.com/JabRef/jabref/blob/v4.x/CHANGELOG.md).  
-The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).  
-The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).  
+The changelog of JabRef 4.x is available at the [v4.x branch](https://github.com/JabRef/jabref/blob/v4.x/CHANGELOG.md).
+The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
+The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v4.3...HEAD
 [4.3]: https://github.com/JabRef/jabref/compare/v4.2...v4.3
@@ -132,3 +137,4 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1
 [JavaFX]: https://en.wikipedia.org/wiki/JavaFX
+

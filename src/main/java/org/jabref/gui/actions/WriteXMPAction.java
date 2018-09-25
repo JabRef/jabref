@@ -105,7 +105,7 @@ public class WriteXMPAction extends SimpleCommand {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
+                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences()))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .collect(Collectors.toList());

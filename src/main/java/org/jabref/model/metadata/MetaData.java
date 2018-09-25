@@ -31,7 +31,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = FieldName.FILE + FilePreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 

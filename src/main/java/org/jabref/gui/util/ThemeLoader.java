@@ -77,7 +77,7 @@ public class ThemeLoader {
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                                 scene.getStylesheets().remove(cssUrl);
-                        scene.getStylesheets().add(index, cssUrl);
+                                scene.getStylesheets().add(index, cssUrl);
                             }
                     );
                 });

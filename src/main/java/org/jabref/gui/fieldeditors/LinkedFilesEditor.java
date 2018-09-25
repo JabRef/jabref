@@ -146,6 +146,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (dragboard.hasFiles()) {
             List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
             items.addAll(linkedFiles);
+            success = true;
         }
         event.setDropCompleted(success);
         event.consume();

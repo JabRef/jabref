@@ -57,7 +57,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean success = openLink();
         if (!success) {
-            List<Path> searchedDirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            List<Path> searchedDirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
             frame.output(Localization.lang("Unable to open %0", link) + " " + Arrays.toString(searchedDirs.toArray()));
         }
     }

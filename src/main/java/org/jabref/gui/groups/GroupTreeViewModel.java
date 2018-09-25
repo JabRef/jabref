@@ -21,6 +21,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,6 +40,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -46,11 +48,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
             .compareToIgnoreCase(v2.getName());
     private Optional<BibDatabaseContext> currentDatabase;
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-
+        this.localDragboard = Objects.requireNonNull(localDragboard);
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
@@ -114,16 +116,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor));
+                                                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard))
+                                                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard));
 
             rootGroup.setValue(newRoot);
             this.selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup))
+                                                   .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
                                 .collect(Collectors.toList()));
         } else {
-            rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor));
+            rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor, localDragboard));
         }
 
         currentDatabase = newDatabase;
