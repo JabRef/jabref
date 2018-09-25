@@ -204,6 +204,23 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return currentFileName.equals(suggestedFileName);
     }
 
+    public boolean performDirectoryConflictCheck() {
+        /*
+        Get the suggested filepath for current linkedFile and compare it to the existing filepath.
+        Return boolean result.
+         */
+        //Get the new path for the file
+        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        Path newDirectory = newDir.get();
+
+        //Get the current path for the file
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+        Path currentDirectory = currentDir.get();
+
+        //Compare the two paths
+        return newDirectory.toString().equals(currentDirectory.getParent().toString());
+    }
+
     public void rename() {
         if (linkedFile.isOnlineLink()) {
             // Cannot rename remote links
