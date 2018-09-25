@@ -21,7 +21,6 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
     @FXML private ButtonType resetButton;
     @FXML private ButtonType helpButton;
     @FXML private ButtonType okButton;
-    @FXML private ButtonType cancelButton;
     @FXML private TextArea fieldsTextArea;
 
     @Inject private DialogService dialogService;
