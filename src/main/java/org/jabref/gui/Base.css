@@ -247,6 +247,7 @@
     -fx-underline: false;
     -fx-border-style: null;
     -fx-border-color: null;
+    -fx-text-fill: -jr-theme;
 }
 
 .hyperlink:visited {
