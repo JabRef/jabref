@@ -128,10 +128,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     private String getMdlUrl() {
         Version currentVersion = Globals.BUILD_INFO.getVersion();
-        if (currentVersion.isDevelopmentVersion()) {
-            return "api-dev.darwingoliath.com";
-        } else {
-            return "api.darwingoliath.com";
-        }
+        return currentVersion.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.darwingoliath.com";
     }
 }
