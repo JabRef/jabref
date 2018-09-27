@@ -5,7 +5,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final MessageFormat HTML_LIST_ITEM_TEMPLATE = new MessageFormat("<a href=''{0}''><font color='#000000' size='4' face='Arial, Helvetica, sans-serif'>{1}</font></a>. <font color='#000000' size='4' face='Arial, Helvetica, sans-serif'>{2} <i>{3}</i> {4}</font>");
     private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = "Error while fetching from Mr.DLib.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
@@ -174,11 +172,6 @@ public class MrDLibImporter extends Importer {
         current.setField(FieldName.YEAR, year);
         current.setField(FieldName.JOURNAL, journal);
         current.setField(FieldName.URL, url);
-
-        // Create HTML representation of recommendation for display on the UI
-        Object[] args = {url, title, authors, journal, year};
-        String htmlRepresentation = HTML_LIST_ITEM_TEMPLATE.format(args);
-        current.setField("html_representation", htmlRepresentation);
 
         return new RankedBibEntry(current, rank);
     }
