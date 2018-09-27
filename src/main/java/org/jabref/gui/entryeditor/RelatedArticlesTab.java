@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RelatedArticlesTab extends EntryEditorTab {
 
-    private final EntryEditorPreferences preferences;
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
+    private final EntryEditorPreferences preferences;
 
     public RelatedArticlesTab(EntryEditorPreferences preferences) {
         setText(Localization.lang("Related articles"));

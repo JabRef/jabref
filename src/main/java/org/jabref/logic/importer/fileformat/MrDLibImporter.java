@@ -32,7 +32,6 @@ public class MrDLibImporter extends Importer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
 
-
     @SuppressWarnings("unused")
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
@@ -143,28 +142,14 @@ public class MrDLibImporter extends Importer {
      */
     private RankedBibEntry populateBibEntry(JSONObject recommendation) {
         BibEntry current = new BibEntry();
-        String authors = "", title = "", year = "", journal = "", url = "";
-        Integer rank = 100;
 
         // parse each of the relevant fields into variables
-        if (recommendation.has("authors") && !recommendation.isNull("authors")) {
-            authors = getAuthorsString(recommendation);
-        }
-        if (recommendation.has("title") && !recommendation.isNull("title")) {
-            title = recommendation.getString("title");
-        }
-        if (recommendation.has("year_published") && !recommendation.isNull("year_published")) {
-            year = Integer.toString(recommendation.getInt("year_published"));
-        }
-        if (recommendation.has("published_in") && !recommendation.isNull("published_in")) {
-            journal = recommendation.getString("published_in");
-        }
-        if (recommendation.has("url") && !recommendation.isNull("url")) {
-            url = recommendation.getString("url");
-        }
-        if (recommendation.has("recommendation_id") && !recommendation.isNull("recommendation_id")) {
-            rank = recommendation.getInt("recommendation_id");
-        }
+        String authors = isRecommendationFieldPresent(recommendation, "authors") ? getAuthorsString(recommendation) : "";
+        String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
+        String year = isRecommendationFieldPresent(recommendation, "year_published") ? Integer.toString(recommendation.getInt("year_published")) : "";
+        String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
+        String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
+        Integer rank = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getInt("recommendation_id") : 100;
 
         // Populate bib entry with relevant data
         current.setField(FieldName.AUTHOR, authors);
@@ -174,6 +159,10 @@ public class MrDLibImporter extends Importer {
         current.setField(FieldName.URL, url);
 
         return new RankedBibEntry(current, rank);
+    }
+
+    private Boolean isRecommendationFieldPresent(JSONObject recommendation, String field) {
+        return recommendation.has(field) && !recommendation.isNull(field);
     }
 
     /**
