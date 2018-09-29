@@ -276,7 +276,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link).
      *
      * @return true if the linked file should be removed afterwards from the entry (i.e because it was deleted
-     * successfully, does not exist in the first place or the user choose to remove it)
+     *         successfully, does not exist in the first place or the user choose to remove it)
      */
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);

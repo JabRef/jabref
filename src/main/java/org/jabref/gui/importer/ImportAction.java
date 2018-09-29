@@ -81,7 +81,7 @@ public class ImportAction {
                 // Import in a specific format was specified. Check if we have stored error information:
                 if (importError == null) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Import failed"),
-                                                         Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+                            Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Import failed"), importError);
                 }

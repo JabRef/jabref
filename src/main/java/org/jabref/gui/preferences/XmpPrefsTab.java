@@ -42,7 +42,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
     private final GridPane builder = new GridPane();
     private final ListProperty<XMPPrivacyFilter> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final CheckBox privacyFilterCheckBox = new CheckBox(
-                                                                Localization.lang("Do not write the following fields to XMP Metadata:"));
+            Localization.lang("Do not write the following fields to XMP Metadata:"));
     private final TableView<XMPPrivacyFilter> tableView = new TableView<>();
 
     /**
@@ -59,9 +59,9 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         deleteIconColumn.setPrefWidth(60);
         deleteIconColumn.setCellValueFactory(cellData -> cellData.getValue().field());
         new ValueTableCellFactory<XMPPrivacyFilter, String>()
-        .withGraphic(item -> {
-            return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-        }).withOnMouseClickedEvent(item -> {
+                .withGraphic(item -> {
+                    return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                }).withOnMouseClickedEvent(item -> {
             return evt -> delete();
         }).install(deleteIconColumn);
 
@@ -130,14 +130,13 @@ class XmpPrefsTab extends Pane implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     *
      */
     @Override
     public void storeSettings() {
 
         fields.stream().filter(s -> StringUtil.isNullOrEmpty(s.getField())).forEach(fields::remove);
         prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                            fields.stream().map(XMPPrivacyFilter::getField).collect(Collectors.toList()));
+                fields.stream().map(XMPPrivacyFilter::getField).collect(Collectors.toList()));
         prefs.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, privacyFilterCheckBox.isSelected());
     }
 
@@ -159,12 +158,12 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             this.field = new SimpleStringProperty(field);
         }
 
-        public void setField(String field) {
-            this.field.set(field);
-        }
-
         public String getField() {
             return field.get();
+        }
+
+        public void setField(String field) {
+            this.field.set(field);
         }
 
         public StringProperty field() {

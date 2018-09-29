@@ -19,7 +19,7 @@ public class ImportFormatPreferences {
     private final boolean keywordSyncEnabled;
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
-            BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+                                   BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                                    FieldContentParserPreferences fieldContentParserPreferences, XmpPreferences xmpPreferences, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
@@ -56,7 +56,7 @@ public class ImportFormatPreferences {
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
         return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
-                                           fieldContentParserPreferences, xmpPreferences, keywordSyncEnabled);
+                fieldContentParserPreferences, xmpPreferences, keywordSyncEnabled);
     }
 
     /**

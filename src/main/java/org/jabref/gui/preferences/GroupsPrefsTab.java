@@ -106,5 +106,4 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Groups");
     }
-
 }

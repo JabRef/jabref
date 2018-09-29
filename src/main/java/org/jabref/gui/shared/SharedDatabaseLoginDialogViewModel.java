@@ -133,7 +133,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
-                                                   Localization.lang("You are already connected to a database using entered connection details."));
+                    Localization.lang("You are already connected to a database using entered connection details."));
             return;
         }
 
@@ -143,9 +143,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
 
                 boolean overwriteFilePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Existing file"),
-                                                                                           Localization.lang("'%0' exists. Overwrite file?", localFilePath.getFileName().toString()),
-                                                                                           Localization.lang("Overwrite file"),
-                                                                                           Localization.lang("Cancel"));
+                        Localization.lang("'%0' exists. Overwrite file?", localFilePath.getFileName().toString()),
+                        Localization.lang("Overwrite file"),
+                        Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
                     return;
                 }
@@ -171,25 +171,22 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
-
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
             Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                                                                                      Localization.lang("Migration help information"),
-                                                                                      Localization.lang("Entered database has obsolete structure and is no longer supported.")
-                                                                                                                                       + "\n" +
-                                                                                                                                       Localization.lang("Click help to learn about the migration of pre-3.6 databases.")
-                                                                                                                                       + "\n" +
-                                                                                                                                       Localization.lang("However, a new database was created alongside the pre-3.6 one."),
-                                                                                      ButtonType.OK, openHelp);
+                    Localization.lang("Migration help information"),
+                    Localization.lang("Entered database has obsolete structure and is no longer supported.")
+                            + "\n" +
+                            Localization.lang("Click help to learn about the migration of pre-3.6 databases.")
+                            + "\n" +
+                            Localization.lang("However, a new database was created alongside the pre-3.6 one."),
+                    ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> HelpAction.openHelpPage(HelpFile.SQL_DATABASE_MIGRATION));
             result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
-
         }
         loading.set(false);
-
     }
 
     private void setPreferences() {
@@ -262,10 +259,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public void showSaveDbToFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                                                                                               .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                               .build();
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         exportPath.ifPresent(path -> {
             folder.setValue(path.toString());
@@ -274,11 +271,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public void showOpenKeystoreFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(FileFilterConverter.ANY_FILE)
-                                                                                               .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
-                                                                                               .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
-                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                               .build();
+                .addExtensionFilter(FileFilterConverter.ANY_FILE)
+                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
+                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
         Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
         keystorePath.ifPresent(path -> {
             keystore.setValue(path.toString());

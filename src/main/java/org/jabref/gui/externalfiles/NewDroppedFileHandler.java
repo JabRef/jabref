@@ -80,11 +80,9 @@ public class NewDroppedFileHandler {
                     } else {
                         showImportOrLinkFileDialog(xmpEntriesInFile, file, entry);
                     }
-
                 } catch (IOException e) {
                     LOGGER.warn("Problem reading XMP", e);
                 }
-
             } else {
                 addToEntryRenameAndMoveToFileDir(entry, files);
             }
@@ -108,7 +106,7 @@ public class NewDroppedFileHandler {
 
         VBox vbox = new VBox();
         Text text = new Text(Localization.lang("The PDF contains one or several BibTeX-records.")
-                             + "\n" + Localization.lang("Do you want to import these as new entries into the current library or do you want to link the file to the entry?"));
+                + "\n" + Localization.lang("Do you want to import these as new entries into the current library or do you want to link the file to the entry?"));
         vbox.getChildren().add(text);
 
         entriesToImport.forEach(entry -> {
@@ -148,5 +146,4 @@ public class NewDroppedFileHandler {
     public void addToEntry(BibEntry entry, List<Path> files) {
         linker.addFilesToEntry(entry, files);
     }
-
 }

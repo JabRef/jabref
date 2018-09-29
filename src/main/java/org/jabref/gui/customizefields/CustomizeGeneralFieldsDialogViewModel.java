@@ -50,7 +50,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 String field = Localization.lang("field");
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Each line must be of the following form") + " '" +
-                                 Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'";
+                        Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'";
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }
@@ -59,13 +59,12 @@ public class CustomizeGeneralFieldsDialogViewModel {
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Field names are not allowed to contain white space or the following "
-                                                   + "characters")
-                                 + ": # { } ~ , ^ &";
+                        + "characters")
+                        + ": # { } ~ , ^ &";
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }
             preferences.setCustomTabsNameAndFields(parts[0], parts[1], i);
-
         }
         preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
         preferences.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
@@ -75,14 +74,13 @@ public class CustomizeGeneralFieldsDialogViewModel {
     public void resetFields() {
 
         StringBuilder sb = new StringBuilder();
-        Map<String,String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
-        for (Map.Entry<String,String>entry : customTabNamesFields.entrySet()) {
+        Map<String, String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
+        for (Map.Entry<String, String> entry : customTabNamesFields.entrySet()) {
             sb.append(entry.getKey());
             sb.append(':');
             sb.append(entry.getValue());
             sb.append('\n');
         }
         fieldsText.set(sb.toString());
-
     }
 }

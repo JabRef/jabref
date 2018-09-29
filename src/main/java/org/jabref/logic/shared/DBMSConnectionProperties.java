@@ -120,6 +120,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     /**
      * Returns username, password and ssl as Properties Object
+     *
      * @return Properties with values for user, password and ssl
      */
     public Properties asProperties() {
@@ -157,11 +158,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         }
         DBMSConnectionProperties properties = (DBMSConnectionProperties) obj;
         return Objects.equals(type, properties.getType())
-               && this.host.equalsIgnoreCase(properties.getHost())
-               && Objects.equals(port, properties.getPort())
-               && Objects.equals(database, properties.getDatabase())
-               && Objects.equals(user, properties.getUser())
-               && Objects.equals(useSSL, properties.isUseSSL());
+                && this.host.equalsIgnoreCase(properties.getHost())
+                && Objects.equals(port, properties.getPort())
+                && Objects.equals(database, properties.getDatabase())
+                && Objects.equals(user, properties.getUser())
+                && Objects.equals(useSSL, properties.isUseSSL());
     }
 
     @Override
@@ -206,11 +207,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     @Override
     public boolean isValid() {
         return Objects.nonNull(type)
-               && Objects.nonNull(host)
-               && Objects.nonNull(port)
-               && Objects.nonNull(database)
-               && Objects.nonNull(user)
-               && Objects.nonNull(password);
+                && Objects.nonNull(host)
+                && Objects.nonNull(port)
+                && Objects.nonNull(database)
+                && Objects.nonNull(user)
+                && Objects.nonNull(password);
     }
 
 }

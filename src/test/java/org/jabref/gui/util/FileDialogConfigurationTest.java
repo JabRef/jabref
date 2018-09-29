@@ -74,7 +74,6 @@ class FileDialogConfigurationTest {
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
-
     private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
         return new FileChooser.ExtensionFilter(description,
                 extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));

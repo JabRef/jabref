@@ -122,7 +122,7 @@ public class LinkedFileHandler {
      * Check to see if a file already exists in the target directory.  Search is not case sensitive.
      *
      * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
-     * override the existing file.
+     *         override the existing file.
      */
     public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry) {
         String targetFileName = getSuggestedFileName();

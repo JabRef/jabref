@@ -55,17 +55,16 @@ public class SharedDatabaseUIManager {
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
 
         Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(AlertType.WARNING,
-                                                                                  Localization.lang("Connection lost"),
-                                                                                  Localization.lang("The connection to the server has been terminated."),
-                                                                                  reconnect,
-                                                                                  workOffline,
-                                                                                  closeLibrary);
+                Localization.lang("Connection lost"),
+                Localization.lang("The connection to the server has been terminated."),
+                reconnect,
+                workOffline,
+                closeLibrary);
 
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
                 jabRefFrame.closeCurrentTab();
                 new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
-
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
                 jabRefFrame.refreshTitleAndTabs();
@@ -82,8 +81,8 @@ public class SharedDatabaseUIManager {
         jabRefFrame.output(Localization.lang("Update refused."));
 
         new MergeSharedEntryDialog(jabRefFrame, dbmsSynchronizer, updateRefusedEvent.getLocalBibEntry(),
-                                   updateRefusedEvent.getSharedBibEntry(),
-                                   updateRefusedEvent.getBibDatabaseContext().getMode()).showMergeDialog();
+                updateRefusedEvent.getSharedBibEntry(),
+                updateRefusedEvent.getBibDatabaseContext().getMode()).showMergeDialog();
     }
 
     @Subscribe
@@ -96,9 +95,9 @@ public class SharedDatabaseUIManager {
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                                                       Localization.lang("The entry you currently work on has been deleted on the shared side.")
-                                                                                                               + "\n"
-                                                                                                               + Localization.lang("You can restore the entry using the \"Undo\" operation."));
+                    Localization.lang("The entry you currently work on has been deleted on the shared side.")
+                            + "\n"
+                            + Localization.lang("You can restore the entry using the \"Undo\" operation."));
             panel.closeBottomPane();
         }
     }
@@ -111,7 +110,7 @@ public class SharedDatabaseUIManager {
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
-        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
@@ -126,8 +125,8 @@ public class SharedDatabaseUIManager {
     }
 
     public void openSharedDatabaseFromParserResult(ParserResult parserResult)
-        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
-        NotASharedDatabaseException {
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
+            NotASharedDatabaseException {
 
         Optional<String> sharedDatabaseIDOptional = parserResult.getDatabase().getSharedDatabaseID();
 

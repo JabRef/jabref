@@ -2,11 +2,11 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RTFCharsTest {
     private LayoutFormatter formatter;
@@ -131,7 +131,7 @@ class RTFCharsTest {
     }
 
     @Test
-    void testRTFCharacters(){
+    void testRTFCharacters() {
         assertEquals("\\'e0",formatter.format("\\`{a}"));
         assertEquals("\\'e8",formatter.format("\\`{e}"));
         assertEquals("\\'ec",formatter.format("\\`{i}"));

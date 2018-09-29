@@ -43,14 +43,12 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(helpButton, getDialogPane(), event -> helpCommand.getCommand().execute());
         ControlHelper.setAction(resetButton, getDialogPane(), event -> resetFields());
         ControlHelper.setAction(okButton, getDialogPane(), event -> saveFieldsAndCloseDialog());
-
     }
 
     @FXML
     private void initialize() {
         viewModel = new CustomizeGeneralFieldsDialogViewModel(dialogService, preferences);
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsTextProperty());
-
     }
 
     @FXML
@@ -67,5 +65,4 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
     private void resetFields() {
         viewModel.resetFields();
     }
-
 }

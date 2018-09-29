@@ -65,8 +65,6 @@ public class ExternalFilesEntryLinker {
                 LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName());
                 entry.addFile(linkedfile);
             });
-
         }
-
     }
 }

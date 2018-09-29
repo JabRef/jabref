@@ -38,13 +38,12 @@ public class ModsExportFormatTestFiles {
 
     public Charset charset;
     private BibDatabaseContext databaseContext;
-    private Path tempFile;
+    private static Path resourceDir;
     private ModsExporter modsExportFormat;
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
     private Path importFile;
-
-    private static Path resourceDir;
+    private Path tempFile;
 
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
@@ -53,7 +52,7 @@ public class ModsExportFormatTestFiles {
         try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
         }
     }
 

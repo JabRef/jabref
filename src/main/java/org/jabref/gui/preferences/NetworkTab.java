@@ -141,7 +141,7 @@ public class NetworkTab extends Pane implements PrefsTab {
                 String userName = usernameTextField.getText();
                 char[] password = passwordTextField.getText().toCharArray();
                 // no empty proxy passwords currently supported (they make no sense in this case anyway)
-                if ((userName == null) || userName.trim().isEmpty()  || (password.length == 0)) {
+                if ((userName == null) || userName.trim().isEmpty() || (password.length == 0)) {
                     validAuthenticationSetting = false;
                     validSetting = false;
                 } else {

@@ -17,7 +17,7 @@ public enum DBMSType {
     private final String urlPattern;
     private final int defaultPort;
 
-    private DBMSType(String type, String driverPath, String urlPattern, int defaultPort) {
+    DBMSType(String type, String driverPath, String urlPattern, int defaultPort) {
         this.type = type;
         this.driverPath = driverPath;
         this.urlPattern = urlPattern;

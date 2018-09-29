@@ -30,55 +30,20 @@ import org.jabref.preferences.JabRefPreferences;
 public class NameFormatterTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
-    private boolean tableChanged;
     private final TableView table;
     private final GridPane builder = new GridPane();
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final ObservableList<TableRow> data = FXCollections.observableArrayList();
-
-    public static class TableRow {
-        private SimpleStringProperty name;
-        private SimpleStringProperty format;
-
-        TableRow() {
-            this("");
-        }
-
-        TableRow(String name) {
-            this(name, NameFormatter.DEFAULT_FORMAT);
-        }
-
-        TableRow(String name, String format) {
-            this.name = new SimpleStringProperty(name);
-            this.format = new SimpleStringProperty(format);
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public void setName(String name) {
-            this.name.set(name);
-        }
-
-        public String getFormat() {
-            return format.get();
-        }
-
-        public void setFormat(String format) {
-            this.format.set(format);
-        }
-    }
+    private boolean tableChanged;
 
     /**
      * Tab to create custom Name Formatters
-     *
      */
     public NameFormatterTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
 
-        TableColumn<TableRow,String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
-        TableColumn<TableRow,String> lastCol = new TableColumn<>(Localization.lang("Format string"));
+        TableColumn<TableRow, String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
+        TableColumn<TableRow, String> lastCol = new TableColumn<>(Localization.lang("Format string"));
         table = new TableView();
         table.setEditable(true);
         firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -116,7 +81,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label insertRows = new Label(Localization.lang("Insert rows"));
         insertRows.setVisible(false);
         Button add = new Button("Insert");
-        add.setOnAction(e-> {
+        add.setOnAction(e -> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
                 addName.clear();
@@ -131,7 +96,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label deleteRows = new Label(Localization.lang("Delete rows"));
         deleteRows.setVisible(false);
         Button delete = new Button("Delete");
-        delete.setOnAction(e-> {
+        delete.setOnAction(e -> {
             if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;
                 int row = table.getFocusModel().getFocusedIndex();
@@ -140,12 +105,13 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 data.remove(tableRow);
                 table.setItems(data);
                 table.refresh();
-            }});
+            }
+        });
         Button help = new Button("?");
-        help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
+        help.setOnAction(e -> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
         HBox toolbar = new HBox();
-        toolbar.getChildren().addAll(addName, addLast,add,delete,help);
+        toolbar.getChildren().addAll(addName, addLast, add, delete, help);
         tabPanel.setBottom(toolbar);
 
         Label specialNameFormatters = new Label(Localization.lang("Special name formatters"));
@@ -176,7 +142,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     *
      */
     @Override
     public void storeSettings() {
@@ -217,5 +182,39 @@ public class NameFormatterTab extends Pane implements PrefsTab {
     @Override
     public String getTabName() {
         return Localization.lang("Name formatter");
+    }
+
+    public static class TableRow {
+        private SimpleStringProperty name;
+        private SimpleStringProperty format;
+
+        TableRow() {
+            this("");
+        }
+
+        TableRow(String name) {
+            this(name, NameFormatter.DEFAULT_FORMAT);
+        }
+
+        TableRow(String name, String format) {
+            this.name = new SimpleStringProperty(name);
+            this.format = new SimpleStringProperty(format);
+        }
+
+        public String getName() {
+            return name.get();
+        }
+
+        public void setName(String name) {
+            this.name.set(name);
+        }
+
+        public String getFormat() {
+            return format.get();
+        }
+
+        public void setFormat(String format) {
+            this.format.set(format);
+        }
     }
 }

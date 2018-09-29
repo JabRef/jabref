@@ -19,11 +19,11 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class ImportSettingsTab extends Pane implements PrefsTab {
 
-    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
+    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[]{"[bibtexkey]",
             "[bibtexkey] - [title]"};
 
     public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
-    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
+    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[]{"bibtexkey", "bibtexkey - title",};
 
     private final JabRefPreferences prefs;
     private final RadioButton radioButtonXmp;
@@ -34,7 +34,6 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
     private final GridPane builder = new GridPane();
     private final TextField fileNamePattern;
     private final ComboBox<String> selectFileNamePattern;
-
 
     private final TextField fileDirPattern;
 
@@ -139,5 +138,4 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Import");
     }
-
 }

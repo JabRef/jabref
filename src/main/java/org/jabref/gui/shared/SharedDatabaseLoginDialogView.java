@@ -27,7 +27,7 @@ import org.fxmisc.easybind.EasyBind;
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     private final JabRefFrame frame;
-
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;
     @FXML private TextField database;
@@ -43,11 +43,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField fileKeystore;
     @FXML private PasswordField passwordKeystore;
     @FXML private Button browseKeystore;
-
     @Inject private DialogService dialogService;
-
     private SharedDatabaseLoginDialogViewModel viewModel;
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public SharedDatabaseLoginDialogView(JabRefFrame frame) {
         this.frame = frame;
@@ -124,5 +121,4 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void showOpenKeystoreFileDialog(ActionEvent event) {
         viewModel.showOpenKeystoreFileDialog();
     }
-
 }

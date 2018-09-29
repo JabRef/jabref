@@ -19,7 +19,8 @@ public class CustomLocalDragboard {
 
     /**
      * Puts the value of the concrete class in a map. All previous content stored in the map is removed
-     * @param type The Type of the class
+     *
+     * @param type  The Type of the class
      * @param value The value to store
      */
     public <T> void putValue(Class<T> type, T value) {
@@ -46,6 +47,7 @@ public class CustomLocalDragboard {
     /**
      * Puts A List of {@link BibEntry} in the map
      * All previous content is cleared
+     *
      * @param entries The list to put
      */
     public void putBibEntries(List<BibEntry> entries) {
@@ -54,6 +56,7 @@ public class CustomLocalDragboard {
 
     /**
      * Get a List of {@link BibEntry} from the dragboard
+     *
      * @return List of BibEntry or empty list if no entries are avaiable
      */
     public List<BibEntry> getBibEntries() {
@@ -62,5 +65,4 @@ public class CustomLocalDragboard {
         }
         return Collections.emptyList();
     }
-
 }

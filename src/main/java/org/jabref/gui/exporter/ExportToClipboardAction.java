@@ -30,10 +30,10 @@ public class ExportToClipboardAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
-    private JabRefFrame frame;
     private final DialogService dialogService;
-    private BasePanel panel;
     private final List<BibEntry> entries = new ArrayList<>();
+    private JabRefFrame frame;
+    private BasePanel panel;
 
     public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
@@ -61,7 +61,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                         .collect(Collectors.toList());
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                                                                                    Localization.lang("Export"), exporters);
+                Localization.lang("Export"), exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                                                              .onSuccess(this::setContentToClipboard)
@@ -85,11 +85,11 @@ public class ExportToClipboardAction extends SimpleCommand {
 
             // Write to file:
             exporter.export(panel.getBibDatabaseContext(), tmp,
-                            panel.getBibDatabaseContext()
-                                 .getMetaData()
-                                 .getEncoding()
-                                 .orElse(Globals.prefs.getDefaultEncoding()),
-                            entries);
+                    panel.getBibDatabaseContext()
+                         .getMetaData()
+                         .getEncoding()
+                         .orElse(Globals.prefs.getDefaultEncoding()),
+                    entries);
             // Read the file and put the contents on the clipboard:
 
             return readFileToString(tmp);
@@ -114,7 +114,6 @@ public class ExportToClipboardAction extends SimpleCommand {
         Globals.clipboardManager.setContent(clipboardContent);
 
         panel.output(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
-
     }
 
     private String readFileToString(Path tmp) throws IOException {

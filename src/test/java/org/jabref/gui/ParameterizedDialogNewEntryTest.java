@@ -18,6 +18,69 @@ import static org.assertj.swing.finder.WindowFinder.findDialog;
 @Tag("GUITest")
 public class ParameterizedDialogNewEntryTest extends AbstractUITest {
 
+    public static Stream<Object[]> instancesToTest() {
+        // Create entry from menu
+        // Structure:
+        // {"BibTeX"/"biblatex", "type"}
+        // @formatter:off
+        return Stream.of(
+                new Object[]{"BibTeX", "Article"},
+/*                new Object[]{"BibTeX", "InBook"},
+                new Object[]{"BibTeX", "Book"},
+                new Object[]{"BibTeX", "Booklet"},
+                new Object[]{"BibTeX", "InCollection"},
+                new Object[]{"BibTeX", "Conference"},
+                new Object[]{"BibTeX", "InProceedings"},
+                new Object[]{"BibTeX", "Proceedings"},
+                new Object[]{"BibTeX", "Manual"},
+                new Object[]{"BibTeX", "MastersThesis"},
+                new Object[]{"BibTeX", "PhdThesis"},
+                new Object[]{"BibTeX", "TechReport"},
+                new Object[]{"BibTeX", "Unpublished"},
+                new Object[]{"BibTeX", "Misc"},
+                new Object[]{"BibTeX", "Electronic"},
+                new Object[]{"BibTeX", "IEEEtranBSTCTL"},
+                new Object[]{"BibTeX", "Periodical"},
+                new Object[]{"BibTeX", "Patent"},
+                new Object[]{"BibTeX", "Standard"},
+                new Object[]{"biblatex", "Article"},
+                new Object[]{"biblatex", "Book"},
+                new Object[]{"biblatex", "BookInBook"},
+                new Object[]{"biblatex", "Booklet"},
+                new Object[]{"biblatex", "Collection"},
+                new Object[]{"biblatex", "Conference"},
+                new Object[]{"biblatex", "Electronic"},
+                new Object[]{"biblatex", "IEEEtranBSTCTL"},
+                new Object[]{"biblatex", "InBook"},
+                new Object[]{"biblatex", "InCollection"},
+                new Object[]{"biblatex", "InProceedings"},
+                new Object[]{"biblatex", "InReference"},
+                new Object[]{"biblatex", "Manual"},
+                new Object[]{"biblatex", "MastersThesis"},
+                new Object[]{"biblatex", "Misc"},
+                new Object[]{"biblatex", "MvBook"},
+                new Object[]{"biblatex", "MvCollection"},
+                new Object[]{"biblatex", "MvProceedings"},
+                new Object[]{"biblatex", "MvReference"},
+                new Object[]{"biblatex", "Online"},
+                new Object[]{"biblatex", "Patent"},
+                new Object[]{"biblatex", "Periodical"},
+                new Object[]{"biblatex", "PhdThesis"},
+                new Object[]{"biblatex", "Proceedings"},
+                new Object[]{"biblatex", "Reference"},
+                new Object[]{"biblatex", "Report"},
+                new Object[]{"biblatex", "Set"},
+                new Object[]{"biblatex", "SuppBook"},
+                new Object[]{"biblatex", "SuppCollection"},
+                new Object[]{"biblatex", "SuppPeriodical"},
+                new Object[]{"biblatex", "TechReport"},
+                new Object[]{"biblatex", "Thesis"},
+                new Object[]{"biblatex", "Unpublished"},*/
+                new Object[]{"biblatex", "WWW"}
+        );
+        // @formatter:on
+    }
+
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void addEntryOfGivenType(String databaseMode, String entryType) {
@@ -124,69 +187,6 @@ public class ParameterizedDialogNewEntryTest extends AbstractUITest {
             }
         };
         return matcher2;
-    }
-
-    public static Stream<Object[]> instancesToTest() {
-        // Create entry from menu
-        // Structure:
-        // {"BibTeX"/"biblatex", "type"}
-        // @formatter:off
-        return Stream.of(
-                new Object[]{"BibTeX", "Article"},
-/*                new Object[]{"BibTeX", "InBook"},
-                new Object[]{"BibTeX", "Book"},
-                new Object[]{"BibTeX", "Booklet"},
-                new Object[]{"BibTeX", "InCollection"},
-                new Object[]{"BibTeX", "Conference"},
-                new Object[]{"BibTeX", "InProceedings"},
-                new Object[]{"BibTeX", "Proceedings"},
-                new Object[]{"BibTeX", "Manual"},
-                new Object[]{"BibTeX", "MastersThesis"},
-                new Object[]{"BibTeX", "PhdThesis"},
-                new Object[]{"BibTeX", "TechReport"},
-                new Object[]{"BibTeX", "Unpublished"},
-                new Object[]{"BibTeX", "Misc"},
-                new Object[]{"BibTeX", "Electronic"},
-                new Object[]{"BibTeX", "IEEEtranBSTCTL"},
-                new Object[]{"BibTeX", "Periodical"},
-                new Object[]{"BibTeX", "Patent"},
-                new Object[]{"BibTeX", "Standard"},
-                new Object[]{"biblatex", "Article"},
-                new Object[]{"biblatex", "Book"},
-                new Object[]{"biblatex", "BookInBook"},
-                new Object[]{"biblatex", "Booklet"},
-                new Object[]{"biblatex", "Collection"},
-                new Object[]{"biblatex", "Conference"},
-                new Object[]{"biblatex", "Electronic"},
-                new Object[]{"biblatex", "IEEEtranBSTCTL"},
-                new Object[]{"biblatex", "InBook"},
-                new Object[]{"biblatex", "InCollection"},
-                new Object[]{"biblatex", "InProceedings"},
-                new Object[]{"biblatex", "InReference"},
-                new Object[]{"biblatex", "Manual"},
-                new Object[]{"biblatex", "MastersThesis"},
-                new Object[]{"biblatex", "Misc"},
-                new Object[]{"biblatex", "MvBook"},
-                new Object[]{"biblatex", "MvCollection"},
-                new Object[]{"biblatex", "MvProceedings"},
-                new Object[]{"biblatex", "MvReference"},
-                new Object[]{"biblatex", "Online"},
-                new Object[]{"biblatex", "Patent"},
-                new Object[]{"biblatex", "Periodical"},
-                new Object[]{"biblatex", "PhdThesis"},
-                new Object[]{"biblatex", "Proceedings"},
-                new Object[]{"biblatex", "Reference"},
-                new Object[]{"biblatex", "Report"},
-                new Object[]{"biblatex", "Set"},
-                new Object[]{"biblatex", "SuppBook"},
-                new Object[]{"biblatex", "SuppCollection"},
-                new Object[]{"biblatex", "SuppPeriodical"},
-                new Object[]{"biblatex", "TechReport"},
-                new Object[]{"biblatex", "Thesis"},
-                new Object[]{"biblatex", "Unpublished"},*/
-                new Object[]{"biblatex", "WWW"}
-        );
-        // @formatter:on
     }
 
 }

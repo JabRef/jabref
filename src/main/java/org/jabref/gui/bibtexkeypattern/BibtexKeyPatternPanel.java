@@ -47,6 +47,14 @@ public class BibtexKeyPatternPanel extends Pane {
         buildGUI();
     }
 
+    private static void setValue(TextField tf, String fieldName, AbstractBibtexKeyPattern keyPattern) {
+        if (keyPattern.isDefaultValue(fieldName)) {
+            tf.setText("");
+        } else {
+            tf.setText(keyPattern.getValue(fieldName).get(0));
+        }
+    }
+
     private void buildGUI() {
         // The header - can be removed
         Label label = new Label(Localization.lang("Entry type"));
@@ -60,7 +68,7 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(defaultPat, 3, 2);
 
         Button button = new Button("Default");
-        button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        button.setOnAction(e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
         gridPane.add(button, 4, 2);
 
         BibDatabaseMode mode;
@@ -91,11 +99,11 @@ public class BibtexKeyPatternPanel extends Pane {
         }
 
         Button help1 = new Button("?");
-        help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
+        help1.setOnAction(e -> new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
         gridPane.add(help1, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
-        btnDefaultAll1.setOnAction(e-> {
+        btnDefaultAll1.setOnAction(e -> {
             // reset all fields
             for (TextField field : textFields.values()) {
                 field.setText("");
@@ -103,6 +111,20 @@ public class BibtexKeyPatternPanel extends Pane {
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
         gridPane.add(btnDefaultAll1, 3, rowIndex);
+    }
+
+    protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
+        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
+                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
+        );
+        fillPatternUsingPanelData(res);
+        return res;
+    }
+
+    public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
+        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
+        fillPatternUsingPanelData(res);
+        return res;
     }
 
     /**
@@ -124,20 +146,6 @@ public class BibtexKeyPatternPanel extends Pane {
         }
     }
 
-    protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
-        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
-                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
-        fillPatternUsingPanelData(res);
-        return res;
-    }
-
-    public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
-        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
-        fillPatternUsingPanelData(res);
-        return res;
-    }
-
     /**
      * Fills the current values to the text fields
      *
@@ -152,14 +160,6 @@ public class BibtexKeyPatternPanel extends Pane {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));
-        }
-    }
-
-    private static void setValue(TextField tf, String fieldName, AbstractBibtexKeyPattern keyPattern) {
-        if (keyPattern.isDefaultValue(fieldName)) {
-            tf.setText("");
-        } else {
-            tf.setText(keyPattern.getValue(fieldName).get(0));
         }
     }
 

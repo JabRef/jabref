@@ -18,7 +18,7 @@ import com.sun.javafx.scene.control.skin.TextAreaSkin;
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     /**
-     *  Variable that contains user-defined behavior for paste action.
+     * Variable that contains user-defined behavior for paste action.
      */
     private PasteActionHandler pasteActionHandler = () -> {
         // Set empty paste behavior by default
@@ -74,7 +74,8 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
 
     /**
      * Set pasteActionHandler variable to passed handler
-     * @param  handler an instance of PasteActionHandler that describes paste behavior
+     *
+     * @param handler an instance of PasteActionHandler that describes paste behavior
      */
     public void setPasteActionHandler(PasteActionHandler handler) {
         Objects.requireNonNull(handler);
@@ -82,7 +83,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     /**
-     *  Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
+     * Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
      */
     @Override
     public void paste() {
@@ -91,7 +92,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     /**
-     *  Interface presents user-described paste behaviour applying to paste method
+     * Interface presents user-described paste behaviour applying to paste method
      */
     @FunctionalInterface
     public interface PasteActionHandler {

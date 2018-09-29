@@ -82,7 +82,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchResultFrame {
 
-    private static final String[] FIELDS = new String[] {FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL};
+    private static final String[] FIELDS = new String[]{FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL};
     private static final int DATABASE_COL = 0;
     private static final int FILE_COL = 1;
     private static final int URL_COL = 2;
@@ -126,7 +126,7 @@ public class SearchResultFrame {
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
-                                                                                                       new EntryTableFormat());
+                new EntryTableFormat());
         entryTable = new JTable(model);
 
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
@@ -134,12 +134,12 @@ public class SearchResultFrame {
         entryTable.setDefaultRenderer(String.class, renderer);
         setWidths();
         TableComparatorChooser<BibEntry> tableSorter = TableComparatorChooser.install(entryTable, sortedEntries,
-                                                                                      AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
         final DefaultEventSelectionModel<BibEntry> selectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
-                                                                                                                           .eventSelectionModelWithThreadProxyList(sortedEntries);
+                .eventSelectionModelWithThreadProxyList(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -277,8 +277,8 @@ public class SearchResultFrame {
             @Override
             public void componentMoved(ComponentEvent e) {
                 new SearchPreferences(Globals.prefs)
-                                                    .setSearchDialogPosX(searchResultFrame.getLocation().x)
-                                                    .setSearchDialogPosY(searchResultFrame.getLocation().y);
+                        .setSearchDialogPosX(searchResultFrame.getLocation().x)
+                        .setSearchDialogPosY(searchResultFrame.getLocation().y);
             }
         });
     }
@@ -526,7 +526,7 @@ public class SearchResultFrame {
                         description = flEntry.getLink();
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), description, flEntry.getLink(),
-                                                      flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
+                            flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
                     count++;
                 }
 

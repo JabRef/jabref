@@ -895,14 +895,14 @@ public class JabRefPreferences implements PreferencesService {
 
     public EntryEditorPreferences getEntryEditorPreferences() {
         return new EntryEditorPreferences(getEntryEditorTabList(),
-                                          getLatexFieldFormatterPreferences(),
-                                          getImportFormatPreferences(),
-                                          getCustomTabFieldNames(),
-                                          getBoolean(SHOW_RECOMMENDATIONS),
-                                          getBoolean(DEFAULT_SHOW_SOURCE),
-                                          getBibtexKeyPatternPreferences(),
-                                          Globals.getKeyPrefs(),
-                                          getBoolean(AVOID_OVERWRITING_KEY));
+                getLatexFieldFormatterPreferences(),
+                getImportFormatPreferences(),
+                getCustomTabFieldNames(),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBibtexKeyPatternPreferences(),
+                Globals.getKeyPrefs(),
+                getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
@@ -942,7 +942,7 @@ public class JabRefPreferences implements PreferencesService {
      * so that they do not have to be parsed in order to fit there
      *
      * @return A map of keys with tab names and values as a string containing
-     * fields for the given name separated by ;
+     *         fields for the given name separated by ;
      */
     @Override
     public Map<String, String> getCustomTabsNamesAndFields() {
@@ -1432,11 +1432,11 @@ public class JabRefPreferences implements PreferencesService {
         Map<String, String> fieldDirectories = Stream.of(FieldName.FILE, FieldName.PDF, FieldName.PS)
                                                      .collect(Collectors.toMap(field -> field, field -> get(field + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
-                                   getUser(),
-                                   fieldDirectories,
-                                   getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
-                                   get(IMPORT_FILENAMEPATTERN),
-                                   get(IMPORT_FILEDIRPATTERN));
+                getUser(),
+                fieldDirectories,
+                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                get(IMPORT_FILENAMEPATTERN),
+                get(IMPORT_FILEDIRPATTERN));
     }
 
     public UpdateFieldPreferences getUpdateFieldPreferences() {
@@ -1461,7 +1461,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
                                            isKeywordSyncEnabled());
     }
 
@@ -1514,13 +1514,13 @@ public class JabRefPreferences implements PreferencesService {
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(
-                                               get(KEY_PATTERN_REGEX),
-                                               get(KEY_PATTERN_REPLACEMENT),
-                                               getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                                               getBoolean(KEY_GEN_FIRST_LETTER_A),
-                                               getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
-                                               getKeyPattern(),
-                                               getKeywordDelimiter());
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getKeyPattern(),
+                getKeywordDelimiter());
     }
 
     public TimestampPreferences getTimestampPreferences() {
@@ -1568,7 +1568,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                                       Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
+                Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
                                        fileDirForDatabase);
     }
 
@@ -1663,8 +1663,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         return new CleanupPreferences(
-                                      getLayoutFormatterPreferences(journalAbbreviationLoader),
-                                      getFilePreferences());
+                getLayoutFormatterPreferences(journalAbbreviationLoader),
+                getFilePreferences());
     }
 
     public CleanupPreset getCleanupPreset() {
@@ -1918,8 +1918,8 @@ public class JabRefPreferences implements PreferencesService {
                                      getStringList(COLUMN_NAMES),
                                      createSpecialFieldColumns(),
                                      createExtraFileColumns(),
-                                     createColumnWidths(),
-                                     getMainTableColumnSortTypes());
+                createColumnWidths(),
+                getMainTableColumnSortTypes());
     }
 
     public MainTablePreferences getMainTablePreferences() {
@@ -1988,12 +1988,12 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
-        put(ID_ENTRY_GENERATOR, fetcherName);
-    }
-
     public String getIdBasedFetcherForEntryGenerator() {
         return get(ID_ENTRY_GENERATOR);
+    }
+
+    public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
+        put(ID_ENTRY_GENERATOR, fetcherName);
     }
 
     public void setMainTableColumnSortType(Map<String, SortType> sortOrder) {

@@ -372,7 +372,7 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
-        actions.put(Actions.REPLACE_ALL, ()-> (new ReplaceStringAction(this)).execute());
+        actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
                 new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
@@ -400,8 +400,8 @@ public class BasePanel extends StackPane {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
             boolean enabled = !previewPreferences.isPreviewPanelEnabled();
             PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
-                    .withPreviewPanelEnabled(enabled)
-                    .build();
+                                                                         .withPreviewPanelEnabled(enabled)
+                                                                         .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
         });
@@ -494,9 +494,9 @@ public class BasePanel extends StackPane {
         if (!selectedBibEntries.isEmpty()) {
             // Collect all non-null titles.
             List<String> titles = selectedBibEntries.stream()
-                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                    .map(bibEntry -> bibEntry.getTitle().get())
-                    .collect(Collectors.toList());
+                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                                                    .map(bibEntry -> bibEntry.getTitle().get())
+                                                    .collect(Collectors.toList());
 
             if (titles.isEmpty()) {
                 output(Localization.lang("None of the selected entries have titles."));
@@ -528,8 +528,8 @@ public class BasePanel extends StackPane {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> cite.contains("\\")) // must contain \
-                    .orElse("\\cite");
+                                         .filter(cite -> cite.contains("\\")) // must contain \
+                                         .orElse("\\cite");
             Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
 
             if (keys.size() == bes.size()) {
@@ -716,12 +716,12 @@ public class BasePanel extends StackPane {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                .stream()
-                .findFirst()
-                .ifPresent(entry -> {
-                    preview.setEntry(entry);
-                    entryEditor.setEntry(entry);
-                }));
+                                                         .stream()
+                                                         .findFirst()
+                                                         .ifPresent(entry -> {
+                                                             preview.setEntry(entry);
+                                                             entryEditor.setEntry(entry);
+                                                         }));
 
         // TODO: Register these actions globally
         /*
@@ -811,8 +811,8 @@ public class BasePanel extends StackPane {
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                .flatMap(SplitPane.Divider::positionProperty)
-                .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+                                              .flatMap(SplitPane.Divider::positionProperty)
+                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
     }
 
     /**
@@ -942,9 +942,9 @@ public class BasePanel extends StackPane {
 
     private void cyclePreview(int newPosition) {
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
+                                                             .getBuilder()
+                                                             .withPreviewCyclePosition(newPosition)
+                                                             .build();
         Globals.prefs.storePreviewPreferences(previewPreferences);
 
         preview.updateLayout(previewPreferences);
@@ -994,7 +994,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -1122,9 +1122,9 @@ public class BasePanel extends StackPane {
 
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                    .getBuilder()
-                    .withPreviewPanelDividerPosition(position)
-                    .build();
+                                                                 .getBuilder()
+                                                                 .withPreviewPanelDividerPosition(position)
+                                                                 .build();
             Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
@@ -1326,7 +1326,7 @@ public class BasePanel extends StackPane {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
-                                                                                  selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
         }
     }
@@ -1427,8 +1427,8 @@ public class BasePanel extends StackPane {
 
                     Optional<LinkedFile> linkedFile = files.stream()
                                                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                                   || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                                                   || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
                                                            .findFirst();
 
                     if (linkedFile.isPresent()) {

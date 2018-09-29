@@ -29,8 +29,7 @@ class TablePrefsTab extends Pane implements PrefsTab {
     /**
      * Customization of external program paths.
      *
-     * @param prefs
-     *            a <code>JabRefPreferences</code> value
+     * @param prefs a <code>JabRefPreferences</code> value
      */
     public TablePrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -105,13 +104,11 @@ class TablePrefsTab extends Pane implements PrefsTab {
         abbrNames.setDisable(namesNatbib.isSelected());
         lastNamesOnly.setDisable(namesNatbib.isSelected());
         noAbbrNames.setDisable(namesNatbib.isSelected());
-
     }
 
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     *
      */
     @Override
     public void storeSettings() {
@@ -123,7 +120,6 @@ class TablePrefsTab extends Pane implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbrNames.isSelected());
 
         prefs.putBoolean(JabRefPreferences.AUTO_RESIZE_MODE, autoResizeMode.isSelected());
-
     }
 
     @Override

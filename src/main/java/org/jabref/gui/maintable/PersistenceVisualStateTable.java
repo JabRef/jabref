@@ -39,7 +39,6 @@ public class PersistenceVisualStateTable {
         if (changed) {
             updateColumnPreferences();
         }
-
     }
 
     private void updateColumnSortType(String text, SortType sortType) {

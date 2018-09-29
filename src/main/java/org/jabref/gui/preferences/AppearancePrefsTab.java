@@ -42,7 +42,6 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF);
-
     }
 
     public Node getBuilder() {

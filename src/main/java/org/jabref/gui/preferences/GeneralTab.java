@@ -62,7 +62,7 @@ class GeneralTab extends Pane implements PrefsTab {
         if (!useTimeStamp.isSelected()) {
             updateTimeStamp.setDisable(true);
         }
-        useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
+        useTimeStamp.setOnAction(e -> updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
@@ -201,7 +201,6 @@ class GeneralTab extends Pane implements PrefsTab {
         try {
             // Test if date format is legal:
             DateTimeFormatter.ofPattern(timeStampFormat.getText());
-
         } catch (IllegalArgumentException ex2) {
             DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Invalid date format"),
                     Localization.lang("The chosen date format for new entries is not valid")));

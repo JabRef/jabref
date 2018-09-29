@@ -2,8 +2,7 @@ package org.jabref.gui;
 
 import org.jabref.gui.actions.SimpleCommand;
 
-public class ReplaceStringAction extends SimpleCommand
-{
+public class ReplaceStringAction extends SimpleCommand {
     private BasePanel basePanel;
 
     public ReplaceStringAction(BasePanel basePanel) {

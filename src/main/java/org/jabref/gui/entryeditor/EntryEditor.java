@@ -105,8 +105,8 @@ public class EntryEditor extends BorderPane {
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
                 Globals.prefs.getFilePreferences(),
-                                                Globals.prefs.getImportFormatPreferences(),
-                                                Globals.prefs.getUpdateFieldPreferences(),
+                Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getUpdateFieldPreferences(),
                 Globals.getFileUpdateMonitor());
 
         ViewLoader.view(this)
@@ -152,7 +152,6 @@ public class EntryEditor extends BorderPane {
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); //alt on win
                     fileHandler.addToEntry(entry, files);
-
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
@@ -162,7 +161,6 @@ public class EntryEditor extends BorderPane {
 
             event.setDropCompleted(success);
             event.consume();
-
         });
     }
 

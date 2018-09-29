@@ -31,6 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LocalizationConsistencyTest {
 
+    private static Language[] installedLanguages() {
+        return Language.values();
+    }
+
     @Test
     void allFilesMustBeInLanguages() throws IOException {
         String bundle = "JabRef";
@@ -50,27 +54,6 @@ class LocalizationConsistencyTest {
                                            .map(Language::getId)
                                            .collect(Collectors.toSet());
         assertEquals(knownLanguages, localizationFiles, "There are some localization files that are not present in org.jabref.logic.l10n.Language or vice versa!");
-    }
-
-    @Test
-    void ensureNoDuplicates() {
-        String bundle = "JabRef";
-        for (Language lang : Language.values()) {
-            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
-
-            // read in
-            DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
-            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
-                 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                properties.load(reader);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            List<String> duplicates = properties.getDuplicates();
-
-            assertEquals(Collections.emptyList(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang.getId());
-        }
     }
 
     @Test
@@ -145,8 +128,25 @@ class LocalizationConsistencyTest {
         }
     }
 
-    private static Language[] installedLanguages() {
-        return Language.values();
+    @Test
+    void ensureNoDuplicates() {
+        String bundle = "JabRef";
+        for (Language lang : Language.values()) {
+            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
+
+            // read in
+            DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
+            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
+                 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                properties.load(reader);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            List<String> duplicates = properties.getDuplicates();
+
+            assertEquals(Collections.emptyList(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang.getId());
+        }
     }
 
     @ParameterizedTest

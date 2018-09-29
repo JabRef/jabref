@@ -78,8 +78,8 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         editorOptions.getStyleClass().add("sectionHeader");
         builder.add(editorOptions, 1, 1);
         builder.add(new Separator(), 2, 1);
-        builder.add(autoOpenForm,  1, 2);
-        builder.add(defSource,  1, 3);
+        builder.add(autoOpenForm, 1, 2);
+        builder.add(defSource, 1, 3);
         builder.add(emacsMode, 1, 4);
         builder.add(emacsRebindCtrlA, 1, 5);
         builder.add(emacsRebindCtrlF, 1, 6);
@@ -90,7 +90,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         Label autocompletionOptions = new Label(Localization.lang("Autocompletion options"));
         autocompletionOptions.getStyleClass().add("sectionHeader");
         builder.add(autocompletionOptions, 1, 10);
-        builder.add(autoComplete,   1, 11);
+        builder.add(autoComplete, 1, 11);
 
         Label useFields = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
         builder.add(useFields, 1, 12);
@@ -101,16 +101,16 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         nameFormat.getStyleClass().add("sectionHeader");
         builder.add(nameFormat, 1, 14);
         builder.add(autoCompFF, 1, 15);
-        builder.add(autoCompLF,  1, 16);
-        builder.add(autoCompBoth,  1, 17);
+        builder.add(autoCompLF, 1, 16);
+        builder.add(autoCompBoth, 1, 17);
         builder.add(new Label(""), 1, 18);
 
         Label treatment = new Label(Localization.lang("Treatment of first names"));
         treatment.getStyleClass().add("sectionHeader");
         builder.add(treatment, 1, 19);
-        builder.add(firstNameModeAbbr,  1, 20);
+        builder.add(firstNameModeAbbr, 1, 20);
         builder.add(firstNameModeFull, 1, 21);
-        builder.add(firstNameModeBoth,  1, 22);
+        builder.add(firstNameModeBoth, 1, 22);
     }
 
     public Node getBuilder() {
