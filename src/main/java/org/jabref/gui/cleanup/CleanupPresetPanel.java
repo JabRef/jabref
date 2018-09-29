@@ -92,9 +92,7 @@ public class CleanupPresetPanel extends ScrollPane {
         container.add(cleanUpBibtex, 0, 7);
         container.add(cleanUpBiblatex, 0, 8);
         container.add(cleanUpISSN, 0, 9);
-        SwingNode cleanUpFormattersFX = new SwingNode();
-        cleanUpFormattersFX.setContent(cleanUpFormatters);
-        container.add(cleanUpFormattersFX, 0, 10);
+        container.add(cleanUpFormatters, 0, 10);
 
         getChildren().add(container);
         setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
