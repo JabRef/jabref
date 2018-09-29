@@ -174,12 +174,4 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
             }
         };
     }
-
-    public void install(ListView<T> listView) {
-        listView.setCellFactory(this);
-    }
-
-    public void install(ComboBox<T> comboBox) {
-        comboBox.setCellFactory(this);
-    }
 }
