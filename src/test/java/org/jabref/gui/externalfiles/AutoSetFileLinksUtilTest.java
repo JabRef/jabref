@@ -51,4 +51,5 @@ public class AutoSetFileLinksUtilTest {
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
     }
+
 }

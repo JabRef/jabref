@@ -98,7 +98,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
         dontOverwrite.setOnAction(e ->
         // Warning before overwriting is only relevant if overwriting can happen:
-                warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
+        warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
     }
 
     public Node getBuilder() {

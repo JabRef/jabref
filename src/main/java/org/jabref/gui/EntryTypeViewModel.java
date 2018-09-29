@@ -40,9 +40,9 @@ public class EntryTypeViewModel {
     private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty idText = new SimpleStringProperty();
     private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
+    private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final BasePanel basePanel;
     private final DialogService dialogService;
-    private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
 
     public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
@@ -50,6 +50,7 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
+
     }
 
     public BooleanProperty searchingProperty() {
@@ -85,6 +86,27 @@ public class EntryTypeViewModel {
         if (fetcherWorker.getState() == Worker.State.RUNNING) {
             fetcherWorker.cancel(true);
         }
+    }
+
+    private class FetcherWorker extends Task<Optional<BibEntry>> {
+
+        private IdBasedFetcher fetcher = null;
+        private String searchID = "";
+
+        @Override
+        protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
+            Optional<BibEntry> bibEntry = Optional.empty();
+
+            searchingProperty().setValue(true);
+            storeSelectedFetcher();
+            fetcher = selectedItemProperty().getValue();
+            searchID = idText.getValue();
+            if (!searchID.isEmpty()) {
+                bibEntry = fetcher.performSearchById(searchID);
+            }
+            return bibEntry;
+        }
+
     }
 
     public void runFetcherWorker() {
@@ -130,26 +152,7 @@ public class EntryTypeViewModel {
 
             focusAndSelectAllProperty.set(true);
             searchingProperty().setValue(false);
+
         });
-    }
-
-    private class FetcherWorker extends Task<Optional<BibEntry>> {
-
-        private IdBasedFetcher fetcher = null;
-        private String searchID = "";
-
-        @Override
-        protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
-            Optional<BibEntry> bibEntry = Optional.empty();
-
-            searchingProperty().setValue(true);
-            storeSelectedFetcher();
-            fetcher = selectedItemProperty().getValue();
-            searchID = idText.getValue();
-            if (!searchID.isEmpty()) {
-                bibEntry = fetcher.performSearchById(searchID);
-            }
-            return bibEntry;
-        }
     }
 }

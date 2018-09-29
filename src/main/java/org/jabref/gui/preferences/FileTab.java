@@ -91,12 +91,12 @@ class FileTab extends Pane implements PrefsTab {
         Label general = new Label(Localization.lang("General"));
         general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
-        builder.add(openLast, 1, 2);
+        builder.add(openLast,  1, 2);
         builder.add(backup, 1, 3);
         Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.add(label, 1, 4);
         builder.add(nonWrappableFields, 2, 4);
-        builder.add(resolveStringsStandard, 1, 5);
+        builder.add(resolveStringsStandard,  1, 5);
         builder.add(resolveStringsAll, 1, 6);
         builder.add(doNotResolveStringsFor, 2, 6);
 
@@ -125,8 +125,8 @@ class FileTab extends Pane implements PrefsTab {
         });
         builder.add(browse, 3, 12);
         builder.add(bibLocAsPrimaryDir, 1, 13);
-        builder.add(matchStartsWithKey, 1, 14);
-        builder.add(matchExactKeyOnly, 1, 15);
+        builder.add(matchStartsWithKey,  1, 14);
+        builder.add(matchExactKeyOnly,  1, 15);
         builder.add(useRegExpComboBox, 1, 16);
         builder.add(regExpTextField, 2, 16);
 
@@ -144,7 +144,7 @@ class FileTab extends Pane implements PrefsTab {
         Label autosave = new Label(Localization.lang("Autosave"));
         autosave.getStyleClass().add("sectionHeader");
         builder.add(autosave, 1, 20);
-        builder.add(localAutoSave, 1, 21);
+        builder.add(localAutoSave,  1, 21);
         Button help1 = new Button("?");
         help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
         builder.add(help1, 2, 21);
@@ -250,4 +250,5 @@ class FileTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("File");
     }
+
 }

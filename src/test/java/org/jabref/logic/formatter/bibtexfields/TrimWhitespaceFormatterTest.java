@@ -56,4 +56,6 @@ public class TrimWhitespaceFormatterTest {
         assertEquals("whitespace", formatter.format("whitespace \n \r"));
         assertEquals("whitespace", formatter.format("   \f\t whitespace  \r \n"));
     }
+
+
 }

@@ -34,9 +34,6 @@ import org.fxmisc.easybind.EasyBind;
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
-    private final BasePanel basePanel;
-    private final DialogService dialogService;
-    private final JabRefPreferences prefs;
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
@@ -48,6 +45,11 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TitledPane bibTexTitlePane;
     @FXML private TitledPane ieeeTranTitlePane;
     @FXML private TitledPane customTitlePane;
+
+    private final BasePanel basePanel;
+    private final DialogService dialogService;
+    private final JabRefPreferences prefs;
+
     private EntryType type;
     private EntryTypeViewModel viewModel;
 
@@ -120,6 +122,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
+
         } else {
             biblatexTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
@@ -132,6 +135,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 addEntriesToPane(customPane, customTypes);
             }
         }
+
     }
 
     public EntryType getChoice() {

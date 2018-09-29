@@ -15,9 +15,10 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -146,6 +147,7 @@ class EntryTypesTest {
         assertEquals(Arrays.asList(overwrittenStandardType), EntryTypes.getAllModifiedStandardTypes(mode));
     }
 
+
     @ParameterizedTest
     @MethodSource("standardArticleTypeAndMode")
     void standardTypeIsStillAcessibleIfOverwritten(EntryType standardArticleType, BibDatabaseMode mode) {
@@ -174,4 +176,5 @@ class EntryTypesTest {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(overwrittenStandardType));
     }
+
 }

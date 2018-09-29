@@ -185,7 +185,7 @@ public class PdfImporter {
     private void doContentImport(String fileName, List<BibEntry> res) {
 
         PdfContentImporter contentImporter = new PdfContentImporter(
-                Globals.prefs.getImportFormatPreferences());
+                                                                    Globals.prefs.getImportFormatPreferences());
         Path filePath = Paths.get(fileName);
         ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {
@@ -205,7 +205,7 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences())
-                .generateAndSetKey(entry);
+                                                                                                             .generateAndSetKey(entry);
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
 

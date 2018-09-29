@@ -16,6 +16,40 @@ import static org.assertj.swing.finder.WindowFinder.findDialog;
 @Tag("GUITest")
 public class ParameterizedDialogTest extends AbstractUITest {
 
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void openAndExitDialog(boolean createDatabase, String[] menuPath, String dialogTitle, String buttonName,
+                                  boolean closeButton) {
+        if (createDatabase) {
+            newDatabase();
+        }
+        mainFrame.menuItemWithPath(menuPath).click();
+        GenericTypeMatcher<JDialog> matcher = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return dialogTitle.equals(dialog.getTitle());
+            }
+        };
+
+        if (closeButton) {
+            findDialog(matcher).withTimeout(10_000).using(robot()).close();
+        } else {
+            findDialog(matcher).withTimeout(10_000).using(robot())
+                    .button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+                        @Override
+                        protected boolean isMatching(@Nonnull JButton jButton) {
+                            return buttonName.equals(jButton.getText());
+                        }
+                    }).click();
+        }
+        if (createDatabase) {
+            closeDatabase();
+        }
+        exitJabRef();
+    }
+
     public static Stream<Object[]> instancesToTest() {
         // Opening and closing (in different ways) the dialogs accessible from the menus without doing anything else
         // Structure:
@@ -95,40 +129,6 @@ public class ParameterizedDialogTest extends AbstractUITest {
                 new Object[]{false, new String[]{"Help", "About JabRef"}, "About JabRef", "Close button", true}
         );
         // @formatter:on
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    public void openAndExitDialog(boolean createDatabase, String[] menuPath, String dialogTitle, String buttonName,
-                                  boolean closeButton) {
-        if (createDatabase) {
-            newDatabase();
-        }
-        mainFrame.menuItemWithPath(menuPath).click();
-        GenericTypeMatcher<JDialog> matcher = new GenericTypeMatcher<JDialog>(JDialog.class) {
-
-            @Override
-            protected boolean isMatching(JDialog dialog) {
-                return dialogTitle.equals(dialog.getTitle());
-            }
-        };
-
-        if (closeButton) {
-            findDialog(matcher).withTimeout(10_000).using(robot()).close();
-        } else {
-            findDialog(matcher).withTimeout(10_000).using(robot())
-                               .button(new GenericTypeMatcher<JButton>(JButton.class) {
-
-                                   @Override
-                                   protected boolean isMatching(@Nonnull JButton jButton) {
-                                       return buttonName.equals(jButton.getText());
-                                   }
-                               }).click();
-        }
-        if (createDatabase) {
-            closeDatabase();
-        }
-        exitJabRef();
     }
 
 }

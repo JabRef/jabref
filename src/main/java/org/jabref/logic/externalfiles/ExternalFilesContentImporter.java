@@ -25,10 +25,12 @@ public class ExternalFilesContentImporter {
 
     public List<BibEntry> importPDFContent(Path file) {
         return pdfImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+
     }
 
     public List<BibEntry> importXMPContent(Path file) throws IOException {
         return XmpUtilReader.readXmp(file, importFormatPreferences.getXmpPreferences());
+
     }
 
     public List<BibEntry> importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) {

@@ -100,6 +100,7 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(useCaseKeeperOnSearch, 2, 19);
         builder.add(new Pane(), 2, 20);
         builder.add(useUnitFormatterOnSearch, 2, 21);
+
     }
 
     @Override
@@ -174,7 +175,7 @@ class AdvancedTab extends Pane implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
+            DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
                             + " '" + Localization.lang("Remote server port") + '\''));
 

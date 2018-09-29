@@ -37,10 +37,11 @@ public class BibTeXMLExporterTestFiles {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    private static Path resourceDir;
+    public Path tempFile;
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
-    public Path tempFile;
+
+    private static Path resourceDir;
 
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
@@ -48,7 +49,7 @@ public class BibTeXMLExporterTestFiles {
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                         .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
+                    .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
     }
 

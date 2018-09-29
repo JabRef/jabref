@@ -19,6 +19,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.io.Resources;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;

@@ -31,8 +31,8 @@ public interface PreferencesService {
 
     void setCustomTabsNameAndFields(String name, String fields, int defNumber);
 
-    void purgeSeries(String prefix, int number);
+    public void purgeSeries(String prefix, int number);
 
-    void updateEntryEditorTabList();
+    public void updateEntryEditorTabList();
 
 }

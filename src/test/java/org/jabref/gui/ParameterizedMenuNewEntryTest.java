@@ -12,6 +12,18 @@ import org.junit.jupiter.params.provider.MethodSource;
 @Tag("GUITest")
 public class ParameterizedMenuNewEntryTest extends AbstractUITest {
 
+    // Not working on Travis
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void addEntryOfGivenType(String databaseMode, String entryType) {
+        mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
+        JTableFixture entryTable = mainFrame.table();
+
+        entryTable.requireRowCount(0);
+        mainFrame.menuItemWithPath("BibTeX", "New entry by type...", StringUtil.capitalizeFirst(entryType)).click();
+        entryTable.requireRowCount(1);
+    }
+
     public static Stream<Object[]> instancesToTest() {
         // Create entry from menu
         // Structure:
@@ -48,18 +60,6 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
                 new Object[]{"biblatex", "misc"}
         );
         // @formatter:on
-    }
-
-    // Not working on Travis
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    public void addEntryOfGivenType(String databaseMode, String entryType) {
-        mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
-        JTableFixture entryTable = mainFrame.table();
-
-        entryTable.requireRowCount(0);
-        mainFrame.menuItemWithPath("BibTeX", "New entry by type...", StringUtil.capitalizeFirst(entryType)).click();
-        entryTable.requireRowCount(1);
     }
 
 }

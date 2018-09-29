@@ -112,7 +112,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             List<Integer> newSelectedIndices = new ArrayList<>();
             ObservableList selectedIndices = chosen.getSelectionModel().getSelectedIndices();
             for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-                int oldIndex = (int) selectedIndices.get(i);
+                int oldIndex = (int)selectedIndices.get(i);
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
                 int newIndex = ((oldIndex < (chosenModel.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
@@ -122,8 +122,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
 
         btnDefault.setOnAction(event -> layout.setText(Globals.prefs.getPreviewPreferences()
-                                                                    .getPreviewStyleDefault()
-                                                                    .replace("__NEWLINE__", "\n")));
+                .getPreviewStyleDefault()
+                .replace("__NEWLINE__", "\n")));
 
         btnTest.setOnAction(event -> {
             try {
@@ -167,7 +167,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnLeft.setPrefSize(80, 20);
         btnUp.setPrefSize(80, 20);
         btnDown.setPrefSize(80, 20);
-        vBox.getChildren().addAll(new Label(""), new Label(""), new Label(""), new Label(""), new Label(""),
+        vBox.getChildren().addAll(new Label(""),  new Label(""), new Label(""), new Label(""), new Label(""),
                 new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
                 btnUp, btnDown);
         Label currentPreview = new Label(Localization.lang("Current Preview"));
@@ -234,9 +234,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 }
                 try {
                     get().stream()
-                         .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
-                         .sorted(Comparator.comparing(CitationStyle::getTitle))
-                         .forEach(availableModel::add);
+                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
+                            .sorted(Comparator.comparing(CitationStyle::getTitle))
+                            .forEach(availableModel::add);
 
                     btnRight.setDisable(availableModel.isEmpty());
                 } catch (InterruptedException | ExecutionException e) {

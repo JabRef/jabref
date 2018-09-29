@@ -584,7 +584,7 @@ public class BibEntry implements Cloneable {
      */
     public String getAuthorTitleYear(int maxCharacters) {
         String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
-                getField(FieldName.YEAR).orElse("N/A")};
+            getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -704,7 +704,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
-                                                 Character keywordDelimiter) {
+            Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
 
@@ -878,10 +878,11 @@ public class BibEntry implements Cloneable {
      * Returns a list of observables that represent the data of the entry.
      */
     public Observable[] getObservables() {
-        return new Observable[]{fields};
+        return new Observable[] {fields};
     }
 
     private interface GetFieldInterface {
         Optional<String> getValueForField(String fieldName);
     }
+
 }

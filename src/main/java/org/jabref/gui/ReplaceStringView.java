@@ -14,18 +14,21 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class ReplaceStringView extends BaseDialog<Void> {
+public class ReplaceStringView extends BaseDialog<Void>
+{
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML private RadioButton allReplace;
     @FXML private CheckBox selectFieldOnly;
     @FXML private ButtonType replaceButton;
     @FXML private TextField limitFieldInput;
     @FXML private TextField findField;
     @FXML private TextField replaceField;
+
     private ReplaceStringViewModel viewModel;
 
-    public ReplaceStringView(BasePanel basePanel) {
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+
+    public ReplaceStringView(BasePanel basePanel)  {
         this.setTitle(Localization.lang("Replace String"));
 
         viewModel = new ReplaceStringViewModel(basePanel);
@@ -51,7 +54,8 @@ public class ReplaceStringView extends BaseDialog<Void> {
     @FXML
     private void buttonReplace() {
         String findString = findField.getText();
-        if ("".equals(findString)) {
+        if ("".equals(findString))
+        {
             this.close();
             return;
         }

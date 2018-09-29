@@ -152,6 +152,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final JabRefPreferences prefs = Globals.prefs;
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
     private final JFXSnackbar statusLine = new JFXSnackbar(this);
+    ;
     private final ProgressBar progressBar = new ProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 

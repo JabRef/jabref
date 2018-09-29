@@ -34,6 +34,13 @@ public class ExporterTest {
     public Charset charset;
     public List<BibEntry> entries;
 
+    @BeforeEach
+    public void setUp() {
+        databaseContext = new BibDatabaseContext();
+        charset = StandardCharsets.UTF_8;
+        entries = Collections.emptyList();
+    }
+
     private static Stream<Object[]> exportFormats() {
         Collection<Object[]> result = new ArrayList<>();
 
@@ -49,13 +56,6 @@ public class ExporterTest {
         return result.stream();
     }
 
-    @BeforeEach
-    public void setUp() {
-        databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
-        entries = Collections.emptyList();
-    }
-
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) throws Exception {
@@ -68,7 +68,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(NullPointerException.class, ()->{
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(null, tmpFile, charset, entries);
@@ -78,7 +78,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(NullPointerException.class, ()->{
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(databaseContext, tmpFile, charset, null);

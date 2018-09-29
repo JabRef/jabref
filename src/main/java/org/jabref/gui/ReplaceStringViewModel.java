@@ -12,7 +12,8 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-public class ReplaceStringViewModel extends AbstractViewModel {
+public class ReplaceStringViewModel extends AbstractViewModel
+{
     private boolean allFieldReplace;
     private String findString;
     private String replaceString;
@@ -25,7 +26,9 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
     private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
-    public ReplaceStringViewModel(BasePanel basePanel) {
+
+    public ReplaceStringViewModel(BasePanel basePanel)
+    {
         Objects.requireNonNull(basePanel);
         this.panel = basePanel;
     }
@@ -40,10 +43,11 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         final NamedCompound compound = new NamedCompound(Localization.lang("Replace string"));
         int counter = 0;
         if (selOnly) {
-            for (BibEntry bibEntry : this.panel.getSelectedEntries())
+            for (BibEntry bibEntry: this.panel.getSelectedEntries())
                 counter += replaceItem(bibEntry, compound);
-        } else {
-            for (BibEntry bibEntry : this.panel.getDatabase().getEntries())
+        }
+        else {
+            for (BibEntry bibEntry: this.panel.getDatabase().getEntries())
                 counter += replaceItem(bibEntry, compound);
         }
         return counter;

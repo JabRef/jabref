@@ -21,15 +21,6 @@ import static org.assertj.swing.timing.Pause.pause;
 @Tag("GUITest")
 public class IdFetcherDialogTest extends AbstractUITest {
 
-    public static Stream<Object[]> instancesToTest() {
-        return Stream.of(
-                new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
-                new Object[]{"biblatex", "DOI", "10.1002/9781118257517"},
-                new Object[]{"BibTeX", "ISBN", "9780321356680"},
-                new Object[]{"biblatex", "ISBN", "9780321356680"}
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void insertEmptySearchID(String databaseMode, String fetcherType, String fetchID) {
@@ -117,6 +108,16 @@ public class IdFetcherDialogTest extends AbstractUITest {
         }, 10_000);
 
         entryTable.requireRowCount(1);
+    }
+
+
+    public static Stream<Object[]> instancesToTest() {
+        return Stream.of(
+                new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
+                new Object[]{"biblatex", "DOI", "10.1002/9781118257517"},
+                new Object[]{"BibTeX", "ISBN", "9780321356680"},
+                new Object[]{"biblatex", "ISBN", "9780321356680"}
+        );
     }
 
 }

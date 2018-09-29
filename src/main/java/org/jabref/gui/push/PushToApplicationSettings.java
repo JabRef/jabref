@@ -38,27 +38,20 @@ public class PushToApplicationSettings {
      */
     public JPanel getSettingsPanel(int n) {
         switch (n) {
-            case 0:
-                application = new PushToEmacs(dialogService);
-                break;
-            case 1:
-                application = new PushToLyx(dialogService);
-                break;
-            case 2:
-                application = new PushToTexmaker(dialogService);
-                break;
-            case 3:
-                application = new PushToTeXstudio(dialogService);
-                break;
-            case 4:
-                application = new PushToVim(dialogService);
-                break;
-            case 5:
-                application = new PushToWinEdt(dialogService);
-                break;
-            default:
-                application = null;
-                break;
+            case 0: application = new PushToEmacs(dialogService);
+                    break;
+            case 1: application = new PushToLyx(dialogService);
+                    break;
+            case 2: application = new PushToTexmaker(dialogService);
+                    break;
+            case 3: application = new PushToTeXstudio(dialogService);
+                     break;
+            case 4: application = new PushToVim(dialogService);
+                    break;
+            case 5: application = new PushToWinEdt(dialogService);
+                    break;
+            default: application = null;
+                    break;
         }
         application.initParameters();
         String commandPath = Globals.prefs.get(application.commandPathPreferenceKey);
@@ -115,8 +108,8 @@ public class PushToApplicationSettings {
         } else {
             label.append(" (").append(application.getCommandName()).append("):");
         }
-        jfxSettings.add(new Label(label.toString()), 1, 1);
-        jfxSettings.add(path1, 2, 1);
+        jfxSettings.add(new Label(label.toString()),1,1);
+        jfxSettings.add(path1,2, 1);
         Button browse = new Button(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -124,8 +117,8 @@ public class PushToApplicationSettings {
 
         browse.setOnAction(
                 e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration))
-                                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
-        jfxSettings.add(browse, 3, 1);
+                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
+        jfxSettings.add(browse,3, 1);
     }
 
     /**

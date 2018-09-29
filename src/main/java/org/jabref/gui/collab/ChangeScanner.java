@@ -88,7 +88,7 @@ public class ChangeScanner implements Runnable {
             });
         } else {
             frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
-                    Localization.lang("No actual changes found."));
+                                                                  Localization.lang("No actual changes found."));
 
             fup.scanResultsResolved(true);
         }

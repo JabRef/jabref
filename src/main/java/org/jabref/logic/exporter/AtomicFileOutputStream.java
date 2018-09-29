@@ -67,7 +67,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
      *
-     * @param path       the path of the file to write to or replace
+     * @param path the path of the file to write to or replace
      * @param keepBackup whether to keep the backup file after a successful write process
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {

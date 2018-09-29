@@ -49,7 +49,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         this.prefs = prefs;
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
         citeCommand = new TextField();
-        editFileTypes.setOnAction(e -> ExternalFileTypeEditor.getAction());
+        editFileTypes.setOnAction(e->ExternalFileTypeEditor.getAction());
         defaultConsole = new RadioButton(Localization.lang("Use default terminal emulator"));
         executeConsole = new RadioButton(Localization.lang("Execute command") + ":");
         consoleCommand = new TextField();
@@ -69,22 +69,22 @@ class ExternalTab extends JPanel implements PrefsTab {
         browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
 
         GridPane consoleOptionPanel = new GridPane();
-        consoleOptionPanel.add(defaultConsole, 1, 1);
-        consoleOptionPanel.add(executeConsole, 1, 2);
-        consoleOptionPanel.add(consoleCommand, 2, 2);
-        consoleOptionPanel.add(browseButton, 3, 2);
-        consoleOptionPanel.add(commandDescription, 2, 3);
+        consoleOptionPanel.add(defaultConsole,  1, 1);
+        consoleOptionPanel.add(executeConsole,  1, 2);
+        consoleOptionPanel.add(consoleCommand,  2, 2);
+        consoleOptionPanel.add(browseButton,  3, 2);
+        consoleOptionPanel.add(commandDescription,  2, 3);
 
         GridPane pdfOptionPanel = new GridPane();
-        pdfOptionPanel.add(adobeAcrobatReader, 1, 1);
-        pdfOptionPanel.add(adobeAcrobatReaderPath, 2, 1);
-        pdfOptionPanel.add(browseAdobeAcrobatReader, 3, 1);
+        pdfOptionPanel.add(adobeAcrobatReader,  1, 1);
+        pdfOptionPanel.add(adobeAcrobatReaderPath,  2, 1);
+        pdfOptionPanel.add(browseAdobeAcrobatReader,  3, 1);
 
         if (OS.WINDOWS) {
             browseSumatraReader.setOnAction(e -> showSumatraChooser());
-            pdfOptionPanel.add(sumatraReader, 1, 2);
-            pdfOptionPanel.add(sumatraReaderPath, 2, 2);
-            pdfOptionPanel.add(browseSumatraReader, 3, 2);
+            pdfOptionPanel.add(sumatraReader,  1, 2);
+            pdfOptionPanel.add(sumatraReaderPath,  2, 2);
+            pdfOptionPanel.add(browseSumatraReader,  3, 2);
         }
 
         Label sendingOfEmails = new Label(Localization.lang("Sending of emails"));
@@ -125,7 +125,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         Label openPdf = new Label(Localization.lang("Open PDF"));
         openPdf.getStyleClass().add("sectionHeader");
-        builder.add(openPdf, 1, 12);
+        builder.add(openPdf,  1, 12);
 
         builder.add(pdfOptionPanel, 1, 13);
         JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));

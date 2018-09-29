@@ -120,6 +120,39 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         event.consume();
     }
 
+    private void handleOnDragDropped(LinkedFileViewModel originalItem, DragEvent event) {
+        Dragboard dragboard = event.getDragboard();
+        boolean success = false;
+
+        ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
+
+        if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
+
+            LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
+            LinkedFileViewModel transferedItem = null;
+            int draggedIdx = 0;
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getFile().equals(linkedFile)) {
+                    draggedIdx = i;
+                    transferedItem = items.get(i);
+                    break;
+                }
+            }
+            int thisIdx = items.indexOf(originalItem);
+            items.set(draggedIdx, originalItem);
+            items.set(thisIdx, transferedItem);
+            success = true;
+        }
+        if (dragboard.hasFiles()) {
+            List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
+            items.addAll(linkedFiles);
+            success = true;
+        }
+        event.setDropCompleted(success);
+        event.consume();
+
+    }
+
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
@@ -154,38 +187,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
 
         return container;
-    }
-
-    private void handleOnDragDropped(LinkedFileViewModel originalItem, DragEvent event) {
-        Dragboard dragboard = event.getDragboard();
-        boolean success = false;
-
-        ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
-
-        if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-
-            LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
-            LinkedFileViewModel transferedItem = null;
-            int draggedIdx = 0;
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).getFile().equals(linkedFile)) {
-                    draggedIdx = i;
-                    transferedItem = items.get(i);
-                    break;
-                }
-            }
-            int thisIdx = items.indexOf(originalItem);
-            items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
-            success = true;
-        }
-        if (dragboard.hasFiles()) {
-            List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-            items.addAll(linkedFiles);
-            success = true;
-        }
-        event.setDropCompleted(success);
-        event.consume();
     }
 
     private void setUpKeyBindings() {

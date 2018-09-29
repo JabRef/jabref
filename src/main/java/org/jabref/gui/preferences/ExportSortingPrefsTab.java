@@ -60,6 +60,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
         builder.add(exportOrderPanel.getJFXPanel(), 1, 8);
         builder.add(new Line(), 2, 9);
+
     }
 
     @Override

@@ -54,10 +54,10 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
-                                   .findFirst()
-                                   .flatMap(ParserResult::getFile)
-                                   .map(File::getAbsolutePath)
-                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                    .findFirst()
+                                    .flatMap(ParserResult::getFile)
+                                    .map(File::getAbsolutePath)
+                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
         new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
