@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.BiConsumer;
 
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -163,5 +164,13 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                 getListView().refresh();
             }
         };
+    }
+
+    public void install(ListView<T> listView) {
+        listView.setCellFactory(this);
+    }
+
+    public void install(ComboBox<T> comboBox) {
+        comboBox.setCellFactory(this);
     }
 }

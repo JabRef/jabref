@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-public class CleanupPresetPanel {
+public class CleanupPresetPanel extends ScrollPane {
 
     private final BibDatabaseContext databaseContext;
     private CheckBox cleanUpDOI;
@@ -35,8 +35,6 @@ public class CleanupPresetPanel {
     private CheckBox cleanUpBibtex;
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
-    private GridPane panel;
-    private ScrollPane scrollPane;
     private CleanupPreset cleanupPreset;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
@@ -81,31 +79,25 @@ public class CleanupPresetPanel {
 
         updateDisplay(cleanupPreset);
 
-        //                FormLayout layout = new FormLayout("left:15dlu, fill:pref:grow",
-        //                        "pref, pref, pref, pref, pref, fill:pref:grow, pref,pref, pref, pref,190dlu, fill:pref:grow,");
-        //
-        //                FormBuilder builder = FormBuilder.create().layout(layout);
-        panel = new GridPane();
-        panel.add(cleanUpDOI, 0, 0);
-        panel.add(cleanUpUpgradeExternalLinks, 0, 1);
-        panel.add(cleanUpMovePDF, 0, 2);
-        panel.add(cleanUpMakePathsRelative, 0, 3);
-        panel.add(cleanUpRenamePDF, 0, 4);
+        GridPane container = new GridPane();
+        container.add(cleanUpDOI, 0, 0);
+        container.add(cleanUpUpgradeExternalLinks, 0, 1);
+        container.add(cleanUpMovePDF, 0, 2);
+        container.add(cleanUpMakePathsRelative, 0, 3);
+        container.add(cleanUpRenamePDF, 0, 4);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ");
         currentPattern = currentPattern.concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
-        panel.add(new Label(currentPattern), 0, 5);
-        panel.add(cleanUpRenamePDFonlyRelativePaths, 0, 6);
-        panel.add(cleanUpBibtex, 0, 7);
-        panel.add(cleanUpBiblatex, 0, 8);
-        panel.add(cleanUpISSN, 0, 9);
+        container.add(new Label(currentPattern), 0, 5);
+        container.add(cleanUpRenamePDFonlyRelativePaths, 0, 6);
+        container.add(cleanUpBibtex, 0, 7);
+        container.add(cleanUpBiblatex, 0, 8);
+        container.add(cleanUpISSN, 0, 9);
         SwingNode cleanUpFormattersFX = new SwingNode();
         cleanUpFormattersFX.setContent(cleanUpFormatters);
-        panel.add(cleanUpFormattersFX, 0, 10);
-        //        panel = builder.build();
-        scrollPane = new ScrollPane(panel);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        scrollPane.setVisible(true);
-        scrollPane.setBorder(null);
+        container.add(cleanUpFormattersFX, 0, 10);
+
+        getChildren().add(container);
+        setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
     }
 
     private void updateDisplay(CleanupPreset preset) {
@@ -122,10 +114,6 @@ public class CleanupPresetPanel {
         cleanUpBibtex.setSelected(preset.isConvertToBibtex());
         cleanUpISSN.setSelected(preset.isCleanUpISSN());
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
-    }
-
-    public ScrollPane getScrollPane() {
-        return scrollPane;
     }
 
     public CleanupPreset getCleanupPreset() {

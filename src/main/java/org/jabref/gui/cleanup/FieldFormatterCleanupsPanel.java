@@ -1,32 +1,21 @@
 package org.jabref.gui.cleanup;
 
-import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JList;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.JFXPanel;
-import javafx.embed.swing.SwingNode;
-import javafx.scene.Scene;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -34,6 +23,7 @@ import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -45,23 +35,25 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 
-public class FieldFormatterCleanupsPanel extends JFXPanel {
+import org.fxmisc.easybind.EasyBind;
+
+public class FieldFormatterCleanupsPanel extends BorderPane {
 
     private static final String DESCRIPTION = Localization.lang("Description") + ": ";
     private final CheckBox cleanupEnabled;
     private FieldFormatterCleanups fieldFormatterCleanups;
-    private JList<?> actionsList;
-    private JComboBox<?> formattersCombobox;
-    private JComboBox<String> selectFieldCombobox;
-    private JButton addButton;
-    private JTextArea descriptionAreaText;
+    private ListView<FieldFormatterCleanup> actionsList;
+    private ComboBox<Formatter> formattersCombobox;
+    private ComboBox<String> selectFieldCombobox;
+    private Button addButton;
+    private Label descriptionAreaText;
     private Button removeButton;
     private Button resetButton;
     private Button recommendButton;
 
     private final FieldFormatterCleanups defaultFormatters;
     private final List<Formatter> availableFormatters;
-
+    private ObservableList<FieldFormatterCleanup> actions;
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
         this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
@@ -80,21 +72,16 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
         fieldFormatterCleanups = formatterCleanups;
 
         // first clear existing content
-        //        this.removeAll();
+        this.getChildren().clear();
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
         //The copy is necessary because the original List is unmodifiable
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions);
         buildLayout(actionsToDisplay);
-
     }
 
     private void buildLayout(List<FieldFormatterCleanup> actionsToDisplay) {
-        //        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-        //                "left:pref, 13dlu, left:pref:grow, 4dlu, pref, 4dlu, pref",
-        //                "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, fill:pref:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu"));
-        //        builder.add(cleanupEnabled).xyw(1, 1, 7);
-        GridPane builder = new GridPane();
+        GridPane root = new GridPane();
         ColumnConstraints first = new ColumnConstraints();
         first.setPrefWidth(25);
         ColumnConstraints second = new ColumnConstraints();
@@ -103,7 +90,7 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
         third.setPrefWidth(200);
         ColumnConstraints fourth = new ColumnConstraints();
         fourth.setPrefWidth(200);
-        builder.getColumnConstraints().addAll(first, second, third, fourth);
+        root.getColumnConstraints().addAll(first, second, third, fourth);
         RowConstraints firstR = new RowConstraints();
         firstR.setPrefHeight(25);
         RowConstraints secondR = new RowConstraints();
@@ -114,58 +101,18 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
         fourthR.setPrefHeight(50);
         RowConstraints fifthR = new RowConstraints();
         fifthR.setPrefHeight(50);
-        builder.getRowConstraints().addAll(firstR, secondR, thirdR, fourthR, fifthR);
-        builder.add(cleanupEnabled, 0, 0, 4, 1);
-        actionsList = new JList<>(new CleanupActionsListModel(actionsToDisplay));
-        actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        actionsList.addMouseMotionListener(new MouseMotionAdapter() {
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                super.mouseMoved(e);
-                CleanupActionsListModel m = (CleanupActionsListModel) actionsList.getModel();
-                int index = actionsList.locationToIndex(e.getPoint());
-                if (index > -1) {
-                    actionsList.setToolTipText(m.getElementAt(index).getFormatter().getDescription());
-                }
-            }
-        });
-
-        actionsList.getModel().addListDataListener(new ListDataListener() {
-
-            @Override
-            public void intervalRemoved(ListDataEvent e) {
-                //index0 is sufficient, because of SingleSelection
-                if (e.getIndex0() == 0) {
-                    //when an item gets deleted, the next one becomes the new 0
-                    actionsList.setSelectedIndex(e.getIndex0());
-                }
-                if (e.getIndex0() > 0) {
-                    actionsList.setSelectedIndex(e.getIndex0() - 1);
-                }
-
-            }
-
-            @Override
-            public void intervalAdded(ListDataEvent e) {
-                //empty, not needed
-
-            }
-
-            @Override
-            public void contentsChanged(ListDataEvent e) {
-                //empty, not needed
-
-            }
-        });
-
-        //        builder.add(actionsList).xyw(3, 5, 5);
-        SwingNode actionList = new SwingNode();
-        actionList.setContent(actionsList);
-        builder.add(actionList, 1, 1, 3, 1);
+        root.getRowConstraints().addAll(firstR, secondR, thirdR, fourthR, fifthR);
+        root.add(cleanupEnabled, 0, 0, 4, 1);
+        actions = FXCollections.observableArrayList(actionsToDisplay);
+        actionsList = new ListView<>(actions);
+        actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        new ViewModelListCellFactory<FieldFormatterCleanup>()
+                .withTooltip(action -> action.getFormatter().getDescription())
+                .install(actionsList);
+        root.add(actionsList, 1, 1, 3, 1);
 
         resetButton = new Button(Localization.lang("Reset"));
-        resetButton.setOnAction(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
+        resetButton.setOnAction(e -> actions.setAll(defaultFormatters.getConfiguredActions()));
 
         BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
@@ -174,53 +121,31 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
 
         recommendButton.setOnAction(e -> {
             if (isBiblatex) {
-                ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBLATEX_ACTIONS);
+                actions.setAll(Cleanups.RECOMMEND_BIBLATEX_ACTIONS.getConfiguredActions());
             } else {
-                ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBTEX_ACTIONS);
+                actions.setAll(Cleanups.RECOMMEND_BIBTEX_ACTIONS.getConfiguredActions());
             }
         });
 
         removeButton = new Button(Localization.lang("Remove selected"));
-        removeButton.setOnAction(
-                e -> ((CleanupActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex()));
+        removeButton.setOnAction(e -> actions.remove(actionsList.getSelectionModel().getSelectedItem()));
 
-        builder.add(removeButton, 3, 2, 1, 1);
-        builder.add(resetButton, 1, 2, 1, 1);
-        builder.add(recommendButton, 2, 2, 1, 1);
-        builder.add(getSelectorPanel(), 1, 3, 3, 1);
+        root.add(removeButton, 3, 2, 1, 1);
+        root.add(resetButton, 1, 2, 1, 1);
+        root.add(recommendButton, 2, 2, 1, 1);
+        root.add(getSelectorPanel(), 1, 3, 3, 1);
 
-        makeDescriptionTextAreaLikeJLabel();
-        SwingNode description = new SwingNode();
-        description.setContent(descriptionAreaText);
-        builder.add(description, 1, 4, 3, 1);
-        //        this.setLayout(new BorderLayout());
-        BorderPane layout = new BorderPane();
-        layout.setLeft(builder);
-        this.setScene(new Scene(layout));
+        descriptionAreaText = new Label(DESCRIPTION);
+        descriptionAreaText.setWrapText(true);
+        root.add(descriptionAreaText, 1, 4, 3, 1);
+
+        setLeft(root);
 
         updateDescription();
 
         // make sure the layout is set according to the checkbox
-        cleanupEnabled.selectedProperty().addListener(new EnablementStatusListener<Boolean>(fieldFormatterCleanups.isEnabled()));
+        cleanupEnabled.selectedProperty().addListener(new EnablementStatusListener<>(fieldFormatterCleanups.isEnabled()));
         cleanupEnabled.setSelected(fieldFormatterCleanups.isEnabled());
-
-    }
-
-    /**
-     * Create a TextArea that looks and behaves like a JLabel. Has the advantage of supporting multine and wordwrap
-     */
-    private void makeDescriptionTextAreaLikeJLabel() {
-
-        descriptionAreaText = new JTextArea(DESCRIPTION);
-        descriptionAreaText.setLineWrap(true);
-        descriptionAreaText.setWrapStyleWord(true);
-        descriptionAreaText.setColumns(6);
-        descriptionAreaText.setEditable(false);
-        descriptionAreaText.setOpaque(false);
-        descriptionAreaText.setFocusable(false);
-        descriptionAreaText.setCursor(null);
-        descriptionAreaText.setFont(UIManager.getFont("Label.font"));
-
     }
 
     private void updateDescription() {
@@ -228,7 +153,7 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
         if (formatterCleanup != null) {
             descriptionAreaText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
         } else {
-            Formatter selectedFormatter = getFieldFormatter();
+            Formatter selectedFormatter = formattersCombobox.getValue();
             if (selectedFormatter != null) {
                 descriptionAreaText.setText(DESCRIPTION + selectedFormatter.getDescription());
             } else {
@@ -242,55 +167,31 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
      * @return Returns the created JPanel
      */
     private GridPane getSelectorPanel() {
-        //        FormBuilder builder = FormBuilder.create()
-        //                .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, fill:pref:grow, 4dlu, right:pref",
-        //                        "fill:pref:grow, 2dlu, pref, 2dlu"));
         GridPane builder = new GridPane();
         List<String> fieldNames = InternalBibtexFields.getAllPublicAndInternalFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
-        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        selectFieldCombobox = new JComboBox<>(allPlusKey);
+        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fieldNames));
         selectFieldCombobox.setEditable(true);
-        SwingNode selectFieldComboboxFX = new SwingNode();
-        selectFieldComboboxFX.setContent(selectFieldCombobox);
-        builder.add(selectFieldComboboxFX, 1, 1);
+        builder.add(selectFieldCombobox, 1, 1);
 
-        List<String> formatterNames = availableFormatters.stream()
-                .map(Formatter::getName).collect(Collectors.toList());
-        List<String> formatterDescriptions = availableFormatters.stream()
-                .map(Formatter::getDescription).collect(Collectors.toList());
-        formattersCombobox = new JComboBox<>(formatterNames.toArray());
-        formattersCombobox.setRenderer(new DefaultListCellRenderer() {
+        formattersCombobox = new ComboBox<>(FXCollections.observableArrayList(availableFormatters));
+        new ViewModelListCellFactory<Formatter>()
+                .withText(Formatter::getName)
+                .withTooltip(Formatter::getDescription)
+                .install(formattersCombobox);
+        EasyBind.subscribe(formattersCombobox.valueProperty(), e -> updateDescription());
+        builder.add(formattersCombobox, 3, 1);
 
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
-                if ((-1 < index) && (index < formatterDescriptions.size()) && (value != null)) {
-                    setToolTipText(formatterDescriptions.get(index));
-
-                }
-                return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            }
-        });
-        formattersCombobox.addItemListener(e -> updateDescription());
-        SwingNode formattersComboboxFX = new SwingNode();
-        formattersComboboxFX.setContent(formattersCombobox);
-        builder.add(formattersComboboxFX, 3, 1);
-
-        addButton = new JButton(Localization.lang("Add"));
-        addButton.addActionListener(e -> {
+        addButton = new Button(Localization.lang("Add"));
+        addButton.setOnAction(e -> {
             FieldFormatterCleanup newAction = getFieldFormatterCleanup();
-            if (newAction == null) {
-                return;
+
+            if (!actions.contains(newAction)) {
+                actions.add(newAction);
             }
-
-            ((CleanupActionsListModel) actionsList.getModel()).addCleanupAction(newAction);
-
         });
-        SwingNode addButtonFX = new SwingNode();
-        addButtonFX.setContent(addButton);
-        builder.add(addButtonFX, 5, 1);
+        builder.add(addButton, 5, 1);
 
         return builder;
     }
@@ -310,7 +211,6 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {
-        List<FieldFormatterCleanup> actions = ((CleanupActionsListModel) actionsList.getModel()).getAllActions();
         return new FieldFormatterCleanups(cleanupEnabled.isSelected(), actions);
     }
 
@@ -323,23 +223,11 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
     }
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
-        Formatter selectedFormatter = getFieldFormatter();
+        Formatter selectedFormatter = formattersCombobox.getValue();
 
-        String fieldKey = selectFieldCombobox.getSelectedItem().toString();
+        String fieldKey = selectFieldCombobox.getValue();
         return new FieldFormatterCleanup(fieldKey, selectedFormatter);
 
-    }
-
-    private Formatter getFieldFormatter() {
-        Formatter selectedFormatter = null;
-        String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
-        for (Formatter formatter : availableFormatters) {
-            if (formatter.getName().equals(selectedFormatterName)) {
-                selectedFormatter = formatter;
-                break;
-            }
-        }
-        return selectedFormatter;
     }
 
     class EnablementStatusListener<T> implements ChangeListener<T> {
@@ -348,29 +236,19 @@ public class FieldFormatterCleanupsPanel extends JFXPanel {
             setStatus(initialStatus);
         }
 
-        //        @Override
-        //        public void actionPerformed(ActionEvent e) {
-        //            boolean enablementStatus = cleanupEnabled.isSelected();
-        //            setStatus(enablementStatus);
-        //
-        //        }
-
         private void setStatus(boolean status) {
-            actionsList.setEnabled(status);
-            selectFieldCombobox.setEnabled(status);
-            formattersCombobox.setEnabled(status);
-            addButton.setEnabled(status);
+            actionsList.setDisable(!status);
+            selectFieldCombobox.setDisable(!status);
+            formattersCombobox.setDisable(!status);
+            addButton.setDisable(!status);
             removeButton.setDisable(!status);
             resetButton.setDisable(!status);
             recommendButton.setDisable(!status);
-
         }
 
         @Override
         public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
-            // TODO Auto-generated method stub
-            boolean enablementStatus = cleanupEnabled.isSelected();
-            setStatus(enablementStatus);
+            setStatus(cleanupEnabled.isSelected());
         }
     }
 
