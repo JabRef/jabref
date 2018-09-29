@@ -29,7 +29,11 @@ public class Password {
      * @param key Key which is used to improve symmetric encryption
      */
     public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
-        this.phrase = new String(phrase).getBytes();
+        this(new String(phrase), key);
+    }
+
+    public Password(String phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+        this.phrase = phrase.getBytes();
         this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.secretKey = new SecretKeySpec(get128BitHash(key.getBytes()), "AES");
         this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());

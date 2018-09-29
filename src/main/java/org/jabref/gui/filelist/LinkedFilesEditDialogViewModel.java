@@ -26,6 +26,9 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicObservableValue;
+
 public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
@@ -33,6 +36,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final StringProperty description = new SimpleStringProperty("");
     private final ListProperty<ExternalFileType> allExternalFileTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
+    private final MonadicObservableValue<ExternalFileType> monadicSelectedExternalFileType;
     private final BibDatabaseContext database;
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -44,6 +48,8 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.externalFileTypes = externalFileTypes;
         allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
+
+        monadicSelectedExternalFileType = EasyBind.monadic(selectedExternalFileType);
         setValues(linkedFile);
     }
 
@@ -64,32 +70,30 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
+        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
 
         Path workingDir = file.orElse(preferences.getWorkingDir());
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(workingDir)
-                                                                                               .withInitialFileName(fileName)
-                                                                                               .build();
+                .withInitialDirectory(workingDir)
+                .withInitialFileName(fileName)
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
+            link.set(relativize(path));
 
-            // If the file is below the file directory, make the path relative:
-            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
-            path = FileUtil.shortenFileName(path, fileDirectories);
-
-            link.set(path.toString());
             setExternalFileTypeByExtension(link.getValueSafe());
         });
     }
 
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
-        link.set(linkedFile.getLink());
+
+        Path linkPath = Paths.get(linkedFile.getLink());
+        link.set(relativize(linkPath));
 
         selectedExternalFileType.setValue(null);
 
@@ -119,8 +123,12 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), link.getValue(), selectedExternalFileType.getValue().toString());
+        return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
+    }
 
+    private String relativize(Path filePath) {
+        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 
 }

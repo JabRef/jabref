@@ -1,0 +1,79 @@
+version: 2
+
+jobs:
+  downloadinstall4j:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          keys:
+            - install4j
+      - checkout
+      - run: scripts/download-install4j-and-jres.sh
+      - save_cache:
+          key: install4j
+          paths:
+            - "~/downloads"
+            - "~/.install4j7"
+    filters:
+      tags:
+        only: /.*/
+
+  buildDev:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          key: dependency-cache
+      - restore_cache:
+          key: install4j
+      - checkout
+      - run: scripts/extract-install4j.sh
+      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - save_cache:
+          key: dependency-cache
+          paths:
+            - "~/.gradle"
+      - store_artifacts:
+          path: build/releases
+          destination: build
+      - run: scripts/upload-to-builds.jabref.org.sh
+
+  buildRelease:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          key: dependency-cache
+      - restore_cache:
+          key: install4j
+      - checkout
+      - run: scripts/extract-install4j.sh
+      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - store_artifacts:
+          path: build/releases
+          destination: release
+      - run: scripts/upload-to-builds.jabref.org.sh
+    filters:
+      tags:
+        only: /.*/
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - downloadinstall4j
+      - buildDev:
+          requires:
+            - downloadinstall4j
+      - buildRelease:
+          requires:
+            - downloadinstall4j
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+

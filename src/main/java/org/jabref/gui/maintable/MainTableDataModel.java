@@ -1,11 +1,9 @@
 package org.jabref.gui.maintable;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -68,11 +66,7 @@ public class MainTableDataModel {
         return Optional.of(searchRules);
     }
 
-    public ObservableList<BibEntryTableViewModel> getEntriesFiltered() {
+    public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesSorted;
-    }
-
-    public void bindComparator(ReadOnlyObjectProperty<Comparator<BibEntryTableViewModel>> comparator) {
-        entriesSorted.comparatorProperty().bind(comparator);
     }
 }

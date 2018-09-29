@@ -48,7 +48,7 @@ public class CleanupPresetPanel extends ScrollPane {
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         cleanUpISSN = new CheckBox(Localization.lang("Reformat ISSN"));
         Optional<Path> firstExistingDir = databaseContext
-                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFileDirectoryPreferences());
+                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFilePreferences());
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF = new CheckBox(Localization.lang("Move linked files to default file directory %0",
                     firstExistingDir.get().toString()));

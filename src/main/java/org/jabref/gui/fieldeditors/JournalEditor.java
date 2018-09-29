@@ -8,7 +8,7 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -17,21 +17,21 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, preferences.getJournalAbbreviationPreferences(), fieldCheckers);
+    public JournalEditor(String fieldName, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textField.textProperty().bindBidirectional(viewModel.textProperty());
+        textField.addToContextMenu(EditorMenus.getDefaultMenu(textField));
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
+        AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public JournalEditorViewModel getViewModel() {

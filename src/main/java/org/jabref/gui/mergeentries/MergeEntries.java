@@ -34,12 +34,14 @@ import org.jabref.Globals;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.DiffHighlighting;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -178,7 +180,7 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
+        entryPreview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
         entryPreview.setEntry(mergedEntry);
         JFXPanel container = CustomJFXPanel.wrap(new Scene(entryPreview));
         mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));

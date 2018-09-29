@@ -15,29 +15,25 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.worker.VersionWorker;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
-
-    private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-    private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    private static final String OSX_AQUA_LOOK_AND_FEEL = "apple.laf.AquaLookAndFeel";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
@@ -58,19 +54,14 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
-                                   .findFirst()
-                                   .flatMap(ParserResult::getFile)
-                                   .map(File::getAbsolutePath)
-                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                    .findFirst()
+                                    .flatMap(ParserResult::getFile)
+                                    .map(File::getAbsolutePath)
+                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
-        JabRefGUI.checkForNewVersion(false);
-    }
-
-    public static void checkForNewVersion(boolean manualExecution) {
-        Version toBeIgnored = Globals.prefs.getVersionPreferences().getIgnoredVersion();
-        Version currentVersion = Globals.BUILD_INFO.getVersion();
-        new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
+        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
+                .checkForNewVersionAsync(false);
     }
 
     private void openWindow(Stage mainStage) {
@@ -113,15 +104,15 @@ public class JabRefGUI {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                     } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                             NotASharedDatabaseException e) {
+                            NotASharedDatabaseException e) {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
                         dialogService.showErrorDialogAndWait(
-                                                             Localization.lang("Connection error"),
-                                                             Localization.lang("A local copy will be opened."),
-                                                             e);
+                                Localization.lang("Connection error"),
+                                Localization.lang("A local copy will be opened."),
+                                e);
                     }
                     toOpenTab.add(pr);
                 } else if (pr.toOpenTab()) {
@@ -153,8 +144,13 @@ public class JabRefGUI {
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
-        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
-        Globals.getThemeLoader().installBaseCss(scene);
+        // We create a decoration pane ourselves for performance reasons
+        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
+        DecorationPane root = new DecorationPane();
+        root.getChildren().add(JabRefGUI.mainFrame);
+
+        Scene scene = new Scene(root, 800, 800);
+        Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
@@ -170,7 +166,7 @@ public class JabRefGUI {
 
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                             + pr.getErrorMessage();
+                    + pr.getErrorMessage();
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
@@ -227,7 +223,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                                                                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");

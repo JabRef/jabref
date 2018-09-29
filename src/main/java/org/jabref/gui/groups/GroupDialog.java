@@ -20,7 +20,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -40,7 +39,6 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.Dialog;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.TooltipTextUtil;
@@ -104,7 +102,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
 
     // for KeywordGroup
     private final JTextField keywordGroupSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final TextField keywordGroupSearchTerm = new TextField(FieldName.KEYWORDS, "", false);
+    private final JTextField keywordGroupSearchTerm = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
     private final JCheckBox keywordGroupCaseSensitive = new JCheckBox(Localization.lang("Case sensitive"));
     private final JCheckBox keywordGroupRegExp = new JCheckBox(Localization.lang("regular expression"));
     // for SearchGroup
@@ -149,7 +147,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super((JFrame) null, Localization.lang("Edit group"), true, GroupDialog.class);
+        super(Localization.lang("Edit group"), true, GroupDialog.class);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));

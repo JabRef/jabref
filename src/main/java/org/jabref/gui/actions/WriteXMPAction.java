@@ -17,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -95,7 +94,7 @@ public class WriteXMPAction extends SimpleCommand {
         errors = entriesChanged = skipped = 0;
 
         if (optionsDialog == null) {
-            optionsDialog = new OptionsDialog(null);
+            optionsDialog = new OptionsDialog();
         }
         optionsDialog.open();
 
@@ -112,7 +111,7 @@ public class WriteXMPAction extends SimpleCommand {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
+                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences()))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .collect(Collectors.toList());
@@ -182,9 +181,8 @@ public class WriteXMPAction extends SimpleCommand {
 
         private final JTextArea progressArea;
 
-
-        public OptionsDialog(JFrame parent) {
-            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false, WriteXMPAction.OptionsDialog.class);
+        public OptionsDialog() {
+            super(Localization.lang("Writing XMP-metadata for selected entries..."), false, WriteXMPAction.OptionsDialog.class);
             okButton.setEnabled(false);
 
             okButton.addActionListener(e -> dispose());

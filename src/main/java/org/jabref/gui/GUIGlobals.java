@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Font;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -15,11 +17,14 @@ import org.slf4j.LoggerFactory;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
+
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
     public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;
     public static Font currentFont;
+
+    public static CustomLocalDragboard localDragboard = new CustomLocalDragboard();
 
     public static final int WIDTH_ICON_COL = 16 + 12; // add some additional space to improve appearance
 
@@ -55,8 +60,9 @@ public class GUIGlobals {
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
 
+        IconTheme.loadFonts();
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+                                          Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
     }
 
     public static void setFont(int size) {
@@ -64,5 +70,4 @@ public class GUIGlobals {
         // update preferences
         Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, size);
     }
-
 }

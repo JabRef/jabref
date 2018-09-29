@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -53,9 +55,12 @@ import org.xml.sax.SAXException;
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
     private static final String API_URL = "https://export.arxiv.org/api/query";
+    private static final String ARXIV_URL_PREFIX_FOR_ID = "(https?://arxiv.org/abs/)";
+    private static final Pattern URL_PATTERN = Pattern.compile(ARXIV_URL_PREFIX_FOR_ID);
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -69,10 +74,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
         try {
             Optional<URL> pdfUrl = searchForEntries(entry).stream()
-                    .map(ArXivEntry::getPdfUrl)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst();
+                                                          .map(ArXivEntry::getPdfUrl)
+                                                          .filter(Optional::isPresent)
+                                                          .map(Optional::get)
+                                                          .findFirst();
 
             if (pdfUrl.isPresent()) {
                 LOGGER.info("Fulltext PDF found @ arXiv.");
@@ -159,7 +164,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
-            throws FetcherException {
+        throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
 
@@ -195,7 +200,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
-                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+                                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -245,14 +250,15 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_OAI2_ARXIV;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_OAI2_ARXIV);
     }
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
         return searchForEntries(query).stream().map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator())).collect(Collectors.toList());
+                                                    (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                      .collect(Collectors.toList());
     }
 
     @Override
@@ -266,10 +272,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
         return searchForEntries(entry).stream()
-                .map(ArXivEntry::getId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
+                                      .map(ArXivEntry::getId)
+                                      .filter(Optional::isPresent)
+                                      .map(Optional::get)
+                                      .findFirst();
     }
 
     @Override
@@ -289,7 +295,6 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         private final Optional<String> doi;
         private final Optional<String> journalReferenceText;
         private final Optional<String> primaryCategory;
-
 
         public ArXivEntry(Node item) {
             // see https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
@@ -347,7 +352,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             // Primary category
             // Ex: <arxiv:primary_category xmlns:arxiv="https://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
             primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
-                    .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
+                                     .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
         }
 
         public static String correctLineBreaks(String s) {
@@ -367,14 +372,16 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
          * Returns the arXiv identifier
          */
         public Optional<String> getIdString() {
-            // remove leading https://arxiv.org/abs/ from abstract url to get arXiv ID
-            String prefix = "https://arxiv.org/abs/";
+
             return urlAbstractPage.map(abstractUrl -> {
-                if (abstractUrl.startsWith(prefix)) {
-                    return abstractUrl.substring(prefix.length());
+                Matcher matcher = URL_PATTERN.matcher(abstractUrl);
+                if (matcher.find()) {
+                    // remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
+                    return abstractUrl.substring(matcher.group(1).length());
                 } else {
                     return abstractUrl;
                 }
+
             });
         }
 
@@ -409,8 +416,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
-            getPdfUrl().ifPresent(url -> bibEntry
-                    .setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
+            getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }
     }

@@ -89,7 +89,7 @@ public class AutoSetLinks {
 
         Runnable r = () -> {
             boolean foundAny = false;
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
 
             for (BibEntry entry : entries) {
 

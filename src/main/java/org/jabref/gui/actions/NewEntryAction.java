@@ -5,14 +5,18 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import org.jabref.gui.EntryTypeDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends SimpleCommand {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
@@ -20,16 +24,21 @@ public class NewEntryAction extends SimpleCommand {
      * The type of the entry to create.
      */
     private final Optional<EntryType> type;
+    private final DialogService dialogService;
+    private final JabRefPreferences preferences;
 
-
-    public NewEntryAction(JabRefFrame jabRefFrame) {
+    public NewEntryAction(JabRefFrame jabRefFrame, DialogService dialogService, JabRefPreferences preferences) {
         this.jabRefFrame = jabRefFrame;
         this.type = Optional.empty();
+        this.dialogService = dialogService;
+        this.preferences = preferences;
     }
 
-    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type) {
+    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type, DialogService dialogService, JabRefPreferences preferences) {
         this.jabRefFrame = jabRefFrame;
         this.type = Optional.of(type);
+        this.dialogService = dialogService;
+        this.preferences = preferences;
     }
 
     @Override
@@ -40,25 +49,23 @@ public class NewEntryAction extends SimpleCommand {
         }
 
         if (type.isPresent()) {
-            jabRefFrame.getCurrentBasePanel().newEntry(type.get());
+            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(type.get()));
         } else {
-            EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-            typeChoiceDialog.setVisible(true);
-            EntryType selectedType = typeChoiceDialog.getChoice();
+            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
+            EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
             if (selectedType == null) {
                 return;
             }
 
             trackNewEntry(selectedType);
-            jabRefFrame.getCurrentBasePanel().newEntry(selectedType);
+            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
         }
     }
 
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", type.getName());
-        Map<String, Double> measurements = new HashMap<>();
 
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, measurements));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
     }
 }

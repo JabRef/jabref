@@ -10,10 +10,10 @@
 <?import javafx.scene.layout.Region?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0"
             xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeView">
     <center>
-        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane">
+        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0">
             <columns>
                 <TreeTableColumn fx:id="mainColumn"/>
                 <TreeTableColumn fx:id="numberColumn" minWidth="50.0" maxWidth="70.0" prefWidth="60.0"
@@ -30,7 +30,7 @@
         <HBox fx:id="barBottom" alignment="CENTER">
             <ButtonBar fx:id="buttonBarBottom">
                 <buttons>
-                    <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
+                    <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="icon-button"
                             ButtonBar.buttonData="LEFT">
                         <graphic>
                             <JabRefIconView glyph="NEW_GROUP" glyphSize="18"/>

@@ -13,23 +13,24 @@ import org.slf4j.LoggerFactory;
 /**
  * A listener for PostgreSQL database notifications.
  */
-public class PostgresSQLNotificationListener extends Thread {
+public class PostgresSQLNotificationListener implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
+    private volatile boolean stop;
 
     public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
-
     @Override
     public void run() {
+        stop = false;
         try {
             //noinspection InfiniteLoopStatement
-            while (true) {
+            while (!stop) {
                 PGNotification notifications[] = pgConnection.getNotifications();
 
                 if (notifications != null) {
@@ -46,5 +47,9 @@ public class PostgresSQLNotificationListener extends Thread {
         } catch (SQLException | InterruptedException exception) {
             LOGGER.error("Error while listening for updates to PostgresSQL", exception);
         }
+    }
+
+    public void stop() {
+        stop = true;
     }
 }
