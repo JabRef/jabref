@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.edit;
 
 import java.util.Objects;
 
@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -56,8 +58,7 @@ public class ReplaceStringViewModel extends AbstractViewModel
     /**
      * Does the actual operation on a Bibtex entry based on the
      * settings specified in this same dialog. Returns the number of
-     * occurences replaced.
-     * Copied and Adapted from org.jabref.gui.ReplaceStringDialog.java
+     * occurrences replaced.
      */
     private int replaceItem(BibEntry entry, NamedCompound compound) {
         int counter = 0;

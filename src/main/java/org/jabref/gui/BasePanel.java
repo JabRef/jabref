@@ -44,6 +44,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
