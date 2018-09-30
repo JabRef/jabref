@@ -1,6 +1,5 @@
 package org.jabref.gui.cleanup;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +15,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -37,7 +35,7 @@ import org.jabref.model.metadata.MetaData;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class FieldFormatterCleanupsPanel extends BorderPane {
+public class FieldFormatterCleanupsPanel extends GridPane {
 
     private static final String DESCRIPTION = Localization.lang("Description") + ": ";
     private final CheckBox cleanupEnabled;
@@ -75,13 +73,11 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
         this.getChildren().clear();
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
-        //The copy is necessary because the original List is unmodifiable
-        List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions);
-        buildLayout(actionsToDisplay);
+        actions = FXCollections.observableArrayList(configuredActions);
+        buildLayout();
     }
 
-    private void buildLayout(List<FieldFormatterCleanup> actionsToDisplay) {
-        GridPane root = new GridPane();
+    private void buildLayout() {
         ColumnConstraints first = new ColumnConstraints();
         first.setPrefWidth(25);
         ColumnConstraints second = new ColumnConstraints();
@@ -90,7 +86,7 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
         third.setPrefWidth(200);
         ColumnConstraints fourth = new ColumnConstraints();
         fourth.setPrefWidth(200);
-        root.getColumnConstraints().addAll(first, second, third, fourth);
+        getColumnConstraints().addAll(first, second, third, fourth);
         RowConstraints firstR = new RowConstraints();
         firstR.setPrefHeight(25);
         RowConstraints secondR = new RowConstraints();
@@ -101,15 +97,16 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
         fourthR.setPrefHeight(50);
         RowConstraints fifthR = new RowConstraints();
         fifthR.setPrefHeight(50);
-        root.getRowConstraints().addAll(firstR, secondR, thirdR, fourthR, fifthR);
-        root.add(cleanupEnabled, 0, 0, 4, 1);
-        actions = FXCollections.observableArrayList(actionsToDisplay);
+        getRowConstraints().addAll(firstR, secondR, thirdR, fourthR, fifthR);
+        add(cleanupEnabled, 0, 0, 4, 1);
+
         actionsList = new ListView<>(actions);
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         new ViewModelListCellFactory<FieldFormatterCleanup>()
+                .withText(action -> action.getFormatter().getName())
                 .withTooltip(action -> action.getFormatter().getDescription())
                 .install(actionsList);
-        root.add(actionsList, 1, 1, 3, 1);
+        add(actionsList, 1, 1, 3, 1);
 
         resetButton = new Button(Localization.lang("Reset"));
         resetButton.setOnAction(e -> actions.setAll(defaultFormatters.getConfiguredActions()));
@@ -129,17 +126,14 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
 
         removeButton = new Button(Localization.lang("Remove selected"));
         removeButton.setOnAction(e -> actions.remove(actionsList.getSelectionModel().getSelectedItem()));
-
-        root.add(removeButton, 3, 2, 1, 1);
-        root.add(resetButton, 1, 2, 1, 1);
-        root.add(recommendButton, 2, 2, 1, 1);
-        root.add(getSelectorPanel(), 1, 3, 3, 1);
-
         descriptionAreaText = new Label(DESCRIPTION);
         descriptionAreaText.setWrapText(true);
-        root.add(descriptionAreaText, 1, 4, 3, 1);
 
-        setLeft(root);
+        add(removeButton, 3, 2, 1, 1);
+        add(resetButton, 1, 2, 1, 1);
+        add(recommendButton, 2, 2, 1, 1);
+        add(getSelectorPanel(), 1, 3, 3, 1);
+        add(descriptionAreaText, 1, 4, 3, 1);
 
         updateDescription();
 
@@ -150,7 +144,7 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
 
     private void updateDescription() {
         FieldFormatterCleanup formatterCleanup = getFieldFormatterCleanup();
-        if (formatterCleanup != null) {
+        if (formatterCleanup.getFormatter() != null) {
             descriptionAreaText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
         } else {
             Formatter selectedFormatter = formattersCombobox.getValue();
@@ -164,7 +158,6 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
 
     /**
      * This panel contains the two comboboxes and the Add button
-     * @return Returns the created JPanel
      */
     private GridPane getSelectorPanel() {
         GridPane builder = new GridPane();
@@ -224,10 +217,8 @@ public class FieldFormatterCleanupsPanel extends BorderPane {
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
         Formatter selectedFormatter = formattersCombobox.getValue();
-
         String fieldKey = selectFieldCombobox.getValue();
         return new FieldFormatterCleanup(fieldKey, selectedFormatter);
-
     }
 
     class EnablementStatusListener<T> implements ChangeListener<T> {

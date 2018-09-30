@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javafx.embed.swing.SwingNode;
 import javafx.scene.Group;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -94,8 +93,8 @@ public class CleanupPresetPanel extends ScrollPane {
         container.add(cleanUpISSN, 0, 9);
         container.add(cleanUpFormatters, 0, 10);
 
-        getChildren().add(container);
-        setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        setContent(container);
+        setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
     }
 
     private void updateDisplay(CleanupPreset preset) {
