@@ -35,10 +35,9 @@ import javafx.stage.Stage;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.FXDialog;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
@@ -63,7 +62,7 @@ import org.jabref.preferences.JabRefPreferences;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends FXDialog {
+class GroupDialog extends BaseDialog<Void> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -127,7 +126,8 @@ class GroupDialog extends FXDialog {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super(AlertType.NONE, Localization.lang("Edit group"), false);
+        this.setTitle(Localization.lang("Edit group"));
+
         nameField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         descriptionField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         colorField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
@@ -344,27 +344,26 @@ class GroupDialog extends FXDialog {
         updateComponents();
 
         // add listeners
-        ChangeListener<Toggle> radioButtonItemListener =
-            (ObservableValue<? extends Toggle> ov, Toggle old_Toggle,
-            Toggle new_Toggle) -> {
-                                                           int select = INDEX_EXPLICIT_GROUP;
-                                                           if (groupType.getSelectedToggle() == explicitRadioButton) {
-                                                               select = INDEX_EXPLICIT_GROUP;
-                                                           } else if (groupType.getSelectedToggle() == keywordsRadioButton) {
-                                                               select = INDEX_KEYWORD_GROUP;
-                                                           } else if (groupType.getSelectedToggle() == searchRadioButton) {
-                                                               select = INDEX_SEARCH_GROUP;
-                                                           } else if (groupType.getSelectedToggle() == autoRadioButton) {
-                                                               select = INDEX_AUTO_GROUP;
-                                                           } else if (groupType.getSelectedToggle() == texRadioButton) {
-                                                               select = INDEX_TEX_GROUP;
-                                                           }
-                                                           for (Node n : optionsPanel.getChildren()) {
-                                                               n.setVisible(false);
-                                                           }
-                                                           optionsPanel.getChildren().get(select).setVisible(true);
-                                                       };
-        groupType.selectedToggleProperty().addListener(radioButtonItemListener);
+        groupType.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle old_Toggle,
+                                                        Toggle new_Toggle) -> {
+            int select = INDEX_EXPLICIT_GROUP;
+            if (groupType.getSelectedToggle() == explicitRadioButton) {
+                select = INDEX_EXPLICIT_GROUP;
+            } else if (groupType.getSelectedToggle() == keywordsRadioButton) {
+                select = INDEX_KEYWORD_GROUP;
+            } else if (groupType.getSelectedToggle() == searchRadioButton) {
+                select = INDEX_SEARCH_GROUP;
+            } else if (groupType.getSelectedToggle() == autoRadioButton) {
+                select = INDEX_AUTO_GROUP;
+            } else if (groupType.getSelectedToggle() == texRadioButton) {
+                select = INDEX_TEX_GROUP;
+            }
+            for (Node n : optionsPanel.getChildren()) {
+                n.setVisible(false);
+            }
+            optionsPanel.getChildren().get(select).setVisible(true);
+            updateComponents();
+        });
 
         mCancel.setOnAction(oa -> dispose());
 
@@ -665,9 +664,9 @@ class GroupDialog extends FXDialog {
     private void setNameFontItalic(boolean italic) {
         Font f = nameField.getFont();
         if (italic) {
-            f.font(f.getFamily(), FontPosture.ITALIC, f.getSize());
+            Font.font(f.getFamily(), FontPosture.ITALIC, f.getSize());
         } else {
-            f.font(f.getFamily(), FontPosture.REGULAR, f.getSize());
+            Font.font(f.getFamily(), FontPosture.REGULAR, f.getSize());
         }
     }
 
