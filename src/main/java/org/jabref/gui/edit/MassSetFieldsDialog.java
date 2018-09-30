@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.edit;
 
 import java.util.Collection;
 import java.util.List;

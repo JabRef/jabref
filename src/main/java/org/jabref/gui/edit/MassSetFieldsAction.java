@@ -1,9 +1,10 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.edit;
 
 import java.util.List;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntry;
 
 /**
