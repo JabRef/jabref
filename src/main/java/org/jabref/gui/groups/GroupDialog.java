@@ -10,9 +10,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -31,7 +30,6 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -62,7 +60,7 @@ import org.jabref.preferences.JabRefPreferences;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends BaseDialog<Void> {
+class GroupDialog extends BaseDialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -111,12 +109,9 @@ class GroupDialog extends BaseDialog<Void> {
     private final TextField texGroupFilePath = new TextField();
 
     // for all types
-    private final Button okButton = new Button(Localization.lang("OK"));
-    private final Button mCancel = new Button(Localization.lang("Cancel"));
     private final WebView descriptionWebView = new WebView();
     private final StackPane optionsPanel = new StackPane();
-    private boolean isOkPressed;
-    private AbstractGroup resultingGroup;
+
 
     /**
      * Shows a group add/edit dialog.
@@ -141,8 +136,6 @@ class GroupDialog extends BaseDialog<Void> {
         autoGroupKeywordsDeliminator.setPrefColumnCount(10);
         autoGroupPersonsField.setPrefColumnCount(10);
         texGroupFilePath.setPrefColumnCount(TEXTFIELD_LENGTH);
-        okButton.setPrefSize(100, 30);
-        mCancel.setPrefSize(100, 30);
         descriptionWebView.setPrefWidth(585);
         optionsPanel.setPadding(PADDING);
         optionsPanel.setStyle("-fx-content-display:top;"
@@ -163,7 +156,6 @@ class GroupDialog extends BaseDialog<Void> {
         independentButton.setToggleGroup(groupHierarchy);
         intersectionButton.setToggleGroup(groupHierarchy);
         unionButton.setToggleGroup(groupHierarchy);
-        okButton.setDefaultButton(true);
 
         // build individual layout cards for each group
         GridPane explicitPanel = new GridPane();
@@ -240,11 +232,7 @@ class GroupDialog extends BaseDialog<Void> {
         texPanel.add(texGroupFilePath, 1, 0);
 
         // ... for buttons panel
-        HBox buttonsPanel = new HBox();
-        buttonsPanel.setAlignment(Pos.BOTTOM_CENTER);
-        buttonsPanel.setPadding(new Insets(15, 0, 0, 0));
-        buttonsPanel.setSpacing(35);
-        buttonsPanel.getChildren().addAll(okButton, mCancel);
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         // General panel
         GridPane generalPanel = new GridPane();
@@ -339,7 +327,6 @@ class GroupDialog extends BaseDialog<Void> {
         mainPanel.add(optionsPanel, 0, 5);
         mainPanel.add(title4, 0, 6);
         mainPanel.add(sp, 0, 7);
-        mainPanel.add(buttonsPanel, 0, 8);
 
         updateComponents();
 
@@ -365,90 +352,84 @@ class GroupDialog extends BaseDialog<Void> {
             updateComponents();
         });
 
-        mCancel.setOnAction(oa -> dispose());
-
-        okButton.setOnAction(oa -> {
-            isOkPressed = true;
-            try {
-                String groupName = nameField.getText().trim();
-                if (explicitRadioButton.isSelected()) {
-                    Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
-                    if (groupName.contains(Character.toString(keywordDelimiter))) {
-                        jabrefFrame.showMessage(
-                                                Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
-                    }
-
-                    Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
-                    if (rootGroup.isPresent()) {
-                        int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
-                        boolean warnAboutSameName = false;
-                        if ((editedGroup == null) && (groupsWithSameName > 0)) {
-                            // New group but there is already one group with the same name
-                            warnAboutSameName = true;
-                        }
-                        if ((editedGroup != null) && !editedGroup.getName().equals(groupName) && (groupsWithSameName > 0)) {
-                            // Edit group, changed name to something that is already present
-                            warnAboutSameName = true;
-                        }
-
-                        if (warnAboutSameName) {
-                            jabrefFrame.showMessage(
-                                                    Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
-                            return;
-                        }
-                    }
-
-                    resultingGroup = new ExplicitGroup(groupName, getContext(),
-                                                       keywordDelimiter);
-                } else if (keywordsRadioButton.isSelected()) {
-                    // regex is correct, otherwise OK would have been disabled
-                    // therefore I don't catch anything here
-                    if (keywordGroupRegExp.isSelected()) {
-                        resultingGroup = new RegexKeywordGroup(groupName, getContext(),
-                                                               keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
-                                                               keywordGroupCaseSensitive.isSelected());
-                    } else {
-                        resultingGroup = new WordKeywordGroup(groupName, getContext(),
-                                                              keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
-                                                              keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
-                    }
-                } else if (searchRadioButton.isSelected()) {
-                    try {
-                        // regex is correct, otherwise OK would have been
-                        // disabled
-                        // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(groupName, getContext(), searchGroupSearchExpression.getText().trim(),
-                                                         isCaseSensitive(), isRegex());
-                    } catch (Exception e1) {
-                        // should never happen
-                    }
-                } else if (autoRadioButton.isSelected()) {
-                    if (autoGroupKeywordsOption.isSelected()) {
-                        resultingGroup = new AutomaticKeywordGroup(
-                                                                   groupName, getContext(),
-                                                                   autoGroupKeywordsField.getText().trim(),
-                                                                   autoGroupKeywordsDeliminator.getText().charAt(0),
-                                                                   autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
-                    } else {
-                        resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
-                                                                   autoGroupPersonsField.getText().trim());
-                    }
-                } else if (texRadioButton.isSelected()) {
-                    resultingGroup = new TexGroup(groupName, getContext(),
-                                                  Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
-                }
+        setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                AbstractGroup resultingGroup = null;
                 try {
-                    resultingGroup.setColor(Color.valueOf(colorField.getText()));
-                } catch (IllegalArgumentException ex) {
-                    // Ignore invalid color (we should probably notify the user instead...)
-                }
-                resultingGroup.setDescription(descriptionField.getText());
-                resultingGroup.setIconName(iconField.getText());
+                    String groupName = nameField.getText().trim();
+                    if (explicitRadioButton.isSelected()) {
+                        Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
+                        if (groupName.contains(Character.toString(keywordDelimiter))) {
+                            jabrefFrame.showMessage(
+                                    Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                        }
 
-                dispose();
-            } catch (IllegalArgumentException | IOException exception) {
-                jabrefFrame.showMessage(exception.getLocalizedMessage());
+                        Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
+                        if (rootGroup.isPresent()) {
+                            int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
+                            boolean warnAboutSameName = false;
+                            if ((editedGroup == null) && (groupsWithSameName > 0)) {
+                                // New group but there is already one group with the same name
+                                warnAboutSameName = true;
+                            }
+                            if ((editedGroup != null) && !editedGroup.getName().equals(groupName) && (groupsWithSameName > 0)) {
+                                // Edit group, changed name to something that is already present
+                                warnAboutSameName = true;
+                            }
+
+                            if (warnAboutSameName) {
+                                jabrefFrame.showMessage(
+                                        Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                                return null;
+                            }
+                        }
+
+                        resultingGroup = new ExplicitGroup(groupName, getContext(),
+                                keywordDelimiter);
+                    } else if (keywordsRadioButton.isSelected()) {
+                        // regex is correct, otherwise OK would have been disabled
+                        // therefore I don't catch anything here
+                        if (keywordGroupRegExp.isSelected()) {
+                            resultingGroup = new RegexKeywordGroup(groupName, getContext(),
+                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    keywordGroupCaseSensitive.isSelected());
+                        } else {
+                            resultingGroup = new WordKeywordGroup(groupName, getContext(),
+                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
+                        }
+                    } else if (searchRadioButton.isSelected()) {
+                        resultingGroup = new SearchGroup(groupName, getContext(), searchGroupSearchExpression.getText().trim(),
+                                isCaseSensitive(), isRegex());
+                    } else if (autoRadioButton.isSelected()) {
+                        if (autoGroupKeywordsOption.isSelected()) {
+                            resultingGroup = new AutomaticKeywordGroup(
+                                    groupName, getContext(),
+                                    autoGroupKeywordsField.getText().trim(),
+                                    autoGroupKeywordsDeliminator.getText().charAt(0),
+                                    autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
+                        } else {
+                            resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
+                                    autoGroupPersonsField.getText().trim());
+                        }
+                    } else if (texRadioButton.isSelected()) {
+                        resultingGroup = new TexGroup(groupName, getContext(),
+                                Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
+                    }
+                    try {
+                        resultingGroup.setColor(Color.valueOf(colorField.getText()));
+                    } catch (IllegalArgumentException ex) {
+                        // Ignore invalid color (we should probably notify the user instead...)
+                    }
+                    resultingGroup.setDescription(descriptionField.getText());
+                    resultingGroup.setIconName(iconField.getText());
+                    return resultingGroup;
+                } catch (IllegalArgumentException | IOException exception) {
+                    jabrefFrame.showMessage(exception.getLocalizedMessage());
+                    return null;
+                }
             }
+            return null;
         });
 
         ChangeListener<String> caretListener = (ObservableValue<? extends String> ov, String oldValue,
@@ -562,21 +543,12 @@ class GroupDialog extends BaseDialog<Void> {
         return s;
     }
 
-    public boolean okPressed() {
-        return isOkPressed;
-    }
-
-    public AbstractGroup getResultingGroup() {
-        return resultingGroup;
-    }
-
-
     private void updateComponents() {
         // all groups need a name
         boolean okEnabled = !nameField.getText().trim().isEmpty();
         if (!okEnabled) {
             setDescription(Localization.lang("Please enter a name for the group."));
-            okButton.setDisable(true);
+            //TODO: okButton.setDisable(true);
             return;
         }
         String s1;
@@ -633,7 +605,7 @@ class GroupDialog extends BaseDialog<Void> {
             setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
-        okButton.setDisable(!okEnabled);
+        //TODO: okButton.setDisable(!okEnabled);
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {
@@ -694,22 +666,5 @@ class GroupDialog extends BaseDialog<Void> {
         } else {
             independentButton.setSelected(true);
         }
-    }
-
-    public Optional<AbstractGroup> showAndWaitCustom() {
-        showAndWait();
-        if (this.okPressed()) {
-            AbstractGroup newGroup = getResultingGroup();
-            return Optional.of(newGroup);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * close the dialog
-     */
-    private void dispose() {
-        ((Stage) (getDialogPane().getScene().getWindow())).close();
     }
 }
