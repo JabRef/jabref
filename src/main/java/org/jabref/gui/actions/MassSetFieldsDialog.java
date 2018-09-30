@@ -3,21 +3,20 @@ package org.jabref.gui.actions;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.undo.UndoableEdit;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -34,41 +33,37 @@ import de.saxsys.mvvmfx.utils.validation.Severity;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 
 public class MassSetFieldsDialog extends BaseDialog<Void> {
 
     private final List<BibEntry> entries;
     private final BasePanel bp;
     private final DialogService dialogService;
-    private RadioButton all;
-    private RadioButton selected;
-    private RadioButton clear;
-    private RadioButton set;
-    private RadioButton append;
-    private RadioButton rename;
-    private ComboBox<String> field;
-    private TextField textFieldSet;
-    private TextField textFieldAppend;
-    private TextField textFieldRename;
-    private CheckBox overwrite;
+
+    private RadioButton clearRadioButton;
+    private RadioButton setRadioButton;
+    private RadioButton appendRadioButton;
+    private RadioButton renameRadioButton;
+    private ComboBox<String> fieldComboBox;
+    private TextField setTextField;
+    private TextField appendTextField;
+    private TextField renameTextField;
+    private CheckBox overwriteCheckBox;
 
     MassSetFieldsDialog(List<BibEntry> entries, BasePanel bp) {
         this.entries = entries;
         this.bp = bp;
         this.dialogService = bp.frame().getDialogService();
 
+        init();
         this.setTitle("Set/clear/append/rename fields");
-        this.getDialogPane().getButtonTypes().addAll();
+        this.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 performEdits();
             }
             return null;
         });
-
-        init();
-        prepareDialog(!entries.isEmpty());
     }
 
     /**
@@ -166,186 +161,79 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
         return compoundEdit;
     }
 
-    private static String[] getFieldNames(String s) {
-        return s.split("[\\s;,]");
-    }
-
-    private void prepareDialog(boolean selection) {
-        selected.setDisable(!selection);
-        if (selection) {
-            selected.setSelected(true);
-        } else {
-            all.setSelected(true);
-        }
-        // Make sure one of the following ones is selected:
-        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected()) {
-            set.setSelected(true);
-        }
-    }
-
     private void init() {
-        field = new ComboBox<>();
-        field.setEditable(true);
-        textFieldSet = new TextField();
+        fieldComboBox = new ComboBox<>();
+        fieldComboBox.setEditable(true);
+        fieldComboBox.getItems().addAll(bp.getDatabase().getAllVisibleFields());
 
-        textFieldSet.setDisable(true);
-        textFieldAppend = new TextField();
+        ToggleGroup toggleGroup = new ToggleGroup();
+        clearRadioButton = new RadioButton(Localization.lang("Clear fields"));
+        clearRadioButton.setToggleGroup(toggleGroup);
+        renameRadioButton = new RadioButton(Localization.lang("Rename field to") + ":");
+        renameRadioButton.setTooltip(new Tooltip(Localization.lang("Move contents of a field into a field with a different name")));
+        renameRadioButton.setToggleGroup(toggleGroup);
+        setRadioButton = new RadioButton(Localization.lang("Set fields") + ":");
+        setRadioButton.setToggleGroup(toggleGroup);
+        appendRadioButton = new RadioButton(Localization.lang("Append to fields") + ":");
+        appendRadioButton.setToggleGroup(toggleGroup);
 
-        textFieldAppend.setDisable(true);
-        textFieldRename = new TextField();
+        setTextField = new TextField();
+        setTextField.disableProperty().bind(setRadioButton.selectedProperty().not());
+        appendTextField = new TextField();
+        appendTextField.disableProperty().bind(appendRadioButton.selectedProperty().not());
+        renameTextField = new TextField();
+        renameTextField.disableProperty().bind(renameRadioButton.selectedProperty().not());
 
-        textFieldRename.setDisable(true);
+        overwriteCheckBox = new CheckBox("Overwrite existing field values");
+
+        GridPane main = new GridPane();
+        main.add(new Label(Localization.lang("Field name")), 0, 0);
+        main.add(fieldComboBox, 1, 0);
+        main.add(setRadioButton, 0, 2);
+        main.add(setTextField, 1, 2);
+        main.add(appendRadioButton, 0, 3);
+        main.add(appendTextField, 1, 3);
+        main.add(renameRadioButton, 0, 4);
+        main.add(renameTextField, 1, 4);
+        main.add(clearRadioButton, 0, 5);
+        main.add(overwriteCheckBox, 0, 7);
+
+        main.setPadding(new Insets(15, 15, 0, 15));
+        main.setGridLinesVisible(false);
+        main.setVgap(4);
+        main.setHgap(10);
+        getDialogPane().setContent(main);
 
         Validator fieldNameValidator = new FunctionBasedValidator<>(
-                field.valueProperty(),
+                fieldComboBox.valueProperty(),
                 StringUtil::isNotBlank,
                 new ValidationMessage(Severity.ERROR, Localization.lang("You must enter at least one field name"))
         );
-
-        Validator renameFieldsValidator = new FunctionBasedValidator<>(
-                field.valueProperty(),
-                fieldName -> {
-                    return false;
-                },
-                new ValidationMessage(Severity.ERROR, Localization.lang("You can only rename one field at a time"))
-        );
-
-        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-        visualizer.setDecoration(new IconValidationDecorator());
-        visualizer.initVisualization(fieldNameValidator.getValidationStatus(), field, true);
-
-        all = new RadioButton(Localization.lang("All entries"));
-        selected = new RadioButton(Localization.lang("Selected entries"));
-        clear = new RadioButton(Localization.lang("Clear fields"));
-        set = new RadioButton(Localization.lang("Set fields"));
-        append = new RadioButton(Localization.lang("Append to fields"));
-        rename = new RadioButton(Localization.lang("Rename field to") + ":");
-        rename.setTooltip(new Tooltip(Localization.lang("Move contents of a field into a field with a different name")));
-        EasyBind.subscribe(rename.selectedProperty(), selected -> {
-            if (selected) {
-                visualizer.initVisualization(renameFieldsValidator.getValidationStatus(), field, true);
-            } else {
-                //visualizer.initVisualization(null, field, false);
-            }
+        Platform.runLater(() -> {
+            // Need to run this async, otherwise the dialog does not work
+            ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+            visualizer.setDecoration(new IconValidationDecorator());
+            visualizer.initVisualization(fieldNameValidator.getValidationStatus(), fieldComboBox, true);
         });
-
-        Set<String> allFields = bp.getDatabase().getAllVisibleFields();
-
-        for (String f : allFields) {
-            //field.addItem(f);
-            field.getItems().add(f);
-        }
-        set.selectedProperty().addListener((ov, a, b) -> textFieldSet.setDisable(!set.isSelected()));
-        append.selectedProperty().addListener((ov, a, b) -> textFieldSet.setDisable(!(!clear.isSelected() && !append.isSelected())));
-        clear.selectedProperty().addListener((ov, a, b) -> textFieldSet.setDisable(!(!clear.isSelected() && !append.isSelected())));
-        rename.selectedProperty().addListener((ov, a, b) -> textFieldSet.setDisable(!rename.isSelected()));
-
-        overwrite = new CheckBox("Overwrite existing field values");
-
-        GridPane main = new GridPane();
-        GridPane fn = new GridPane();
-        GridPane ie = new GridPane();
-        GridPane nfv = new GridPane();
-        HBox title1 = new HBox();
-        HBox title2 = new HBox();
-        HBox title3 = new HBox();
-        HBox optionButtons = new HBox();
-        getDialogPane().setContent(main);
-        main.setPrefSize(400, 400);
-
-        main.add(title1, 0, 0);
-        main.add(fn, 0, 1);
-        main.add(title2, 0, 2);
-        main.add(ie, 0, 3, 2, 1);
-        main.add(title3, 0, 5);
-        main.add(nfv, 0, 6, 4, 1);
-        main.add(optionButtons, 0, 10);
-        main.setPadding(new Insets(15, 5, 0, 0));
-        main.setGridLinesVisible(false);
-        getDialogPane().setContent(main);
-
-        Label str1 = new Label(Localization.lang("Field name"));
-        Label str2 = new Label(Localization.lang("Include entries"));
-        Label str3 = new Label(Localization.lang("New field value"));
-        title1.getChildren().add(str1);
-        title1.setPadding(new Insets(10, 0, 0, 0));
-        title1.setAlignment(Pos.CENTER_LEFT);
-        title2.getChildren().add(str2);
-        title2.setPadding(new Insets(10, 0, 0, 0));
-        title2.setAlignment(Pos.CENTER_LEFT);
-        title3.getChildren().add(str3);
-        title3.setPadding(new Insets(10, 0, 0, 0));
-        title3.setAlignment(Pos.CENTER_LEFT);
-
-        fn.setHgap(34);
-        fn.setVgap(5);
-        fn.setPadding(new Insets(5, 15, 5, 15));
-        fn.add(new Label(Localization.lang("Field name") + ":"), 0, 0);
-        fn.add(field, 1, 0);
-        fn.setStyle("-fx-content-display:top;"
-                + "-fx-border-insets:0 0 0 0;"
-                + "-fx-border-color:#D3D3D3");
-
-        ie.setHgap(10);
-        ie.setVgap(10);
-        ie.setPadding(new Insets(5, 15, 5, 15));
-        ie.add(all, 0, 0);
-        ie.add(selected, 0, 1);
-        ie.setStyle("-fx-content-display:top;"
-                + "-fx-border-insets:0 0 0 0;"
-                + "-fx-border-color:#D3D3D3");
-
-        nfv.setHgap(34);
-        nfv.setVgap(5);
-        nfv.setPadding(new Insets(5, 15, 5, 15));
-        nfv.add(set, 0, 0);
-        nfv.add(clear, 0, 1);
-        nfv.add(append, 0, 2);
-        nfv.add(rename, 0, 3);
-        nfv.add(overwrite, 0, 4);
-        nfv.setStyle("-fx-content-display:top;"
-                + "-fx-border-insets:0 0 0 0;"
-                + "-fx-border-color:#D3D3D3");
     }
 
     private void performEdits() {
-        Collection<BibEntry> entryList;
-        // If all entries should be treated, change the entries
-        if (all.isSelected()) {
-            entryList = bp.getDatabase().getEntries();
-        } else {
-            entryList = entries;
-        }
-
-        String toSet = textFieldSet.getText();
+        String toSet = setTextField.getText();
         if (toSet.isEmpty()) {
             toSet = null;
         }
 
-        String[] fields = (String[]) field.getItems().toArray();
-        for (String s : fields) {
-            s = s.toLowerCase();
-        }
+        String fieldName = fieldComboBox.getValue();
 
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
-        if (rename.isSelected()) {
-            if (fields.length > 1) {
-                dialogService.showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
-                return; // Do not close the dialog.
-            } else {
-                compoundEdit.addEdit(massRenameField(entryList, fields[0], textFieldRename.getText(),
-                        overwrite.isSelected()));
-            }
-        } else if (append.isSelected()) {
-            for (String field : fields) {
-                compoundEdit.addEdit(massAppendField(entryList, field, textFieldAppend.getText()));
-            }
+        if (renameRadioButton.isSelected()) {
+            compoundEdit.addEdit(massRenameField(entries, fieldName, renameTextField.getText(), overwriteCheckBox.isSelected()));
+        } else if (appendRadioButton.isSelected()) {
+            compoundEdit.addEdit(massAppendField(entries, fieldName, appendTextField.getText()));
         } else {
-            for (String field : fields) {
-                compoundEdit.addEdit(massSetField(entryList, field,
-                        set.isSelected() ? toSet : null,
-                        overwrite.isSelected()));
-            }
+            compoundEdit.addEdit(massSetField(entries, fieldName,
+                    setRadioButton.isSelected() ? toSet : null,
+                    overwriteCheckBox.isSelected()));
         }
         compoundEdit.end();
         bp.getUndoManager().addEdit(compoundEdit);
