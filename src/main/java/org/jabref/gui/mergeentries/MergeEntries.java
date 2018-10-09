@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
