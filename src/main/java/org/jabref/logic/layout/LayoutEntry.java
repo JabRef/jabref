@@ -231,6 +231,9 @@ class LayoutEntry {
         }
 
         if (option != null) {
+            // remove all LaTeX commands before other formatters are changing the text
+            RemoveLatexCommandsFormatter rm = new RemoveLatexCommandsFormatter();
+            fieldEntry = rm.format(fieldEntry);
             for (LayoutFormatter anOption : option) {
                 fieldEntry = anOption.format(fieldEntry);
             }
