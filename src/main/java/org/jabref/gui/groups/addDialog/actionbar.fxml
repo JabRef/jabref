@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+ 
+<HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" spacing="12.0" style="-fx-background-color: darkgray;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<children>
+  <Button fx:id="backButton" mnemonicParsing="false" text="Back" />
+  <Button fx:id="nextButton" mnemonicParsing="false" text="Next" />
+  <Button fx:id="finishButton" mnemonicParsing="false" text="Finish" />
+</children>
+<padding>
+  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+</padding>
+</HBox>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+
+<DialogPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <buttonTypes>
+      <ButtonType fx:constant="APPLY" />
+      <ButtonType fx:constant="CANCEL" />
+   </buttonTypes>
+   <header>
+      <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="728.0" prefWidth="600.0">
+         <children>
+            <Group layoutX="3.0" layoutY="-17.0">
+               <children>
+                  <Label layoutX="11.0" layoutY="31.0" text="General" />
+                  <GridPane layoutX="11.0" layoutY="48.0" prefHeight="144.0" prefWidth="554.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="493.0" minWidth="317.0" prefWidth="472.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints maxHeight="60.0" minHeight="0.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="60.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Name" />
+                        <TextField GridPane.columnIndex="1" />
+                        <Label text="Description" GridPane.rowIndex="1" />
+                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <ColorPicker GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="Color" GridPane.rowIndex="2" />
+                        <Label text="Icon" GridPane.rowIndex="3" />
+                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                     </children>
+                  </GridPane>
+               </children>
+            </Group>
+            <TitledPane layoutX="14.0" layoutY="198.0" prefHeight="116.0" prefWidth="349.0" text="Group Definition">
+               <content>
+                  <Group>
+                     <children>
+                        <RadioButton layoutX="-7.0" layoutY="77.0" mnemonicParsing="false" text="Dynamically group entries by searching for a keyword" />
+                        <RadioButton layoutX="-7.0" layoutY="54.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="292.0" text="Statically group entries by manual assignment" />
+                        <RadioButton layoutX="-7.0" layoutY="102.0" mnemonicParsing="false" text="Dynamically group entries by a free forn search expression" />
+                        <RadioButton layoutX="-7.0" layoutY="121.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="172.0" text="Automatically create groups" />
+                     </children>
+                  </Group>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" layoutX="14.0" layoutY="329.0" text="Options">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="22.0" text="Label" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </TitledPane>
+            <TitledPane collapsible="false" layoutX="14.0" layoutY="551.0" text="Description">
+               <content>
+                  <TextArea prefHeight="128.0" prefWidth="528.0" />
+               </content>
+            </TitledPane>
+         </children>
+      </Pane>
+   </header>
+</DialogPane>
