@@ -17,7 +17,7 @@ buildscript {
 plugins {
     id 'com.gradle.build-scan' version '1.16'
     id 'com.install4j.gradle' version '7.0.7'
-    id 'com.github.johnrengelman.shadow' version '4.0.1'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.7'
@@ -96,9 +96,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.12'
+    compile 'org.apache.pdfbox:pdfbox:2.0.11'
     compile 'org.apache.pdfbox:fontbox:2.0.12'
-    compile 'org.apache.pdfbox:xmpbox:2.0.12'
+    compile 'org.apache.pdfbox:xmpbox:2.0.11'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.60'
