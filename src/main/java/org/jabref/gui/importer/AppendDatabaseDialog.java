@@ -19,7 +19,7 @@ public class AppendDatabaseDialog extends BaseDialog<Boolean> {
     private final CheckBox selector = new CheckBox();
 
     public AppendDatabaseDialog() {
-        this.setTitle(Localization.lang("Append Library"));
+        this.setTitle(Localization.lang("Append library"));
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         this.setResultConverter(button -> button == ButtonType.OK);
