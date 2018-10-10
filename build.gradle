@@ -65,7 +65,7 @@ sourceSets {
             srcDirs = ["src/main/java", "src/main/resources"]
         }
     }
-    test{
+    test {
         java {
             srcDirs = ["src/test/java"]
         }
@@ -199,7 +199,7 @@ dependencyUpdates.revision = 'integration'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
+            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
@@ -209,7 +209,8 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /0.2.[3,4]/) { // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
+            if (selection.candidate.version ==~ /0.2.[3,4]/) {
+                // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
@@ -231,6 +232,11 @@ dependencyUpdates.resolutionStrategy = {
         rules.withModule("com.google.errorprone:javac") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /1.9.*/ || selection.candidate.version ==~ /9.*/) {
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+            }
+        }
+        rules.withModule("com.sun.xml.bind:jaxb-xjc") { ComponentSelection selection ->
+            if (!(selection.candidate.version ==~ /2.2.4.*/) || selection.candidate.version ==~ /2.[3-9].*/) {
+                selection.reject("Cannot be updated to 2.2.5 or higher.")
             }
         }
     }
