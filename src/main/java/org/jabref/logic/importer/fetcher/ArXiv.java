@@ -376,9 +376,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         public static String createIdString(String id) {
-
                 Matcher matcher = URL_PATTERN.matcher(id);
                 if (matcher.find()) {
+                    // Remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
                     return id.substring(matcher.group(1).length());
                 } else {
                     return id;
