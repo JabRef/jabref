@@ -158,7 +158,7 @@ dependencies {
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    errorproneJavac 'com.google.errorprone:javac:1.8.0-beta-132'
+    errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.2.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.2.0'
@@ -199,7 +199,7 @@ dependencyUpdates.revision = 'integration'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if ( selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
+            if (selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
@@ -214,7 +214,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version == /4.0.1/) { // Reject version 9 or higher
+            if (selection.candidate.version == /4.0.1/) {
                 selection.reject("Version 4.0.1 breaks the release process.")
             }
         }
@@ -225,6 +225,11 @@ dependencyUpdates.resolutionStrategy = {
         }
         rules.withModule("com.jfoenix:jfoenix") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
+                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+            }
+        }
+        rules.withModule("com.google.errorprone:javac") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /1.9.*/ || selection.candidate.version ==~ /9.*/) {
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
