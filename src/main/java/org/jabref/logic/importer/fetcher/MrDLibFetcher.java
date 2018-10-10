@@ -99,7 +99,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     /**
      * Constructs the query based on title of the bibentry. Adds statistical stuff to the url.
      *
-     * @param query: the title of the bib entry.
+     * @param queryWithTitle the title of the bib entry.
      * @return the string used to make the query at mdl server
      */
     private String constructQuery(String queryWithTitle) {
