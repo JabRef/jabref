@@ -213,12 +213,17 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
+        rules.withModule("com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin") { ComponentSelection selection ->
+            if (selection.candidate.version == /4.0.1/) { // Reject version 9 or higher
+                selection.reject("Version 4.0.1 breaks the release process.")
+            }
+        }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.*/) {
                 selection.reject("Cannot be upgraded to version 2")
             }
         }
-         rules.withModule("com.jfoenix:jfoenix") { ComponentSelection selection ->
+        rules.withModule("com.jfoenix:jfoenix") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
