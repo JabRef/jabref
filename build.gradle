@@ -198,8 +198,8 @@ dependencyUpdates.revision = 'integration'
 // We have some dependencies which cannot be updated due to various reasons.
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
-        rules.withModule("javax.inject") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
+        rules.all { ComponentSelection selection ->
+            if (selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
