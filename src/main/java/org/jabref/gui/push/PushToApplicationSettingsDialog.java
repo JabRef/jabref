@@ -14,21 +14,25 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationSettingsDialog {
-    public static void showSettingsDialog(JFrame parent, PushToApplicationSettings toApp, int n) {
+    public static void showSettingsDialog(JFrame parent, JabRefFrame frame, PushToApplicationSettings toApp, int n) {
         final JDialog diag = new JDialog(parent, Localization.lang("Settings"), true);
         JPanel options = toApp.getSettingsPanel(n);
         options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
+        JButton defaultApp = new JButton(Localization.lang("Set Default"));
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addGlue();
+        bb.addButton(defaultApp);
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
@@ -40,7 +44,10 @@ public class PushToApplicationSettingsDialog {
             diag.dispose();
         });
         cancel.addActionListener(e -> diag.dispose());
-
+        defaultApp.addActionListener(e -> {
+            Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, toApp.getApplicationName());
+            frame.externalTabRefresh();
+        });
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);

@@ -129,4 +129,9 @@ public class PushToApplicationSettings {
     public void storeSettings() {
         Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
     }
+
+
+    public String getApplicationName() {
+        return application.getApplicationName();
+    }
 }

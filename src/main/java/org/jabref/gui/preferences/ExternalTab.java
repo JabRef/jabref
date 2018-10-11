@@ -30,6 +30,7 @@ import org.jabref.preferences.JabRefPreferences;
 class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
+    private final JabRefFrame frame;
     private final TextField emailSubject;
     private final TextField citeCommand;
     private final CheckBox openFoldersOfAttachedFiles;
@@ -47,6 +48,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
+        this.frame = frame;
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
         citeCommand = new TextField();
         editFileTypes.setOnAction(e->ExternalFileTypeEditor.getAction());
@@ -141,7 +143,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
-        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
+        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, frame, settings, index));
         if (index % 2 == 0) {
             panel.add(button, 1, index / 2 + 1);
         } else {

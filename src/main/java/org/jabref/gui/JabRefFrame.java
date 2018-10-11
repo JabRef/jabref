@@ -6,14 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
@@ -176,6 +169,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
     private SidePane sidePane;
+    private Observable uiUpdate;
+//    private PushToApplicationButton pushToExternal;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -212,6 +207,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
         tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+
+        uiUpdate = new Observable() {
+            @Override
+            public void notifyObservers() {
+                setChanged();
+                super.notifyObservers();
+            }
+        };
 
         initLayout();
 
@@ -618,23 +621,48 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
-        HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
-                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
-                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
+        LinkedHashMap<String, Button> rightSideButtons = new LinkedHashMap<>(12);
+        rightSideButtons.put("1", factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)));
+        rightSideButtons.put("2", factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)));
+        rightSideButtons.put("3", factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)));
+        rightSideButtons.put("4", factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)));
+        rightSideButtons.put("5", factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)));
+        rightSideButtons.put("6", factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)));
+        rightSideButtons.put("7", factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)));
+        rightSideButtons.put("8", factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)));
+        rightSideButtons.put("9", factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal));
+        rightSideButtons.put("10", factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")));
+        rightSideButtons.put("11", factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")));
+        rightSideButtons.put("12", factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")));
 
-                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
-                factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
 
-                factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
-                factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+        HBox rightSide = new HBox(rightSideButtons.values().toArray(new Button[12])
+//                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
+//                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
+
+//                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+//                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+//                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
+//                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
+//                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
+
+//                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+//                factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
+
+//                factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+//                factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+//                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
         );
+
+        uiUpdate.addObserver((o, arg) -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                rightSide.getChildren().clear();
+                PushToApplicationButton pushExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+                rightSideButtons.put("9", factory.createIconButton(pushExternal.getMenuAction(), pushExternal));
+                rightSide.getChildren().addAll(rightSideButtons.values());
+            });
+        });
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
 
@@ -648,6 +676,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
+    }
+
+//    public PushToApplicationButton getPushToApplicationButton() {
+//        return pushToExternal;
+//    }
+
+    public void externalTabRefresh() {
+        uiUpdate.notifyObservers();
     }
 
     /**
