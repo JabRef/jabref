@@ -50,7 +50,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
      */
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
-        root.setStyle("-fx-padding: 20 20 20 20");
+        root.getStyleClass().add("related-articles-tab");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 

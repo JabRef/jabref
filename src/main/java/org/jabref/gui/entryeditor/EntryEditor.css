@@ -88,4 +88,8 @@
     -fx-background-color: -jr-selected;
 }
 
+.related-articles-tab {
+    -fx-padding: 20 20 20 20;
+}
+
 
