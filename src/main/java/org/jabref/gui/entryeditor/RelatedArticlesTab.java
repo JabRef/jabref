@@ -125,6 +125,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
      */
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
+        root.getStyleClass().add("related-articles-tab");
         VBox vbox = new VBox();
         vbox.getStyleClass().add("gdpr-dialog");
         vbox.setSpacing(20.0);
@@ -156,7 +157,6 @@ public class RelatedArticlesTab extends EntryEditorTab {
             }
         });
 
-        root.setStyle("-fx-padding: 20 20 20 20");
         vbox.getChildren().addAll(line1, mdlLink, line2, button);
         root.setContent(vbox);
 
@@ -171,7 +171,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         // Ask for consent to send data to Mr. DLib on first time to tab
-        if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS)) {
+        if (preferences.isMrdlibAccepted()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
             setContent(getPrivacyDialog(entry));
