@@ -1,15 +1,17 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
+import javafx.print.PrinterJob;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -18,13 +20,17 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.Globals;
+import org.jabref.gui.Dialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.DialogService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +107,6 @@ public class RelatedArticlesTab extends EntryEditorTab {
                             JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
                         } catch (IOException e) {
                             LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
-                            e.printStackTrace();
                         }
                     }
                 }
