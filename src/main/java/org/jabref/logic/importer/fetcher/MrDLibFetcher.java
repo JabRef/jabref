@@ -60,8 +60,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                     // For displaying An ErrorMessage
                     String error = importer.getResponseErrorMessage(response);
                     BibEntry errorBibEntry = new BibEntry();
-                    errorBibEntry.setField("html_representation",
-                                           Localization.lang(error));
+                    errorBibEntry.setField("html_representation", error);
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);
@@ -80,7 +79,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     /**
      * Contact the server with the title of the selected item
      *
-     * @param query: The query holds the title of the selected entry. Used to make a query to the MDL Server
+     * @param queryByTitle: The query holds the title of the selected entry. Used to make a query to the MDL Server
      * @return Returns the server response. This is an XML document as a String.
      */
     private String makeServerRequest(String queryByTitle) throws FetcherException {
@@ -101,7 +100,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     /**
      * Constructs the query based on title of the bibentry. Adds statistical stuff to the url.
      *
-     * @param query: the title of the bib entry.
+     * @param queryWithTitle: the title of the bib entry.
      * @return the string used to make the query at mdl server
      */
     private String constructQuery(String queryWithTitle) {

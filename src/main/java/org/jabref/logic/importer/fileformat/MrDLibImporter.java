@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = "Error while fetching from Mr.DLib.";
+    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching from Mr.DLib.");
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
 

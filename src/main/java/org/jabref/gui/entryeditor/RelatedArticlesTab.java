@@ -129,13 +129,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vbox.getStyleClass().add("gdpr-dialog");
         vbox.setSpacing(20.0);
 
-        Button button = new Button("I Agree");
+        Button button = new Button(Localization.lang("I Agree"));
         button.getStyleClass().add("accept-button");
-        Text line1 = new Text("Mr. DLib is an external service which provides article recommendations based on the currently selected entry. Data about the selected entry must be sent to Mr. DLib in order to provide these recommendations. Do you agree that this data may be sent?");
+        Text line1 = new Text(Localization.lang("Mr. DLib is an external service which provides article recommendations based on the currently selected entry. Data about the selected entry must be sent to Mr. DLib in order to provide these recommendations. Do you agree that this data may be sent?"));
 
         line1.setWrappingWidth(1300.0);
-        Text line2 = new Text("This setting may be changed in preferences at any time.");
-        Hyperlink mdlLink = new Hyperlink("Further information about Mr DLib. for JabRef users.");
+        Text line2 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
+        Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr DLib. for JabRef users."));
         mdlLink.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
