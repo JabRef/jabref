@@ -935,6 +935,40 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    /**
+     * Get a Map of default tab names to deafult tab fields.
+     * The fields are returned as a String with fields separated by ;
+     * They are combined into one string in order to feed into CustomizeGeneralFieldsDialogViewModel.resetFields()
+     * so that they do not have to be parsed in order to fit there
+     *
+     * @return A map of keys with tab names and values as a string containing
+     * fields for the given name separated by ;
+     */
+    @Override
+    public Map<String, String> getCustomTabsNamesAndFields() {
+        Map<String, String> customTabsMap = new HashMap<>();
+
+        int defNumber = 0;
+        while (true) {
+            //Saved as CUSTOMTABNAME_def{number} and ; separated
+            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
+                break;
+            }
+            customTabsMap.put(name, fields);
+            defNumber++;
+        }
+        return customTabsMap;
+    }
+
+    @Override
+    public void setCustomTabsNameAndFields(String name, String fields, int defNumber) {
+        prefs.put(CUSTOM_TAB_NAME + defNumber, name);
+        prefs.put(CUSTOM_TAB_FIELDS + defNumber, fields);
+    }
+
     public List<String> getCustomTabFieldNames() {
         List<String> customFields = new ArrayList<>();
 
@@ -943,7 +977,7 @@ public class JabRefPreferences implements PreferencesService {
             // saved as CUSTOMTABNAME_def{number} and ; separated
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            if ((fields == null) || fields.isEmpty()) {
+            if (StringUtil.isNullOrEmpty(fields)) {
                 break;
             }
 
@@ -1295,6 +1329,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param number or higher.
      */
+    @Override
     public void purgeSeries(String prefix, int number) {
         int n = number;
         while (get(prefix + n) != null) {
@@ -1303,6 +1338,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
     public Map<String, List<String>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
@@ -1310,6 +1346,12 @@ public class JabRefPreferences implements PreferencesService {
         return tabList;
     }
 
+    @Override
+    public Boolean getEnforceLegalKeys() {
+        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    }
+
+    @Override
     public void updateEntryEditorTabList() {
         tabList = EntryEditorTabList.create(this);
     }

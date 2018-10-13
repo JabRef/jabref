@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
@@ -27,7 +26,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         textInput = isSingleLine
                 ? new EditorTextField()
                 : new EditorTextArea();
-        HBox.setHgrow(textInput, Priority.ALWAYS);
+
         textInput.textProperty().bindBidirectional(viewModel.textProperty());
         ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getNameMenu(textInput));
         this.getChildren().add(textInput);

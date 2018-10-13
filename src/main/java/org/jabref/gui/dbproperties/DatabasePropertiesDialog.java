@@ -141,7 +141,7 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
                 Cleanups.DEFAULT_SAVE_ACTIONS);
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
-        builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
+        builder.add(CustomJFXPanel.wrap(new Scene(fieldFormatterCleanupsPanel))).xyw(1, 29, 5);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();

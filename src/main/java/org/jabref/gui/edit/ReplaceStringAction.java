@@ -1,5 +1,6 @@
-package org.jabref.gui;
+package org.jabref.gui.edit;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.SimpleCommand;
 
 public class ReplaceStringAction extends SimpleCommand

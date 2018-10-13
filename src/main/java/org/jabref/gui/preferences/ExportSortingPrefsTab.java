@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
@@ -34,6 +35,11 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
         exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
+
+        final ToggleGroup group = new ToggleGroup();
+        exportInOriginalOrder.setToggleGroup(group);
+        exportInTableOrder.setToggleGroup(group);
+        exportInSpecifiedOrder.setToggleGroup(group);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
 

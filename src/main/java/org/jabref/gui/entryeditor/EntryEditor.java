@@ -36,10 +36,11 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
-import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
+import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -91,14 +92,16 @@ public class EntryEditor extends BorderPane {
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final NewDroppedFileHandler fileHandler;
+    private final TaskExecutor taskExecutor;
 
-    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService, ExternalFileTypes externalFileTypes) {
+    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.databaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
         this.preferences = Objects.requireNonNull(preferences);
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
                 Globals.prefs.getFilePreferences(),
@@ -340,7 +343,7 @@ public class EntryEditor extends BorderPane {
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferences.getImportFormatPreferences())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
-            fetcherMenuItem.setOnAction(event -> new EntryFetchAndMergeWorker(panel, getEntry(), fetcher).execute());
+            fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
         fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
@@ -351,6 +354,10 @@ public class EntryEditor extends BorderPane {
                         StandardActions.GENERATE_CITE_KEY,
                         new GenerateBibtexKeySingleAction(getEntry(), databaseContext, dialogService, preferences, undoManager),
                         generateCiteKeyButton);
+    }
+
+    private void fetchAndMerge(EntryBasedFetcher fetcher) {
+        new FetchAndMergeEntry(panel, taskExecutor).fetchAndMerge(entry, fetcher);
     }
 
     void addSearchListener(SearchQueryHighlightListener listener) {
