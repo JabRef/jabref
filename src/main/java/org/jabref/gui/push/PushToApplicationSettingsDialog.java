@@ -17,8 +17,8 @@ import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
-
 import org.jabref.preferences.JabRefPreferences;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class PushToApplicationSettingsDialog {
