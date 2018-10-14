@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
 
 public class SaveOrderConfigDisplay {
 
@@ -85,12 +86,12 @@ public class SaveOrderConfigDisplay {
 
     public SaveOrderConfig getSaveOrderConfig() {
         SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
-        saveOrderConfig.getSortCriteria().get(0).field = getSelectedItemAsLowerCaseTrim(savePriSort);
-        saveOrderConfig.getSortCriteria().get(0).descending = savePriDesc.isSelected();
-        saveOrderConfig.getSortCriteria().get(1).field = getSelectedItemAsLowerCaseTrim(saveSecSort);
-        saveOrderConfig.getSortCriteria().get(1).descending = saveSecDesc.isSelected();
-        saveOrderConfig.getSortCriteria().get(2).field = getSelectedItemAsLowerCaseTrim(saveTerSort);
-        saveOrderConfig.getSortCriteria().get(2).descending = saveTerDesc.isSelected();
+        SortCriterion primary = new SortCriterion(getSelectedItemAsLowerCaseTrim(savePriSort), savePriDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(primary);
+        SortCriterion secondary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveSecSort), saveSecDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(secondary);
+        SortCriterion tertiary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveTerSort), saveTerDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(tertiary);
 
         return saveOrderConfig;
     }

@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.edit;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -6,6 +6,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
