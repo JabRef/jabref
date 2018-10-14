@@ -66,7 +66,7 @@ public class ModsExportFormatTestFiles {
         Files.createFile(path);
         tempFile = path.toAbsolutePath();
         ImportFormatPreferences mock = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-		bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
+        bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
 		Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
         modsImporter = new ModsImporter(mock);
     }
@@ -85,9 +85,8 @@ public class ModsExportFormatTestFiles {
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(tempFilename));
-        CompareMatcher matcher = CompareMatcher.isSimilarTo(control)
-        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure();
-        assertThat(test, matcher);
+        assertThat(test, CompareMatcher.isSimilarTo(control)
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
     
