@@ -67,7 +67,7 @@ public class ModsExportFormatTestFiles {
         tempFile = path.toAbsolutePath();
         ImportFormatPreferences mock = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
-		Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
+        Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
         modsImporter = new ModsImporter(mock);
     }
 
