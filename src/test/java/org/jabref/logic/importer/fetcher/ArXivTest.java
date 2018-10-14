@@ -191,8 +191,24 @@ public class ArXivTest {
 
         assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
     }
+
     @Test
     public void searchEmptyId() throws Exception {
         assertEquals(Optional.empty(), finder.performSearchById(""));
+    }
+
+    @Test
+    public void searchWithHttpUrl() throws Exception{
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("http://arxiv.org/abs/1405.2249"));
+    }
+
+    @Test
+    public void searchWithHttpsUrl() throws Exception{
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("https://arxiv.org/abs/1405.2249"));
+    }
+
+    @Test
+    public void searchWithHttpsUrlNotTrimmed() throws Exception{
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 }

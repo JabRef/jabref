@@ -7,9 +7,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -118,13 +115,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                                                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard))
-                                                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard));
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard));
 
             rootGroup.setValue(newRoot);
             this.selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                                   .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
                                 .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor, localDragboard));
@@ -137,21 +134,19 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
-            newGroup.ifPresent(group -> {
-                parent.addSubgroup(group);
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+        newGroup.ifPresent(group -> {
+            parent.addSubgroup(group);
 
-                // TODO: Add undo
-                //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                //panel.getUndoManager().addEdit(undo);
+            // TODO: Add undo
+            //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+            //panel.getUndoManager().addEdit(undo);
 
-                // TODO: Expand parent to make new group visible
-                //parent.expand();
+            // TODO: Expand parent to make new group visible
+            //parent.expand();
 
-                dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
-                writeGroupChangesToMetaData();
-            });
+            dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+            writeGroupChangesToMetaData();
         });
     }
 
@@ -163,47 +158,42 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService
-                    .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
-            newGroup.ifPresent(group -> {
+        Optional<AbstractGroup> newGroup = dialogService
+                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+        newGroup.ifPresent(group -> {
+            // TODO: Keep assignments
+            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Change of Grouping Method"),
+                    Localization.lang("Assign the original group's entries to this group?"));
+            //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                    && (group instanceof ExplicitGroup);
 
-                Platform.runLater(() -> {
-                    // TODO: Keep assignments
-                    boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
-                            Localization.lang("Change of Grouping Method"),
-                            Localization.lang("Assign the original group's entries to this group?"));
-                    //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-                    boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                            && (group instanceof ExplicitGroup);
+            oldGroup.getGroupNode().setGroup(
+                    group,
+                    keepPreviousAssignments,
+                    removePreviousAssignents,
+                    stateManager.getEntriesInCurrentDatabase());
 
-                    oldGroup.getGroupNode().setGroup(
-                            group,
-                            keepPreviousAssignments,
-                            removePreviousAssignents,
-                            stateManager.getEntriesInCurrentDatabase());
+            // TODO: Add undo
+            // Store undo information.
+            // AbstractUndoableEdit undoAddPreviousEntries = null;
+            // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
+            // if (undoAddPreviousEntries == null) {
+            //    panel.getUndoManager().addEdit(undo);
+            //} else {
+            //    NamedCompound nc = new NamedCompound("Modify Group");
+            //    nc.addEdit(undo);
+            //    nc.addEdit(undoAddPreviousEntries);
+            //    nc.end();/
+            //      panel.getUndoManager().addEdit(nc);
+            //}
+            //if (!addChange.isEmpty()) {
+            //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
+            //}
 
-                    // TODO: Add undo
-                    // Store undo information.
-                    // AbstractUndoableEdit undoAddPreviousEntries = null;
-                    // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
-                    // if (undoAddPreviousEntries == null) {
-                    //    panel.getUndoManager().addEdit(undo);
-                    //} else {
-                    //    NamedCompound nc = new NamedCompound("Modify Group");
-                    //    nc.addEdit(undo);
-                    //    nc.addEdit(undoAddPreviousEntries);
-                    //    nc.end();/
-                    //      panel.getUndoManager().addEdit(nc);
-                    //}
-                    //if (!addChange.isEmpty()) {
-                    //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
-                    //}
-
-                    dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
-                    writeGroupChangesToMetaData();
-                });
-            });
+            dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+            writeGroupChangesToMetaData();
         });
     }
 
@@ -232,7 +222,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
             groupNode.getParent()
-                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));

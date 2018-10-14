@@ -48,6 +48,10 @@ public class OptionalUtil {
         return value.isPresent() && check.test(value.get());
     }
 
+    public static <T> Boolean isPresentAndTrue(Optional<Boolean> value) {
+        return value.isPresent() && value.get();
+    }
+
     public static <T, S, R> Optional<R> combine(Optional<T> valueOne, Optional<S> valueTwo, BiFunction<T, S, R> combine) {
         if (valueOne.isPresent() && valueTwo.isPresent()) {
             return Optional.ofNullable(combine.apply(valueOne.get(), valueTwo.get()));
