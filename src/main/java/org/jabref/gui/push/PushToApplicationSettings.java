@@ -130,7 +130,6 @@ public class PushToApplicationSettings {
         Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
     }
 
-
     public String getApplicationName() {
         return application.getApplicationName();
     }

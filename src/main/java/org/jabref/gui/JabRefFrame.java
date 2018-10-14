@@ -6,7 +6,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Observable;
+import java.util.Optional;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
@@ -635,7 +644,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         rightSideButtons.put("10", factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")));
         rightSideButtons.put("11", factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")));
         rightSideButtons.put("12", factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")));
-
 
         HBox rightSide = new HBox(rightSideButtons.values().toArray(new Button[12])
 //                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),

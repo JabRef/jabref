@@ -18,8 +18,8 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jabref.preferences.JabRefPreferences;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class PushToApplicationSettingsDialog {
     public static void showSettingsDialog(JFrame parent, JabRefFrame frame, PushToApplicationSettings toApp, int n) {
