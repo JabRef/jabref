@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -42,11 +43,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
+    private final DialogService dialogService;
 
-    public RelatedArticlesTab(EntryEditorPreferences preferences) {
+    public RelatedArticlesTab(EntryEditorPreferences preferences, DialogService dialogService) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
         this.preferences = preferences;
+        this.dialogService = dialogService;
     }
 
     /**
@@ -107,6 +110,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                             JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
                         } catch (IOException e) {
                             LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
+                            dialogService.showErrorDialogAndWait(e);
                         }
                     }
                 }
@@ -143,7 +147,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 try {
                     JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
                 } catch (IOException e) {
-                    LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
+                    LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
+                    dialogService.showErrorDialogAndWait(e);
                 }
             }
         });
@@ -153,6 +158,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             public void handle(ActionEvent event) {
                 JabRefPreferences prefs = JabRefPreferences.getInstance();
                 prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, true);
+                dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
                 setContent(getRelatedArticlesPane(entry));
             }
         });
