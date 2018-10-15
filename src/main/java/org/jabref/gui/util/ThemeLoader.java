@@ -42,10 +42,10 @@ public class ThemeLoader {
     private final String CSS_SYSTEM_PROPERTY;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor) {
+    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        String cssFileName = JabRefPreferences.getInstance().get(JabRefPreferences.FX_THEME);
+        String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
         if (cssFileName != null) {
             CSS_SYSTEM_PROPERTY = new File("src/main/java/org/jabref/gui/"+cssFileName).getAbsolutePath();
         } else

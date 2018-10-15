@@ -29,7 +29,7 @@ public class StyleTesterMain extends Application {
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
         Scene scene = new Scene(view.getContent());
-        new ThemeLoader(fileUpdateMonitor).installBaseCss(scene, JabRefPreferences.getInstance());
+        new ThemeLoader(fileUpdateMonitor, JabRefPreferences.getInstance()).installBaseCss(scene, JabRefPreferences.getInstance());
         stage.setScene(scene);
         stage.show();
     }
