@@ -180,22 +180,8 @@ public class TemplateExporter extends Exporter {
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
-        SaveSession saveSession = null;
-        if (this.encoding != null) {
-            try {
-                saveSession = new FileSaveSession(this.encoding, false);
-            } catch (SaveException ex) {
-                // Perhaps the overriding encoding doesn't work?
-                // We will fall back on the default encoding.
-                LOGGER.warn("Cannot get save session.", ex);
-            }
-        }
-        if (saveSession == null) {
-            saveSession = new FileSaveSession(encoding, false);
-        }
 
-        try (VerifyingWriter ps = saveSession.getWriter()) {
-
+        try (AtomicFileWriter ps = new AtomicFileWriter(file, encoding)) {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
@@ -305,9 +291,7 @@ public class TemplateExporter extends Exporter {
                 sb.append(String.join(", ", missingFormatters));
                 LOGGER.warn("Formatters not found", sb);
             }
-            saveSession.finalize(file);
         }
-
     }
 
     /**

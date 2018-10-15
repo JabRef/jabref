@@ -26,7 +26,7 @@ public class UnlinkedPDFFileFilter implements FileFilter {
 
     public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext) {
         this.fileFilter = fileFilter;
-        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFilePreferences());
     }
 
     @Override

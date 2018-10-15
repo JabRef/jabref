@@ -11,6 +11,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We updated the dialog for setting up general fields.
+- URL field formatting is updated. All whitespace chars, located at the beginning/ending of the url, are trimmed automatically
 - We changed the behavior of the field formatting dialog such that the `bibtexkey` is not changed when formatting all fields or all text fields.
 - We added a "Move file to file directory and rename file" option for simultaneously moving and renaming of document file. [#4166](https://github.com/JabRef/jabref/issues/4166)
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
@@ -31,6 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
 - We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
 - We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
+- We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl<kbd> + <kbd>E<kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
 
 
 
@@ -68,6 +71,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201) and [#4241](https://github.com/JabRef/jabref/issues/4241)
 - We fixed an issue where author list parser can't generate bibtex for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
 - We fixed an issue where the list of XMP Exclusion fields in the preferences was not be saved [#4072](https://github.com/JabRef/jabref/issues/4072)
+- We fixed an issue where the ArXiv Fetcher did not support HTTP URLs [#4367](https://github.com/JabRef/jabref/pull/4367)
 
 
 

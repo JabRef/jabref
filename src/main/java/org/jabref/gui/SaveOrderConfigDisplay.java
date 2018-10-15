@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
 
 public class SaveOrderConfigDisplay {
 
@@ -83,28 +84,27 @@ public class SaveOrderConfigDisplay {
         saveTerDesc.setDisable(!enabled);
     }
 
+    public SaveOrderConfig getSaveOrderConfig() {
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
+        SortCriterion primary = new SortCriterion(getSelectedItemAsLowerCaseTrim(savePriSort), savePriDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(primary);
+        SortCriterion secondary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveSecSort), saveSecDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(secondary);
+        SortCriterion tertiary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveTerSort), saveTerDesc.isSelected());
+        saveOrderConfig.getSortCriteria().add(tertiary);
+
+        return saveOrderConfig;
+    }
+
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
         Objects.requireNonNull(saveOrderConfig);
 
-        savePriSort.setValue(saveOrderConfig.sortCriteria[0].field);
-        savePriDesc.setSelected(saveOrderConfig.sortCriteria[0].descending);
-        saveSecSort.setValue(saveOrderConfig.sortCriteria[1].field);
-        saveSecDesc.setSelected(saveOrderConfig.sortCriteria[1].descending);
-        saveTerSort.setValue(saveOrderConfig.sortCriteria[2].field);
-        saveTerDesc.setSelected(saveOrderConfig.sortCriteria[2].descending);
-
-    }
-
-    public SaveOrderConfig getSaveOrderConfig() {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
-        saveOrderConfig.sortCriteria[0].field = getSelectedItemAsLowerCaseTrim(savePriSort);
-        saveOrderConfig.sortCriteria[0].descending = savePriDesc.isSelected();
-        saveOrderConfig.sortCriteria[1].field = getSelectedItemAsLowerCaseTrim(saveSecSort);
-        saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
-        saveOrderConfig.sortCriteria[2].field = getSelectedItemAsLowerCaseTrim(saveTerSort);
-        saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
-
-        return saveOrderConfig;
+        savePriSort.setValue(saveOrderConfig.getSortCriteria().get(0).field);
+        savePriDesc.setSelected(saveOrderConfig.getSortCriteria().get(0).descending);
+        saveSecSort.setValue(saveOrderConfig.getSortCriteria().get(1).field);
+        saveSecDesc.setSelected(saveOrderConfig.getSortCriteria().get(1).descending);
+        saveTerSort.setValue(saveOrderConfig.getSortCriteria().get(2).field);
+        saveTerDesc.setSelected(saveOrderConfig.getSortCriteria().get(2).descending);
     }
 
     private String getSelectedItemAsLowerCaseTrim(ComboBox<String> sortBox) {
