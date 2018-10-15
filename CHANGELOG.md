@@ -34,7 +34,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
 - We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
 - We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl<kbd> + <kbd>E<kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
-
+- Change theme to dark or light via settings
 
 
 
