@@ -47,8 +47,7 @@ public class ThemeLoader {
 
         String cssFileName = JabRefPreferences.getInstance().get(JabRefPreferences.FX_THEME);
         if (cssFileName != null) {
-            String themeName = JabRefFrame.class.getResource(cssFileName).getPath();
-            CSS_SYSTEM_PROPERTY = new File(themeName).getAbsolutePath();
+            CSS_SYSTEM_PROPERTY = new File("src/main/java/org/jabref/gui/"+cssFileName).getAbsolutePath();
         } else
             CSS_SYSTEM_PROPERTY = null;
     }
