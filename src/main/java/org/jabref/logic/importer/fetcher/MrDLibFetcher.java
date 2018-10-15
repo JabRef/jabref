@@ -33,10 +33,10 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
     private final String LANGUAGE;
-    private final String VERSION;
+    private final Version VERSION;
 
 
-    public MrDLibFetcher(String language, String version) {
+    public MrDLibFetcher(String language, Version version) {
         LANGUAGE = language;
         VERSION = version;
     }
@@ -112,7 +112,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.setPath("/v2/items/" + queryWithTitle + "/related_items");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
-        builder.addParameter("app_version", VERSION);
+        builder.addParameter("app_version", VERSION.getFullVersion());
         builder.addParameter("app_lang", LANGUAGE);
         URI uri = null;
         try {
@@ -126,7 +126,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     private String getMdlUrl() {
-        Version currentVersion = Globals.BUILD_INFO.getVersion();
-        return currentVersion.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.darwingoliath.com";
+        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.darwingoliath.com";
     }
 }

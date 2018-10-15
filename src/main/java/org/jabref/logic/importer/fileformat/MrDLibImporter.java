@@ -71,7 +71,7 @@ public class MrDLibImporter extends Importer {
 
     /**
      * Convert Buffered Reader response to string for JSON parsing.
-     * @param Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
+     * @param input Takes a BufferedReader with a reference to the JSON document delivered by mdl server.
      * @return Returns an String containing the JSON document.
      * @throws IOException
      */
