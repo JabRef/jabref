@@ -119,7 +119,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
     public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
-    public static final String FX_THEME = "theme";
+    public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
