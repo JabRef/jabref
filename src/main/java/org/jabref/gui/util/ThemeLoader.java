@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,12 +38,19 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
-    private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.theme.css");
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
+    private final String CSS_SYSTEM_PROPERTY;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public ThemeLoader(FileUpdateMonitor fileUpdateMonitor) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+
+        String cssFileName = JabRefPreferences.getInstance().get(JabRefPreferences.FX_THEME);
+        if (cssFileName != null) {
+            String themeName = JabRefFrame.class.getResource(cssFileName).getPath();
+            CSS_SYSTEM_PROPERTY = new File(themeName).getAbsolutePath();
+        } else
+            CSS_SYSTEM_PROPERTY = null;
     }
 
     /**
