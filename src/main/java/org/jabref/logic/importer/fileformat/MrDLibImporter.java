@@ -116,8 +116,7 @@ public class MrDLibImporter extends Importer {
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
         // Get recommendations from response and populate bib entries
-        JSONObject recommendationsJson = new JSONObject(recommendations);
-        recommendationsJson = recommendationsJson.getJSONObject("recommendations");
+        JSONObject recommendationsJson = new JSONObject(recommendations).getJSONObject("recommendations");
         Iterator<String> keys = recommendationsJson.keys();
         while (keys.hasNext()) {
             String key = keys.next();
