@@ -38,14 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class DBMSSynchronizerTest {
 
+    @Parameter
+    public DBMSType dbmsType;
     private DBMSSynchronizer dbmsSynchronizer;
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
     private GlobalBibtexKeyPattern pattern;
 
-    @Parameter
-    public DBMSType dbmsType;
+    @Parameters(name = "Test with {0} database system")
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        return TestManager.getDBMSTypeTestParameter();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
@@ -63,11 +67,6 @@ public class DBMSSynchronizerTest {
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-    }
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test

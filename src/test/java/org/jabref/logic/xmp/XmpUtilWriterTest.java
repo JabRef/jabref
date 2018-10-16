@@ -25,11 +25,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(TempDirectory.class)
 class XmpUtilWriterTest {
 
-    private XmpPreferences xmpPreferences;
-
     private static BibEntry olly2018;
     private static BibEntry toral2006;
     private static BibEntry vapnik2000;
+    private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
 

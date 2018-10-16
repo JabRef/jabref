@@ -34,9 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MedlinePlainImporterTest {
 
-    private MedlinePlainImporter importer;
-
     private static final String FILE_ENDING = ".txt";
+    private MedlinePlainImporter importer;
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("MedlinePlainImporterTest")

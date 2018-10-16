@@ -37,6 +37,7 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class ModsExportFormatTestFiles {
 
+    private static Path resourceDir;
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private Path tempFile;
@@ -44,8 +45,6 @@ public class ModsExportFormatTestFiles {
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
     private Path importFile;
-
-    private static Path resourceDir;
 
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();

@@ -26,10 +26,10 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(TempDirectory.class)
 public class HtmlExportFormatTest {
-    private Exporter exportFormat;
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public List<BibEntry> entries;
+    private Exporter exportFormat;
 
     @BeforeEach
     public void setUp() {

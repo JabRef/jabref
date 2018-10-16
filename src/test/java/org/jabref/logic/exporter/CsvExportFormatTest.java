@@ -28,9 +28,9 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class CsvExportFormatTest {
 
-    private Exporter exportFormat;
     public BibDatabaseContext databaseContext;
     public Charset charset;
+    private Exporter exportFormat;
 
     @BeforeEach
     public void setUp() {

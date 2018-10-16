@@ -25,9 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class IsiImporterTest {
 
-    private final IsiImporter importer = new IsiImporter();
-
     private static final String FILE_ENDING = ".isi";
+    private final IsiImporter importer = new IsiImporter();
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("IsiImporterTest")

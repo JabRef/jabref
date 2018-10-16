@@ -35,13 +35,12 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class MSBibExportFormatTestFiles {
 
+    private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public Path tempFile;
     public MSBibExporter msBibExportFormat;
     public BibtexImporter testImporter;
-
-    private static Path resourceDir;
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         //we have to point it to one existing file, otherwise it will return the default class path

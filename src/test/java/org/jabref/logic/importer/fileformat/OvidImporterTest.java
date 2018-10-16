@@ -26,9 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class OvidImporterTest {
 
-    private OvidImporter importer;
-
     private static final String FILE_ENDING = ".txt";
+    private OvidImporter importer;
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("OvidImporterTest")
