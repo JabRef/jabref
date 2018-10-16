@@ -1,7 +1,8 @@
 package org.jabref.logic.layout.format;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AuthorLF_FFTest {
 
