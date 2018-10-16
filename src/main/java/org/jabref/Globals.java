@@ -75,7 +75,7 @@ public class Globals {
     }
 
     // Background tasks
-    public static void startBackgroundTasks() {
+    public static void startBackgroundTasks() throws JabRefException {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 

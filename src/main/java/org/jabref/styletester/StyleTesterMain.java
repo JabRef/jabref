@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import org.jabref.JabRefException;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
@@ -20,7 +21,7 @@ public class StyleTesterMain extends Application {
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws JabRefException {
         StyleTesterView view = new StyleTesterView();
 
         IconTheme.loadFonts();
