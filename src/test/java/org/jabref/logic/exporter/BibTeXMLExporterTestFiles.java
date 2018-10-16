@@ -49,7 +49,7 @@ public class BibTeXMLExporterTestFiles {
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -71,7 +71,7 @@ public class BibTeXMLExporterTestFiles {
         String tempFilePath = tempFile.toAbsolutePath().toString();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                             .getEntries();
 
         bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
 
@@ -79,6 +79,6 @@ public class BibTeXMLExporterTestFiles {
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }

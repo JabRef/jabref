@@ -34,7 +34,6 @@ public class FieldFormatterCleanupTest {
         fieldMap.put("doi", "jabrefdoi");
         fieldMap.put("issn", "jabrefissn");
         entry.setField(fieldMap);
-
     }
 
     @Test
@@ -91,5 +90,4 @@ public class FieldFormatterCleanupTest {
 
         assertEquals("Fran{\\c{c}}ois-Marie Arouet", entry.getField(BibEntry.KEY_FIELD).get());
     }
-
 }

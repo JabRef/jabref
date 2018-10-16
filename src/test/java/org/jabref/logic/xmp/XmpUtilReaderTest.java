@@ -103,5 +103,4 @@ class XmpUtilReaderTest {
 
         assertEquals(entryFromBibFile.get(), entries.get(0));
     }
-
 }

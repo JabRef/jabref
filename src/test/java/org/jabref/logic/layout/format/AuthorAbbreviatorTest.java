@@ -22,7 +22,5 @@ public class AuthorAbbreviatorTest {
         assertEquals(b.format("Smith, John"), a.format("Smith, John"));
         assertEquals(b.format("von Neumann, John and Smith, John and Black Brown, Peter"), a
                 .format("von Neumann, John and Smith, John and Black Brown, Peter"));
-
     }
-
 }

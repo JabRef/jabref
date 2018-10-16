@@ -29,5 +29,4 @@ public class AuthorLastFirstTest {
         assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", a
                 .format("John von Neumann and John Smith and Black Brown, Peter"));
     }
-
 }

@@ -80,7 +80,7 @@ class MedlinePlainImporterTest {
                 .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestMultipleEntries.txt").toURI());
 
         List<BibEntry> entries = importer.importDatabase(inputFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                         .getEntries();
         BibEntry testEntry = entries.get(0);
 
         assertEquals(7, entries.size());

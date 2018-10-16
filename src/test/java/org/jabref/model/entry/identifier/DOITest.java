@@ -148,7 +148,5 @@ public class DOITest {
     public void parseDOIWithWhiteSpace() {
         String doiWithSpace = "https : / / doi.org / 10 .1109 /V LHCC.20 04.20";
         assertEquals("https://doi.org/10.1109/VLHCC.2004.20", DOI.parse(doiWithSpace).get().getURIAsASCIIString());
-
     }
-
 }

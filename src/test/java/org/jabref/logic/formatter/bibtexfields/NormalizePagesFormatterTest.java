@@ -108,5 +108,4 @@ public class NormalizePagesFormatterTest {
     public void formatExample() {
         assertEquals("1--2", formatter.format(formatter.getExampleInput()));
     }
-
 }

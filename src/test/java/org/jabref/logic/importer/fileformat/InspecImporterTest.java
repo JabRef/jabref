@@ -126,5 +126,4 @@ public class InspecImporterTest {
     public void testGetDescription() {
         assertEquals("INSPEC format importer.", importer.getDescription());
     }
-
 }

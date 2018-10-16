@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
+
 /**
  * This test has been split to work, the other part can be found at DialogTest2
  */

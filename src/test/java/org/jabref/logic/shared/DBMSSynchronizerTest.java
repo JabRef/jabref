@@ -63,7 +63,6 @@ public class DBMSSynchronizerTest {
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-
     }
 
     @Parameters(name = "Test with {0} database system")
@@ -99,7 +98,6 @@ public class DBMSSynchronizerTest {
         assertEquals(1, actualEntries.size());
         assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
         assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
-
     }
 
     @Test
@@ -200,7 +198,6 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.applyMetaData();
 
         assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
-
     }
 
     private BibEntry getBibEntryExample(int index) {
@@ -216,5 +213,4 @@ public class DBMSSynchronizerTest {
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
-
 }

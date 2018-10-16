@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SpecialFieldTest {
 
-
     @Test
     public void getSpecialFieldInstanceFromFieldNameValid() {
         assertEquals(Optional.of(SpecialField.RANKING),

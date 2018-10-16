@@ -69,7 +69,7 @@ public class ImporterTestEngine {
 
     public static void testImportMalformedFiles(Importer importer, String fileName) throws IOException {
         List<BibEntry> entries = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                         .getEntries();
         assertEquals(entries, new ArrayList<BibEntry>());
     }
 }

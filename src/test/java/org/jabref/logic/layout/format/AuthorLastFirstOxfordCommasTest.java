@@ -32,5 +32,4 @@ public class AuthorLastFirstOxfordCommasTest {
         assertEquals("von Neumann, John, Smith, John, and Black Brown, Peter", a
                 .format("John von Neumann and John Smith and Black Brown, Peter"));
     }
-
 }

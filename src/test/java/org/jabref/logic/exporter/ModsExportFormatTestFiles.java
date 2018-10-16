@@ -54,7 +54,7 @@ public class ModsExportFormatTestFiles {
         try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -81,16 +81,15 @@ public class ModsExportFormatTestFiles {
         Path tempFilename = tempFile.toAbsolutePath();
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
-       
+
         modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(tempFilename));
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-    
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -118,7 +117,6 @@ public class ModsExportFormatTestFiles {
         Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
-
 }

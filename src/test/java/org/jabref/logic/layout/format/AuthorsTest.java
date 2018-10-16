@@ -154,5 +154,4 @@ public class AuthorsTest {
         assertEquals("Bruce, Bob Croydon",
                 a.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
-
 }

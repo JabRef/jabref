@@ -144,9 +144,9 @@ class FileUtilTest {
         // bibkey - title
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
-        entry.setField( "author", "O. Kitsune" );
-        entry.setField( "year", "1868" );
-        entry.setField( "pages", "567-579" );
+        entry.setField("author", "O. Kitsune");
+        entry.setField("year", "1868");
+        entry.setField("pages", "567-579");
 
         assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
@@ -222,42 +222,42 @@ class FileUtilTest {
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile(){
+    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, true));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile(){
+    void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, false));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile(){
+    void testCopyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile(){
+    void testCopyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, existingTestFile, false));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToExistDestinationPathWithOverrideExistFile(){
+    void testCopyFileFromExistSourcePathToExistDestinationPathWithOverrideExistFile() {
         assertTrue(FileUtil.copyFile(existingTestFile, existingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile(){
+    void testCopyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(existingTestFile, existingTestFile, false));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithOverrideExistFile(){
+    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithOverrideExistFile() {
         assertTrue(FileUtil.copyFile(existingTestFile, otherExistingTestFile, true));
     }
 
     @Test
-    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithoutOverrideExistFile(){
+    void testCopyFileFromExistSourcePathToOtherExistDestinationPathWithoutOverrideExistFile() {
         assertFalse(FileUtil.copyFile(existingTestFile, otherExistingTestFile, false));
     }
 
@@ -297,27 +297,27 @@ class FileUtilTest {
     }
 
     @Test
-    void testRenameFileWithFromFileNotExistAndToFileNotExist(){
+    void testRenameFileWithFromFileNotExistAndToFileNotExist() {
         assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
     }
 
     @Test
-    void testRenameFileWithFromFileNotExistAndToFileExist(){
+    void testRenameFileWithFromFileNotExistAndToFileExist() {
         assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
     }
 
     @Test
-    void testRenameFileWithFromFileExistAndToFileNotExist(){
+    void testRenameFileWithFromFileExistAndToFileNotExist() {
         assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
     }
 
     @Test
-    void testRenameFileWithFromFileExistAndToFileExist(){
+    void testRenameFileWithFromFileExistAndToFileExist() {
         assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
     }
 
     @Test
-    void testRenameFileWithFromFileExistAndOtherToFileExist(){
+    void testRenameFileWithFromFileExistAndOtherToFileExist() {
         assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
     }
 
@@ -369,9 +369,9 @@ class FileUtilTest {
         assertEquals("PDF/1998/Åuthör/1234 - mytitle",
                 FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
     }
+
     @Test
-    public void testIsBibFile() throws IOException
-    {
+    public void testIsBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
 
         assertTrue(FileUtil.isBibFile(bibFile));

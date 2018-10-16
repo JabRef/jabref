@@ -169,5 +169,4 @@ public class RegExpBasedFileFinderTests {
                 RegExpBasedFileFinder.expandBrackets("[author] have published [title] in [journal].", entry, database,
                         ','));
     }
-
 }

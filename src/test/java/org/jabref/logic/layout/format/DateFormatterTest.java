@@ -26,5 +26,4 @@ public class DateFormatterTest {
         formatter.setArgument("MM/yyyy");
         assertEquals("07/2016", formatter.format("2016-07-15"));
     }
-
 }

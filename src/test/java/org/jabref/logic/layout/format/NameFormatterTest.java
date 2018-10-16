@@ -28,7 +28,6 @@ public class NameFormatterTest {
         assertEquals("Doe Joe and Jane, M. and Kamp, J.~A.",
                 l.format("Joe Doe and Mary Jane and John Arthur van Kamp",
                         "1@*@{ll}, {ff}@@*@1@{ll} {ff}@2..-1@ and {ll}, {f}."));
-
     }
 
     @Test
@@ -59,5 +58,4 @@ public class NameFormatterTest {
         assertEquals("von Neumann John, Smith, John, Vandekamp, Mary~Ann and Black~Brown, Peter", a.format(
                 "von Neumann, John and Smith, John and Vandekamp, Mary Ann and Black Brown, Peter", formatString));
     }
-
 }

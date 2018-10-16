@@ -17,5 +17,4 @@ public class NoSpaceBetweenAbbreviationsTest {
         assertEquals("J.R.R. Tolkien", f.format("J. R. R. Tolkien"));
         assertEquals("J.R.R. Tolkien and J.F. Kennedy", f.format("J. R. R. Tolkien and J. F. Kennedy"));
     }
-
 }

@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-
 class SearchQueryHighlightObservableTest {
 
     @Captor ArgumentCaptor<Optional<Pattern>> captor;

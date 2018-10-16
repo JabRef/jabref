@@ -8,18 +8,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * Tests for ensuring we can compare most appearing version strings
  */
 public class JavaVersionTest {
 
     private static List<String> java = new ArrayList<>();
-    private static List<String > java9 = new ArrayList<>();
+    private static List<String> java9 = new ArrayList<>();
 
     private final static JavaVersion nullCheck = new JavaVersion(null);
     private final static JavaVersion noSenseCheck = new JavaVersion("U.N.K.N.O.W.N");
-
 
     static {
         java.add("1.6.0_10"); // Oracle
@@ -71,7 +69,6 @@ public class JavaVersionTest {
             assertTrue(nullCheck.isAtLeast(version8));
             assertTrue(noSenseCheck.isAtLeast(version8));
             assertTrue(java8Example.isAtLeast("useless"));
-
 
             // Check against all java 9 entries in both directions
             for (String version9 : java9) {

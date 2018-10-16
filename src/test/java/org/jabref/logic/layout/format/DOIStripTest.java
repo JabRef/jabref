@@ -21,7 +21,5 @@ public class DOIStripTest {
 
         assertEquals("10.1000/ISBN1-900512-44-0",
                 lf.format("http://doi.acm.org/10.1000/ISBN1-900512-44-0"));
-
     }
-
 }

@@ -46,5 +46,4 @@ public class DefaultTest {
         ParamLayoutFormatter a = new Default();
         assertEquals("", a.format(""));
     }
-
 }

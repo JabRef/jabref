@@ -23,7 +23,6 @@ public class ImportDataTest {
     public static final File UNLINKED_FILES_TEST_BIB = Paths
             .get("src/test/resources/org/jabref/util/unlinkedFilesTestBib.bib").toFile();
 
-
     /**
      * Tests the testing environment.
      */
@@ -45,5 +44,4 @@ public class ImportDataTest {
         assertFalse(ImportDataTest.NOT_EXISTING_FOLDER.exists());
         assertFalse(ImportDataTest.NOT_EXISTING_PDF.exists());
     }
-
 }

@@ -99,5 +99,4 @@ public class ProtectedTermsListTest {
         externalList.addProtectedTerm("CCC");
         assertTrue(externalList.getTermList().contains("CCC"));
     }
-
 }

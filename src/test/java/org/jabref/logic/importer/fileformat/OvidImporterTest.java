@@ -153,7 +153,7 @@ public class OvidImporterTest {
             Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
             try (InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
                 List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
-                        .getEntries();
+                                                 .getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
                 BibEntryAssert.assertEquals(nis, entries.get(0));

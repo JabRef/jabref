@@ -35,5 +35,4 @@ public class DOICheckTest {
         // Obviously a wrong doi, will not change anything.
         assertEquals("1", lf.format("1"));
     }
-
 }

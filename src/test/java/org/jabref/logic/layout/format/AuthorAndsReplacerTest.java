@@ -9,8 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuthorAndsReplacerTest {
 
     /**
-     * Test method for
-     * {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
+     * Test method for {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
      */
     @Test
     public void testFormat() {
@@ -33,5 +32,4 @@ public class AuthorAndsReplacerTest {
         assertEquals("John von Neumann; John Smith & Peter Black Brown", a
                 .format("John von Neumann and John Smith and Peter Black Brown"));
     }
-
 }

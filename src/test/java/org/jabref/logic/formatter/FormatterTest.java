@@ -33,19 +33,20 @@ class FormatterTest {
     }
 
     /**
-     * When a new formatter is added by copy and pasting another formatter, it may happen that the <code>getKey()</code> method is not adapted. This results in duplicate keys, which this test tests for.
+     * When a new formatter is added by copy and pasting another formatter, it may happen that the <code>getKey()</code>
+     * method is not adapted. This results in duplicate keys, which this test tests for.
      */
     @Test
     public void allFormatterKeysAreUnique() {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
-       assertEquals(Collections.emptyList(),
-               getFormatters().collect(Collectors.groupingBy(
-                 formatter -> formatter.getKey(),
-                 Collectors.counting()))
-               .entrySet().stream()
-               .filter(e -> e.getValue() > 1)
-               .map(Map.Entry::getKey)
-               .collect(Collectors.toList()));
+        assertEquals(Collections.emptyList(),
+                getFormatters().collect(Collectors.groupingBy(
+                        formatter -> formatter.getKey(),
+                        Collectors.counting()))
+                               .entrySet().stream()
+                               .filter(e -> e.getValue() > 1)
+                               .map(Map.Entry::getKey)
+                               .collect(Collectors.toList()));
     }
 
     @ParameterizedTest

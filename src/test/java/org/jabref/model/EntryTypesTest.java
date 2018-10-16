@@ -146,7 +146,6 @@ class EntryTypesTest {
         assertEquals(Arrays.asList(overwrittenStandardType), EntryTypes.getAllModifiedStandardTypes(mode));
     }
 
-
     @ParameterizedTest
     @MethodSource("standardArticleTypeAndMode")
     void standardTypeIsStillAcessibleIfOverwritten(EntryType standardArticleType, BibDatabaseMode mode) {
@@ -175,5 +174,4 @@ class EntryTypesTest {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(overwrittenStandardType));
     }
-
 }

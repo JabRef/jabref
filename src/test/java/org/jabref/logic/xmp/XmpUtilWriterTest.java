@@ -113,7 +113,6 @@ class XmpUtilWriterTest {
 
         // compare the two entries
         assertEquals(entry, entryWritten);
-
     }
 
     /**
@@ -130,7 +129,6 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
         assertEquals(3, entryList.size());
-
     }
 
     private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
