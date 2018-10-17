@@ -38,24 +38,24 @@ public class ThemeLoader {
 
     private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
-    private String CSS_PROPERTY = System.getProperty("jabref.theme.css");
+    private String cssProperty = System.getProperty("jabref.theme.css");
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) throws JabRefException {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        if (StringUtil.isNullOrEmpty(CSS_PROPERTY)) {
+        if (StringUtil.isNullOrEmpty(cssProperty)) {
             String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
             if (cssFileName != null) {
                 try {
-                    CSS_PROPERTY = Paths.get(JabRefFrame.class.getResource(cssFileName).toURI()).toString();
+                    cssProperty = Paths.get(JabRefFrame.class.getResource(cssFileName).toURI()).toString();
                 } catch (URISyntaxException e) {
                     LOGGER.warn("can't get css file URI");
                     throw new JabRefException("can't set custom theme");
                 }
             }
         } else
-            CSS_PROPERTY = null;
+            cssProperty = null;
     }
 
     /**
@@ -65,8 +65,8 @@ public class ThemeLoader {
     public void installBaseCss(Scene scene, JabRefPreferences preferences) {
         addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
 
-        if (StringUtil.isNotBlank(CSS_PROPERTY)) {
-            final Path path = Paths.get(CSS_PROPERTY);
+        if (StringUtil.isNotBlank(cssProperty)) {
+            final Path path = Paths.get(cssProperty);
             if (Files.isReadable(path)) {
                 String cssUrl = path.toUri().toString();
                 addAndWatchForChanges(scene, cssUrl, 1);
@@ -82,7 +82,7 @@ public class ThemeLoader {
         try {
             // If -Djabref.theme.css is defined and the resources are not part of a .jar bundle,
             // we watch the file for changes and turn on live reloading
-            if (!cssUrl.startsWith("jar:") && CSS_PROPERTY != null) {
+            if (!cssUrl.startsWith("jar:") && cssProperty != null) {
                 Path cssFile = Paths.get(new URL(cssUrl).toURI());
                 LOGGER.info("Enabling live reloading of " + cssFile);
                 fileUpdateMonitor.addListenerForFile(cssFile, () -> {
