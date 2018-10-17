@@ -135,7 +135,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vbox.setSpacing(20.0);
 
         Button button = new Button(Localization.lang("I Agree"));
-        button.getStyleClass().add("accept-button");
+        button.setDefaultButton(true);
         Text line1 = new Text(Localization.lang("Mr. DLib is an external service which provides article recommendations based on the currently selected entry. Data about the selected entry must be sent to Mr. DLib in order to provide these recommendations. Do you agree that this data may be sent?"));
 
         line1.setWrappingWidth(1300.0);
