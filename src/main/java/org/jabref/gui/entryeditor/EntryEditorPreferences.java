@@ -19,7 +19,7 @@ public class EntryEditorPreferences {
     private final boolean isMrdlibAccepted;
     private boolean showSourceTabByDefault;
     private final KeyBindingRepository keyBindings;
-    private final boolean avoidOverwritingCiteKey;
+    private boolean avoidOverwritingCiteKey;
 
     public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
