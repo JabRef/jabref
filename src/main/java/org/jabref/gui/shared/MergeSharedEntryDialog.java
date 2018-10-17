@@ -14,7 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import javafx.scene.Scene;
+
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
@@ -65,7 +68,7 @@ public class MergeSharedEntryDialog {
         mergeInnformation.setBorder(new EmptyBorder(9, 9, 9, 9));
 
         mergeDialog.add(mergeInnformation, BorderLayout.NORTH);
-        mergeDialog.add(mergeEntries.getMergeEntryPanel(), BorderLayout.CENTER);
+        mergeDialog.add(CustomJFXPanel.wrap(new Scene(mergeEntries)), BorderLayout.CENTER);
 
         JButton mergeButton = new JButton(Localization.lang("Merge entries"));
         mergeButton.addActionListener(e -> mergeEntries());
