@@ -473,7 +473,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         defaults.put(FX_FONT_RENDERING_TWEAK, OS.LINUX); //we turn this on per default on Linux
-        defaults.put(FX_THEME, "Base.css");
         defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
