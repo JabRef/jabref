@@ -2,6 +2,7 @@ package org.jabref.gui.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,22 +66,21 @@ public final class EntryFromFileCreatorManager {
     }
 
     /**
-     * Returns a EntryFromFileCreator object that is capable of creating a
-     * BibEntry for the given File.
+     * Returns a {@link EntryFromFileCreator} object that is capable of creating a entry for the given file.
      *
-     * @param file the pdf file
-     * @return null if there is no EntryFromFileCreator for this File.
+     * @param file the external file
+     * @return an empty optional if there is no EntryFromFileCreator for this file.
      */
-    public EntryFromFileCreator getEntryCreator(File file) {
-        if ((file == null) || !file.exists()) {
-            return null;
+    public Optional<EntryFromFileCreator> getEntryCreator(Path file) {
+        if (!Files.exists(file)) {
+            return Optional.empty();
         }
         for (EntryFromFileCreator creator : entryCreators) {
-            if (creator.accept(file)) {
-                return creator;
+            if (creator.accept(file.toFile())) {
+                return Optional.of(creator);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -110,11 +110,11 @@ public final class EntryFromFileCreatorManager {
         int count = 0;
         CompoundEdit ce = new CompoundEdit();
         for (Path f : files) {
-            EntryFromFileCreator creator = getEntryCreator(f.toFile());
-            if (creator == null) {
+            Optional<EntryFromFileCreator> creator = getEntryCreator(f);
+            if (!creator.isPresent()) {
                 importGUIMessages.add("Problem importing " + f.toAbsolutePath() + ": Unknown filetype.");
             } else {
-                Optional<BibEntry> entry = creator.createEntry(f.toFile(), generateKeywordsFromPathToFile);
+                Optional<BibEntry> entry = creator.get().createEntry(f.toFile(), generateKeywordsFromPathToFile);
                 if (!entry.isPresent()) {
                     importGUIMessages.add("Problem importing " + f.toAbsolutePath() + ": Entry could not be created.");
                     continue;
