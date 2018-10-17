@@ -23,8 +23,7 @@ class DatabaseFileLookupTest {
 
     private BibEntry entry1;
     private BibEntry entry2;
-
-
+    
     @BeforeEach
     void setUp() throws Exception {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
