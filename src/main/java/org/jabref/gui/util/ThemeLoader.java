@@ -37,24 +37,25 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
-    private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.theme.css");
+    private String CSS_PROPERTY = System.getProperty("jabref.theme.css");
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
-    private final Path CSS_USER_PREFERENCE;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) throws JabRefException {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
-        if (cssFileName != null) {
-            try {
-                CSS_USER_PREFERENCE = Paths.get(JabRefFrame.class.getResource(cssFileName).toURI());
-            } catch (URISyntaxException e) {
-                LOGGER.warn("can't get css file URI");
-                throw new JabRefException("can't set custom theme");
+        if (StringUtil.isNullOrEmpty(CSS_PROPERTY)) {
+            String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
+            if (cssFileName != null) {
+                try {
+                    CSS_PROPERTY = Paths.get(JabRefFrame.class.getResource(cssFileName).toURI()).toString();
+                } catch (URISyntaxException e) {
+                    LOGGER.warn("can't get css file URI");
+                    throw new JabRefException("can't set custom theme");
+                }
             }
         } else
-            CSS_USER_PREFERENCE = null;
+            CSS_PROPERTY = null;
     }
 
     /**
@@ -64,15 +65,12 @@ public class ThemeLoader {
     public void installBaseCss(Scene scene, JabRefPreferences preferences) {
         addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
 
-        if (StringUtil.isNotBlank(CSS_SYSTEM_PROPERTY)) {
-            final Path path = Paths.get(CSS_SYSTEM_PROPERTY);
+        if (StringUtil.isNotBlank(CSS_PROPERTY)) {
+            final Path path = Paths.get(CSS_PROPERTY);
             if (Files.isReadable(path)) {
                 String cssUrl = path.toUri().toString();
                 addAndWatchForChanges(scene, cssUrl, 1);
             }
-        } else if (CSS_USER_PREFERENCE != null && Files.isReadable(CSS_USER_PREFERENCE)) {
-            String cssUrl = CSS_USER_PREFERENCE.toUri().toString();
-            addAndWatchForChanges(scene, cssUrl, 1);
         }
 
         preferences.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
@@ -84,7 +82,7 @@ public class ThemeLoader {
         try {
             // If -Djabref.theme.css is defined and the resources are not part of a .jar bundle,
             // we watch the file for changes and turn on live reloading
-            if (!cssUrl.startsWith("jar:") && CSS_SYSTEM_PROPERTY != null) {
+            if (!cssUrl.startsWith("jar:") && CSS_PROPERTY != null) {
                 Path cssFile = Paths.get(new URL(cssUrl).toURI());
                 LOGGER.info("Enabling live reloading of " + cssFile);
                 fileUpdateMonitor.addListenerForFile(cssFile, () -> {
