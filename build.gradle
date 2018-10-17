@@ -177,7 +177,8 @@ dependencies {
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.8.3'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.1'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.1'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
@@ -402,12 +403,7 @@ jacocoTestReport {
 
 // Code quality tasks
 checkstyle {
-    // do not use other packages for checkstyle, excluding gen(erated) sources
-    checkstyleMain.source = "src/main/java"
-    toolVersion = '8.5'
 
-    // do not perform checkstyle checks by default
-    sourceSets = []
 }
 
 modernizer {

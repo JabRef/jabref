@@ -26,11 +26,10 @@ public class DatabaseFileLookupTest {
     private BibEntry entry1;
     private BibEntry entry2;
 
-
     @BeforeEach
     public void setUp() throws Exception {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
-                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+             InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(reader);
             database = result.getDatabase();
             entries = database.getEntries();
@@ -50,5 +49,4 @@ public class DatabaseFileLookupTest {
         assertNotNull(entry1);
         assertNotNull(entry2);
     }
-
 }

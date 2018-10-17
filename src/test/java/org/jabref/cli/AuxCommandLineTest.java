@@ -45,5 +45,4 @@ public class AuxCommandLineTest {
             assertEquals(2, newDB.getEntries().size());
         }
     }
-
 }

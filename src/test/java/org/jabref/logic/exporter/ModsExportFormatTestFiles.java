@@ -1,8 +1,5 @@
 package org.jabref.logic.exporter;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +16,7 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +31,13 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+
 @ExtendWith(TempDirectory.class)
 public class ModsExportFormatTestFiles {
 
+    private static Path resourceDir;
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private Path tempFile;
@@ -44,8 +46,6 @@ public class ModsExportFormatTestFiles {
     private ModsImporter modsImporter;
     private Path importFile;
 
-    private static Path resourceDir;
-
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
         System.out.println(resourceDir);
@@ -53,7 +53,7 @@ public class ModsExportFormatTestFiles {
         try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -80,16 +80,15 @@ public class ModsExportFormatTestFiles {
         Path tempFilename = tempFile.toAbsolutePath();
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
-       
+
         modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(tempFilename));
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-    
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -117,7 +116,6 @@ public class ModsExportFormatTestFiles {
         Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
-
 }

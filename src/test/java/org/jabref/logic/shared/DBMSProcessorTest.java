@@ -33,10 +33,10 @@ class DBMSProcessorTest {
     private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
         Collection<Object[]> result = new ArrayList<>();
         for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-                result.add(new Object[] {
-                        dbmsType,
-                        TestConnector.getTestDBMSConnection(dbmsType),
-                        DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
+            result.add(new Object[]{
+                    dbmsType,
+                    TestConnector.getTestDBMSConnection(dbmsType),
+                    DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
         }
         return result.stream();
     }

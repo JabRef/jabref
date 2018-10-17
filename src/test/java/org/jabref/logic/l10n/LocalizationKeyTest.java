@@ -19,5 +19,4 @@ class LocalizationKeyTest {
         LocalizationKey localizationKey = new LocalizationKey("test_with_underscore");
         assertEquals("test_with_underscore", localizationKey.getPropertiesKey());
     }
-
 }

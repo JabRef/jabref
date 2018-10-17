@@ -188,5 +188,4 @@ public class ParameterizedDialogNewEntryTest extends AbstractUITest {
         );
         // @formatter:on
     }
-
 }

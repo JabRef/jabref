@@ -41,7 +41,6 @@ public class EntryFromFileCreatorManagerTest {
     public void setUp() {
         externalFileTypes = mock(ExternalFileTypes.class, Answers.RETURNS_DEEP_STUBS);
         when(externalFileTypes.getExternalFileTypeByExt("pdf")).thenReturn(Optional.empty());
-
     }
 
     @Test
@@ -58,7 +57,7 @@ public class EntryFromFileCreatorManagerTest {
     @Test
     public void testAddEntrysFromFiles() throws IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
-                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+             InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(prefs, new DummyFileUpdateMonitor()).parse(reader);
             BibDatabase database = result.getDatabase();
 

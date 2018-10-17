@@ -84,8 +84,8 @@ public class MainArchitectureTests {
         Predicate<String> isExceptionPackage = (s) -> (s.startsWith("import " + secondPackage)
                 || s.startsWith("import static " + secondPackage))
                 && exceptions.getOrDefault(firstPackage, Collections.emptyList())
-                        .stream()
-                        .noneMatch(exception -> s.startsWith("import " + exception));
+                             .stream()
+                             .noneMatch(exception -> s.startsWith("import " + exception));
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 

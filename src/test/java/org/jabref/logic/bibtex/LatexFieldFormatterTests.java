@@ -28,7 +28,7 @@ public class LatexFieldFormatterTests {
 
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String expected = "{" + "lorem" + OS.NEWLINE + " ipsum lorem ipsum" + OS.NEWLINE
- + "lorem ipsum "
+                + "lorem ipsum "
                 + OS.NEWLINE + "lorem ipsum"
                 + OS.NEWLINE + "test" + "}";
 
@@ -69,7 +69,7 @@ public class LatexFieldFormatterTests {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
 
         String result = formatter.format(text, fieldName);
-        String expected = "{"+text+"}";
+        String expected = "{" + text + "}";
 
         assertEquals(expected, result);
     }
@@ -126,5 +126,4 @@ public class LatexFieldFormatterTests {
         String text = "#jan# - #feb#";
         assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
     }
-
 }

@@ -58,7 +58,6 @@ public class BibDatabaseTest {
         BibEntry entry1 = new BibEntry();
         entry1.setId(entry0.getId());
         assertThrows(KeyCollisionException.class, () -> database.insertEntry(entry1));
-
     }
 
     @Test
@@ -127,7 +126,6 @@ public class BibDatabaseTest {
         final BibtexString finalString = new BibtexString("DSP", "Digital Signal Processor");
 
         assertThrows(KeyCollisionException.class, () -> database.addString(finalString));
-
     }
 
     @Test
@@ -139,7 +137,6 @@ public class BibDatabaseTest {
         finalString.setId("duplicateid");
 
         assertThrows(KeyCollisionException.class, () -> database.addString(finalString));
-
     }
 
     @Test
@@ -319,5 +316,4 @@ public class BibDatabaseTest {
         database.setPreamble("Oh yeah!");
         assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
     }
-
 }

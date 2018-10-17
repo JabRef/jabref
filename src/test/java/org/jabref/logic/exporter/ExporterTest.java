@@ -68,7 +68,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, ()->{
+        assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(null, tmpFile, charset, entries);
@@ -78,7 +78,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, ()->{
+        assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(databaseContext, tmpFile, charset, null);

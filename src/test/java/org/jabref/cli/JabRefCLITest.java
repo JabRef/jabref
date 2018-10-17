@@ -11,7 +11,7 @@ class JabRefCLITest {
 
     @Test
     void parsingLongOptions() {
-        JabRefCLI cli = new JabRefCLI(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
+        JabRefCLI cli = new JabRefCLI(new String[]{"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
         assertEquals("some/file", cli.getFileImport());
@@ -21,7 +21,7 @@ class JabRefCLITest {
 
     @Test
     void parsingShortOptions() {
-        JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
+        JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
         assertEquals("some/file", cli.getFileImport());
@@ -31,7 +31,7 @@ class JabRefCLITest {
 
     @Test
     void preferencesExport() {
-        JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-x=some/file"});
+        JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-x=some/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
         assertEquals("some/file", cli.getPreferencesExport());
