@@ -54,8 +54,7 @@ public class ThemeLoader {
                     throw new JabRefException("can't set custom theme");
                 }
             }
-        } else
-            cssProperty = null;
+        }
     }
 
     /**
