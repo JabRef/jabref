@@ -46,5 +46,4 @@ class DatabaseFileLookupTest {
         assertNotNull(entry1);
         assertNotNull(entry2);
     }
-
 }

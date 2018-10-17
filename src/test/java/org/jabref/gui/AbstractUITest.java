@@ -45,8 +45,9 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
     }
 
     /**
-     * Returns the absolute Path of the given relative Path
-     * The backlashes are replaced with forwardslashes b/c assertJ can't type the former one on windows
+     * Returns the absolute Path of the given relative Path The backlashes are replaced with forwardslashes b/c assertJ
+     * can't type the former one on windows
+     *
      * @param relativePath the relative path to the resource database
      */
     protected String getAbsolutePath(String relativePath) throws URISyntaxException {
@@ -94,7 +95,7 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
         screenshotTaker.saveComponentAsPng(dialog.target(), file.toString());
     }
 
-    protected void assertColumnValue(JTableFixture table, int rowIndex, int columnIndex, String selectionValue){
+    protected void assertColumnValue(JTableFixture table, int rowIndex, int columnIndex, String selectionValue) {
         String[][] tableContent;
         tableContent = table.contents();
 

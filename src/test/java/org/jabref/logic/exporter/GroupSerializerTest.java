@@ -157,5 +157,4 @@ public class GroupSerializerTest {
         );
         assertEquals(expected, groupSerializer.serializeTree(root));
     }
-
 }

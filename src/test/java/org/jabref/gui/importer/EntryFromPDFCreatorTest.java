@@ -55,6 +55,5 @@ public class EntryFromPDFCreatorTest {
         assertTrue(entry.get().getField("file").get().endsWith(":PDF"));
         assertEquals(Optional.of(ImportDataTest.FILE_NOT_IN_DATABASE.getFileName().toString()),
                 entry.get().getField("title"));
-
     }
 }

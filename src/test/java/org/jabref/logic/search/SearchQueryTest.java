@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 public class SearchQueryTest {
 
     @Test
@@ -183,7 +182,6 @@ public class SearchQueryTest {
         entry.setField("abstract", "text");
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
-
     }
 
     @Test
@@ -194,5 +192,4 @@ public class SearchQueryTest {
 
         assertFalse(result.isGrammarBasedSearch());
     }
-
 }

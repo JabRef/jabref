@@ -30,19 +30,16 @@ public class StyleLoaderTest {
     private LayoutFormatterPreferences layoutPreferences;
     private Charset encoding;
 
-
     @BeforeEach
     public void setUp() {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         encoding = StandardCharsets.UTF_8;
-
     }
 
     @Test
     public void throwNPEWithNullPreferences() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
-
     }
 
     @Test
@@ -69,7 +66,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
 
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         loader.addStyleIfValid(filename);
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
@@ -86,7 +83,7 @@ public class StyleLoaderTest {
     @Test
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
@@ -103,7 +100,7 @@ public class StyleLoaderTest {
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
@@ -124,7 +121,7 @@ public class StyleLoaderTest {
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
@@ -148,7 +145,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         int beforeAdding = loader.getStyles().size();
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         loader.addStyleIfValid(filename);
         loader.addStyleIfValid(filename);
         assertEquals(beforeAdding + 1, loader.getStyles().size());
@@ -158,7 +155,6 @@ public class StyleLoaderTest {
     public void testAddNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
-
     }
 
     @Test
@@ -206,5 +202,4 @@ public class StyleLoaderTest {
         assertFalse(loader.removeStyle(toremove.get(0)));
         assertEquals(numberOfInternalStyles, loader.getStyles().size());
     }
-
 }

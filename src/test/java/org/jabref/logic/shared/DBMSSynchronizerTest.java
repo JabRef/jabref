@@ -38,14 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class DBMSSynchronizerTest {
 
+    @Parameter
+    public DBMSType dbmsType;
     private DBMSSynchronizer dbmsSynchronizer;
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
     private GlobalBibtexKeyPattern pattern;
 
-    @Parameter
-    public DBMSType dbmsType;
+    @Parameters(name = "Test with {0} database system")
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        return TestManager.getDBMSTypeTestParameter();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
@@ -63,12 +67,6 @@ public class DBMSSynchronizerTest {
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-
-    }
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
@@ -99,7 +97,6 @@ public class DBMSSynchronizerTest {
         assertEquals(1, actualEntries.size());
         assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
         assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
-
     }
 
     @Test
@@ -200,7 +197,6 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.applyMetaData();
 
         assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
-
     }
 
     private BibEntry getBibEntryExample(int index) {
@@ -216,5 +212,4 @@ public class DBMSSynchronizerTest {
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
-
 }

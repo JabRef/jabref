@@ -26,5 +26,4 @@ public class CanonicalBibEntryTest {
         String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
         assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
     }
-
 }

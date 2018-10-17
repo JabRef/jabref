@@ -2,8 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DOIStripTest {
 
@@ -20,7 +21,5 @@ public class DOIStripTest {
 
         assertEquals("10.1000/ISBN1-900512-44-0",
                 lf.format("http://doi.acm.org/10.1000/ISBN1-900512-44-0"));
-
     }
-
 }

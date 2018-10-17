@@ -19,5 +19,4 @@ public class BibDatabaseDiffTest {
         assertEquals(Collections.emptyList(), diff.getBibStringDifferences());
         assertEquals(Collections.emptyList(), diff.getEntryDifferences());
     }
-
 }
