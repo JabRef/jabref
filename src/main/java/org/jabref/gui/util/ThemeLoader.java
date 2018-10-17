@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.theme.css");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final Path CSS_USER_PREFERENCE;
     private final FileUpdateMonitor fileUpdateMonitor;
 
