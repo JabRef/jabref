@@ -2012,5 +2012,4 @@ public class JabRefPreferences implements PreferencesService {
         }
         return map;
     }
-
 }
