@@ -34,8 +34,8 @@ public class CIServerCondition implements ExecutionCondition {
         Optional<DisabledOnCIServer> disabled = AnnotationUtils.findAnnotation(element, DisabledOnCIServer.class);
         if (disabled.isPresent()) {
             String reason = disabled.map(DisabledOnCIServer::value)
-                    .filter(StringUtil::isNotBlank)
-                    .orElseGet(() -> element.get() + " is disabled on CI server");
+                                    .filter(StringUtil::isNotBlank)
+                                    .orElseGet(() -> element.get() + " is disabled on CI server");
             return ConditionEvaluationResult.disabled(reason);
         }
 

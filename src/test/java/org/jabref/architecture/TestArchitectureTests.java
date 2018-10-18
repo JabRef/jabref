@@ -39,15 +39,14 @@ public class TestArchitectureTests {
         exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
         exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
         exceptions.add(CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST);
-
     }
 
     public static Stream<String[]> data() {
         return Stream.of(
-                         new String[][] {
-                                         {CLASS_ORG_JABREF_PREFERENCES},
-                                         {CLASS_ORG_JABREF_GLOBALS}
-                         });
+                new String[][]{
+                        {CLASS_ORG_JABREF_PREFERENCES},
+                        {CLASS_ORG_JABREF_GLOBALS}
+                });
     }
 
     @ParameterizedTest
@@ -58,21 +57,21 @@ public class TestArchitectureTests {
 
         try (Stream<Path> pathStream = Files.walk(Paths.get("src/test/"))) {
             List<Path> files = pathStream
-                                         .filter(p -> p.toString().endsWith(".java"))
-                                         .filter(p -> {
-                                             try {
-                                                 return Files.readAllLines(p, StandardCharsets.UTF_8).stream().noneMatch(isExceptionClass);
-                                             } catch (IOException e) {
-                                                 return false;
-                                             }
-                                         })
-                                         .filter(p -> {
-                                             try {
-                                                 return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isForbiddenPackage);
-                                             } catch (IOException e) {
-                                                 return false;
-                                             }
-                                         }).collect(Collectors.toList());
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .filter(p -> {
+                        try {
+                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().noneMatch(isExceptionClass);
+                        } catch (IOException e) {
+                            return false;
+                        }
+                    })
+                    .filter(p -> {
+                        try {
+                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isForbiddenPackage);
+                        } catch (IOException e) {
+                            return false;
+                        }
+                    }).collect(Collectors.toList());
 
             assertEquals(Collections.emptyList(), files, "The following classes are not allowed to depend on " + forbiddenPackage);
         }

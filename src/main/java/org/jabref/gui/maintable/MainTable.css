@@ -14,7 +14,7 @@
 
 .table-row-cell:hover .empty-special-field {
     visibility: visible;
-    /*-fx-fill: -jr-grayed-text;*/
+    -fx-fill: -jr-gray-2;
 }
 
 .rating > .container {

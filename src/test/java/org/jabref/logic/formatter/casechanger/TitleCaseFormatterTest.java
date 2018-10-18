@@ -84,5 +84,4 @@ public class TitleCaseFormatterTest {
     public void formatExample() {
         assertEquals("{BPMN} Conformance in Open Source Engines", formatter.format(formatter.getExampleInput()));
     }
-
 }

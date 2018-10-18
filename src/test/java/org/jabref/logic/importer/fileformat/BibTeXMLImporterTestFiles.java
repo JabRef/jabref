@@ -41,5 +41,4 @@ public class BibTeXMLImporterTestFiles {
     public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new BibTeXMLImporter(), fileName, FILE_ENDING);
     }
-
 }

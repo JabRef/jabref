@@ -24,6 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
+import org.mockito.Mockito;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class ModsExportFormatTestFiles {
 
+    private static Path resourceDir;
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private Path tempFile;
@@ -44,8 +46,6 @@ public class ModsExportFormatTestFiles {
     private ModsImporter modsImporter;
     private Path importFile;
 
-    private static Path resourceDir;
-
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
         System.out.println(resourceDir);
@@ -53,7 +53,7 @@ public class ModsExportFormatTestFiles {
         try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -65,8 +65,10 @@ public class ModsExportFormatTestFiles {
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         Files.createFile(path);
         tempFile = path.toAbsolutePath();
-        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        modsImporter = new ModsImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        ImportFormatPreferences mock = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
+        Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
+        modsImporter = new ModsImporter(mock);
     }
 
     @Disabled
@@ -83,12 +85,10 @@ public class ModsExportFormatTestFiles {
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(tempFilename));
-
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -116,7 +116,6 @@ public class ModsExportFormatTestFiles {
         Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
-
 }

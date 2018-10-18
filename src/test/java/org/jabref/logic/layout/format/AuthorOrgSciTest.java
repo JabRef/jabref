@@ -2,8 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AuthorOrgSciTest {
 
@@ -14,7 +15,6 @@ public class AuthorOrgSciTest {
         assertEquals("Flynn, J., S. Gartska", f.format("John Flynn and Sabine Gartska"));
         assertEquals("Garvin, D. A.", f.format("David A. Garvin"));
         assertEquals("Makridakis, S., S. C. Wheelwright, V. E. McGee", f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
-
     }
 
     @Test

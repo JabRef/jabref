@@ -98,7 +98,7 @@ class LayoutTest {
     }
 
     @Test
-    // Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
+        // Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
                 new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));

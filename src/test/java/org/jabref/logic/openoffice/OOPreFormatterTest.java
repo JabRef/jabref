@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class OOPreFormatterTest {
 
     @Test
@@ -38,7 +37,6 @@ public class OOPreFormatterTest {
         assertEquals("ftmch", new OOPreFormatter().format("{\\ftmch}"));
         assertEquals("ftmchaaa", new OOPreFormatter().format("{\\ftmch\\aaa}"));
     }
-
 
     @Test
     public void testEquations() {

@@ -326,7 +326,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
-                .withField("author", "Ed von T@st");
+                                                   .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
@@ -938,7 +938,6 @@ class BibtexParserTest {
                         + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
                         + "	Year = 2002" + "}"));
 
-
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1339,7 +1338,7 @@ class BibtexParserTest {
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
         assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
-                new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
+                        new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
                 saveOrderConfig.get());
     }
 
@@ -1441,7 +1440,6 @@ class BibtexParserTest {
 
         assertEquals(Collections.singletonList(expectedEntry), entries);
     }
-
 
     @Test
     void parseRecognizesDatabaseID() throws Exception {

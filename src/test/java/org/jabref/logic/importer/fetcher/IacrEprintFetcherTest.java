@@ -161,7 +161,7 @@ public class IacrEprintFetcherTest {
     /**
      * Helper method for allNonWithdrawnIdsWithOldHtmlFormat.
      *
-     * @param year The year of the generated IDs (e.g. 1996)
+     * @param year  The year of the generated IDs (e.g. 1996)
      * @param maxId The maximum ID to generate in the given year (e.g. 112)
      * @return A list of IDs in the from yyyy/iii (e.g. [1996/001, 1996/002, ..., 1996/112]
      */

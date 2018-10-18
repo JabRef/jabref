@@ -53,6 +53,4 @@ public class MedlineImporterTestFiles {
     public void testImportMalfomedFiles(String fileName) throws IOException {
         ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
     }
-
-
 }

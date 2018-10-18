@@ -40,7 +40,6 @@ public class ContainBasedSearchRuleTest {
         assertEquals(false, bsCaseInsensitive.applyRule(query, be));
         assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
         assertEquals(true, bsCaseInsensitiveRegexp.applyRule(query, be));
-
     }
 
     public BibEntry makeBibtexEntry() {
