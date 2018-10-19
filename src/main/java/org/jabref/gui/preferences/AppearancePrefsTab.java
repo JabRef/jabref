@@ -14,7 +14,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 class AppearancePrefsTab extends Pane implements PrefsTab {
