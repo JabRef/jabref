@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 class AppearancePrefsTab extends Pane implements PrefsTab {
@@ -54,10 +55,11 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         darkTheme.setToggleGroup(themeGroup);
 
         String cssFileName = prefs.get(JabRefPreferences.FX_THEME);
-        if (BASE_CSS.equals(cssFileName))
+        if (StringUtil.isBlank(cssFileName) || BASE_CSS.equals(cssFileName)) {
             lightTheme.setSelected(true);
-        else if (DARK_CSS.equals(cssFileName))
+        } else if (DARK_CSS.equals(cssFileName)) {
             darkTheme.setSelected(true);
+        }
 
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
 
