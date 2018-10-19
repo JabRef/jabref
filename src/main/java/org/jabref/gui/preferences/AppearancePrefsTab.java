@@ -55,12 +55,10 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         darkTheme.setToggleGroup(themeGroup);
 
         String cssFileName = prefs.get(JabRefPreferences.FX_THEME);
-        if (StringUtil.isNotBlank(cssFileName)) {
-            if (cssFileName.equals(BASE_CSS))
-                lightTheme.setSelected(true);
-            else if (cssFileName.equals(DARK_CSS))
-                darkTheme.setSelected(true);
-        }
+        if (BASE_CSS.equals(cssFileName))
+            lightTheme.setSelected(true);
+        else if (DARK_CSS.equals(cssFileName))
+            darkTheme.setSelected(true);
 
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
 
