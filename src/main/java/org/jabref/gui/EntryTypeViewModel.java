@@ -153,7 +153,6 @@ public class EntryTypeViewModel {
                 }
                 searchSuccesfulProperty.set(true);
 
-                // close();
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }
