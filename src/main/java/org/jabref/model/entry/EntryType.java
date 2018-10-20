@@ -83,12 +83,6 @@ public interface EntryType extends Comparable<EntryType> {
         return deprecatedFields;
     }
 
-    default Set<String> getSecondaryOptionalNotDeprecatedFields() {
-        Set<String> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
-        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
-        return optionalFieldsNotPrimaryOrDeprecated;
-    }
-
     /**
      * Get list of all optional fields of this entry and their aliases.
      */

@@ -25,6 +25,6 @@ public class OptionalFields2Tab extends FieldsEditorTab {
 
     @Override
     protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        return entryType.getSecondaryOptionalNotDeprecatedFields();
+        return entryType.getSecondaryOptionalFields();
     }
 }
