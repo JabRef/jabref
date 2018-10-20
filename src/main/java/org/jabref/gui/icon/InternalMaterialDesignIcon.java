@@ -57,7 +57,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     public Node getGraphicNode() {
         GlyphIcons icon = icons.get(0);
 
-        Text text = new Text(icon.unicode());
+        Text text = new Text(unicode);
         text.getStyleClass().add("glyph-icon");
         text.setStyle(String.format("-fx-font-family: %s;", icon.fontFamily()));
 
