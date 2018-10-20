@@ -6,12 +6,8 @@ import java.util.prefs.BackingStoreException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -114,6 +110,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 .withText(PrefsTab::getTabName)
                 .install(tabsList);
 
+        TextField searchBox = new TextField();
+        searchBox.setPromptText("Search...");
+
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
         Button importPreferences = new Button(Localization.lang("Import preferences"));
@@ -141,6 +140,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         VBox.setVgrow(tabsList, Priority.ALWAYS);
         VBox.setVgrow(spacer, Priority.SOMETIMES);
         vBox.getChildren().addAll(
+                searchBox,
                 tabsList,
                 spacer,
                 buttonContainer
