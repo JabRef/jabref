@@ -35,4 +35,8 @@ public interface PreferencesService {
 
     public void updateEntryEditorTabList();
 
+    List<String> getStringList(String key);
+
+    String get(String key);
+
 }
