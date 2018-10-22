@@ -2,10 +2,7 @@ package org.jabref.gui.bibtexkeypattern;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -81,11 +78,11 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(defaultPat, 2, rowIndex);
         gridPane.add(button, 3, rowIndex);
 
-        Object[] entryTypes = EntryTypes.getAllValues(mode).toArray();
+        List<EntryType> entryTypes = new ArrayList<>(EntryTypes.getAllValues(mode));
 
         columnIndex=1;
-        for(int i=0; i < entryTypes.length; i++){
-            EntryType type = (EntryType) entryTypes[i];
+        for(int i=0; i < entryTypes.size(); i++){
+            EntryType type = entryTypes.get(i);
             Label label1 = new Label(type.getName());
 
             TextField textField = new TextField();
