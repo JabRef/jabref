@@ -26,6 +26,8 @@
     -fx-pref-height: 10;
     -fx-background-repeat: no-repeat no-repeat;
     -fx-background-size: 16 16;
+    -fx-border-style: none;
+    -fx-border-width: 0;
     -fx-padding:  0;
 }
 
