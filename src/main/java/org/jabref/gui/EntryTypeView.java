@@ -75,8 +75,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> (searching) ? Localization.lang("Searching...") : Localization.lang("Generate")));
         btnGenerate.disableProperty().bind(viewModel.searchingProperty());
 
-        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value->{
-            if(value) {
+        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
+            if (value) {
                 setEntryTypeForReturnAndClose(null);
             }
         });
