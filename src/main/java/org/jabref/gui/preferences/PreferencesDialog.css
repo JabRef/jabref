@@ -11,6 +11,15 @@
     -fx-padding: 0em 1em 0em 3em;
 }
 
+.preferencePaneContainer .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+}
+
+.preferencePaneContainer:hover .scroll-bar {
+    -fx-opacity: 1;
+}
+
 .sectionHeader {
     -fx-font-size: 1.5em;
     -fx-padding: 1em 0em 1em 0em;

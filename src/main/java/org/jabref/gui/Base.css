@@ -667,6 +667,7 @@
     -fx-background-radius: 0em;
 }
 
+
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
     -fx-background-color: -jr-scrollbar-thumb;
