@@ -18,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -88,7 +87,6 @@ public class ModsExportFormatTestFiles {
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -99,7 +97,6 @@ public class ModsExportFormatTestFiles {
         BibEntryAssert.assertEquals(entries, tempFile, modsImporter);
     }
 
-    
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
