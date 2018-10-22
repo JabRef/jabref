@@ -30,7 +30,6 @@ class FileDialogConfigurationTest {
         assertEquals(Optional.of(Paths.get(tempFolder)), fileDialogConfiguration.getInitialDirectory());
     }
 
-
     @Test
     void testWithValidDirectoryPath(@TempDirectory.TempDir Path tempFolder) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -74,10 +73,8 @@ class FileDialogConfigurationTest {
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
-
     private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
         return new FileChooser.ExtensionFilter(description,
                 extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
-
 }

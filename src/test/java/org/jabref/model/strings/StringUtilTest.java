@@ -57,7 +57,6 @@ class StringUtilTest {
         assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
-
     @Test
     void testUnifyLineBreaks() {
         // Mac < v9
@@ -129,7 +128,7 @@ class StringUtilTest {
 
         assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
-        assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
+        assertEquals("", StringUtil.join(new String[]{}, "\\", 0, 0));
     }
 
     @Test
@@ -192,7 +191,6 @@ class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
         assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
-
     }
 
     @Test

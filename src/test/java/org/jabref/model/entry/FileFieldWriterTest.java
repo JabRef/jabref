@@ -103,10 +103,10 @@ public class FileFieldWriterTest {
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals("a:b;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", "b"}, {"c", "d"}}));
-        assertEquals("a:;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ""}, {"c", "d"}}));
-        assertEquals("a:" + null + ";c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", null}, {"c", "d"}}));
-        assertEquals("a:\\:b;c\\;:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ":b"}, {"c;", "d"}}));
+        assertEquals("a:b;c:d", FileFieldWriter.encodeStringArray(new String[][]{{"a", "b"}, {"c", "d"}}));
+        assertEquals("a:;c:d", FileFieldWriter.encodeStringArray(new String[][]{{"a", ""}, {"c", "d"}}));
+        assertEquals("a:" + null + ";c:d", FileFieldWriter.encodeStringArray(new String[][]{{"a", null}, {"c", "d"}}));
+        assertEquals("a:\\:b;c\\;:d", FileFieldWriter.encodeStringArray(new String[][]{{"a", ":b"}, {"c;", "d"}}));
     }
 
     @Test
@@ -114,6 +114,4 @@ public class FileFieldWriterTest {
         LinkedFile file = new LinkedFile("test", "X:\\Users\\abc.pdf", "PDF");
         assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }
-
-
 }

@@ -350,5 +350,4 @@ class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         assertEquals(Optional.of("01"), entry.getField("month"));
     }
-
 }

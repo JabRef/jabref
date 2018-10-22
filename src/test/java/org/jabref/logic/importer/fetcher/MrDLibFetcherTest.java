@@ -56,5 +56,4 @@ public class MrDLibFetcherTest {
     public void testGetName() {
         assertEquals("MDL_FETCHER", fetcher.getName());
     }
-
 }

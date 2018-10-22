@@ -15,5 +15,4 @@ public class BackupManagerTest {
         Path savPath = BackupManager.getBackupPath(bibPath);
         assertEquals(Paths.get("tmp", "test.bib.sav"), savPath);
     }
-
 }

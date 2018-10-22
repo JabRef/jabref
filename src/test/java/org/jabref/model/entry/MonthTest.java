@@ -137,7 +137,7 @@ public class MonthTest {
 
     @Test
     public void parseCorrectlyByShortNameGermanLowercase() {
-    	assertEquals(Optional.of(Month.JANUARY), Month.parse("jan"));
+        assertEquals(Optional.of(Month.JANUARY), Month.parse("jan"));
         assertEquals(Optional.of(Month.FEBRUARY), Month.parse("feb"));
         assertEquals(Optional.of(Month.MARCH), Month.parse("mär"));
         assertEquals(Optional.of(Month.MARCH), Month.parse("mae"));

@@ -36,6 +36,7 @@ import org.xmlunit.matchers.CompareMatcher;
 @ExtendWith(TempDirectory.class)
 public class ModsExportFormatTestFiles {
 
+    private static Path resourceDir;
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private Path tempFile;
@@ -44,8 +45,6 @@ public class ModsExportFormatTestFiles {
     private ModsImporter modsImporter;
     private Path importFile;
 
-    private static Path resourceDir;
-
     public static Stream<String> fileNames() throws Exception {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
         System.out.println(resourceDir);
@@ -53,7 +52,7 @@ public class ModsExportFormatTestFiles {
         try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -86,10 +85,10 @@ public class ModsExportFormatTestFiles {
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(tempFilename));
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
-    
+
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -117,7 +116,6 @@ public class ModsExportFormatTestFiles {
         Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
-
 }

@@ -35,21 +35,19 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class BibTeXMLExporterTestFiles {
 
+    private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public Path tempFile;
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
-    private static Path resourceDir;
-
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
-//        System.out.println(resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
     }
 
@@ -71,7 +69,7 @@ public class BibTeXMLExporterTestFiles {
         String tempFilePath = tempFile.toAbsolutePath().toString();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                             .getEntries();
 
         bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
 
@@ -79,6 +77,6 @@ public class BibTeXMLExporterTestFiles {
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }

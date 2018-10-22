@@ -65,5 +65,4 @@ class LocalizationTest {
     void testUnsetLanguageTranslation() {
         assertEquals("Groups", Localization.lang("Groups"));
     }
-
 }
