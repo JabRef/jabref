@@ -71,7 +71,6 @@ public class ModsExportFormatTestFiles {
         modsImporter = new ModsImporter(mock);
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testPerformExport(String filename) throws Exception {
@@ -89,6 +88,7 @@ public class ModsExportFormatTestFiles {
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 
+
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
@@ -99,7 +99,7 @@ public class ModsExportFormatTestFiles {
         BibEntryAssert.assertEquals(entries, tempFile, modsImporter);
     }
 
-    @Disabled
+    
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
