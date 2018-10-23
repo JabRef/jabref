@@ -216,8 +216,8 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version == /4.0.1/) {
-                selection.reject("Version 4.0.1 breaks the release process.")
+            if (selection.candidate.version ==~ /4.*/) {
+                selection.reject("Version 4.X breaks the release process.")
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
