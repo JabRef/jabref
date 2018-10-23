@@ -182,7 +182,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.13'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.14'
 }
 
 jacoco {
