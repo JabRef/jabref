@@ -715,7 +715,8 @@
 .tree-view:hover .scroll-bar,
 .table-view:hover .scroll-bar,
 .tree-table-view:hover .scroll-bar,
-.text-input:hover .scroll-bar {
+.text-input:hover .scroll-bar,
+.scroll-pane:hover .scroll-bar {
     -fx-opacity: 1;
 }
 
