@@ -53,13 +53,12 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         darkTheme = new RadioButton("Dark theme");
         darkTheme.setToggleGroup(themeGroup);
 
-        if (prefs.get(JabRefPreferences.FX_THEME).equals(BASE_CSS))
+        if (prefs.get(JabRefPreferences.FX_THEME).equals(BASE_CSS)) {
             lightTheme.setSelected(true);
-        else if (prefs.get(JabRefPreferences.FX_THEME).equals(DARK_CSS))
+        } else if (prefs.get(JabRefPreferences.FX_THEME).equals(DARK_CSS)) {
             darkTheme.setSelected(true);
-
+        }
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
-
     }
 
     public Node getBuilder() {
