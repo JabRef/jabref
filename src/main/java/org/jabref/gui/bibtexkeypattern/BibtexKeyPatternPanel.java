@@ -2,11 +2,10 @@ package org.jabref.gui.bibtexkeypattern;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
+
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
