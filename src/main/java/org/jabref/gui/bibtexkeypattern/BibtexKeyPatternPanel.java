@@ -2,7 +2,11 @@ package org.jabref.gui.bibtexkeypattern;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -78,15 +82,10 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(defaultPat, 2, rowIndex);
         gridPane.add(button, 3, rowIndex);
 
-        List<EntryType> entryTypes = new ArrayList<>(EntryTypes.getAllValues(mode));
-
-        columnIndex=1;
-        for(int i=0; i < entryTypes.size(); i++){
-            EntryType type = entryTypes.get(i);
+        columnIndex = 1;
+        for (EntryType type : EntryTypes.getAllValues(mode)) {
             Label label1 = new Label(type.getName());
-
             TextField textField = new TextField();
-
             Button button1 = new Button("Default");
             button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
 
@@ -96,10 +95,10 @@ public class BibtexKeyPatternPanel extends Pane {
 
             textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
 
-            if(columnIndex == COLUMNS - 1){
+            if (columnIndex == COLUMNS - 1) {
                 columnIndex = 0;
                 rowIndex++;
-            }else
+            } else
                 columnIndex++;
         }
 
