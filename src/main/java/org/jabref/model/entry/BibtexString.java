@@ -12,22 +12,32 @@ public class BibtexString implements Cloneable {
      * <p>
      * Differentiate a \@String based on its usage:
      * <p>
-     * - {@link #AUTHOR}: prefix "a", for author and editor fields. - {@link #INSTITUTION}: prefix "i", for institution
-     * and organization field - {@link #PUBLISHER}: prefix "p", for publisher fields - {@link #OTHER}: no prefix, for
-     * any field
+     * - {@link #AUTHOR}: prefix "a", for author and editor fields.
+     * - {@link #INSTITUTION}: prefix "i", for institution and organization
+     * field
+     * - {@link #PUBLISHER}: prefix "p", for publisher fields
+     * - {@link #OTHER}: no prefix, for any field
      * <p>
      * Examples:
      * <p>
-     * \@String { aKahle    = "Kahle, Brewster " } -> author \@String { aStallman = "Stallman, Richard" } -> author
-     * \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution \@String { pMIT      =
-     * "{Massachusetts Institute of Technology ({MIT}) press}" } -> publisher \@String { anct      = "Anecdote" } ->
-     * other \@String { eg        = "for example" } -> other \@String { et        = " and " } -> other \@String {
-     * lBigMac   = "Big Mac" } -> other
+     * \@String { aKahle    = "Kahle, Brewster " } -> author
+     * \@String { aStallman = "Stallman, Richard" } -> author
+     * \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
+     * \@String { pMIT      = "{Massachusetts Institute of Technology ({MIT}) press}" } -> publisher
+     * \@String { anct      = "Anecdote" } -> other
+     * \@String { eg        = "for example" } -> other
+     * \@String { et        = " and " } -> other
+     * \@String { lBigMac   = "Big Mac" } -> other
      * <p>
      * Usage:
      * <p>
-     * \@Misc { title       = "The GNU Project" author      = aStallman # et # aKahle institution = iMIT publisher   =
-     * pMIT note        = "Just " # eg }
+     * \@Misc {
+     * title       = "The GNU Project"
+     * author      = aStallman # et # aKahle
+     * institution = iMIT
+     * publisher   = pMIT
+     * note        = "Just " # eg
+     * }
      */
     public enum Type {
         AUTHOR("a"),
