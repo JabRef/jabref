@@ -204,6 +204,11 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
+        rules.withModule("com.gradle.build-scan:com.gradle.build-scan.gradle.plugin") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.*/) {
+                selection.reject("Cannot be upgraded to version 2 until we upgrade to gradle 5")
+            }
+        }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
