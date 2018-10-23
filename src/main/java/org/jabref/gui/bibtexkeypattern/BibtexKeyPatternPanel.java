@@ -2,7 +2,6 @@ package org.jabref.gui.bibtexkeypattern;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
