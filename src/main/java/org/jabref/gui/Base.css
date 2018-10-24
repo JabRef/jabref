@@ -667,6 +667,7 @@
     -fx-background-radius: 0em;
 }
 
+
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
     -fx-background-color: -jr-scrollbar-thumb;
@@ -714,7 +715,8 @@
 .tree-view:hover .scroll-bar,
 .table-view:hover .scroll-bar,
 .tree-table-view:hover .scroll-bar,
-.text-input:hover .scroll-bar {
+.text-input:hover .scroll-bar,
+.scroll-pane:hover .scroll-bar {
     -fx-opacity: 1;
 }
 
