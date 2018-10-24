@@ -44,23 +44,7 @@ public class BindingsHelper {
     }
 
     public static void includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
-        BooleanProperty pseudoClassState = new BooleanPropertyBase(false) {
-            @Override
-            protected void invalidated() {
-                node.pseudoClassStateChanged(pseudoClass, get());
-            }
-
-            @Override
-            public Object getBean() {
-                return node;
-            }
-
-            @Override
-            public String getName() {
-                return pseudoClass.getPseudoClassName();
-            }
-        };
-        pseudoClassState.bind(condition);
+        condition.addListener((obs, oldValue, newValue) -> node.pseudoClassStateChanged(pseudoClass,newValue));
     }
 
     /**
