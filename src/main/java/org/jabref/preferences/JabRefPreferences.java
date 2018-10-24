@@ -780,6 +780,8 @@ public class JabRefPreferences implements PreferencesService {
                                     + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
                                     + "</dd>__NEWLINE__<p></p></font>");
 
+        // set default theme
+        defaults.put(JabRefPreferences.FX_THEME, "Base.css");
         setLanguageDependentDefaultValues();
     }
 
