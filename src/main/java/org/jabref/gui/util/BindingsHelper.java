@@ -42,7 +42,7 @@ public class BindingsHelper {
     }
 
     public static void includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
-        condition.addListener((obs, oldValue, newValue) -> node.pseudoClassStateChanged(pseudoClass,newValue));
+        condition.addListener((obs, oldValue, newValue) -> node.pseudoClassStateChanged(pseudoClass, newValue));
     }
 
     /**
