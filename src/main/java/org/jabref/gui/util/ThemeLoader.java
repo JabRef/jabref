@@ -69,10 +69,10 @@ public class ThemeLoader {
             if (Files.isReadable(path)) {
                 String cssUrl = path.toUri().toString();
                 addAndWatchForChanges(scene, cssUrl, 0);
-            }else{
+            } else {
                 LOGGER.warn(path.toAbsolutePath() + " is not readable");
             }
-        }else{
+        } else {
             addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
         }
 
