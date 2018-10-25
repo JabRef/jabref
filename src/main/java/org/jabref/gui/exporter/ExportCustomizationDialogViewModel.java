@@ -1,8 +1,9 @@
 package org.jabref.gui.exporter;
 
+import java.util.List;
+
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -16,7 +17,8 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     //The class vars might need to be reordered
 
-    private final SimpleListProperty<TemplateExporter> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     private final int size; //final?  Or you don't need this and just use a a while loop
 
     //Indices within which export format information is stored within JabRefPreferences
@@ -45,12 +47,25 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     }
 
-    //possibly not necessary, and if so getSortedList will have to return the correct type, not Eventlist<List<String>>
     public void loadExporters() {
-        exporters.addAll(preferences.getCustomExportFormats()); //Implement in JabRefPreferences
-        //preferences.customExports.getSortedList(); //As of now getSortedList refers to EventList<List<String>>
+        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(); //Var may need more descriptive name
+        for (TemplateExporter exporter : exportersLogic) {
+            exporters.add(new ExporterViewModel(exporter));
+        }
     }
 
+    //The following method will have to be implemented to get information from the JavaFX analogue of Swing CustomExportDialog
+    public void addExporter() {
+        // open add Exporter dialog, set vars as dialogResult or analogous
+        exporters.add(new ExporterViewModel(dialogResult)) //var might have to be renamed
+
+    }
+
+    public void saveToPrefs() {
+        List<TemplateExporter> exportersLogic;
+        exporters.forEach(exporter -> exportersLogic.add(exporter.getLogic()));
+        preferences.storeNewExporters(exportersLogic);
+    }
     public void init() {
         loadExporters();
     }
