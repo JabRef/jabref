@@ -45,7 +45,7 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
         init();
 
         //ExporterViewModel is organized as a singular version of what now is CustomExportDialog, which
-        //currently stores all the exporters in a class var.  Each ViewModel wraps and exporter, and
+        //currently stores all the exporters in a class var.  Each ViewModel wraps an exporter, and
         //the class var exporters is a list of them
 
     }
@@ -64,7 +64,7 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     }
 
-    public void modfiyExporter(int row) {
+    public void modifyExporter(int row) {
         // open modify Exporter dialog, which may be the same as add Exporter dialog, and set that into exporters.
         exporters.set(row, new ExporterViewModel(dialogResult)); //result must come from dialog
     }
