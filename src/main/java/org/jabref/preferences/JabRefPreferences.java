@@ -51,6 +51,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.preferences.ImportSettingsTab;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -780,6 +781,8 @@ public class JabRefPreferences implements PreferencesService {
                                     + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
                                     + "</dd>__NEWLINE__<p></p></font>");
 
+        // set default theme
+        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.DEFAULT_MAIN_CSS);
         setLanguageDependentDefaultValues();
     }
 
