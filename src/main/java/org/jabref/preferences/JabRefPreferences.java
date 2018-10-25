@@ -79,7 +79,9 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -2011,5 +2013,43 @@ public class JabRefPreferences implements PreferencesService {
             map.put(columns.get(i), sortTypes.get(i));
         }
         return map;
+    }
+
+    @Override
+    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader) {
+        int i = 0;
+        List<TemplateExporter> formats;
+        String exporterName;
+        String filename;
+        String extension;
+        String lfFileName;
+        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(loader);
+        SavePreferences savePreferences = loadForExportFromPreferences();
+        List<String> s;
+        while (!((s = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
+            exporterName = s.get(0);
+            filename = s.get(1); // 0, 1, 2 were originally static vars
+            extension = s.get(2);
+            if (filename.endsWith(".layout")) {
+                lfFileName = filename.substring(0, filename.length() - ".layout".length());
+            } else {
+                lfFileName = filename;
+            if (extension.contains(".")) {
+                extension = extension.substring(extension.indexOf('.') + 1, extension.length());
+            }
+            FileType fileType = StandardFileType.newFileType(extension);
+            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, exporterName, lfFileName,
+                                                                                 null, fileType, layoutPreferences,
+                                                                                 savePreferences));
+            format.get().setCustomExport(true); //Taken out of orig CustomExporerList
+            if (format.isPresent()) {
+                formats.add(format.get());
+            } else {
+                String customExportFormat = get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
+                LOGGER.error("Error initializing custom export format from string " + customExportFormat);
+            }
+            i++;
+        }
+        return formats;
     }
 }

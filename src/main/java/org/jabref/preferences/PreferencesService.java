@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.metadata.FilePreferences;
 
@@ -35,8 +36,6 @@ public interface PreferencesService {
 
     public void updateEntryEditorTabList();
 
-    List<String> getStringList(String key);
-
-    String get(String key);
+    List<TemplateExporter> getCustomExportFormats();
 
 }
