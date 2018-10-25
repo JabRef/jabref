@@ -1,13 +1,15 @@
 package org.jabref.gui.exporter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.preferences.CustomExportList;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     //The class vars might need to be reordered
 
+    //exporters should probably be a JavaFX SortedList, but not yet sure how to make that into a property
     private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final int size; //final?  Or you don't need this and just use a a while loop
@@ -28,6 +31,7 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private final JournalAbbreviationLoader loader;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomExportList.class);
 
@@ -35,20 +39,19 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     //Also write tests for all of this
 
-    public ExportCustomizationDialogViewModel(DialogService dialogService) {
+    public ExportCustomizationDialogViewModel(DialogService dialogService, JournalAbbreviationLoader loader) {
         this.dialogService = dialogService;
+        this.loader = loader;
         init();
 
-        //ExporterViewModel will be organized as a singular version of what now is CustomExportDialog, which
-        //currently stores all the exporters in a class var.  Each ViewModel will have one exporter and associated data, and
-        //the class var exporters will be a list of them
-        //You will have to write properites into ExpoerterViewModel that get all the relevant information about the exporter
-        //in addition to a property for the exporter itself
+        //ExporterViewModel is organized as a singular version of what now is CustomExportDialog, which
+        //currently stores all the exporters in a class var.  Each ViewModel wraps and exporter, and
+        //the class var exporters is a list of them
 
     }
 
     public void loadExporters() {
-        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(); //Var may need more descriptive name
+        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(loader); //Var may need more descriptive name
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
         }
@@ -61,10 +64,24 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
 
     }
 
+    public void modfiyExporter(int row) {
+        // open modify Exporter dialog, which may be the same as add Exporter dialog, and set that into exporters.
+        exporters.set(row, new ExporterViewModel(dialogResult)); //result must come from dialog
+    }
+
+    public void removeExporters(int[] rows) {
+        if (rows.length == 0) { // Is this check necessary?  Probably not
+            return;
+        }
+        for (int i = 0; i < rows.length; i++) {
+            exporters.remove(rows[i]);
+        }
+    }
+
     public void saveToPrefs() {
         List<TemplateExporter> exportersLogic;
         exporters.forEach(exporter -> exportersLogic.add(exporter.getLogic()));
-        preferences.storeNewExporters(exportersLogic);
+        preferences.storeCustomExportFormats(exportersLogic);
     }
     public void init() {
         loadExporters();

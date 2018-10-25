@@ -2034,6 +2034,7 @@ public class JabRefPreferences implements PreferencesService {
                 lfFileName = filename.substring(0, filename.length() - ".layout".length());
             } else {
                 lfFileName = filename;
+            }
             if (extension.contains(".")) {
                 extension = extension.substring(extension.indexOf('.') + 1, extension.length());
             }
@@ -2051,5 +2052,28 @@ public class JabRefPreferences implements PreferencesService {
             i++;
         }
         return formats;
+    }
+
+    @Override
+    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
+        if (exporters.isEmpty()) {
+            purgeCustomExportFormats(0);
+        } else {
+            for (int i = 0; i < exporters.size(); i++) {
+                List<String> exporterData = new ArrayList<>();
+                exporterData.add(exporters.get(i).getName());
+                exporterData.add(exporters.get(i).getId());
+                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
+            }
+            purgeCustomExportFormats(exporters.size());
+        }
+    }
+
+    private void purgeCustomExportFormats(int from) {
+        int i = from;
+        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
+            remove(CUSTOM_EXPORT_FORMAT + i);
+            i++;
+        }
     }
 }
