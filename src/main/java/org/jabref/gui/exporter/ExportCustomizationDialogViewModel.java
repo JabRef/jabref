@@ -6,8 +6,8 @@ import java.util.List;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
@@ -15,7 +15,7 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
+public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //The class vars might need to be reordered
 
@@ -60,7 +60,8 @@ public class ExportCustomizationDialogViewModel extends BaseDialog<Void> {
     //The following method will have to be implemented to get information from the JavaFX analogue of Swing CustomExportDialog
     public void addExporter() {
         // open add Exporter dialog, set vars as dialogResult or analogous
-        exporters.add(new ExporterViewModel(dialogResult)) //var might have to be renamed
+        TemplateExporter exporter = new CreateModifyExporterDialogView().show(); //Not sure if this is right
+        exporters.add(new ExporterViewModel(exporter));//var might have to be renamed
 
     }
 
