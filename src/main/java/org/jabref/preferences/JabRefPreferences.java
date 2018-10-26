@@ -2018,7 +2018,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader) {
         int i = 0;
-        List<TemplateExporter> formats;
+        List<TemplateExporter> formats = null;
         String exporterName;
         String filename;
         String extension;
@@ -2026,6 +2026,7 @@ public class JabRefPreferences implements PreferencesService {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = loadForExportFromPreferences();
         List<String> s;
+        // possibly check if CUSTOM_EXPORT_FORMAT + 0 is empty too and throw error
         while (!((s = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
             exporterName = s.get(0);
             filename = s.get(1); // 0, 1, 2 were originally static vars
