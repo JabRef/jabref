@@ -391,10 +391,30 @@
 }
 
 .check-box > .box > .mark {
-    -fx-background-color: white;
+    -fx-background-color: -fx-control-inner-background;
     -fx-padding: 0.2em 0.2em 0.2em 0.2em;
     -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
     -fx-stroke-width: 5;
+}
+
+.radio-button > .radio {
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
+    -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
+    -fx-background-insets: 0, 2px;
+}
+
+.radio-button:selected > .radio {
+    -fx-background-color: -jr-checked, -fx-background;
+}
+
+.radio-button > .radio > .dot {
+    -fx-padding: 0.25em; /* radius of the inner dot when selected */
+    -fx-background-insets: 0;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -jr-checked;
 }
 
 .menu-bar {
