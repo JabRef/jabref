@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -10,12 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.MrDLibImporter;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
@@ -52,7 +47,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         if (title.isPresent()) {
             String response = makeServerRequest(title.get());
             MrDLibImporter importer = new MrDLibImporter();
-            ParserResult parserResult = new ParserResult();
+            ParserResult parserResult;
             try {
                 if (importer.isRecognizedFormat(response)) {
                     parserResult = importer.importDatabase(response);
@@ -85,7 +80,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
             URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
-            urlDownload.bypassSSLVerification();
+            URLDownload.bypassSSLVerification();
             String response = urlDownload.asString();
 
             //Conversion of < and >
@@ -98,7 +93,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     /**
-     * Constructs the query based on title of the bibentry. Adds statistical stuff to the url.
+     * Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
      *
      * @param queryWithTitle: the title of the bib entry.
      * @return the string used to make the query at mdl server
@@ -114,9 +109,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
         builder.addParameter("app_lang", LANGUAGE);
-        URI uri = null;
         try {
-            uri = builder.build();
+            URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());
             return uri.toString();
         } catch (URISyntaxException e) {

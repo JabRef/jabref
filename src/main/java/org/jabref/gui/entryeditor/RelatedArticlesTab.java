@@ -1,18 +1,13 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.print.PrinterJob;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -21,17 +16,14 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.Globals;
-import org.jabref.gui.Dialog;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.gui.DialogService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,16 +94,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
             journalText.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
             Text authorsText = new Text(authors);
             Text yearText = new Text("(" + year + ")");
-            titleLink.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    if (entry.getField(FieldName.URL).isPresent()) {
-                        try {
-                            JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
-                        } catch (IOException e) {
-                            LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
-                            dialogService.showErrorDialogAndWait(e);
-                        }
+            titleLink.setOnAction(event -> {
+                if (entry.getField(FieldName.URL).isPresent()) {
+                    try {
+                        JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
+                    } catch (IOException e) {
+                        LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
+                        dialogService.showErrorDialogAndWait(e);
                     }
                 }
             });
@@ -141,26 +130,20 @@ public class RelatedArticlesTab extends EntryEditorTab {
         line1.setWrappingWidth(1300.0);
         Text line2 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr DLib. for JabRef users."));
-        mdlLink.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try {
-                    JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
-                } catch (IOException e) {
-                    LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
-                    dialogService.showErrorDialogAndWait(e);
-                }
+        mdlLink.setOnAction(event -> {
+            try {
+                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
+            } catch (IOException e) {
+                LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
+                dialogService.showErrorDialogAndWait(e);
             }
         });
 
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                JabRefPreferences prefs = JabRefPreferences.getInstance();
-                prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, true);
-                dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
-                setContent(getRelatedArticlesPane(entry));
-            }
+        button.setOnAction(event -> {
+            JabRefPreferences prefs = JabRefPreferences.getInstance();
+            prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, true);
+            dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
+            setContent(getRelatedArticlesPane(entry));
         });
 
         vbox.getChildren().addAll(line1, mdlLink, line2, button);
