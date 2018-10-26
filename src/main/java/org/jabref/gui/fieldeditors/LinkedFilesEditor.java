@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
+
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
