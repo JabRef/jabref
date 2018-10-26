@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.entryeditor.FileDragDropPreferences;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -42,10 +43,16 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     private final JabRefPreferences prefs;
     private final AutoCompletePreferences autoCompletePreferences;
 
+    private final FileDragDropPreferences dragDropPreferences;
+    private final RadioButton copyFile;
+    private final RadioButton linkFile;
+    private final RadioButton renameCopyFile;
 
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
+        dragDropPreferences = prefs.getEntryEditorFileLinkPreference();
+
         autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
         defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
         emacsMode = new CheckBox(Localization.lang("Use Emacs key bindings"));
@@ -123,6 +130,20 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         firstNameModeAbbr.setToggleGroup(treatmentOfFirstNamesToggleGroup);
         firstNameModeFull.setToggleGroup(treatmentOfFirstNamesToggleGroup);
         firstNameModeBoth.setToggleGroup(treatmentOfFirstNamesToggleGroup);
+
+        final ToggleGroup group = new ToggleGroup();
+        Label linkFileOptions = new Label(Localization.lang("Options to add file"));
+        linkFileOptions.getStyleClass().add("sectionHeader");
+        copyFile = new RadioButton(Localization.lang("Copy file to current location"));
+        linkFile = new RadioButton(Localization.lang("Link file (without copying)"));
+        renameCopyFile = new RadioButton(Localization.lang("Copy, rename and link file"));
+        builder.add(linkFileOptions, 1, 23);
+        builder.add(copyFile, 1, 24);
+        builder.add(linkFile, 1, 25);
+        builder.add(renameCopyFile, 1, 26);
+        copyFile.setToggleGroup(group);
+        linkFile.setToggleGroup(group);
+        renameCopyFile.setToggleGroup(group);
     }
 
     @Override
@@ -170,6 +191,14 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         default:
             firstNameModeBoth.setSelected(true);
             break;
+        }
+
+        if (dragDropPreferences.isCopyFile()) {
+            copyFile.setSelected(true);
+        } else if (dragDropPreferences.isLinkFile()) {
+            linkFile.setSelected(true);
+        } else {
+            renameCopyFile.setSelected(true);
         }
 
         // similar for emacs CTRL-a and emacs mode
@@ -230,6 +259,22 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         } else {
             autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
         }
+
+        if (copyFile.isSelected()) {
+            dragDropPreferences.setCopyFile(true);
+            dragDropPreferences.setLinkFile(false);
+            dragDropPreferences.setRenameCopyFile(false);
+        } else if (linkFile.isSelected()) {
+            dragDropPreferences.setCopyFile(false);
+            dragDropPreferences.setLinkFile(true);
+            dragDropPreferences.setRenameCopyFile(false);
+        } else {
+            dragDropPreferences.setCopyFile(false);
+            dragDropPreferences.setLinkFile(false);
+            dragDropPreferences.setRenameCopyFile(true);
+        }
+
+        prefs.storeEntryEditorFileLinkPreference(dragDropPreferences);
         prefs.storeAutoCompletePreferences(autoCompletePreferences);
     }
 

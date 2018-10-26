@@ -1,12 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javafx.beans.binding.Bindings;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -18,19 +13,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.TaskExecutor;
@@ -39,7 +29,6 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -64,93 +53,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withTooltip(LinkedFileViewModel::getDescription)
                 .withGraphic(LinkedFilesEditor::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
-                .withOnMouseClickedEvent(this::handleItemMouseClick)
-                .setOnDragDetected(this::handleOnDragDetected)
-                .setOnDragDropped(this::handleOnDragDropped)
-                .setOnDragOver(this::handleOnDragOver);
+                .withOnMouseClickedEvent(this::handleItemMouseClick);
 
         listView.setCellFactory(cellFactory);
 
-        setUpFilesDragAndDrop();
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
         setUpKeyBindings();
-    }
-
-    private void setUpFilesDragAndDrop() {
-        listView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
-            }
-        });
-
-        listView.setOnDragDropped(event -> {
-            Dragboard dragboard = event.getDragboard();
-            boolean success = false;
-            ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
-
-            if (dragboard.hasFiles()) {
-                List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-                items.addAll(linkedFiles);
-                success = true;
-            }
-            event.setDropCompleted(success);
-            event.consume();
-        });
-
-    }
-
-    private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-            event.acceptTransferModes(TransferMode.MOVE);
-        }
-        if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
-        }
-    }
-
-    private void handleOnDragDetected(@SuppressWarnings("unused") LinkedFileViewModel linkedFile, MouseEvent event) {
-        LinkedFile selectedItem = listView.getSelectionModel().getSelectedItem().getFile();
-        if (selectedItem != null) {
-            ClipboardContent content = new ClipboardContent();
-            Dragboard dragboard = listView.startDragAndDrop(TransferMode.MOVE);
-            //We have to use the model class here, as the content of the dragboard must be serializable
-            content.put(DragAndDropDataFormats.LINKED_FILE, selectedItem);
-            dragboard.setContent(content);
-        }
-        event.consume();
-    }
-
-    private void handleOnDragDropped(LinkedFileViewModel originalItem, DragEvent event) {
-        Dragboard dragboard = event.getDragboard();
-        boolean success = false;
-
-        ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
-
-        if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-
-            LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
-            LinkedFileViewModel transferedItem = null;
-            int draggedIdx = 0;
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).getFile().equals(linkedFile)) {
-                    draggedIdx = i;
-                    transferedItem = items.get(i);
-                    break;
-                }
-            }
-            int thisIdx = items.indexOf(originalItem);
-            items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
-            success = true;
-        }
-        if (dragboard.hasFiles()) {
-            List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-            items.addAll(linkedFiles);
-            success = true;
-        }
-        event.setDropCompleted(success);
-        event.consume();
-
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {

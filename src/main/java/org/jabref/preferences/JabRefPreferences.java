@@ -44,6 +44,7 @@ import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.entryeditor.FileDragDropPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.groups.GroupViewMode;
@@ -403,6 +404,11 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
+    //File linking Options for entry editor
+    private static final String ENTRY_EDITOR_COPY_FILE = "copyFile";
+    private static final String ENTRY_EDITOR_LINK_FILE = "linkFile";
+    private static final String ENTRY_EDITOR_RENAME_COPY_FILE = "renameCopyFile";
+
     //GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
 
@@ -411,6 +417,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -786,6 +793,10 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+
+        defaults.put(ENTRY_EDITOR_COPY_FILE, Boolean.TRUE);
+        defaults.put(ENTRY_EDITOR_LINK_FILE, Boolean.FALSE);
+        defaults.put(ENTRY_EDITOR_RENAME_COPY_FILE, Boolean.FALSE);
         setLanguageDependentDefaultValues();
     }
 
@@ -2018,5 +2029,16 @@ public class JabRefPreferences implements PreferencesService {
             map.put(columns.get(i), sortTypes.get(i));
         }
         return map;
+    }
+
+    public FileDragDropPreferences getEntryEditorFileLinkPreference() {
+        return new FileDragDropPreferences(getBoolean(ENTRY_EDITOR_COPY_FILE), getBoolean(ENTRY_EDITOR_LINK_FILE),
+                                                      getBoolean(ENTRY_EDITOR_RENAME_COPY_FILE));
+    }
+
+    public void storeEntryEditorFileLinkPreference(FileDragDropPreferences dragDropPreferences) {
+        putBoolean(ENTRY_EDITOR_COPY_FILE, dragDropPreferences.isCopyFile());
+        putBoolean(ENTRY_EDITOR_LINK_FILE, dragDropPreferences.isLinkFile());
+        putBoolean(ENTRY_EDITOR_RENAME_COPY_FILE, dragDropPreferences.isRenameCopyFile());
     }
 }
