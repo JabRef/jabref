@@ -27,6 +27,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     private final CheckBox emacsRebindCtrlF;
     private final CheckBox autoComplete;
     private final CheckBox recommendations;
+    private final CheckBox acceptRecommendations;
     private final CheckBox validation;
     private final RadioButton autoCompBoth;
     private final RadioButton autoCompFF;
@@ -51,6 +52,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         emacsRebindCtrlF = new CheckBox(Localization.lang("Rebind C-f, too"));
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
+        acceptRecommendations = new CheckBox(Localization.lang("Accept recommendations from Mr. DLib"));
         validation = new CheckBox(Localization.lang("Show validation messages"));
 
         // allowed name formats
@@ -84,8 +86,9 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(emacsRebindCtrlA, 1, 5);
         builder.add(emacsRebindCtrlF, 1, 6);
         builder.add(recommendations, 1, 7);
-        builder.add(validation, 1, 8);
-        builder.add(new Label(""), 1, 9);
+        builder.add(acceptRecommendations, 1, 8);
+        builder.add(validation, 1, 9);
+        builder.add(new Label(""), 1, 10);
 
         Label autocompletionOptions = new Label(Localization.lang("Autocompletion options"));
         autocompletionOptions.getStyleClass().add("sectionHeader");
@@ -113,6 +116,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(firstNameModeBoth,  1, 22);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -135,6 +139,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         emacsRebindCtrlA.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
+        acceptRecommendations.setSelected(prefs.getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS));
         autoComplete.setSelected(autoCompletePreferences.shouldAutoComplete());
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
 
@@ -171,6 +176,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
         prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, recommendations.isSelected());
+        prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendations.isSelected());
         prefs.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, validation.isSelected());
         boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
         boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
