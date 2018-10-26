@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,21 +11,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.swing.ButtonGroup;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -35,22 +40,10 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MergeEntries extends BorderPane {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntries.class);
-
-    private static final String MARGIN = "10px";
-
-    private static final List<Label> HEADING_LABELS = new ArrayList<>(6);
-
-    private static final List<String> DIFF_MODES = Arrays.asList(Localization.lang("Plain text"),
-            Localization.lang("Show diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show diff") + " - " + Localization.lang("character"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character"));
+    private final ComboBox<DiffMode> diffMode = new ComboBox<>();
 
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
@@ -64,14 +57,29 @@ public class MergeEntries extends BorderPane {
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
-    private final BibDatabaseMode databaseType;
-    private final ComboBox<String> diffMode = new ComboBox<>();
+
+    /**
+     * Constructor with optional column captions for the two entries
+     *
+     * @param entryLeft    Left entry
+     * @param entryRight   Right entry
+     * @param headingLeft  Heading for left entry
+     * @param headingRight Heading for right entry
+     * @param type         Bib database mode
+     */
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
+        this.leftEntry = entryLeft;
+        this.rightEntry = entryRight;
+
+        initialize();
+        setLeftHeaderText(headingLeft);
+        setRightHeaderText(headingRight);
+    }
     private Boolean identicalTypes;
     private final Map<String, TextFlow> leftTextPanes = new HashMap<>();
     private final Set<String> allFields = new TreeSet<>();
     private final Map<String, TextFlow> rightTextPanes = new HashMap<>();
     private final Map<String, List<RadioButton>> radioButtons = new HashMap<>();
-    private ScrollPane scrollPane;
     private List<RadioButton> typeRadioButtons;
 
 
@@ -85,58 +93,69 @@ public class MergeEntries extends BorderPane {
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight, BibDatabaseMode type) {
         leftEntry = entryLeft;
         rightEntry = entryRight;
-        this.databaseType = type;
         initialize();
     }
 
-    /**
-     * Constructor with optional column captions for the two entries
-     *
-     * @param entryLeft Left entry
-     * @param entryRight Right entry
-     * @param headingLeft Heading for left entry
-     * @param headingRight Heading for right entry
-     * @param type Bib database mode
-     */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
-        this.leftEntry = entryLeft;
-        this.rightEntry = entryRight;
-
-        this.databaseType = type;
-
-        initialize();
+    private static String getDisplayText(DiffMode mode) {
+        switch (mode) {
+            case Plain:
+                return Localization.lang("Plain text");
+            case Word:
+                return Localization.lang("Show diff") + " - " + Localization.lang("word");
+            case Character:
+                return Localization.lang("Show diff") + " - " + Localization.lang("character");
+            case WordSymmetric:
+                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("word");
+            case CharacterSymmetric:
+                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("character");
+            default:
+                throw new UnsupportedOperationException("Not implemented: " + mode);
+        }
     }
 
     /**
      * Main function for building the merge entry JPanel
      */
     private void initialize() {
+        setPrefWidth(800);
+
         setupFields();
 
         fillDiffModes();
 
-        setupHeadingRows();
-
         GridPane mergePanel = new GridPane();
-        setupEntryTypeRow(mergePanel);
-        int maxLabelWidth = setupFieldRows(mergePanel);
+        mergePanel.setVgap(10);
+        mergePanel.setHgap(15);
+        ColumnConstraints columnLabel = new ColumnConstraints();
+        columnLabel.setHgrow(Priority.NEVER);
+        ColumnConstraints columnValues = new ColumnConstraints();
+        columnValues.setHgrow(Priority.ALWAYS);
+        columnValues.setPercentWidth(40);
+        ColumnConstraints columnSelect = new ColumnConstraints();
+        columnSelect.setHgrow(Priority.NEVER);
+        mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
 
-        scrollPane = new ScrollPane(mergePanel);
+        setupHeadingRows(mergePanel);
+        setupEntryTypeRow(mergePanel);
+        setupFieldRows(mergePanel);
+
+        ScrollPane scrollPane = new ScrollPane(mergePanel);
         scrollPane.setFitToWidth(true);
         setCenter(scrollPane);
 
-        updateTextPanes(allFields);
+        updateFieldValues(allFields);
 
-        updateAll();
+        updateMergedEntry();
+
+        getStylesheets().add(0, MergeEntries.class.getResource("MergeEntries.css").toExternalForm());
     }
 
-    private int setupFieldRows(GridPane mergePanel) {
+    private void setupFieldRows(GridPane mergePanel) {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
-        int maxLabelWidth = -1;
         for (String field : allFields) {
-            Label label = boldFontLabel(new SentenceCaseFormatter().format(field));
-            mergePanel.add(label, 1, (2 * row) - 1);
+            Label label = new Label(new SentenceCaseFormatter().format(field));
+            mergePanel.add(label, 0, row);
             Optional<String> leftString = leftEntry.getField(field);
             Optional<String> rightString = rightEntry.getField(field);
             if (leftString.equals(rightString)) {
@@ -145,12 +164,10 @@ public class MergeEntries extends BorderPane {
                 differentFields.add(field);
             }
 
-            //maxLabelWidth = Math.max(maxLabelWidth, label.getPreferredSize().width);
-
             // Left text pane
             if (leftString.isPresent()) {
                 TextFlow tf = new DiffHighlightingTextPane();
-                mergePanel.add(tf, 3, (2 * row) - 1);
+                mergePanel.add(tf, 1, row);
                 leftTextPanes.put(field, tf);
             }
 
@@ -158,13 +175,13 @@ public class MergeEntries extends BorderPane {
             if (identicalFields.contains(field)) {
                 mergedEntry.setField(field, leftString.get()); // Will only happen if both entries have the field and the content is identical
             } else {
-                ButtonGroup group = new ButtonGroup();
+                ToggleGroup group = new ToggleGroup();
                 List<RadioButton> list = new ArrayList<>(3);
                 for (int k = 0; k < 3; k++) {
                     RadioButton button = new RadioButton();
-                    //group.add(button);
-                    mergePanel.add(button, 5 + (k * 2), (2 * row) - 1);
-                    //button.addChangeListener(e -> updateAll());
+                    EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
+                    group.getToggles().add(button);
+                    mergePanel.add(button, 2 + k, row);
                     list.add(button);
                 }
                 radioButtons.put(field, list);
@@ -182,117 +199,105 @@ public class MergeEntries extends BorderPane {
             // Right text pane
             if (rightString.isPresent()) {
                 TextFlow tf = new DiffHighlightingTextPane();
-                mergePanel.add(tf, 11, (2 * row) - 1);
+                mergePanel.add(tf, 5, row);
                 rightTextPanes.put(field, tf);
             }
             row++;
         }
-        return maxLabelWidth;
     }
 
     private void setupEntryTypeRow(GridPane mergePanel) {
         // Start with entry type
-        mergePanel.add(boldFontLabel(Localization.lang("Entry type")), 1, 1);
+        mergePanel.add(new Label(Localization.lang("Entry type")), 0, 1);
 
-        TextFlow leftTypeDisplay = new DiffHighlightingTextPane();
-        //leftTypeDisplay.setText(DiffHighlighting.HTML_START + leftEntry.getType() + DiffHighlighting.HTML_END);
-        mergePanel.add(leftTypeDisplay, 3, 1);
         if (leftEntry.getType().equals(rightEntry.getType())) {
+            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType()), 1, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType()), 5, 1);
             identicalTypes = true;
         } else {
+            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType()), 1, 1);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType()), 5, 1);
             identicalTypes = false;
-//            ButtonGroup group = new ButtonGroup();
+            ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);
             for (int k = 0; k < 3; k += 2) {
                 RadioButton button = new RadioButton();
+                EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
                 typeRadioButtons.add(button);
-                //group.add(button);
-                mergePanel.add(button, 5 + (k * 2), 1);
-                //button.addChangeListener(e -> updateAll());
+                group.getToggles().add(button);
+                mergePanel.add(button, 2 + k, 1);
             }
             typeRadioButtons.get(0).setSelected(true);
         }
-        TextFlow rightTypeDisplay = new DiffHighlightingTextPane();
-        //rightTypeDisplay.setText(DiffHighlighting.HTML_START + rightEntry.getType() + DiffHighlighting.HTML_END);
-        mergePanel.add(rightTypeDisplay, 11, 1);
     }
 
-    private void setupHeadingRows() {
-        VBox heading = new VBox(10);
-        heading.getChildren().setAll(boldFontLabel(Localization.lang("Use")), diffMode);
-        setTop(heading);
-
+    private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
-        //for (int i = 0; i < 6; i++) {
-        //    HEADING_LABELS.add(boldFontLabel(columnHeadings.get(i)));
-        //    mainPanel.add(HEADING_LABELS.get(i), CELL_CONSTRAINTS.xy(1 + (i * 2), 2));
-        //}
+        for (int i = 0; i < 6; i++) {
+            mergePanel.add(new Label(columnHeadings.get(i)), i, 0);
+        }
     }
 
     private void fillDiffModes() {
-        diffMode.setItems(FXCollections.observableList(DIFF_MODES));
+        diffMode.setItems(FXCollections.observableList(Arrays.asList(DiffMode.values())));
+        new ViewModelListCellFactory<DiffMode>()
+                .withText(MergeEntries::getDisplayText)
+                .install(diffMode);
         diffMode.getSelectionModel().select(Globals.prefs.getInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE));
         EasyBind.subscribe(diffMode.valueProperty(), mode -> {
-            updateTextPanes(differentFields);
+            updateFieldValues(differentFields);
             Globals.prefs.putInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, diffMode.getSelectionModel().getSelectedIndex());
         });
-    }
 
-    private Label boldFontLabel(String text) {
-        Label label = new Label(text);
-        //label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        return label;
+        HBox heading = new HBox(10);
+        heading.getChildren().setAll(diffMode);
+        setTop(heading);
+        BorderPane.setMargin(heading, new Insets(0, 0, 10, 0));
     }
 
     private void setupFields() {
         allFields.addAll(leftEntry.getFieldNames());
         allFields.addAll(rightEntry.getFieldNames());
 
-        // Remove internal fields
-        Set<String> toberemoved = new TreeSet<>();
-        for (String field : allFields) {
-            if (InternalBibtexFields.isInternalField(field)) {
-                toberemoved.add(field);
-            }
-        }
-        allFields.removeAll(toberemoved);
+        // Do not show internal fields
+        Set<String> internalFields = allFields.stream().filter(InternalBibtexFields::isInternalField).collect(Collectors.toSet());
+        allFields.removeAll(internalFields);
     }
 
-    private void updateTextPanes(Collection<String> fields) {
+    private void updateFieldValues(Collection<String> fields) {
         for (String field : fields) {
             String leftString = leftEntry.getField(field).orElse("");
             String rightString = rightEntry.getField(field).orElse("");
-            switch (diffMode.getSelectionModel().getSelectedIndex()) {
-            case 0: // Plain text
-                break;
-            case 1: // Latexdiff style - word
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
-                break;
-            case 2: // Latexdiff style - character
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
-                break;
-            case 3: // Symmetric style - word
-                String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
-                leftString = tmpLeftString;
-                break;
-            case 4: // Symmetric style - character
-                tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
-                leftString = tmpLeftString;
-                break;
-            default: // Shouldn't happen
-                break;
+            List<Text> leftText = leftString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(leftString));
+            List<Text> rightText = rightString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(rightString));
+            switch (diffMode.getValue()) {
+                case Plain:
+                    break;
+                case Word:
+                    rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
+                    break;
+                case Character:
+                    rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
+                    break;
+                case WordSymmetric:
+                    leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
+                    rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
+                    break;
+                case CharacterSymmetric:
+                    leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
+                    rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
             }
-            if ((leftString != null) && leftTextPanes.containsKey(field)) {
-                leftTextPanes.get(field).getChildren().setAll(new Text(leftString));
+            if (!leftText.isEmpty() && leftTextPanes.containsKey(field)) {
+                leftTextPanes.get(field).getChildren().setAll(leftText);
             }
-            if ((rightString != null) && rightTextPanes.containsKey(field)) {
-                rightTextPanes.get(field).getChildren().setAll(new Text(rightString));
+            if (!rightText.isEmpty() && rightTextPanes.containsKey(field)) {
+                rightTextPanes.get(field).getChildren().setAll(rightText);
             }
         }
     }
-
 
     /**
      * @return Merged BibEntry
@@ -302,11 +307,11 @@ public class MergeEntries extends BorderPane {
     }
 
     /**
-     * Update the merged BibEntry with source and preview panel every time something is changed
+     * Update the merged entry
      */
-    private void updateAll() {
+    private void updateMergedEntry() {
         // Check if the type has changed
-        if (!identicalTypes && typeRadioButtons.get(0).isSelected()) {
+        if (!identicalTypes && !typeRadioButtons.isEmpty() && typeRadioButtons.get(0).isSelected()) {
             mergedEntry.setType(leftEntry.getType());
         } else {
             mergedEntry.setType(rightEntry.getType());
@@ -314,6 +319,10 @@ public class MergeEntries extends BorderPane {
 
         // Check the potentially different fields
         for (String field : differentFields) {
+            if (!radioButtons.containsKey(field)) {
+                // May happen during initialization -> just ignore
+                continue;
+            }
             if (radioButtons.get(field).get(0).isSelected()) {
                 mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
             } else if (radioButtons.get(field).get(2).isSelected()) {
@@ -326,9 +335,19 @@ public class MergeEntries extends BorderPane {
 
     public void setLeftHeaderText(String leftHeaderText) {
         columnHeadings.set(1, leftHeaderText);
+        initialize();
     }
 
     public void setRightHeaderText(String rightHeaderText) {
         columnHeadings.set(5, rightHeaderText);
+        initialize();
+    }
+
+    enum DiffMode {
+        Plain,
+        Word,
+        Character,
+        WordSymmetric,
+        CharacterSymmetric
     }
 }
