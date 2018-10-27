@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -15,7 +16,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class GenerateBibtexKeyAction implements BaseAction {
     private final DialogService dialogService;
-    private BasePanel basePanel;
+    private final BasePanel basePanel;
     private List<BibEntry> entries;
     private boolean isCanceled;
 
@@ -44,6 +45,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
                     Localization.lang("Cancel"),
                     Localization.lang("Disable this confirmation dialog"),
                     optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+
         } else {
             // Always overwrite keys by default
             return true;
@@ -56,7 +58,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
             entries.removeIf(BibEntry::hasCiteKey);
             // if we're going to override some cite keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
-            boolean overwriteKeys = confirmOverwriteKeys(dialogService);
+            boolean overwriteKeys = DefaultTaskExecutor.runInJavaFXThread(() -> confirmOverwriteKeys(dialogService));
 
             // The user doesn't want to override cite keys
             if (!overwriteKeys) {
