@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class CitationEntry implements Comparable<CitationEntry> {
@@ -59,14 +60,14 @@ public class CitationEntry implements Comparable<CitationEntry> {
         }
         if (o instanceof CitationEntry) {
             CitationEntry other = (CitationEntry) o;
-            return this.refMarkName.equals(other.refMarkName);
+            return Objects.equals(this.refMarkName, other.refMarkName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.refMarkName.hashCode();
+        return Objects.hash(refMarkName);
     }
 
     public String getContext() {

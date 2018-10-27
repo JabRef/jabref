@@ -57,7 +57,7 @@ class CitationManager {
     private final DefaultEventTableModel<CitationEntry> tableModel;
 
     public CitationManager(OOBibBase ooBase, DialogService dialogService)
-            throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
+                                                                          throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
         diag = new JDialog((JFrame) null, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
@@ -66,8 +66,8 @@ class CitationManager {
         List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
             list.add(new CitationEntry(name,
-                    "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
-                    ooBase.getCustomProperty(name)));
+                                       "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
+                                       ooBase.getCustomProperty(name)));
         }
         tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
@@ -91,7 +91,7 @@ class CitationManager {
             try {
                 storeSettings();
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
-                    IllegalArgumentException ex) {
+                     IllegalArgumentException ex) {
                 LOGGER.warn("Problem modifying citation", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Problem modifying citation"), ex);
             }
@@ -107,8 +107,7 @@ class CitationManager {
         };
         cancel.addActionListener(cancelAction);
 
-        bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
+        bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(580);
@@ -118,7 +117,7 @@ class CitationManager {
     }
 
     private void storeSettings() throws UnknownPropertyException, NotRemoveableException, PropertyExistException,
-            IllegalTypeException, IllegalArgumentException {
+        IllegalTypeException, IllegalArgumentException {
         for (CitationEntry entry : list) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (entry.pageInfoChanged() && pageInfo.isPresent()) {
@@ -180,7 +179,6 @@ class CitationManager {
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         private final CitationEntry entry;
 
-
         public SingleCitationDialog(CitationEntry citEntry) {
             this.entry = citEntry;
             pageInfo.setText(entry.getPageInfo().orElse(""));
@@ -188,7 +186,7 @@ class CitationManager {
             singleCiteDialog = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
             FormBuilder builder = FormBuilder.create()
-                    .layout(new FormLayout("left:pref, 4dlu, fill:150dlu:grow", "pref, 4dlu, pref"));
+                                             .layout(new FormLayout("left:pref, 4dlu, fill:150dlu:grow", "pref, 4dlu, pref"));
             builder.add(entry.getContext()).xyw(1, 1, 3);
             builder.add(Localization.lang("Extra information (e.g. page number)")).xy(1, 3);
             builder.add(pageInfo).xy(3, 3);
@@ -222,8 +220,7 @@ class CitationManager {
             };
             cancelButton.addActionListener(cancelAction);
 
-            builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
+            builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
             builder.getPanel().getActionMap().put("close", cancelAction);
 
         }

@@ -2,6 +2,7 @@ package org.jabref.gui.openoffice;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
@@ -40,6 +41,10 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         colCitation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
         colExtraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
+        colExtraInfo.setEditable(true);
 
+        colExtraInfo.setOnEditCommit((CellEditEvent<ManageCitationsItemViewModel, String> cell) -> {
+            cell.getRowValue().setExtraInfo(cell.getNewValue());
+        });
     }
 }
