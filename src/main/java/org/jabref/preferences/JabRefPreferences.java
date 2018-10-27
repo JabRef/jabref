@@ -784,7 +784,7 @@ public class JabRefPreferences implements PreferencesService {
                                     + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.DEFAULT_MAIN_CSS);
+        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
         setLanguageDependentDefaultValues();
     }
 

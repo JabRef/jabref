@@ -1,13 +1,15 @@
 package org.jabref.gui.util;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import org.jabref.gui.JabRefFrame;
@@ -34,79 +36,74 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeLoader {
 
-    public static final String DEFAULT_MAIN_CSS = "Base.css";
-    private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource(DEFAULT_MAIN_CSS).toExternalForm();
+    public static final String MAIN_CSS = "Base.css";
+    public static final String DARK_CSS = "Dark.css";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
-    private String cssToLoad = System.getProperty("jabref.theme.css");
+    private final Optional<URL> additionalCssToLoad;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        if (!StringUtil.isNullOrEmpty(cssToLoad)) {
-            LOGGER.info("using css from system " + cssToLoad);
-            return;
-        }
-
-        // otherwise load css from preference
-        String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
-        if (cssFileName != null) {
+        String cssVmArgument = System.getProperty("jabref.theme.css");
+        String cssPreferences = jabRefPreferences.get(JabRefPreferences.FX_THEME);
+        if (StringUtil.isNotBlank(cssVmArgument)) {
+            // First priority: VM argument
+            LOGGER.info("Using css from VM option: " + cssVmArgument);
+            URL cssVmUrl = null;
             try {
-                cssToLoad = JabRefFrame.class.getResource(cssFileName).toExternalForm();
-                LOGGER.info("using css " + cssToLoad);
-            } catch (Exception e) {
-                LOGGER.warn("can't get css file path of " + cssFileName);
+                cssVmUrl = Paths.get(cssVmArgument).toUri().toURL();
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Cannot load css " + cssVmArgument, e);
             }
+            additionalCssToLoad = Optional.ofNullable(cssVmUrl);
+        } else if (StringUtil.isNotBlank(cssPreferences) && !MAIN_CSS.equalsIgnoreCase(cssPreferences)) {
+            // Otherwise load css from preference
+            URL cssResource = JabRefFrame.class.getResource(cssPreferences);
+            if (cssResource != null) {
+                LOGGER.debug("Using css " + cssResource);
+                additionalCssToLoad = Optional.of(cssResource);
+            } else {
+                additionalCssToLoad = Optional.empty();
+                LOGGER.warn("Cannot load css " + cssPreferences);
+            }
+        } else {
+            additionalCssToLoad = Optional.empty();
         }
     }
 
 
     /**
-     * Installs the base css file as a stylesheet in the given scene.
+     * Installs the base and all theme stylesheets in the given scene.
      * Changes in the css file lead to a redraw of the scene using the new css file.
      */
-    public void installBaseCss(Scene scene, JabRefPreferences preferences) {
-        if (!StringUtil.isNullOrEmpty(cssToLoad)) {
-            addAndWatchForChanges(scene, cssToLoad, 0);
-        } else {
-            LOGGER.warn("using the last default css " + DEFAULT_PATH_MAIN_CSS);
-            addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
-        }
+    public void installCss(Scene scene, JabRefPreferences preferences) {
+        addAndWatchForChanges(scene, JabRefFrame.class.getResource(MAIN_CSS), 0);
+        additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, 1));
 
         preferences.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
     }
 
-    private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
-        // avoid repeat add
-        if (scene.getStylesheets().contains(cssUrl)) return;
-
-        scene.getStylesheets().add(index, cssUrl);
+    private void addAndWatchForChanges(Scene scene, URL cssFile, int index) {
+        scene.getStylesheets().add(index, cssFile.toExternalForm());
 
         try {
-            // If -Djabref.theme.css is defined and the resources are not part of a .jar bundle,
-            // we watch the file for changes and turn on live reloading
-            if (!cssUrl.startsWith("jar:")) {
-                Path cssFile = Paths.get(new URL(cssUrl).toURI());
-                LOGGER.info("Enabling live reloading of " + cssFile);
-                fileUpdateMonitor.addListenerForFile(cssFile, () -> {
+            // If the file is an ordinary file (i.e. not a resource part of a .jar bundle), we watch it for changes and turn on live reloading
+            Path cssPath = Paths.get(cssFile.toURI());
+            if (Files.isRegularFile(cssPath)) {
+                LOGGER.info("Enabling live reloading of " + cssPath);
+                fileUpdateMonitor.addListenerForFile(cssPath, () -> {
                     LOGGER.info("Reload css file " + cssFile);
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
-                                scene.getStylesheets().remove(cssUrl);
-                                scene.getStylesheets().add(index, cssUrl);
+                        scene.getStylesheets().remove(cssFile.toExternalForm());
+                        scene.getStylesheets().add(index, cssFile.toExternalForm());
                             }
                     );
                 });
             }
-        } catch (URISyntaxException | IOException e) {
-            LOGGER.error("Could not watch css file for changes " + cssUrl, e);
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.error("Could not watch css file for changes " + cssFile, e);
         }
-    }
-
-    /**
-     * @deprecated you should never need to add css to a control, add it to the scene containing the control
-     */
-    @Deprecated
-    public void installBaseCss(Parent control) {
-        control.getStylesheets().add(0, DEFAULT_PATH_MAIN_CSS);
     }
 }
