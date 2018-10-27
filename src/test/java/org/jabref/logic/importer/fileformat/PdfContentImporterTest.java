@@ -44,5 +44,4 @@ public class PdfContentImporterTest {
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
-
 }

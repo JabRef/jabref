@@ -1,7 +1,7 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.externalfiles;
 
-import org.jabref.gui.FindUnlinkedFilesDialog;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.SimpleCommand;
 
 public class FindUnlinkedFilesAction extends SimpleCommand {
 
@@ -14,7 +14,7 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         FindUnlinkedFilesDialog dlg = new FindUnlinkedFilesDialog(jabRefFrame);
-        dlg.setVisible(true);
+        dlg.showAndWait();
     }
 
 }

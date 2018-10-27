@@ -509,5 +509,4 @@ public class BibEntryWriterTest {
 
         assertEquals(expected, actual);
     }
-
 }

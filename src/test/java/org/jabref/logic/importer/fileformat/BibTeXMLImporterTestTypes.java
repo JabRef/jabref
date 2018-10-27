@@ -38,7 +38,6 @@ public class BibTeXMLImporterTestTypes {
         });
     }
 
-
     @ParameterizedTest
     @MethodSource("types")
     public void importConvertsToCorrectBibType(String type) throws IOException {
@@ -49,7 +48,7 @@ public class BibTeXMLImporterTestTypes {
                 + type + ">\n" + "</bibtex:entry>\n" + "</bibtex:file>";
 
         List<BibEntry> bibEntries = new BibTeXMLImporter().importDatabase(new BufferedReader(new StringReader(bibteXMLInput)))
-                .getDatabase().getEntries();
+                                                          .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
         entry.setField("author", "Max Mustermann");

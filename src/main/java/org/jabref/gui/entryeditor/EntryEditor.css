@@ -79,3 +79,13 @@
 .code-area .text {
     -fx-fill: -fx-text-background-color;
 }
+
+.gdpr-dialog {
+    -fx-font-size: 14pt;
+}
+
+.related-articles-tab {
+    -fx-padding: 20 20 20 20;
+}
+
+

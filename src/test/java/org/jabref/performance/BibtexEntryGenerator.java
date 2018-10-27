@@ -23,5 +23,4 @@ public class BibtexEntryGenerator {
                 "  publisher={Wiley Online Library}\n" +
                 "}\n";
     }
-
 }

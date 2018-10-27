@@ -2,8 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AuthorsTest {
 
@@ -153,5 +154,4 @@ public class AuthorsTest {
         assertEquals("Bruce, Bob Croydon",
                 a.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
-
 }

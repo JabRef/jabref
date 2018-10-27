@@ -14,7 +14,7 @@
 
 .table-row-cell:hover .empty-special-field {
     visibility: visible;
-    /*-fx-fill: -jr-grayed-text;*/
+    -fx-fill: -jr-gray-2;
 }
 
 .rating > .container {
@@ -22,10 +22,13 @@
 }
 
 .rating > .container > .button {
-    -fx-pref-width: 10;
+    -fx-pref-width: 16;
     -fx-pref-height: 10;
-    -fx-background-size: cover;
-    -fx-padding: 0;
+    -fx-background-repeat: no-repeat no-repeat;
+    -fx-background-size: 16 16;
+    -fx-border-style: none;
+    -fx-border-width: 0;
+    -fx-padding:  0;
 }
 
 .rating > .container > .button.strong {

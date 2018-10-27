@@ -12,7 +12,6 @@ public class SynchronizationTestEventListener {
     private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;
     private UpdateRefusedEvent updateRefusedEvent;
 
-
     @Subscribe
     public void listen(SharedEntryNotPresentEvent event) {
         this.sharedEntryNotPresentEvent = event;

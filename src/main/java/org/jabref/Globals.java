@@ -75,11 +75,11 @@ public class Globals {
     }
 
     // Background tasks
-    public static void startBackgroundTasks() {
+    public static void startBackgroundTasks() throws JabRefException {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        themeLoader = new ThemeLoader(fileUpdateMonitor);
+        themeLoader = new ThemeLoader(fileUpdateMonitor, prefs);
 
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();

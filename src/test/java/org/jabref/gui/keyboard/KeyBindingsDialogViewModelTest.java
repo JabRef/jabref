@@ -50,7 +50,6 @@ public class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
     }
 
-
     @Test
     public void testSpecialKeysValidKeyBindingIsSaved() {
         setKeyBindingViewModel(KeyBinding.IMPORT_INTO_NEW_DATABASE);

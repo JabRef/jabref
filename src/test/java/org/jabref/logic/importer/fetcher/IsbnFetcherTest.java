@@ -38,7 +38,6 @@ public class IsbnFetcherTest {
         bibEntry.setField("ean", "9780134685991");
         bibEntry.setField("isbn", "0134685997");
         bibEntry.setField("url", "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
-
     }
 
     @Test
@@ -85,14 +84,12 @@ public class IsbnFetcherTest {
     }
 
     /**
-     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21
-     * However, this ISBN is not available on ebook.de. The fetcher should something as it falls back to Chimbori
-     * @throws FetcherException
+     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
+     * not available on ebook.de. The fetcher should something as it falls back to Chimbori
      */
     @Test
     public void searchForIsbnAvailableAtChimboriButNonOnEbookDe() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
         assertNotEquals(Optional.empty(), fetchedEntry);
     }
-
 }

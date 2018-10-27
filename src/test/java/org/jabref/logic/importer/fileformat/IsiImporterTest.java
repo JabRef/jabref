@@ -25,9 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class IsiImporterTest {
 
-    private final IsiImporter importer = new IsiImporter();
-
     private static final String FILE_ENDING = ".isi";
+    private final IsiImporter importer = new IsiImporter();
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("IsiImporterTest")
@@ -228,7 +227,6 @@ public class IsiImporterTest {
                 "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
                 IsiImporter.isiAuthorsConvert(
                         "Joffe, Hadine; Hall, Janet E; Gruber, Staci; Sarmiento, Ingrid A; Cohen, Lee S; Yurgelun-Todd, Deborah; Martin, Kathryn A"));
-
     }
 
     @Test
@@ -266,7 +264,7 @@ public class IsiImporterTest {
         assertEquals("article", entry.getType());
         assertEquals(Optional.of("Geoscience and Remote Sensing Letters, IEEE"), entry.getField("journal"));
         assertEquals(Optional.of("Improving Urban Road Extraction in High-Resolution "
-                + "Images Exploiting Directional Filtering, Perceptual " + "Grouping, and Simple Topological Concepts"),
+                        + "Images Exploiting Directional Filtering, Perceptual " + "Grouping, and Simple Topological Concepts"),
                 entry.getField("title"));
         assertEquals(Optional.of("4"), entry.getField("volume"));
         assertEquals(Optional.of("3"), entry.getField("number"));
