@@ -8,7 +8,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -52,13 +51,13 @@ public class GenerateBibtexKeyAction implements BaseAction {
         }
     }
 
-    private void generateKeys() {
+    private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
             entries.removeIf(BibEntry::hasCiteKey);
             // if we're going to override some cite keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
-            boolean overwriteKeys = DefaultTaskExecutor.runInJavaFXThread(() -> confirmOverwriteKeys(dialogService));
+            boolean overwriteKeys = confirmOverwriteKeys(dialogService);
 
             // The user doesn't want to override cite keys
             if (!overwriteKeys) {
@@ -66,7 +65,12 @@ public class GenerateBibtexKeyAction implements BaseAction {
                 return;
             }
         }
+    }
 
+    private void generateKeys() {
+        if (isCanceled) {
+            return;
+        }
         // generate the new cite keys for each entry
         final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
         BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
@@ -81,12 +85,10 @@ public class GenerateBibtexKeyAction implements BaseAction {
             basePanel.getUndoManager().addEdit(compound);
         }
 
-        if (isCanceled) {
-            return;
-        }
         basePanel.markBaseChanged();
         basePanel.output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
     }
+
 
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
@@ -96,6 +98,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
     @Override
     public void action() {
         init();
+        checkOverwriteKeysChosen();
         BackgroundTask.wrap(this::generateKeys)
                       .executeWith(Globals.TASK_EXECUTOR);
     }
