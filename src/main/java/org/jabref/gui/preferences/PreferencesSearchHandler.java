@@ -9,17 +9,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Labeled;
 
-import org.jabref.gui.JabRefFrame;
-
 class PreferencesSearchHandler {
 
-    private final JabRefFrame frame;
     private final ObservableList<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
     private final List<String> labelNames;
 
-    PreferencesSearchHandler(JabRefFrame frame, ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
-        this.frame = frame;
+    PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
         this.preferenceTabs = preferenceTabs;
         this.searchText = searchText;
         this.labelNames = getLabelNames();

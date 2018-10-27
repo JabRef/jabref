@@ -154,7 +154,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         container.setLeft(vBox);
 
         setValues();
-        new PreferencesSearchHandler(frame, preferenceTabs, searchBox.textProperty());
+        new PreferencesSearchHandler(preferenceTabs, searchBox.textProperty());
     }
 
     private void resetPreferences() {
