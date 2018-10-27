@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run: scripts/download-install4j-and-jres.sh
       - save_cache:
-          key: install4j-{{ checksum "/home/circleci/download-install4j-and-jres.sh" }}
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
           paths:
             - "~/downloads"
             - "~/.install4j7"
@@ -26,7 +26,7 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - restore_cache:
-          key: install4j-{{ checksum "/home/circleci/download-install4j-and-jres.sh" }}
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - checkout
       - run: scripts/extract-install4j.sh
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
@@ -47,7 +47,7 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - restore_cache:
-          key: install4j-{{ checksum "/home/circleci/download-install4j-and-jres.sh" }}
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - checkout
       - run: scripts/extract-install4j.sh
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
