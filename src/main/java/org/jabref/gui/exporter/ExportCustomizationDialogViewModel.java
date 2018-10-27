@@ -19,7 +19,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //The class vars might need to be reordered
 
-    //exporters should probably be a JavaFX SortedList, but not yet sure how to make that into a property
+    //exporters should probably be a JavaFX SortedList instead of SimpleListPreperty,
+    //but not yet sure how to make SortedList into a property
     private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final int size; //final?  Or you don't need this and just use a a while loop
@@ -37,7 +38,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //Other variable declarations here
 
-    //Also write tests for all of this
+    //Also write tests for all of this if necessary
 
     public ExportCustomizationDialogViewModel(DialogService dialogService, JournalAbbreviationLoader loader) {
         this.dialogService = dialogService;
@@ -45,8 +46,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         init();
 
         //ExporterViewModel is organized as a singular version of what now is CustomExportDialog, which
-        //currently stores all the exporters in a class var.  Each ViewModel wraps an exporter, and
-        //the class var exporters is a list of them
+        //currently stores all the exporters in a class var.  Each ExporterViewModel wraps an exporter, and
+        //the class var exporters is a list of the ExporterViewModels
 
     }
 
