@@ -2031,6 +2031,7 @@ public class JabRefPreferences implements PreferencesService {
             exporterName = s.get(0);
             filename = s.get(1); // 0, 1, 2 were originally static vars
             extension = s.get(2);
+            //You might want to put the following few lines in logic because it also appears in CreateModifyExporterDialogViewModel
             if (filename.endsWith(".layout")) {
                 lfFileName = filename.substring(0, filename.length() - ".layout".length());
             } else {

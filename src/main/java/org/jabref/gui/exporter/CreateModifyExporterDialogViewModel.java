@@ -58,6 +58,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         String filename = layoutFile.get(); //change var name?
         String extensionString = extension.get(); //change var name?
         String lfFileName;
+        //You might want to move the next few lines into logic because it also appears in JabRefPreferences
         if (filename.endsWith(".layout")) {
             lfFileName = filename.substring(0, filename.length() - ".layout".length());
         } else {
