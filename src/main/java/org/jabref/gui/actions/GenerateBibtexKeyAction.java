@@ -14,6 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 public class GenerateBibtexKeyAction implements BaseAction {
+
     private final DialogService dialogService;
     private final BasePanel basePanel;
     private List<BibEntry> entries;
@@ -29,7 +30,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
 
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate BibTeX keys"),
-                    Localization.lang("First select the entries you want keys to be generated for."));
+                                                   Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
         basePanel.output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
@@ -38,12 +39,12 @@ public class GenerateBibtexKeyAction implements BaseAction {
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
         if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
-                    Localization.lang("Overwrite keys"),
-                    Localization.lang("One or more keys will be overwritten. Continue?"),
-                    Localization.lang("Overwrite keys"),
-                    Localization.lang("Cancel"),
-                    Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+                                                                         Localization.lang("Overwrite keys"),
+                                                                         Localization.lang("One or more keys will be overwritten. Continue?"),
+                                                                         Localization.lang("Overwrite keys"),
+                                                                         Localization.lang("Cancel"),
+                                                                         Localization.lang("Disable this confirmation dialog"),
+                                                                         optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
 
         } else {
             // Always overwrite keys by default
@@ -89,10 +90,9 @@ public class GenerateBibtexKeyAction implements BaseAction {
         basePanel.output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
     }
 
-
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
-                (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+                             (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
 
     @Override
