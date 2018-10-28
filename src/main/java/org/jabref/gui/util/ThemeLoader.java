@@ -3,7 +3,6 @@ package org.jabref.gui.util;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -11,7 +10,6 @@ import java.util.Objects;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-import org.jabref.JabRefException;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -36,57 +34,62 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeLoader {
 
-    private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Base.css").toExternalForm();
+    public static final String DEFAULT_MAIN_CSS = "Base.css";
+    private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource(DEFAULT_MAIN_CSS).toExternalForm();
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
-    private String cssProperty = System.getProperty("jabref.theme.css");
+    private String cssToLoad = System.getProperty("jabref.theme.css");
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) throws JabRefException {
+    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        if (StringUtil.isNullOrEmpty(cssProperty)) {
-            String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
-            if (cssFileName != null) {
-                try {
-                    cssProperty = Paths.get(JabRefFrame.class.getResource(cssFileName).toURI()).toString();
-                } catch (URISyntaxException e) {
-                    LOGGER.warn("can't get css file URI");
-                    throw new JabRefException("can't set custom theme");
-                }
+        if (!StringUtil.isNullOrEmpty(cssToLoad)) {
+            LOGGER.info("using css from system " + cssToLoad);
+            return;
+        }
+
+        // otherwise load css from preference
+        String cssFileName = jabRefPreferences.get(JabRefPreferences.FX_THEME);
+        if (cssFileName != null) {
+            try {
+                cssToLoad = JabRefFrame.class.getResource(cssFileName).toExternalForm();
+                LOGGER.info("using css " + cssToLoad);
+            } catch (Exception e) {
+                LOGGER.warn("can't get css file path of " + cssFileName);
             }
         }
     }
+
 
     /**
      * Installs the base css file as a stylesheet in the given scene.
      * Changes in the css file lead to a redraw of the scene using the new css file.
      */
     public void installBaseCss(Scene scene, JabRefPreferences preferences) {
-        addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
-
-        if (StringUtil.isNotBlank(cssProperty)) {
-            final Path path = Paths.get(cssProperty);
-            if (Files.isReadable(path)) {
-                String cssUrl = path.toUri().toString();
-                addAndWatchForChanges(scene, cssUrl, 1);
-            }
+        if (!StringUtil.isNullOrEmpty(cssToLoad)) {
+            addAndWatchForChanges(scene, cssToLoad, 0);
+        } else {
+            LOGGER.warn("using the last default css " + DEFAULT_PATH_MAIN_CSS);
+            addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
         }
 
         preferences.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
     }
 
     private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
+        // avoid repeat add
+        if (scene.getStylesheets().contains(cssUrl)) return;
+
         scene.getStylesheets().add(index, cssUrl);
 
         try {
             // If -Djabref.theme.css is defined and the resources are not part of a .jar bundle,
             // we watch the file for changes and turn on live reloading
-            if (!cssUrl.startsWith("jar:") && cssProperty != null) {
+            if (!cssUrl.startsWith("jar:")) {
                 Path cssFile = Paths.get(new URL(cssUrl).toURI());
                 LOGGER.info("Enabling live reloading of " + cssFile);
                 fileUpdateMonitor.addListenerForFile(cssFile, () -> {
                     LOGGER.info("Reload css file " + cssFile);
-
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                                 scene.getStylesheets().remove(cssUrl);
                                 scene.getStylesheets().add(index, cssUrl);

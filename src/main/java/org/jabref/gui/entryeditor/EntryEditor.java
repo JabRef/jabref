@@ -253,7 +253,7 @@ public class EntryEditor extends BorderPane {
         // Special tabs
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
-        tabs.add(new RelatedArticlesTab(preferences));
+        tabs.add(new RelatedArticlesTab(preferences, dialogService));
 
         // Source tab
         sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);

@@ -57,7 +57,7 @@
             </mods:place>
             <mods:dateCreated keyDate="yes">2000-11-10</mods:dateCreated>
             <mods:issuance>monographic</mods:issuance>
-            <mods:publisher>Verlag verlag</mods:publisher>
+            <mods:publisher ns3:type="mods:stringPlusLanguagePlusSupplied">Verlag verlag</mods:publisher>
         </mods:originInfo>
         <mods:relatedItem type="host">
             <mods:titleInfo>
