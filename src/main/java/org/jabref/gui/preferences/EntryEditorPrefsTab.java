@@ -12,7 +12,7 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.entryeditor.FileDragDropPreferences;
+import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -43,7 +43,6 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     private final JabRefPreferences prefs;
     private final AutoCompletePreferences autoCompletePreferences;
 
-    private final FileDragDropPreferences dragDropPreferences;
     private final RadioButton copyFile;
     private final RadioButton linkFile;
     private final RadioButton renameCopyFile;
@@ -51,7 +50,6 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
-        dragDropPreferences = prefs.getEntryEditorFileLinkPreference();
 
         autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
         defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
@@ -134,7 +132,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         final ToggleGroup group = new ToggleGroup();
         Label linkFileOptions = new Label(Localization.lang("Options to add file"));
         linkFileOptions.getStyleClass().add("sectionHeader");
-        copyFile = new RadioButton(Localization.lang("Copy file to current location"));
+        copyFile = new RadioButton(Localization.lang("Copy file to default file folder"));
         linkFile = new RadioButton(Localization.lang("Link file (without copying)"));
         renameCopyFile = new RadioButton(Localization.lang("Copy, rename and link file"));
         builder.add(linkFileOptions, 1, 23);
@@ -193,9 +191,10 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
             break;
         }
 
-        if (dragDropPreferences.isCopyFile()) {
+        FileDragDropPreferenceType dragDropPreferenceType = prefs.getEntryEditorFileLinkPreference();
+        if (dragDropPreferenceType == FileDragDropPreferenceType.COPY) {
             copyFile.setSelected(true);
-        } else if (dragDropPreferences.isLinkFile()) {
+        } else if (dragDropPreferenceType == FileDragDropPreferenceType.LINK) {
             linkFile.setSelected(true);
         } else {
             renameCopyFile.setSelected(true);
@@ -261,20 +260,13 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         }
 
         if (copyFile.isSelected()) {
-            dragDropPreferences.setCopyFile(true);
-            dragDropPreferences.setLinkFile(false);
-            dragDropPreferences.setRenameCopyFile(false);
+            prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.COPY);
         } else if (linkFile.isSelected()) {
-            dragDropPreferences.setCopyFile(false);
-            dragDropPreferences.setLinkFile(true);
-            dragDropPreferences.setRenameCopyFile(false);
+            prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.LINK);
         } else {
-            dragDropPreferences.setCopyFile(false);
-            dragDropPreferences.setLinkFile(false);
-            dragDropPreferences.setRenameCopyFile(true);
+            prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.RENAME_COPY);
         }
 
-        prefs.storeEntryEditorFileLinkPreference(dragDropPreferences);
         prefs.storeAutoCompletePreferences(autoCompletePreferences);
     }
 

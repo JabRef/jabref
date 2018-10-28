@@ -144,18 +144,17 @@ public class EntryEditor extends BorderPane {
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
-                FileDragDropPreferences dragDropPreferences = Globals.prefs.getEntryEditorFileLinkPreference();
+                FileDragDropPreferenceType dragDropPreferencesType = Globals.prefs.getEntryEditorFileLinkPreference();
 
-                if (dragDropPreferences.isRenameCopyFile()) {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.RENAME_COPY) {
                     LOGGER.debug("Mode MOVE"); //shift on win or no modifier
                     fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
                 }
-                if (dragDropPreferences.isLinkFile()) {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
                     LOGGER.debug("Mode LINK"); //alt on win
                     fileHandler.addToEntry(entry, files);
-
                 }
-                if (dragDropPreferences.isCopyFile()) {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
                     LOGGER.debug("Mode COPY"); //ctrl on win, no modifier on Xubuntu
                     fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
                 }

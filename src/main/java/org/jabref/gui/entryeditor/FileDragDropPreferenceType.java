@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-public enum FileDragDropType {
+public enum FileDragDropPreferenceType {
     COPY,
     LINK,
     RENAME_COPY;
