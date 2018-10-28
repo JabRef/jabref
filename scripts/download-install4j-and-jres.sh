@@ -5,7 +5,7 @@ if [ ! -d ~/downloads ]; then
   mkdir ~/downloads
 fi
 cd ~/downloads
-wget --quiet -nc http://download-keycdn.ej-technologies.com/install4j/install4j_unix_7_0_4.tar.gz
+wget --quiet -nc --show-progress http://download-keycdn.ej-technologies.com/install4j/install4j_unix_7_0_8.tar.gz
 
 # fetch JREs
 if [ ! -d ~/.install4j7/jres ]; then
