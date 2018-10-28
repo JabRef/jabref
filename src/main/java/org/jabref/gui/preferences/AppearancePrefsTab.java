@@ -62,7 +62,6 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         }
 
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
-
     }
 
     public Node getBuilder() {

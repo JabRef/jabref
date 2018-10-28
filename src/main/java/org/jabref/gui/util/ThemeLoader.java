@@ -62,8 +62,8 @@ public class ThemeLoader {
 
 
     /**
-     * Installs the base css file as a stylesheet in the given scene.
-     * Changes in the css file lead to a redraw of the scene using the new css file.
+     * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
+     * scene using the new css file.
      */
     public void installBaseCss(Scene scene, JabRefPreferences preferences) {
         if (!StringUtil.isNullOrEmpty(cssToLoad)) {
@@ -78,7 +78,9 @@ public class ThemeLoader {
 
     private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
         // avoid repeat add
-        if (scene.getStylesheets().contains(cssUrl)) return;
+        if (scene.getStylesheets().contains(cssUrl)) {
+            return;
+        }
 
         scene.getStylesheets().add(index, cssUrl);
 
