@@ -130,7 +130,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         firstNameModeBoth.setToggleGroup(treatmentOfFirstNamesToggleGroup);
 
         final ToggleGroup group = new ToggleGroup();
-        Label linkFileOptions = new Label(Localization.lang("Options to add file"));
+        Label linkFileOptions = new Label(Localization.lang("Default drag & drop action"));
         linkFileOptions.getStyleClass().add("sectionHeader");
         copyFile = new RadioButton(Localization.lang("Copy file to default file folder"));
         linkFile = new RadioButton(Localization.lang("Link file (without copying)"));
