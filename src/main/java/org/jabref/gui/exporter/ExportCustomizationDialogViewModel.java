@@ -22,6 +22,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     //exporters should probably be a JavaFX SortedList instead of SimpleListPreperty,
     //but not yet sure how to make SortedList into a property
     private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     //Indices within which export format information is stored within JabRefPreferences
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -64,17 +65,17 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     }
 
-    public void modifyExporter(int row) {
+    public void modifyExporter() {
         // open modify Exporter dialog, which may be the same as add Exporter dialog, and set that into exporters.
-        exporters.set(row, new ExporterViewModel(dialogResult)); //result must come from dialog
+        exporters.add(new ExporterViewModel(dialogResult)); //result must come from dialog, and this will append the exporter unless you make a sorted list property
     }
 
-    public void removeExporters(int[] rows) {
-        if (rows.length == 0) { // Is this check necessary?  Probably not
+    public void removeExporters() {
+        if (selectedExporters.getSize() == 0) { // Is this check necessary?
             return;
         }
-        for (int i = 0; i < rows.length; i++) {
-            exporters.remove(rows[i]);
+        for (ExporterViewModel exporter : selectedExporters) {
+            exporters.remove(exporter);
         }
     }
 
