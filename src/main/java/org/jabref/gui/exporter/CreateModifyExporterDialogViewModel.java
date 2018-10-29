@@ -18,41 +18,60 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences; //will be removed with writing of new method
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     //This could be separated into two dialogs, one for adding exporters and one for modifying them.
-    //See the two constructors for the view
+    //See the two constructors for the view, as was done in CustomExportDialog
 
     //The view will return a TemplateExporter
     //You will have to look at Swing class CustomExportDialog when you write the View
 
     //Cancel to be implemented in View, not here
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
+
     private final TemplateExporter exporter;
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
-    private final SimpleStringProperty name; //prevent saveExporter from saving this if it's null
+    private final SimpleStringProperty name;
     private final SimpleStringProperty layoutFile;
     private final SimpleStringProperty extension;
 
 
-    public CreateModifyExporterDialogViewModel(TemplateExporter exporter, DialogService dialogService, PreferencesService preferences) {
+    public CreateModifyExporterDialogViewModel(TemplateExporter exporter, DialogService dialogService, PreferencesService preferences,
+                                               String name, String layoutFile, String extension) {
         this.exporter = exporter;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        //Set text of each of the boxes
 
+        //Set text of each of the boxes
+        this.name = name;
+        this.layoutFile = layoutFile;
+        this.extension = extension;
     }
 
     public TemplateExporter saveExporter() {//void?
         Path layoutFileDir = Paths.get(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
-            preferences.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, layoutFileDir.toString()); //fix to work with PreferencesService
+            String layoutFileDirString = layoutFileDir.toString();
+            preferences.setExportWorkingDirectory(layoutFileDirString);
 
         }
-        preferences.saveExportWorkingDirectory(layoutFileDir.toString()); //See Swing class CustomExportDialog for more on how implement this
-        // Create a new exporter to be returned to ExportCustomizationDialog, which requested it
+
+        // Check that there are no empty strings.
+        if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
+            || !layoutFile.get().endsWith(".layout")) {
+
+            LOGGER.info("One of the fields is empty!"); //TODO: Better error message
+            return null; //return implemented similarly to CleanupDialog, although JavaFX documentation says you need something
+            //like a result converter, which must be in the view, see class EntryTypeView
+        }
+
+        // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences();
         SavePreferences savePreferences = preferences.LoadForExportFromPreferences();
         String filename = layoutFile.get(); //change var name?

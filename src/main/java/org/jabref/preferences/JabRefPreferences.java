@@ -2078,4 +2078,10 @@ public class JabRefPreferences implements PreferencesService {
             i++;
         }
     }
+
+    @Override
+    public void setExportWorkingDirectory(String layoutFileDirString) {
+        put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
+    }
+
 }

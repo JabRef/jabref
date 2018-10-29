@@ -23,8 +23,6 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     //but not yet sure how to make SortedList into a property
     private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final int size; //final?  Or you don't need this and just use a a while loop
-
     //Indices within which export format information is stored within JabRefPreferences
     private static final int EXPORTER_NAME_INDEX = 0;
     private static final int EXPORTER_FILENAME_INDEX = 1;
@@ -58,7 +56,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         }
     }
 
-    //The following method will have to be implemented to get information from the JavaFX analogue of Swing CustomExportDialog
+    //The following dialog will have to be implemented as the JavaFX MVVM analogue of Swing CustomExportDialog
     public void addExporter() {
         // open add Exporter dialog, set vars as dialogResult or analogous
         TemplateExporter exporter = new CreateModifyExporterDialogView().show(); //Not sure if this is right
