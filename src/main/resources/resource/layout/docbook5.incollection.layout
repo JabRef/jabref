@@ -1,0 +1,50 @@
+<biblioentry xreflabel="\format[Authors(3,Noinitials,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+   <authorgroup>
+<!--AUTHORS-->
+\begin{author}       \format[CreateDocBook5Authors]{\author} \end{author}
+<!--EDITORS-->
+\begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
+   </authorgroup>
+   <!--TITLE-->
+    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    
+<!--INCOLLECTION booktitle, edition, series, (pages), publisher-->
+    \begin{incollection}    
+        <biblioset relation="incollection">\n
+        \begin{booktitle} 
+            <booktitle >\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle> 
+        \end{booktitle}
+        \begin{edition}   
+            <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> 
+        \end{edition}
+        \begin{year}   <pubdate>\year</pubdate>  \end{year}
+        \begin{series}
+            <series>\format[XMLChars,RemoveLatexCommands]{\series}</series>
+        \end{series}
+        \end{booktitle}
+        \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
+        \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+        \begin{publisher}   
+            <publisher>
+                    <publishername>\format[XMLChars]{\publisher}</publishername>
+                    \begin{address}{\address}\end{address}
+            </publisher>
+        \end{publisher}
+    \end{incollection}
+    
+<!-- IDENTIFIERS--> 
+    \begin{url}  
+        <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+    \end{url}
+    \begin{doi}  
+        <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
+    \end{doi}
+    \begin{isbn}
+        <biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>
+    \end{isbn}
+<!--ABSTRACT-->
+    \begin{abstract}   
+        <abstract>
+            <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
+        </abstract>
+    \end{abstract}

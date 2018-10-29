@@ -1,4 +1,3 @@
-<!--Default fallback for unkown entry types -->
 <biblioentry xreflabel="\format[Authors(3,Noinitials,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
    <authorgroup>
 <!--AUTHORS-->
@@ -8,8 +7,19 @@
    </authorgroup>
    <!--TITLE-->
     \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    
+<!--MASTERTHESIS -->
+    \begin{masterthesis}
+        <biblioset relation="masterthesis">\n
+        \begin{school}   
+            <publisher>
+                <publishername>\format[XMLChars]{\school}</publishername>
+            </publisher>
+            \begin{year}   <pubdate>\year</pubdate>  \end{year}
+        \end{school}
+    \end{masterthesis}
 
-    <!-- IDENTIFIERS-->
+    <!-- IDENTIFIERS--> 
     \begin{url}
         <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}

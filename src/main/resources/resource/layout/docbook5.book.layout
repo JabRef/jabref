@@ -1,4 +1,3 @@
-<!--Default fallback for unkown entry types -->
 <biblioentry xreflabel="\format[Authors(3,Noinitials,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
    <authorgroup>
 <!--AUTHORS-->
@@ -8,19 +7,39 @@
    </authorgroup>
    <!--TITLE-->
     \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
-
-    <!-- IDENTIFIERS-->
+    
+<!--BOOK booktitle, edition, (pages), publisher-->
+    \begin{book}
+        <biblioset relation="book">\n
+        \begin{booktitle} 
+            <booktitle >\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle>
+        \end{booktitle}
+        \begin{edition}   
+            <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> 
+        \end{edition}
+        \begin{year}   <pubdate>\year</pubdate>  \end{year}
+        \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+        \begin{publisher}
+            <publisher>
+                <publishername></publishername>
+                <address></address>
+            </publisher>
+        \end{publisher}
+    \end{book}
+    
+    
+<!-- IDENTIFIERS-->
     \begin{url}
         <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
-    \begin{doi}  
+    \begin{doi}
         <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
     \end{doi}
     \begin{isbn}
         <biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>
     \end{isbn}
 <!--ABSTRACT-->
-    \begin{abstract}   
+    \begin{abstract}
         <abstract>
             <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
         </abstract>
