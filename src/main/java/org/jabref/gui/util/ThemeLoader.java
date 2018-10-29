@@ -75,8 +75,8 @@ public class ThemeLoader {
 
 
     /**
-     * Installs the base and all theme stylesheets in the given scene.
-     * Changes in the css file lead to a redraw of the scene using the new css file.
+     * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
+     * scene using the new css file.
      */
     public void installCss(Scene scene, JabRefPreferences preferences) {
         addAndWatchForChanges(scene, JabRefFrame.class.getResource(MAIN_CSS), 0);

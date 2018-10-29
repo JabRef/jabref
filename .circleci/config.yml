@@ -5,13 +5,13 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
+      - checkout
       - restore_cache:
           keys:
-            - install4j
-      - checkout
+            - install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/download-install4j-and-jres.sh
       - save_cache:
-          key: install4j
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
           paths:
             - "~/downloads"
             - "~/.install4j7"
@@ -25,9 +25,9 @@ jobs:
     steps:
       - restore_cache:
           key: dependency-cache
-      - restore_cache:
-          key: install4j
       - checkout
+      - restore_cache:
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
@@ -46,9 +46,9 @@ jobs:
     steps:
       - restore_cache:
           key: dependency-cache
-      - restore_cache:
-          key: install4j
       - checkout
+      - restore_cache:
+          key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
       - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
