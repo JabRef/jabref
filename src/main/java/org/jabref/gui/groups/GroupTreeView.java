@@ -312,6 +312,7 @@ public class GroupTreeView {
         editGroup.setOnAction(event -> {
             menu.hide();
             viewModel.editGroup(group);
+            groupTree.refresh();
         });
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
