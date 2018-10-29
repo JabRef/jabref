@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 /**
  * Search class for files. <br>
@@ -30,10 +30,10 @@ public class DatabaseFileLookup {
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences))
-                .orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectoriesAsPaths(filePreferences))
+                                    .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));

@@ -16,16 +16,18 @@ public class EntryEditorPreferences {
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final List<String> customTabFieldNames;
     private final boolean shouldShowRecommendationsTab;
+    private final boolean isMrdlibAccepted;
     private boolean showSourceTabByDefault;
     private final KeyBindingRepository keyBindings;
     private boolean avoidOverwritingCiteKey;
 
-    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.customTabFieldNames = customTabFieldNames;
         this.shouldShowRecommendationsTab = shouldShowRecommendationsTab;
+        this.isMrdlibAccepted = isMrdlibAccepted;
         this.showSourceTabByDefault = showSourceTabByDefault;
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
@@ -50,6 +52,10 @@ public class EntryEditorPreferences {
 
     public boolean shouldShowRecommendationsTab() {
         return shouldShowRecommendationsTab;
+    }
+
+    public boolean isMrdlibAccepted() {
+        return isMrdlibAccepted;
     }
 
     public boolean showSourceTabByDefault() {

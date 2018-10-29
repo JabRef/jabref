@@ -49,7 +49,14 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     }
 
     public ViewModelListCellFactory<T> withIcon(Callback<T, GlyphIcons> toIcon) {
-        this.toGraphic = viewModel -> MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
+        this.toGraphic = viewModel -> {
+            GlyphIcons icon = toIcon.call(viewModel);
+            if (icon != null) {
+                return MaterialDesignIconFactory.get().createIcon(icon);
+            } else {
+                return null;
+            }
+        };
         return this;
     }
 

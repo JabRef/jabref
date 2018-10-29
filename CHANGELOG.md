@@ -11,6 +11,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We updated the dialog for setting up general fields.
+- URL field formatting is updated. All whitespace chars, located at the beginning/ending of the url, are trimmed automatically
 - We changed the behavior of the field formatting dialog such that the `bibtexkey` is not changed when formatting all fields or all text fields.
 - We added a "Move file to file directory and rename file" option for simultaneously moving and renaming of document file. [#4166](https://github.com/JabRef/jabref/issues/4166)
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
@@ -31,7 +33,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
 - We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
 - We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
-
+- We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl<kbd> + <kbd>E<kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
+- We added an option in the preference dialog box, that allows user to pick the dark or light theme option. [#4130] (https://github.com/JabRef/jabref/issues/4130)
+- We updated updated the Related Articles tab to accept JSON from the new version of the Mr. DLib service
 
 
 
@@ -39,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 ### Fixed
+- We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 - Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
 - The entry editor no longer gets corrupted after using the source tab. https://github.com/JabRef/jabref/issues/3532 https://github.com/JabRef/jabref/issues/3608 https://github.com/JabRef/jabref/issues/3616
@@ -56,6 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the order of fields in customized entry types was not saved correctly. [#4033](http://github.com/JabRef/jabref/issues/4033)
 - We fixed an issue where the groups tree of the last database was still shown even after the database was already closed.
 - We fixed an issue where the "Open file dialog" may disappear behind other windows. https://github.com/JabRef/jabref/issues/3410
+- We fixed an issue where the number of entries matched was not updated correctly upon adding or removing an entry. [#3537](https://github.com/JabRef/jabref/issues/3537)
 - We fixed an issue where the default icon of a group was not colored correctly.
 - We fixed an issue where the first field in entry editor was not focused when adding a new entry. [#4024](https://github.com/JabRef/jabref/issues/4024)
 - We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files https://github.com/JabRef/jabref/issues/2970
@@ -68,6 +74,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201) and [#4241](https://github.com/JabRef/jabref/issues/4241)
 - We fixed an issue where author list parser can't generate bibtex for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
 - We fixed an issue where the list of XMP Exclusion fields in the preferences was not be saved [#4072](https://github.com/JabRef/jabref/issues/4072)
+- We fixed an issue where the ArXiv Fetcher did not support HTTP URLs [#4367](https://github.com/JabRef/jabref/pull/4367)
 
 
 

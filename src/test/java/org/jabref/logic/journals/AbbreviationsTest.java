@@ -24,7 +24,7 @@ public class AbbreviationsTest {
 
         assertEquals("#IEEE_J_PROC#",
                 abbreviations.getRepository(prefs)
-                        .getNextAbbreviation("Proceedings of the IEEE").get());
+                             .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
@@ -33,27 +33,27 @@ public class AbbreviationsTest {
 
         assertEquals("Proceedings of the IEEE",
                 abbreviations.getRepository(prefs)
-                        .getNextAbbreviation("#IEEE_J_PROC#").get());
+                             .getNextAbbreviation("#IEEE_J_PROC#").get());
     }
 
     @Test
     public void getNextAbbreviationAbbreviatesJournalTitle() {
         assertEquals("Proc. IEEE",
                 abbreviations.getRepository(prefs)
-                        .getNextAbbreviation("Proceedings of the IEEE").get());
+                             .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationRemovesPoint() {
         assertEquals("Proc IEEE",
                 abbreviations.getRepository(prefs)
-                        .getNextAbbreviation("Proc. IEEE").get());
+                             .getNextAbbreviation("Proc. IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationExpandsAbbreviation() {
         assertEquals("Proceedings of the IEEE",
                 abbreviations.getRepository(prefs)
-                        .getNextAbbreviation("Proc IEEE").get());
+                             .getNextAbbreviation("Proc IEEE").get());
     }
 }

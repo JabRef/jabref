@@ -48,7 +48,6 @@ public class DoiFetcherTest {
         bibEntryDecker2007.setField("doi", "10.1109/icws.2007.59");
     }
 
-
     @Test
     public void testGetName() {
         assertEquals("DOI", fetcher.getName());
@@ -79,7 +78,6 @@ public class DoiFetcherTest {
     @Test
     public void testPerformSearchInvalidDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
-
     }
 
     @Test

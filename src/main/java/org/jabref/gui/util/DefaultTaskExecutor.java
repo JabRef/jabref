@@ -103,6 +103,12 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
             {
                 EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+                EasyBind.subscribe(task.messageProperty(), this::updateMessage);
+                EasyBind.subscribe(task.isCanceledProperty(), cancelled -> {
+                    if (cancelled) {
+                        cancel();
+                    }
+                });
             }
 
             @Override

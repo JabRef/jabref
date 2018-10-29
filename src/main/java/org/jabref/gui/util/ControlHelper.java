@@ -28,7 +28,6 @@ public class ControlHelper {
         SwingNode node = new SwingNode();
         node.setContent(content);
         node.setVisible(true);
-
         dialogPane.setContent(node);
     }
 

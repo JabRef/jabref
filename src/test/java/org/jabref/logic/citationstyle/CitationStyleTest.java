@@ -27,5 +27,4 @@ public class CitationStyleTest {
 
         assertEquals(expected, citation);
     }
-
 }

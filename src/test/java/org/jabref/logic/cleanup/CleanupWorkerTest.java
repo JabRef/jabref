@@ -2,13 +2,13 @@ package org.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.nio.file.Path;
-import java.nio.file.Files;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -29,13 +29,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
-import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -62,17 +63,12 @@ class CleanupWorkerTest {
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabaseFile(bibFolder.resolve("test.bib").toFile());
 
-        FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
+        FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
         //Biblocation as Primary overwrites all other dirs
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
 
         worker = new CleanupWorker(context,
-                //empty fileDirPattern for backwards compatibility
-                new CleanupPreferences("[bibtexkey]",
-                        "",
-                        mock(LayoutFormatterPreferences.class),
-                        fileDirPrefs));
-
+                new CleanupPreferences(mock(LayoutFormatterPreferences.class), fileDirPrefs));
     }
 
     @Test
@@ -354,5 +350,4 @@ class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         assertEquals(Optional.of("01"), entry.getField("month"));
     }
-
 }

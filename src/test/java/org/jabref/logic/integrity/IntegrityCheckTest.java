@@ -19,7 +19,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
@@ -135,13 +135,13 @@ public class IntegrityCheckTest {
     @Test
     public void testBibtexkeyChecks() {
         final BibDatabaseContext correctContext = createContext("bibtexkey", "Knuth2014");
-        correctContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        correctContext.getDatabase().getEntries().get(0).setField("year","2014");
+        correctContext.getDatabase().getEntries().get(0).setField("author", "Knuth");
+        correctContext.getDatabase().getEntries().get(0).setField("year", "2014");
         assertCorrect(correctContext);
 
         final BibDatabaseContext wrongContext = createContext("bibtexkey", "Knuth2014a");
-        wrongContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        wrongContext.getDatabase().getEntries().get(0).setField("year","2014");
+        wrongContext.getDatabase().getEntries().get(0).setField("author", "Knuth");
+        wrongContext.getDatabase().getEntries().get(0).setField("year", "2014");
         assertWrong(wrongContext);
     }
 
@@ -340,7 +340,7 @@ public class IntegrityCheckTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
 
         new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
@@ -378,7 +378,7 @@ public class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
@@ -387,7 +387,7 @@ public class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true
         ).checkBibtexDatabase();
@@ -410,5 +410,4 @@ public class IntegrityCheckTest {
         context.setMode(mode);
         return context;
     }
-
 }

@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,7 @@ public class ISSNCleanupTest {
     @BeforeEach
     public void setUp() {
         worker = new CleanupWorker(mock(BibDatabaseContext.class),
-                new CleanupPreferences("", "", mock(LayoutFormatterPreferences.class),
-                        mock(FileDirectoryPreferences.class)));
+                new CleanupPreferences(mock(LayoutFormatterPreferences.class), mock(FilePreferences.class)));
     }
 
     @Test
@@ -53,5 +52,4 @@ public class ISSNCleanupTest {
         worker.cleanup(preset, entry);
         assertEquals(Optional.of("Banana"), entry.getField("issn"));
     }
-
 }

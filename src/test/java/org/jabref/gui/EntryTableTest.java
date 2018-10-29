@@ -11,13 +11,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Specific Use-Case:
- * I import a database. Then I doubleclick on the first entry in the table to open the entry editor.
- * Then I click on the first entry again, and scroll through all of the lists entries, without having to click
- * on the table again.
+ * Specific Use-Case: I import a database. Then I doubleclick on the first entry in the table to open the entry editor.
+ * Then I click on the first entry again, and scroll through all of the lists entries, without having to click on the
+ * table again.
  */
 @Tag("GUITest")
-public class EntryTableTest extends AbstractUITest{
+public class EntryTableTest extends AbstractUITest {
 
     private final static int SCROLL_ACTION_EXECUTION = 5;
     private final static String TEST_FILE_NAME = "testbib/testjabref.bib";
@@ -26,7 +25,7 @@ public class EntryTableTest extends AbstractUITest{
     private final static int TITLE_COLUMN_INDEX = 5;
 
     @Test
-    public void scrollThroughEntryList() {
+    public void scrollThroughEntryList() throws Exception {
         String path = getAbsolutePath(TEST_FILE_NAME);
 
         importBibIntoNewDatabase(path);
@@ -48,20 +47,19 @@ public class EntryTableTest extends AbstractUITest{
         assertColumnValue(entryTable, 0, TITLE_COLUMN_INDEX, entryTable.selectionValue());
 
         //go throught the table and check if the entry with the correct index is selected
-        for (int i=0; i < SCROLL_ACTION_EXECUTION; i++) {
+        for (int i = 0; i < SCROLL_ACTION_EXECUTION; i++) {
             robot().pressAndReleaseKey(DOWN);
             assertNotNull(entryTable.selectionValue());
-            assertColumnValue(entryTable, i+1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
+            assertColumnValue(entryTable, i + 1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
         //do the same going up again
         for (int i = SCROLL_ACTION_EXECUTION; i > 0; i--) {
             robot().pressAndReleaseKey(UP);
             assertNotNull(entryTable.selectionValue());
-            assertColumnValue(entryTable, i-1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
+            assertColumnValue(entryTable, i - 1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
 
         closeDatabase();
         exitJabRef();
     }
-
 }

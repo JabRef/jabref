@@ -72,5 +72,4 @@ public class RemoveBracesFormatterTest {
     public void formatExample() {
         assertEquals("In CDMA", formatter.format(formatter.getExampleInput()));
     }
-
 }

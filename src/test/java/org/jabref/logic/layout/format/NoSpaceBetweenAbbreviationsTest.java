@@ -2,8 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NoSpaceBetweenAbbreviationsTest {
 
@@ -16,5 +17,4 @@ public class NoSpaceBetweenAbbreviationsTest {
         assertEquals("J.R.R. Tolkien", f.format("J. R. R. Tolkien"));
         assertEquals("J.R.R. Tolkien and J.F. Kennedy", f.format("J. R. R. Tolkien and J. F. Kennedy"));
     }
-
 }

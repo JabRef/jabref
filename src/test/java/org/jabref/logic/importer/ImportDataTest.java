@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
@@ -10,40 +11,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ImportDataTest {
 
-    public static final File FILE_IN_DATABASE = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
-    public static final File FILE_NOT_IN_DATABASE = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf")
-            .toFile();
-    public static final File EXISTING_FOLDER = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder").toFile();
-    public static final File NOT_EXISTING_FOLDER = Paths.get("notexistingfolder").toFile();
-    public static final File NOT_EXISTING_PDF = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf").toFile();
-    public static final File UNLINKED_FILES_TEST_BIB = Paths
-            .get("src/test/resources/org/jabref/util/unlinkedFilesTestBib.bib").toFile();
-
+    public static final Path FILE_IN_DATABASE = Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf");
+    public static final Path FILE_NOT_IN_DATABASE = Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
+    public static final Path EXISTING_FOLDER = Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder");
+    public static final Path NOT_EXISTING_FOLDER = Paths.get("notexistingfolder");
+    public static final Path NOT_EXISTING_PDF = Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf");
+    public static final Path UNLINKED_FILES_TEST_BIB = Paths.get("src/test/resources/org/jabref/util/unlinkedFilesTestBib.bib");
 
     /**
      * Tests the testing environment.
      */
     @Test
-    public void testTestingEnvironment() {
+    void testTestingEnvironment() {
 
-        assertTrue(ImportDataTest.EXISTING_FOLDER.exists());
-        assertTrue(ImportDataTest.EXISTING_FOLDER.isDirectory());
+        assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER));
+        assertTrue(Files.isDirectory(ImportDataTest.EXISTING_FOLDER));
 
-        assertTrue(ImportDataTest.FILE_IN_DATABASE.exists());
-        assertTrue(ImportDataTest.FILE_IN_DATABASE.isFile());
+        assertTrue(Files.exists(ImportDataTest.FILE_IN_DATABASE));
+        assertTrue(Files.isRegularFile(ImportDataTest.FILE_IN_DATABASE));
 
-        assertTrue(ImportDataTest.FILE_NOT_IN_DATABASE.exists());
-        assertTrue(ImportDataTest.FILE_NOT_IN_DATABASE.isFile());
+        assertTrue(Files.exists(ImportDataTest.FILE_NOT_IN_DATABASE));
+        assertTrue(Files.isRegularFile(ImportDataTest.FILE_NOT_IN_DATABASE));
+
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_FOLDER));
+        assertFalse(Files.exists(ImportDataTest.NOT_EXISTING_PDF));
     }
-
-    @Test
-    public void testOpenNotExistingDirectory() {
-        assertFalse(ImportDataTest.NOT_EXISTING_FOLDER.exists());
-        assertFalse(ImportDataTest.NOT_EXISTING_PDF.exists());
-    }
-
 }

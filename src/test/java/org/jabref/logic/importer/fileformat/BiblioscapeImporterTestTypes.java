@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class BiblioscapeImporterTestTypes {
 
     private static Stream<String[]> types() {
-        return Arrays.stream(new String[][] {
+        return Arrays.stream(new String[][]{
                 {"journal", "article"},
                 {"book section", "inbook"},
                 {"book", "book"},
@@ -36,7 +36,7 @@ public class BiblioscapeImporterTestTypes {
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
         List<BibEntry> bibEntries = new BiblioscapeImporter().importDatabase(new BufferedReader(new StringReader(bsInput)))
-                .getDatabase().getEntries();
+                                                             .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
         entry.setField("author", "Baklouti, F.");

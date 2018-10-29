@@ -87,7 +87,7 @@ public class EditorMenus {
     }
 
     /**
-     * The default context menu with a specific menu item to cleanup  URL.
+     * The default context menu with a specific menu item to cleanup URL.
      *
      * @param textArea text-area that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL

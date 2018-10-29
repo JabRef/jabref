@@ -38,7 +38,7 @@ public class AttachFileAction extends SimpleCommand {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
 
-            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
