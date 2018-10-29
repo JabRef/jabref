@@ -174,7 +174,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     keepPreviousAssignments,
                     removePreviousAssignents,
                     stateManager.getEntriesInCurrentDatabase());
-
+            oldGroup.setDisplayName(group.getName());
             // TODO: Add undo
             // Store undo information.
             // AbstractUndoableEdit undoAddPreviousEntries = null;

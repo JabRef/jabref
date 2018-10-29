@@ -42,7 +42,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private final String displayName;
+    private String displayName;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -135,6 +135,10 @@ public class GroupNodeViewModel {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public boolean isRoot() {
