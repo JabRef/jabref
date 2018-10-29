@@ -4,6 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -54,26 +55,33 @@ class TablePrefsTab extends Pane implements PrefsTab {
         Label formatOfAuthor = new Label(Localization.lang("Format of author and editor names"));
         formatOfAuthor.getStyleClass().add("sectionHeader");
         builder.add(formatOfAuthor, 1, 1);
+        final ToggleGroup formatNamesToggleGroup = new ToggleGroup();
+        final ToggleGroup nameAbbrevToggleGroup = new ToggleGroup();
         builder.add(namesAsIs, 1, 2);
+        namesAsIs.setToggleGroup(formatNamesToggleGroup);
         builder.add(noAbbrNames, 2, 2);
+        noAbbrNames.setToggleGroup(nameAbbrevToggleGroup);
         builder.add(namesFf, 1, 3);
+        namesFf.setToggleGroup(formatNamesToggleGroup);
         builder.add(abbrNames, 2, 3);
+        abbrNames.setToggleGroup(nameAbbrevToggleGroup);
         builder.add(namesFl, 1, 4);
+        namesFl.setToggleGroup(formatNamesToggleGroup);
         builder.add(lastNamesOnly, 2, 4);
+        lastNamesOnly.setToggleGroup(nameAbbrevToggleGroup);
         builder.add(namesNatbib, 1, 5);
-
+        namesNatbib.setToggleGroup(formatNamesToggleGroup);
         Label label1 = new Label("");
         builder.add(label1, 1, 6);
-
         Label general = new Label(Localization.lang("General"));
         general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 7);
         builder.add(autoResizeMode, 1, 8);
-        namesNatbib.setOnAction(e -> {
-            abbrNames.setDisable(namesNatbib.isSelected());
-            lastNamesOnly.setDisable(namesNatbib.isSelected());
-            noAbbrNames.setDisable(namesNatbib.isSelected());
-        });
+
+        abbrNames.disableProperty().bind(namesNatbib.selectedProperty());
+        lastNamesOnly.disableProperty().bind(namesNatbib.selectedProperty());
+        noAbbrNames.disableProperty().bind(namesNatbib.selectedProperty());
+
     }
 
     @Override
@@ -101,10 +109,6 @@ class TablePrefsTab extends Pane implements PrefsTab {
         } else {
             noAbbrNames.setSelected(true);
         }
-
-        abbrNames.setDisable(namesNatbib.isSelected());
-        lastNamesOnly.setDisable(namesNatbib.isSelected());
-        noAbbrNames.setDisable(namesNatbib.isSelected());
 
     }
 
