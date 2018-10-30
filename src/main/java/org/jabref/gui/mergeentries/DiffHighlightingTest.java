@@ -1,4 +1,4 @@
-package org.jabref.logic.util.strings;
+package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(ApplicationExtension.class)
 class DiffHighlightingTest {
@@ -29,12 +27,12 @@ class DiffHighlightingTest {
 
     @Test
     void testGenerateDiffHighlightingBothNullThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
+        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting(null, null, ""));
     }
 
     @Test
     void testNullSeparatorThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
+        Assertions.assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.jabref.logic.util.strings;
+package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
 import java.util.Collections;

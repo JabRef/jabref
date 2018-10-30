@@ -33,7 +33,6 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.DiffHighlighting;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -57,6 +56,12 @@ public class MergeEntries extends BorderPane {
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
+    private final Map<String, TextFlow> leftTextPanes = new HashMap<>();
+    private final Set<String> allFields = new TreeSet<>();
+    private final Map<String, TextFlow> rightTextPanes = new HashMap<>();
+    private final Map<String, List<RadioButton>> radioButtons = new HashMap<>();
+    private Boolean identicalTypes;
+    private List<RadioButton> typeRadioButtons;
 
     /**
      * Constructor with optional column captions for the two entries
@@ -75,12 +80,6 @@ public class MergeEntries extends BorderPane {
         setLeftHeaderText(headingLeft);
         setRightHeaderText(headingRight);
     }
-    private Boolean identicalTypes;
-    private final Map<String, TextFlow> leftTextPanes = new HashMap<>();
-    private final Set<String> allFields = new TreeSet<>();
-    private final Map<String, TextFlow> rightTextPanes = new HashMap<>();
-    private final Map<String, List<RadioButton>> radioButtons = new HashMap<>();
-    private List<RadioButton> typeRadioButtons;
 
 
     /**
@@ -98,15 +97,15 @@ public class MergeEntries extends BorderPane {
 
     private static String getDisplayText(DiffMode mode) {
         switch (mode) {
-            case Plain:
+            case PLAIN:
                 return Localization.lang("Plain text");
-            case Word:
+            case WORD:
                 return Localization.lang("Show diff") + " - " + Localization.lang("word");
-            case Character:
+            case CHARACTER:
                 return Localization.lang("Show diff") + " - " + Localization.lang("character");
-            case WordSymmetric:
+            case WORD_SYMMETRIC:
                 return Localization.lang("Show symmetric diff") + " - " + Localization.lang("word");
-            case CharacterSymmetric:
+            case CHARACTER_SYMMETRIC:
                 return Localization.lang("Show symmetric diff") + " - " + Localization.lang("character");
             default:
                 throw new UnsupportedOperationException("Not implemented: " + mode);
@@ -243,10 +242,12 @@ public class MergeEntries extends BorderPane {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(MergeEntries::getDisplayText)
                 .install(diffMode);
-        diffMode.getSelectionModel().select(Globals.prefs.getInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE));
+        Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
+                     .flatMap(DiffMode::parse)
+                     .ifPresent(diffMode::setValue);
         EasyBind.subscribe(diffMode.valueProperty(), mode -> {
             updateFieldValues(differentFields);
-            Globals.prefs.putInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, diffMode.getSelectionModel().getSelectedIndex());
+            Globals.prefs.put(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, mode.name());
         });
 
         HBox heading = new HBox(10);
@@ -271,19 +272,19 @@ public class MergeEntries extends BorderPane {
             List<Text> leftText = leftString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(leftString));
             List<Text> rightText = rightString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(rightString));
             switch (diffMode.getValue()) {
-                case Plain:
+                case PLAIN:
                     break;
-                case Word:
+                case WORD:
                     rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
                     break;
-                case Character:
+                case CHARACTER:
                     rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
                     break;
-                case WordSymmetric:
+                case WORD_SYMMETRIC:
                     leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
                     rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
                     break;
-                case CharacterSymmetric:
+                case CHARACTER_SYMMETRIC:
                     leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
                     rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
                     break;
@@ -344,10 +345,18 @@ public class MergeEntries extends BorderPane {
     }
 
     enum DiffMode {
-        Plain,
-        Word,
-        Character,
-        WordSymmetric,
-        CharacterSymmetric
+        PLAIN,
+        WORD,
+        CHARACTER,
+        WORD_SYMMETRIC,
+        CHARACTER_SYMMETRIC;
+
+        public static Optional<DiffMode> parse(String name) {
+            try {
+                return Optional.of(DiffMode.valueOf(name));
+            } catch (IllegalArgumentException e) {
+                return Optional.empty();
+            }
+        }
     }
 }
