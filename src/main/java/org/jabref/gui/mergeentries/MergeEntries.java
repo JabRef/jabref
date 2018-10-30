@@ -344,7 +344,7 @@ public class MergeEntries extends BorderPane {
         initialize();
     }
 
-    enum DiffMode {
+    public enum DiffMode {
         PLAIN,
         WORD,
         CHARACTER,
