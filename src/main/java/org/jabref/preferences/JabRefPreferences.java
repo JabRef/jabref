@@ -50,6 +50,7 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportSettingsTab;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -569,7 +570,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
