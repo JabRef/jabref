@@ -1,23 +1,30 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<bibliography xmlns="http://docbook.org/ns/docbook" version="5.1"
-   xmlns:xlink="http://www.w3.org/1999/xlink">
-<title/>
-<biblioentry xreflabel="Kolb and Diez (2018)" xml:id="mykey">
+<bibliography>
+<biblioentry xreflabel="S. Kolb and T. Diez (2018)" xml:id="mykey">
    <authorgroup>
+<!--AUTHORS-->
        <author><personname><firstname>Stefan</firstname><surname>Kolb</surname></personname></author>
        <author><personname><firstname>Tobias</firstname><surname>Diez</surname></personname></author> 
+<!--EDITORS-->
 
    </authorgroup>
-   <citetitle pubwork="article">my paper title</citetitle>
-
-
-
-
-
-   <pubdate>2018</pubdate>  
-
-
-
-</biblioentry>
-
-</bibliography>
+   <!--TITLE-->
+           <citetitle pubwork="Book">my paper title</citetitle> 
+    
+<!--BOOK booktitle, edition, (pages), publisher-->
+    
+        
+           <pubdate>2018</pubdate>  
+        
+        
+    
+    
+    
+<!-- IDENTIFIERS-->
+    
+    
+    
+        <biblioid class="isbn">1&#45;2&#45;34</biblioid>
+    
+<!--ABSTRACT-->
+    
+</biblioentry></bibliography>

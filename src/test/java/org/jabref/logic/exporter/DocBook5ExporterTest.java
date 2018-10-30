@@ -16,6 +16,8 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,9 +59,10 @@ public class DocBook5ExporterTest {
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        BibEntry entry = new BibEntry();
-        entry.setField("title", "my paper title");
-        entry.setField("author", "Stefan Kolb and Tobias Diez");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.BOOK);
+        entry.setField(FieldName.TITLE, "my paper title");
+        entry.setField(FieldName.AUTHOR, "Stefan Kolb and Tobias Diez");
+        entry.setField(FieldName.ISBN, "1-2-34");
         entry.setCiteKey("mykey");
         entry.setDate(new org.jabref.model.entry.Date(myDate));
         entries = Arrays.asList(entry);
@@ -74,6 +77,7 @@ public class DocBook5ExporterTest {
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(path));
+
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
