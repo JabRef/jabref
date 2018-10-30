@@ -128,7 +128,7 @@ dependencies {
     compile 'com.google.guava:guava:27.0-jre'
 
     // JavaFX stuff
-    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
+    compile 'de.jensd:fontawesomefx-materialdesignfont:2.0.26-9.1.2'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
