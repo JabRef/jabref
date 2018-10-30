@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -60,11 +61,16 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
         defaultImportStyle.getStyleClass().add("sectionHeader");
         builder.add(defaultImportStyle, 1, 1);
+        final ToggleGroup defaultImportStyleDragDropPdfs = new ToggleGroup();
         builder.add(new Separator(), 2, 1);
         builder.add(radioButtonNoMeta, 2, 2);
         builder.add(radioButtonXmp, 2, 3);
         builder.add(radioButtonPDFcontent, 2, 4);
         builder.add(radioButtononlyAttachPDF, 2, 5);
+        radioButtonNoMeta.setToggleGroup(defaultImportStyleDragDropPdfs);
+        radioButtonXmp.setToggleGroup(defaultImportStyleDragDropPdfs);
+        radioButtonPDFcontent.setToggleGroup(defaultImportStyleDragDropPdfs);
+        radioButtononlyAttachPDF.setToggleGroup(defaultImportStyleDragDropPdfs);
         builder.add(useDefaultPDFImportStyle, 2, 6);
         builder.add(new Label(""), 1, 7);
 
