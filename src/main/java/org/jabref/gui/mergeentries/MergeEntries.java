@@ -242,16 +242,17 @@ public class MergeEntries extends BorderPane {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(MergeEntries::getDisplayText)
                 .install(diffMode);
-        Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
-                     .flatMap(DiffMode::parse)
-                     .ifPresent(diffMode::setValue);
-        EasyBind.subscribe(diffMode.valueProperty(), mode -> {
+        DiffMode diffModePref = Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
+                                             .flatMap(DiffMode::parse)
+                                             .orElse(DiffMode.WORD);
+        diffMode.setValue(diffModePref);
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
             updateFieldValues(differentFields);
             Globals.prefs.put(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, mode.name());
         });
 
         HBox heading = new HBox(10);
-        heading.getChildren().setAll(diffMode);
+        heading.getChildren().setAll(this.diffMode);
         setTop(heading);
         BorderPane.setMargin(heading, new Insets(0, 0, 10, 0));
     }
