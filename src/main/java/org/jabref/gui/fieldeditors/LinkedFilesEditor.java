@@ -1,9 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -70,7 +67,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .setOnDragOver(this::handleOnDragOver);
 
         listView.setCellFactory(cellFactory);
-        
+
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
         setUpKeyBindings();
     }
