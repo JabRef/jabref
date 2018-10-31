@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.121"
+         fx:controller="org.jabref.gui.cleanup.CleanupPresetPanel">
+
+    <CheckBox fx:id="cleanUpDOI" text="%Move DOIs from note and URL field to DOI field and remove http prefix"/>
+    <CheckBox fx:id="cleanUpEprint"
+              text="%Move preprint information from 'URL' and 'journal' field to the 'eprint' field"/>
+    <CheckBox fx:id="cleanUpISSN" text="%Reformat ISSN"/>
+    <CheckBox fx:id="cleanUpUpgradeExternalLinks"/>
+    <CheckBox fx:id="cleanUpMovePDF"/>
+    <CheckBox fx:id="cleanUpMakePathsRelative" text="%Make paths of linked files relative (if possible)"/>
+    <CheckBox fx:id="cleanUpRenamePDF" text="%Rename PDFs to given filename format pattern"/>
+    <VBox spacing="5.0">
+        <Label fx:id="cleanupRenamePDFLabel"/>
+        <CheckBox fx:id="cleanUpRenamePDFonlyRelativePaths" text="%Rename only PDFs having a relative path"/>
+        <VBox.margin>
+            <Insets left="40.0"/>
+        </VBox.margin>
+    </VBox>
+
+    <CheckBox fx:id="cleanUpBiblatex"
+              text="%Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"/>
+    <CheckBox fx:id="cleanUpBibtex"
+              text="%Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"/>
+
+    <VBox fx:id="formatterContainer"/>
+
+</fx:root>
