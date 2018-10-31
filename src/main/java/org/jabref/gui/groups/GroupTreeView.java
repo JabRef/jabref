@@ -198,13 +198,13 @@ public class GroupTreeView {
                 List<String> groupsToMove = new ArrayList<>();
                 for (TreeItem<GroupNodeViewModel> selectedItem : treeTable.getSelectionModel().getSelectedItems()) {
                     if ((selectedItem != null) && (selectedItem.getValue() != null)) {
-                        // Display the group when dragging
                         groupsToMove.add(selectedItem.getValue().getPath());
                     }
                 }
 
                 // Put the group nodes as content
                 Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
+                // Display the group when dragging
                 dragboard.setDragView(row.snapshot(null, null));
                 ClipboardContent content = new ClipboardContent();
                 content.put(DragAndDropDataFormats.GROUP, groupsToMove);
