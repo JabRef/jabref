@@ -31,7 +31,7 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - checkout
-       - run:
+      - run:
           name: "Pull Submodules"
           command: |
             git submodule init
@@ -57,7 +57,7 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - checkout
-       - run:
+      - run:
           name: "Pull Submodules"
           command: |
             git submodule init
