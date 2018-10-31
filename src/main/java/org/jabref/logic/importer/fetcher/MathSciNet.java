@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,6 +53,12 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
      */
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+        Optional<String> mrNumberInEntry = entry.getField(FieldName.MR_NUMBER);
+        if (mrNumberInEntry.isPresent()) {
+            // We are lucky and already know the id, so use it instead
+            return getURLForID(mrNumberInEntry.get());
+        }
+
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
         uriBuilder.addParameter("format", "bibtex");
 
