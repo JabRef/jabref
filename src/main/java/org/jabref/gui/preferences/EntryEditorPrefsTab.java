@@ -264,7 +264,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         } else if (linkFile.isSelected()) {
             prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.LINK);
         } else {
-            prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.RENAME_COPY);
+            prefs.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.MOVE);
         }
 
         prefs.storeAutoCompletePreferences(autoCompletePreferences);

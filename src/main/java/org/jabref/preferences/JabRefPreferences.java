@@ -793,7 +793,7 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
 
-        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.COPY.name());
+        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.MOVE.name());
         setLanguageDependentDefaultValues();
     }
 
