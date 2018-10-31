@@ -148,7 +148,7 @@ public class EntryEditor extends BorderPane {
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE)
                 {
-                    if(event.getTransferMode() == TransferMode.LINK) //alt on win
+                    if (event.getTransferMode() == TransferMode.LINK) //alt on win
                     {
                         LOGGER.debug("Mode LINK");
                         fileHandler.addToEntry(entry, files);
@@ -167,7 +167,7 @@ public class EntryEditor extends BorderPane {
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.COPY)
                 {
-                    if(event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
                     {
                         LOGGER.debug("Mode MOVE");
                         fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
@@ -186,7 +186,7 @@ public class EntryEditor extends BorderPane {
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.LINK)
                 {
-                    if(event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
                     {
                         LOGGER.debug("Mode COPY");
                         fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
