@@ -73,7 +73,6 @@ public class ThemeLoader {
         }
     }
 
-
     /**
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
@@ -90,17 +89,21 @@ public class ThemeLoader {
 
         try {
             // If the file is an ordinary file (i.e. not a resource part of a .jar bundle), we watch it for changes and turn on live reloading
-            Path cssPath = Paths.get(cssFile.toURI());
-            if (Files.isRegularFile(cssPath)) {
-                LOGGER.info("Enabling live reloading of " + cssPath);
-                fileUpdateMonitor.addListenerForFile(cssPath, () -> {
-                    LOGGER.info("Reload css file " + cssFile);
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        scene.getStylesheets().remove(cssFile.toExternalForm());
-                        scene.getStylesheets().add(index, cssFile.toExternalForm());
-                            }
-                    );
-                });
+
+            if (cssFile.toURI() != null) {
+                LOGGER.debug("CSS URI {}", cssFile);
+
+                Path cssPath = Paths.get(cssFile.toURI());
+                if (Files.isRegularFile(cssPath)) {
+                    LOGGER.info("Enabling live reloading of {}", cssPath);
+                    fileUpdateMonitor.addListenerForFile(cssPath, () -> {
+                        LOGGER.info("Reload css file " + cssFile);
+                        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                            scene.getStylesheets().remove(cssFile.toExternalForm());
+                            scene.getStylesheets().add(index, cssFile.toExternalForm());
+                        });
+                    });
+                }
             }
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Could not watch css file for changes " + cssFile, e);
