@@ -2,9 +2,9 @@ package org.jabref.gui.util;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -88,13 +88,14 @@ public class ThemeLoader {
         scene.getStylesheets().add(index, cssFile.toExternalForm());
 
         try {
-            // If the file is an ordinary file (i.e. not a resource part of a .jar bundle), we watch it for changes and turn on live reloading
 
-            if (cssFile.toURI() != null) {
-                LOGGER.debug("CSS URI {}", cssFile);
+            URI cssUri = cssFile.toURI();
+            if (!cssUri.toString().contains("jar")) {
+                LOGGER.debug("CSS URI {}", cssUri);
 
-                Path cssPath = Paths.get(cssFile.toURI());
-                if (Files.isRegularFile(cssPath)) {
+                Path cssPath = Paths.get(cssUri).toAbsolutePath();
+                // If the file is an ordinary file (i.e. not a resource part of a .jar bundle), we watch it for changes and turn on live reloading
+                if (!cssUri.toString().contains("jar")) {
                     LOGGER.info("Enabling live reloading of {}", cssPath);
                     fileUpdateMonitor.addListenerForFile(cssPath, () -> {
                         LOGGER.info("Reload css file " + cssFile);
