@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -138,6 +139,7 @@ class GeneralTab extends Pane implements PrefsTab {
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
         overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
+        useTimeStamp.getOnAction().handle(new ActionEvent()); // pretend we just clicked on the checkbox so it updates the UI
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setSelected(useTimeStamp.isSelected());
@@ -182,9 +184,9 @@ class GeneralTab extends Pane implements PrefsTab {
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding(encodings.getValue());
-        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue().equals(BibDatabaseMode.BIBLATEX));
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue() == BibDatabaseMode.BIBLATEX);
 
-        if (!languageSelection.getValue().equals(prefs.getLanguage())) {
+        if (languageSelection.getValue() != prefs.getLanguage()) {
             prefs.setLanguage(languageSelection.getValue());
             Localization.setLanguage(languageSelection.getValue());
 
