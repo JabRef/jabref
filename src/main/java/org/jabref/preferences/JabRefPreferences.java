@@ -1006,7 +1006,7 @@ public class JabRefPreferences implements PreferencesService {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = InternalBibtexFields.DEFAULT_GENERAL_FIELDS.stream().collect(Collectors.joining(";"));
+        String fieldNames = InternalBibtexFields.getDefaultGeneralFields().stream().collect(Collectors.joining(";"));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
 
         // Entry editor tab 1:

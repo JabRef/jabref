@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -25,6 +26,9 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
 
     @Override
     protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        return entryType.getDeprecatedFields();
+        return entryType.getDeprecatedFields()
+                        .stream()
+                        .filter(entry::hasField)
+                        .collect(Collectors.toList());
     }
 }

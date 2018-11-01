@@ -20,14 +20,14 @@ public class NoBibtexFieldChecker implements Checker {
     private List<String> getAllBiblatexOnlyFields() {
         Set<String> allBibtexFields = BibtexEntryTypes.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
         return BiblatexEntryTypes.ALL.stream()
-                .flatMap(type -> type.getAllFields().stream())
-                .filter(fieldName -> !allBibtexFields.contains(fieldName))
-                // these fields are displayed by JabRef as default
-                .filter(fieldName -> !InternalBibtexFields.DEFAULT_GENERAL_FIELDS.contains(fieldName))
-                .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
-                .filter(fieldName -> !fieldName.equals(FieldName.REVIEW))
-                .sorted()
-                .collect(Collectors.toList());
+                                     .flatMap(type -> type.getAllFields().stream())
+                                     .filter(fieldName -> !allBibtexFields.contains(fieldName))
+                                     // these fields are displayed by JabRef as default
+                                     .filter(fieldName -> !InternalBibtexFields.getDefaultGeneralFields().contains(fieldName))
+                                     .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
+                                     .filter(fieldName -> !fieldName.equals(FieldName.REVIEW))
+                                     .sorted()
+                                     .collect(Collectors.toList());
     }
 
     @Override
