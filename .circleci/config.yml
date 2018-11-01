@@ -6,6 +6,8 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
       - restore_cache:
           keys:
             - install4j-{{ checksum "scripts/extract-install4j.sh" }}
@@ -26,6 +28,8 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
       - restore_cache:
           key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
@@ -47,6 +51,8 @@ jobs:
       - restore_cache:
           key: dependency-cache
       - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
       - restore_cache:
           key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
