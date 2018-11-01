@@ -125,6 +125,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     private String getMdlUrl() {
-        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.darwingoliath.com";
+        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.mr-dlib.org";
     }
 }
