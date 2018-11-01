@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
+    private static final String MDL_JABREF_PARTNER_ID = "1";
     private final String LANGUAGE;
     private final Version VERSION;
 
@@ -106,7 +107,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.setScheme("http");
         builder.setHost(getMdlUrl());
         builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
-        builder.addParameter("partner_id", "1");
+        builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
         builder.addParameter("app_lang", LANGUAGE);
