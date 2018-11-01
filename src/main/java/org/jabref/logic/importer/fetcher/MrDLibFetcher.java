@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,11 +105,15 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
         builder.setHost(getMdlUrl());
-        builder.setPath("/v2/items/" + queryWithTitle + "/related_items");
-        builder.addParameter("partner_id", "jabref");
+        builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
+        builder.addParameter("partner_id", "1");
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
         builder.addParameter("app_lang", LANGUAGE);
+        builder.addParameter("os", System.getProperty("os.name"));
+        builder.addParameter("os_version", System.getProperty("os.version"));
+        builder.addParameter("java_version", System.getProperty("java.version"));
+        builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
         try {
             URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());

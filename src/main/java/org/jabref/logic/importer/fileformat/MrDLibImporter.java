@@ -146,10 +146,10 @@ public class MrDLibImporter extends Importer {
         // parse each of the relevant fields into variables
         String authors = isRecommendationFieldPresent(recommendation, "authors") ? getAuthorsString(recommendation) : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
-        String year = isRecommendationFieldPresent(recommendation, "year_published") ? Integer.toString(recommendation.getInt("year_published")) : "";
+        String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
         String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
-        Integer rank = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getInt("recommendation_id") : 100;
+        Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;
 
         // Populate bib entry with relevant data
         current.setField(FieldName.AUTHOR, authors);
