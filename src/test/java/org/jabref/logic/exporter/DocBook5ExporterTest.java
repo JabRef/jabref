@@ -78,7 +78,6 @@ public class DocBook5ExporterTest {
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(path));
 
-
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
