@@ -56,6 +56,8 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 * In command line go to a folder you want to place the source code locally (parent folder of `jabref/`)
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
+* Update submodules: `git submodule update --init`
+
 
 ### Generating additional source codes and getting dependencies using Gradle:
 (not required for IntelliJ)
