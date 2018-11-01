@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -102,18 +103,26 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
 
         Label nameFormat = new Label(Localization.lang("Name format used for autocompletion"));
         nameFormat.getStyleClass().add("sectionHeader");
+        final ToggleGroup autocompletionToggleGroup = new ToggleGroup();
         builder.add(nameFormat, 1, 14);
         builder.add(autoCompFF, 1, 15);
         builder.add(autoCompLF,  1, 16);
         builder.add(autoCompBoth,  1, 17);
+        autoCompFF.setToggleGroup(autocompletionToggleGroup);
+        autoCompLF.setToggleGroup(autocompletionToggleGroup);
+        autoCompBoth.setToggleGroup(autocompletionToggleGroup);
         builder.add(new Label(""), 1, 18);
 
         Label treatment = new Label(Localization.lang("Treatment of first names"));
         treatment.getStyleClass().add("sectionHeader");
+        final ToggleGroup treatmentOfFirstNamesToggleGroup = new ToggleGroup();
         builder.add(treatment, 1, 19);
         builder.add(firstNameModeAbbr,  1, 20);
         builder.add(firstNameModeFull, 1, 21);
         builder.add(firstNameModeBoth,  1, 22);
+        firstNameModeAbbr.setToggleGroup(treatmentOfFirstNamesToggleGroup);
+        firstNameModeFull.setToggleGroup(treatmentOfFirstNamesToggleGroup);
+        firstNameModeBoth.setToggleGroup(treatmentOfFirstNamesToggleGroup);
     }
 
     @Override

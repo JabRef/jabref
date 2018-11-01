@@ -151,9 +151,6 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-api:2.11.1'
     compile 'org.apache.logging.log4j:log4j-core:2.11.1'
 
-    // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
-    compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
-    compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
