@@ -1,9 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -71,40 +68,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         listView.setCellFactory(cellFactory);
 
-        setUpFilesDragAndDrop();
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
         setUpKeyBindings();
-    }
-
-    private void setUpFilesDragAndDrop() {
-        listView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
-            }
-        });
-
-        listView.setOnDragDropped(event -> {
-            Dragboard dragboard = event.getDragboard();
-            boolean success = false;
-            ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
-
-            if (dragboard.hasFiles()) {
-                List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-                items.addAll(linkedFiles);
-                success = true;
-            }
-            event.setDropCompleted(success);
-            event.consume();
-        });
-
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
             event.acceptTransferModes(TransferMode.MOVE);
-        }
-        if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
         }
     }
 
@@ -143,11 +113,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             items.set(thisIdx, transferedItem);
             success = true;
         }
-        if (dragboard.hasFiles()) {
-            List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-            items.addAll(linkedFiles);
-            success = true;
-        }
+
         event.setDropCompleted(success);
         event.consume();
 
