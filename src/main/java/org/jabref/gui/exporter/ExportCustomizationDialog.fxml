@@ -15,9 +15,9 @@
          <children>
             <TableView prefHeight="150.0" prefWidth="500.0">
               <columns>
-                <TableColumn prefWidth="50.0" text="C1" />
-                <TableColumn prefWidth="200.0" text="C2" />
-                <TableColumn prefWidth="30.0" text="Column X" />
+                <TableColumn prefWidth="50.0" text="%Export Name" />
+                <TableColumn prefWidth="200.0" text="%Main Layout File" />
+                <TableColumn prefWidth="30.0" text="%File extension" />
               </columns>
             </TableView>
          </children>
