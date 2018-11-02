@@ -144,19 +144,63 @@ public class EntryEditor extends BorderPane {
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
-                if (event.getTransferMode() == TransferMode.MOVE) {
+                FileDragDropPreferenceType dragDropPreferencesType = Globals.prefs.getEntryEditorFileLinkPreference();
 
-                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE)
+                {
+                    if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode LINK");
+                        fileHandler.addToEntry(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode COPY");
+                        fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+                        fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    }
                 }
-                if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); //alt on win
-                    fileHandler.addToEntry(entry, files);
 
+                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY)
+                {
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode MOVE");
+                        fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode LINK");
+                        fileHandler.addToEntry(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode COPY"); //shift on win or no modifier
+                        fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
                 }
-                if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
-                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+
+                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK)
+                {
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode COPY");
+                        fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode MOVE");
+                        fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode LINK"); //shift on win or no modifier
+                        fileHandler.addToEntry(entry, files);
+                    }
                 }
             }
 
