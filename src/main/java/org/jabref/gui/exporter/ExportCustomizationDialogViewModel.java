@@ -3,6 +3,7 @@ package org.jabref.gui.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
@@ -33,7 +34,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final JournalAbbreviationLoader loader;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomExportList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportCustomizationDialogViewModel.class);
 
     //Other variable declarations here
 
@@ -83,7 +84,13 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         List<TemplateExporter> exportersLogic;
         exporters.forEach(exporter -> exportersLogic.add(exporter.getLogic()));
         preferences.storeCustomExportFormats(exportersLogic);
+
     }
+
+    public ListProperty<ExporterViewModel> selectedExportersProperty() {
+        return selectedExporters;
+    }
+
     public void init() {
         loadExporters();
     }

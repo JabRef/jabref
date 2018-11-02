@@ -8,6 +8,7 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
@@ -51,14 +52,13 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new ExportCustomizationDialogViewModel(dialogService, loader);
         //enable multiple selection somewhere around here
-        EasyBind.listBind(viewModel.selectedExportersProperty(),
-                          EasyBind.monadic(exporterTable.selectionModelProperty().
-
-                              )
+        EasyBind.listBind(viewModel.selectedExportersProperty(), //the order may be mixed up here
+                          EasyBind.monadic(exporterTable.selectionModelProperty())
+                                  .selectProperty(MultipleSelectionModel::getSelectedItems));
         //trying something new above
         viewModel.selectedExportersProperty().bind(
                 EasyBind.monadic(exporterTable.selectionModelProperty()).
-                flatMap(SelectionModel::selectedItemsProperty). //This will have to be done differently from key bindings because it's multiple selection
+                flatMap(SelectionModel::selectedItemProperty). //This will have to be done differently from key bindings because it's multiple selection
                 selectProperty(Item::valueProperty)
         );
 
