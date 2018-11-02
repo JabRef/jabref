@@ -40,7 +40,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //Also write tests for all of this if necessary
 
-    public ExportCustomizationDialogViewModel(DialogService dialogService, JournalAbbreviationLoader loader) {
+    public ExportCustomizationDialogViewModel(PreferencesService prefernces, DialogService dialogService, JournalAbbreviationLoader loader) {
+        this.preferences = prefernces;
         this.dialogService = dialogService;
         this.loader = loader;
         init();

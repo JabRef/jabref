@@ -48,4 +48,6 @@ public interface PreferencesService {
     SavePreferences LoadForExportFromPreferences();
 
     void setExportWorkingDirectory(String layoutFileDirString);
+
+    String getExportWorkingDirectory();
 }

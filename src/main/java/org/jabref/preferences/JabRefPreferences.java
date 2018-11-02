@@ -2084,4 +2084,22 @@ public class JabRefPreferences implements PreferencesService {
         put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
     }
 
+    @Override
+    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SavePreferences LoadForExportFromPreferences() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getExportWorkingDirectory() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

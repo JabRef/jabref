@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -37,9 +38,9 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
-    private final SimpleStringProperty name;
-    private final SimpleStringProperty layoutFile;
-    private final SimpleStringProperty extension;
+    private final StringProperty name = new SimpleStringProperty("");
+    private final StringProperty layoutFile = new SimpleStringProperty("");
+    private final StringProperty extension = new SimpleStringProperty("");
 
 
     public CreateModifyExporterDialogViewModel(TemplateExporter exporter, DialogService dialogService, PreferencesService preferences,
@@ -49,9 +50,9 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
 
         //Set text of each of the boxes
-        this.name = name;
-        this.layoutFile = layoutFile;
-        this.extension = extension;
+        this.name.setValue( name);
+        this.layoutFile.setValue(layoutFile);
+        this.extension.setValue(extension);
     }
 
     public TemplateExporter saveExporter() {//void?
