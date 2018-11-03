@@ -92,6 +92,7 @@ class IsbnFetcherTest {
         List<BibEntry> fetchedEntry = fetcher.performSearch(input);
         assertEquals(Collections.singletonList(bibEntry), fetchedEntry);
     }
+
     /**
      * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
      * not available on ebook.de. The fetcher should something as it falls back to Chimbori
