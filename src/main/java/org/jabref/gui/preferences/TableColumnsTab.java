@@ -24,6 +24,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
@@ -284,14 +285,20 @@ class TableColumnsTab extends Pane implements PrefsTab {
         specialTableColumnsBuilder.add(priorityColumn, 1, 5);
         specialTableColumnsBuilder.add(printedColumn, 1, 6);
         specialTableColumnsBuilder.add(readStatusColumn, 1, 7);
+        final ToggleGroup syncGroup = new ToggleGroup();
         specialTableColumnsBuilder.add(syncKeywords, 1, 8);
         specialTableColumnsBuilder.add(writeSpecialFields, 1, 9);
+        syncKeywords.setToggleGroup(syncGroup);
+        writeSpecialFields.setToggleGroup(syncGroup);
         specialTableColumnsBuilder.add(helpButton, 1, 10);
 
         specialTableColumnsBuilder.add(fileColumn, 2, 1);
         specialTableColumnsBuilder.add(urlColumn, 2, 2);
+        final ToggleGroup preferUrlOrDoi = new ToggleGroup();
         specialTableColumnsBuilder.add(preferUrl, 2 ,3);
         specialTableColumnsBuilder.add(preferDoi, 2, 4);
+        preferUrl.setToggleGroup(preferUrlOrDoi);
+        preferDoi.setToggleGroup(preferUrlOrDoi);
         specialTableColumnsBuilder.add(arxivColumn, 2, 5);
 
         specialTableColumnsBuilder.add(extraFileColumns,2, 6);

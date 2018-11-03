@@ -60,7 +60,7 @@ import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -324,7 +324,7 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesDialog(BasePanel.this, dialogService));
+        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame).execute());
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, this::copyKey);

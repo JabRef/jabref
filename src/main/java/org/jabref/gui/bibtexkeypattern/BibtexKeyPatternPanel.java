@@ -75,7 +75,7 @@ public class BibtexKeyPatternPanel extends Pane {
         rowIndex++;
         Label defaultPattern = new Label(Localization.lang("Default pattern"));
         Button button = new Button("Default");
-        button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        button.setOnAction(e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
         gridPane.add(defaultPattern, 1, rowIndex);
         gridPane.add(defaultPat, 2, rowIndex);
         gridPane.add(button, 3, rowIndex);
@@ -87,7 +87,7 @@ public class BibtexKeyPatternPanel extends Pane {
             Button button1 = new Button("Default");
             button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
 
-            gridPane.add(label1, 1 + (columnIndex * 3) , rowIndex);
+            gridPane.add(label1, 1 + (columnIndex * 3), rowIndex);
             gridPane.add(textField, 2 + (columnIndex * 3), rowIndex);
             gridPane.add(button1, 3 + (columnIndex * 3), rowIndex);
 
@@ -96,18 +96,19 @@ public class BibtexKeyPatternPanel extends Pane {
             if (columnIndex == COLUMNS - 1) {
                 columnIndex = 0;
                 rowIndex++;
-            } else
+            } else {
                 columnIndex++;
+            }
         }
 
         rowIndex++;
 
         Button help1 = new Button("?");
-        help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
+        help1.setOnAction(e -> new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
         gridPane.add(help1, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
-        btnDefaultAll1.setOnAction(e-> {
+        btnDefaultAll1.setOnAction(e -> {
             // reset all fields
             for (TextField field : textFields.values()) {
                 field.setText("");

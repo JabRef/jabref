@@ -46,10 +46,12 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportSettingsTab;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -368,6 +370,10 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
+
+    //File linking Options for entry editor
+    public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
+
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
@@ -410,6 +416,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -569,7 +576,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -784,7 +791,9 @@ public class JabRefPreferences implements PreferencesService {
                                     + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.DEFAULT_MAIN_CSS);
+        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+
+        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.MOVE.name());
         setLanguageDependentDefaultValues();
     }
 
@@ -2020,5 +2029,13 @@ public class JabRefPreferences implements PreferencesService {
             map.put(columns.get(i), sortTypes.get(i));
         }
         return map;
+    }
+
+    public FileDragDropPreferenceType getEntryEditorFileLinkPreference() {
+        return FileDragDropPreferenceType.valueOf(get(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE));
+    }
+
+    public void storeEntryEditorFileLinkPreference(FileDragDropPreferenceType type) {
+        put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, type.name());
     }
 }
