@@ -195,20 +195,21 @@ public class GroupTreeView {
 
             // Drag and drop support
             row.setOnDragDetected(event -> {
-                TreeItem<GroupNodeViewModel> selectedItem = treeTable.getSelectionModel().getSelectedItem();
-                if ((selectedItem != null) && (selectedItem.getValue() != null)) {
-                    Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
-
-                    // Display the group when dragging
-                    dragboard.setDragView(row.snapshot(null, null));
-
-                    // Put the group node as content
-                    ClipboardContent content = new ClipboardContent();
-                    content.put(DragAndDropDataFormats.GROUP, selectedItem.getValue().getPath());
-                    dragboard.setContent(content);
-
-                    event.consume();
+                List<String> groupsToMove = new ArrayList<>();
+                for (TreeItem<GroupNodeViewModel> selectedItem : treeTable.getSelectionModel().getSelectedItems()) {
+                    if ((selectedItem != null) && (selectedItem.getValue() != null)) {
+                        groupsToMove.add(selectedItem.getValue().getPath());
+                    }
                 }
+
+                // Put the group nodes as content
+                Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
+                // Display the group when dragging
+                dragboard.setDragView(row.snapshot(null, null));
+                ClipboardContent content = new ClipboardContent();
+                content.put(DragAndDropDataFormats.GROUP, groupsToMove);
+                dragboard.setContent(content);
+                event.consume();
             });
             row.setOnDragOver(event -> {
                 Dragboard dragboard = event.getDragboard();
@@ -240,13 +241,16 @@ public class GroupTreeView {
             row.setOnDragDropped(event -> {
                 Dragboard dragboard = event.getDragboard();
                 boolean success = false;
+
                 if (dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
-                    String pathToSource = (String) dragboard.getContent(DragAndDropDataFormats.GROUP);
-                    Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
-                            .getChildByPath(pathToSource);
-                    if (source.isPresent()) {
-                        source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
-                        success = true;
+                    List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+                    for (String pathToSource : pathToSources) {
+                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
+                                .getChildByPath(pathToSource);
+                        if (source.isPresent()) {
+                            source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
+                            success = true;
+                        }
                     }
                 }
 
