@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
     protected final ImportFormatPreferences importFormatPreferences;
-    Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
