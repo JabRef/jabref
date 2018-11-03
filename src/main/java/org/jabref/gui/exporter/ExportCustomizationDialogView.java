@@ -62,6 +62,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, loader);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         // Unidirectional list binding - this is okay because item selection only fires from the View
         EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());

@@ -15,10 +15,10 @@ public class ExporterViewModel {
 
     public ExporterViewModel(TemplateExporter exporter) {
         this.exporter = exporter;
-        this.name.set(exporter.getName());
-        this.lfFileName.set(exporter.getLayoutFileName());
+        this.name.setValue(exporter.getName());
+        this.lfFileName.setValue(exporter.getLayoutFileName());
         //This should return at least one of the extensions, but may need to be changed to return the most common extension
-        this.extension.set(exporter.getFileType().getExtensionsWithDot().get(0));
+        this.extension.setValue(exporter.getFileType().getExtensionsWithDot().get(0));
     }
 
     public TemplateExporter getLogic() {

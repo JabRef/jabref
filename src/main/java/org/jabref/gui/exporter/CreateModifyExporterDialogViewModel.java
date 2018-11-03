@@ -2,8 +2,6 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -16,7 +14,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences; //will be removed with writing of new method
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -50,7 +47,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
 
         //Set text of each of the boxes
-        this.name.setValue( name);
+        this.name.setValue(name);
         this.layoutFile.setValue(layoutFile);
         this.extension.setValue(extension);
     }
@@ -67,7 +64,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
             || !layoutFile.get().endsWith(".layout")) {
 
-            LOGGER.info("One of the fields is empty!"); //TODO: Better error message
+            LOGGER.info("One of the fields is empty!");
             return null; //return implemented similarly to CleanupDialog, although JavaFX documentation says you need something
             //like a result converter, which must be in the view, see class EntryTypeView
         }
