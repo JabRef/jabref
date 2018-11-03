@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.Dialog;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -22,8 +23,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //exporters should probably be a JavaFX SortedList instead of SimpleListPreperty,
     //but not yet sure how to make SortedList into a property
-    private final SimpleListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final SimpleListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     //Indices within which export format information is stored within JabRefPreferences
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -40,8 +41,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //Also write tests for all of this if necessary
 
-    public ExportCustomizationDialogViewModel(PreferencesService prefernces, DialogService dialogService, JournalAbbreviationLoader loader) {
-        this.preferences = prefernces;
+    public ExportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationLoader loader) {
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.loader = loader;
         init();
@@ -61,15 +62,16 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //The following dialog will have to be implemented as the JavaFX MVVM analogue of Swing CustomExportDialog
     public void addExporter() {
-        // open add Exporter dialog, set vars as dialogResult or analogous
-        TemplateExporter exporter = new CreateModifyExporterDialogView().show(); //Not sure if this is right
+        TemplateExporter exporter = dialogService.showCustomDialogAndWait(new CreateModifyExporterDialogView());
         exporters.add(new ExporterViewModel(exporter));//var might have to be renamed
 
     }
 
     public void modifyExporter() {
         // open modify Exporter dialog, which may be the same as add Exporter dialog, and set that into exporters.
-        exporters.add(new ExporterViewModel(dialogResult)); //result must come from dialog, and this will append the exporter unless you make a sorted list property
+        Dialog<T> dialog = new CreateModifyExporterDialogView(selectedExporters.get(0));
+        TemplateExporter exporter = dialogService.showCustomDialogAndWait(dialog);
+        exporters.add(new ExporterViewModel(exporter)); //result must come from dialog, and this will append the exporter unless you make a sorted list property
     }
 
     public void removeExporters() {
@@ -90,6 +92,10 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     public ListProperty<ExporterViewModel> selectedExportersProperty() {
         return selectedExporters;
+    }
+
+    public ListProperty<ExporterViewModel> exportersProperty() {
+        return exporters;
     }
 
     public void init() {

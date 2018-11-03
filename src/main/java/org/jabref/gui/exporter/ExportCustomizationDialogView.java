@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.easybind.EasyBind;
 
 public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
@@ -45,27 +46,27 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(removeButton, getDialogPane(), event -> removeExporter());
     }
 
-    private void removeExporter() {
-        // TODO Auto-generated method stub
+    private void addExporter() {
+        viewModel.addExporter();
     }
 
     private void modifyExporter() {
-        // TODO Auto-generated method stub
+        viewModel.modifyExporter();
     }
 
-    private void addExporter() {
-        // TODO Auto-generated method stub
-
+    private void removeExporter() {
+        viewModel.removeExporters();
     }
 
     @FXML
     private void initialize() {
-        viewModel = new ExportCustomizationDialogViewModel(dialogService, loader);
-        //enable multiple selection somewhere around here
-
+        viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, loader);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        exporterTable.setItems(viewModel.selectedExportersProperty());
-
+        // Unidirectional list binding - this is okay because item selection only fires from the View
+        EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
+        layoutColumn.setCellValueFactory(cellData -> cellData.getValue().getLayoutFileName());
+        extensionColumn.setCellValueFactory(cellData -> cellData.getValue().getExtension());
     }
 
 }

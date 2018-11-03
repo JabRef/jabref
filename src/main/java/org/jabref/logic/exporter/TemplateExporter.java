@@ -331,4 +331,8 @@ public class TemplateExporter extends Exporter {
             }
         }
     }
+
+    public String getLayoutFileName() {
+        return lfFileName;
+    }
 }
