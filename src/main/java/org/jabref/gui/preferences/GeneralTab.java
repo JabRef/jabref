@@ -26,6 +26,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
+import static javafx.beans.binding.Bindings.not;
+
 class GeneralTab extends Pane implements PrefsTab {
 
     private final CheckBox useOwner;
@@ -59,10 +61,7 @@ class GeneralTab extends Pane implements PrefsTab {
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        if (!useTimeStamp.isSelected()) {
-            updateTimeStamp.setDisable(true);
-        }
-        useTimeStamp.setOnAction(e->setDisableUpdateTimeStamp());
+        updateTimeStamp.disableProperty().bind(not(useTimeStamp.selectedProperty()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
@@ -133,16 +132,11 @@ class GeneralTab extends Pane implements PrefsTab {
         return builder;
     }
 
-    private void setDisableUpdateTimeStamp() {
-        updateTimeStamp.setDisable(!useTimeStamp.isSelected());
-    }
-
     @Override
     public void setValues() {
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
         overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
-        setDisableUpdateTimeStamp();
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setSelected(useTimeStamp.isSelected());
