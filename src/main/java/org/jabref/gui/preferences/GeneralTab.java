@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -63,7 +62,7 @@ class GeneralTab extends Pane implements PrefsTab {
         if (!useTimeStamp.isSelected()) {
             updateTimeStamp.setDisable(true);
         }
-        useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
+        useTimeStamp.setOnAction(e->setDisableUpdateTimeStamp());
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
@@ -134,12 +133,16 @@ class GeneralTab extends Pane implements PrefsTab {
         return builder;
     }
 
+    private void setDisableUpdateTimeStamp() {
+        updateTimeStamp.setDisable(!useTimeStamp.isSelected());
+    }
+
     @Override
     public void setValues() {
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
         overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
-        useTimeStamp.getOnAction().handle(new ActionEvent()); // pretend we just clicked on the checkbox so it updates the UI
+        setDisableUpdateTimeStamp();
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setSelected(useTimeStamp.isSelected());
