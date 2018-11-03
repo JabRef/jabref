@@ -17,7 +17,7 @@ public class ManageCitationsItemViewModel {
         this.extraInformation.setValue(extraInfo);
     }
 
-    public ManageCitationsItemViewModel fromCitationEntry(CitationEntry citationEntry) {
+    public static ManageCitationsItemViewModel fromCitationEntry(CitationEntry citationEntry) {
         return new ManageCitationsItemViewModel(citationEntry.getRefMarkName(), citationEntry.getContext(), citationEntry.getPageInfo().orElse(""));
     }
 

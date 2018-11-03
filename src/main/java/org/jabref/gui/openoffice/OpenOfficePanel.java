@@ -257,12 +257,8 @@ public class OpenOfficePanel {
         settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(e -> {
-            try {
-                CitationManager cm = new CitationManager(ooBase, dialogService);
-                cm.showDialog();
-            } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
-                LOGGER.warn("Problem showing citation manager", ex);
-            }
+            ManageCitationsDialogView dlg = new ManageCitationsDialogView(ooBase, dialogService);
+            dlg.showAndWait();
         });
 
         exportCitations.setMaxWidth(Double.MAX_VALUE);

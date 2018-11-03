@@ -24,15 +24,15 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="OOPathLabel" minWidth="-Infinity" text="Path to OpenOffice/LibreOffice directory" />
+            <Label fx:id="OOPathLabel" minWidth="-Infinity" text="%Path to OpenOffice/LibreOffice directory" />
             <TextField fx:id="ooPath" GridPane.columnIndex="1" />
-            <Button fx:id="browseOOPath" mnemonicParsing="false" onAction="#browseOOPath" text="Browse" GridPane.columnIndex="2" />
-            <Button fx:id="browseOOExec" mnemonicParsing="false" onAction="#browseOOExec" text="Browse" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <Button fx:id="browseOOJars" mnemonicParsing="false" onAction="#browseOOJars" text="Browse" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Button fx:id="browseOOPath" mnemonicParsing="false" onAction="#browseOOPath" text="%Browse" GridPane.columnIndex="2" />
+            <Button fx:id="browseOOExec" mnemonicParsing="false" onAction="#browseOOExec" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Button fx:id="browseOOJars" mnemonicParsing="false" onAction="#browseOOJars" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <TextField fx:id="ooExec" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="ooJars" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label fx:id="ooExecLabel" minWidth="-Infinity" text="Path to OpenOffice/LibreOffice executable" GridPane.rowIndex="1" />
-            <Label fx:id="ooJarsLabel" minWidth="-Infinity" text="Path to OpenOffice/LibreOffice library dir" GridPane.rowIndex="2" />
+            <Label fx:id="ooExecLabel" minWidth="-Infinity" text="%Path to OpenOffice/LibreOffice executable" GridPane.rowIndex="1" />
+            <Label fx:id="ooJarsLabel" minWidth="-Infinity" text="%Path to OpenOffice/LibreOffice library dir" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </content>

@@ -1,9 +1,11 @@
 package org.jabref.gui.openoffice;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
@@ -32,6 +34,12 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
+        setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                viewModel.storeSettings();
+            }
+            return null;
+        });
     }
 
     @FXML
@@ -43,8 +51,12 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         colExtraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
         colExtraInfo.setEditable(true);
 
+        tvCitations.setItems(viewModel.citationsProperty());
+
         colExtraInfo.setOnEditCommit((CellEditEvent<ManageCitationsItemViewModel, String> cell) -> {
             cell.getRowValue().setExtraInfo(cell.getNewValue());
         });
+        colExtraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
+
     }
 }

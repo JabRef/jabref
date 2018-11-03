@@ -13,8 +13,8 @@
    <content>
       <TableView fx:id="tvCitations" prefHeight="208.0" prefWidth="662.0">
         <columns>
-          <TableColumn fx:id="colCitation" prefWidth="251.0" text="Citation" />
-          <TableColumn fx:id="colExtraInfo" prefWidth="425.0" text="Extra Information" />
+          <TableColumn fx:id="colCitation" prefWidth="251.0" text="%Citation" />
+          <TableColumn fx:id="colExtraInfo" prefWidth="425.0" text="%Extra information" />
         </columns>
       </TableView>
    </content>

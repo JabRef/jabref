@@ -12,10 +12,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewModel> {
 
-    @FXML TextField pageInfo;
-    @FXML RadioButton inPar;
-    @FXML RadioButton inText;
-    @FXML ToggleGroup citeToggleGroup;
+    @FXML private TextField pageInfo;
+    @FXML private RadioButton inPar;
+    @FXML private RadioButton inText;
+    @FXML private ToggleGroup citeToggleGroup;
     private AdvancedCiteDialogViewModel viewModel;
 
     public AdvancedCiteDialogView() {
