@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -166,7 +167,8 @@ public class GroupAddRemoveDialog implements BaseAction {
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             if (checkGroupEnable(node)) {
 
-                List<BibEntry> entries = Globals.stateManager.getSelectedEntries();
+                List<BibEntry> entries = new ArrayList<>(Globals.stateManager.getSelectedEntries()); //we need to copy the contents of the oversable list here, because when remove is called,
+                                                                                                     //the selected entries is empty and the first wil be selecteds
 
                 if (move) {
                     recuriveRemoveFromNode((GroupTreeNodeViewModel) tree.getModel().getRoot(), entries);
