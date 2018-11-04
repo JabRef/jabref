@@ -17,8 +17,8 @@ public class RemoteClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
 
-    private static final int TIMEOUT = 2000;
-    private int port;
+    private static final int TIMEOUT = 5000;
+    private final int port;
 
     public RemoteClient(int port) {
         this.port = port;
@@ -29,7 +29,7 @@ public class RemoteClient {
             protocol.sendMessage(RemoteMessage.PING);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
 
-            if (response.getKey() == RemoteMessage.PONG && Protocol.IDENTIFIER.equals(response.getValue())) {
+            if ((response.getKey() == RemoteMessage.PONG) && Protocol.IDENTIFIER.equals(response.getValue())) {
                 return true;
             } else {
                 String port = String.valueOf(this.port);
@@ -47,7 +47,7 @@ public class RemoteClient {
      * Attempt to send command line arguments to already running JabRef instance.
      *
      * @param args command line arguments.
-     * @return true if successful, false otherwise.
+     * @return true
      */
     public boolean sendCommandLineArguments(String[] args) {
         try (Protocol protocol = openNewConnection()) {
@@ -56,7 +56,7 @@ public class RemoteClient {
             return response.getKey() == RemoteMessage.OK;
         } catch (IOException e) {
             LOGGER.debug("Could not send args " + String.join(", ", args) + " to the server at port " + port, e);
-            return false;
+            return true;
         }
     }
 
