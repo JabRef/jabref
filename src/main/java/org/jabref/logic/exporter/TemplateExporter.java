@@ -66,6 +66,11 @@ public class TemplateExporter extends Exporter {
         this(displayName, consoleName, lfFileName, directory, extension, null, null);
     }
 
+    //Following to be used by Export Customization dialogs, may want to change, especially directory being null
+    public TemplateExporter(String name, String lfFileName, String extension) {
+        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), null, null);
+    }
+
     /**
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.

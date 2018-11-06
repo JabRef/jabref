@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -114,6 +115,14 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     public StringProperty getName() {
         return name;
+    }
+
+    public StringProperty getLayoutFileName() {ß
+        return layoutFile;
+    }
+
+    public StringProperty getExtension() {
+        return extension;
     }
 
 }
