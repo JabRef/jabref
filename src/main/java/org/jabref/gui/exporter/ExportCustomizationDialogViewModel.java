@@ -2,12 +2,11 @@ package org.jabref.gui.exporter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Dialog;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -62,16 +61,19 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //The following dialog will have to be implemented as the JavaFX MVVM analogue of Swing CustomExportDialog
     public void addExporter() {
-        TemplateExporter exporter = dialogService.showCustomDialogAndWait(new CreateModifyExporterDialogView());
-        exporters.add(new ExporterViewModel(exporter));//var might have to be renamed
-
+        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(new CreateModifyExporterDialogView());
+        if (exporter.isPresent()) {
+            exporters.add(exporter.get());
+        }
     }
 
     public void modifyExporter() {
         // open modify Exporter dialog, which may be the same as add Exporter dialog, and set that into exporters.
-        Dialog<T> dialog = new CreateModifyExporterDialogView(selectedExporters.get(0));
-        TemplateExporter exporter = dialogService.showCustomDialogAndWait(dialog);
-        exporters.add(new ExporterViewModel(exporter)); //result must come from dialog, and this will append the exporter unless you make a sorted list property
+        //Make the following line shorter
+        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(new CreateModifyExporterDialogView(selectedExporters.get(0)));
+        if (exporter.isPresent()) {
+            exporters.add(exporter.get()); //result must come from dialog, and this will append the exporter unless you make a sorted list property
+        }
     }
 
     public void removeExporters() {
@@ -84,7 +86,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void saveToPrefs() {
-        List<TemplateExporter> exportersLogic;
+        List<TemplateExporter> exportersLogic = new ArrayList<>();
         exporters.forEach(exporter -> exportersLogic.add(exporter.getLogic()));
         preferences.storeCustomExportFormats(exportersLogic);
 

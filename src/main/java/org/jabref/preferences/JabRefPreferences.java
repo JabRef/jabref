@@ -2018,7 +2018,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader) {
         int i = 0;
-        List<TemplateExporter> formats = null;
+        List<TemplateExporter> formats = new ArrayList<>();
         String exporterName;
         String filename;
         String extension;

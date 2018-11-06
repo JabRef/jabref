@@ -2,6 +2,8 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -31,7 +33,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
 
-    private final TemplateExporter exporter;
+    private final ExporterViewModel exporter; //Maybe you should get rid of this - maybe the exporter can be held by am ExporterVM that directly observes the View
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
@@ -40,16 +42,15 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty extension = new SimpleStringProperty("");
 
 
-    public CreateModifyExporterDialogViewModel(TemplateExporter exporter, DialogService dialogService, PreferencesService preferences,
-                                               String name, String layoutFile, String extension) {
-        this.exporter = exporter;
+    public CreateModifyExporterDialogViewModel(Optional<ExporterViewModel> exporter, DialogService dialogService, PreferencesService preferences,
+                                               String name, String layoutFile, String extension) { //get ride of name, layout file, extension, take them from exporter
+        this.exporter = exporter.orElse(null); //Is using null the right way of doing this?
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        //Set text of each of the boxes
-        this.name.setValue(name);
-        this.layoutFile.setValue(layoutFile);
-        this.extension.setValue(extension);
+        setTextFields()
+
+
     }
 
     public TemplateExporter saveExporter() {//void?
@@ -101,6 +102,18 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
             .withInitialDirectory(getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString())); //implement setting the text
+    }
+
+    private void setTextFields() {
+
+        //Set text of each of the boxes
+        name.setValue(exporter.getName().get());  //Should this even be done in this VM, or should the View direclty bind to the ExporterVM?
+        layoutFile.setValue(exporter.getLayoutFileName().get());
+        extension.setValue(exporter.getExtension().get()));
+    }
+
+    public StringProperty getName() {
+        return name;
     }
 
 }
