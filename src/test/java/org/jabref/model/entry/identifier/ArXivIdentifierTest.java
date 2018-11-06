@@ -51,6 +51,13 @@ class ArXivIdentifierTest {
     }
 
     @Test
+    void parseOldIdentifierWithArXivPrefix() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("arXiv:math.GT/0309136");
+
+        assertEquals(Optional.of(new ArXivIdentifier("math.GT/0309136", "math.GT")), parsed);
+    }
+
+    @Test
     void parseUrl() throws Exception {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/abs/1502.05795");
 

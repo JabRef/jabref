@@ -17,7 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a "Move file to file directory and rename file" option for simultaneously moving and renaming of document file. [#4166](https://github.com/JabRef/jabref/issues/4166)
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
 - We added a cleanup operation that detects an arXiv identifier in the note, journal or url field and moves it to the `eprint` field.
-  Because of this change, the activated cleanup operations were reset.
+  Because of this change, the last-used cleanup operations were reset.
 - We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [4093](https://github.com/JabRef/jabref/issues/4093)
 - The special fields like `Printed` and `Read status` now show gray icons when the row is hovered.
 - We added a button in the tab header which allows you to close the database with one click. https://github.com/JabRef/jabref/issues/494

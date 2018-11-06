@@ -38,7 +38,7 @@ public class CleanupAction implements BaseAction {
         if (isCanceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset(), preferences.getFilePreferences());
 
         Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
 

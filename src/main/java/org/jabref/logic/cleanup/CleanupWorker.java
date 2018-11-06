@@ -10,8 +10,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.FilePreferences;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
@@ -75,7 +73,7 @@ public class CleanupWorker {
             case CLEAN_UP_ISSN:
                 return new ISSNCleanup();
             default:
-                throw new NotImplementedException(action.name());
+                throw new UnsupportedOperationException(action.name());
         }
     }
 }

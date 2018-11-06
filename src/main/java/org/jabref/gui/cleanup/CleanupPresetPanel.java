@@ -11,13 +11,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -39,7 +38,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private VBox formatterContainer;
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
-    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
+    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.cleanupPreset = cleanupPreset;
 
@@ -48,11 +47,11 @@ public class CleanupPresetPanel extends VBox {
                   .root(this)
                   .load();
 
-        init();
+        init(filePreferences);
     }
 
-    private void init() {
-        Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(JabRefPreferences.getInstance().getFilePreferences());
+    private void init(FilePreferences filePreferences) {
+        Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
         } else {
@@ -72,7 +71,7 @@ public class CleanupPresetPanel extends VBox {
 
         String currentPattern = Localization.lang("Filename format pattern")
                                             .concat(": ")
-                                            .concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+                                            .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
 
         updateDisplay(cleanupPreset);
