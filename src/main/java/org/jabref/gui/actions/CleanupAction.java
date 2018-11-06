@@ -53,12 +53,15 @@ public class CleanupAction implements BaseAction {
 
                 if (!confirmed) {
                     isCanceled = true;
-                } else {
-                    BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
-                                  .onSuccess(x -> showResults())
-                                  .executeWith(Globals.TASK_EXECUTOR);
+                    return;
                 }
             }
+
+            preferences.setCleanupPreset(chosenPreset.get());
+
+            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
+                          .onSuccess(result -> showResults())
+                          .executeWith(Globals.TASK_EXECUTOR);
         }
     }
 

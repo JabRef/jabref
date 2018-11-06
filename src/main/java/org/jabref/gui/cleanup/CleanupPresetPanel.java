@@ -23,7 +23,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class CleanupPresetPanel extends VBox {
 
     private final BibDatabaseContext databaseContext;
-    private final CleanupPreset cleanupPreset;
     @FXML private Label cleanupRenamePDFLabel;
     @FXML private CheckBox cleanUpDOI;
     @FXML private CheckBox cleanUpEprint;
@@ -40,17 +39,16 @@ public class CleanupPresetPanel extends VBox {
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.cleanupPreset = cleanupPreset;
 
         // Load FXML
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        init(filePreferences);
+        init(cleanupPreset, filePreferences);
     }
 
-    private void init(FilePreferences filePreferences) {
+    private void init(CleanupPreset cleanupPreset, FilePreferences filePreferences) {
         Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
             cleanUpMovePDF.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
