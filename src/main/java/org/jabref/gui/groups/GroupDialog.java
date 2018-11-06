@@ -56,6 +56,8 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jfoenix.controls.JFXColorPicker;
+
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
@@ -69,13 +71,13 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private static final int INDEX_TEX_GROUP = 4;
     private static final int TEXTFIELD_LENGTH = 40;
     private static final int HGAP = 7;
-    private static final int VGAP = 5;
+    private static final int VGAP = 10;
     private static final Insets PADDING = new Insets(5, 5, 5, 5);
 
     // for all types
     private final TextField nameField = new TextField();
     private final TextField descriptionField = new TextField();
-    private final TextField colorField = new TextField();
+    private final JFXColorPicker colorField = new JFXColorPicker();
     private final TextField iconField = new TextField();
     private final RadioButton explicitRadioButton = new RadioButton(Localization.lang("Statically group entries by manual assignment"));
     private final RadioButton keywordsRadioButton = new RadioButton(Localization.lang("Dynamically group entries by searching a field for a keyword"));
@@ -125,7 +127,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
         nameField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         descriptionField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        colorField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         iconField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         explicitRadioButton.setSelected(true);
         keywordGroupSearchTerm.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
@@ -245,7 +246,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         generalPanel.setStyle("-fx-content-display:top;"
                               + "-fx-border-insets:0 0 0 0;"
                               + "-fx-border-color:#D3D3D3");
-
         ColumnConstraints columnLabel = new ColumnConstraints();
         columnLabel.setHalignment(HPos.RIGHT);
         textFieldPanel.getColumnConstraints().add(columnLabel);
@@ -416,11 +416,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         resultingGroup = new TexGroup(groupName, getContext(),
                                 Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
                     }
-                    try {
-                        resultingGroup.setColor(Color.valueOf(colorField.getText()));
-                    } catch (IllegalArgumentException ex) {
-                        // Ignore invalid color (we should probably notify the user instead...)
-                    }
+
+                    resultingGroup.setColor(colorField.getValue());
                     resultingGroup.setDescription(descriptionField.getText());
                     resultingGroup.setIconName(iconField.getText());
                     return resultingGroup;
@@ -438,7 +435,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                                                 Boolean newBoolean) -> updateComponents();
 
         nameField.textProperty().addListener(caretListener);
-        colorField.textProperty().addListener(caretListener);
         descriptionField.textProperty().addListener(caretListener);
         iconField.textProperty().addListener(caretListener);
         keywordGroupSearchField.textProperty().addListener(caretListener);
@@ -456,7 +452,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setContext(GroupHierarchyType.INDEPENDENT);
         } else {
             nameField.setText(editedGroup.getName());
-            colorField.setText(editedGroup.getColor().map(Color::toString).orElse(""));
+            editedGroup.getColor().ifPresent(colorField::setValue);
             descriptionField.setText(editedGroup.getDescription().orElse(""));
             iconField.setText(editedGroup.getIconName().orElse(""));
 
