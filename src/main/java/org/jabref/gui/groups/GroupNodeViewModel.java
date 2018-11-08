@@ -44,7 +44,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private StringProperty displayName = new SimpleStringProperty();
+    private StringProperty displayNameProperty;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -66,7 +66,9 @@ public class GroupNodeViewModel {
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayName.bindBidirectional(groupNode.getGroup().nameProperty());
+        displayNameProperty = new SimpleStringProperty(formatter.format(groupNode.getGroup().getName()));
+        groupNode.getGroup().nameProperty().bindBidirectional(displayNameProperty);
+
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
@@ -136,15 +138,11 @@ public class GroupNodeViewModel {
     }
 
     public String getDisplayName() {
-        return displayName.getValue();
+        return displayNameProperty.getValue();
     }
 
     public StringProperty displayNameProperty() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName.set(displayName);
+        return displayNameProperty;
     }
 
     public boolean isRoot() {
@@ -176,7 +174,7 @@ public class GroupNodeViewModel {
     @Override
     public String toString() {
         return "GroupNodeViewModel{" +
-                "displayName='" + displayName + '\'' +
+                "displayNameProperty='" + displayNameProperty + '\'' +
                 ", isRoot=" + isRoot +
                 ", icon='" + getIcon() + '\'' +
                 ", children=" + children +
