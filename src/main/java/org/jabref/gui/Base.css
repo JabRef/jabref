@@ -242,6 +242,7 @@
 /*
  * The base css file defining the style that is valid for every pane and dialog.
  */
+
 .hyperlink {
     -fx-padding: 0;
     -fx-underline: false;
@@ -630,8 +631,10 @@
 }
 
 .text-input:focused {
+    -fx-highlight-fill: derive(-jr-accent, 20%);
     -fx-background-color: -jr-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 .text-area {
@@ -940,4 +943,16 @@ We want to have a look that matches our icons in the tool-bar */
 .jfx-snackbar-toast {
     -fx-text-fill: -fx-light-text-color;
     -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -jr-theme;
+}
+
+.progress-bar:indeterminate > .bar {
+    -fx-background-color: -jr-theme;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -jr-accent;
 }

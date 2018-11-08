@@ -13,14 +13,13 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 class AppearancePrefsTab extends Pane implements PrefsTab {
 
-    public static final String BASE_CSS = "Base.css";
-    public static final String DARK_CSS = "Dark.css";
     private final JabRefPreferences prefs;
     private final CheckBox fontTweaksLAF;
     private final TextField fontSize;
@@ -55,9 +54,9 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         darkTheme.setToggleGroup(themeGroup);
 
         String cssFileName = prefs.get(JabRefPreferences.FX_THEME);
-        if (StringUtil.isBlank(cssFileName) || BASE_CSS.equals(cssFileName)) {
+        if (StringUtil.isBlank(cssFileName) || ThemeLoader.MAIN_CSS.equalsIgnoreCase(cssFileName)) {
             lightTheme.setSelected(true);
-        } else if (DARK_CSS.equals(cssFileName)) {
+        } else if (ThemeLoader.DARK_CSS.equals(cssFileName)) {
             darkTheme.setSelected(true);
         }
 
@@ -89,11 +88,11 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
 
         boolean isThemeChanged = false;
 
-        if (lightTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(BASE_CSS)) {
-            prefs.put(JabRefPreferences.FX_THEME, BASE_CSS);
+        if (lightTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
+            prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
             isThemeChanged = true;
-        } else if (darkTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(DARK_CSS)) {
-            prefs.put(JabRefPreferences.FX_THEME, DARK_CSS);
+        } else if (darkTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
+            prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
             isThemeChanged = true;
         }
 

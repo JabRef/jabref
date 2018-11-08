@@ -119,6 +119,7 @@ public class WebFetchers {
         ArrayList<EntryBasedFetcher> list = new ArrayList<>();
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new DoiFetcher(importFormatPreferences));
+        list.add(new IsbnFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new CrossRef());
         list.sort(Comparator.comparing(WebFetcher::getName));

@@ -16,6 +16,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the behavior of the field formatting dialog such that the `bibtexkey` is not changed when formatting all fields or all text fields.
 - We added a "Move file to file directory and rename file" option for simultaneously moving and renaming of document file. [#4166](https://github.com/JabRef/jabref/issues/4166)
 - Use integrated graphics card instead of discrete on macOS [#4070](https://github.com/JabRef/jabref/issues/4070)
+- We added a cleanup operation that detects an arXiv identifier in the note, journal or url field and moves it to the `eprint` field.
+  Because of this change, the last-used cleanup operations were reset.
 - We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [4093](https://github.com/JabRef/jabref/issues/4093)
 - The special fields like `Printed` and `Read status` now show gray icons when the row is hovered.
 - We added a button in the tab header which allows you to close the database with one click. https://github.com/JabRef/jabref/issues/494
@@ -28,15 +30,17 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the default keyboard shortcuts for moving between entries when the entry editor is active to ̀<kbd>alt</kbd> + <kbd>up/down</kbd>.
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
 - Window state is saved on close and restored on start.
+- We made the MathSciNet fetcher more reliable.
+- We added the ISBN fetcher to the list of fetcher available under "Update with bibliographic information from the web" in the entry editor toolbar.
 - Files without a defined external file type are now directly opened with the default application of the operating system
 - We streamlined the process to rename and move files by removing the confirmation dialogs.
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
-- We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
+- We add auto url formatting when user paste link to URL field in entry editor. [koppor#254](https://github.com/koppor/jabref/issues/254)
 - We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
 - We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl<kbd> + <kbd>E<kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
 - We added an option in the preference dialog box, that allows user to pick the dark or light theme option. [#4130] (https://github.com/JabRef/jabref/issues/4130)
 - We updated updated the Related Articles tab to accept JSON from the new version of the Mr. DLib service
-
+- We added an option in the preference dialog box that allows user to choose behavior after dragging and dropping files in Entry Editor. [#4356](https://github.com/JabRef/jabref/issues/4356)
 
 
 
@@ -74,8 +78,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201) and [#4241](https://github.com/JabRef/jabref/issues/4241)
 - We fixed an issue where author list parser can't generate bibtex for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
 - We fixed an issue where the list of XMP Exclusion fields in the preferences was not be saved [#4072](https://github.com/JabRef/jabref/issues/4072)
-- We fixed an issue where the ArXiv Fetcher did not support HTTP URLs [#4367](https://github.com/JabRef/jabref/pull/4367)
-
+- We fixed an issue where the ArXiv Fetcher did not support HTTP URLs [koppor#328](https://github.com/koppor/jabref/issues/328)
+- We fixed an issue where only one PDF file could be imported [#4422](https://github.com/JabRef/jabref/issues/4422)
 
 
 
