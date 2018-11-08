@@ -43,7 +43,7 @@ public interface PreferencesService {
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences();
+    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
     SavePreferences LoadForExportFromPreferences();
 

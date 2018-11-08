@@ -13,10 +13,6 @@ public class ExporterViewModel {
     //If the TemplateExporter
     private final StringProperty extension = new SimpleStringProperty();
 
-    public ExporterViewModel() {
-        this(new TemplateExporter()); //You will need a new constructor in logic for this, that is probably also called by JAbREf preferences, for creating a new TE in the Export Customization subdialog
-    }
-
     public ExporterViewModel(TemplateExporter exporter) {
         this.exporter = exporter;
         this.name.setValue(exporter.getName());

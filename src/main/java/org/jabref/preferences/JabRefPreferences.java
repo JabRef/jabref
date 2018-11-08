@@ -1468,6 +1468,7 @@ public class JabRefPreferences implements PreferencesService {
                                            isKeywordSyncEnabled());
     }
 
+    @Override
     public SavePreferences loadForExportFromPreferences() {
         Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
@@ -1530,6 +1531,7 @@ public class JabRefPreferences implements PreferencesService {
         return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), get(TIME_STAMP_FIELD), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
     }
 
+    @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(
                                                                     JournalAbbreviationLoader journalAbbreviationLoader) {
         Objects.requireNonNull(journalAbbreviationLoader);
@@ -2085,21 +2087,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SavePreferences LoadForExportFromPreferences() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String getExportWorkingDirectory() {
-        // TODO Auto-generated method stub
-        return null;
+        return get(EXPORT_WORKING_DIRECTORY);
     }
 
 }

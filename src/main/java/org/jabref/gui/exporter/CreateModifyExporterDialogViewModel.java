@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
@@ -42,14 +43,17 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
+    private final JournalAbbreviationLoader loader;
+
 
     public CreateModifyExporterDialogViewModel(Optional<ExporterViewModel> exporter, DialogService dialogService, PreferencesService preferences,
-                                               String name, String layoutFile, String extension) { //get ride of name, layout file, extension, take them from exporter
+                                               JournalAbbreviationLoader loader) { //get ride of name, layout file, extension, take them from exporter
         this.exporter = exporter.orElse(null); //Is using null the right way of doing this?
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.loader = loader;
 
-        setTextFields()
+        setTextFields();
 
 
     }
@@ -72,7 +76,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences();
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = preferences.LoadForExportFromPreferences();
         String filename = layoutFile.get(); //change var name?
         String extensionString = extension.get(); //change var name?
@@ -110,7 +114,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         //Set text of each of the boxes
         name.setValue(exporter.getName().get());  //Should this even be done in this VM, or should the View direclty bind to the ExporterVM?
         layoutFile.setValue(exporter.getLayoutFileName().get());
-        extension.setValue(exporter.getExtension().get()));
+        extension.setValue(exporter.getExtension().get());
     }
 
     public StringProperty getName() {

@@ -66,9 +66,10 @@ public class TemplateExporter extends Exporter {
         this(displayName, consoleName, lfFileName, directory, extension, null, null);
     }
 
-    //Following to be used by Export Customization dialogs, may want to change, especially directory being null
-    public TemplateExporter(String name, String lfFileName, String extension) {
-        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), null, null);
+    //Following to be used by Export Customization dialogs, as of now directory can be null for custom exports
+    public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
+                            SavePreferences savePreferences) {
+        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), layoutPreferences, savePreferences);
     }
 
     /**

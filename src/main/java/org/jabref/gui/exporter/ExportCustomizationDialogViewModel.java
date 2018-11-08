@@ -13,9 +13,6 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     //The class vars might need to be reordered
@@ -25,16 +22,10 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    //Indices within which export format information is stored within JabRefPreferences, currently unused
-    private static final int EXPORTER_NAME_INDEX = 0;
-    private static final int EXPORTER_FILENAME_INDEX = 1;
-    private static final int EXPORTER_EXTENSION_INDEX = 2;
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final JournalAbbreviationLoader loader;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExportCustomizationDialogViewModel.class); //currently unused
 
     public ExportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationLoader loader) {
         this.preferences = preferences;
@@ -56,21 +47,30 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void addExporter() {
-        ExporterViewModel blankExporter = new ExporterViewModel();
-        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(blankExporter);
-        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
-        if (exporter.isPresent()) {
-            exporters.add(exporter.get());
+        Optional<ExporterViewModel> blankExporter = Optional.empty();
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(blankExporter, dialogService, preferences,
+                                                                                   loader);
+        Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
+        if (exporter.isPresent() && exporter.get().isPresent()) {
+            exporters.add(exporter.get().get());
         }
     }
 
     public void modifyExporter() {
         // open modify Exporter dialog, which is the same as add Exporter dialog but beginning with a non-blank ExporterViewModel,
         // and set that into exporters.
-        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(selectedExporters.get(0));
-        Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
-        if (exporter.isPresent()) {
-            exporters.add(exporter.get()); //result must come from dialog, and this will append the exporter unless you make a sorted list property
+        CreateModifyExporterDialogView dialog;
+        try {
+            dialog = new CreateModifyExporterDialogView(Optional.of(selectedExporters.get(0)),
+                                                        dialogService, preferences, loader);
+        } catch (IndexOutOfBoundsException ex) {
+            Optional<ExporterViewModel> emptyExporter = Optional.empty();
+            dialog = new CreateModifyExporterDialogView(emptyExporter, dialogService,
+                                                                                       preferences, loader);
+        }
+        Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
+        if (exporter.isPresent() && exporter.get().isPresent()) { //First optional because you may not have entered a exporter to begin with, and second because you may not have outputted one at the end
+            exporters.add(exporter.get().get()); // this will append the exporter unless you make a sorted list property
         }
     }
 
