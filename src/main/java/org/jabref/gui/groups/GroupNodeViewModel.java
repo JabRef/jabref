@@ -10,6 +10,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -42,7 +44,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private String displayName;
+    private StringProperty displayName = new SimpleStringProperty();
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -64,7 +66,7 @@ public class GroupNodeViewModel {
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayName = formatter.format(groupNode.getName());
+        displayName.bindBidirectional(groupNode.getGroup().nameProperty());
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
@@ -134,11 +136,15 @@ public class GroupNodeViewModel {
     }
 
     public String getDisplayName() {
+        return displayName.getValue();
+    }
+
+    public StringProperty displayNameProperty() {
         return displayName;
     }
 
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+        this.displayName.set(displayName);
     }
 
     public boolean isRoot() {
