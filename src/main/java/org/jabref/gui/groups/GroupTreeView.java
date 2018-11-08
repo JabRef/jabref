@@ -115,7 +115,7 @@ public class GroupTreeView {
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
-                .withText(GroupNodeViewModel::getDisplayName)
+                .withText(GroupNodeViewModel::displayNameProperty)
                 .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription));
 
@@ -312,7 +312,6 @@ public class GroupTreeView {
         editGroup.setOnAction(event -> {
             menu.hide();
             viewModel.editGroup(group);
-            groupTree.refresh();
         });
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));

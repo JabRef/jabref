@@ -145,7 +145,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // TODO: Expand parent to make new group visible
             //parent.expand();
 
-            dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+            dialogService.notify(Localization.lang("Added group \"%0\".", parent.getDisplayName()));
             writeGroupChangesToMetaData();
         });
     }
@@ -162,19 +162,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
             // TODO: Keep assignments
-            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Change of Grouping Method"),
-                    Localization.lang("Assign the original group's entries to this group?"));
             //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                    && (group instanceof ExplicitGroup);
-
-            oldGroup.getGroupNode().setGroup(
-                    group,
-                    keepPreviousAssignments,
-                    removePreviousAssignents,
-                    stateManager.getEntriesInCurrentDatabase());
-            oldGroup.setDisplayName(group.getName());
             // TODO: Add undo
             // Store undo information.
             // AbstractUndoableEdit undoAddPreviousEntries = null;
