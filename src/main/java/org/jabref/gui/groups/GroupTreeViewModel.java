@@ -161,8 +161,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
         Optional<AbstractGroup> newGroup = dialogService
                 .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
-            // TODO: Keep assignments
-            //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
             // TODO: Add undo
             // Store undo information.
             // AbstractUndoableEdit undoAddPreviousEntries = null;
