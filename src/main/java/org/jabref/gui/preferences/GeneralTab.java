@@ -26,6 +26,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
+import static javafx.beans.binding.Bindings.not;
+
 class GeneralTab extends Pane implements PrefsTab {
 
     private final CheckBox useOwner;
@@ -59,10 +61,7 @@ class GeneralTab extends Pane implements PrefsTab {
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        if (!useTimeStamp.isSelected()) {
-            updateTimeStamp.setDisable(true);
-        }
-        useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
+        updateTimeStamp.disableProperty().bind(not(useTimeStamp.selectedProperty()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
@@ -140,7 +139,6 @@ class GeneralTab extends Pane implements PrefsTab {
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
-        updateTimeStamp.setSelected(useTimeStamp.isSelected());
         enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         shouldCollectTelemetry.setSelected(prefs.shouldCollectTelemetry());
         memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
@@ -182,9 +180,9 @@ class GeneralTab extends Pane implements PrefsTab {
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding(encodings.getValue());
-        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue().equals(BibDatabaseMode.BIBLATEX));
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue() == BibDatabaseMode.BIBLATEX);
 
-        if (!languageSelection.getValue().equals(prefs.getLanguage())) {
+        if (languageSelection.getValue() != prefs.getLanguage()) {
             prefs.setLanguage(languageSelection.getValue());
             Localization.setLanguage(languageSelection.getValue());
 
