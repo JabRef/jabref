@@ -166,7 +166,7 @@ public class GroupNodeViewModel {
             return false;
         }
 
-        GroupNodeViewModel that = (GroupNodeViewModel) o;
+            GroupNodeViewModel that = (GroupNodeViewModel) o;
 
         return groupNode.equals(that.groupNode);
     }
@@ -174,7 +174,7 @@ public class GroupNodeViewModel {
     @Override
     public String toString() {
         return "GroupNodeViewModel{" +
-                "displayNameProperty='" + displayNameProperty + '\'' +
+                "displayNameProperty='" + displayNameProperty.getValue() + '\'' +
                 ", isRoot=" + isRoot +
                 ", icon='" + getIcon() + '\'' +
                 ", children=" + children +
