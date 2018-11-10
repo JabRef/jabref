@@ -25,7 +25,6 @@ public class ManageCitationsItemViewModel {
         return new CitationEntry(refMarkName, citation.getValue(), extraInformation.getValue());
     }
 
-
     public StringProperty citationProperty() {
         return citation;
     }
