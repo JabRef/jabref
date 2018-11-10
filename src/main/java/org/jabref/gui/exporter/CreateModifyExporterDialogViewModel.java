@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -35,7 +34,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
 
-    private final ExporterViewModel exporter; //Maybe you should get rid of this - maybe the exporter can be held by am ExporterVM that directly observes the View
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
@@ -48,17 +46,17 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     public CreateModifyExporterDialogViewModel(Optional<ExporterViewModel> exporter, DialogService dialogService, PreferencesService preferences,
                                                JournalAbbreviationLoader loader) { //get ride of name, layout file, extension, take them from exporter
-        this.exporter = exporter.orElse(null); //Is using null the right way of doing this?
+        //this.exporter = exporter.orElse(null); //Is using null the right way of doing this?
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.loader = loader;
 
-        setTextFields();
+        setTextFields(exporter);
 
 
     }
 
-    public TemplateExporter saveExporter() {//void?
+    public Optional<ExporterViewModel> saveExporter() {
         Path layoutFileDir = Paths.get(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
@@ -71,7 +69,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             || !layoutFile.get().endsWith(".layout")) {
 
             LOGGER.info("One of the fields is empty!");
-            return null; //return implemented similarly to CleanupDialog, although JavaFX documentation says you need something
+            return Optional.empty(); //return implemented similarly to CleanupDialog, although JavaFX documentation says you need something
             //like a result converter, which must be in the view, see class EntryTypeView
         }
 
@@ -94,7 +92,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         TemplateExporter format = new TemplateExporter(name.get(), name.get(), lfFileName, null, fileType, layoutPreferences,
                                                        savePreferences);
         format.setCustomExport(true);
-        return format;
+        return Optional.of(new ExporterViewModel(format));
     }
 
     public String getExportWorkingDirectory() {//i.e. layout dir
@@ -109,19 +107,21 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString())); //implement setting the text
     }
 
-    private void setTextFields() {
+    private void setTextFields(Optional<ExporterViewModel> exporter) {
 
         //Set text of each of the boxes
-        name.setValue(exporter.getName().get());  //Should this even be done in this VM, or should the View direclty bind to the ExporterVM?
-        layoutFile.setValue(exporter.getLayoutFileName().get());
-        extension.setValue(exporter.getExtension().get());
+        if (exporter.isPresent()) {
+            name.setValue(exporter.get().getName().get());
+            layoutFile.setValue(exporter.get().getLayoutFileName().get());
+            extension.setValue(exporter.get().getExtension().get());
+        }
     }
 
     public StringProperty getName() {
         return name;
     }
 
-    public StringProperty getLayoutFileName() {ß
+    public StringProperty getLayoutFileName() {
         return layoutFile;
     }
 
