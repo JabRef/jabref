@@ -1,6 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,7 +12,6 @@ public class CleanupPreset {
 
     private final Set<CleanupStep> activeJobs;
     private final FieldFormatterCleanups formatterCleanups;
-
 
     public CleanupPreset(Set<CleanupStep> activeJobs) {
         this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
@@ -30,44 +30,12 @@ public class CleanupPreset {
         this.formatterCleanups = Objects.requireNonNull(formatterCleanups);
     }
 
-    public boolean isCleanUpUpgradeExternalLinks() {
-        return isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+    public Set<CleanupStep> getActiveJobs() {
+        return Collections.unmodifiableSet(activeJobs);
     }
 
-    public boolean isCleanUpDOI() {
-        return isActive(CleanupStep.CLEAN_UP_DOI);
-    }
-
-    public boolean isCleanUpISSN() {
-        return isActive(CleanupStep.CLEAN_UP_ISSN);
-    }
-
-    public boolean isFixFileLinks() {
-        return isActive(CleanupStep.FIX_FILE_LINKS);
-    }
-
-    public boolean isMovePDF() {
-        return isActive(CleanupStep.MOVE_PDF);
-    }
-
-    public boolean isMakePathsRelative() {
-        return isActive(CleanupStep.MAKE_PATHS_RELATIVE);
-    }
-
-    public boolean isRenamePDF() {
+    public boolean isRenamePDFActive() {
         return isActive(CleanupStep.RENAME_PDF) || isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
-    }
-
-    public boolean isConvertToBiblatex() {
-        return isActive(CleanupStep.CONVERT_TO_BIBLATEX);
-    }
-
-    public boolean isConvertToBibtex() {
-        return isActive(CleanupStep.CONVERT_TO_BIBTEX);
-    }
-
-    public boolean isRenamePdfOnlyRelativePaths() {
-        return isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
     }
 
     public Boolean isActive(CleanupStep step) {
@@ -83,6 +51,7 @@ public class CleanupPreset {
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
          */
         CLEAN_UP_DOI,
+        CLEANUP_EPRINT,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
@@ -102,5 +71,4 @@ public class CleanupPreset {
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN
     }
-
 }
