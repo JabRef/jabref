@@ -9,6 +9,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ValueTableCellFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.sun.star.beans.UnknownPropertyException;
@@ -48,10 +49,15 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
         colCitation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
+
+        new ValueTableCellFactory<ManageCitationsItemViewModel, String>().withGraphic(viewModel::getText).install(colCitation);
+
         colExtraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
         colExtraInfo.setEditable(true);
 
-        tvCitations.setItems(viewModel.citationsProperty());
+        tvCitations.setEditable(true);
+
+        tvCitations.itemsProperty().bindBidirectional(viewModel.citationsProperty());
 
         colExtraInfo.setOnEditCommit((CellEditEvent<ManageCitationsItemViewModel, String> cell) -> {
             cell.getRowValue().setExtraInfo(cell.getNewValue());
@@ -59,4 +65,5 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         colExtraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
 
     }
+
 }
