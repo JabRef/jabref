@@ -45,7 +45,7 @@ public interface PreferencesService {
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
-    SavePreferences LoadForExportFromPreferences();
+    SavePreferences loadForExportFromPreferences();
 
     void setExportWorkingDirectory(String layoutFileDirString);
 

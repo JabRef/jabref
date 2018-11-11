@@ -75,7 +75,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
-        SavePreferences savePreferences = preferences.LoadForExportFromPreferences();
+        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         String filename = layoutFile.get(); //change var name?
         String extensionString = extension.get(); //change var name?
         String lfFileName;
