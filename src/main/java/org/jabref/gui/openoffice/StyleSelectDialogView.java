@@ -64,6 +64,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
             return null;
 
         });
+        setTitle(Localization.lang("Style selection"));
     }
 
     @FXML
@@ -89,6 +90,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         }).withOnMouseClickedEvent(item -> {
             return evt -> viewModel.deleteStyle();
+        }).withTooltip(item -> {
+            return Localization.lang("Remove style");
         }).install(colDeleteIcon);
 
         edit.setOnAction(e -> viewModel.editStyle());

@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
@@ -57,8 +58,8 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
             return null;
         });
 
+        setTitle(Localization.lang("Set connection parameters"));
     }
-
     @FXML
     private void initialize() {
         this.preferences = preferencesService.getOpenOfficePreferences();

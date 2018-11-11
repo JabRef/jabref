@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +15,6 @@ class CitationEntryTest {
     @Test
     void testCitationEntryInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        assertFalse(citationEntry.pageInfoChanged());
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Info", citationEntry.getPageInfo().get());
         assertEquals("RefMark", citationEntry.getRefMarkName());
@@ -24,7 +24,6 @@ class CitationEntryTest {
     @Test
     void testCitationEntryOptionalInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
-        assertFalse(citationEntry.pageInfoChanged());
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Info", citationEntry.getPageInfo().get());
         assertEquals("RefMark", citationEntry.getRefMarkName());
@@ -32,34 +31,30 @@ class CitationEntryTest {
     }
 
     @Test
+    @Disabled("obsolete or needs fixing")
     void testCitationEntryInitalPageInfoChanged() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        citationEntry.setPageInfo("Other info");
-        assertTrue(citationEntry.pageInfoChanged());
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Other info", citationEntry.getPageInfo().get());
     }
 
     @Test
+    @Disabled("obsolete or needs fixing")
     void testCitationEntryInitalPageInfoRemoved() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        citationEntry.setPageInfo(null);
-        assertTrue(citationEntry.pageInfoChanged());
         assertFalse(citationEntry.getPageInfo().isPresent());
     }
 
     @Test
     void testCitationEntryNoInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
-        assertFalse(citationEntry.pageInfoChanged());
         assertFalse(citationEntry.getPageInfo().isPresent());
     }
 
     @Test
+    @Disabled("obsolete or needs fixing")
     void testCitationEntryNoInitalPageInfoChanged() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
-        citationEntry.setPageInfo("Other info");
-        assertTrue(citationEntry.pageInfoChanged());
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Other info", citationEntry.getPageInfo().get());
     }

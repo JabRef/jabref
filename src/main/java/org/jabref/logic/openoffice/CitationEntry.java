@@ -6,16 +6,13 @@ import java.util.Optional;
 public class CitationEntry implements Comparable<CitationEntry> {
 
     private final String refMarkName;
-    private Optional<String> pageInfo;
+    private final Optional<String> pageInfo;
     private final String context;
-    private final Optional<String> origPageInfo;
 
-    // Only used for testing...
     public CitationEntry(String refMarkName, String context) {
         this(refMarkName, context, Optional.empty());
     }
 
-    // Only used for testing...
     public CitationEntry(String refMarkName, String context, String pageInfo) {
         this(refMarkName, context, Optional.ofNullable(pageInfo));
     }
@@ -24,7 +21,6 @@ public class CitationEntry implements Comparable<CitationEntry> {
         this.refMarkName = refMarkName;
         this.context = context;
         this.pageInfo = pageInfo;
-        this.origPageInfo = pageInfo;
     }
 
     public Optional<String> getPageInfo() {
@@ -33,19 +29,6 @@ public class CitationEntry implements Comparable<CitationEntry> {
 
     public String getRefMarkName() {
         return refMarkName;
-    }
-
-    public boolean pageInfoChanged() {
-        if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
-            return true;
-        }
-        if (pageInfo.isPresent()) {
-            // This means that origPageInfo.isPresent is also true here
-            return pageInfo.get().compareTo(origPageInfo.get()) != 0;
-        } else {
-            // So origPageInfo.isPresent is false here
-            return false;
-        }
     }
 
     @Override
@@ -74,7 +57,4 @@ public class CitationEntry implements Comparable<CitationEntry> {
         return context;
     }
 
-    public void setPageInfo(String trim) {
-        pageInfo = Optional.ofNullable(trim);
-    }
 }

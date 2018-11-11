@@ -55,14 +55,17 @@ public class ManageCitationsDialogViewModel {
             ManageCitationsItemViewModel itemViewModelEntry = ManageCitationsItemViewModel.fromCitationEntry(entry);
             citations.add(itemViewModelEntry);
         }
+
     }
 
+    //TODO: Call store settings after edit commit
+    //update reference then and call refresh/sync in the background
     public void storeSettings() {
         List<CitationEntry> ciationEntries = citations.stream().map(ManageCitationsItemViewModel::toCitationEntry).collect(Collectors.toList());
         try {
             for (CitationEntry entry : ciationEntries) {
                 Optional<String> pageInfo = entry.getPageInfo();
-                if (entry.pageInfoChanged() && pageInfo.isPresent()) {
+                if (pageInfo.isPresent()) {
                     ooBase.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
                 }
             }

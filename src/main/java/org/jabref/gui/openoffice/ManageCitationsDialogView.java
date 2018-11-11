@@ -10,6 +10,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.sun.star.beans.UnknownPropertyException;
@@ -41,6 +42,8 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
             }
             return null;
         });
+
+        setTitle(Localization.lang("Manage citations"));
     }
 
     @FXML
@@ -63,7 +66,6 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
             cell.getRowValue().setExtraInfo(cell.getNewValue());
         });
         colExtraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
-
     }
 
 }

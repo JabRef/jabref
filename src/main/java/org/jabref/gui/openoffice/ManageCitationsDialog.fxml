@@ -14,7 +14,7 @@
       <TableView fx:id="tvCitations" prefHeight="208.0" prefWidth="662.0">
         <columns>
           <TableColumn fx:id="colCitation" prefWidth="251.0" text="%Citation" />
-          <TableColumn fx:id="colExtraInfo" prefWidth="425.0" text="%Extra information" />
+          <TableColumn fx:id="colExtraInfo" prefWidth="425.0" text="%Extra information (e.g. page number)"/>
         </columns>
       </TableView>
    </content>
