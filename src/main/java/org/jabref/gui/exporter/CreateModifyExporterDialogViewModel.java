@@ -15,7 +15,6 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
 
@@ -76,8 +75,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        FileType fileType = StandardFileType.newFileType(extension.get());
-        TemplateExporter format = new TemplateExporter(name.get(), name.get(), layoutFile.get(), null, fileType, layoutPreferences,
+        TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(), layoutPreferences,
                                                        savePreferences);
         format.setCustomExport(true);
         return Optional.of(new ExporterViewModel(format));

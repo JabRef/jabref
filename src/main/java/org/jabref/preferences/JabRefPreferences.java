@@ -82,9 +82,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -1999,10 +1997,8 @@ public class JabRefPreferences implements PreferencesService {
             exporterName = s.get(0);
             filename = s.get(1); // 0, 1, 2 were originally static vars
             extension = s.get(2);
-            FileType fileType = StandardFileType.newFileType(extension);
-            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, exporterName, filename,
-                                                                                 null, fileType, layoutPreferences,
-                                                                                 savePreferences));
+            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, filename, extension,
+                                                                                 layoutPreferences, savePreferences));
             format.get().setCustomExport(true); //Taken out of orig CustomExporerList
             if (format.isPresent()) {
                 formats.add(format.get());
