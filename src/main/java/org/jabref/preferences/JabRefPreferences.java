@@ -408,6 +408,11 @@ public class JabRefPreferences implements PreferencesService {
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
 
+    // Indexes for Strings within stored custom export entries
+    private static final int EXPORTER_NAME_INDEX = 0;
+    private static final int EXPORTER_FILENAME_INDEX = 1;
+    private static final int EXPORTER_EXTENSION_INDEX = 2;
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -1994,9 +1999,9 @@ public class JabRefPreferences implements PreferencesService {
         List<String> formatData;
         // possibly check if CUSTOM_EXPORT_FORMAT + 0 is empty too and throw error
         while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(0);
-            filename = formatData.get(1); // 0, 1, 2 were originally static vars
-            extension = formatData.get(2);
+            exporterName = formatData.get(EXPORTER_NAME_INDEX);
+            filename = formatData.get(EXPORTER_FILENAME_INDEX); // 0, 1, 2 were originally static vars
+            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, filename, extension,
                                                                                  layoutPreferences, savePreferences));
             format.get().setCustomExport(true); //Taken out of orig CustomExporerList
@@ -2018,10 +2023,10 @@ public class JabRefPreferences implements PreferencesService {
         } else {
             for (int i = 0; i < exporters.size(); i++) {
                 List<String> exporterData = new ArrayList<>();
-                exporterData.add(exporters.get(i).getName());
-                exporterData.add(exporters.get(i).getLayoutFileName());
+                exporterData.add(EXPORTER_NAME_INDEX, exporters.get(i).getName());
+                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());
                 // Only stores the first extension associated with FileType
-                exporterData.add(exporters.get(i).getFileType().getExtensions().get(0));
+                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
                 putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
             }
             purgeCustomExportFormats(exporters.size());
