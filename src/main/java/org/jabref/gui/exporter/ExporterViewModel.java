@@ -16,9 +16,11 @@ public class ExporterViewModel {
     public ExporterViewModel(TemplateExporter exporter) {
         this.exporter = exporter;
         this.name.setValue(exporter.getName());
-        this.lfFileName.setValue(exporter.getLayoutFileName());
+        this.lfFileName.setValue(exporter.getLayoutFileNameWithExtension());
         //This should return at least one of the extensions, but may need to be changed to return the most common extension
-        this.extension.setValue(exporter.getFileType().getExtensionsWithDot().get(0));
+        //Removes the asterisk with substring(1)
+        String extensionString = exporter.getFileType().getExtensionsWithDot().get(0).substring(1);
+        this.extension.setValue(extensionString);
     }
 
     public TemplateExporter getLogic() {

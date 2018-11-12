@@ -2024,7 +2024,6 @@ public class JabRefPreferences implements PreferencesService {
         String exporterName;
         String filename;
         String extension;
-        String lfFileName;
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = loadForExportFromPreferences();
         List<String> s;
@@ -2033,17 +2032,8 @@ public class JabRefPreferences implements PreferencesService {
             exporterName = s.get(0);
             filename = s.get(1); // 0, 1, 2 were originally static vars
             extension = s.get(2);
-            //You might want to put the following few lines in logic because it also appears in CreateModifyExporterDialogViewModel
-            if (filename.endsWith(".layout")) {
-                lfFileName = filename.substring(0, filename.length() - ".layout".length());
-            } else {
-                lfFileName = filename;
-            }
-            if (extension.contains(".")) {
-                extension = extension.substring(extension.indexOf('.') + 1, extension.length());
-            }
             FileType fileType = StandardFileType.newFileType(extension);
-            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, exporterName, lfFileName,
+            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, exporterName, filename,
                                                                                  null, fileType, layoutPreferences,
                                                                                  savePreferences));
             format.get().setCustomExport(true); //Taken out of orig CustomExporerList

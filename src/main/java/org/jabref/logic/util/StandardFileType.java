@@ -51,6 +51,11 @@ public enum StandardFileType implements FileType {
     }
 
     public static FileType newFileType(String... extensions) {
+        for (int i = 0; i < extensions.length; i++) {
+            if (extensions[i].contains(".")) {
+                extensions[i] = extensions[i].substring(extensions[i].indexOf('.') + 1);
+            }
+        }
         return () -> Arrays.asList(extensions);
     }
 }

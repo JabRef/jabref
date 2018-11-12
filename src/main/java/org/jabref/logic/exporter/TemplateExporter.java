@@ -87,7 +87,11 @@ public class TemplateExporter extends Exporter {
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         super(consoleName, displayName, extension);
-        this.lfFileName = Objects.requireNonNull(lfFileName);
+        if (Objects.requireNonNull(lfFileName).endsWith(".layout")) {
+            this.lfFileName = lfFileName.substring(0, lfFileName.length() - ".layout".length());
+        } else {
+            this.lfFileName = lfFileName;
+        }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
@@ -340,5 +344,9 @@ public class TemplateExporter extends Exporter {
 
     public String getLayoutFileName() {
         return lfFileName;
+    }
+
+    public String getLayoutFileNameWithExtension() {
+        return lfFileName + ".layout";
     }
 }

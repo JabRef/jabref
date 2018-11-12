@@ -76,20 +76,8 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        String filename = layoutFile.get(); //change var name?
-        String extensionString = extension.get(); //change var name?
-        String lfFileName;
-        //You might want to move the next few lines into logic because it also appears in JabRefPreferences
-        if (filename.endsWith(".layout")) {
-            lfFileName = filename.substring(0, filename.length() - ".layout".length());
-        } else {
-            lfFileName = filename;
-        }
-        if (extensionString.contains(".")) {
-            extension.set(extensionString.substring(extensionString.indexOf('.') + 1, extensionString.length()));
-        }
-        FileType fileType = StandardFileType.newFileType(extensionString);
-        TemplateExporter format = new TemplateExporter(name.get(), name.get(), lfFileName, null, fileType, layoutPreferences,
+        FileType fileType = StandardFileType.newFileType(extension.get());
+        TemplateExporter format = new TemplateExporter(name.get(), name.get(), layoutFile.get(), null, fileType, layoutPreferences,
                                                        savePreferences);
         format.setCustomExport(true);
         return Optional.of(new ExporterViewModel(format));
