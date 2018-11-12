@@ -66,7 +66,17 @@ public class TemplateExporter extends Exporter {
         this(displayName, consoleName, lfFileName, directory, extension, null, null);
     }
 
-    //Following to be used by Export Customization dialogs, as of now directory can be null for custom exports
+    /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     *
+     * @param name to display to the user and to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   May or may not contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for the layout
+     * @param savePreferences Preferences for saving
+     */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
                             SavePreferences savePreferences) {
         this(name, name, lfFileName, null, StandardFileType.newFileType(extension), layoutPreferences, savePreferences);

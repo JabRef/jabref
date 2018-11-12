@@ -5,9 +5,16 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.exporter.TemplateExporter;
 
+/**
+ * ExporterViewModel wraps a TemplateExporter from logic and is used in the exporter customization dialog view
+ * and ViewModel.
+ *
+ *
+ */
+
 public class ExporterViewModel {
 
-    private final TemplateExporter exporter; //Should this be final?  Eclipse says so
+    private final TemplateExporter exporter;
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty lfFileName = new SimpleStringProperty();
     //If the TemplateExporter
@@ -17,8 +24,8 @@ public class ExporterViewModel {
         this.exporter = exporter;
         this.name.setValue(exporter.getName());
         this.lfFileName.setValue(exporter.getLayoutFileNameWithExtension());
-        //This should return at least one of the extensions, but may need to be changed to return the most common extension
-        //Removes the asterisk with substring(1)
+        // Only the first of the extensions gotten from FileType is saved into the class using get(0)
+        // substring(1) used to remove "*" from extension, i.e. "*.txt" to ".txt"
         String extensionString = exporter.getFileType().getExtensionsWithDot().get(0).substring(1);
         this.extension.setValue(extensionString);
     }

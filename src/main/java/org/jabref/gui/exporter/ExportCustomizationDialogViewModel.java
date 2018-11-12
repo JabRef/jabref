@@ -15,10 +15,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
-    //The class vars might need to be reordered
-
-    //exporters should probably be a JavaFX SortedList instead of SimpleListPreperty,
-    //but not yet sure how to make SortedList into a property
+    //TODO: Use JavaFX SortedList instead of SimpleListPreperty for exporters.  There is no SimpleSortedListProperty.
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -32,11 +29,6 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.loader = loader;
         init();
-
-        //ExporterViewModel is organized as a singular version of what now is CustomExportDialog, which
-        //currently stores all the exporters in a class var.  Each ExporterViewModel wraps an exporter, and
-        //the class var exporters is a list of the ExporterViewModels
-
     }
 
     public void loadExporters() {
@@ -56,23 +48,27 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         }
     }
 
+    /**
+     * Open dialog to modify exporter, which is the same as adding ane exporter but passes in
+     * a non-empty Optional of ExporterViewModel and sets the result into exporters.
+     */
+
     public void modifyExporter() {
-        // open modify Exporter dialog, which is the same as add Exporter dialog but beginning with a non-blank ExporterViewModel,
-        // and set that into exporters.
         CreateModifyExporterDialogView dialog;
         ExporterViewModel exporterToModify = selectedExporters.get(0);
         try {
-            dialog = new CreateModifyExporterDialogView(Optional.of(exporterToModify),
-                                                        dialogService, preferences, loader);
+            dialog = new CreateModifyExporterDialogView(Optional.of(exporterToModify), dialogService, preferences, loader);
         } catch (IndexOutOfBoundsException ex) {
             Optional<ExporterViewModel> emptyExporter = Optional.empty();
-            dialog = new CreateModifyExporterDialogView(emptyExporter, dialogService,
-                                                                                       preferences, loader);
+            dialog = new CreateModifyExporterDialogView(emptyExporter, dialogService, preferences, loader);
         }
         Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
-        if (exporter.isPresent() && exporter.get().isPresent()) { //First optional because you may not have entered a exporter to begin with, and second because you may not have outputted one at the end
+        // Outer optional because an exporter may not have been entered to begin with,
+        // and inner optional because one may not have been output by the dialog
+        if (exporter.isPresent() && exporter.get().isPresent()) {
             exporters.remove(exporterToModify);
-            exporters.add(exporter.get().get()); // this will append the exporter unless you make a sorted list property
+            // this will append the exporter to the final position unless a sorted list property is used, see TODO above
+            exporters.add(exporter.get().get());
         }
     }
 

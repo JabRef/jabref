@@ -31,7 +31,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private JournalAbbreviationLoader loader; //not sure this should be injected this way
+    @Inject private JournalAbbreviationLoader loader; // Should this be injected?
     private ExportCustomizationDialogViewModel viewModel;
 
     public ExportCustomizationDialogView() {

@@ -22,15 +22,16 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *
+ * This view model can be used both for "add exporter" and "modify exporter" functionalities.
+ * It takes an optional exporter which is empty for "add exporter," and takes the selected exporter
+ * for "modify exporter."  It returns an optional exporter which empty if an invalid or no exporter is
+ * created, and otherwise contains the exporter to be added or that is modified.
+ *
+ */
+
 public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
-
-    //This could be separated into two dialogs, one for adding exporters and one for modifying them.
-    //See the two constructors for the view, as was done in CustomExportDialog
-
-    //The view will return a TemplateExporter
-    //You will have to look at Swing class CustomExportDialog when you write the View
-
-    //Cancel to be implemented in View, not here
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
 
@@ -45,8 +46,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
 
     public CreateModifyExporterDialogViewModel(Optional<ExporterViewModel> exporter, DialogService dialogService, PreferencesService preferences,
-                                               JournalAbbreviationLoader loader) { //get ride of name, layout file, extension, take them from exporter
-        //this.exporter = exporter.orElse(null); //Is using null the right way of doing this?
+                                               JournalAbbreviationLoader loader) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.loader = loader;
@@ -69,8 +69,8 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             || !layoutFile.get().endsWith(".layout")) {
 
             LOGGER.info("One of the fields is empty!");
-            return Optional.empty(); //return implemented similarly to CleanupDialog, although JavaFX documentation says you need something
-            //like a result converter, which must be in the view, see class EntryTypeView
+            // Return empty exporter to the main exporter customization dialog
+            return Optional.empty();
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
@@ -83,7 +83,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         return Optional.of(new ExporterViewModel(format));
     }
 
-    public String getExportWorkingDirectory() {//i.e. layout dir
+    public String getExportWorkingDirectory() { //i.e. layout dir
         return preferences.getExportWorkingDirectory();
     }
 
