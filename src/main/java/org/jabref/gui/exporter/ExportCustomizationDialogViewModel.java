@@ -60,8 +60,9 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         // open modify Exporter dialog, which is the same as add Exporter dialog but beginning with a non-blank ExporterViewModel,
         // and set that into exporters.
         CreateModifyExporterDialogView dialog;
+        ExporterViewModel exporterToModify = selectedExporters.get(0);
         try {
-            dialog = new CreateModifyExporterDialogView(Optional.of(selectedExporters.get(0)),
+            dialog = new CreateModifyExporterDialogView(Optional.of(exporterToModify),
                                                         dialogService, preferences, loader);
         } catch (IndexOutOfBoundsException ex) {
             Optional<ExporterViewModel> emptyExporter = Optional.empty();
@@ -70,6 +71,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         }
         Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
         if (exporter.isPresent() && exporter.get().isPresent()) { //First optional because you may not have entered a exporter to begin with, and second because you may not have outputted one at the end
+            exporters.remove(exporterToModify);
             exporters.add(exporter.get().get()); // this will append the exporter unless you make a sorted list property
         }
     }
