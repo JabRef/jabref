@@ -454,9 +454,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         fileHistory.storeHistory();
-        prefs.customExports.store(Globals.prefs);
-        prefs.customImports.store();
-
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore

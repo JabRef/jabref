@@ -1509,7 +1509,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
-        Map<String, TemplateExporter> customFormats = this.customExports.getCustomExportFormats(this, abbreviationLoader);
+        List<TemplateExporter> customFormats = getCustomExportFormats(abbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationLoader);
         SavePreferences savePreferences = this.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = this.getXMPPreferences();

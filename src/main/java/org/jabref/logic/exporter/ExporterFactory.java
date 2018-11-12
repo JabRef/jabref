@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ public class ExporterFactory {
         this.exporters = Objects.requireNonNull(exporters);
     }
 
-    public static ExporterFactory create(Map<String, TemplateExporter> customFormats,
+    public static ExporterFactory create(List<TemplateExporter> customFormats,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
@@ -60,7 +59,7 @@ public class ExporterFactory {
         exporters.add(new XmpPdfExporter(xmpPreferences));
 
         // Now add custom export formats
-        exporters.addAll(customFormats.values());
+        exporters.addAll(customFormats);
 
         return new ExporterFactory(exporters);
     }
