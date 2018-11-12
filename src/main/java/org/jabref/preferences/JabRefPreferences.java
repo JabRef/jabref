@@ -1526,8 +1526,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public LayoutFormatterPreferences getLayoutFormatterPreferences(
-                                                                    JournalAbbreviationLoader journalAbbreviationLoader) {
+    public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         Objects.requireNonNull(journalAbbreviationLoader);
         return new LayoutFormatterPreferences(getNameFormatterPreferences(), getJournalAbbreviationPreferences(),
                                               getFileLinkPreferences(), journalAbbreviationLoader);
