@@ -44,6 +44,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(addButton, getDialogPane(), event -> addExporter());
         ControlHelper.setAction(modifyButton, getDialogPane(), event -> modifyExporter());
         ControlHelper.setAction(removeButton, getDialogPane(), event -> removeExporter());
+        ControlHelper.setAction(closeButton, getDialogPane(), event -> saveAndClose());
     }
 
     private void addExporter() {
@@ -70,4 +71,12 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().getExtension());
     }
 
+    private void closeDialog() {
+        close();
+    }
+
+    private void saveAndClose() {
+        viewModel.saveToPrefs();
+        closeDialog();
+    }
 }

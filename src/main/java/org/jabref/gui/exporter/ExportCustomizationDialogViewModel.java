@@ -77,12 +77,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void removeExporters() {
-        if (selectedExporters.getSize() == 0) { // Is this check necessary?
-            return;
-        }
-        for (ExporterViewModel exporter : selectedExporters) {
-            exporters.remove(exporter);
-        }
+        exporters.removeAll(selectedExporters);
     }
 
     public void saveToPrefs() {
