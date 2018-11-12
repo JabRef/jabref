@@ -139,8 +139,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         descriptionWebView.setPrefWidth(585);
         optionsPanel.setPadding(PADDING);
         optionsPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
+                + "-fx-border-insets:0 0 0 0;"
+                + "-fx-border-color:#D3D3D3");
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -243,8 +243,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         generalPanel.setVgap(VGAP);
         generalPanel.setPadding(PADDING);
         generalPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
+                + "-fx-border-insets:0 0 0 0;"
+                + "-fx-border-color:#D3D3D3");
 
         ColumnConstraints columnLabel = new ColumnConstraints();
         columnLabel.setHalignment(HPos.RIGHT);
@@ -276,8 +276,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         contextPanel.setHgap(HGAP);
         contextPanel.setPadding(PADDING);
         contextPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
+                + "-fx-border-insets:0 0 0 0;"
+                + "-fx-border-color:#D3D3D3");
         contextPanel.add(independentButton, 0, 0);
         contextPanel.add(intersectionButton, 0, 1);
         contextPanel.add(unionButton, 0, 2);
@@ -288,8 +288,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         sp.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
         sp.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
         sp.setStyle("-fx-content-display:top;"
-                    + "-fx-border-insets:0 0 0 0;"
-                    + "-fx-border-color:#D3D3D3");
+                + "-fx-border-insets:0 0 0 0;"
+                + "-fx-border-color:#D3D3D3");
 
         // create border
         HBox title1 = new HBox();
@@ -384,8 +384,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                             }
                         }
 
-                        editedGroup.nameProperty().setValue(groupName);
-                        resultingGroup = editedGroup;
+                        resultingGroup = new ExplicitGroup(groupName, getContext(),
+                                keywordDelimiter);
                     } else if (keywordsRadioButton.isSelected()) {
                         // regex is correct, otherwise OK would have been disabled
                         // therefore I don't catch anything here
@@ -527,11 +527,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Localization.lang(
-                                     "The regular expression <b>%0</b> is invalid:",
-                                     StringUtil.quoteForHTML(regExp))
-                   + "<p><tt>"
-                   + sb
-                   + "</tt>";
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
         if (!(e instanceof PatternSyntaxException)) {
             return s;
         }
@@ -563,18 +563,18 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     try {
                         Pattern.compile(s2);
                         setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
-                                                                                  keywordGroupRegExp.isSelected()));
+                                keywordGroupRegExp.isSelected()));
                     } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s2, e));
                     }
                 } else {
                     setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
-                                                                              keywordGroupRegExp.isSelected()));
+                            keywordGroupRegExp.isSelected()));
                 }
             } else {
                 setDescription(Localization.lang(
-                                                 "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
+                        "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             }
             setNameFontItalic(true);
         } else if (searchRadioButton.isSelected()) {
@@ -582,8 +582,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
                 setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
-                                                                                               new SearchQuery(s1, isCaseSensitive(), isRegex()))
-                                                                        .getDescription()));
+                        new SearchQuery(s1, isCaseSensitive(), isRegex()))
+                        .getDescription()));
 
                 if (isRegex()) {
                     try {
@@ -595,10 +595,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 }
             } else {
                 setDescription(Localization
-                                           .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
-                                                 + "<tt>smith</tt><p>"
-                                                 + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
-                                                 + "<tt>author=smith and title=electrical</tt>"));
+                        .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
+                                + "<tt>smith</tt><p>"
+                                + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
+                                + "<tt>author=smith and title=electrical</tt>"));
             }
             setNameFontItalic(true);
         } else if (explicitRadioButton.isSelected()) {

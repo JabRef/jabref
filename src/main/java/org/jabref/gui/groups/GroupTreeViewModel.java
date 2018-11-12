@@ -157,9 +157,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
-    public void editGroup(GroupNodeViewModel oldGroup) {
+    public void editGroup(GroupNodeViewModel editGroup) {
         Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+                .showCustomDialogAndWait(new GroupDialog(editGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
             // TODO: Add undo
             // Store undo information.
@@ -178,6 +178,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
             //}
 
+            editGroup.displayNameProperty().setValue(group.getName());
             dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
         });
