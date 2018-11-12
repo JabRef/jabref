@@ -416,8 +416,6 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-    // Object containing custom export formats:
-    public final CustomExportList customExports;
     /**
      * Set with all custom {@link org.jabref.logic.importer.Importer}s
      */
@@ -731,7 +729,6 @@ public class JabRefPreferences implements PreferencesService {
         //Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
 
-        customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";

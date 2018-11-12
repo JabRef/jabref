@@ -2,8 +2,6 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
@@ -50,7 +48,7 @@ public class ExportCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        Map<String, TemplateExporter> customExporters = preferences.customExports.getCustomExportFormats(preferences, Globals.journalAbbreviationLoader);
+        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
