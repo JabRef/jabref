@@ -52,7 +52,6 @@ public class CreateModifyExporterDialogView extends BaseDialog<Optional<Exporter
         });
 
         browseButton.setOnAction(event -> browse());
-
     }
 
     @FXML

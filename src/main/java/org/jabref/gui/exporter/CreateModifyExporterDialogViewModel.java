@@ -51,8 +51,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         this.loader = loader;
 
         setTextFields(exporter);
-
-
     }
 
     public Optional<ExporterViewModel> saveExporter() {
@@ -60,7 +58,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
             preferences.setExportWorkingDirectory(layoutFileDirString);
-
         }
 
         // Check that there are no empty strings.
@@ -75,8 +72,8 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(), layoutPreferences,
-                                                       savePreferences);
+        TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
+                                                       layoutPreferences, savePreferences);
         format.setCustomExport(true);
         return Optional.of(new ExporterViewModel(format));
     }
