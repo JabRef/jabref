@@ -2027,7 +2027,9 @@ public class JabRefPreferences implements PreferencesService {
             for (int i = 0; i < exporters.size(); i++) {
                 List<String> exporterData = new ArrayList<>();
                 exporterData.add(exporters.get(i).getName());
-                exporterData.add(exporters.get(i).getId());
+                exporterData.add(exporters.get(i).getLayoutFileName());
+                // Only stores the first extension associated with FileType
+                exporterData.add(exporters.get(i).getFileType().getExtensions().get(0));
                 putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
             }
             purgeCustomExportFormats(exporters.size());
