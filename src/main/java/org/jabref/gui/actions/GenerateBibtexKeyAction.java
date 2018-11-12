@@ -14,8 +14,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 public class GenerateBibtexKeyAction implements BaseAction {
+
     private final DialogService dialogService;
-    private BasePanel basePanel;
+    private final BasePanel basePanel;
     private List<BibEntry> entries;
     private boolean isCanceled;
 
@@ -29,7 +30,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
 
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate BibTeX keys"),
-                    Localization.lang("First select the entries you want keys to be generated for."));
+                                                   Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
         basePanel.output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
@@ -38,19 +39,20 @@ public class GenerateBibtexKeyAction implements BaseAction {
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
         if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
-                    Localization.lang("Overwrite keys"),
-                    Localization.lang("One or more keys will be overwritten. Continue?"),
-                    Localization.lang("Overwrite keys"),
-                    Localization.lang("Cancel"),
-                    Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+                                                                         Localization.lang("Overwrite keys"),
+                                                                         Localization.lang("One or more keys will be overwritten. Continue?"),
+                                                                         Localization.lang("Overwrite keys"),
+                                                                         Localization.lang("Cancel"),
+                                                                         Localization.lang("Disable this confirmation dialog"),
+                                                                         optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+
         } else {
             // Always overwrite keys by default
             return true;
         }
     }
 
-    private void generateKeys() {
+    private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
             entries.removeIf(BibEntry::hasCiteKey);
@@ -64,7 +66,12 @@ public class GenerateBibtexKeyAction implements BaseAction {
                 return;
             }
         }
+    }
 
+    private void generateKeys() {
+        if (isCanceled) {
+            return;
+        }
         // generate the new cite keys for each entry
         final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
         BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
@@ -79,21 +86,19 @@ public class GenerateBibtexKeyAction implements BaseAction {
             basePanel.getUndoManager().addEdit(compound);
         }
 
-        if (isCanceled) {
-            return;
-        }
         basePanel.markBaseChanged();
         basePanel.output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
     }
 
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
-                (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+                             (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
 
     @Override
     public void action() {
         init();
+        checkOverwriteKeysChosen();
         BackgroundTask.wrap(this::generateKeys)
                       .executeWith(Globals.TASK_EXECUTOR);
     }

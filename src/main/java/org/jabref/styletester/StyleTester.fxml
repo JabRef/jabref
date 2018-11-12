@@ -28,147 +28,178 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="900.0"
-            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.styletester.StyleTesterView">
+
+<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.styletester.StyleTesterView">
     <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
              AnchorPane.topAnchor="0.0">
         <Tab text="Buttons">
-            <GridPane vgap="16" hgap="32" style="-fx-padding: 20 30 20 30;">
-                <Label GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="6">Normal buttons:</Label>
-                <Button text="Normal" GridPane.rowIndex="1" GridPane.columnIndex="0">
+            <GridPane hgap="32" style="-fx-padding: 20 30 20 30;" vgap="16">
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="0">Normal buttons:</Label>
+                <Button text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Hover" fx:id="normalButtonHover" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                <Button fx:id="normalButtonHover" text="Hover" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Pressed" fx:id="normalButtonPressed" GridPane.rowIndex="1" GridPane.columnIndex="2">
+                <Button fx:id="normalButtonPressed" text="Pressed" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Focused" fx:id="normalButtonFocused" GridPane.rowIndex="1" GridPane.columnIndex="3">
+                <Button fx:id="normalButtonFocused" text="Focused" GridPane.columnIndex="3" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button disable="true" text="Disabled" GridPane.rowIndex="1" GridPane.columnIndex="4">
+                <Button disable="true" text="Disabled" GridPane.columnIndex="4" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button defaultButton="true" text="Default" GridPane.rowIndex="1" GridPane.columnIndex="5">
+                <Button defaultButton="true" text="Default" GridPane.columnIndex="5" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button cancelButton="true" text="Cancel" GridPane.rowIndex="1" GridPane.columnIndex="6">
+                <Button cancelButton="true" text="Cancel" GridPane.columnIndex="6" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Label GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="6">Text buttons:</Label>
-                <Button text="Normal" styleClass="text-button" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="2">Text buttons:</Label>
+                <Button styleClass="text-button" text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Hover" fx:id="textButtonHover" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="1">
+                <Button fx:id="textButtonHover" styleClass="text-button" text="Hover" GridPane.columnIndex="1"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Pressed" fx:id="textButtonPressed" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="2">
+                <Button fx:id="textButtonPressed" styleClass="text-button" text="Pressed" GridPane.columnIndex="2"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Focused" fx:id="textButtonFocused" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="3">
+                <Button fx:id="textButtonFocused" styleClass="text-button" text="Focused" GridPane.columnIndex="3"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button disable="true" text="Disabled" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="4">
+                <Button disable="true" styleClass="text-button" text="Disabled" GridPane.columnIndex="4"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button defaultButton="true" text="Default" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="5">
+                <Button defaultButton="true" styleClass="text-button" text="Default" GridPane.columnIndex="5"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button cancelButton="true" text="Cancel" styleClass="text-button" GridPane.rowIndex="3"
-                        GridPane.columnIndex="6">
+                <Button cancelButton="true" styleClass="text-button" text="Cancel" GridPane.columnIndex="6"
+                        GridPane.rowIndex="3">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Label GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="6">Contained buttons:</Label>
-                <Button text="Normal" styleClass="contained-button" GridPane.rowIndex="5" GridPane.columnIndex="0">
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="4">Contained buttons:</Label>
+                <Button styleClass="contained-button" text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Hover" fx:id="containedButtonHover" styleClass="contained-button" GridPane.rowIndex="5"
-                        GridPane.columnIndex="1">
+                <Button fx:id="containedButtonHover" styleClass="contained-button" text="Hover" GridPane.columnIndex="1"
+                        GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Pressed" fx:id="containedButtonPressed" styleClass="contained-button"
-                        GridPane.rowIndex="5" GridPane.columnIndex="2">
+                <Button fx:id="containedButtonPressed" styleClass="contained-button" text="Pressed"
+                        GridPane.columnIndex="2" GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="Focused" fx:id="containedButtonFocused" styleClass="contained-button"
-                        GridPane.rowIndex="5" GridPane.columnIndex="3">
+                <Button fx:id="containedButtonFocused" styleClass="contained-button" text="Focused"
+                        GridPane.columnIndex="3" GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button disable="true" text="Disabled" styleClass="contained-button" GridPane.rowIndex="5"
-                        GridPane.columnIndex="4">
+                <Button disable="true" styleClass="contained-button" text="Disabled" GridPane.columnIndex="4"
+                        GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button defaultButton="true" text="Default" styleClass="contained-button" GridPane.rowIndex="5"
-                        GridPane.columnIndex="5">
+                <Button defaultButton="true" styleClass="contained-button" text="Default" GridPane.columnIndex="5"
+                        GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button cancelButton="true" text="Cancel" styleClass="contained-button" GridPane.rowIndex="5"
-                        GridPane.columnIndex="6">
+                <Button cancelButton="true" styleClass="contained-button" text="Cancel" GridPane.columnIndex="6"
+                        GridPane.rowIndex="5">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
+                <columnConstraints>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                </rowConstraints>
             </GridPane>
         </Tab>
         <Tab text="Switches">
-            <VBox style="-fx-padding: 1em" spacing="10">
+            <VBox spacing="10" style="-fx-padding: 1em">
                 <Label text="Checkboxes"/>
-                <VBox style="-fx-padding: 0em 0em 0em 1em" spacing="15">
+                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
                     <CheckBox text="Unchecked"/>
-                    <CheckBox text="Checked" selected="true"/>
-                    <CheckBox text="Unchecked disabled" disable="true"/>
-                    <CheckBox text="Checked disabled" disable="true" selected="true"/>
+                    <CheckBox selected="true" text="Checked"/>
+                    <CheckBox disable="true" text="Unchecked disabled"/>
+                    <CheckBox disable="true" selected="true" text="Checked disabled"/>
+                </VBox>
+                <Label text="Radio-Buttons">
+                    <VBox.margin>
+                        <Insets top="20.0"/>
+                    </VBox.margin>
+                </Label>
+                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
+                    <RadioButton text="Unchecked"/>
+                    <RadioButton selected="true" text="Checked"/>
+                    <RadioButton disable="true" text="Unchecked disabled"/>
+                    <RadioButton disable="true" selected="true" text="Checked disabled"/>
                 </VBox>
             </VBox>
         </Tab>

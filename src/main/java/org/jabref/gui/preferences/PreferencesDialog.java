@@ -91,8 +91,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new AppearancePrefsTab(dialogService, prefs));
 
         container = new BorderPane();
-        ScrollPane scroll = new ScrollPane(container);
-        getDialogPane().setContent(scroll);
+        getDialogPane().setContent(container);
         construct();
     }
 

@@ -13,6 +13,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
@@ -69,6 +70,9 @@ class ExternalTab extends JPanel implements PrefsTab {
         browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
 
         GridPane consoleOptionPanel = new GridPane();
+        final ToggleGroup consoleGroup = new ToggleGroup();
+        defaultConsole.setToggleGroup(consoleGroup);
+        executeConsole.setToggleGroup(consoleGroup);
         consoleOptionPanel.add(defaultConsole,  1, 1);
         consoleOptionPanel.add(executeConsole,  1, 2);
         consoleOptionPanel.add(consoleCommand,  2, 2);
@@ -76,13 +80,16 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleOptionPanel.add(commandDescription,  2, 3);
 
         GridPane pdfOptionPanel = new GridPane();
+        final ToggleGroup pdfReaderGroup = new ToggleGroup();
         pdfOptionPanel.add(adobeAcrobatReader,  1, 1);
         pdfOptionPanel.add(adobeAcrobatReaderPath,  2, 1);
+        adobeAcrobatReader.setToggleGroup(pdfReaderGroup);
         pdfOptionPanel.add(browseAdobeAcrobatReader,  3, 1);
 
         if (OS.WINDOWS) {
             browseSumatraReader.setOnAction(e -> showSumatraChooser());
             pdfOptionPanel.add(sumatraReader,  1, 2);
+            sumatraReader.setToggleGroup(pdfReaderGroup);
             pdfOptionPanel.add(sumatraReaderPath,  2, 2);
             pdfOptionPanel.add(browseSumatraReader,  3, 2);
         }

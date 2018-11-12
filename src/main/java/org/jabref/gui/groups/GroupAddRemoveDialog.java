@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,9 +58,9 @@ public class GroupAddRemoveDialog implements BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog((JFrame) null,
-                (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
-                        .lang("Remove from group")),
-                true);
+                                         (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
+                                                                                                                                              .lang("Remove from group")),
+                                         true);
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(new GroupTreeNodeViewModel(groups.get()));
@@ -166,7 +167,9 @@ public class GroupAddRemoveDialog implements BaseAction {
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             if (checkGroupEnable(node)) {
 
-                List<BibEntry> entries = Globals.stateManager.getSelectedEntries();
+                //we need to copy the contents of the observable list here, because when removeFromEntries is called,
+                //probably the focus changes to the first entry in the all entries group and thus getSelectedEntries() no longer contains our entry we want to move
+                List<BibEntry> entries = new ArrayList<>(Globals.stateManager.getSelectedEntries());
 
                 if (move) {
                     recuriveRemoveFromNode((GroupTreeNodeViewModel) tree.getModel().getRoot(), entries);
@@ -175,7 +178,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                 if (add) {
                     node.addEntriesToGroup(entries);
                 } else {
-                    node.removeEntriesFromGroup(Globals.stateManager.getSelectedEntries());
+                    node.removeEntriesFromGroup(entries);
                 }
 
                 return true;
@@ -187,7 +190,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     private void recuriveRemoveFromNode(GroupTreeNodeViewModel node, List<BibEntry> entries) {
         node.removeEntriesFromGroup(entries);
-        for (GroupTreeNodeViewModel child: node.getChildren()) {
+        for (GroupTreeNodeViewModel child : node.getChildren()) {
             recuriveRemoveFromNode(child, entries);
         }
     }
@@ -207,7 +210,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
-                boolean leaf, int row, boolean hasFocus) {
+                                                      boolean leaf, int row, boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) value;

@@ -42,8 +42,12 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
         return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
                 Objects.equals(field, that.field);

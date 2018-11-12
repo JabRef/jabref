@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -45,8 +46,11 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
         builder.add(view, 1, 1);
         builder.add(hideNonHits, 2, 2);
         builder.add(grayOut, 2, 3);
+        final ToggleGroup selectionModeGroup = new ToggleGroup();
         builder.add(multiSelectionModeIntersection, 2, 4);
         builder.add(multiSelectionModeUnion, 2, 5);
+        multiSelectionModeIntersection.setToggleGroup(selectionModeGroup);
+        multiSelectionModeUnion.setToggleGroup(selectionModeGroup);
         builder.add(autoAssignGroup, 2, 6);
         builder.add(new Label(""), 1, 7);
 

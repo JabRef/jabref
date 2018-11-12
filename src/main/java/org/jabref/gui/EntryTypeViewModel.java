@@ -36,6 +36,7 @@ public class EntryTypeViewModel {
 
     private final JabRefPreferences prefs;
     private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
+    private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
     private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty idText = new SimpleStringProperty();
@@ -51,6 +52,10 @@ public class EntryTypeViewModel {
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
 
+    }
+
+    public BooleanProperty searchSuccesfulProperty() {
+        return searchSuccesfulProperty;
     }
 
     public BooleanProperty searchingProperty() {
@@ -110,6 +115,7 @@ public class EntryTypeViewModel {
     }
 
     public void runFetcherWorker() {
+        searchSuccesfulProperty.set(false);
         fetcherWorker.run();
         fetcherWorker.setOnFailed(event -> {
             Throwable exception = fetcherWorker.getException();
@@ -124,7 +130,9 @@ public class EntryTypeViewModel {
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
             searchingProperty.set(false);
+
             fetcherWorker = new FetcherWorker();
+
         });
 
         fetcherWorker.setOnSucceeded(evt -> {
@@ -143,8 +151,8 @@ public class EntryTypeViewModel {
                     new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                     basePanel.insertEntry(bibEntry);
                 }
+                searchSuccesfulProperty.set(true);
 
-                // close();
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }

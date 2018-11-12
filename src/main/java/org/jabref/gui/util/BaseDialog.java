@@ -21,7 +21,7 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
         setDialogIcon(IconTheme.getJabRefImageFX());
         setResizable(true);
-        Globals.getThemeLoader().installBaseCss(getDialogPane().getScene(), Globals.prefs);
+        Globals.getThemeLoader().installCss(getDialogPane().getScene(), Globals.prefs);
     }
 
     private void setDialogIcon(Image image) {

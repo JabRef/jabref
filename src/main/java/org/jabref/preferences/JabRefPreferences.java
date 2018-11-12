@@ -46,11 +46,14 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportSettingsTab;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -285,16 +288,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
-    public static final String CLEANUP_DOI = "CleanUpDOI";
-    public static final String CLEANUP_ISSN = "CleanUpISSN";
-    public static final String CLEANUP_MOVE_PDF = "CleanUpMovePDF";
-    public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
-    public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
-    public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
-    public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
-    public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
-    public static final String CLEANUP_CONVERT_TO_BIBTEX = "CleanUpConvertToBibtex";
-    public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
+    public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
     public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
@@ -304,6 +298,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -368,6 +363,10 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
+
+    //File linking Options for entry editor
+    public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
+
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
@@ -410,6 +409,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -569,9 +569,10 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
+        defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
@@ -782,6 +783,10 @@ public class JabRefPreferences implements PreferencesService {
                                     + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
                                     + "</dd>__NEWLINE__<p></p></font>");
 
+        // set default theme
+        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+
+        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.MOVE.name());
         setLanguageDependentDefaultValues();
     }
 
@@ -875,25 +880,16 @@ public class JabRefPreferences implements PreferencesService {
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
         EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
-                                                                        CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                                                                        CleanupPreset.CleanupStep.MOVE_PDF,
-                                                                        CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
-        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivatedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
-
-        storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
-        storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
-        storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());
-        storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
-        storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
-        storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
-        storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
-        storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
-        storage.put(CLEANUP_CONVERT_TO_BIBTEX, preset.isConvertToBibtex());
-        storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
-        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
+        for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
+            storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
+        }
+        storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
     }
 
     public EntryEditorPreferences getEntryEditorPreferences() {
@@ -902,6 +898,7 @@ public class JabRefPreferences implements PreferencesService {
                                           getImportFormatPreferences(),
                                           getCustomTabFieldNames(),
                                           getBoolean(SHOW_RECOMMENDATIONS),
+                                          getBoolean(ACCEPT_RECOMMENDATIONS),
                                           getBoolean(DEFAULT_SHOW_SOURCE),
                                           getBibtexKeyPatternPreferences(),
                                           Globals.getKeyPrefs(),
@@ -1675,57 +1672,23 @@ public class JabRefPreferences implements PreferencesService {
     public CleanupPreset getCleanupPreset() {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
-        if (this.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_ISSN)) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
-            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
-            activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF)) {
-            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS)) {
-            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX)) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
-        }
-        if (this.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
-            activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
+        for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
+            if (getBoolean(JabRefPreferences.CLEANUP + action.name())) {
+                activeJobs.add(action);
+            }
         }
 
-        FieldFormatterCleanups formatterCleanups = Cleanups.parse(
-                                                                  this.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
+        FieldFormatterCleanups formatterCleanups = Cleanups.parse(getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
 
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
-        this.putBoolean(JabRefPreferences.CLEANUP_DOI, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_DOI));
-        this.putBoolean(JabRefPreferences.CLEANUP_ISSN, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
-        this.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.MOVE_PDF));
-        this.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, cleanupPreset.isActive(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE));
-        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF));
-        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
-                        cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        this.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
-                        cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
-        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
-        this.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, cleanupPreset.isActive(CleanupPreset.CleanupStep.FIX_FILE_LINKS));
-        this.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
+        for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
+            putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));
+        }
+
+        putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
     public RemotePreferences getRemotePreferences() {
@@ -2017,6 +1980,14 @@ public class JabRefPreferences implements PreferencesService {
         return map;
     }
 
+    public FileDragDropPreferenceType getEntryEditorFileLinkPreference() {
+        return FileDragDropPreferenceType.valueOf(get(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE));
+    }
+
+    public void storeEntryEditorFileLinkPreference(FileDragDropPreferenceType type) {
+        put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, type.name());
+    }
+
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader) {
         int i = 0;
@@ -2080,5 +2051,4 @@ public class JabRefPreferences implements PreferencesService {
     public String getExportWorkingDirectory() {
         return get(EXPORT_WORKING_DIRECTORY);
     }
-
 }
