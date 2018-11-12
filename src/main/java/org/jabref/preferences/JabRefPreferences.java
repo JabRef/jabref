@@ -1997,14 +1997,13 @@ public class JabRefPreferences implements PreferencesService {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = loadForExportFromPreferences();
         List<String> formatData;
-        // possibly check if CUSTOM_EXPORT_FORMAT + 0 is empty too and throw error
         while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
             exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX); // 0, 1, 2 were originally static vars
+            filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, filename, extension,
                                                                                  layoutPreferences, savePreferences));
-            format.get().setCustomExport(true); //Taken out of orig CustomExporerList
+            format.get().setCustomExport(true);
             if (format.isPresent()) {
                 formats.add(format.get());
             } else {
