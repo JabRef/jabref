@@ -13,8 +13,8 @@
          <children>
             <TableView fx:id="exporterTable" prefHeight="150.0" prefWidth="500.0">
               <columns>
-                <TableColumn fx:id="nameColumn" prefWidth="150.0" text="%Export Name" />
-                <TableColumn fx:id="layoutColumn" prefWidth="250.0" text="%Main Layout File" />
+                <TableColumn fx:id="nameColumn" prefWidth="150.0" text="%Export name" />
+                <TableColumn fx:id="layoutColumn" prefWidth="250.0" text="%Main layout file" />
                 <TableColumn fx:id="extensionColumn" prefWidth="100.0" text="%Extension" />
               </columns>
             </TableView>
