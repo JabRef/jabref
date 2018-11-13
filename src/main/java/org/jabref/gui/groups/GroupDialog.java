@@ -384,8 +384,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                             }
                         }
 
-                        resultingGroup = new ExplicitGroup(groupName, getContext(),
-                                keywordDelimiter);
+                        editedGroup.nameProperty().setValue(groupName);
+                        resultingGroup = editedGroup;
                     } else if (keywordsRadioButton.isSelected()) {
                         // regex is correct, otherwise OK would have been disabled
                         // therefore I don't catch anything here

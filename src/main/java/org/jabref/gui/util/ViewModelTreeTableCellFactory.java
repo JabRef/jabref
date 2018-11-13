@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -19,12 +20,12 @@ import org.jabref.model.strings.StringUtil;
  */
 public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableColumn<S, T>, TreeTableCell<S, T>> {
 
-    private Callback<S, String> toText;
+    private Callback<S, StringProperty> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
 
-    public ViewModelTreeTableCellFactory<S, T> withText(Callback<S, String> toText) {
+    public ViewModelTreeTableCellFactory<S, T> withText(Callback<S, StringProperty> toText) {
         this.toText = toText;
         return this;
     }
@@ -66,7 +67,7 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
                 } else {
                     S viewModel = getTreeTableRow().getItem();
                     if (toText != null) {
-                        setText(toText.call(viewModel));
+                        textProperty().bindBidirectional(toText.call(viewModel));
                     }
                     if (toGraphic != null) {
                         setGraphic(toGraphic.call(viewModel));
