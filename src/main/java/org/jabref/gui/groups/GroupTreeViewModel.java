@@ -145,7 +145,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // TODO: Expand parent to make new group visible
             //parent.expand();
 
-            dialogService.notify(Localization.lang("Added group \"%0\".", parent.getDisplayName()));
+            dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
         });
     }
@@ -157,10 +157,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
-    public void editGroup(GroupNodeViewModel editGroup) {
+    public void editGroup(GroupNodeViewModel oldGroup) {
         Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(editGroup.getGroupNode().getGroup()));
+                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
+            // TODO: Keep assignments
+            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Change of Grouping Method"),
+                    Localization.lang("Assign the original group's entries to this group?"));
+            //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                    && (group instanceof ExplicitGroup);
+
+            oldGroup.getGroupNode().setGroup(
+                    group,
+                    keepPreviousAssignments,
+                    removePreviousAssignents,
+                    stateManager.getEntriesInCurrentDatabase());
+
             // TODO: Add undo
             // Store undo information.
             // AbstractUndoableEdit undoAddPreviousEntries = null;
@@ -178,7 +192,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
             //}
 
-            editGroup.displayNameProperty().setValue(group.getName());
             dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
         });
