@@ -38,13 +38,13 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
+import org.fxmisc.easybind.EasyBind;
 import com.google.common.base.Enums;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private StringProperty displayNameProperty;
+    private final StringProperty displayNameProperty = new SimpleStringProperty();
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -66,8 +66,7 @@ public class GroupNodeViewModel {
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayNameProperty = new SimpleStringProperty(formatter.format(groupNode.getGroup().getName()));
-        groupNode.getGroup().nameProperty().bindBidirectional(displayNameProperty);
+        displayNameProperty.bind(EasyBind.map(groupNode.getGroup().nameProperty(), formatter::format));
 
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
