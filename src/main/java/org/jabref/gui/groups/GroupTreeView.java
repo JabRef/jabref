@@ -115,7 +115,7 @@ public class GroupTreeView {
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
-                .withText(GroupNodeViewModel::displayNameProperty)
+                .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription));
 
