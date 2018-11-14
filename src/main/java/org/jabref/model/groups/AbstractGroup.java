@@ -56,7 +56,7 @@ public abstract class AbstractGroup implements SearchMatcher {
             return false;
         }
         AbstractGroup that = (AbstractGroup) other;
-        return Objects.equals(this.name.getValue(), that.name) && Objects.equals(this.description, that.description)
+        return Objects.equals(this.name.getValue(), that.name.getValue()) && Objects.equals(this.description, that.description)
                 && Objects.equals(this.context, that.context);
     }
 
