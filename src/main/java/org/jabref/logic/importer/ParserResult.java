@@ -29,6 +29,8 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
     private boolean changedOnMigration = false;
+    private String title;
+    private String description;
 
     public ParserResult() {
         this(Collections.emptyList());
@@ -100,6 +102,22 @@ public class ParserResult {
 
     public void setFile(File f) {
         file = f.toPath();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

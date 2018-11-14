@@ -31,6 +31,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final String MDL_JABREF_PARTNER_ID = "1";
     private final String LANGUAGE;
     private final Version VERSION;
+    private String heading = "";
+    private String description = "";
 
 
     public MrDLibFetcher(String language, Version version) {
@@ -53,6 +55,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             try {
                 if (importer.isRecognizedFormat(response)) {
                     parserResult = importer.importDatabase(response);
+                    heading = parserResult.getTitle();
+                    description = parserResult.getDescription();
                 } else {
                     // For displaying An ErrorMessage
                     String error = importer.getResponseErrorMessage(response);
@@ -71,6 +75,14 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             // without a title there is no reason to ask MrDLib
             return new ArrayList<>(0);
         }
+    }
+
+    public String getHeading() {
+        return heading;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -105,7 +117,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost(getMdlUrl());
+        builder.setHost("localhost:5000");
         builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");

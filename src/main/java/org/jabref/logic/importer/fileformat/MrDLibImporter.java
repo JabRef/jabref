@@ -133,6 +133,10 @@ public class MrDLibImporter extends Importer {
             bibDatabase.insertEntry(bibentry);
         }
         parserResult = new ParserResult(bibDatabase);
+
+        JSONObject label = new JSONObject(recommendations).getJSONObject("label");
+        parserResult.setTitle(label.getString("label-text"));
+        parserResult.setDescription(label.getString("label-description"));
     }
 
     /**

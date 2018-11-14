@@ -62,7 +62,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                       .onRunning(() -> progress.setVisible(true))
                       .onSuccess(relatedArticles -> {
                           progress.setVisible(false);
-                          root.getChildren().add(getRelatedArticleInfo(relatedArticles));
+                          root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
                       })
                       .executeWith(Globals.TASK_EXECUTOR);
 
@@ -76,13 +76,25 @@ public class RelatedArticlesTab extends EntryEditorTab {
      * @param list List of BibEntries of related articles
      * @return VBox of related article descriptions to be displayed in the Related Articles tab
      */
-    private VBox getRelatedArticleInfo(List<BibEntry> list) {
+    private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
+        ScrollPane scrollPane = new ScrollPane();
+
         VBox vBox = new VBox();
         vBox.setSpacing(20.0);
+
+        String heading = fetcher.getHeading();
+        Text headingText = new Text(heading);
+        headingText.getStyleClass().add("recommendation-heading");
+        String description = fetcher.getDescription();
+        Text descriptionText = new Text(description);
+        descriptionText.getStyleClass().add("recommendation-description");
+        vBox.getChildren().add(headingText);
+        vBox.getChildren().add(descriptionText);
 
         for (BibEntry entry : list) {
             HBox hBox = new HBox();
             hBox.setSpacing(5.0);
+            hBox.getStyleClass().add("recommendation-item");
 
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(FieldName.JOURNAL).orElse("");
@@ -108,7 +120,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
             hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
             vBox.getChildren().add(hBox);
         }
-        return vBox;
+        scrollPane.setContent(vBox);
+        return scrollPane;
     }
 
     /**
