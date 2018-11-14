@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added server timezone parameter when connecting to a shared database.
 - We updated the dialog for setting up general fields.
 - URL field formatting is updated. All whitespace chars, located at the beginning/ending of the url, are trimmed automatically
 - We changed the behavior of the field formatting dialog such that the `bibtexkey` is not changed when formatting all fields or all text fields.
