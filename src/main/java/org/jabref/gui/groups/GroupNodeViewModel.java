@@ -10,8 +10,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -38,13 +36,13 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
-import org.fxmisc.easybind.EasyBind;
 import com.google.common.base.Enums;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private final StringProperty displayNameProperty = new SimpleStringProperty();
+    private final String displayName;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -66,8 +64,7 @@ public class GroupNodeViewModel {
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayNameProperty.bind(EasyBind.map(groupNode.getGroup().nameProperty(), formatter::format));
-
+        displayName = formatter.format(groupNode.getName());
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
@@ -137,11 +134,7 @@ public class GroupNodeViewModel {
     }
 
     public String getDisplayName() {
-        return displayNameProperty.getValue();
-    }
-
-    public StringProperty displayNameProperty() {
-        return displayNameProperty;
+        return displayName;
     }
 
     public boolean isRoot() {
@@ -165,7 +158,7 @@ public class GroupNodeViewModel {
             return false;
         }
 
-            GroupNodeViewModel that = (GroupNodeViewModel) o;
+        GroupNodeViewModel that = (GroupNodeViewModel) o;
 
         return groupNode.equals(that.groupNode);
     }
@@ -173,7 +166,7 @@ public class GroupNodeViewModel {
     @Override
     public String toString() {
         return "GroupNodeViewModel{" +
-                "displayNameProperty='" + displayNameProperty.getValue() + '\'' +
+                "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
                 ", icon='" + getIcon() + '\'' +
                 ", children=" + children +
