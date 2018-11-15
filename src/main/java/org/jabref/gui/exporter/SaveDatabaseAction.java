@@ -163,7 +163,14 @@ public class SaveDatabaseAction {
             panel.frame().output(Localization.lang("Saving library") + "...");
             panel.setSaving(true);
             return doSave();
+        } else {
+            Optional<Path> savePath = getSavePath();
+            if (savePath.isPresent()) {
+                saveAs(savePath.get());
+                return true;
+            }
         }
+
         return false;
     }
 
