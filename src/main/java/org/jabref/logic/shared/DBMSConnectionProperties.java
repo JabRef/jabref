@@ -28,6 +28,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String user;
     private String password;
     private boolean useSSL;
+    private String serverTimezone;
 
     //Not needed for connection, but stored for future login
     private String keyStore;
@@ -41,7 +42,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     public DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
-                                    String password, boolean useSSL) {
+                                    String password, boolean useSSL, String serverTimezone) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -49,6 +50,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.user = user;
         this.password = password;
         this.useSSL = useSSL;
+        this.serverTimezone = serverTimezone;
     }
 
     @Override
@@ -118,6 +120,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return type.getUrl(host, port, database);
     }
 
+    @Override
+    public String getServerTimezone() { return serverTimezone; }
+
+    public void setServerTimezone(String serverTimezone) { this.serverTimezone = serverTimezone; }
+
     /**
      * Returns username, password and ssl as Properties Object
      * @return Properties with values for user, password and ssl
@@ -126,6 +133,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
+        props.setProperty("serverTimezone", serverTimezone);
 
         if (useSSL) {
             props.setProperty("ssl", Boolean.toString(useSSL));
@@ -161,7 +169,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
                && Objects.equals(port, properties.getPort())
                && Objects.equals(database, properties.getDatabase())
                && Objects.equals(user, properties.getUser())
-               && Objects.equals(useSSL, properties.isUseSSL());
+               && Objects.equals(useSSL, properties.isUseSSL())
+               && Objects.equals(serverTimezone, properties.getServerTimezone());
+
     }
 
     @Override
@@ -184,6 +194,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
         prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
+        prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
         this.setUseSSL(prefs.isUseSSL());
 
         if (prefs.getUser().isPresent()) {
