@@ -23,7 +23,7 @@ public class NoBibtexFieldChecker implements Checker {
                                      .filter(fieldName -> !allBibtexFields.contains(fieldName))
                                      // these fields are displayed by JabRef as default
                                      .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
-                                     .filter(fieldName -> !fieldName.equals(FieldName.REVIEW))
+                                     .filter(fieldName -> !fieldName.equals(FieldName.COMMENT))
                                      .filter(fieldName -> !fieldName.equals(FieldName.DOI))
                                      .filter(fieldName -> !fieldName.equals(FieldName.URL))
                                      .sorted()
