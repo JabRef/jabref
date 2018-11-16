@@ -8,7 +8,7 @@ import org.jabref.logic.l10n.Localization;
 
 public class GroupModeViewModel {
 
-    private GroupViewMode mode;
+    private final GroupViewMode mode;
 
     public GroupModeViewModel(GroupViewMode mode) {
         this.mode = mode;
@@ -27,9 +27,9 @@ public class GroupModeViewModel {
 
     public Tooltip getUnionIntersectionTooltip() {
         if (mode == GroupViewMode.UNION) {
-            return new Tooltip(Localization.lang("Toogle intersection"));
+            return new Tooltip(Localization.lang("Toggle intersection"));
         } else if (mode == GroupViewMode.INTERSECTION) {
-            return new Tooltip(Localization.lang("Toogle union"));
+            return new Tooltip(Localization.lang("Toggle union"));
         }
         return new Tooltip();
     }

@@ -20,4 +20,6 @@ public interface DatabaseConnectionProperties {
 
     boolean isUseSSL();
 
+    String getServerTimezone();
+
 }

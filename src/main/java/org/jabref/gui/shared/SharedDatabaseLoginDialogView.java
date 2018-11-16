@@ -43,6 +43,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField fileKeystore;
     @FXML private PasswordField passwordKeystore;
     @FXML private Button browseKeystore;
+    @FXML private TextField serverTimezone;
 
     @Inject private DialogService dialogService;
 
@@ -83,6 +84,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         user.textProperty().bindBidirectional(viewModel.userProperty());
         password.textProperty().bindBidirectional(viewModel.passwordProperty());
         port.textProperty().bindBidirectional(viewModel.portProperty());
+        serverTimezone.textProperty().bindBidirectional(viewModel.serverTimezoneProperty());
         databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
