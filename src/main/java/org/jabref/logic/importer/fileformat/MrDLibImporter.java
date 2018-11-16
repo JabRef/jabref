@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching from Mr.DLib.");
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
 
@@ -191,21 +189,4 @@ public class MrDLibImporter extends Importer {
         return parserResult;
     }
 
-    /**
-     * Gets the error message to be returned if there has been an error in returning recommendations.
-     * Returns default error message if there is no message from Mr. DLib.
-     * @param response The response from the MDL server as a string.
-     * @return String error message to be shown to the user.
-     */
-    public String getResponseErrorMessage(String response) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            if (!jsonObject.has("message")) {
-                return jsonObject.getString("message");
-            }
-        } catch (JSONException ex) {
-            return DEFAULT_MRDLIB_ERROR_MESSAGE;
-        }
-        return DEFAULT_MRDLIB_ERROR_MESSAGE;
-    }
 }

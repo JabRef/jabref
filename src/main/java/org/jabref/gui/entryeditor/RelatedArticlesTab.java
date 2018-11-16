@@ -64,6 +64,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
                           progress.setVisible(false);
                           root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
                       })
+                      .onFailure(exception -> {
+                          LOGGER.error("Error while fetching from Mr. DLib", exception);
+                          progress.setVisible(false);
+                          root.getChildren().add(getErrorInfo());
+                      })
                       .executeWith(Globals.TASK_EXECUTOR);
 
         root.getChildren().add(progress);
@@ -121,6 +126,24 @@ public class RelatedArticlesTab extends EntryEditorTab {
             vBox.getChildren().add(hBox);
         }
         scrollPane.setContent(vBox);
+        return scrollPane;
+    }
+
+    /**
+     * Gets a ScrollPane to display error info when recommendations fail.
+     * @return ScrollPane to display in place of recommendations
+     */
+    private ScrollPane getErrorInfo() {
+        ScrollPane scrollPane = new ScrollPane();
+
+        VBox vBox = new VBox();
+        vBox.setSpacing(20.0);
+
+        Text descriptionText = new Text(Localization.lang("No recommendations received from Mr. DLib for this entry."));
+        descriptionText.getStyleClass().add("recommendation-description");
+        vBox.getChildren().add(descriptionText);
+        scrollPane.setContent(vBox);
+
         return scrollPane;
     }
 
