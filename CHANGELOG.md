@@ -11,6 +11,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
+  - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
+  - DOI/URL: General -> Optional
+  - Internal fields like ranking, read status and priority: Other -> General
+  - Moreover, empty deprecated fields are no longer shown
 - Added server timezone parameter when connecting to a shared database.
 - We updated the dialog for setting up general fields.
 - URL field formatting is updated. All whitespace chars, located at the beginning/ending of the url, are trimmed automatically
