@@ -8,8 +8,8 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
@@ -91,7 +91,7 @@ public class ManageCitationsDialogViewModel {
         inBetweenText.setStyle("-fx-font-weight: bold");
         Text endText = new Text(end);
 
-        TextFlow flow = new TextFlow(startText, inBetweenText, endText);
+        FlowPane flow = new FlowPane(startText, inBetweenText, endText);
         return flow;
     }
 }
