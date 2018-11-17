@@ -52,7 +52,6 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
         colCitation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
-
         new ValueTableCellFactory<ManageCitationsItemViewModel, String>().withGraphic(viewModel::getText).install(colCitation);
 
         colExtraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
@@ -66,6 +65,6 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
             cell.getRowValue().setExtraInfo(cell.getNewValue());
         });
         colExtraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
-    }
 
+    }
 }

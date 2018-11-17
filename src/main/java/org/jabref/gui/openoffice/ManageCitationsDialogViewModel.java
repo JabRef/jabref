@@ -58,8 +58,6 @@ public class ManageCitationsDialogViewModel {
 
     }
 
-    //TODO: Call store settings after edit commit
-    //update reference then and call refresh/sync in the background
     public void storeSettings() {
         List<CitationEntry> ciationEntries = citations.stream().map(ManageCitationsItemViewModel::toCitationEntry).collect(Collectors.toList());
         try {

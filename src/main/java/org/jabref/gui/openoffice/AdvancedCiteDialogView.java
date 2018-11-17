@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -30,6 +31,7 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
             return null;
         });
 
+        setTitle(Localization.lang("Cite special"));
     }
 
     @FXML
@@ -37,7 +39,7 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
         viewModel = new AdvancedCiteDialogViewModel();
 
         inPar.selectedProperty().bindBidirectional(viewModel.citeInParProperty());
-        inText.selectedProperty().bindBidirectional(viewModel.citeInTexTProperty());
+        inText.selectedProperty().bindBidirectional(viewModel.citeInTextProperty());
         pageInfo.textProperty().bindBidirectional(viewModel.pageInfoProperty());
 
     }

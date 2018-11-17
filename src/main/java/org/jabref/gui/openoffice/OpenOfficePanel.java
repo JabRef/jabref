@@ -153,8 +153,8 @@ public class OpenOfficePanel {
 
             try {
                 ooBase.selectDocument();
-                frame.output(Localization.lang("Connected to document") + ": "
-                             + ooBase.getCurrentDocumentTitle().orElse(""));
+                dialogService.notify(Localization.lang("Connected to document") + ": "
+                                     + ooBase.getCurrentDocumentTitle().orElse(""));
             } catch (UnknownPropertyException | WrappedTargetException | IndexOutOfBoundsException |
                      NoSuchElementException | NoDocumentException ex) {
                 LOGGER.warn("Problem connecting", ex);
@@ -174,7 +174,7 @@ public class OpenOfficePanel {
                 } catch (IOException e) {
                     LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
                 }
-                frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
+                dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
             });
 
         });
@@ -303,8 +303,7 @@ public class OpenOfficePanel {
 
             }
 
-            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-
+            Defaults defaults = new Defaults(jabRefPreferences.getDefaultBibDatabaseMode());
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
             this.frame.addTab(databaseContext, true);
 
@@ -374,7 +373,7 @@ public class OpenOfficePanel {
                               this.ooBase = ooBase;
 
                               if (ooBase.isConnectedToDocument()) {
-                                  frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
+                                  dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
                               }
 
                               // Enable actions that depend on Connect:

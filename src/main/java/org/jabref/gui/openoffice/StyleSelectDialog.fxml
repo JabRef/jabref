@@ -10,7 +10,7 @@
 
 <DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
    <content>
-      <BorderPane fx:id="contentPane">
+      <BorderPane>
          <top>
             <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
               <columns>

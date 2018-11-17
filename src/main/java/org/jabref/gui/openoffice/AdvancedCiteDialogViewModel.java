@@ -19,7 +19,7 @@ public class AdvancedCiteDialogViewModel {
         return citeInPar;
     }
 
-    public BooleanProperty citeInTexTProperty() {
+    public BooleanProperty citeInTextProperty() {
         return citeInText;
     }
 }

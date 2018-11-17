@@ -94,17 +94,17 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
     }
 
     @FXML
-    void browseOOPath(ActionEvent event) {
+    private void browseOOPath(ActionEvent event) {
         viewModel.browseOOPath();
     }
 
     @FXML
-    void browseOOExec(ActionEvent event) {
+    private void browseOOExec(ActionEvent event) {
         viewModel.browseOOExec();
     }
 
     @FXML
-    void browseOOJars(ActionEvent event) {
+    private void browseOOJars(ActionEvent event) {
         viewModel.browseOOJars();
     }
 
