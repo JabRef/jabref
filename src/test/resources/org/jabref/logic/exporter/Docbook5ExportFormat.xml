@@ -1,4 +1,7 @@
-<bibliography>
+<bibliography version="5.1" xml:lang="en"
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:ns="http://docbook.org/ns/docbook">
 <biblioentry xreflabel="S. Kolb and T. Diez (2018)" xml:id="mykey">
    <authorgroup>
 <!--AUTHORS-->
@@ -8,7 +11,7 @@
 
    </authorgroup>
    <!--TITLE-->
-           <citetitle pubwork="Book">my paper title</citetitle> 
+           <citetitle pubwork="book">my paper title</citetitle> 
     
 <!--BOOK booktitle, edition, (pages), publisher-->
     
