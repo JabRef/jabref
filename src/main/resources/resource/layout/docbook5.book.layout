@@ -6,7 +6,7 @@
 \begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
    </authorgroup>
    <!--TITLE-->
-    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{title}       <citetitle pubwork="book">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
     
 <!--BOOK booktitle, edition, (pages), publisher-->
     \begin{book}
@@ -21,8 +21,8 @@
         \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
         \begin{publisher}
             <publisher>
-                <publishername></publishername>
-                <address></address>
+                <publishername>\publisher</publishername>
+                <address>\address</address>
             </publisher>
         \end{publisher}
     \end{book}
@@ -30,7 +30,7 @@
     
 <!-- IDENTIFIERS-->
     \begin{url}
-        <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
     \begin{doi}
         <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>

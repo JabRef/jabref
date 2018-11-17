@@ -6,7 +6,7 @@
 \begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
    </authorgroup>
    <!--TITLE-->
-    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{title}       <citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
 
 <!--JOURNAL, Vol, Pages, Year-->
     \begin{journal}
@@ -18,7 +18,7 @@
 
 <!-- IDENTIFIERS-->
     \begin{url}
-        <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
     \begin{doi}
         <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>

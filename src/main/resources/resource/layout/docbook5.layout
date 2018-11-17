@@ -7,11 +7,11 @@
 \begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
    </authorgroup>
    <!--TITLE-->
-    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{title}   <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
 
     <!-- IDENTIFIERS-->
     \begin{url}
-        <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
     \begin{doi}  
         <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
@@ -25,3 +25,4 @@
             <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
         </abstract>
     \end{abstract}
+</biblioentry>

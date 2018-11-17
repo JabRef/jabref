@@ -6,13 +6,13 @@
 \begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
    </authorgroup>
    <!--TITLE-->
-    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{title}       <citetitle pubwork="book">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
     
 <!--INCOLLECTION booktitle, edition, series, (pages), publisher-->
     \begin{incollection}    
         <biblioset relation="incollection">\n
         \begin{booktitle} 
-            <booktitle >\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle> 
+            <title >\format[XMLChars,RemoveLatexCommands]{\booktitle}</title> 
         \end{booktitle}
         \begin{edition}   
             <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> 
@@ -24,17 +24,15 @@
         \end{booktitle}
         \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
         \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
-        \begin{publisher}   
-            <publisher>
-                    <publishername>\format[XMLChars]{\publisher}</publishername>
-                    \begin{address}{\address}\end{address}
-            </publisher>
-        \end{publisher}
+        \begin{publisher} <publisher>\end{publisher}
+		\begin{publisher} <publishername>\format[XMLChars]{\publisher}</publishername> \end{publisher}	
+		\begin{location} \begin{address}<address>{\location}</address>\end{address}\end{location}
+		\begin{publisher}</publisher>\end{publisher}
     \end{incollection}
     
 <!-- IDENTIFIERS--> 
     \begin{url}  
-        <bibliomisc><link xref:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
     \begin{doi}  
         <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
