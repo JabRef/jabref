@@ -21,14 +21,12 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE,
-                    FieldName.orFields(FieldName.JOURNAL, FieldName.JOURNALTITLE),
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, FieldName.DATE);
             addAllOptional(FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.SUBTITLE,
                     FieldName.TITLEADDON, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
                     FieldName.JOURNALSUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE,
                     FieldName.ORIGLANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID,
-                    FieldName.ISSUE, FieldName.MONTH, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE,
+                    FieldName.ISSUE, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE,
                     FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -53,7 +51,7 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
                     FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
                     FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -84,7 +82,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
                     FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
                     FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -115,8 +113,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
             addAllOptional(FieldName.BOOKAUTHOR, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB,
                     FieldName.EDITORC, FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR,
                     FieldName.INTRODUCTION, FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE,
@@ -195,8 +192,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
                     FieldName.TYPE, FieldName.NOTE, FieldName.LOCATION, FieldName.CHAPTER, FieldName.PAGES,
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
@@ -223,7 +219,7 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR,
                     FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD,
                     FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
@@ -254,7 +250,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR,
                     FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD,
                     FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE,
@@ -285,8 +281,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
                     FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
                     FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -341,8 +336,7 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.EDITION,
                     FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER,
@@ -368,11 +362,10 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
                     FieldName.TYPE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.LOCATION,
-                    FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
@@ -393,10 +386,9 @@ public class BiblatexEntryTypes {
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE), FieldName.URL);
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE, FieldName.URL);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.VERSION,
-                    FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE,
+                    FieldName.NOTE, FieldName.ORGANIZATION, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.URLDATE);
         }
 
@@ -418,10 +410,9 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, FieldName.DATE);
             addAllOptional(FieldName.HOLDER, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
-                    FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH, FieldName.ADDENDUM,
+                    FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.ADDENDUM,
                     FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
         }
@@ -444,10 +435,10 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.SUBTITLE,
                     FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE, FieldName.SERIES,
-                    FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.MONTH, FieldName.NOTE,
+                    FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.NOTE,
                     FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -496,12 +487,12 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
                     FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.EVENTTITLEADDON,
                     FieldName.EVENTDATE, FieldName.VENUE, FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART,
                     FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.YEAR, FieldName.ISBN,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
                     FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
@@ -527,11 +518,11 @@ public class BiblatexEntryTypes {
                 FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EVENTTITLE,
                     FieldName.EVENTTITLEADDON, FieldName.EVENTDATE, FieldName.VENUE, FieldName.LANGUAGE,
                     FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.PAGETOTAL,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
                     FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
@@ -558,14 +549,13 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
                     FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON,
                     FieldName.EVENTTITLE, FieldName.EVENTTITLEADDON, FieldName.EVENTDATE, FieldName.VENUE,
                     FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.VOLUMES, FieldName.SERIES,
                     FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION,
-                    FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM,
+                    FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM,
                     FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
         }
@@ -661,10 +651,9 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NUMBER,
-                    FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISRN,
+                    FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.ISRN,
                     FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
@@ -701,10 +690,9 @@ public class BiblatexEntryTypes {
                         FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -727,9 +715,9 @@ public class BiblatexEntryTypes {
                         FieldName.PUBSTATE, FieldName.URL, FieldName.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
-                    FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE,
+                    FieldName.NOTE, FieldName.LOCATION, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.URL, FieldName.URLDATE);
         }
 
@@ -803,10 +791,9 @@ public class BiblatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -831,10 +818,9 @@ public class BiblatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -859,10 +845,9 @@ public class BiblatexEntryTypes {
 
         {
             // Treated as alias of "REPORT", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION,
-                    FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE,
-                    FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+                    FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION,
                     FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM,
                     FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
