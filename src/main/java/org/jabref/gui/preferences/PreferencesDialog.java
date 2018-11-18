@@ -118,6 +118,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
         TextField searchBox = new TextField();
         searchBox.setPromptText("Search...");
 
+        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs, searchBox.textProperty());
+        tabsList.itemsProperty().bindBidirectional(searchHandler.getFilteredPreferenceTabsProperty());
+
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
         Button importPreferences = new Button(Localization.lang("Import preferences"));
@@ -154,7 +157,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
         container.setLeft(vBox);
 
         setValues();
-        new PreferencesSearchHandler(preferenceTabs, searchBox.textProperty());
     }
 
     private void resetPreferences() {
