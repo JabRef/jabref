@@ -1,7 +1,11 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -17,15 +21,16 @@ class PreferencesSearchHandler {
 
     private final ObservableList<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
-    private final List<String> labelNames;
+    private final Set<String> labelNames;
     private final ObservableList<PrefsTab> filteredPreferenceTabs;
     private final ListProperty filteredPreferenceTabsProperty;
-
+    private final Map<String, Set<PrefsTab>> preferenceTabsLabelNames;
 
     PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
         this.preferenceTabs = preferenceTabs;
         this.searchText = searchText;
-        this.labelNames = getLabelNames();
+        this.preferenceTabsLabelNames = getPrefsTabLabelMap();
+        this.labelNames = preferenceTabsLabelNames.keySet();
         this.filteredPreferenceTabs = FXCollections.observableArrayList(preferenceTabs);
         this.filteredPreferenceTabsProperty = new SimpleListProperty<>(filteredPreferenceTabs);
         initializeSearchTextListener();
@@ -58,6 +63,13 @@ class PreferencesSearchHandler {
         for (String label : labelNames) {
             if (label.toLowerCase().contains(newSearchText)) {
                 System.out.println("Found label: " + label); // TODO: remove system out
+
+                Set<PrefsTab> prefsTabs = preferenceTabsLabelNames.get(label);
+                for (PrefsTab tab : prefsTabs) {
+                    if (!filteredPreferenceTabs.contains(tab)){
+                        filteredPreferenceTabs.add(tab);
+                    }
+                }
                 // mark entries
             }
         }
@@ -67,8 +79,8 @@ class PreferencesSearchHandler {
         filteredPreferenceTabs.setAll(preferenceTabs);
     }
 
-    private List<String> getLabelNames() {
-        List<String> labelNames = new ArrayList<>();
+    private Map<String, Set<PrefsTab>> getPrefsTabLabelMap() {
+        Map<String, Set<PrefsTab>> prefsTabLabelMap = new HashMap<>();
         for (PrefsTab prefsTab : preferenceTabs) {
             Node builder = prefsTab.getBuilder();
             if (builder instanceof Parent) {
@@ -77,12 +89,17 @@ class PreferencesSearchHandler {
                 for (Node child : children) {
                     if (child instanceof Labeled) {
                         Labeled childLabel = (Labeled) child;
-                        labelNames.add(childLabel.getText());
+                        String labelText = childLabel.getText();
+                        if (!labelText.isEmpty()){
+                            Set<PrefsTab> prefsTabsForLabel = prefsTabLabelMap.getOrDefault(labelText, new HashSet<>());
+                            prefsTabsForLabel.add(prefsTab);
+                            prefsTabLabelMap.put(labelText, prefsTabsForLabel);
+                        }
                     }
                 }
             }
         }
-        return labelNames;
+        return prefsTabLabelMap;
     }
 
     protected ListProperty getFilteredPreferenceTabsProperty() {
