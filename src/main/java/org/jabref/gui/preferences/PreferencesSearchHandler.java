@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
@@ -39,10 +40,11 @@ class PreferencesSearchHandler {
         System.out.println("Searched: " + newSearchText); // TODO: remove system out
 
         // TODO: check if necessary to check tabname, the labelname could be also a tab
-        preferenceTabs.stream() //
-                      .map(PrefsTab::getTabName) //
-                      .filter(tabName -> tabName.toLowerCase().contains(newSearchText)) //
-                      .forEach(tabName -> System.out.println("Found tabname: " + tabName)); // TODO: remove system out
+        List<PrefsTab> filteredTabs = preferenceTabs.stream()
+                .filter(tab -> tab.getTabName().toLowerCase().contains(newSearchText))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        filteredTabs.forEach(tab -> System.out.println("Found tabname: " + tab.getTabName())); // TODO: remove system out
 
         for (String label : labelNames) {
             if (label.toLowerCase().contains(newSearchText)) {
