@@ -2,7 +2,7 @@
     xmlns="http://docbook.org/ns/docbook"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:ns="http://docbook.org/ns/docbook">
-<biblioentry xreflabel="S. Kolb and T. Diez (2018)" xml:id="mykey">
+<biblioentry xreflabel="Stefan Kolb and Tobias Diez (2018)" xml:id="mykey">
    <authorgroup>
 <!--AUTHORS-->
        <author><personname><firstname>Stefan</firstname><surname>Kolb</surname></personname></author>
