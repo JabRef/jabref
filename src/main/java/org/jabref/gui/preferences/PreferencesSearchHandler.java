@@ -60,7 +60,7 @@ class PreferencesSearchHandler {
 
                 Set<PrefsTab> prefsTabs = preferenceTabsLabelNames.get(label);
                 for (PrefsTab tab : prefsTabs) {
-                    if (!filteredPreferenceTabs.contains(tab)){
+                    if (!filteredPreferenceTabs.contains(tab)) {
                         filteredPreferenceTabs.add(tab);
                     }
                 }
@@ -93,7 +93,7 @@ class PreferencesSearchHandler {
                     if (child instanceof Labeled) {
                         Labeled childLabel = (Labeled) child;
                         String labelText = childLabel.getText();
-                        if (!labelText.isEmpty()){
+                        if (!labelText.isEmpty()) {
                             Set<PrefsTab> prefsTabsForLabel = prefsTabLabelMap.getOrDefault(labelText, new HashSet<>());
                             prefsTabsForLabel.add(prefsTab);
                             prefsTabLabelMap.put(labelText, prefsTabsForLabel);
