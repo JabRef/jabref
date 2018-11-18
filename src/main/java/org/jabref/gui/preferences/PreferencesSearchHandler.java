@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -19,7 +17,7 @@ class PreferencesSearchHandler {
     private final StringProperty searchText;
     private final List<String> labelNames;
     private final ObservableList<PrefsTab> filteredPreferenceTabs;
-    private final Property<ObservableList<PrefsTab>> filteredPreferenceTabsProperty;
+    private final ListProperty filteredPreferenceTabsProperty;
 
 
     PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
@@ -27,7 +25,7 @@ class PreferencesSearchHandler {
         this.searchText = searchText;
         this.labelNames = getLabelNames();
         this.filteredPreferenceTabs = FXCollections.observableArrayList(preferenceTabs);
-        this.filteredPreferenceTabsProperty = new SimpleObjectProperty<>(filteredPreferenceTabs);
+        this.filteredPreferenceTabsProperty = new SimpleListProperty<>(filteredPreferenceTabs);
         initializeSearchTextListener();
     }
 
@@ -85,7 +83,7 @@ class PreferencesSearchHandler {
         return labelNames;
     }
 
-    Property<ObservableList<PrefsTab>> getFilteredPreferenceTabsProperty() {
+    ListProperty getFilteredPreferenceTabsProperty() {
         return filteredPreferenceTabsProperty;
     }
 }
