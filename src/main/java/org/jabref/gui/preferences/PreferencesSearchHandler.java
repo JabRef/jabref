@@ -21,7 +21,7 @@ class PreferencesSearchHandler {
 
     private final ObservableList<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
-    private final ListProperty filteredPreferenceTabs;
+    private final ListProperty<PrefsTab> filteredPreferenceTabs;
     private final Map<String, Set<PrefsTab>> preferenceTabsLabelNames;
 
     PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
@@ -106,7 +106,7 @@ class PreferencesSearchHandler {
         return prefsTabLabelMap;
     }
 
-    protected ListProperty getFilteredPreferenceTabsProperty() {
+    protected ListProperty<PrefsTab> getFilteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
 }
