@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -83,7 +85,7 @@ class PreferencesSearchHandler {
         return labelNames;
     }
 
-    ListProperty getFilteredPreferenceTabsProperty() {
+    protected ListProperty getFilteredPreferenceTabsProperty() {
         return filteredPreferenceTabsProperty;
     }
 }
