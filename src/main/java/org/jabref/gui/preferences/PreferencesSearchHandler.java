@@ -70,7 +70,6 @@ class PreferencesSearchHandler {
     }
 
     private void filterByTabName(String newSearchText) {
-        // TODO: check if this method is necessary, tabname mabye is found by label as well
         List<PrefsTab> filteredTabs = preferenceTabs.stream()
                                                     .filter(tab -> tab.getTabName().toLowerCase().contains(newSearchText))
                                                     .collect(Collectors.toCollection(ArrayList::new));
