@@ -21,18 +21,14 @@ class PreferencesSearchHandler {
 
     private final ObservableList<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
-    private final Set<String> labelNames;
-    private final ObservableList<PrefsTab> filteredPreferenceTabs;
-    private final ListProperty filteredPreferenceTabsProperty;
+    private final ListProperty filteredPreferenceTabs;
     private final Map<String, Set<PrefsTab>> preferenceTabsLabelNames;
 
     PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
         this.preferenceTabs = preferenceTabs;
         this.searchText = searchText;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
-        this.labelNames = preferenceTabsLabelNames.keySet();
-        this.filteredPreferenceTabs = FXCollections.observableArrayList(preferenceTabs);
-        this.filteredPreferenceTabsProperty = new SimpleListProperty<>(filteredPreferenceTabs);
+        this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
         initializeSearchTextListener();
     }
 
@@ -60,6 +56,7 @@ class PreferencesSearchHandler {
         filteredPreferenceTabs.setAll(filteredTabs);
         filteredTabs.forEach(tab -> System.out.println("Found tabname: " + tab.getTabName())); // TODO: remove system out
 
+        Set<String> labelNames = preferenceTabsLabelNames.keySet();
         for (String label : labelNames) {
             if (label.toLowerCase().contains(newSearchText)) {
                 System.out.println("Found label: " + label); // TODO: remove system out
@@ -103,6 +100,6 @@ class PreferencesSearchHandler {
     }
 
     protected ListProperty getFilteredPreferenceTabsProperty() {
-        return filteredPreferenceTabsProperty;
+        return filteredPreferenceTabs;
     }
 }
