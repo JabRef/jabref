@@ -48,14 +48,11 @@ class PreferencesSearchHandler {
     private void updateSearch(String newSearchText) {
         System.out.println("Searched: " + newSearchText); // TODO: remove system out
 
-        // TODO: check if necessary to check tabname, the labelname could be also a tab
-        List<PrefsTab> filteredTabs = preferenceTabs.stream()
-                .filter(tab -> tab.getTabName().toLowerCase().contains(newSearchText))
-                .collect(Collectors.toCollection(ArrayList::new));
+        filterByTabName(newSearchText);
+        filterByLabelName(newSearchText);
+    }
 
-        filteredPreferenceTabs.setAll(filteredTabs);
-        filteredTabs.forEach(tab -> System.out.println("Found tabname: " + tab.getTabName())); // TODO: remove system out
-
+    private void filterByLabelName(String newSearchText) {
         Set<String> labelNames = preferenceTabsLabelNames.keySet();
         for (String label : labelNames) {
             if (label.toLowerCase().contains(newSearchText)) {
@@ -70,6 +67,16 @@ class PreferencesSearchHandler {
                 // mark entries
             }
         }
+    }
+
+    private void filterByTabName(String newSearchText) {
+        // TODO: check if this method is necessary, tabname mabye is found by label as well
+        List<PrefsTab> filteredTabs = preferenceTabs.stream()
+                                                    .filter(tab -> tab.getTabName().toLowerCase().contains(newSearchText))
+                                                    .collect(Collectors.toCollection(ArrayList::new));
+
+        filteredPreferenceTabs.setAll(filteredTabs);
+        filteredTabs.forEach(tab -> System.out.println("Found tabname: " + tab.getTabName())); // TODO: remove system out
     }
 
     private void clearSearch() {
