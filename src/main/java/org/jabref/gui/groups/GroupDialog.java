@@ -395,6 +395,40 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         }
     }
 
+    public GroupDialog() {
+        this(JabRefGUI.getMainFrame(), null);
+    }
+
+    public GroupDialog(AbstractGroup editedGroup) {
+        this(JabRefGUI.getMainFrame(), editedGroup);
+    }
+
+    private static String formatRegExException(String regExp, Exception e) {
+        String[] sa = e.getMessage().split("\\n");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sa.length; ++i) {
+            if (i > 0) {
+                sb.append("<br>");
+            }
+            sb.append(StringUtil.quoteForHTML(sa[i]));
+        }
+        String s = Localization.lang(
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
+        if (!(e instanceof PatternSyntaxException)) {
+            return s;
+        }
+        int lastNewline = s.lastIndexOf("<br>");
+        int hat = s.lastIndexOf('^');
+        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
+        }
+        return s;
+    }
+
     private VBox createOptionsTexGroup() {
         VBox texPanel = new VBox();
         texPanel.setVisible(false);
@@ -476,40 +510,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 keywordGroupRegExp
         );
         return keywordPanel;
-    }
-
-    public GroupDialog() {
-        this(JabRefGUI.getMainFrame(), null);
-    }
-
-    public GroupDialog(AbstractGroup editedGroup) {
-        this(JabRefGUI.getMainFrame(), editedGroup);
-    }
-
-    private static String formatRegExException(String regExp, Exception e) {
-        String[] sa = e.getMessage().split("\\n");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < sa.length; ++i) {
-            if (i > 0) {
-                sb.append("<br>");
-            }
-            sb.append(StringUtil.quoteForHTML(sa[i]));
-        }
-        String s = Localization.lang(
-                                     "The regular expression <b>%0</b> is invalid:",
-                                     StringUtil.quoteForHTML(regExp))
-                   + "<p><tt>"
-                   + sb
-                   + "</tt>";
-        if (!(e instanceof PatternSyntaxException)) {
-            return s;
-        }
-        int lastNewline = s.lastIndexOf("<br>");
-        int hat = s.lastIndexOf('^');
-        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
-        }
-        return s;
     }
 
     private void updateComponents() {
