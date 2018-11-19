@@ -161,7 +161,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(panel).saveAs(Paths.get(folder.getValue()));
+                    new SaveDatabaseAction(panel, Globals.prefs).saveAs(Paths.get(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
