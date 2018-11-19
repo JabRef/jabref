@@ -8,7 +8,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
@@ -20,11 +19,9 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
@@ -56,6 +53,8 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jfoenix.controls.JFXColorPicker;
+
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
@@ -67,15 +66,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private static final int INDEX_SEARCH_GROUP = 2;
     private static final int INDEX_AUTO_GROUP = 3;
     private static final int INDEX_TEX_GROUP = 4;
-    private static final int TEXTFIELD_LENGTH = 40;
-    private static final int HGAP = 7;
-    private static final int VGAP = 5;
-    private static final Insets PADDING = new Insets(5, 5, 5, 5);
 
     // for all types
     private final TextField nameField = new TextField();
     private final TextField descriptionField = new TextField();
-    private final TextField colorField = new TextField();
+    private final JFXColorPicker colorField = new JFXColorPicker();
     private final TextField iconField = new TextField();
     private final RadioButton explicitRadioButton = new RadioButton(Localization.lang("Statically group entries by manual assignment"));
     private final RadioButton keywordsRadioButton = new RadioButton(Localization.lang("Dynamically group entries by searching a field for a keyword"));
@@ -123,24 +118,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
         this.setTitle(Localization.lang("Edit group"));
 
-        nameField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        descriptionField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        colorField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        iconField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
         explicitRadioButton.setSelected(true);
-        keywordGroupSearchTerm.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        keywordGroupSearchField.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        searchGroupSearchExpression.setPrefColumnCount(GroupDialog.TEXTFIELD_LENGTH);
-        autoGroupKeywordsField.setPrefColumnCount(10);
-        autoGroupKeywordsDeliminator.setPrefColumnCount(10);
-        autoGroupKeywordsDeliminator.setPrefColumnCount(10);
-        autoGroupPersonsField.setPrefColumnCount(10);
-        texGroupFilePath.setPrefColumnCount(TEXTFIELD_LENGTH);
+
         descriptionWebView.setPrefWidth(585);
-        optionsPanel.setPadding(PADDING);
-        optionsPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -152,181 +132,91 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         searchRadioButton.setToggleGroup(groupType);
         autoRadioButton.setToggleGroup(groupType);
         texRadioButton.setToggleGroup(groupType);
+
+        // Build individual layout cards for each group
+        VBox explicitPanel = createOptionsExplicitGroup();
+        explicitPanel.setVisible(true);
+        VBox keywordPanel = createOptionsKeywordGroup();
+        VBox searchPanel = createOptionsSearchGroup();
+        VBox autoPanel = createOptionsAutoGroup();
+        VBox texPanel = createOptionsTexGroup();
+        optionsPanel.getChildren().addAll(explicitPanel, keywordPanel, searchPanel, autoPanel, texPanel);
+        optionsPanel.setPadding(new Insets(0, 0, 0, 10));
+
+        // ... for buttons panel
+        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // General information
+        VBox contextPanel = new VBox(10);
+        contextPanel.setPadding(new Insets(0, 0, 0, 10));
+        contextPanel.getChildren().setAll(
+                independentButton,
+                intersectionButton,
+                unionButton
+        );
         ToggleGroup groupHierarchy = new ToggleGroup();
         independentButton.setToggleGroup(groupHierarchy);
         intersectionButton.setToggleGroup(groupHierarchy);
         unionButton.setToggleGroup(groupHierarchy);
 
-        // build individual layout cards for each group
-        GridPane explicitPanel = new GridPane();
-        GridPane keywordPanel = new GridPane();
-        GridPane searchPanel = new GridPane();
-        GridPane autoPanel = new GridPane();
-        GridPane texPanel = new GridPane();
-        // ... for explicit group
-        optionsPanel.getChildren().add(explicitPanel);
-        explicitPanel.setVisible(true);
-        // ... for keyword group
-        optionsPanel.getChildren().add(keywordPanel);
-        keywordPanel.setVisible(false);
-        keywordPanel.setHgap(HGAP);
-        keywordPanel.setVgap(VGAP);
-        keywordPanel.setPadding(PADDING);
-        ColumnConstraints keywordPanelLCol = new ColumnConstraints();
-        keywordPanelLCol.setHalignment(HPos.RIGHT);
-        keywordPanel.getColumnConstraints().add(keywordPanelLCol);
-        ColumnConstraints keywordPanelRCol = new ColumnConstraints();
-        keywordPanelRCol.setHalignment(HPos.LEFT);
-        keywordPanel.getColumnConstraints().add(keywordPanelRCol);
-        keywordPanel.add(new Label(Localization.lang("Field")), 0, 0);
-        keywordPanel.add(keywordGroupSearchField, 1, 0);
-        keywordPanel.add(new Label(Localization.lang("Keyword")), 0, 1);
-        keywordPanel.add(keywordGroupSearchTerm, 1, 1);
-        GridPane.setHalignment(keywordGroupCaseSensitive, HPos.LEFT);
-        keywordPanel.add(keywordGroupCaseSensitive, 0, 2, 2, 1);
-        GridPane.setHalignment(keywordGroupRegExp, HPos.LEFT);
-        keywordPanel.add(keywordGroupRegExp, 0, 3, 2, 1);
-        // ... for search group
-        optionsPanel.getChildren().add(searchPanel);
-        searchPanel.setVisible(false);
-        searchPanel.setHgap(HGAP);
-        searchPanel.setVgap(VGAP);
-        searchPanel.setPadding(PADDING);
-        searchPanel.add(new Label(Localization.lang("Search expression")), 0, 0);
-        searchPanel.add(searchGroupSearchExpression, 1, 0, 2, 1);
-        searchPanel.add(searchGroupCaseSensitive, 0, 1, 2, 1);
-        searchPanel.add(searchGroupRegExp, 0, 2, 2, 1);
-        // ... for auto group
-        optionsPanel.getChildren().add(autoPanel);
-        autoPanel.setVisible(false);
-        autoPanel.setHgap(HGAP);
-        autoPanel.setVgap(VGAP);
-        autoPanel.setPadding(PADDING);
-        ToggleGroup tg = new ToggleGroup();
-        autoGroupKeywordsOption.setToggleGroup(tg);
-        autoGroupPersonsOption.setToggleGroup(tg);
-        Label placeholderLabel = new Label();
-        placeholderLabel.setPrefWidth(30);
-        autoPanel.add(autoGroupKeywordsOption, 0, 0, 3, 1);
-        autoPanel.add(placeholderLabel, 0, 1);
-        autoPanel.add(new Label(Localization.lang("Field to group by") + ":"), 1, 1);
-        autoPanel.add(autoGroupKeywordsField, 2, 1);
-        autoPanel.add(new Label(Localization.lang("Use the following delimiter character(s):")), 1, 2);
-        autoPanel.add(autoGroupKeywordsDeliminator, 2, 2);
-        autoPanel.add(autoGroupKeywordsHierarchicalDeliminator, 2, 3);
-        autoPanel.add(autoGroupPersonsOption, 0, 4, 3, 1);
-        autoPanel.add(new Label(Localization.lang("Field to group by") + ":"), 1, 5);
-        autoPanel.add(autoGroupPersonsField, 2, 5);
-        autoGroupKeywordsOption.setSelected(true);
-        autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
-        autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
-        autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
-        autoGroupPersonsField.setText(FieldName.AUTHOR);
-        // ... for tex group
-        optionsPanel.getChildren().add(texPanel);
-        texPanel.setVisible(false);
-        texPanel.setHgap(HGAP);
-        texPanel.setVgap(VGAP);
-        texPanel.setPadding(PADDING);
-        texPanel.add(new Label(Localization.lang("Aux file")), 0, 0);
-        texPanel.add(texGroupFilePath, 1, 0);
+        colorField.setMinHeight(20);
+        VBox generalPanel = new VBox(10);
+        generalPanel.getChildren().setAll(
+                new VBox(
+                        new Label(Localization.lang("Name")),
+                        nameField
+                ),
+                new VBox(
+                        new Label(Localization.lang("Description")),
+                        descriptionField
+                ),
+                new HBox(30,
+                        new VBox(
+                                new Label(Localization.lang("Icon")),
+                                iconField
+                        ),
+                        new VBox(
+                                new Label(Localization.lang("Color")),
+                                colorField
+                        )
+                ),
+                new VBox(5,
+                        new Label(Localization.lang("Hierarchical context")),
+                        contextPanel
+                )
+        );
 
-        // ... for buttons panel
-        getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
-
-        // General panel
-        GridPane generalPanel = new GridPane();
-        GridPane textFieldPanel = new GridPane();
-        GridPane selectPanel = new GridPane();
-        generalPanel.add(textFieldPanel, 0, 0);
-        generalPanel.add(selectPanel, 0, 1);
-        generalPanel.setVgap(VGAP);
-        generalPanel.setPadding(PADDING);
-        generalPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
-
-        ColumnConstraints columnLabel = new ColumnConstraints();
-        columnLabel.setHalignment(HPos.RIGHT);
-        textFieldPanel.getColumnConstraints().add(columnLabel);
-        ColumnConstraints columnTextField = new ColumnConstraints();
-        columnTextField.setHalignment(HPos.LEFT);
-        textFieldPanel.getColumnConstraints().add(columnTextField);
-        textFieldPanel.setVgap(VGAP);
-        textFieldPanel.setHgap(HGAP);
-        textFieldPanel.add(new Label(Localization.lang("Name")), 0, 0);
-        textFieldPanel.add(nameField, 1, 0);
-        textFieldPanel.add(new Label(Localization.lang("Description")), 0, 1);
-        textFieldPanel.add(descriptionField, 1, 1);
-        textFieldPanel.add(new Label(Localization.lang("Color")), 0, 2);
-        textFieldPanel.add(colorField, 1, 2);
-        textFieldPanel.add(new Label(Localization.lang("Icon")), 0, 3);
-        textFieldPanel.add(iconField, 1, 3);
-
-        selectPanel.setVgap(VGAP);
-        selectPanel.add(explicitRadioButton, 0, 0);
-        selectPanel.add(keywordsRadioButton, 0, 1);
-        selectPanel.add(searchRadioButton, 0, 2);
-        selectPanel.add(autoRadioButton, 0, 3);
-        selectPanel.add(texRadioButton, 0, 4);
-
-        // Context panel
-        GridPane contextPanel = new GridPane();
-        contextPanel.setVgap(VGAP);
-        contextPanel.setHgap(HGAP);
-        contextPanel.setPadding(PADDING);
-        contextPanel.setStyle("-fx-content-display:top;"
-                              + "-fx-border-insets:0 0 0 0;"
-                              + "-fx-border-color:#D3D3D3");
-        contextPanel.add(independentButton, 0, 0);
-        contextPanel.add(intersectionButton, 0, 1);
-        contextPanel.add(unionButton, 0, 2);
+        VBox selectPanel = new VBox(10,
+                explicitRadioButton,
+                keywordsRadioButton,
+                searchRadioButton,
+                autoRadioButton,
+                texRadioButton
+        );
+        selectPanel.setPadding(new Insets(0, 0, 0, 10));
 
         // Description panel
-        ScrollPane sp = new ScrollPane(descriptionWebView);
-        sp.setPadding(PADDING);
-        sp.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
-        sp.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-        sp.setStyle("-fx-content-display:top;"
-                    + "-fx-border-insets:0 0 0 0;"
-                    + "-fx-border-color:#D3D3D3");
-
-        // create border
-        HBox title1 = new HBox();
-        HBox title2 = new HBox();
-        HBox title3 = new HBox();
-        HBox title4 = new HBox();
-        Label title1Label = new Label(Localization.lang("General"));
-        Label title2Label = new Label(Localization.lang("Hierarchical context"));
-        Label title3Label = new Label(Localization.lang("Options"));
-        Label title4Label = new Label(Localization.lang("Description"));
-        title1Label.setTextFill(Color.web("#778899"));
-        title2Label.setTextFill(Color.web("#778899"));
-        title3Label.setTextFill(Color.web("#778899"));
-        title4Label.setTextFill(Color.web("#778899"));
-        title1.setPadding(new Insets(10, 0, 0, 0));
-        title2.setPadding(new Insets(10, 0, 0, 0));
-        title3.setPadding(new Insets(10, 0, 0, 0));
-        title4.setPadding(new Insets(10, 0, 0, 0));
-        title1.getChildren().add(title1Label);
-        title2.getChildren().add(title2Label);
-        title3.getChildren().add(title3Label);
-        title4.getChildren().add(title4Label);
+        ScrollPane descriptionPane = new ScrollPane(descriptionWebView);
+        descriptionPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+        descriptionPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
         // create layout
-        GridPane mainPanel = new GridPane();
+        VBox mainPanel = new VBox(15);
         getDialogPane().setContent(mainPanel);
-        mainPanel.setPrefHeight(810);
-        mainPanel.setPrefWidth(630);
-        mainPanel.setPadding(new Insets(5, 15, 5, 5));
-        mainPanel.add(title1, 0, 0);
-        mainPanel.add(generalPanel, 0, 1);
-        mainPanel.add(title2, 0, 2);
-        mainPanel.add(contextPanel, 0, 3);
-        mainPanel.add(title3, 0, 4);
-        mainPanel.add(optionsPanel, 0, 5);
-        mainPanel.add(title4, 0, 6);
-        mainPanel.add(sp, 0, 7);
+        mainPanel.setPadding(new Insets(5, 15, 5, 15));
+        mainPanel.getChildren().setAll(
+                generalPanel,
+                new VBox(5,
+                        new Label(Localization.lang("Type")),
+                        selectPanel
+                ),
+                new VBox(
+                        new Label(Localization.lang("Options")),
+                        optionsPanel
+                ),
+                new Label(Localization.lang("Description")),
+                descriptionPane
+        );
 
         updateComponents();
 
@@ -416,11 +306,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         resultingGroup = new TexGroup(groupName, getContext(),
                                 Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
                     }
-                    try {
-                        resultingGroup.setColor(Color.valueOf(colorField.getText()));
-                    } catch (IllegalArgumentException ex) {
-                        // Ignore invalid color (we should probably notify the user instead...)
-                    }
+
+                    resultingGroup.setColor(colorField.getValue());
                     resultingGroup.setDescription(descriptionField.getText());
                     resultingGroup.setIconName(iconField.getText());
                     return resultingGroup;
@@ -438,7 +325,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                                                 Boolean newBoolean) -> updateComponents();
 
         nameField.textProperty().addListener(caretListener);
-        colorField.textProperty().addListener(caretListener);
         descriptionField.textProperty().addListener(caretListener);
         iconField.textProperty().addListener(caretListener);
         keywordGroupSearchField.textProperty().addListener(caretListener);
@@ -456,7 +342,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setContext(GroupHierarchyType.INDEPENDENT);
         } else {
             nameField.setText(editedGroup.getName());
-            colorField.setText(editedGroup.getColor().map(Color::toString).orElse(""));
+            editedGroup.getColor().ifPresent(colorField::setValue);
             descriptionField.setText(editedGroup.getDescription().orElse(""));
             iconField.setText(editedGroup.getIconName().orElse(""));
 
@@ -527,11 +413,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Localization.lang(
-                                     "The regular expression <b>%0</b> is invalid:",
-                                     StringUtil.quoteForHTML(regExp))
-                   + "<p><tt>"
-                   + sb
-                   + "</tt>";
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
         if (!(e instanceof PatternSyntaxException)) {
             return s;
         }
@@ -541,6 +427,89 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
         }
         return s;
+    }
+
+    private VBox createOptionsTexGroup() {
+        VBox texPanel = new VBox();
+        texPanel.setVisible(false);
+        texPanel.getChildren().add(new Label(Localization.lang("Aux file")));
+        texPanel.getChildren().add(texGroupFilePath);
+        return texPanel;
+    }
+
+    private VBox createOptionsAutoGroup() {
+        VBox autoPanel = new VBox(10);
+        autoPanel.setVisible(false);
+        ToggleGroup tg = new ToggleGroup();
+        autoGroupKeywordsOption.setToggleGroup(tg);
+        autoGroupPersonsOption.setToggleGroup(tg);
+        VBox fieldToGroupByKeywords = new VBox(
+                new Label(Localization.lang("Field to group by") + ":"),
+                autoGroupKeywordsField
+        );
+        fieldToGroupByKeywords.setPadding(new Insets(0, 0, 0, 20));
+        VBox delimiterCharacters = new VBox(
+                new Label(Localization.lang("Use the following delimiter character(s):")),
+                new HBox(10,
+                        autoGroupKeywordsDeliminator,
+                        autoGroupKeywordsHierarchicalDeliminator
+                )
+        );
+        delimiterCharacters.setPadding(new Insets(0, 0, 0, 20));
+        VBox fieldToGroupByPersons = new VBox(
+                new Label(Localization.lang("Field to group by") + ":"),
+                autoGroupPersonsField
+        );
+        fieldToGroupByPersons.setPadding(new Insets(0, 0, 0, 20));
+        autoPanel.getChildren().setAll(
+                autoGroupKeywordsOption,
+                fieldToGroupByKeywords,
+                delimiterCharacters,
+                autoGroupPersonsOption,
+                fieldToGroupByPersons
+        );
+        autoGroupKeywordsOption.setSelected(true);
+        autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
+        autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
+        autoGroupPersonsField.setText(FieldName.AUTHOR);
+        return autoPanel;
+    }
+
+    private VBox createOptionsSearchGroup() {
+        VBox searchPanel = new VBox(10);
+        searchPanel.setVisible(false);
+        searchPanel.getChildren().setAll(
+                new VBox(
+                        new Label(Localization.lang("Search expression")),
+                        searchGroupSearchExpression
+                ),
+                searchGroupCaseSensitive,
+                searchGroupRegExp
+        );
+        return searchPanel;
+    }
+
+    private VBox createOptionsExplicitGroup() {
+        return new VBox();
+    }
+
+    private VBox createOptionsKeywordGroup() {
+        VBox keywordPanel = new VBox(10);
+        keywordPanel.setVisible(false);
+        keywordPanel.getChildren().setAll(
+                new VBox(
+                        new Label(Localization.lang("Field")),
+                        keywordGroupSearchField
+                ),
+                new VBox(
+                        new Label(Localization.lang("Keyword")),
+                        keywordGroupSearchTerm
+                ),
+                keywordGroupCaseSensitive,
+                keywordGroupRegExp
+        );
+        return keywordPanel;
     }
 
     private void updateComponents() {
