@@ -9,23 +9,16 @@
     \begin{title}       <citetitle pubwork="book">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
     
 <!--BOOK booktitle, edition, (pages), publisher-->
-    \begin{book}
-        <biblioset relation="book">\n
-        \begin{booktitle} 
-            <booktitle >\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle>
-        \end{booktitle}
-        \begin{edition}   
-            <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> 
-        \end{edition}
-        \begin{year}   <pubdate>\year</pubdate>  \end{year}
-        \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
-        \begin{publisher}
-            <publisher>
-                <publishername>\publisher</publishername>
-                <address>\address</address>
-            </publisher>
-        \end{publisher}
-    \end{book}
+    <biblioset relation="book">\n
+        \begin{booktitle}<booktitle>\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle>\end{booktitle}
+		\begin{edition}<edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition>\end{edition}
+        \begin{year}<pubdate>\year</pubdate>\end{year}
+        \begin{pages}<artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+        \begin{publisher}<publisher>\end{publisher}
+		<publishername>\publisher</publishername>
+        <address>\address</address>
+        \begin{publisher}</publisher>\end{publisher}
+	</biblioset>
     
     
 <!-- IDENTIFIERS-->

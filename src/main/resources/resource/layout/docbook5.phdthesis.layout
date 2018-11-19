@@ -1,38 +1,30 @@
 <biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
    <authorgroup>
 <!--AUTHORS-->
-\begin{author}       \format[CreateDocBook5Authors]{\author} \end{author}
-<!--EDITORS-->
-\begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
+		\begin{author}\format[CreateDocBook5Authors]{\author} \end{author}
    </authorgroup>
 <!--TITLE-->
-    \begin{title}       <citetitle pubwork="\entrytype">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{title}<citetitle pubwork="\format[ToLowerCase]{\entrytype}">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
     
 <!--MASTERTHESIS -->
-    \begin{masterthesis}
-        <biblioset relation="masterthesis">\n
-        \begin{school}   
-            <publisher>
-                <publishername>\format[XMLChars]{\school}</publishername>
-            </publisher>
-            \begin{year}   <pubdate>\year</pubdate>  \end{year}
-        \end{school}
-    \end{masterthesis}
-
-    <!-- IDENTIFIERS--> 
+    <biblioset relation="phdthesis">\n
+		\begin{institution}<publisher><publishername>\format[XMLChars]{\institution}</publishername></publisher>\end{institution}
+		\begin{year}<pubdate>\year</pubdate>\end{year}
+	</biblioset>
+<!-- IDENTIFIERS-->
     \begin{url}
-        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+ <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
-    \begin{doi}  
-        <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
+    \begin{doi}
+ <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
     \end{doi}
     \begin{isbn}
-        <biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>
+ <biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>
     \end{isbn}
 <!--ABSTRACT-->
-    \begin{abstract}   
-        <abstract>
-            <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
-        </abstract>
+    \begin{abstract}
+ <abstract>
+     <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
+ </abstract>
     \end{abstract}
 </biblioentry>
