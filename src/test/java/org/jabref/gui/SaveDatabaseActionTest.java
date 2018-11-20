@@ -20,7 +20,8 @@ import static org.mockito.Mockito.*;
 
 public class SaveDatabaseActionTest {
 
-    private final File file = new File("C:\\Users\\John_Doe\\Jabref");
+    private static final String TEST_FILE_PATH = "C:\\Users\\John_Doe\\Jabref";
+    private final File file = new File(TEST_FILE_PATH);
     private Optional<Path> path = Optional.of(file.toPath());
 
     private DialogService dialogService = mock(DialogService.class);
@@ -40,8 +41,8 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_setWorkingDirectory(){
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn("C:\\Users\\John_Doe\\Jabref");
+    public void saveAsShouldSetWorkingDirectory(){
+        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(path);
         doNothing().when(saveDatabaseAction).saveAs(any());
 
@@ -51,8 +52,8 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_notSetWorkingDirectory_ifNotSelected(){
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn("C:\\Users\\John_Doe\\Jabref");
+    public void saveAsShouldNotSetWorkingDirectoryIfNotSelected(){
+        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doNothing().when(saveDatabaseAction).saveAs(any());
 
@@ -62,7 +63,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_setNewDatabasePath_intoContext(){
+    public void saveAsShouldSetNewDatabasePathIntoContext(){
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -73,21 +74,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_saveDatabaseByNewPath(){
-        SavePreferences savePreferences = mock(SavePreferences.class);
-
-        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
-        when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-        when(preferences.getDefaultEncoding()).thenReturn(Charset.defaultCharset());
-        when(preferences.loadForSaveFromPreferences()).thenReturn(savePreferences);
-        when(savePreferences.withEncoding(any())).thenReturn(savePreferences);
-        when(savePreferences.withSaveType(any())).thenReturn(savePreferences);
-
-        saveDatabaseAction.saveAs(file.toPath());
-    }
-
-    @Test
-    public void save_notSaveDatabase_pathNotSet(){
+    public void saveShouldNotSaveDatabaseIfPathNotSet(){
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
 
         boolean result = saveDatabaseAction.save();
