@@ -19,12 +19,12 @@ import javafx.scene.control.Labeled;
 
 class PreferencesSearchHandler {
 
-    private final ObservableList<PrefsTab> preferenceTabs;
+    private final List<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
     private final Map<String, Set<PrefsTab>> preferenceTabsLabelNames;
 
-    PreferencesSearchHandler(ObservableList<PrefsTab> preferenceTabs, StringProperty searchText) {
+    PreferencesSearchHandler(List<PrefsTab> preferenceTabs, StringProperty searchText) {
         this.preferenceTabs = preferenceTabs;
         this.searchText = searchText;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
