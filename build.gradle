@@ -174,7 +174,7 @@ dependencies {
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
-    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.2'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.3'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.2'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
