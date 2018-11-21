@@ -168,7 +168,7 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.3.0'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
-    testCompile 'org.mockito:mockito-core:2.23.0'
+    testCompile 'org.mockito:mockito-core:2.23.4'
     testCompile 'com.github.tomakehurst:wiremock:2.19.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
