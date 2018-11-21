@@ -345,16 +345,6 @@ To test that a preferences migration works succesfully, use the mockito method `
 
 Global variables should be avoided. Try to pass them as dependency.
 
-## Designing GUI Confirmation dialogs
-
-1. Avoid asking questions 
-2. Be as concise as possible
-3. Identify the item at risk
-4. Name your buttons for the actions
-
-More information:
-http://ux.stackexchange.com/a/768
-
 ## "Special Fields"
 
 ### keywords sync
