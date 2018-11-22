@@ -1,9 +1,7 @@
 package org.jabref.gui;
 
-import org.apache.pdfbox.contentstream.operator.state.Save;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.preferences.JabRefPreferences;
@@ -11,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -28,8 +25,8 @@ public class SaveDatabaseActionTest {
     private JabRefPreferences preferences = mock(JabRefPreferences.class);
     private BasePanel basePanel = mock(BasePanel.class);
     private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
-    private SaveDatabaseAction saveDatabaseAction;
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
+    private SaveDatabaseAction saveDatabaseAction;
 
     @Before
     public void setUp(){
@@ -78,10 +75,12 @@ public class SaveDatabaseActionTest {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
+        when(dialogService.showFileSaveDialog(any())).thenReturn(path);
+        doNothing().when(saveDatabaseAction).saveAs(file.toPath());
 
         saveDatabaseAction.save();
 
-        verify(dbContext, times(1)).setDatabaseFile(file.toPath());
+        verify(saveDatabaseAction, times(1)).saveAs(file.toPath());
     }
 
     @Test
