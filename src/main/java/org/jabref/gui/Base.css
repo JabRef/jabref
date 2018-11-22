@@ -291,7 +291,6 @@
 .check-box > .box,
 .menu-button,
 .choice-box,
-.color-picker.split-button > .color-picker-label,
 .combo-box-base,
 .combo-box-base:editable > .arrow-button {
     -fx-background-color: transparent;
@@ -955,4 +954,24 @@ We want to have a look that matches our icons in the tool-bar */
 
 .progress-bar > .track {
     -fx-background-color: -jr-accent;
+}
+
+.jfx-color-picker:armed,
+.jfx-color-picker:hover,
+.jfx-color-picker:focused,
+.jfx-color-picker {
+    -fx-background-color: transparent, transparent, transparent, transparent;
+    -fx-background-radius: 0px;
+    -fx-background-insets: 0px;
+    -fx-effect: null;
+}
+
+.color-palette {
+    -fx-background-color: -fx-background;
+    -fx-background-radius: 0px;
+    -fx-background-insets: 0px;
+}
+
+.color-palette-region .button {
+    -fx-border-width: 0px;
 }
