@@ -5,7 +5,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,10 +29,10 @@ import org.slf4j.LoggerFactory;
 public class MrDLibImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
+    public ParserResult parserResult;
     private String recommendationsHeading;
     private String recommendationsDescription;
     private String recommendationSetId;
-    public ParserResult parserResult;
 
     @SuppressWarnings("unused")
     @Override

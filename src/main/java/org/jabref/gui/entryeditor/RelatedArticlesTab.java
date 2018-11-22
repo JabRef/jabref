@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
+    private static final String MDL_STATUS_RECEIVED = "received";
+    private static final String MDL_STATUS_DISPLAYED = "displayed";
     private final EntryEditorPreferences preferences;
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
@@ -64,14 +66,14 @@ public class RelatedArticlesTab extends EntryEditorTab {
                       .onRunning(() -> progress.setVisible(true))
                       .onSuccess(relatedArticles -> {
                           BackgroundTask
-                                  .wrap(() -> fetcher.confirmRecommendations("received"))
+                                  .wrap(() -> fetcher.confirmRecommendations(MDL_STATUS_RECEIVED))
                                   .executeWith(Globals.TASK_EXECUTOR);
                           progress.setVisible(false);
                           root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
                           if (entry.getAuthorTitleYear(100)
                                   .equals(entryEditor.getEntry().getAuthorTitleYear(100))) {
                               BackgroundTask
-                                      .wrap(() -> fetcher.confirmRecommendations("displayed"))
+                                      .wrap(() -> fetcher.confirmRecommendations(MDL_STATUS_DISPLAYED))
                                       .executeWith(Globals.TASK_EXECUTOR);
                           }
                       })

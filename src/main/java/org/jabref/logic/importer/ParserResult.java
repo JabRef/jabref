@@ -101,6 +101,7 @@ public class ParserResult {
     public void setFile(File f) {
         file = f.toPath();
     }
+
     /**
      * Add a parser warning.
      *
