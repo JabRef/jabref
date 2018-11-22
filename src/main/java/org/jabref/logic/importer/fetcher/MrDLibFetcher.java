@@ -33,8 +33,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching recommendations from Mr.DLib.");
     private final String LANGUAGE;
     private final Version VERSION;
-    private String heading = "";
-    private String description = "";
+    private String heading;
+    private String description;
+    private String recommendationSetId;
 
 
     public MrDLibFetcher(String language, Version version) {
@@ -57,8 +58,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             try {
                 if (importer.isRecognizedFormat(response)) {
                     parserResult = importer.importDatabase(response);
-                    heading = parserResult.getTitle();
-                    description = parserResult.getDescription();
+                    heading = importer.getRecommendationsHeading();
+                    description = importer.getRecommendationsDescription();
+                    recommendationSetId = importer.getRecommendationSetId();
                 } else {
                     // For displaying An ErrorMessage
                     description = DEFAULT_MRDLIB_ERROR_MESSAGE;
@@ -82,6 +84,28 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     public String getDescription() {
         return description;
+    }
+
+    public void confirmRecommendations(String status) {
+        try {
+            URIBuilder builder = new URIBuilder();
+            builder.setScheme("http");
+            builder.setHost("localhost:5000");
+            builder.setPath("/v2/recommendations/" + recommendationSetId + "/status/" + status);
+            try {
+                URI uri = builder.build();
+                URLDownload urlDownload = new URLDownload(uri.toString());
+                URLDownload.bypassSSLVerification();
+                urlDownload.setPostData(recommendationSetId);
+                urlDownload.asString();
+            }
+            catch (URISyntaxException se) {
+                LOGGER.error("Problem connecting to Mr. DLib", se);
+            }
+
+        } catch (IOException e) {
+            LOGGER.error("Problem connecting to Mr. DLib", e);
+        }
     }
 
     /**

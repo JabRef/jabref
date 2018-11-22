@@ -5,6 +5,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +30,9 @@ import org.slf4j.LoggerFactory;
 public class MrDLibImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
+    private String recommendationsHeading;
+    private String recommendationsDescription;
+    private String recommendationSetId;
     public ParserResult parserResult;
 
     @SuppressWarnings("unused")
@@ -109,12 +113,13 @@ public class MrDLibImporter extends Importer {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse
-        String recommendations = convertToString(input);
+        String recommendationSet = convertToString(input);
+        JSONObject recommendationSetJson = new JSONObject(recommendationSet);
         // The sorted BibEntries gets stored here later
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
         // Get recommendations from response and populate bib entries
-        JSONObject recommendationsJson = new JSONObject(recommendations).getJSONObject("recommendations");
+        JSONObject recommendationsJson = recommendationSetJson.getJSONObject("recommendations");
         Iterator<String> keys = recommendationsJson.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -132,9 +137,10 @@ public class MrDLibImporter extends Importer {
         }
         parserResult = new ParserResult(bibDatabase);
 
-        JSONObject label = new JSONObject(recommendations).getJSONObject("label");
-        parserResult.setTitle(label.getString("label-text"));
-        parserResult.setDescription(label.getString("label-description"));
+        JSONObject label = recommendationSetJson.getJSONObject("label");
+        recommendationsHeading = label.getString("label-text");
+        recommendationsDescription = label.getString("label-description");
+        recommendationSetId = recommendationSetJson.getBigInteger("recommendation_set_id").toString();
     }
 
     /**
@@ -187,6 +193,18 @@ public class MrDLibImporter extends Importer {
 
     public ParserResult getParserResult() {
         return parserResult;
+    }
+
+    public String getRecommendationsHeading() {
+        return recommendationsHeading;
+    }
+
+    public String getRecommendationsDescription() {
+        return recommendationsDescription;
+    }
+
+    public String getRecommendationSetId() {
+        return recommendationSetId;
     }
 
 }

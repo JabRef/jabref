@@ -35,11 +35,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
+    private final EntryEditor entryEditor;
     private final DialogService dialogService;
 
-    public RelatedArticlesTab(EntryEditorPreferences preferences, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, DialogService dialogService) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
+        this.entryEditor = entryEditor;
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -61,8 +63,17 @@ public class RelatedArticlesTab extends EntryEditorTab {
                       .wrap(() -> fetcher.performSearch(entry))
                       .onRunning(() -> progress.setVisible(true))
                       .onSuccess(relatedArticles -> {
+                          BackgroundTask
+                                  .wrap(() -> fetcher.confirmRecommendations("received"))
+                                  .executeWith(Globals.TASK_EXECUTOR);
                           progress.setVisible(false);
                           root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
+                          if (entry.getAuthorTitleYear(100)
+                                  .equals(entryEditor.getEntry().getAuthorTitleYear(100))) {
+                              BackgroundTask
+                                      .wrap(() -> fetcher.confirmRecommendations("displayed"))
+                                      .executeWith(Globals.TASK_EXECUTOR);
+                          }
                       })
                       .onFailure(exception -> {
                           LOGGER.error("Error while fetching from Mr. DLib", exception);
