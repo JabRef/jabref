@@ -3,7 +3,6 @@ package org.jabref.gui.exporter;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -32,7 +31,7 @@ public class SaveDatabaseActionTest {
     private SaveDatabaseAction saveDatabaseAction;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         when(basePanel.frame()).thenReturn(jabRefFrame);
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
@@ -41,7 +40,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldSetWorkingDirectory(){
+    public void saveAs_shouldSetWorkingDirectory() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(path);
         doNothing().when(saveDatabaseAction).saveAs(any());
@@ -52,7 +51,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldNotSetWorkingDirectoryIfNotSelected(){
+    public void saveAs_shouldNotSetWorkingDirectoryIfNotSelected() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doNothing().when(saveDatabaseAction).saveAs(any());
@@ -63,7 +62,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldSetNewDatabasePathIntoContext(){
+    public void saveAs_shouldSetNewDatabasePathIntoContext() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -74,7 +73,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void save_shouldShowSaveAsIfDatabaseNotSelected(){
+    public void save_shouldShowSaveAsIfDatabaseNotSelected() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -87,7 +86,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void save_shouldNotSaveDatabaseIfPathNotSet(){
+    public void save_shouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
 
         boolean result = saveDatabaseAction.save();
@@ -95,4 +94,3 @@ public class SaveDatabaseActionTest {
         assertFalse(result);
     }
 }
-
