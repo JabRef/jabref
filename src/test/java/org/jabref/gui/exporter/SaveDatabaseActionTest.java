@@ -40,7 +40,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldSetWorkingDirectory() {
+    public void saveAsShouldSetWorkingDirectory() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(path);
         doNothing().when(saveDatabaseAction).saveAs(any());
@@ -51,7 +51,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldNotSetWorkingDirectoryIfNotSelected() {
+    public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_FILE_PATH);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doNothing().when(saveDatabaseAction).saveAs(any());
@@ -62,7 +62,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void saveAs_shouldSetNewDatabasePathIntoContext() {
+    public void saveAsShouldSetNewDatabasePathIntoContext() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -73,7 +73,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void save_shouldShowSaveAsIfDatabaseNotSelected() {
+    public void saveShouldShowSaveAsIfDatabaseNotSelected() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
@@ -86,7 +86,7 @@ public class SaveDatabaseActionTest {
     }
 
     @Test
-    public void save_shouldNotSaveDatabaseIfPathNotSet() {
+    public void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
 
         boolean result = saveDatabaseAction.save();
