@@ -1,5 +1,8 @@
-package org.jabref.gui;
+package org.jabref.gui.exporter;
 
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.model.database.BibDatabaseContext;
