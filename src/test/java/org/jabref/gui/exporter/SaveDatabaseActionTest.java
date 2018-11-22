@@ -1,5 +1,9 @@
 package org.jabref.gui.exporter;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -7,15 +11,18 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.preferences.JabRefPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Optional;
-
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SaveDatabaseActionTest {
 
