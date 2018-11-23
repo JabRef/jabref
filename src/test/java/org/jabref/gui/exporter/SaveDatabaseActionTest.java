@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class SaveDatabaseActionTest {
+class SaveDatabaseActionTest {
 
     private static final String TEST_FILE_PATH = "C:\\Users\\John_Doe\\Jabref";
     private final File file = new File(TEST_FILE_PATH);

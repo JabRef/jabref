@@ -23,6 +23,7 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
     private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "JabRefPreferencesTest";
     private static final String CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST = "PreferencesMigrationsTest";
+    private static final String CLASS_ORG_JABREF_SAVE_DATABASE_ACTION_TEST = "SaveDatabaseActionTest";
     private static final String CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST = "UpdateTimestampListenerTest";
     private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
     private static final String CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST = "LinkedFileViewModelTest";
@@ -36,9 +37,11 @@ public class TestArchitectureTests {
         exceptions = new ArrayList<>();
         exceptions.add(CLASS_ORG_JABREF_PREFERENCES_TEST);
         exceptions.add(CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST);
+        exceptions.add(CLASS_ORG_JABREF_SAVE_DATABASE_ACTION_TEST);
         exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
         exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
         exceptions.add(CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST);
+
     }
 
     public static Stream<String[]> data() {
