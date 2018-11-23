@@ -110,7 +110,7 @@ dependencies {
     compile "org.libreoffice:ridl:5.4.2"
     compile "org.libreoffice:unoil:5.4.2"
 
-    compile 'io.github.java-diff-utils:java-diff-utils:2.2.0'
+    compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.1.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
