@@ -2,7 +2,6 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -53,7 +52,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         setTextFields(exporter);
     }
 
-    public Optional<ExporterViewModel> saveExporter() {
+    public ExporterViewModel saveExporter() {
         Path layoutFileDir = Paths.get(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
@@ -66,7 +65,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
             LOGGER.info("One of the fields is empty or invalid!");
             // Return empty exporter to the main exporter customization dialog
-            return Optional.empty();
+            return null;
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
@@ -75,7 +74,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
                                                        layoutPreferences, savePreferences);
         format.setCustomExport(true);
-        return Optional.of(new ExporterViewModel(format));
+        return new ExporterViewModel(format);
     }
 
     public String getExportWorkingDirectory() { //i.e. layout dir

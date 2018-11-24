@@ -1,7 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.util.Optional;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -15,7 +13,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CreateModifyExporterDialogView extends BaseDialog<Optional<ExporterViewModel>> {
+public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
     //Browse must be a Button because ButtonTypes  must be on the buttom, not next to the filename field
     @FXML private Button browseButton;
@@ -47,7 +45,7 @@ public class CreateModifyExporterDialogView extends BaseDialog<Optional<Exporter
             if (button == saveExporter) {
                 return viewModel.saveExporter();
             } else {
-                return Optional.empty();
+                return null;
             }
         });
 
