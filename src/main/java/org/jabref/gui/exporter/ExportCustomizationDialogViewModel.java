@@ -40,8 +40,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void addExporter() {
-        Optional<ExporterViewModel> blankExporter = Optional.empty();
-        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(blankExporter, dialogService, preferences,
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null, dialogService, preferences,
                                                                                    loader);
         Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
         if (exporter.isPresent() && exporter.get().isPresent()) {
@@ -58,10 +57,9 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         CreateModifyExporterDialogView dialog;
         ExporterViewModel exporterToModify = selectedExporters.get(0);
         try {
-            dialog = new CreateModifyExporterDialogView(Optional.of(exporterToModify), dialogService, preferences, loader);
+            dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
         } catch (IndexOutOfBoundsException ex) {
-            Optional<ExporterViewModel> emptyExporter = Optional.empty();
-            dialog = new CreateModifyExporterDialogView(emptyExporter, dialogService, preferences, loader);
+            dialog = new CreateModifyExporterDialogView(null, dialogService, preferences, loader);
         }
         Optional<Optional<ExporterViewModel>> exporter = dialogService.showCustomDialogAndWait(dialog);
         // Outer optional because an exporter may not have been entered to begin with,

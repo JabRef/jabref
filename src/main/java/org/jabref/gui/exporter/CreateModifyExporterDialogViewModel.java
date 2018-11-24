@@ -44,7 +44,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final JournalAbbreviationLoader loader;
 
 
-    public CreateModifyExporterDialogViewModel(Optional<ExporterViewModel> exporter, DialogService dialogService, PreferencesService preferences,
+    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
                                                JournalAbbreviationLoader loader) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -90,13 +90,13 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString())); //implement setting the text
     }
 
-    private void setTextFields(Optional<ExporterViewModel> exporter) {
+    private void setTextFields(ExporterViewModel exporter) {
 
         //Set text of each of the boxes
-        if (exporter.isPresent()) {
-            name.setValue(exporter.get().getName().get());
-            layoutFile.setValue(exporter.get().getLayoutFileName().get());
-            extension.setValue(exporter.get().getExtension().get());
+        if (exporter != null) {
+            name.setValue(exporter.getName().get());
+            layoutFile.setValue(exporter.getLayoutFileName().get());
+            extension.setValue(exporter.getExtension().get());
         }
     }
 

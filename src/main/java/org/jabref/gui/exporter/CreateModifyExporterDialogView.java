@@ -28,10 +28,10 @@ public class CreateModifyExporterDialogView extends BaseDialog<Optional<Exporter
     private PreferencesService preferences;
     private CreateModifyExporterDialogViewModel viewModel;
 
-    private final Optional<ExporterViewModel> exporter;
+    private final ExporterViewModel exporter;
     private final JournalAbbreviationLoader loader;
 
-    public CreateModifyExporterDialogView(Optional<ExporterViewModel> exporter, DialogService dialogService,
+    public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
                                           PreferencesService preferences, JournalAbbreviationLoader loader) { //should the latter three have been injected as in the main dialog rather than passed as a param?
         this.setTitle(Localization.lang("Customize Export Formats"));
         this.exporter = exporter;
