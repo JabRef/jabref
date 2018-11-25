@@ -1,0 +1,23 @@
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+   <authorgroup>
+<!--AUTHORS-->
+\begin{author}\format[CreateDocBook5Authors]{\author} \end{author}
+<!--EDITORS-->
+\begin{editor}\format[CreateDocBook5Editors]{\editor} \end{editor}
+   </authorgroup>
+<!--WWW author, year, title, editor, url, orgnisation, publisher-->
+    <biblioset relation="webpage">\n
+    \begin{title}<citetitle pubwork="webpage">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+    \begin{year}<pubdate>\year</pubdate>\end{year}
+    </biblioset>
+    <!-- IDENTIFIERS-->
+    \begin{url}
+    <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+    \end{url}
+<!--ABSTRACT-->
+    \begin{abstract}   
+    <abstract>
+      <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
+    </abstract>
+    \end{abstract}
+</biblioentry>

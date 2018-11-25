@@ -1,0 +1,36 @@
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+   <authorgroup>
+<!--AUTHORS-->
+\begin{author}       \format[CreateDocBook5Authors]{\author} \end{author}
+<!--EDITORS-->
+\begin{editor}       \format[CreateDocBook5Editors]{\editor} \end{editor}
+   </authorgroup>
+   <!--TITLE-->
+    \begin{title}       <citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+
+<!--JOURNAL, Vol, Pages, Year-->
+    \begin{journal}
+        <biblioset relation="journal">\n
+        \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
+        \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+        \begin{year}   <pubdate>\year</pubdate>  \end{year}
+    \end{journal}
+
+<!-- IDENTIFIERS-->
+    \begin{url}
+        <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
+    \end{url}
+    \begin{doi}
+        <biblioid class="doi">\format[XMLChars]{\doi}</biblioid>
+    \end{doi}
+    \begin{isbn}
+        <biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>
+    \end{isbn}
+
+<!--ABSTRACT-->
+    \begin{abstract}
+        <abstract>
+            <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
+        </abstract>
+    \end{abstract}
+</biblioentry>

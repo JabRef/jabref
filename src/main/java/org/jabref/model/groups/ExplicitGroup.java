@@ -64,7 +64,7 @@ public class ExplicitGroup extends WordKeywordGroup {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, context, legacyEntryKeys, iconName, color, description, isExpanded);
+        return Objects.hash(name.getValue(), context, legacyEntryKeys, iconName, color, description, isExpanded);
     }
 
     @Override

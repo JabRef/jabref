@@ -110,7 +110,7 @@ dependencies {
     compile "org.libreoffice:ridl:5.4.2"
     compile "org.libreoffice:unoil:5.4.2"
 
-    compile 'io.github.java-diff-utils:java-diff-utils:2.2.0'
+    compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.1.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
@@ -125,7 +125,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:27.0-jre'
+    compile 'com.google.guava:guava:27.0.1-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
@@ -168,14 +168,14 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.3.0'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
-    testCompile 'org.mockito:mockito-core:2.23.0'
+    testCompile 'org.mockito:mockito-core:2.23.4'
     testCompile 'com.github.tomakehurst:wiremock:2.19.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
-    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.2'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.2'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.3'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.3'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
