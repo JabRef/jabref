@@ -30,7 +30,7 @@
               </rowConstraints>
                <children>
                   <TextField fx:id="name" GridPane.rowIndex="1" />
-                  <Label text="%Main Layout File:" GridPane.rowIndex="2" />
+                  <Label text="%Main layout file:" GridPane.rowIndex="2" />
                   <TextField fx:id="fileName" GridPane.rowIndex="3" />
                   <TextField fx:id="extension" GridPane.rowIndex="6" />
                   <Label alignment="TOP_LEFT" text="%Export format name:">
