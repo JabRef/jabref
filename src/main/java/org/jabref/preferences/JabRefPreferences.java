@@ -2001,15 +2001,10 @@ public class JabRefPreferences implements PreferencesService {
             exporterName = formatData.get(EXPORTER_NAME_INDEX);
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
-            Optional<TemplateExporter> format = Optional.of(new TemplateExporter(exporterName, filename, extension,
-                                                                                 layoutPreferences, savePreferences));
-            format.get().setCustomExport(true);
-            if (format.isPresent()) {
-                formats.add(format.get());
-            } else {
-                String customExportFormat = get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
-                LOGGER.error("Error initializing custom export format from string " + customExportFormat);
-            }
+            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
+                                                           layoutPreferences, savePreferences);
+            format.setCustomExport(true);
+            formats.add(format);
             i++;
         }
         return formats;
