@@ -71,12 +71,8 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().getExtension());
     }
 
-    private void closeDialog() {
-        close();
-    }
-
     private void saveAndClose() {
         viewModel.saveToPrefs();
-        closeDialog();
+        close();
     }
 }
