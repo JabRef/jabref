@@ -1,5 +1,7 @@
 package org.jabref.gui.exporter;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -22,12 +24,12 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     @FXML private TextField extension;
     @FXML private ButtonType saveExporter;
 
-    private DialogService dialogService;
-    private PreferencesService preferences;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
+    @Inject private final JournalAbbreviationLoader loader;
     private CreateModifyExporterDialogViewModel viewModel;
 
     private final ExporterViewModel exporter;
-    private final JournalAbbreviationLoader loader;
 
     public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
                                           PreferencesService preferences, JournalAbbreviationLoader loader) { //should the latter three have been injected as in the main dialog rather than passed as a param?
