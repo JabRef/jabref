@@ -1,8 +1,8 @@
 package org.jabref.gui.exporter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -54,8 +54,9 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     public void modifyExporter() {
         CreateModifyExporterDialogView dialog;
+        ExporterViewModel exporterToModify = null;
         try {
-            ExporterViewModel exporterToModify = selectedExporters.get(0);
+            exporterToModify = selectedExporters.get(0);
             dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
         } catch (IndexOutOfBoundsException ex) {
             dialog = new CreateModifyExporterDialogView(null, dialogService, preferences, loader);
@@ -75,8 +76,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void saveToPrefs() {
-        List<TemplateExporter> exportersLogic = new ArrayList<>();
-        exporters.forEach(exporter -> exportersLogic.add(exporter.getLogic()));
+        List<TemplateExporter> exportersLogic = exporters.stream().map(ExporterViewModel::getLogic).collect(Collectors.toList());
         preferences.storeCustomExportFormats(exportersLogic);
 
     }
