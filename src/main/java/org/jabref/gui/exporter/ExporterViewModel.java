@@ -16,34 +16,34 @@ public class ExporterViewModel {
 
     private final TemplateExporter exporter;
     private final StringProperty name = new SimpleStringProperty();
-    private final StringProperty lfFileName = new SimpleStringProperty();
+    private final StringProperty layoutFileName = new SimpleStringProperty();
     //If the TemplateExporter
     private final StringProperty extension = new SimpleStringProperty();
 
     public ExporterViewModel(TemplateExporter exporter) {
         this.exporter = exporter;
         this.name.setValue(exporter.getName());
-        this.lfFileName.setValue(exporter.getLayoutFileNameWithExtension());
+        this.layoutFileName.setValue(exporter.getLayoutFileNameWithExtension());
         // Only the first of the extensions gotten from FileType is saved into the class using get(0)
         // substring(1) used to remove "*" from extension, i.e. "*.txt" to ".txt"
         String extensionString = exporter.getFileType().getExtensionsWithDot().get(0).substring(1);
         this.extension.setValue(extensionString);
     }
 
-    public TemplateExporter getLogic() {
+    public TemplateExporter Logic() {
         return this.exporter;
     }
 
-    public StringProperty getName() {
+    public StringProperty Name() {
         return this.name;
 
     }
 
-    public StringProperty getLayoutFileName() {
-        return this.lfFileName;
+    public StringProperty LayoutFileName() {
+        return this.layoutFileName;
     }
 
-    public StringProperty getExtension() {
+    public StringProperty Extension() {
         return this.extension;
     }
 }
