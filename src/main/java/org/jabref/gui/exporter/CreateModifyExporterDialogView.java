@@ -2,6 +2,7 @@ package org.jabref.gui.exporter;
 
 import javax.inject.Inject;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -50,8 +51,6 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
                 return null;
             }
         });
-
-        browseButton.setOnAction(event -> browse());
     }
 
     @FXML
@@ -62,7 +61,8 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
         extension.textProperty().bindBidirectional(viewModel.getExtension());
     }
 
-    private void browse() {
+    @FXML
+    private void browse(ActionEvent event) {
         viewModel.browse();
     }
 
