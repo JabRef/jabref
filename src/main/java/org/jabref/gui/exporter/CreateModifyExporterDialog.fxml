@@ -48,4 +48,5 @@
          </children></AnchorPane>
     </content>
     <ButtonType fx:id="saveExporter" text="%Save exporter" />
+    <ButtonType fx:constant="CANCEL" />
 </DialogPane>
