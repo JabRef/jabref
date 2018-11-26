@@ -16,7 +16,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
-    //TODO: Use JavaFX SortedList instead of SimpleListPreperty for exporters.  There is no SimpleSortedListProperty.
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
