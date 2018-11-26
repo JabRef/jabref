@@ -28,7 +28,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.loader = loader;
-        init();
+        loadExporters();
     }
 
     private void loadExporters() {
@@ -87,9 +87,5 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     public ListProperty<ExporterViewModel> exportersProperty() {
         return exporters;
-    }
-
-    public void init() {
-        loadExporters();
     }
 }
