@@ -49,7 +49,12 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.loader = loader;
 
-        setTextFields(exporter);
+        //Set text of each of the boxes
+        if (exporter != null) {
+            name.setValue(exporter.getName().get());
+            layoutFile.setValue(exporter.getLayoutFileName().get());
+            extension.setValue(exporter.getExtension().get());
+        }
     }
 
     public ExporterViewModel saveExporter() {
@@ -87,16 +92,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
             .withInitialDirectory(getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString())); //implement setting the text
-    }
-
-    private void setTextFields(ExporterViewModel exporter) {
-
-        //Set text of each of the boxes
-        if (exporter != null) {
-            name.setValue(exporter.getName().get());
-            layoutFile.setValue(exporter.getLayoutFileName().get());
-            extension.setValue(exporter.getExtension().get());
-        }
     }
 
     public StringProperty getName() {
