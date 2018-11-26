@@ -31,7 +31,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         init();
     }
 
-    public void loadExporters() {
+    private void loadExporters() {
         List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(loader); //Var exportersLogic may need more descriptive name
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
