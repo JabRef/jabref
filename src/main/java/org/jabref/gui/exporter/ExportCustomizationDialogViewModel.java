@@ -55,8 +55,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     public void modifyExporter() {
         CreateModifyExporterDialogView dialog;
-        ExporterViewModel exporterToModify = selectedExporters.get(0);
         try {
+            ExporterViewModel exporterToModify = selectedExporters.get(0);
             dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
         } catch (IndexOutOfBoundsException ex) {
             dialog = new CreateModifyExporterDialogView(null, dialogService, preferences, loader);
