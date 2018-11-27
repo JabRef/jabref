@@ -25,9 +25,10 @@ public class SaveAllAction extends SimpleCommand {
             if (!panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
                 //It will ask a path before saving.
                 panel.runCommand(Actions.SAVE_AS);
-            }else
+            } else {
                 panel.runCommand(Actions.SAVE);
-            // TODO: can we find out whether the save was actually done or not?
+                // TODO: can we find out whether the save was actually done or not?
+            }
         }
 
         dialogService.notify(Localization.lang("Save all finished."));
