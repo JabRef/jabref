@@ -45,7 +45,7 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void execute_shouldRunSaveCommandInEveryPanel() {
+    public void executeShouldRunSaveCommandInEveryPanel() {
         doNothing().when(dialogService).notify(anyString());
 
         saveAllAction.execute();
@@ -55,7 +55,7 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void execute_shouldNotifyAboutSavingProcess() {
+    public void executeShouldNotifyAboutSavingProcess() {
         when(bibDatabaseContext.getDatabasePath()).thenReturn(databasePath);
 
         saveAllAction.execute();
