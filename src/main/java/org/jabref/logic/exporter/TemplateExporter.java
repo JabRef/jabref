@@ -41,6 +41,10 @@ public class TemplateExporter extends Exporter {
      * \\s simply marks any whitespace character
      */
     private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
+    private static final String LAYOUT_EXTENSION = LAYOUT_EXTENSION;
+    private static final String FORMATTERS_EXTENSION = ".formatters";
+    private static final String BEGIN_INFIX = ".begin";
+    private static final String END_INFIX = ".end";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
 
@@ -97,8 +101,8 @@ public class TemplateExporter extends Exporter {
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         super(consoleName, displayName, extension);
-        if (Objects.requireNonNull(lfFileName).endsWith(".layout")) {
-            this.lfFileName = lfFileName.substring(0, lfFileName.length() - ".layout".length());
+        if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
+            this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
         } else {
             this.lfFileName = lfFileName;
         }
@@ -211,7 +215,7 @@ public class TemplateExporter extends Exporter {
             List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
-            try (Reader reader = getReader(lfFileName + ".begin.layout")) {
+            try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
                 LayoutHelper layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
@@ -236,7 +240,7 @@ public class TemplateExporter extends Exporter {
             // Load default layout
             Layout defLayout;
             LayoutHelper layoutHelper;
-            try (Reader reader = getReader(lfFileName + ".layout")) {
+            try (Reader reader = getReader(lfFileName + LAYOUT_EXTENSION)) {
                 layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
@@ -257,7 +261,7 @@ public class TemplateExporter extends Exporter {
                 if (layouts.containsKey(type)) {
                     layout = layouts.get(type);
                 } else {
-                    try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
+                    try (Reader reader = getReader(lfFileName + '.' + type + LAYOUT_EXTENSION)) {
                         // We try to get a type-specific layout for this entry.
                         layoutHelper = new LayoutHelper(reader, layoutPreferences);
                         layout = layoutHelper.getLayoutFromText();
@@ -289,7 +293,7 @@ public class TemplateExporter extends Exporter {
 
             // changed section - begin (arudert)
             Layout endLayout = null;
-            try (Reader reader = getReader(lfFileName + ".end.layout")) {
+            try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
                 layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
@@ -320,7 +324,7 @@ public class TemplateExporter extends Exporter {
      *
      */
     private void readFormatterFile() {
-        File formatterFile = new File(lfFileName + ".formatters");
+        File formatterFile = new File(lfFileName + FORMATTERS_EXTENSION);
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {
                 // Ok, we found and opened the file. Read all contents:
@@ -357,6 +361,6 @@ public class TemplateExporter extends Exporter {
     }
 
     public String getLayoutFileNameWithExtension() {
-        return lfFileName + ".layout";
+        return lfFileName + LAYOUT_EXTENSION;
     }
 }
