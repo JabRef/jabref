@@ -1,20 +1,26 @@
 package org.jabref.gui.exporter;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.Actions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Optional;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SaveAllActionTest {
 
@@ -23,11 +29,11 @@ public class SaveAllActionTest {
     private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private DialogService dialogService = mock(DialogService.class);
     private BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-    private Optional<Path> databasePath = Optional.of(new File("").toPath());
+    private Optional<Path> databasePath = Optional.of(new File("C:\\Users\\John_Doe\\Jabref").toPath());
     private SaveAllAction saveAllAction;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         when(firstPanel.getBibDatabaseContext()).thenReturn(bibDatabaseContext);
         when(secondPanel.getBibDatabaseContext()).thenReturn(bibDatabaseContext);
         when(bibDatabaseContext.getDatabasePath()).thenReturn(databasePath);
@@ -39,7 +45,7 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void execute_shouldRunSaveCommandInEveryPanel(){
+    public void execute_shouldRunSaveCommandInEveryPanel() {
         doNothing().when(dialogService).notify(anyString());
 
         saveAllAction.execute();
@@ -49,7 +55,7 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void execute_shouldNotifyAboutSavingProcess(){
+    public void execute_shouldNotifyAboutSavingProcess() {
         when(bibDatabaseContext.getDatabasePath()).thenReturn(databasePath);
 
         saveAllAction.execute();
@@ -59,7 +65,7 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void executeShouldShowSaveAsWindowIfDatabaseNotSelected(){
+    public void executeShouldShowSaveAsWindowIfDatabaseNotSelected() {
         when(bibDatabaseContext.getDatabasePath()).thenReturn(Optional.empty());
         doNothing().when(dialogService).notify(anyString());
 
