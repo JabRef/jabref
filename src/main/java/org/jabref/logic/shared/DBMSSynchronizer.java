@@ -167,8 +167,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Override
     public void synchronizeLocalDatabase() {
-        long startTime = System.currentTimeMillis();
-
         if (!checkCurrentConnection()) {
             return;
         }
@@ -215,10 +213,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (BibEntry bibEntry : dbmsProcessor.getSharedEntriesByIdList(entryToDrag)) {
             bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
         }
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println("time = " + elapsedTime);
     }
 
     /**
