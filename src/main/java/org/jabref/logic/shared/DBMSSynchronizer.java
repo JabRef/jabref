@@ -2,6 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -166,6 +167,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Override
     public void synchronizeLocalDatabase() {
+        long startTime = System.currentTimeMillis();
+
         if (!checkCurrentConnection()) {
             return;
         }
@@ -175,7 +178,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         // remove old entries locally
         removeNotSharedEntries(localEntries, idVersionMap.keySet());
-
+        List<Integer> entryToDrag = new ArrayList<>();
         // compare versions and update local entry if needed
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean match = false;
@@ -188,7 +191,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             // update fields
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
-                                      .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+                                    .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
                                 localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
@@ -205,19 +208,24 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
             }
             if (!match) {
-                Optional<BibEntry> bibEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
-                if (bibEntry.isPresent()) {
-                    bibDatabase.insertEntry(bibEntry.get(), EntryEventSource.SHARED);
-                }
+                entryToDrag.add(idVersionEntry.getKey());
             }
         }
+
+        for (BibEntry bibEntry : dbmsProcessor.getSharedEntriesByIdList(entryToDrag)) {
+            bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
+        }
+
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println("time = " + elapsedTime);
     }
 
     /**
      * Removes all local entries which are not present on shared database.
      *
      * @param localEntries List of {@link BibEntry} the entries should be removed from
-     * @param sharedIDs Set of all IDs which are present on shared database
+     * @param sharedIDs    Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         for (int i = 0; i < localEntries.size(); i++) {
@@ -322,10 +330,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     *  Checks whether the current SQL connection is valid.
-     *  In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     * Checks whether the current SQL connection is valid.
+     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
      *
-     *  @return <code>true</code> if the connection is valid, else <code>false</code>.
+     * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
     public boolean checkCurrentConnection() {
         try {

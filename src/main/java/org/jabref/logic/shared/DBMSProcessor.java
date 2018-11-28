@@ -431,6 +431,47 @@ public abstract class DBMSProcessor {
         return getSharedEntryList(0);
     }
 
+    public List<BibEntry> getSharedEntriesByIdList(List<Integer> idList) {
+        List<BibEntry> sharedEntries = new ArrayList<>();
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * from ")
+                .append(escape("ENTRY"))
+                .append(" inner join ")
+                .append(escape("FIELD"))
+                .append(" F on ")
+                .append( escape("ENTRY")+".")
+                .append(escape("SHARED_ID") + " = F." + escape("ENTRY_SHARED_ID"))
+                .append(" where ")
+                .append(escape("SHARED_ID")).append(" in (");
+
+        for (int i = 0; i < idList.size() - 1; i++) {
+            query.append(idList.get(i)).append(", ");
+        }
+        query.append(idList.get(idList.size() - 1)).append(") order by ").append(escape("SHARED_ID")).append(";");
+
+        try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(query.toString())) {
+            BibEntry bibEntry = null;
+            int lastId = -1;
+            while (selectEntryResultSet.next()) {
+                if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
+                    bibEntry = new BibEntry();
+                    bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
+                    bibEntry.setType(selectEntryResultSet.getString("TYPE"));
+                    bibEntry.getSharedBibEntryData().setVersion(selectEntryResultSet.getInt("VERSION"));
+                    sharedEntries.add(bibEntry);
+                    lastId = selectEntryResultSet.getInt("SHARED_ID");
+                }
+
+                bibEntry.setField(selectEntryResultSet.getString("NAME"), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntryEventSource.SHARED);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error", e);
+        }
+
+        return sharedEntries;
+    }
+
     /**
      * @param sharedID Entry ID. If 0, all entries are going to be fetched.
      * @return List of {@link BibEntry} instances
