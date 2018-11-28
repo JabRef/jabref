@@ -189,7 +189,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             // update fields
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
-                                    .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+                                      .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
                                 localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
@@ -219,7 +219,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Removes all local entries which are not present on shared database.
      *
      * @param localEntries List of {@link BibEntry} the entries should be removed from
-     * @param sharedIDs    Set of all IDs which are present on shared database
+     * @param sharedIDs Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         for (int i = 0; i < localEntries.size(); i++) {
@@ -324,10 +324,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Checks whether the current SQL connection is valid.
-     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     *Checks whether the current SQL connection is valid.
+     *In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
      *
-     * @return <code>true</code> if the connection is valid, else <code>false</code>.
+     *@return <code>true</code> if the connection is valid, else <code>false</code>.
      */
     public boolean checkCurrentConnection() {
         try {
