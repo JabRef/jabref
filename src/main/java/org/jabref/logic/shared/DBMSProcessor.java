@@ -440,7 +440,7 @@ public abstract class DBMSProcessor {
                 .append(" inner join ")
                 .append(escape("FIELD"))
                 .append(" F on ")
-                .append( escape("ENTRY")+".")
+                .append(escape("ENTRY") + ".")
                 .append(escape("SHARED_ID") + " = F." + escape("ENTRY_SHARED_ID"))
                 .append(" where ")
                 .append(escape("SHARED_ID")).append(" in (");
