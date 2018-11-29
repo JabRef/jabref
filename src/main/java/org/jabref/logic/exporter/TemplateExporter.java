@@ -41,7 +41,7 @@ public class TemplateExporter extends Exporter {
      * \\s simply marks any whitespace character
      */
     private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
-    private static final String LAYOUT_EXTENSION = LAYOUT_EXTENSION;
+    private static final String LAYOUT_EXTENSION = ".layout";
     private static final String FORMATTERS_EXTENSION = ".formatters";
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
