@@ -65,9 +65,4 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     private void browse(ActionEvent event) {
         viewModel.browse();
     }
-
-    @FXML
-    private void closeDialog() {
-        close();
-    }
 }
