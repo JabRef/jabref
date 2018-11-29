@@ -66,9 +66,9 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         // Unidirectional list binding - this is okay because item selection only fires from the View, not the other way around
         EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());
-        layoutColumn.setCellValueFactory(cellData -> cellData.getValue().getLayoutFileName());
-        extensionColumn.setCellValueFactory(cellData -> cellData.getValue().getExtension());
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
+        layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
+        extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
     }
 
     private void saveAndClose() {
