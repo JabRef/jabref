@@ -354,14 +354,19 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     private void copyPreviewToClipBoard() {
-        StringBuilder previewContent = new StringBuilder();
+        StringBuilder previewStringContent = new StringBuilder();
         Document document = previewView.getEngine().getDocument();
         NodeList nodeList = document.getElementsByTagName("*");
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            previewContent.append(element.getNodeValue()).append("\n");
+            previewStringContent.append(element.getNodeValue()).append("\n");
         }
 
-        clipBoardManager.setContent(previewContent.toString());    }
+        ClipboardContent content = new ClipboardContent();
+        content.putString(previewStringContent.toString());
+        content.putHtml((String) previewView.getEngine().executeScript("document.documentElement.outerHTML"));
+
+        clipBoardManager.setContent(content);
+    }
 }
