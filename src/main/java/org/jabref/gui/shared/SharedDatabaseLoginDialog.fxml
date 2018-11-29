@@ -52,6 +52,8 @@
                         <CheckBox fx:id="useSSL" mnemonicParsing="false" text="%Use SSL" GridPane.rowIndex="5" />
                         <TextField fx:id="fileKeystore" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         <Button fx:id="browseKeystore" mnemonicParsing="false" onAction="#showOpenKeystoreFileDialog" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <Label text="%Server Timezone:" GridPane.rowIndex="8"/>
+                        <TextField fx:id="serverTimezone" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8" />
                         <GridPane>
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

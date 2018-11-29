@@ -69,6 +69,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty keystore = new SimpleStringProperty("");
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
+    private final StringProperty serverTimezone = new SimpleStringProperty("");
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
@@ -118,6 +119,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setPassword(password.getValue());
         connectionProperties.setUseSSL(useSSL.getValue());
         connectionProperties.setKeyStore(keystore.getValue());
+        connectionProperties.setServerTimezone(serverTimezone.getValue());
 
         setupKeyStore();
         openSharedDatabase(connectionProperties);
@@ -161,7 +163,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(panel).saveAs(Paths.get(folder.getValue()));
+                    new SaveDatabaseAction(panel, Globals.prefs).saveAs(Paths.get(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
@@ -200,6 +202,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         prefs.setUser(user.getValue());
         prefs.setUseSSL(useSSL.getValue());
         prefs.setKeystoreFile(keystore.getValue());
+        prefs.setServerTimezone(serverTimezone.getValue());
 
         if (rememberPassword.get()) {
             try {
@@ -364,4 +367,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public ValidationStatus formValidation() {
         return formValidator.getValidationStatus();
     }
+
+    public StringProperty serverTimezoneProperty() { return serverTimezone; }
 }

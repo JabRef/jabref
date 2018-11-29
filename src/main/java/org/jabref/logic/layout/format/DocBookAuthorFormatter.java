@@ -1,42 +1,42 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.model.entry.FieldName;
 
 /**
- * Create DocBook authors formatter.
+ * DocBook author formatter for both version 4 and 5
+ *
  */
-public class CreateDocBookAuthors implements LayoutFormatter {
+public class DocBookAuthorFormatter {
 
     private static final XMLChars XML_CHARS = new XMLChars();
 
-    @Override
-    public String format(String fieldText) {
-
-        StringBuilder sb = new StringBuilder(100);
-
-        AuthorList al = AuthorList.parse(fieldText);
-
-        addBody(sb, al, FieldName.AUTHOR);
-        return sb.toString();
-
-    }
-
-    public void addBody(StringBuilder sb, AuthorList al, String tagName) {
+    /**
+     *
+     * @param sb {@link StringBuilder}
+     * @param al {@link AuthorList}
+     * @param tagName Editor or author field/tag
+     * @param version @link {@link DocBookVersion}
+     */
+    public void addBody(StringBuilder sb, AuthorList al, String tagName, DocBookVersion version) {
         for (int i = 0; i < al.getNumberOfAuthors(); i++) {
             sb.append('<').append(tagName).append('>');
+            if (version == DocBookVersion.DOCBOOK_5) {
+                sb.append("<personname>");
+            }
             Author a = al.getAuthor(i);
             a.getFirst().filter(first -> !first.isEmpty()).ifPresent(first -> sb.append("<firstname>")
-                    .append(CreateDocBookAuthors.XML_CHARS.format(first)).append("</firstname>"));
+                    .append(XML_CHARS.format(first)).append("</firstname>"));
             a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append("<othername>")
-                    .append(CreateDocBookAuthors.XML_CHARS.format(von)).append("</othername>"));
+                    .append(XML_CHARS.format(von)).append("</othername>"));
             a.getLast().filter(last -> !last.isEmpty()).ifPresent(last -> {
-                sb.append("<surname>").append(CreateDocBookAuthors.XML_CHARS.format(last));
+                sb.append("<surname>").append(XML_CHARS.format(last));
                 a.getJr().filter(jr -> !jr.isEmpty())
-                        .ifPresent(jr -> sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(jr)));
+                        .ifPresent(jr -> sb.append(' ').append(XML_CHARS.format(jr)));
                 sb.append("</surname>");
+                if (version == DocBookVersion.DOCBOOK_5) {
+                    sb.append("</personname>");
+                }
             });
 
             if (i < (al.getNumberOfAuthors() - 1)) {
@@ -46,5 +46,4 @@ public class CreateDocBookAuthors implements LayoutFormatter {
             }
         }
     }
-
 }

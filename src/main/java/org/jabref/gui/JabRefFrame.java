@@ -1332,7 +1332,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
                 if (!saveAction.save()) {
                     // The action was either canceled or unsuccessful.
                     output(Localization.lang("Unable to save library"));
