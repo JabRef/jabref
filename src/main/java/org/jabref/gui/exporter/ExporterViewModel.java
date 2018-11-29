@@ -26,7 +26,7 @@ public class ExporterViewModel {
         this.layoutFileName.setValue(exporter.getLayoutFileNameWithExtension());
         // Only the first of the extensions gotten from FileType is saved into the class using get(0)
         // substring(1) used to remove "*" from extension, i.e. "*.txt" to ".txt"
-        String extensionString = exporter.getFileType().getExtensionsWithDot().get(0).substring(1);
+        String extensionString = exporter.getFileType().getExtensions().get(0);
         this.extension.setValue(extensionString);
     }
 
