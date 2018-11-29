@@ -30,20 +30,20 @@ public class ExporterViewModel {
         this.extension.setValue(extensionString);
     }
 
-    public TemplateExporter Logic() {
+    public TemplateExporter getLogic() {
         return this.exporter;
     }
 
-    public StringProperty Name() {
+    public StringProperty name() {
         return this.name;
 
     }
 
-    public StringProperty LayoutFileName() {
+    public StringProperty layoutFileName() {
         return this.layoutFileName;
     }
 
-    public StringProperty Extension() {
+    public StringProperty extension() {
         return this.extension;
     }
 }

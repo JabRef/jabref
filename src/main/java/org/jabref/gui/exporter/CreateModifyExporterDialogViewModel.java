@@ -51,9 +51,9 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
         //Set text of each of the boxes
         if (exporter != null) {
-            name.setValue(exporter.getName().get());
-            layoutFile.setValue(exporter.getLayoutFileName().get());
-            extension.setValue(exporter.getExtension().get());
+            name.setValue(exporter.name().get());
+            layoutFile.setValue(exporter.layoutFileName().get());
+            extension.setValue(exporter.extension().get());
         }
     }
 
