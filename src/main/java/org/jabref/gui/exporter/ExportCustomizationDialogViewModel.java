@@ -55,12 +55,11 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     public void modifyExporter() {
         CreateModifyExporterDialogView dialog;
         ExporterViewModel exporterToModify = null;
-        try {
-            exporterToModify = selectedExporters.get(0);
-            dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
-        } catch (IndexOutOfBoundsException ex) {
-            dialog = new CreateModifyExporterDialogView(null, dialogService, preferences, loader);
+        if (selectedExporters.isEmpty()) {
+            return;
         }
+        exporterToModify = selectedExporters.get(0);
+        dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         // Outer optional because an exporter may not have been entered to begin with,
         // and inner optional because one may not have been output by the dialog
