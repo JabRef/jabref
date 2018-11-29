@@ -1,7 +1,7 @@
 package org.jabref.gui.exporter;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class SaveAllActionTest {
     private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private DialogService dialogService = mock(DialogService.class);
     private BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-    private Optional<Path> databasePath = Optional.of(new File("C:\\Users\\John_Doe\\Jabref").toPath());
+    private Optional<Path> databasePath = Optional.of(Paths.get("C:\\Users\\John_Doe\\Jabref"));
     private SaveAllAction saveAllAction;
 
     @Before
