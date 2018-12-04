@@ -176,7 +176,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         // remove old entries locally
         removeNotSharedEntries(localEntries, idVersionMap.keySet());
-        List<Integer> entryToDrag = new ArrayList<>();
+        List<Integer> entriesToDrag = new ArrayList<>();
         // compare versions and update local entry if needed
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean match = false;
@@ -206,11 +206,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
             }
             if (!match) {
-                entryToDrag.add(idVersionEntry.getKey());
+                entriesToDrag.add(idVersionEntry.getKey());
             }
         }
 
-        for (BibEntry bibEntry : dbmsProcessor.getSharedEntriesByIdList(entryToDrag)) {
+        for (BibEntry bibEntry : dbmsProcessor.getSharedEntriesByIdList(entriesToDrag)) {
             bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
         }
     }
