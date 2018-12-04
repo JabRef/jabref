@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
@@ -427,10 +428,6 @@ public abstract class DBMSProcessor {
         return Optional.empty();
     }
 
-    public List<BibEntry> getSharedEntries() {
-        return getSharedEntryList(0);
-    }
-
     public List<BibEntry> getSharedEntriesByIdList(List<Integer> idList) {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
@@ -452,10 +449,12 @@ public abstract class DBMSProcessor {
                 .append(" where ")
                 .append(escape("SHARED_ID")).append(" in (");
 
-        for (int i = 0; i < idList.size() - 1; i++) {
-            query.append(idList.get(i)).append(", ");
-        }
-        query.append(idList.get(idList.size() - 1)).append(") order by ").append(escape("SHARED_ID")).append(";");
+        idList.stream().map(id -> String.valueOf(id)).collect(Collectors.joining(", "));
+
+        query.append(idList.get(idList.size() - 1))
+                .append(") order by ")
+                .append(escape("SHARED_ID"))
+                .append(";");
 
         try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(query.toString())) {
             BibEntry bibEntry = null;
@@ -477,6 +476,10 @@ public abstract class DBMSProcessor {
         }
 
         return sharedEntries;
+    }
+
+    public List<BibEntry> getSharedEntries() {
+        return getSharedEntryList(0);
     }
 
     /**
