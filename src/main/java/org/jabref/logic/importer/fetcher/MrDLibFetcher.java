@@ -19,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,14 +111,23 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
-        builder.addParameter("app_lang", LANGUAGE);
-        builder.addParameter("os", System.getProperty("os.name"));
-        builder.addParameter("os_version", System.getProperty("os.version"));
-        builder.addParameter("java_version", System.getProperty("java.version"));
-        builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
+
+
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        if (prefs.getBoolean(JabRefPreferences.SEND_LANGUAGE_DATA)) {
+            builder.addParameter("app_lang", LANGUAGE);
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_OS_DATA)){
+            builder.addParameter("os", System.getProperty("os.name"));
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_TIMEZONE_DATA)){
+            builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
+        }
+
         try {
             URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());
+            System.out.println("Request: " + uri.toString());
             return uri.toString();
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
