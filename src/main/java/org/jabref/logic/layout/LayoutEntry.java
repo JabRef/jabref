@@ -34,8 +34,10 @@ import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
-import org.jabref.logic.layout.format.CreateDocBookAuthors;
-import org.jabref.logic.layout.format.CreateDocBookEditors;
+import org.jabref.logic.layout.format.CreateDocBook4Authors;
+import org.jabref.logic.layout.format.CreateDocBook4Editors;
+import org.jabref.logic.layout.format.CreateDocBook5Authors;
+import org.jabref.logic.layout.format.CreateDocBook5Editors;
 import org.jabref.logic.layout.format.CurrentDate;
 import org.jabref.logic.layout.format.DOICheck;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -444,10 +446,14 @@ class LayoutEntry {
                 return new CompositeFormat();
             case "CreateBibORDFAuthors":
                 return new CreateBibORDFAuthors();
-            case "CreateDocBookAuthors":
-                return new CreateDocBookAuthors();
-            case "CreateDocBookEditors":
-                return new CreateDocBookEditors();
+            case "CreateDocBook4Authors":
+                return new CreateDocBook4Authors();
+            case "CreateDocBook4Editors":
+                return new CreateDocBook4Editors();
+            case "CreateDocBook5Authors":
+                return new CreateDocBook5Authors();
+            case "CreateDocBook5Editors":
+                return new CreateDocBook5Editors();
             case "CurrentDate":
                 return new CurrentDate();
             case "DateFormatter":

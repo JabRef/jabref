@@ -10,7 +10,6 @@ import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -22,11 +21,6 @@ public class CleanupAction implements BaseAction {
 
     private final BasePanel panel;
     private final DialogService dialogService;
-
-    /**
-     * Global variable to count unsuccessful renames
-     */
-    private int unsuccessfulRenames;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
@@ -44,13 +38,31 @@ public class CleanupAction implements BaseAction {
         if (isCanceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset(), preferences.getFilePreferences());
 
         Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
-        chosenPreset.ifPresent(cleanupPreset ->
-                BackgroundTask.wrap(() -> cleanup(cleanupPreset))
-                              .onSuccess(x -> showResults())
-                              .executeWith(Globals.TASK_EXECUTOR));
+
+        if (chosenPreset.isPresent()) {
+            if (chosenPreset.get().isRenamePDFActive() && preferences.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+                boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
+                        Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                        Localization.lang("Autogenerate PDF Names"),
+                        Localization.lang("Cancel"),
+                        Localization.lang("Disable this confirmation dialog"),
+                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut));
+
+                if (!confirmed) {
+                    isCanceled = true;
+                    return;
+                }
+            }
+
+            preferences.setCleanupPreset(chosenPreset.get());
+
+            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
+                          .onSuccess(result -> showResults())
+                          .executeWith(Globals.TASK_EXECUTOR);
+        }
     }
 
     public void init() {
@@ -110,21 +122,6 @@ public class CleanupAction implements BaseAction {
 
     private void cleanup(CleanupPreset cleanupPreset) {
         preferences.setCleanupPreset(cleanupPreset);
-
-        if (cleanupPreset.isRenamePDF() && preferences.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
-
-            boolean confirmed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                    Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("Cancel"),
-                    Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
-
-            if (!confirmed) {
-                isCanceled = true;
-                return;
-            }
-        }
 
         for (BibEntry entry : panel.getSelectedEntries()) {
             // undo granularity is on entry level
