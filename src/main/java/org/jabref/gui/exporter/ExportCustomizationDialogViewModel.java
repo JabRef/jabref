@@ -19,7 +19,6 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final JournalAbbreviationLoader loader;

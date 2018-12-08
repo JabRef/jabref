@@ -42,7 +42,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     private final JournalAbbreviationLoader loader;
 
-
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
                                                JournalAbbreviationLoader loader) {
         this.dialogService = dialogService;
