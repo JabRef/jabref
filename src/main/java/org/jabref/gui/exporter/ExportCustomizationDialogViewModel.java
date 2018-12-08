@@ -32,7 +32,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     private void loadExporters() {
-        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(loader); //Var exportersLogic may need more descriptive name
+        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(loader);
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
         }
@@ -47,11 +47,6 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Open dialog to modify exporter, which is the same as adding ane exporter but passes in
-     * a non-empty Optional of ExporterViewModel and sets the result into exporters.
-     */
-
     public void modifyExporter() {
         CreateModifyExporterDialogView dialog;
         ExporterViewModel exporterToModify = null;
@@ -61,11 +56,8 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
         exporterToModify = selectedExporters.get(0);
         dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
-        // Outer optional because an exporter may not have been entered to begin with,
-        // and inner optional because one may not have been output by the dialog
         if ((exporter != null) && exporter.isPresent()) {
             exporters.remove(exporterToModify);
-            // this will append the exporter to the final position unless a sorted list property is used, see TODO above
             exporters.add(exporter.get());
         }
     }

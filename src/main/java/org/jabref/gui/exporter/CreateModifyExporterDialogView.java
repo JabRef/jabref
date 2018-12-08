@@ -18,7 +18,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
-    //Browse must be a Button because ButtonTypes  must be on the buttom, not next to the filename field
     @FXML private Button browseButton;
     @FXML private TextField name;
     @FXML private TextField fileName;
@@ -33,7 +32,7 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     private final ExporterViewModel exporter;
 
     public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
-                                          PreferencesService preferences, JournalAbbreviationLoader loader) { //should the latter three have been injected as in the main dialog rather than passed as a param?
+                                          PreferencesService preferences, JournalAbbreviationLoader loader) {
         this.setTitle(Localization.lang("Customize Export Formats"));
         this.exporter = exporter;
         this.loader = loader;

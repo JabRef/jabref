@@ -31,7 +31,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private JournalAbbreviationLoader loader; // Should this be injected?
+    @Inject private JournalAbbreviationLoader loader;
     private ExportCustomizationDialogViewModel viewModel;
 
     public ExportCustomizationDialogView() {
@@ -64,7 +64,6 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, loader);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
-        // Unidirectional list binding - this is okay because item selection only fires from the View, not the other way around
         EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());

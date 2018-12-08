@@ -69,7 +69,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             || !layoutFile.get().endsWith(".layout")) {
 
             LOGGER.info("One of the fields is empty or invalid!");
-            // Return empty exporter to the main exporter customization dialog
             return null;
         }
 
@@ -82,7 +81,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         return new ExporterViewModel(format);
     }
 
-    public String getExportWorkingDirectory() { //i.e. layout dir
+    public String getExportWorkingDirectory() {
         return preferences.getExportWorkingDirectory();
     }
 
@@ -91,7 +90,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
             .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
             .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
             .withInitialDirectory(getExportWorkingDirectory()).build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString())); //implement setting the text
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));
     }
 
     public StringProperty getName() {

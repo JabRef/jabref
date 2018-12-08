@@ -17,7 +17,6 @@ public class ExporterViewModel {
     private final TemplateExporter exporter;
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty layoutFileName = new SimpleStringProperty();
-    //If the TemplateExporter
     private final StringProperty extension = new SimpleStringProperty();
 
     public ExporterViewModel(TemplateExporter exporter) {
@@ -25,7 +24,6 @@ public class ExporterViewModel {
         this.name.setValue(exporter.getName());
         this.layoutFileName.setValue(exporter.getLayoutFileNameWithExtension());
         // Only the first of the extensions gotten from FileType is saved into the class using get(0)
-        // substring(1) used to remove "*" from extension, i.e. "*.txt" to ".txt"
         String extensionString = exporter.getFileType().getExtensions().get(0);
         this.extension.setValue(extensionString);
     }
