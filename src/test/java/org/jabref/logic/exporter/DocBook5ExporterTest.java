@@ -7,10 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -47,7 +46,7 @@ public class DocBook5ExporterTest {
     public void setUp() throws URISyntaxException {
         xmlFile = Paths.get(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
 
-        Map<String, TemplateExporter> customFormats = new HashMap<>();
+        List<TemplateExporter> customFormats = new ArrayList<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);

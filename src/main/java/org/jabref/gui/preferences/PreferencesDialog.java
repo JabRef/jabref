@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences;
 
-import java.util.Map;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
@@ -193,7 +193,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
+        List<TemplateExporter> customExporters = prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = prefs.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = prefs.getXMPPreferences();
