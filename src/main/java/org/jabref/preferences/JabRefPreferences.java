@@ -264,6 +264,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
+    public static final String LAST_USED_CLIPBOARD_EXPORT = "lastUsedClipboardExport";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
