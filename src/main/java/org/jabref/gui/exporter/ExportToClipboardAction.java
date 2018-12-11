@@ -22,8 +22,8 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.preferences.JabRefPreferences;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,22 +66,17 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         //Iterate through exporters looking for match
         for (Exporter e: exporters) {
-            if(e.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))) {
+            if (e.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))) {
                 defaultChoice = e;
             }
         }
 
-
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                     Localization.lang("Export"),defaultChoice, exporters);
-
 
              selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                      .onSuccess(this::setContentToClipboard)
                      .executeWith(Globals.TASK_EXECUTOR));
-
-
-
 
     }
 
