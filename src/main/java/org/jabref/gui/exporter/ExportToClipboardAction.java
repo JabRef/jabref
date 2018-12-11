@@ -23,6 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 
+import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +61,27 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());
 
-        Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                                                                                    Localization.lang("Export"), exporters);
+        //Create exporter for default choice
+        Exporter defaultChoice = null;
 
-        selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                             .onSuccess(this::setContentToClipboard)
-                                                             .executeWith(Globals.TASK_EXECUTOR));
+        //Iterate through exporters looking for match
+        for (Exporter e: exporters) {
+            if(e.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))) {
+                defaultChoice = e;
+            }
+        }
+
+
+        Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
+                    Localization.lang("Export"),defaultChoice, exporters);
+
+
+             selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
+                     .onSuccess(this::setContentToClipboard)
+                     .executeWith(Globals.TASK_EXECUTOR));
+
+
+
 
     }
 
@@ -74,6 +90,9 @@ public class ExportToClipboardAction extends SimpleCommand {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
+
+        //Add chosen export type to last used pref
+        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());
 
         Path tmp = null;
         try {
