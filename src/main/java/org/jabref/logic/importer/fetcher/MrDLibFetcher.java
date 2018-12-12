@@ -17,9 +17,9 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,15 +112,14 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
 
-
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         if (prefs.getBoolean(JabRefPreferences.SEND_LANGUAGE_DATA)) {
             builder.addParameter("app_lang", LANGUAGE);
         }
-        if (prefs.getBoolean(JabRefPreferences.SEND_OS_DATA)){
+        if (prefs.getBoolean(JabRefPreferences.SEND_OS_DATA)) {
             builder.addParameter("os", System.getProperty("os.name"));
         }
-        if (prefs.getBoolean(JabRefPreferences.SEND_TIMEZONE_DATA)){
+        if (prefs.getBoolean(JabRefPreferences.SEND_TIMEZONE_DATA)) {
             builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
         }
 
