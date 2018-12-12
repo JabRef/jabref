@@ -68,9 +68,9 @@ public class ExportToClipboardAction extends SimpleCommand {
                 .orElse(null);
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                    Localization.lang("Export"),defaultChoice, exporters);
+                    Localization.lang("Export"), defaultChoice, exporters);
 
-             selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
+        selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                      .onSuccess(this::setContentToClipboard)
                      .executeWith(Globals.TASK_EXECUTOR));
 
