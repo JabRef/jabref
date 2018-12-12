@@ -126,7 +126,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         try {
             URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());
-            System.out.println("Request: " + uri.toString());
             return uri.toString();
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
