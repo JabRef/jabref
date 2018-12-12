@@ -61,15 +61,11 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());
 
-        //Create exporter for default choice
-        Exporter defaultChoice = null;
-
-        //Iterate through exporters looking for match
-        for (Exporter e: exporters) {
-            if (e.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_CLIPBOARD_EXPORT))) {
-                defaultChoice = e;
-            }
-        }
+        //Find default choice, if any
+        Exporter defaultChoice = exporters.stream()
+                .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_CLIPBOARD_EXPORT)))
+                .findAny()
+                .orElse(null);
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                     Localization.lang("Export"),defaultChoice, exporters);
@@ -86,7 +82,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
 
-        //Add chosen export type to last used pref
+        //Add chosen export type to last used pref, to become default
         Globals.prefs.put(JabRefPreferences.LAST_USED_CLIPBOARD_EXPORT, exporter.getName());
 
         Path tmp = null;
