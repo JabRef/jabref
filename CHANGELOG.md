@@ -94,6 +94,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+
 ### Removed
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
