@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,19 +10,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.SwingUtilities;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +50,9 @@ public class FindFullTextAction implements BaseAction {
     @Override
     public void action() {
         BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
-                      .executeWith(Globals.TASK_EXECUTOR);
+                .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
+                .executeWith(Globals.TASK_EXECUTOR);
+
     }
 
     private Map<Optional<URL>, BibEntry> findFullTexts() {
@@ -76,6 +80,7 @@ public class FindFullTextAction implements BaseAction {
             }
         }
 
+        /****TODO:PROBLEM HERE, ENTRIES ARE BEING IGNORED**/
         Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
@@ -101,35 +106,37 @@ public class FindFullTextAction implements BaseAction {
 
                     return;
                 }
-                DownloadExternalFile fileDownload = new DownloadExternalFile(dialogService,
-                        basePanel.getBibDatabaseContext(), entry);
-                try {
-                    fileDownload.download(result.get(), "application/pdf", file -> {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            Optional<FieldChange> fieldChange = entry.addFile(file);
-                            if (fieldChange.isPresent()) {
-                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                                basePanel.getUndoManager().addEdit(edit);
-                                basePanel.markBaseChanged();
-                            }
-                        });
 
-                    });
-                } catch (IOException e) {
-                    LOGGER.warn("Problem downloading file", e);
-                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-                }
+                /********************TODO:WORKING HERE*******************/
+                FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
+                final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
+                final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
+
+
+
+                BackgroundTask
+                        .wrap(() -> fetcher.findFullTextPDF(entry))
+                        .onRunning(() -> fulltextLookupInProgress.setValue(true))
+                        .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                        .onSuccess(url -> {
+                                LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                                        new LinkedFile(result.get(), ""),
+                                        entry, basePanel.getBibDatabaseContext(),
+                                        Globals.TASK_EXECUTOR, dialogService,
+                                        JabRefPreferences.getInstance());
+                                files.add(onlineFile);
+                                onlineFile.download();
+                        })
+                        .executeWith(Globals.TASK_EXECUTOR);
+
+
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-            } else {
-                String title = Localization.lang("No full text document found");
-                String message = Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
-                basePanel.output(message);
-                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
+           } else {
+
+                dialogService.notify(Localization.lang("No full text document found"));
+
             }
             finishedTasks.add(result);
         }
