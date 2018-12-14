@@ -1,7 +1,9 @@
 package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -54,14 +56,19 @@ public class ExportCommand extends SimpleCommand {
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
 
+        //Get list of exporters and sort before adding to file dialog
+        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
+                .sorted(Comparator.comparing(Exporter::getName))
+                .collect(Collectors.toList());
+
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(Globals.exportFactory.getExporters()))
+                .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
                 .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))
                 .build();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                     .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters()));
+                     .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
     }
 
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
