@@ -80,7 +80,7 @@ public class FindFullTextAction implements BaseAction {
             }
         }
 
-        /****TODO:PROBLEM HERE, ENTRIES ARE BEING IGNORED**/
+        /****TODO:PROBLEM HERE, ENTRIES ARE BEING IGNORED, ALSO LOOK IN MAINTABLE @ GETSELECTEDENTRIES()**/
         Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
@@ -112,8 +112,6 @@ public class FindFullTextAction implements BaseAction {
                 final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
                 final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
 
-
-
                 BackgroundTask
                         .wrap(() -> fetcher.findFullTextPDF(entry))
                         .onRunning(() -> fulltextLookupInProgress.setValue(true))
@@ -129,7 +127,6 @@ public class FindFullTextAction implements BaseAction {
                         })
                         .executeWith(Globals.TASK_EXECUTOR);
 
-
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
 
@@ -138,6 +135,8 @@ public class FindFullTextAction implements BaseAction {
                 dialogService.notify(Localization.lang("No full text document found"));
 
             }
+
+            /***************************** TODO:*********************************/
             finishedTasks.add(result);
         }
         for (Optional<URL> result : finishedTasks) {
