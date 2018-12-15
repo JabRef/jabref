@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.Globals;
-
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.BaseAction;
@@ -26,13 +25,10 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.model.entry.LinkedFile;
-
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
 
 /**
@@ -49,7 +45,6 @@ public class FindFullTextAction implements BaseAction {
 
     //Stuff for downloading full texts
     private final FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
-    private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
 
     public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
@@ -119,13 +114,12 @@ public class FindFullTextAction implements BaseAction {
                 //Download full text
                 BackgroundTask
                         .wrap(() -> fetcher.findFullTextPDF(entry))
-                        .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                        .onFinished(() -> fulltextLookupInProgress.setValue(false))
                         .onSuccess(url -> addLinkedFileFromURL(result.get(), entry))
                         .executeWith(Globals.TASK_EXECUTOR);
 
            } else {
-                dialogService.notify(Localization.lang("No full text document found"));
+                dialogService.notify(Localization.lang("No full text document found for entry %0.",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
             finishedTasks.add(result);
         }
@@ -143,7 +137,6 @@ public class FindFullTextAction implements BaseAction {
     private void addLinkedFileFromURL(URL url, BibEntry entry) {
 
         LinkedFile newLinkedFile = new LinkedFile(url, "");
-        String basePanelOutput ;
 
         if (!entry.getFiles().contains(newLinkedFile)) {
 
@@ -159,16 +152,11 @@ public class FindFullTextAction implements BaseAction {
             onlineFile.download();
 
             entry.addFile(newLinkedFile);
-
-            basePanelOutput = "Finished downloading full text document for entry %0.";
-
+            dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         } else {
-
-            basePanelOutput = "Full text document for entry %0 already linked.";
-
+            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
-
-        basePanel.output(Localization.lang(basePanelOutput,
-                entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
     }
 }
