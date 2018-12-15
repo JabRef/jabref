@@ -15,7 +15,9 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+
 import org.jabref.Globals;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.BaseAction;
@@ -26,8 +28,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import org.jabref.model.entry.LinkedFile;
+
 import org.jabref.preferences.JabRefPreferences;
+
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -43,7 +48,7 @@ public class FindFullTextAction implements BaseAction {
     private final DialogService dialogService;
 
     //Stuff for downloading full texts
-    FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
+    private final FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
 
@@ -120,11 +125,8 @@ public class FindFullTextAction implements BaseAction {
                         .executeWith(Globals.TASK_EXECUTOR);
 
            } else {
-
                 dialogService.notify(Localization.lang("No full text document found"));
-
             }
-
             finishedTasks.add(result);
         }
         for (Optional<URL> result : finishedTasks) {
