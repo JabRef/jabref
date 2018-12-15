@@ -42,6 +42,11 @@ public class FindFullTextAction implements BaseAction {
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
+    //Stuff for downloading full texts
+    FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
+    private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
+    private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
+
     public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
         this.basePanel = basePanel;
         this.dialogService = dialogService;
@@ -80,7 +85,6 @@ public class FindFullTextAction implements BaseAction {
             }
         }
 
-        /****TODO:PROBLEM HERE, ENTRIES ARE BEING IGNORED, ALSO LOOK IN MAINTABLE @ GETSELECTEDENTRIES()**/
         Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
@@ -107,28 +111,13 @@ public class FindFullTextAction implements BaseAction {
                     return;
                 }
 
-                /********************TODO:WORKING HERE*******************/
-                FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
-                final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
-                final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
-
+                //Download full text
                 BackgroundTask
                         .wrap(() -> fetcher.findFullTextPDF(entry))
                         .onRunning(() -> fulltextLookupInProgress.setValue(true))
                         .onFinished(() -> fulltextLookupInProgress.setValue(false))
-                        .onSuccess(url -> {
-                                LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                                        new LinkedFile(result.get(), ""),
-                                        entry, basePanel.getBibDatabaseContext(),
-                                        Globals.TASK_EXECUTOR, dialogService,
-                                        JabRefPreferences.getInstance());
-                                files.add(onlineFile);
-                                onlineFile.download();
-                        })
+                        .onSuccess(url -> addLinkedFileFromURL(result.get(), entry))
                         .executeWith(Globals.TASK_EXECUTOR);
-
-                basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
 
            } else {
 
@@ -136,11 +125,48 @@ public class FindFullTextAction implements BaseAction {
 
             }
 
-            /***************************** TODO:*********************************/
             finishedTasks.add(result);
         }
         for (Optional<URL> result : finishedTasks) {
             downloads.remove(result);
         }
+    }
+
+    /**
+     * This method attaches a linked file from a URL (if not already linked) to an entry and using the key and value pair
+     * from the findFullTexts map
+     * @param url the url "key"
+     * @param entry the entry "value"
+     */
+    private void addLinkedFileFromURL(URL url, BibEntry entry) {
+
+        LinkedFile newLinkedFile = new LinkedFile(url, "");
+        String basePanelOutput ;
+
+        if (!entry.getFiles().contains(newLinkedFile)) {
+
+            LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                    newLinkedFile,
+                    entry,
+                    basePanel.getBibDatabaseContext(),
+                    Globals.TASK_EXECUTOR,
+                    dialogService,
+                    JabRefPreferences.getInstance());
+
+            files.add(onlineFile);
+            onlineFile.download();
+
+            entry.addFile(newLinkedFile);
+
+            basePanelOutput = "Finished downloading full text document for entry %0.";
+
+        } else {
+
+            basePanelOutput = "Full text document for entry %0 already linked.";
+
+        }
+
+        basePanel.output(Localization.lang(basePanelOutput,
+                entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
     }
 }
