@@ -8,18 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.SwingUtilities;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
@@ -34,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction implements BaseAction {
+public class FindFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
@@ -43,21 +35,16 @@ public class FindFullTextAction implements BaseAction {
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
-    //Stuff for downloading full texts
-    private final FulltextFetchers fetcher = new FulltextFetchers(JabRefPreferences.getInstance().getImportFormatPreferences());
-    private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
-
-    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
+    public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
-        this.dialogService = dialogService;
+        this.dialogService = basePanel.frame().getDialogService();
     }
 
     @Override
-    public void action() {
+    public void execute() {
         BackgroundTask.wrap(this::findFullTexts)
-                .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
+                .onSuccess(this::downloadFullTexts)
                 .executeWith(Globals.TASK_EXECUTOR);
-
     }
 
     private Map<Optional<URL>, BibEntry> findFullTexts() {
@@ -112,10 +99,7 @@ public class FindFullTextAction implements BaseAction {
                 }
 
                 //Download full text
-                BackgroundTask
-                        .wrap(() -> fetcher.findFullTextPDF(entry))
-                        .onSuccess(url -> addLinkedFileFromURL(result.get(), entry))
-                        .executeWith(Globals.TASK_EXECUTOR);
+                addLinkedFileFromURL(result.get(), entry);
 
            } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
@@ -129,7 +113,7 @@ public class FindFullTextAction implements BaseAction {
     }
 
     /**
-     * This method attaches a linked file from a URL (if not already linked) to an entry and using the key and value pair
+     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
      * from the findFullTexts map
      * @param url the url "key"
      * @param entry the entry "value"
@@ -148,10 +132,10 @@ public class FindFullTextAction implements BaseAction {
                     dialogService,
                     JabRefPreferences.getInstance());
 
-            files.add(onlineFile);
             onlineFile.download();
 
-            entry.addFile(newLinkedFile);
+            entry.addFile(onlineFile.getFile());
+
             dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
                     entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         } else {
