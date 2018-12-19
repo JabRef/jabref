@@ -157,7 +157,7 @@ dependencies {
 
     errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.2.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.2.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
