@@ -1,12 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 
@@ -49,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 class TableColumnsTab extends Pane implements PrefsTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TableColumnsTab.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(TableColumnsTab.class);
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -88,6 +83,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
     private final VBox listOfFileColumnsVBox;
     private final ObservableList<TableRow> data;
     private final GridPane builder = new GridPane();
+
     /**
      * Customization of external program paths.
      *
@@ -96,43 +92,50 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public TableColumnsTab(JabRefPreferences prefs, JabRefFrame frame) {
         this.prefs = prefs;
         this.frame = frame;
-        this.data = FXCollections.observableArrayList(
-                new TableRow("entrytype",75),
-                new TableRow("author/editor",300),
-                new TableRow("title",470),
-                new TableRow("year",60),
-                new TableRow("journal",130),
-                new TableRow("bibtexkey",100));
 
+        /* Populate the data of Entry table columns */
+        List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
+        this.data = FXCollections.observableArrayList();
+        for (int i = 0; i < prefColNames.size(); i++) {
+            this.data.add(new TableRow(prefColNames.get(i)));
+        }
+
+        /* UI for Entry table columns */
         colSetup = new TableView<>();
-        TableColumn<TableRow,String> field = new TableColumn<>(Localization.lang("Field name"));
-        TableColumn<TableRow,Double> column = new TableColumn<>(Localization.lang("Column width"));
+        TableColumn<TableRow, String> field = new TableColumn<>(Localization.lang("Field name"));
+        //TableColumn<TableRow,Double> column = new TableColumn<>(Localization.lang("Column width"));
         field.setPrefWidth(400);
-        column.setPrefWidth(240);
+        //column.setPrefWidth(240);
         field.setCellValueFactory(new PropertyValueFactory<>("name"));
         field.setCellFactory(TextFieldTableCell.forTableColumn());
         field.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                (TableColumn.CellEditEvent<TableRow, String> t) -> { // t.getNewValue()
                     t.getTableView().getItems().get(
                             t.getTablePosition().getRow()).setName(t.getNewValue());
+                    // Update the displayed Field name
+                    this.data.set(t.getTablePosition().getRow(), new TableRow(t.getNewValue()));
+                    // Update the User Preference of COLUMN_NAMES
+                    List<String> tempColumnNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
+                    tempColumnNames.set(t.getTablePosition().getRow(), t.getNewValue());
+                    this.prefs.putStringList(this.prefs.COLUMN_NAMES,tempColumnNames);
                 });
-        column.setCellValueFactory(new PropertyValueFactory<>("length"));
-        column.setOnEditCommit(
+        //column.setCellValueFactory(new PropertyValueFactory<>("length"));
+        /*column.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, Double> t) -> {
                     t.getTableView().getItems().get(
                             t.getTablePosition().getRow()).setLength(t.getNewValue());
-                });
+                });*/
 
         colSetup.setItems(data);
-        colSetup.getColumns().addAll(field,column);
+        colSetup.getColumns().addAll(field);
         final TextField addName = new TextField();
         addName.setPromptText("name");
         addName.setMaxWidth(field.getPrefWidth());
         addName.setPrefHeight(30);
-        final TextField addLast = new TextField();
+        /*final TextField addLast = new TextField();
         addLast.setMaxWidth(column.getPrefWidth());
         addLast.setPromptText("width");
-        addLast.setPrefHeight(30);
+        addLast.setPrefHeight(30);*/
         BorderPane tabPanel = new BorderPane();
         ScrollPane sp = new ScrollPane();
         sp.setContent(colSetup);
@@ -141,36 +144,35 @@ class TableColumnsTab extends Pane implements PrefsTab {
         HBox toolBar = new HBox();
         Button addRow = new Button("Add");
         addRow.setPrefSize(80, 20);
-        addRow.setOnAction( e -> {
-            if (!addLast.getText().isEmpty()) {
-                TableRow tableRow = addLast.getText().matches("[1-9][0-9]") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())) : new TableRow(addName.getText());
-                addName.clear();
-                addLast.clear();
-                data.add(tableRow);
-                tableRows.clear();
-                tableRows.addAll(data);
-                colSetup.setItems(data);
-                tableChanged = true;
-                colSetup.refresh();
-            }
+        addRow.setOnAction(e -> {
+            TableRow tableRow = new TableRow(addName.getText());
+            addName.clear();
+            data.add(tableRow);
+            tableRows.clear();
+            tableRows.addAll(data);
+            colSetup.setItems(data);
+            tableChanged = true;
+            colSetup.refresh();
+
         });
 
         Button deleteRow = new Button("Delete");
         deleteRow.setPrefSize(80, 20);
         deleteRow.setOnAction(e -> {
             if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
-            tableChanged = true;
-            int row = colSetup.getFocusModel().getFocusedIndex();
-            TableRow tableRow = data.get(row);
-            data.remove(tableRow);
-            tableRows.clear();
-            tableRows.addAll(data);
-            colSetup.setItems(data);
-            colSetup.refresh();
-        }});
+                tableChanged = true;
+                int row = colSetup.getFocusModel().getFocusedIndex();
+                TableRow tableRow = data.get(row);
+                data.remove(tableRow);
+                tableRows.clear();
+                tableRows.addAll(data);
+                colSetup.setItems(data);
+                colSetup.refresh();
+            }
+        });
         Button up = new Button("Up");
         up.setPrefSize(80, 20);
-        up.setOnAction(e-> {
+        up.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row > data.size() || row == 0) {
@@ -190,7 +192,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         });
         Button down = new Button("Down");
         down.setPrefSize(80, 20);
-        down.setOnAction(e-> {
+        down.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row + 1 > data.size()) {
@@ -208,8 +210,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 return;
             }
         });
-        toolBar.getChildren().addAll(addName, addLast, addRow, deleteRow, up, down);
+        toolBar.getChildren().addAll(addName, addRow, deleteRow, up, down);
         tabPanel.setBottom(toolBar);
+        /* end UI for Entry table columns */
 
         fileColumn = new CheckBox(Localization.lang("Show file column"));
         urlColumn = new CheckBox(Localization.lang("Show URL/DOI column"));
@@ -244,7 +247,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         Button helpButton = new Button("?");
         helpButton.setPrefSize(20, 20);
-        helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
+        helpButton.setOnAction(e -> new HelpAction(Localization.lang("Help on special fields"),
                 HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
@@ -280,7 +283,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         GridPane specialTableColumnsBuilder = new GridPane();
         specialTableColumnsBuilder.add(specialFieldsEnabled, 1, 1);
         specialTableColumnsBuilder.add(rankingColumn, 1, 2);
-        specialTableColumnsBuilder.add(relevanceColumn,  1, 3);
+        specialTableColumnsBuilder.add(relevanceColumn, 1, 3);
         specialTableColumnsBuilder.add(qualityColumn, 1, 4);
         specialTableColumnsBuilder.add(priorityColumn, 1, 5);
         specialTableColumnsBuilder.add(printedColumn, 1, 6);
@@ -295,13 +298,13 @@ class TableColumnsTab extends Pane implements PrefsTab {
         specialTableColumnsBuilder.add(fileColumn, 2, 1);
         specialTableColumnsBuilder.add(urlColumn, 2, 2);
         final ToggleGroup preferUrlOrDoi = new ToggleGroup();
-        specialTableColumnsBuilder.add(preferUrl, 2 ,3);
+        specialTableColumnsBuilder.add(preferUrl, 2, 3);
         specialTableColumnsBuilder.add(preferDoi, 2, 4);
         preferUrl.setToggleGroup(preferUrlOrDoi);
         preferDoi.setToggleGroup(preferUrlOrDoi);
         specialTableColumnsBuilder.add(arxivColumn, 2, 5);
 
-        specialTableColumnsBuilder.add(extraFileColumns,2, 6);
+        specialTableColumnsBuilder.add(extraFileColumns, 2, 6);
         specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, 2, 10);
 
         builder.add(specialTableColumnsBuilder, 1, 2);
@@ -315,10 +318,10 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         Button buttonWidth = new Button("Update to current column widths");
         buttonWidth.setPrefSize(300, 30);
-        buttonWidth.setOnAction(e->new UpdateWidthsAction());
+        buttonWidth.setOnAction(e -> new UpdateWidthsAction());
         Button buttonOrder = new Button("Update to current column order");
         buttonOrder.setPrefSize(300, 30);
-        buttonOrder.setOnAction(e->new UpdateOrderAction());
+        buttonOrder.setOnAction(e -> new UpdateOrderAction());
         builder.add(buttonWidth, 1, 6);
         builder.add(buttonOrder, 1, 7);
     }
@@ -354,7 +357,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
             }
         } else {
-            listOfFileColumns.getSelectionModel().select(new int[] {});
+            listOfFileColumns.getSelectionModel().select(new int[]{});
         }
 
         /*** begin: special fields ***/
@@ -392,13 +395,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         tableRows.clear();
         List<String> names = prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-        List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
+        //List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
-            if (i < lengths.size()) {
-                tableRows.add(new TableRow(names.get(i), Double.parseDouble(lengths.get(i))));
-            } else {
-                tableRows.add(new TableRow(names.get(i)));
-            }
+            tableRows.add(new TableRow(names.get(i)));
         }
     }
 
@@ -407,22 +406,22 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public static class TableRow {
 
         private SimpleStringProperty name;
-        private SimpleDoubleProperty length;
+        //private SimpleDoubleProperty length;
 
         public TableRow() {
             name = new SimpleStringProperty("");
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            //length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
             this.name = new SimpleStringProperty(name);
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            //length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
-        public TableRow(String name, double length) {
+        /*public TableRow(String name, double length) {
             this.name = new SimpleStringProperty(name);
             this.length = new SimpleDoubleProperty(length);
-        }
+        }*/
 
         public String getName() {
             return name.get();
@@ -432,13 +431,13 @@ class TableColumnsTab extends Pane implements PrefsTab {
             this.name.set(name);
         }
 
-        public double getLength() {
+        /*public double getLength() {
             return length.get();
         }
 
         public void setLength(double length) {
             this.length.set(length);
-        }
+        }*/
     }
 
     class UpdateOrderAction extends AbstractAction {
@@ -526,7 +525,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when
      * the user clicks Ok.
-     *
      */
     @Override
     public void storeSettings() {
@@ -596,7 +594,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 //        }
 
         // Now we need to make sense of the contents the user has made to the
-        // table setup table.
+        // table setup table. rachelwu21: this might be the unused code that used to make updating Field Name work
         if (tableChanged) {
             // First we remove all rows with empty names.
             int i = 0;
@@ -609,16 +607,16 @@ class TableColumnsTab extends Pane implements PrefsTab {
             }
             // Then we make arrays
             List<String> names = new ArrayList<>(tableRows.size());
-            List<String> widths = new ArrayList<>(tableRows.size());
+            //List<String> widths = new ArrayList<>(tableRows.size());
 
             for (TableRow tr : tableRows) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
-                widths.add(String.valueOf(tr.getLength()));
+                //widths.add(String.valueOf(tr.getLength()));
             }
 
             // Finally, we store the new preferences.
             prefs.putStringList(JabRefPreferences.COLUMN_NAMES, names);
-            prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
+            //prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }
