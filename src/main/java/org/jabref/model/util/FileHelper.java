@@ -1,5 +1,6 @@
 package org.jabref.model.util;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +32,10 @@ public class FileHelper {
      * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
+        if (isUrl(fileName)) {
+            return Optional.empty();
+        }
+
         int dotPosition = fileName.lastIndexOf('.');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
             return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
@@ -127,6 +132,15 @@ public class FileHelper {
             return Optional.of(resolvedFile);
         } else {
             return Optional.empty();
+        }
+    }
+
+    private static boolean isUrl(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
