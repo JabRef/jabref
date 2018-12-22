@@ -102,40 +102,33 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /* UI for Entry table columns */
         colSetup = new TableView<>();
+        colSetup.setEditable(true);
         TableColumn<TableRow, String> field = new TableColumn<>(Localization.lang("Field name"));
-        //TableColumn<TableRow,Double> column = new TableColumn<>(Localization.lang("Column width"));
         field.setPrefWidth(400);
-        //column.setPrefWidth(240);
         field.setCellValueFactory(new PropertyValueFactory<>("name"));
         field.setCellFactory(TextFieldTableCell.forTableColumn());
+        field.setEditable(true);
         field.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, String> t) -> { // t.getNewValue()
                     t.getTableView().getItems().get(
                             t.getTablePosition().getRow()).setName(t.getNewValue());
-                    // Update the displayed Field name
+                    // Since data is an ObservableList, updating it updates the displayed field name.
                     this.data.set(t.getTablePosition().getRow(), new TableRow(t.getNewValue()));
                     // Update the User Preference of COLUMN_NAMES
                     List<String> tempColumnNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
                     tempColumnNames.set(t.getTablePosition().getRow(), t.getNewValue());
                     this.prefs.putStringList(this.prefs.COLUMN_NAMES,tempColumnNames);
                 });
-        //column.setCellValueFactory(new PropertyValueFactory<>("length"));
-        /*column.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, Double> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setLength(t.getNewValue());
-                });*/
 
+        tableRows.clear();
+        tableRows.addAll(data);
         colSetup.setItems(data);
-        colSetup.getColumns().addAll(field);
+        colSetup.getColumns().add(field);
+
         final TextField addName = new TextField();
         addName.setPromptText("name");
         addName.setMaxWidth(field.getPrefWidth());
         addName.setPrefHeight(30);
-        /*final TextField addLast = new TextField();
-        addLast.setMaxWidth(column.getPrefWidth());
-        addLast.setPromptText("width");
-        addLast.setPrefHeight(30);*/
         BorderPane tabPanel = new BorderPane();
         ScrollPane sp = new ScrollPane();
         sp.setContent(colSetup);
@@ -395,7 +388,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         tableRows.clear();
         List<String> names = prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-        //List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
             tableRows.add(new TableRow(names.get(i)));
         }
@@ -406,22 +398,14 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public static class TableRow {
 
         private SimpleStringProperty name;
-        //private SimpleDoubleProperty length;
 
         public TableRow() {
             name = new SimpleStringProperty("");
-            //length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
             this.name = new SimpleStringProperty(name);
-            //length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
-
-        /*public TableRow(String name, double length) {
-            this.name = new SimpleStringProperty(name);
-            this.length = new SimpleDoubleProperty(length);
-        }*/
 
         public String getName() {
             return name.get();
@@ -431,13 +415,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
             this.name.set(name);
         }
 
-        /*public double getLength() {
-            return length.get();
-        }
-
-        public void setLength(double length) {
-            this.length.set(length);
-        }*/
     }
 
     class UpdateOrderAction extends AbstractAction {
@@ -572,7 +549,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         }
 
         // restart required implies that the settings have been changed
-        // the seetings need to be stored
+        // the settings need to be stored
         if (restartRequired) {
             prefs.putBoolean(JabRefPreferences.SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
             prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_RANKING, newRankingColumn);
@@ -594,7 +571,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 //        }
 
         // Now we need to make sense of the contents the user has made to the
-        // table setup table. rachelwu21: this might be the unused code that used to make updating Field Name work
+        // table setup table.
         if (tableChanged) {
             // First we remove all rows with empty names.
             int i = 0;
@@ -607,16 +584,13 @@ class TableColumnsTab extends Pane implements PrefsTab {
             }
             // Then we make arrays
             List<String> names = new ArrayList<>(tableRows.size());
-            //List<String> widths = new ArrayList<>(tableRows.size());
 
             for (TableRow tr : tableRows) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
-                //widths.add(String.valueOf(tr.getLength()));
             }
 
             // Finally, we store the new preferences.
             prefs.putStringList(JabRefPreferences.COLUMN_NAMES, names);
-            //prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }
