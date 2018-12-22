@@ -90,7 +90,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where only one PDF file could be imported [#4422](https://github.com/JabRef/jabref/issues/4422)
 - We fixed an issue where "Move to group" would always move the first entry in the library and not the selected [#4414](https://github.com/JabRef/jabref/issues/4414)
 - We fixed an issue where an older dialog appears when downloading full texts from the quality menu. [#4489](https://github.com/JabRef/jabref/issues/4489)
-
+- We fixed an issue where the Field name is not editable [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 
 

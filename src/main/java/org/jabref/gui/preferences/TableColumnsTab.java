@@ -1,11 +1,15 @@
 package org.jabref.gui.preferences;
 
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,11 +40,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TableColumnsTab extends Pane implements PrefsTab {
 
