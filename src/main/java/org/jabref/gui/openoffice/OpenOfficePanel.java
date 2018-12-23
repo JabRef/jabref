@@ -337,17 +337,27 @@ public class OpenOfficePanel {
     private void connectAutomatically() {
         DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(ooPrefs, dialogService);
 
-        BackgroundTask
-                      .wrap(() -> {
-                          boolean installed = officeInstallation.isInstalled().get();
-                          if (!installed) {
-                              throw new IllegalStateException("OpenOffice Installation could not be detected.");
-                          }
-                          return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
-                      })
-                      .onSuccess(x -> connect())
-                      .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
-                      .executeWith(Globals.TASK_EXECUTOR);
+        if (officeInstallation.isExecutablePathDefined()) {
+            connect();
+        } else {
+
+            FXDialog progressDialog = officeInstallation.initProgressDialog();
+            BackgroundTask
+                          .wrap(() -> {
+                              boolean installed = officeInstallation.isInstalled().get();
+                              if (!installed) {
+                                  throw new IllegalStateException("OpenOffice Installation could not be detected.");
+                              }
+                              return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
+                          })
+                          .onSuccess(x -> {
+                              progressDialog.close();
+                              connect();
+                          })
+                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+                          .executeWith(Globals.TASK_EXECUTOR);
+        }
+
     }
 
     private void connectManually() {

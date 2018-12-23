@@ -12,13 +12,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ProgressIndicator;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
@@ -43,24 +40,23 @@ public class DetectOpenOfficeInstallation {
 
     public Future<Boolean> isInstalled() {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        if (this.checkAutoDetectedPaths(preferences)) {
-            future.complete(true);
-        } else {
-            DefaultTaskExecutor.runInJavaFXThread(() -> init());
-            BackgroundTask.wrap(() -> future.complete(autoDetectPaths()))
-                          .onSuccess(x -> progressDialog.close())
-                          .executeWith(Globals.TASK_EXECUTOR);
-        }
+        future.complete(autoDetectPaths());
         return future;
     }
 
-    private void init() {
+    public boolean isExecutablePathDefined() {
+        return checkAutoDetectedPaths(preferences);
+    }
+
+    public FXDialog initProgressDialog() {
         DialogPane dialogPane = new DialogPane();
         ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         dialogPane.setContent(indicator);
 
         progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
         progressDialog.show();
+
+        return progressDialog;
     }
 
     private Optional<Path> selectInstallationPath() {

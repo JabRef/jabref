@@ -19,9 +19,9 @@ import com.sun.star.lang.WrappedTargetException;
 
 public class ManageCitationsDialogView extends BaseDialog<Void> {
 
-    @FXML private TableView<ManageCitationsItemViewModel> tvCitations;
-    @FXML private TableColumn<ManageCitationsItemViewModel, String> colCitation;
-    @FXML private TableColumn<ManageCitationsItemViewModel, String> colExtraInfo;
+    @FXML private TableView<ManageCitationsItemViewModel> citationsTableView;
+    @FXML private TableColumn<ManageCitationsItemViewModel, String> citation;
+    @FXML private TableColumn<ManageCitationsItemViewModel, String> extraInfo;
 
     private final DialogService dialogService;
     private final OOBibBase ooBase;
@@ -51,20 +51,20 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
-        colCitation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
-        new ValueTableCellFactory<ManageCitationsItemViewModel, String>().withGraphic(viewModel::getText).install(colCitation);
+        citation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
+        new ValueTableCellFactory<ManageCitationsItemViewModel, String>().withGraphic(viewModel::getText).install(citation);
 
-        colExtraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
-        colExtraInfo.setEditable(true);
+        extraInfo.setCellValueFactory(cellData -> cellData.getValue().extraInformationProperty());
+        extraInfo.setEditable(true);
 
-        tvCitations.setEditable(true);
+        citationsTableView.setEditable(true);
 
-        tvCitations.itemsProperty().bindBidirectional(viewModel.citationsProperty());
+        citationsTableView.itemsProperty().bindBidirectional(viewModel.citationsProperty());
 
-        colExtraInfo.setOnEditCommit((CellEditEvent<ManageCitationsItemViewModel, String> cell) -> {
+        extraInfo.setOnEditCommit((CellEditEvent<ManageCitationsItemViewModel, String> cell) -> {
             cell.getRowValue().setExtraInfo(cell.getNewValue());
         });
-        colExtraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
+        extraInfo.setCellFactory(TextFieldTableCell.forTableColumn());
 
     }
 }
