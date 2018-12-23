@@ -9,8 +9,8 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.metadata.FilePreferences;
 
 public interface PreferencesService {
