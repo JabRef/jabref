@@ -84,4 +84,8 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
             }
         };
     }
+
+    public void install(TreeTableColumn<S, T> column) {
+        column.setCellFactory(this);
+    }
 }
