@@ -23,15 +23,16 @@ import com.sun.star.lang.WrappedTargetException;
 
 public class ManageCitationsDialogView extends BaseDialog<Void> {
 
-    @FXML private TableView<CitationEntryViewModel> citationsTableView;
-    @FXML private TableColumn<CitationEntryViewModel, String> citation;
-    @FXML private TableColumn<CitationEntryViewModel, String> extraInfo;
-
     private static final String HTML_BOLD_END_TAG = "</b>";
     private static final String HTML_BOLD_START_TAG = "<b>";
 
     private final DialogService dialogService;
     private final OOBibBase ooBase;
+
+    @FXML private TableView<CitationEntryViewModel> citationsTableView;
+    @FXML private TableColumn<CitationEntryViewModel, String> citation;
+    @FXML private TableColumn<CitationEntryViewModel, String> extraInfo;
+
 
     private ManageCitationsDialogViewModel viewModel;
 
