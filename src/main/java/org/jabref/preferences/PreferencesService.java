@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.metadata.FilePreferences;
 
 public interface PreferencesService {
@@ -43,4 +47,15 @@ public interface PreferencesService {
 
     public void updateEntryEditorTabList();
 
+    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
+
+    void storeCustomExportFormats(List<TemplateExporter> exporters);
+
+    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+
+    SavePreferences loadForExportFromPreferences();
+
+    void setExportWorkingDirectory(String layoutFileDirString);
+
+    String getExportWorkingDirectory();
 }

@@ -116,8 +116,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.7.1'
-    compile 'org.antlr:antlr4-runtime:4.7.1'
+    antlr4 'org.antlr:antlr4:4.7.2'
+    compile 'org.antlr:antlr4-runtime:4.7.2'
 
     compile 'mysql:mysql-connector-java:8.0.13'
 
@@ -157,8 +157,8 @@ dependencies {
 
     errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.2.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.2.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.0'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.2'
@@ -180,7 +180,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.14'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.15'
 }
 
 jacoco {
