@@ -7,14 +7,10 @@ import java.util.stream.Collectors;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.Node;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitationEntry;
-import org.jabref.model.strings.StringUtil;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -29,12 +25,9 @@ import org.slf4j.LoggerFactory;
 
 public class ManageCitationsDialogViewModel {
 
-    private static final String HTML_BOLD_END_TAG = "</b>";
-    private static final String HTML_BOLD_START_TAG = "<b>";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageCitationsDialogViewModel.class);
 
-    private final ListProperty<ManageCitationsItemViewModel> citations = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<CitationEntryViewModel> citations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final OOBibBase ooBase;
     private final DialogService dialogService;
 
@@ -50,16 +43,14 @@ public class ManageCitationsDialogViewModel {
                                                     ooBase.getCitationContext(nameAccess, name, 30, 30, true),
                                                     ooBase.getCustomProperty(name));
 
-            getText(ooBase.getCitationContext(nameAccess, name, 30, 30, true));
-
-            ManageCitationsItemViewModel itemViewModelEntry = ManageCitationsItemViewModel.fromCitationEntry(entry);
+            CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);
         }
 
     }
 
     public void storeSettings() {
-        List<CitationEntry> ciationEntries = citations.stream().map(ManageCitationsItemViewModel::toCitationEntry).collect(Collectors.toList());
+        List<CitationEntry> ciationEntries = citations.stream().map(CitationEntryViewModel::toCitationEntry).collect(Collectors.toList());
         try {
             for (CitationEntry entry : ciationEntries) {
                 Optional<String> pageInfo = entry.getPageInfo();
@@ -74,22 +65,8 @@ public class ManageCitationsDialogViewModel {
         }
     }
 
-    public ListProperty<ManageCitationsItemViewModel> citationsProperty() {
+    public ListProperty<CitationEntryViewModel> citationsProperty() {
         return citations;
     }
 
-    public Node getText(String citationContext) {
-
-        String inBetween = StringUtil.substringBetween(citationContext, HTML_BOLD_START_TAG, HTML_BOLD_END_TAG);
-        String start = citationContext.substring(0, citationContext.indexOf(HTML_BOLD_START_TAG));
-        String end = citationContext.substring(citationContext.lastIndexOf(HTML_BOLD_END_TAG) + HTML_BOLD_END_TAG.length(), citationContext.length());
-
-        Text startText = new Text(start);
-        Text inBetweenText = new Text(inBetween);
-        inBetweenText.setStyle("-fx-font-weight: bold");
-        Text endText = new Text(end);
-
-        FlowPane flow = new FlowPane(startText, inBetweenText, endText);
-        return flow;
-    }
 }
