@@ -114,15 +114,16 @@ public class GroupTreeView {
 
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
-                .withTooltip(GroupNodeViewModel::getDescription));
+                .withTooltip(GroupNodeViewModel::getDescription)
+                .install(mainColumn);
 
         // Number of hits
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
-        numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(group -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
@@ -138,11 +139,12 @@ public class GroupTreeView {
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
-                }));
+                })
+                .install(numberColumn);
 
         // Arrow indicating expanded status
         disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        disclosureNodeColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
                     final StackPane disclosureNode = new StackPane();
                     disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
@@ -156,7 +158,8 @@ public class GroupTreeView {
                 .withOnMouseClickedEvent(group -> event -> {
                     group.toggleExpansion();
                     event.consume();
-                }));
+                })
+                .install(disclosureNodeColumn);
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -316,6 +319,7 @@ public class GroupTreeView {
         editGroup.setOnAction(event -> {
             menu.hide();
             viewModel.editGroup(group);
+            groupTree.refresh();
         });
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
