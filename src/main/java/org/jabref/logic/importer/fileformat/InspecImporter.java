@@ -121,7 +121,7 @@ public class InspecImporter extends Importer {
                     }
                 }
             }
-            BibEntry b = new BibEntry(BibtexEntryTypes.getType(type));
+            BibEntry b = new BibEntry(BibtexEntryTypes.getType(type).get());
             b.setField(h);
 
             bibitems.add(b);
