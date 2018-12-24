@@ -1,8 +1,8 @@
 package org.jabref.logic.bibtex.comparator;
 
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.model.entry.BibtexEntryTypes;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

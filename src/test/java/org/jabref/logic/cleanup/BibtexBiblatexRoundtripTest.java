@@ -1,8 +1,8 @@
 package org.jabref.logic.cleanup;
 
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.model.entry.BibtexEntryTypes;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
