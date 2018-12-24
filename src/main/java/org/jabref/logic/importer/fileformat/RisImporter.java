@@ -14,7 +14,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.entry.*;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Month;
 
 public class RisImporter extends Importer {
 

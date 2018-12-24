@@ -28,7 +28,14 @@ import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
-import org.jabref.model.entry.*;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 

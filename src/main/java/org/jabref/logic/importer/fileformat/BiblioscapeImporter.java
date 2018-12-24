@@ -12,7 +12,9 @@ import java.util.Objects;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.entry.*;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
