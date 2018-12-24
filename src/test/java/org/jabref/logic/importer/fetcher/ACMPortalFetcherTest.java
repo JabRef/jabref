@@ -29,7 +29,7 @@ class ACMPortalFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         expected.setCiteKey("Olsson:2017:RCC:3129790.3129810");
         expected.setField("acmid", "3129810");
         expected.setField("address", "New York, NY, USA");

@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.IdGenerator;
+import org.jabref.model.entry.*;
 import org.jabref.model.event.TestEventListener;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -250,7 +248,7 @@ public class BibDatabaseTest {
 
     @Test
     public void getUsedStrings() {
-        BibEntry entry = new BibEntry(IdGenerator.next());
+        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(),"required","optional"));
         entry.setField("author", "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");
@@ -298,9 +296,9 @@ public class BibDatabaseTest {
 
     @Test
     public void getEntriesSortedWithTwoEntries() {
-        BibEntry entryB = new BibEntry("article");
+        BibEntry entryB = new BibEntry(BibtexEntryTypes.ARTICLE);
         entryB.setId("2");
-        BibEntry entryA = new BibEntry("article");
+        BibEntry entryA = new BibEntry(BiblatexEntryTypes.ARTICLE);
         entryB.setId("1");
         database.insertEntries(entryB, entryA);
         assertEquals(Arrays.asList(entryA, entryB), database.getEntriesSorted(Comparator.comparing(BibEntry::getId)));

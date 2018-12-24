@@ -24,11 +24,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.Date;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.*;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -325,7 +321,7 @@ class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(BibEntry.KEY_FIELD, "test")
                                                    .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
@@ -336,7 +332,7 @@ class BibtexParserTest {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
                 + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
         String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
-        BibEntry expected = new BibEntry("article")
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE)
                 .withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
