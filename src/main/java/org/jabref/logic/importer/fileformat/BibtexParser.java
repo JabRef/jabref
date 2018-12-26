@@ -505,7 +505,16 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(BibtexEntryTypes.getType(entryType).get());
+        Optional<EntryType> optionalEntryType = BibtexEntryTypes.getType(entryType);
+        BibEntry result;
+
+        //This is a workaround because some types are not registered in the Enumeration BibtexEntryTypes
+        if(optionalEntryType.isPresent()) {
+            result = new BibEntry(BibtexEntryTypes.getType(entryType).get());
+        }else{
+            result = new BibEntry(new CustomEntryType(entryType,"required","optional"));
+        }
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();
