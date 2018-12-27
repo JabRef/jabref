@@ -803,7 +803,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<String> getLatexFreeField(String name) {
-        if (!hasField(name)) {
+        if (!hasField(name) && !TYPE_HEADER.equals(name)) {
             return Optional.empty();
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
@@ -812,6 +812,15 @@ public class BibEntry implements Cloneable {
             Optional<String> citeKey = getCiteKeyOptional();
             latexFreeFields.put(name, citeKey.get());
             return citeKey;
+        } else if (TYPE_HEADER.equals(name)) {
+            Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                String entryName = entryType.get().getName();
+                latexFreeFields.put(name, entryName);
+                return Optional.of(entryName);
+            } else {
+                return Optional.empty();
+            }
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);

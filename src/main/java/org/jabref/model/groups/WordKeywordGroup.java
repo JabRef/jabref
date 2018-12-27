@@ -1,15 +1,20 @@
 package org.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
 
@@ -113,6 +118,14 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
     private Set<String> getFieldContentAsWords(BibEntry entry) {
         if (onlySplitWordsAtSeparator) {
+            if (BibEntry.TYPE_HEADER.equals(searchField)) {
+                for (String searchWord : searchWords) {
+                    Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
+                    if (entryType.isPresent() && entryType.get().getName().equals(searchWord)) {
+                        return new HashSet<>(Arrays.asList(searchWord));
+                    }
+                }
+            }
             return entry.getField(searchField)
                     .map(content -> KeywordList.parse(content, keywordSeparator).toStringList())
                     .orElse(Collections.emptySet());
