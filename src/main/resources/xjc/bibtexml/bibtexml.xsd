@@ -1,0 +1,1001 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!-- draft release, 2002.10.06 -->
+<!-- Source: https://github.com/egonw/bodr/blob/master/bodr/schemas/bibtexml.xsd-->
+
+<xsd:schema 
+     xmlns:xsd= "http://www.w3.org/2001/XMLSchema" 
+     xmlns:bibtex="http://bibtexml.sf.net/"
+     targetNamespace="http://bibtexml.sf.net/"
+     version="Beta"
+     elementFormDefault="qualified">
+     <!-- attributeFormDefault="qualified" -->
+
+<xsd:annotation>
+  <xsd:documentation xml:lang="en">
+    BibteXML bibliography schema
+    Author:    Z.W. Hendrikse
+    Version:   Adapted from $Revision: 1.1.1.1 $
+    Copyright: GPL
+  </xsd:documentation>
+</xsd:annotation>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Main structure                                            -->
+<!-- bibtex:entry may contain one of the bibliographic types.  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:element name="entry" >
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element ref="bibtex:article"       />
+        <xsd:element ref="bibtex:book"          />
+        <xsd:element ref="bibtex:booklet"       />
+        <xsd:element ref="bibtex:manual"        />
+        <xsd:element ref="bibtex:techreport"    />
+        <xsd:element ref="bibtex:mastersthesis" />
+        <xsd:element ref="bibtex:phdthesis"     />
+        <xsd:element ref="bibtex:inbook"        />
+        <xsd:element ref="bibtex:incollection"  />
+        <xsd:element ref="bibtex:proceedings"   />
+        <xsd:element ref="bibtex:inproceedings" />
+        <xsd:element ref="bibtex:conference"    />
+        <xsd:element ref="bibtex:unpublished"   />
+        <xsd:element ref="bibtex:misc"          />
+      </xsd:choice>
+    </xsd:sequence>
+    <xsd:attribute name="id" 
+                   use="required" 
+                   type="xsd:ID" />
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="file">
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element ref="bibtex:entry" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <!--
+    <xsd:attribute name="xmlns:bibtex" 
+                   fixed="http://bibtexml.sf.net/"
+                   type="xsd:string" />
+    -->
+  </xsd:complexType>
+</xsd:element>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Parameter entities                                                  -->
+<!--                                                                     -->
+<!-- These are additional elements often used, but not included in the   -->
+<!-- standard BibTeX distribution, these must be added to the            -->
+<!-- bibliography styles, otherwise these fields will be omitted by      -->
+<!-- the formatter.                                                      -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Equivalent of the n.user ENTITY of the bibtexml.dtd -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:group name="user">
+  <xsd:sequence>
+    <xsd:element name="abstract"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          An abstract of the work.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="affiliation" type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The authors affiliation.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="contents"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          A Table of Contents.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="copyright"   type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Copyright information.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="doi"   type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Digital Object Identifier number.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:choice>
+      <xsd:element name="isbn" type="xsd:string" minOccurs="0" />
+      <xsd:element name="issn" type="xsd:string" minOccurs="0" />
+    </xsd:choice>
+    <xsd:element name="keywords"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Key words used for searching or possibly for annotation.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="language"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The language the document is in.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="lccn"        type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The Library of Congress Call Number, also seen as lib-congress.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="location"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          A location associated with the entry,
+          such as the city in which a conference took place.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="mrnumber"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The Mathematical Reviews number.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="price"       type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The price of the document.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="size"        type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The physical dimensions of a work.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="url"         type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The WWW Universal Resource Locator that points to the item being
+          referenced. This often is used for technical reports to point to 
+          the ftp site where the postscript source of the report is located.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="category"    type="xsd:string" minOccurs="0" >
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Category of this bibitem, added by Zeger W. Hendrikse.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+  </xsd:sequence>
+</xsd:group>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Equivalent of the n.common ENTITY of the bibtexml.dtd -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:group name="common">
+  <xsd:sequence>
+    <xsd:element name="key"      type="bibtex:keyType"      minOccurs="0" />
+    <xsd:element name="annotate" type="bibtex:annotateType" minOccurs="0" />
+    <xsd:element name="crossref" type="bibtex:crossrefType" minOccurs="0" />
+    <xsd:group   ref="bibtex:user" />
+  </xsd:sequence>
+</xsd:group>
+
+<!-- - - - - - - - - - - - - - - - - - - -->
+<!-- Content models used more than once  -->
+<!-- - - - - - - - - - - - - - - - - - - -->
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Equivalent of the n.InProceedings ENTITY of the bibtexml.dtd  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:group name="InProceedings">
+  <xsd:sequence>
+      <xsd:element name="author"       
+                   type="bibtex:authorType" />
+      <xsd:element name="title"      
+                   type="bibtex:titleType" />
+      <xsd:element name="booktitle"    
+                   type="bibtex:booktitleType" />
+      <xsd:element name="year"         
+                   type="bibtex:yearType" />
+      <xsd:element name="editor"       
+                   type="bibtex:editorType"       
+                   minOccurs="0" />
+      <xsd:choice minOccurs="0" >
+        <xsd:element name="volume"     
+                     type="bibtex:volumeType"       
+                     minOccurs="0" />
+        <xsd:element name="number"     
+                     type="bibtex:numberType"       
+                     minOccurs="0" />
+      </xsd:choice>
+      <xsd:element name="series"       
+                   type="bibtex:seriesType"       
+                   minOccurs="0" />
+      <xsd:element name="pages"        
+                   type="bibtex:pagesType"        
+                   minOccurs="0" />
+      <xsd:element name="address"      
+                   type="bibtex:addressType"      
+                   minOccurs="0" />
+      <xsd:element name="month"        
+                   type="bibtex:monthType"        
+                   minOccurs="0" />
+      <xsd:element name="organization" 
+                   type="bibtex:organizationType" 
+                   minOccurs="0" />
+      <xsd:element name="publisher"    
+                   type="bibtex:publisherType"    
+                   minOccurs="0" />
+      <xsd:element name="note"         
+                   type="bibtex:editorType"       
+                   minOccurs="0" />
+    <xsd:group   ref="bibtex:common" />
+  </xsd:sequence>
+</xsd:group>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Equivalent of the n.PHDThesis ENTITY of the bibtexml.dtd  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:group name="PHDThesis">
+  <xsd:sequence>
+    <xsd:element name="author"  type="bibtex:authorType"                />
+    <xsd:element name="title"   type="bibtex:titleType"                 />
+    <xsd:element name="school"  type="bibtex:schoolType"                />
+    <xsd:element name="year"    type="bibtex:yearType"                  />
+    <xsd:element name="type"    type="bibtex:typeType"    minOccurs="0" />
+    <xsd:element name="address" type="bibtex:addressType" minOccurs="0" />
+    <xsd:element name="month"   type="bibtex:monthType"   minOccurs="0" />
+    <xsd:element name="note"    type="bibtex:editorType"  minOccurs="0" />
+    <xsd:group   ref="bibtex:common" />
+  </xsd:sequence>
+</xsd:group>
+
+<!-- - - - - - - - - - - - - - - - - -->
+<!-- Entries in the BibTeX database  -->
+<!-- - - - - - - - - - - - - - - - - -->
+<xsd:element name="article" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @article tag.
+      An article from a journal or magazine.
+      Required fields: author, title, journal, year.
+      Optional fields: volume, number, pages, month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"  type="bibtex:authorType"  />
+      <xsd:element name="title"   type="bibtex:titleType"   />
+      <xsd:element name="journal" type="bibtex:journalType" />
+      <xsd:element name="year"    type="bibtex:yearType"    />
+      <xsd:element name="volume"  type="bibtex:volumeType"  minOccurs="0" />
+      <xsd:element name="number"  type="bibtex:numberType"  minOccurs="0" />
+      <xsd:element name="pages"   type="bibtex:pagesType"   minOccurs="0" />
+      <xsd:element name="month"   type="bibtex:monthType"   minOccurs="0" />
+      <xsd:element name="note"    type="bibtex:noteType"    minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="book" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @book tag.
+      A book with an explicit publisher.
+      Required fields: author or editor, title, publisher, year.
+      Optional fields: volume or number, series, address, edition, 
+                       month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="author"  type="bibtex:authorType"    />
+        <xsd:element name="editor"  type="bibtex:editorType"    />
+      </xsd:choice>
+      <xsd:element name="title"     type="bibtex:titleType"     />
+      <xsd:element name="publisher" type="bibtex:publisherType" />
+      <xsd:element name="year"      type="bibtex:yearType"      />
+      <xsd:choice minOccurs="0">
+        <xsd:element name="volume"  type="bibtex:volumeType"  minOccurs="0" />
+        <xsd:element name="number"  type="bibtex:numberType"  minOccurs="0" />
+      </xsd:choice>
+      <xsd:element name="series"    type="bibtex:seriesType"  minOccurs="0" />
+      <xsd:element name="address"   type="bibtex:addressType" minOccurs="0" />
+      <xsd:element name="edition"   type="bibtex:editionType" minOccurs="0" />
+      <xsd:element name="month"     type="bibtex:monthType"   minOccurs="0" />
+      <xsd:element name="note"      type="bibtex:noteType"    minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="booklet" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @booklet tag.
+      A work that is printed and bound, but without a named
+      publisher or sponsoring institution.
+      Required fields: title.
+      Optional fields: author, howpublished, address, month, year, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"       
+                   type="bibtex:authorType"       
+                   minOccurs="0" />
+      <xsd:element name="title"        
+                   type="bibtex:titleType" />
+      <xsd:element name="howpublished" 
+                   type="bibtex:howpublishedType" 
+                   minOccurs="0" />
+      <xsd:element name="address"      
+                   type="bibtex:addressType"      
+                   minOccurs="0" />
+      <xsd:element name="month"        
+                   type="bibtex:monthType"        
+                   minOccurs="0" />
+      <xsd:element name="year"         
+                   type="bibtex:yearType"         
+                   minOccurs="0" />
+      <xsd:element name="note"         
+                   type="bibtex:noteType"         
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="conference" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @conference tag.
+      The same as INPROCEEDINGS, included for Scribe compatibility.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:group   ref="bibtex:InProceedings" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="inbook" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @inbook tag.
+      A part of a book, which may be a chapter (or section or
+      publisher or sponsoring institution.
+      Required fields: author or editor, title, chapter and/or pages,
+                       publisher, year.
+      Optional fields: fields: volume or number, series, type, address,
+                       edition, month, note. 
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="author"    
+                     type="bibtex:authorType" />
+        
+      </xsd:choice>
+      <xsd:element name="title"       
+                   type="bibtex:titleType" />
+      <xsd:choice>
+        <xsd:group ref="bibtex:inbookGroup1" /> 
+        <xsd:element name="pages"     
+                     type="bibtex:pagesType" />
+      </xsd:choice>
+      <xsd:element name="publisher"   
+                   type="bibtex:publisherType" 
+                   minOccurs="0" />
+      <xsd:element name="year"        
+                   type="bibtex:yearType"      
+                   minOccurs="0" />
+      <xsd:choice minOccurs="0" >
+        <xsd:element name="volume"    
+                     type="bibtex:volumeType" />
+        <xsd:element name="number"    
+                     type="bibtex:numberType" />
+      </xsd:choice>
+      <xsd:element name="series"      
+                   type="bibtex:seriesType"    
+                   minOccurs="0" />
+      <xsd:element name="editor"    
+                     type="bibtex:editorType" />
+      <xsd:element name="type"        
+                   type="bibtex:typeType"      
+                   minOccurs="0" />
+      <xsd:element name="address"     
+                   type="bibtex:addressType"   
+                   minOccurs="0" />
+      <xsd:element name="edition"     
+                   type="bibtex:editionType"   
+                   minOccurs="0" />
+      <xsd:element name="month"       
+                   type="bibtex:monthType"     
+                   minOccurs="0" />
+      <xsd:element name="note"        
+                   type="bibtex:noteType"      
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+<xsd:group name="inbookGroup1"> 
+  <xsd:sequence>
+    <xsd:element name="chapter" type="bibtex:chapterType"               />
+    <xsd:element name="pages"   type="bibtex:pagesType"   minOccurs="0" />
+  </xsd:sequence>
+</xsd:group>
+
+<xsd:element name="incollection" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @incollection tag.
+      A part of a book having its own title.
+      Required fields: author, title, booktitle, publisher, year.
+      Optional fields: editor, volume or number, series, type,
+                       chapter, pages, address, edition, month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"    type="bibtex:authorType"    />
+      <xsd:element name="title"     type="bibtex:titleType"     />
+      <xsd:element name="booktitle" type="bibtex:booktitleType" />
+      <xsd:element name="publisher" type="bibtex:publisherType" />
+      <xsd:element name="year"      type="bibtex:yearType"      />
+      <xsd:element name="editor"    type="bibtex:editorType"  minOccurs="0" />
+      <xsd:choice minOccurs="0" >
+        <xsd:element name="volume"  type="bibtex:volumeType" />
+        <xsd:element name="number"  type="bibtex:numberType" />
+      </xsd:choice>
+      <xsd:element name="series"    type="bibtex:seriesType"  minOccurs="0" />
+      <xsd:element name="type"      type="bibtex:typeType"    minOccurs="0" />
+      <xsd:element name="chapter"   type="bibtex:chapterType" minOccurs="0" />
+      <xsd:element name="pages"     type="bibtex:pagesType"   minOccurs="0" />
+      <xsd:element name="address"   type="bibtex:addressType" minOccurs="0" />
+      <xsd:element name="edition"   type="bibtex:editionType" minOccurs="0" />
+      <xsd:element name="month"     type="bibtex:monthType"   minOccurs="0" />
+      <xsd:element name="note"      type="bibtex:noteType"    minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="inproceedings" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @inproceedings tag.
+      An article in a conference proceedings.
+      Required fields: author, title, booktitle, year.
+      Optional fields: editor, volume or number, series, pages,
+                       address, month, organization, publisher, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:group   ref="bibtex:InProceedings" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="manual" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @manual tag.
+      Technical documentation.
+      Required field: title.
+      Optional fields: author, organization, address,
+                       edition, month, year, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"       
+                   type="bibtex:authorType"       
+                   minOccurs="0" />
+      <xsd:element name="title"        
+                   type="bibtex:titleType" />
+      <xsd:element name="organization" 
+                   type="bibtex:organizationType" 
+                   minOccurs="0" />
+      <xsd:element name="address"      
+                   type="bibtex:addressType"      
+                   minOccurs="0" />
+      <xsd:element name="edition"      
+                   type="bibtex:editionType"      
+                   minOccurs="0" />
+      <xsd:element name="month"        
+                   type="bibtex:monthType"        
+                   minOccurs="0" />
+      <xsd:element name="year"         
+                   type="bibtex:yearType"         
+                   minOccurs="0" />
+      <xsd:element name="note"         
+                   type="bibtex:noteType"         
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="mastersthesis" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @mastersthesis tag.
+      A Master's thesis.
+      Required fields: author, title, school, year.
+      Optional fields: type, address, month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:group   ref="bibtex:PHDThesis" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="misc" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @misc tag.
+      Use this type when nothing else fits.
+      Required fields: none.
+      Optional fields: author, title, howpublished, month, year, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"       
+                   type="bibtex:authorType"       
+                   minOccurs="0" />
+      <xsd:element name="title"        
+                   type="bibtex:titleType"
+                   minOccurs="0" />
+      <xsd:element name="howpublished" 
+                   type="bibtex:howpublishedType" 
+                   minOccurs="0" />
+      <xsd:element name="month"        
+                   type="bibtex:monthType"        
+                   minOccurs="0" />
+      <xsd:element name="year"         
+                   type="bibtex:yearType"         
+                   minOccurs="0" />
+      <xsd:element name="note"         
+                   type="bibtex:noteType"         
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+  
+<xsd:element name="phdthesis" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @phdthesis tag.
+      A PhD thesis.
+      Required fields: author, title, school, year.
+      Optional fields: type, address, month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:group   ref="bibtex:PHDThesis" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="proceedings" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @proceedings tag.
+      The proceedings of a conference.
+      Required fields: title, year.
+      Optional fields: editor, volume or number, series,
+                       address, month, organization, publisher, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="editor"       
+                   type="bibtex:editorType"       
+                   minOccurs="0" />
+      <xsd:element name="title"        
+                   type="bibtex:titleType" />
+      <xsd:element name="year"         
+                   type="bibtex:yearType" />
+      <xsd:choice minOccurs="0" >
+        <xsd:element name="volume"     
+                     type="bibtex:volumeType"       
+                     minOccurs="0" />
+        <xsd:element name="number"     
+                     type="bibtex:numberType"       
+                     minOccurs="0" />
+      </xsd:choice>
+      <xsd:element name="series"       
+                   type="bibtex:seriesType"       
+                   minOccurs="0" />
+      <xsd:element name="address"      
+                   type="bibtex:addressType"      
+                   minOccurs="0" />
+      <xsd:element name="month"        
+                   type="bibtex:monthType"        
+                   minOccurs="0" />
+      <xsd:element name="organization" 
+                   type="bibtex:organizationType" 
+                   minOccurs="0" />
+      <xsd:element name="publisher"    
+                   type="bibtex:publisherType"    
+                   minOccurs="0" />
+      <xsd:element name="note"         
+                   type="bibtex:noteType"         
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="techreport" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @techreport tag.
+      A report published by a school or other institution,
+      usually numbered within a series.
+      Required fields: author, title, institution, year.
+      Optional fields: type, number, address, month, note.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"      
+                   type="bibtex:authorType" />
+      <xsd:element name="title"       
+                   type="bibtex:titleType" />
+      <xsd:element name="institution" 
+                   type="bibtex:institutionType" />
+      <xsd:element name="year"        
+                   type="bibtex:yearType" />
+      <xsd:element name="type"        
+                   type="bibtex:typeType"        
+                   minOccurs="0" />
+      <xsd:element name="number"      
+                   type="bibtex:numberType"      
+                   minOccurs="0" />
+      <xsd:element name="address"     
+                   type="bibtex:addressType"     
+                   minOccurs="0" />
+      <xsd:element name="month"       
+                   type="bibtex:monthType"       
+                   minOccurs="0" />
+      <xsd:element name="note"        
+                   type="bibtex:noteType"        
+                   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="unpublished" >
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The bibteXML equivalent of the @unpublished tag.
+      A document having an author and title, but not formally published.
+      Required fields: author, title, note.
+      Optional fields: month, year.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author"  type="bibtex:authorType"               />
+      <xsd:element name="title"   type="bibtex:titleType"                />
+      <xsd:element name="note"    type="bibtex:noteType"                 />
+      <xsd:element name="month"   type="bibtex:monthType"  minOccurs="0" />
+      <xsd:element name="year"    type="bibtex:yearType"   minOccurs="0" />
+      <xsd:group   ref="bibtex:common" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:element>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Fields from the standard bibliography styles  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsd:simpleType name="addressType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      Usually the address of the publisher or other type of
+      institution. For major publishing houses, van Leunen recommends
+      omitting the information entirely. For small publishers, on the other
+      hand, you can help the reader by giving the complete address.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="annotateType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+       An annotation. It is not used by the standard bibliography
+       styles, but may be used by others that produce an annotated
+       bibliography.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="authorType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The name(s) of the author(s), in the format described in the
+      LaTeX book.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="booktitleType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      Title of a book, part of which is being cited.  See the
+      LaTeX book for how to type titles. For book entries, use the title
+      field instead.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="chapterType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      A chapter (or section or whatever) number.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:positiveInteger" />
+</xsd:simpleType>
+
+<xsd:simpleType name="crossrefType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The database key of the entry being cross referenced.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="editionType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The edition of a book-for example, ``Second''.  This   
+      should be an ordinal, and should have the first letter capitalized, as
+      shown here; the standard styles convert to lower case when necessary.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" >
+    <xsd:pattern value="[A-Z].*" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="editorType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      Name(s) of editor(s), typed as indicated in the LaTeX book.
+      If there is also an author field, then the editor field gives the
+      editor of the book or collection in which the reference appears.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="howpublishedType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      How something strange has been published.  The first
+      word should be capitalized.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="institutionType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The sponsoring institution of a technical report.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="journalType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      A journal name.  Abbreviations are provided for many
+      journals; see the Local Guide.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="keyType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      Used for alphabetizing, cross referencing, and creating a label
+      when the ``author'' information (described in Section [ref: ] is
+      missing. This field should not be confused with the key that appears
+      in the \cite command and at the beginning of the database entry.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="monthType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The month in which the work was published or, for an
+      unpublished work, in which it was written  You should use the
+      standard three-letter abbreviation, as described in Appendix B.1.3 of
+      the LaTeX book. As XML Schema supports a special month format, it is
+      decided to allow e.g. 05 (for May) too.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:union memberTypes="bibtex:monthTypeString bibtex:monthTypeInt" />
+</xsd:simpleType>
+
+<xsd:simpleType name="noteType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      Any additional information that can help the reader. The first
+      word should be capitalized.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="numberType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The number of a journal, magazine, technical report, or of a
+      work in a series.  An issue of a journal or magazine is usually
+      identified by its volume and number; the organization that issues a
+      technical report usually gives it a number; and sometimes books are
+      given numbers in a named series.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:positiveInteger" />
+</xsd:simpleType>
+
+<xsd:simpleType name="organizationType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The organization that sponsors a conference or that publishes a manual.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="pagesType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      One or more page numbers or range of numbers, such as 42-111
+      or 7,41,73-97 or 43+ (the `+" in this last example indicates pages
+      following that don"t form a simple range). To make it easier to
+      maintain Scribe-compatible databases, the standard styles convert a
+      single dash (as in 7-33) to the double dash used in TeX to denote
+      number ranges (as in 7-33).
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" >
+    <xsd:pattern value="[0-9]*-{0,2}[0-9]*" />
+  </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="publisherType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The publisher's name.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="schoolType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The name of the school where a thesis was written.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="seriesType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The name of a series or set of books.  When citing an entire
+      book, the the title field gives its title and an optional series field
+      gives the name of a series or multi-volume set in which the book is
+      published.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="titleType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The work's title, typed as explained in the LaTeX book.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="typeType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The work's title, typed as explained in the LaTeX book.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="volumeType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The volume of a journal or multivolume book.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:string" />
+</xsd:simpleType>
+
+<xsd:simpleType name="yearType">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      The year of publication or, for an unpublished work, the year
+      it was written.  Generally it should consist of four numerals, such as
+      1984. Although the standard styles can handle any year whose last four
+      nonpunctuation characters are numerals, such as `(about 1984)", it
+      is decided here to keep the year limited to four numerals, as such a
+      type is pre-defined in XML Schema.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:restriction base="xsd:gYear" />
+</xsd:simpleType>
+
+<xsd:simpleType name="monthTypeString">
+  <xsd:restriction base="xsd:string">
+    <xsd:enumeration value="Jan" />
+    <xsd:enumeration value="Feb" />
+    <xsd:enumeration value="Mar" />
+    <xsd:enumeration value="Apr" />
+    <xsd:enumeration value="May" />
+    <xsd:enumeration value="Jun" />
+    <xsd:enumeration value="Jul" />
+    <xsd:enumeration value="Aug" />
+    <xsd:enumeration value="Sep" />
+    <xsd:enumeration value="Oct" />
+    <xsd:enumeration value="Nov" />
+    <xsd:enumeration value="Dec" />
+  </xsd:restriction>
+</xsd:simpleType>
+<xsd:simpleType name="monthTypeInt">
+  <xsd:restriction base="xsd:gMonth" />
+</xsd:simpleType>
+
+</xsd:schema>

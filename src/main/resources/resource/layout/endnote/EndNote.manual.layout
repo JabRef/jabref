@@ -1,0 +1,43 @@
+%0 \endnotereftype
+%0 Computer Program
+%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%D \year
+%T \format[RemoveLatexCommands]{\title}
+%E
+%B 
+%C \address
+%I \organization
+%V 
+%6
+%N 
+%P \format[FormatPagesForHTML]{\pages}
+%& 
+%Y 
+%S 
+%7 \edition
+%8 \month
+%9
+%? 
+%! \shorttitle
+%Z 
+%@ \isbn
+%(
+%)
+%*
+%L
+%M
+\format[FileLink(pdf),WrapContent(%1 ,)]{\file}
+%2 \comment
+%3 manual
+%4 \crossref
+%# \owner
+%$ \key
+%F \bibtexkey
+%K \keywords
+%X \abstract
+%Z \note
+\format[WrapContent(%U ,)]{\url}
+\format[FileLink(url),WrapContent(%U ,)]{\file}
+%+
+%^
+

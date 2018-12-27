@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3"
+                xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
+<mods version="3.3">
+<titleInfo>
+<title>Telescope Peak from Zabriskie Point</title>
+</titleInfo>
+<titleInfo type="alternative" >
+<title>Telescope PK from Zabriskie Pt.</title>
+</titleInfo>
+<abstract>an abstract</abstract>
+<name>
+<namePart type="family">Telescope</namePart>
+<affiliation>an affiliation</affiliation>
+</name>
+<typeOfResource>still image</typeOfResource>
+<genre authority="gmgpc">Article</genre>
+<originInfo>
+<dateCreated encoding="w3cdtf" keyDate="yes">1955-03-22</dateCreated>
+<dateCaptured>1955-11-30</dateCaptured>
+<dateModified>1970-12-01</dateModified>
+<edition>2</edition>
+<copyrightDate encoding="w3cdtf">2003</copyrightDate>
+</originInfo>
+<physicalDescription>
+<internetMediaType>image/jpeg</internetMediaType>
+<digitalOrigin>reformatted digital</digitalOrigin>
+</physicalDescription>
+<subject authority="lctgm">
+</subject>
+<subject>
+<hierarchicalGeographic>
+<country>United States</country>
+<city>New York</city>
+</hierarchicalGeographic>
+</subject>
+<relatedItem type="host">
+<titleInfo>
+<title>Cell</title>
+</titleInfo>
+<part>
+<extent unit="page">
+<total>50</total>
+</extent>
+</part>
+</relatedItem>
+<identifier displayLabel="Cushman number" type="local">955.11</identifier>
+<identifier displayLabel="IU Archives number" type="local">P07803</identifier>
+<identifier type="citekey">TelPeak</identifier>
+<location>
+<url>http://purl.dlib.indiana.edu/iudl/archives/cushman/P07803</url>
+<url access="preview">http://quod.lib.umich.edu/m/mods/thumbs/Indiana/oai.dlib.indiana.edu/ archives/cushman/oai_3Aoai.dlib.indiana.edu_3Aarchives_5Ccushman_5CP07803.png</url>
+</location>
+<accessCondition>Copyright and reproduction rights for all Charles W. Cushman photographs are held by Indiana University and administered by the University Archives, Indiana University, Bloomington, IN 47405</accessCondition>
+<recordInfo>
+<recordContentSource>Indiana University Digital Library Program</recordContentSource>
+<recordCreationDate encoding="w3cdtf">2004-09-09</recordCreationDate>
+<recordIdentifier>archives/cushman/P07803</recordIdentifier>
+</recordInfo>
+</mods>
+</modsCollection>

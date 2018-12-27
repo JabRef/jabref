@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+<zs:version>1.1</zs:version>
+<zs:numberOfRecords>2</zs:numberOfRecords>
+<zs:records>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="001@">
+    <subfield code="0">20</subfield>
+  </datafield>
+  <datafield tag="001A">
+    <subfield code="0">2001:14-05-14</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">0084:07-11-14</subfield>
+    <subfield code="t">14:03:00.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">0084:20-10-14</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="001X">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Aau0z</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">785759913</subfield>
+  </datafield>
+  <datafield tag="004A">
+    <subfield code="A">9783943267914</subfield>
+    <subfield code="f">spiralgeh. : EUR 20.87</subfield>
+    <subfield code="m">DE</subfield>
+  </datafield>
+  <datafield tag="004L">
+    <subfield code="0">9783943267914</subfield>
+  </datafield>
+  <datafield tag="006G">
+    <subfield code="0">1050792157</subfield>
+  </datafield>
+  <datafield tag="006L">
+    <subfield code="c">DNB</subfield>
+    <subfield code="0">1050792157</subfield>
+  </datafield>
+  <datafield tag="006U">
+    <subfield code="0">14A22</subfield>
+  </datafield>
+  <datafield tag="006X">
+    <subfield code="c">OCoLC</subfield>
+    <subfield code="0">879880337</subfield>
+  </datafield>
+  <datafield tag="007G">
+    <subfield code="c">DNB</subfield>
+    <subfield code="0">1050792157</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="a">http://d-nb.info/1050792157/04</subfield>
+    <subfield code="n">DE-101</subfield>
+    <subfield code="q">application/pdf</subfield>
+    <subfield code="v">2014-05-28</subfield>
+    <subfield code="3">04</subfield>
+    <subfield code="5">2</subfield>
+    <subfield code="A">DNB</subfield>
+    <subfield code="B">2</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="a">http://deposit.d-nb.de/cgi-bin/dokserv?id=4659669&amp;prov=M&amp;dok_var=1&amp;dok_ext=htm</subfield>
+    <subfield code="n">Verlag: MVB</subfield>
+    <subfield code="q">text/html</subfield>
+    <subfield code="v">2014-05-28</subfield>
+    <subfield code="3">01</subfield>
+    <subfield code="5">2</subfield>
+    <subfield code="A">DNB</subfield>
+    <subfield code="B">2</subfield>
+  </datafield>
+  <datafield tag="010@">
+    <subfield code="a">ger</subfield>
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="011@">
+    <subfield code="a">2014</subfield>
+  </datafield>
+  <datafield tag="019@">
+    <subfield code="a">XA-DE</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">GMP-Regelwerke für Arzneimittel</subfield>
+  </datafield>
+  <datafield tag="032@">
+    <subfield code="a">7., aktualisierte Aufl.</subfield>
+  </datafield>
+  <datafield tag="033A">
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas &amp; Peither, GMP-Verl.</subfield>
+  </datafield>
+  <datafield tag="034D">
+    <subfield code="a">310 S.</subfield>
+  </datafield>
+  <datafield tag="034I">
+    <subfield code="a">14 cm</subfield>
+  </datafield>
+  <datafield tag="036E">
+    <subfield code="a">Kleiner GMP-Berater</subfield>
+    <subfield code="l">7</subfield>
+  </datafield>
+  <datafield tag="036F">
+    <subfield code="x">700</subfield>
+    <subfield code="9">496510126</subfield>
+    <subfield code="a">Kleiner GMP-Berater</subfield>
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas &amp; Peither, GMP-Verl</subfield>
+    <subfield code="n">2000-</subfield>
+    <subfield code="0">21989291</subfield>
+    <subfield code="l">7</subfield>
+  </datafield>
+  <datafield tag="037A">
+    <subfield code="a">Text teilw. dt., teilw. engl.</subfield>
+  </datafield>
+  <datafield tag="041A">
+    <subfield code="9">528183451</subfield>
+    <subfield code="M">Tuv1</subfield>
+    <subfield code="a">Arzneimittel- und Wirkstoffherstellungsverordnung</subfield>
+    <subfield code="0">gnd/7568112-2</subfield>
+  </datafield>
+  <datafield occurrence="09" tag="041A">
+    <subfield code="A">DE-101</subfield>
+  </datafield>
+  <datafield occurrence="10" tag="041A">
+    <subfield code="9">104616016</subfield>
+    <subfield code="M">Tgv1</subfield>
+    <subfield code="a">Europ�ische Union</subfield>
+    <subfield code="0">gnd/4131753-1</subfield>
+  </datafield>
+  <datafield occurrence="11" tag="041A">
+    <subfield code="9">104161949</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">GMP-Regeln</subfield>
+    <subfield code="0">gnd/4113765-6</subfield>
+  </datafield>
+  <datafield occurrence="12" tag="041A">
+    <subfield code="9">104962720</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Produktinformation</subfield>
+    <subfield code="0">gnd/4227582-9</subfield>
+  </datafield>
+  <datafield occurrence="19" tag="041A">
+    <subfield code="A">DE-101</subfield>
+  </datafield>
+  <datafield tag="044G">
+    <subfield code="S">c</subfield>
+    <subfield code="a">Deutschland</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">22/ger</subfield>
+    <subfield code="a">615.19002184</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">23sdnb</subfield>
+    <subfield code="a">610</subfield>
+    <subfield code="a">340</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">23sdnb</subfield>
+    <subfield code="a">610</subfield>
+  </datafield>
+  <datafield tag="045G">
+    <subfield code="a">610</subfield>
+    <subfield code="a">340</subfield>
+    <subfield code="A">DNB</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="045Q">
+    <subfield code="9">106416995</subfield>
+    <subfield code="a">86.56</subfield>
+    <subfield code="j">Gesundheitsrecht</subfield>
+    <subfield code="j">Lebensmittelrecht</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="045Q">
+    <subfield code="9">106423304</subfield>
+    <subfield code="a">44.40</subfield>
+    <subfield code="j">Pharmazie</subfield>
+    <subfield code="j">Pharmazeutika</subfield>
+  </datafield>
+  <datafield tag="045V">
+    <subfield code="a">15,3</subfield>
+  </datafield>
+  <datafield tag="045Y">
+    <subfield code="a">pha</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">20</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">20-10-14</subfield>
+    <subfield code="t">10:29:15.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">20-10-14</subfield>
+    <subfield code="b">1014</subfield>
+    <subfield code="a">0084</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1458093670</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">15-07-14</subfield>
+    <subfield code="b">k</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="a">1452-1627</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209G">
+    <subfield code="a">84$014521627</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>1</zs:recordPosition>
+</zs:record>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="001@">
+    <subfield code="0">20,293</subfield>
+  </datafield>
+  <datafield tag="001A">
+    <subfield code="0">3293:04-12-14</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">2004:19-11-15</subfield>
+    <subfield code="t">02:28:21.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">3293:04-12-14</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="001X">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Aau</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">810635399</subfield>
+  </datafield>
+  <datafield tag="004A">
+    <subfield code="A">9783958070011</subfield>
+  </datafield>
+  <datafield tag="007G">
+    <subfield code="c">GBV</subfield>
+    <subfield code="0">810635399</subfield>
+  </datafield>
+  <datafield tag="010@">
+    <subfield code="a">ger</subfield>
+    <subfield code="a">eng</subfield>
+    <subfield code="c">eng</subfield>
+  </datafield>
+  <datafield tag="011@">
+    <subfield code="a">2014</subfield>
+  </datafield>
+  <datafield tag="019@">
+    <subfield code="a">XA-DE</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">GMP-Regelwerke für computergestützte Systeme</subfield>
+  </datafield>
+  <datafield tag="032@">
+    <subfield code="a">4., aktual. Aufl.</subfield>
+  </datafield>
+  <datafield tag="033A">
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas &amp; Peither, GMP-Verl</subfield>
+  </datafield>
+  <datafield tag="034D">
+    <subfield code="a">142 S.</subfield>
+  </datafield>
+  <datafield tag="036E">
+    <subfield code="a">Kleiner GMP-Berater</subfield>
+    <subfield code="l">Bd. 5</subfield>
+  </datafield>
+  <datafield tag="036F">
+    <subfield code="x">500</subfield>
+    <subfield code="9">496510126</subfield>
+    <subfield code="a">Kleiner GMP-Berater</subfield>
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas &amp; Peither, GMP-Verl</subfield>
+    <subfield code="n">2000-</subfield>
+    <subfield code="0">21989291</subfield>
+    <subfield code="l">Bd. 5</subfield>
+  </datafield>
+  <datafield tag="037A">
+    <subfield code="a">Text teilw. dt. und engl</subfield>
+  </datafield>
+  <datafield tag="041A">
+    <subfield code="9">106200690</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Pharmazeutische Industrie</subfield>
+    <subfield code="0">gnd/4045696-1</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="041A">
+    <subfield code="9">104451939</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Betriebliches Informationssystem</subfield>
+    <subfield code="0">gnd/4069386-7</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="041A">
+    <subfield code="9">104467525</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Computersicherheit</subfield>
+    <subfield code="0">gnd/4274324-2</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="041A">
+    <subfield code="9">104212543</subfield>
+    <subfield code="M">Tsv1</subfield>
+    <subfield code="a">Softwareschutz</subfield>
+    <subfield code="0">gnd/4131649-6</subfield>
+  </datafield>
+  <datafield occurrence="09" tag="041A">
+    <subfield code="A">DE-101</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">23sdnb</subfield>
+    <subfield code="a">610</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">22/ger</subfield>
+    <subfield code="a">658.4038011</subfield>
+  </datafield>
+  <datafield tag="045F">
+    <subfield code="e">23sdnb</subfield>
+    <subfield code="a">650</subfield>
+    <subfield code="a">004</subfield>
+  </datafield>
+  <datafield tag="045G">
+    <subfield code="a">650</subfield>
+    <subfield code="a">004</subfield>
+    <subfield code="A">DNB</subfield>
+  </datafield>
+  <datafield tag="045V">
+    <subfield code="a">15,3</subfield>
+  </datafield>
+  <datafield tag="045Y">
+    <subfield code="a">pha</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">20</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">17-11-15</subfield>
+    <subfield code="t">12:06:23.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">17-11-15</subfield>
+    <subfield code="b">1014</subfield>
+    <subfield code="a">0084</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1468429450</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">11-12-14</subfield>
+    <subfield code="b">k</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="a">1452-3227</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209G">
+    <subfield code="a">84$014523227</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">293</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="t">14:49:02.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="b">5601</subfield>
+    <subfield code="a">3293/0333</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">1508486832</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">04-12-14</subfield>
+    <subfield code="b">zf</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="f">KSF/FHH</subfield>
+    <subfield code="a">MED 2200 251(4):1</subfield>
+    <subfield code="d">s</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209C">
+    <subfield code="a">fi 2014/0607</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209G">
+    <subfield code="a">960$02115956</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="201B">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="t">14:49:02.000</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="201D">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="b">5601</subfield>
+    <subfield code="a">3293/0333</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="203@">
+    <subfield code="0">1513287834</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="208@">
+    <subfield code="a">04-12-14</subfield>
+    <subfield code="b">zf</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="209A">
+    <subfield code="f">KSF/FHH</subfield>
+    <subfield code="a">MED 2200 251(4):2</subfield>
+    <subfield code="d">u</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="209C">
+    <subfield code="a">fi 2014/0608</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="02" tag="209G">
+    <subfield code="a">960$02115913</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="201B">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="t">14:49:02.000</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="201D">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="b">5601</subfield>
+    <subfield code="a">3293/0333</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="203@">
+    <subfield code="0">1513287842</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="208@">
+    <subfield code="a">04-12-14</subfield>
+    <subfield code="b">zf</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="209A">
+    <subfield code="f">KSF/FHH</subfield>
+    <subfield code="a">MED 2200 251(4):3</subfield>
+    <subfield code="d">u</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="209C">
+    <subfield code="a">fi 2014/0609</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="03" tag="209G">
+    <subfield code="a">960$02115964</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="201B">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="t">14:49:02.000</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="201D">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="b">5601</subfield>
+    <subfield code="a">3293/0333</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="203@">
+    <subfield code="0">1513287850</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="208@">
+    <subfield code="a">04-12-14</subfield>
+    <subfield code="b">zf</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="209A">
+    <subfield code="f">KSF/FHH</subfield>
+    <subfield code="a">MED 2200 251(4):4</subfield>
+    <subfield code="d">u</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="209C">
+    <subfield code="a">fi 2014/0610</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="04" tag="209G">
+    <subfield code="a">960$02115921</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="201B">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="t">14:49:02.000</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="201D">
+    <subfield code="0">04-12-14</subfield>
+    <subfield code="b">5601</subfield>
+    <subfield code="a">3293/0333</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="203@">
+    <subfield code="0">1513287869</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="208@">
+    <subfield code="a">04-12-14</subfield>
+    <subfield code="b">zf</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="209A">
+    <subfield code="f">KSF/FHH</subfield>
+    <subfield code="a">MED 2200 251(4):5</subfield>
+    <subfield code="d">u</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="209C">
+    <subfield code="a">fi 2014/0611</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="05" tag="209G">
+    <subfield code="a">960$0211593X</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>2</zs:recordPosition>
+</zs:record>
+</zs:records>
+<zs:echoedSearchRetrieveRequest>
+<zs:version>1.1</zs:version>
+<zs:query>pica.all=GMP-Regelwerke für Arzneimittel</zs:query>
+<zs:maximumRecords>50</zs:maximumRecords>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:sortKeys>Year,,1</zs:sortKeys>
+</zs:echoedSearchRetrieveRequest>
+</zs:searchRetrieveResponse>
+

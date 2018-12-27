@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: MIT
+
+NAME
+Default [number] style file.
+
+JOURNALS
+Journal name 1
+Journal name 2
+
+PROPERTIES
+Title="References"
+IsSortByPosition="true"
+IsNumberEntries="true"
+ReferenceParagraphFormat="Text body"
+ReferenceHeaderParagraphFormat="Heading 2"
+
+CITATION
+BracketBefore="["
+BracketAfter="]"
+BracketBeforeInList="["
+BracketAfterInList="] "
+CitationSeparator="; "
+UniquefierSeparator=","
+GroupedNumbersSeparator="-"
+MinimumGroupingCount="3"
+FormatCitations="false"
+CitationCharacterFormat="Default"
+PageInfoSeparator="; "
+
+LAYOUT
+article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+
+book=\format[Authors(LastFirst,Semicolon)]{\author}\begin{editor}\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor}, <b>\year\uniq</b>. <i>\title</i>. \publisher, \address.
+
+incollection=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\booktitle</i>, \publisher.
+
+inbook=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\chapter</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\title</i>, \publisher.
+
+phdthesis=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \school.
+
+default=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.

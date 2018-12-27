@@ -1,0 +1,43 @@
+%0 \endnotereftype
+%0 Journal Article
+%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%D \year
+%T \format[RemoveLatexCommands]{\title}
+%E 
+%B \journal
+%C 
+%I \publisher
+%V \volume
+%6
+%N \number
+%P \format[FormatPagesForHTML]{\pages}
+%& 
+%Y 
+%S 
+%7
+%8 \month
+%9
+%? 
+%! \shorttitle
+%Z 
+%@ \issn
+%(
+%)
+%*
+%L
+%M
+\format[FileLink(pdf),WrapContent(%1 ,)]{\file}
+%2 \comment
+%3 article
+%4 \crossref
+%# \owner
+%$ \key
+%F \bibtexkey
+%K \keywords
+%X \abstract
+%Z \note
+\format[WrapContent(%U ,)]{\url}
+\format[FileLink(url),WrapContent(%U ,)]{\file}
+%+
+%^
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:BIBTEX_Price>10</b:BIBTEX_Price>
+<b:BIBTEX_Series>ser</b:BIBTEX_Series>
+<b:BIBTEX_Entry>article</b:BIBTEX_Entry>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Reporter>rep</b:Reporter>
+<b:Accessed>July 3, 2010</b:Accessed>
+<b:Court>court</b:Court>
+<b:RecordingNumber>record</b:RecordingNumber>
+<b:Station>stat</b:Station>
+<b:Theater>th</b:Theater>
+<b:PeriodicalTitle>Besondere Turingmaschinen</b:PeriodicalTitle>
+<b:Type>type</b:Type>
+<b:Department>Gymnasium Unterrieden</b:Department>
+<b:Distributor>dist</b:Distributor>
+<b:Medium>med</b:Medium>
+<b:ProductionCompany>produktion</b:ProductionCompany>
+<b:CaseNumber>case</b:CaseNumber>
+<b:Broadcaster>broad</b:Broadcaster>
+<b:NumberVolumes>10</b:NumberVolumes>
+<b:AbbreviatedCaseNumber>abb</b:AbbreviatedCaseNumber>
+<b:BIBTEX_Size>1000</b:BIBTEX_Size>
+<b:Author/>
+</b:Source>
+</b:Sources>

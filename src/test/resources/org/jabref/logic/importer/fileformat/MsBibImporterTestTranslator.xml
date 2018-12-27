@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+   <b:Source>
+      <b:Tag>Nac16</b:Tag>
+      <b:SourceType>Misc</b:SourceType>
+      <b:Guid>{BD524449-102F-470B-951F-CFE852BA526D}</b:Guid>
+      <b:Title>MeinArtikel</b:Title>
+      <b:Year>2016</b:Year>
+      <b:Pages>17</b:Pages>
+      <b:JournalName>MeineZeitung</b:JournalName>
+      <b:Author>
+         <b:Author>
+            <b:Corporate>Nachname, Vorname MIddleName; Nachname2, Vorname2 MiddleName21</b:Corporate>
+         </b:Author>
+         <b:Translator>
+            <b:NameList>
+               <b:Person>
+                  <b:Last>TestÜbersetzer</b:Last>
+               </b:Person>
+            </b:NameList>
+         </b:Translator>
+      </b:Author>
+      <b:RefOrder>1</b:RefOrder>
+      <b:Month>07</b:Month>
+      <b:Day>1</b:Day>
+      <b:YearAccessed>2018</b:YearAccessed>
+      <b:MonthAccessed>07</b:MonthAccessed>
+      <b:DayAccessed>1</b:DayAccessed>
+   </b:Source>
+</b:Sources>

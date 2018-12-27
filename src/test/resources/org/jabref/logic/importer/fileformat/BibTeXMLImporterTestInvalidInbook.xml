@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="Mustermann2016">
+  <bibtex:inbook>
+	<bibtex:school>should not be mapped, because not valid according to XSD</bibtex:school>
+  </bibtex:inbook>
+</bibtex:entry>
+</bibtex:file>

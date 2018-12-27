@@ -1,0 +1,18 @@
+
+TI:  Simulation studies of multiple dipole neuromagnetic source localization, model order and limits of source resolution. 
+AU:  Supek-S; Aine-CJ
+AD:  Neuromagnetism Laboratory, Los Alamos National Laboratory, NM 87545. 
+SO:  IEEE-Trans-Biomed-Eng. ,  	1993;40(6) : 529-540
+DT:    journal
+ISSN: 0018-9294
+PY: 1993
+LA: ENGLISH
+CP: UNITED-STATES
+AB:  Numerical
+MESH: Data-Interpretation,-Statistical; Electromagnetic-Fields; Monte-Carlo-Method
+MESH: *Magnetoencephalography-; *Models,-Biological; *Models,-Statistical
+TG: Support,-U.S.-Gov't,-Non-P.H.S.; Support,-U.S.-Gov't,-P.H.S.    
+PT: JOURNAL-ARTICLE
+CN: NEIEY08610EYNEI
+AN: 94085977
+UD: 9403

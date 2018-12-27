@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="Mustermann2016">
+  <bibtex:conference>
+    <bibtex:author>Max Mustermann</bibtex:author>
+    <bibtex:editor>Maxima Musterfrau</bibtex:editor>
+    <bibtex:title>Java Conference</bibtex:title>
+    <bibtex:booktitle>Java Booktitle</bibtex:booktitle>
+    <bibtex:publisher>Java Publisher</bibtex:publisher>
+    <bibtex:year>2016</bibtex:year>
+    <bibtex:volume>1</bibtex:volume>
+    <bibtex:month>February</bibtex:month>
+    <bibtex:pages>3-9</bibtex:pages>
+    <bibtex:number>1</bibtex:number>
+    <bibtex:series>1</bibtex:series>
+    <bibtex:organization>Java Org</bibtex:organization>
+    <bibtex:address>Stuttgart</bibtex:address>
+    <bibtex:keywords>java</bibtex:keywords>
+  </bibtex:conference>
+</bibtex:entry>
+</bibtex:file>

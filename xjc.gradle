@@ -1,0 +1,41 @@
+configurations {
+    xjc
+}
+
+dependencies {
+    // Cannot be updated.
+    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+}
+
+task xjc {
+    inputs.dir "src/main/resources/xjc/medline/"
+    inputs.dir "src/main/resources/xjc/bibtexml/"
+    inputs.dir "src/main/resources/xjc/endnote/"
+    inputs.dir "src/main/resources/xjc/mods/"
+    outputs.dir "src/main/gen/org/jabref/logic/importer/fileformat/medline"
+    outputs.dir "src/main/gen/org/jabref/logic/importer/fileformat/bibtexml"
+    outputs.dir "src/main/gen/org/jabref/logic/importer/fileformat/endnote"
+    outputs.dir "src/main/gen/org/jabref/logic/importer/fileformat/mods"
+
+    ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
+
+    doLast {
+        ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.medline') {
+            schema(dir: 'src/main/resources/xjc/medline', includes: 'medline.xsd')
+        }
+        ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.bibtexml') {
+            schema(dir: 'src/main/resources/xjc/bibtexml', includes: 'bibtexml.xsd')
+        }
+        ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.endnote') {
+            arg(value: '-dtd')
+            schema(dir: 'src/main/resources/xjc/endnote', includes: 'RSXML.dtd')
+        }
+        ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.mods') {
+            arg(value: '-npa') //don't create package-info.java because it was manually added in src/main/java to ensure the namespace prefix mapping
+            schema(dir: 'src/main/resources/xjc/mods', includes: 'mods-3-7.xsd')
+            binding(dir: 'src/main/resources/xjc/mods', includes: 'mods-binding.xjb')
+        }
+    }
+}
+
+tasks.compileJava.dependsOn xjc

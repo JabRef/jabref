@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <inproceedings>
+            <author>Max Mustermann</author>
+            <title>Java InProceedings</title>
+            <booktitle>Java Book</booktitle>
+            <year>2016</year>
+            <month>February</month>
+            <organization>Java Org</organization>
+            <publisher>Java Publisher</publisher>
+            <keywords>java</keywords>
+        </inproceedings>
+    </entry>
+</file>

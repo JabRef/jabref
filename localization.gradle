@@ -1,0 +1,58 @@
+repositories {
+    jcenter()
+}
+
+configurations {
+    jython
+}
+
+dependencies {
+    jython 'org.python:jython-standalone:2.7.1'
+}
+
+task localizationStatusWithMarkdown(type: JavaExec) {
+    description "Creates an update file in Markdown"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "markdown"
+}
+
+task localizationStatus(type: JavaExec) {
+    description "Prints the current status"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "status"
+}
+
+task localizationStatusExtended(type: JavaExec) {
+    description "Prints the current status (extended output)"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "status"
+    args "--extended"
+}
+
+task localizationUpdate(type: JavaExec) {
+    description "Updates the localization files (fixes duplicates, adds missing keys, and sort them"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "update"
+}
+
+task localizationUpdateExtended(type: JavaExec) {
+    description "Updates the localization files (fixes duplicates, adds missing keys, and sort them (extended output)"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "update"
+    args "--extended"
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:Issue>3</b:Issue>
+<b:Volume>5</b:Volume>
+<b:BIBTEX_Entry>article</b:BIBTEX_Entry>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Title>Application of Ontology In the ITIL Domain</b:Title>
+<b:Tag>Orlowski;2011</b:Tag>
+<b:Publisher>Oficyna Wydawnicza Politechniki Wrocławskiej</b:Publisher>
+<b:DOI>10.13140/2.1.3259.2169</b:DOI>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Czarnecki</b:Last>
+<b:Middle>and Or{\l}owski, Cezary</b:Middle>
+<b:First>Adam</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>99-108</b:Pages>
+<b:Year>2011</b:Year>
+<b:Month>Fall</b:Month>
+<b:JournalName>Information Systems Architecture and Technology: Service Oriented Networked Systems</b:JournalName>
+<b:StandardNumber> DOI: 10.13140/2.1.3259.2169</b:StandardNumber>
+</b:Source>
+</b:Sources>

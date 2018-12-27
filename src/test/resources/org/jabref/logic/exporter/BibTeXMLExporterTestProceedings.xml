@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Musterfrau2016">
+        <proceedings>
+            <editor>Maxima Musterfrau</editor>
+            <title>Java Proceedings</title>
+            <year>2016</year>
+            <address>Stuttgart</address>
+            <month>February</month>
+            <organization>Java Org</organization>
+            <publisher>Java Pub</publisher>
+        </proceedings>
+    </entry>
+</file>

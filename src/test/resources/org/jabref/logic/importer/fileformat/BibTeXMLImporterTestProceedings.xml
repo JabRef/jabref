@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="Musterfrau2016">
+  <bibtex:proceedings>
+    <bibtex:editor>Maxima Musterfrau</bibtex:editor>
+    <bibtex:title>Java Proceedings</bibtex:title>
+    <bibtex:publisher>Java Pub</bibtex:publisher>
+    <bibtex:year>2016</bibtex:year>
+    <bibtex:month>February</bibtex:month>
+    <bibtex:organization>Java Org</bibtex:organization>
+    <bibtex:address>Stuttgart</bibtex:address>
+  </bibtex:proceedings>
+</bibtex:entry>
+</bibtex:file>

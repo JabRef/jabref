@@ -1,0 +1,246 @@
+<8>
+Score
+  *****
+Accession Number
+  01445406-201509000-00006.
+Author
+  Kohler, Lars 1;  Leuschner, Christoph 1;  Hauck, Markus 1;  Hertel, Dietrich 1
+Institution
+  (1) Plant Ecology and Ecosystems Research, Albrecht von Haller Institute for Plant Sciences, University of Gottingen, Untere Karspule 2, 37073, Gottingen, Germany
+Title
+  Cloud water interception and element deposition differ largely between Norway spruce stands along an elevation transect in Harz Mountains, Germany.[Article]
+Source
+  Ecohydrology.   8(6):1048-1064, September 2015.
+Abstract
+  Lorem ipsum abstract
+Author Keywords
+  alpine treeline;  canopy cover;  canopy water budget;  gross precipitation;  Picea abies;  throughfall.
+References
+  Aber JD, Nadelhoffer KJ, Streudler P, Melillo JM. 1989. Nitrogen saturation in northern forest ecosystems. Bioscience 39: 378-386.
+
+  Acker K, Moller D, Wieprecht W, Kala[latin sharp s] D, Auel R. 1998. Investigations of ground-based clouds at the Mt. Brocken. Fresenius Journal of Analytical Chemistry 361: 59-64.
+
+  Acker K, Mertes S, Moller D, Wieprecht W, Auel R, Kala[latin sharp s] D. 2002. Case study of cloud physical and chemical process in low clouds at Mt. Brocken. Atmospheric Research 64: 41-51.
+
+  Baumgardner RE, Isil SS, Lavery TF, Rogers CM, Mohen VA. 2003. Estimates of cloud water deposition at mountain acid deposition program sites in the Appalachian Mountains. Journal of the Air & Waste Management Association 53: 291-308.
+
+  Beier C, Gundersen P. 1989. Atmospheric deposition to the edge of a spruce forest in Denmark. Environmental Pollution 60: 257-271.
+
+  Beniston M. 2006. Mountain weather and climate: a general overview and a focus on climatic change in the Alps. In Lami A, Boggero A (eds), Ecology of High Altitude Aquatic Systems in the Alps. Hydrobiologia 562: 3-16.
+
+  Bluthgen J, Weischet W. 1980. Lehrbuch der Allgemeinen Geographie, Band 2: Allgemeine Klimageographie. Gruyter: Berlin.
+
+  Bobbink R, Ashmore M, Braun S, Fluckiger W, Van den Wyngaert IJJ. 2003. Empirical nitrogen critical loads for natural and semi-natural ecosystems: 2002 update. In Empirical Critical Loads for Nitrogen Achermann B, Bobbink R (eds). Swiss Agency for Environment, Forest and Landscape SAEFL: Berne, Switzerland; 43-170.
+
+  Bobbink R, Hicks K, Galloway JG, Spranger T, Alkemade R, Ashmore M, Bustamente M, Cinderby S, Davidson E, Dentener F, Emmentt B, Erisman JW, Fenn M, Gilliam F, Nordin A, Pardo L, De Vries W. 2010. Global assessment of nitrogen deposition effects on terrestrial plant diversity: a synthesis. Ecological Applications 20: 30-59.
+
+  Bohlmann N, Meissner R, Bernsdorf S, Bohme F, Russow R, Wegener U. 2005. Studies of atmospheric nitrogen deposition in a mire of the German National Park Hochharz mountains using two different methods. Water, Air, and Soil Pollution 168: 17-32.
+
+  Bruijnzeel LA. 2005. Tropical montane cloud forest: a unique hydrological case. In Forests, Water and People in the Humid Tropics Bonell M, Bruijnzeel LA (eds). Cambridge University Press. Cambridge; 462-483.
+
+  Bruijnzeel LA, Mulligan M, Scatena FN. 2011. Hydrometeorology of tropical montane cloud forests: emerging patterns. Hydrological Processes 25: 465-498.
+
+  Bruijnzeel LA, Proctor J. 1995. Hydrology and biochemistry of tropical montane cloud forests: what do we really know? In Tropical Montane Cloud Forests. Ecological Studies 110, Hamilton LS, Juvik JO, Scatena FN (eds). Springer: New York; 38-78.
+
+  Brumme R, Leimcke U, Matzner E. 1992. Interception and uptake of NH4 and NO3 from wet deposition by above-ground parts of young beech (Fagus sylvatica L.) trees. Plant and Soil 142: 273-279.
+
+  Cavelier J, Goldstein G. 1989. Mist and fog interception in elfin cloud forests in Colombia and Venezuela. Journal of Tropical Ecology 5: 309-322.
+
+  Corre MD, Brumme R, Veldkamp E, Beese F. 2007. Changes in nitrogen cycling and retention processes in soil under spruce forests along a nitrogen enrichment gradient in Germany. Global Change Biology 13: 1509-1527.
+
+  Crockford RH, Richardson DP. 2000. Partitioning of rainfall into throughfall, stemflow and interception: effect of forest type, ground cover and climate. Hydrological Processes 14: 2903-2920.
+
+  Dawson TE. 1998. Fog in the California redwood forest: ecosystem input and use by plants. Oecologia 117: 476-485.
+
+  De Schrijver A, Geudens G, Augusto L, Staelens J, Mertens J, Wuyts K, Gielis L, Verheyen K. 2007. The effect of forest type on throughfall deposition and seepage flux: a review. Oecologia 153: 663-674.
+
+  De Vries W, Reinds GJ, Vel E. 2003. Intensive monitoring of forest ecosystems in Europe. 2: Atmospheric deposition and its impacts on soil solution chemistry. Forest Ecology and Management 174: 97-115.
+
+  Deutscher Wetterdienst. 2014. Online climate report.  ftp://ftp-cdc.dwd.de/pub/CDC/observations_germany/climate/multi_annual/mean_61-90/. Accessed 06 August, 2014.
+
+  Eilers G, Brumme R, Matzner E. 1992. Above-ground N-uptake from wet deposition by Norway spruce (Picea abies Karst.). Forest Ecology and Management 51: 239-249.
+
+  Ekern PC. 1964. Direct interception of cloud water on Lanaihale, Hawaii. Soil Science of America Journal 28: 419-421.
+
+  Elias V, Tesar M, Buchtele J. 1995. Occult precipitation: sampling, chemical analysis and process modelling in the Sumava Mts. (Czech Republic) and in the Taunus Mts. (Germany). Journal of Hydrology 166: 409-420.
+
+  Ellenberg H, Leuschner C. 2010. Vegetation Mitteleuropas mit den Alpen in okologischer, dynamischer und historischer Sicht 6th edn. Ulmer: Stuttgart.
+
+  Emmett BA. 2007. Nitrogen saturation of terrestrial ecosystems: some recent findings and their implications for our conceptual framework. Water, Air, and Soil Pollution 7: 99-109.
+
+  Figueira C, de Sequeira MM, Vasconcelos R, Prada S. 2013. Cloud water interception in the temperate laurel forest of Madeira Island. Hydrological Science Journal 58: 152-161.
+
+  Firbas F, Preuss H. 1934. Uber die Bestimmung der Walddichte und der Vegetation waldloser Gebiete mit Hilfe der Pollenanalyse. Planta 22: 109-145.
+
+  Firbas F, Losert H, Broihan F. 1939. Untersuchungen zur jungeren Vegetationsgeschichte im Oberharz. Planta 30: 422-456.
+
+  Fluckiger W, Braun S. 1998. Nitrogen deposition in Swiss forests and its possible relevance for leaf nutrient status, parasite attacks and soil acidification. Environmental Pollution 102: 69-76.
+
+  Friedland AJ, Gregory RA, Karenlampi L, Johnson AH. 1984. Winter damage to foliage as a factor in red spruce decline. Canadian Journal of Forest Research 14: 963-965.
+
+  Galloway JN, Dentener FJ, Capone DG, Boyer EW, Howarth RW, Seitzinger SP, Asner GP, Cleveland CC, Green PA, Holland EA, Karl DM, Michaels AF, Porter JH, Townsend AR, Vorosmarty CJ. 2004. Nitrogen cycles: past, present and future. Biochemistry 70: 153-226.
+
+  Garcia-Santos G, Bruijnzeel LA. 2011. Rainfall, fog and throughfall dynamics in a subtropical ridge top cloud forest, National Park of Garajonay (La Gomera, Canary Islands, Spain). Hydrological Processes 25: 411-417.
+
+  Gomez-Peralta D, Oberbauer SF, McClain ME, Philippi TE. 2008. Rainfall and cloud-water interception in tropical montane forests in the eastern Andes of Central Peru Forest. Ecology and Management 255: 1315-1325.
+
+  Gundersen P, Rasmussen L. 1990. Nitrification in forest soils: effects from nitrogen deposition on soil acidification and aluminum release. Reviews of Environmental Contamination and Toxicology 113: 1-45.
+
+  Hansen JM. 1992. Effects of nutritional factors on frost hardening in Larix leptolepis (Sieb & Zucc.) Gord. Scand. Journal of Forest Research 7: 183-192.
+
+  Hasselrot B, Grennfelt P. 1986. Deposition of air pollutants in a wind-exposed forest edge. Water, Air, and Soil Pollution 34: 135-143.
+
+  Hauck M, Zimmermann J, Jacob M, Dulamsuren C, Bade C, Ahrends B, Leuschner C. 2012. Rapid recovery of stem increment in Norway spruce at reduced SO2 levels in the Harz Mountains, Germany. Environmental Pollution 164: 132-141.
+
+  Hedin LO, Granat L, Likens GE, Buishand TA, Galloway JN, Butler TJ, Rodhe H. 1994. Steep declines in atmospheric base cations in regions of Europe and North America. Nature 367: 351-354.
+
+  Herckes P, Mirabel P, Wortham H. 2002. Cloud water deposition at a high-elevation site in the Vosges Mountains (France). Science of the Total Environment 296: 59-75.
+
+  Hertel D, Scholing D. 2011a. Norway spruce shows contrasting changes in below- versus above-ground carbon partitioning towards the alpine treeline: evidence from a central European case study. Arctic Antarctic and Alpine Research 42: 46-55.
+
+  Hertel D, Scholing D. 2011b. Below-ground response of Norway spruce to climate conditions at Mt. Brocken (Germany). A re-assessment of central Europe's northernmost treeline. Flora 206: 127-135.
+
+  Holscher D, Kohler L, Van Dijk AIJM, Bruijnzeel LA. 2004. The importance of epiphytes to total rainfall interception by a tropical montane rain forest in Costa Rica. Journal of Hydrology 292: 308-322.
+
+  Holder CD. 2004. Rainfall interception and fog precipitation in a tropical montane cloud forest of Guatemala. Forest Ecology and Management 190: 373-384.
+
+  Holland EA, Braswell BH, Sulzman J, Lamarque JF. 2005. Nitrogen deposition onto the United States and Western Europe: synthesis of observations and models. Ecological Applications 15: 38-57.
+
+  Holwerda F, Burkard R, Eugster W, Scatena FN, Meesters AGCA, Bruijnzeel LA. 2006. Estimating fog deposition at a Puerto Rican elfin cloud forest site: comparison of the water budget and eddy covariance methods. Hydrological Processes 20: 2669-2692.
+
+  Holwerda F, Bruijnzeel LA, Munoz-Villers LE, Equihua M, Asbjornsen H. 2010. Rainfall and cloud water interception in mature and secondary lower montane cloud forests of central Veracruz, Mexico. Journal of Hydrology 384: 84-96.
+
+  Ignatova N, Dambrine E. 1999. Canopy uptake of N deposition in spruce (Picea abies (L.) Karst) stands. Annals of Forest Science 57: 113-120.
+
+  Ingestad T. 1959. Studies on the nutrition of forest tree seedlings, II mineral nutrition of spruce. Physiologia Plantarum 12: 568-593.
+
+  Jonsson AM, Kivimaenpaa K, Stjernquist I, Sutinen S. 2001. Frost hardiness in bark and needles of Norway spruce in southern Sweden. Trees 15: 171-176.
+
+  Johnson DW, Lindberg SE. 1992. Atmospheric Deposition and Forest Nutrient Cycling. A Synthesis of the Integrated Forest Study. Springer: New York.
+
+  Johnson NC, Graham JH, Smith FA. 1997. Functioning of mycorrhizal associations along the mutualism-parasitism continuum. New Phytologist 135: 575-585.
+
+  Kalina ME, Stopper S, Zambo E, Puxbaum H. 2002. Altitude-dependent wet, dry and occult nitrogen deposition in an Alpine region. Environment Science and Pollution 2: 16-22.
+
+  Katzensteiner K, Glatzel G, Kazda M. 1992. Nitrogen-induced nutritional imbalances - a contributing factor to Norway spruce decline in the Bohemian Forest (Austria). Forest Ecology and Management 51: 29-42.
+
+  Klemm O, Wrzesinsky T. 2007. Fog deposition fluxes of water and ions to a mountainous site in Central Europe. Tellus 59: 705-714.
+
+  Kohler L, Holscher D, Leuschner C. 2006. Above-ground water and nutrient fluxes in three successional stages of Costa Rican montane oak forest with contrasting epiphyte abundance. In Ecology and Conservation of Neotropical Montane Oak Forests. Ecological Studies 185, Kappelle M (ed). Springer: Heidelberg; 271-282.
+
+  Lange C, Matschullat J, Zimmermann F, Sterzik G, Wienhaus O. 2003. Fog frequency and chemical composition of fog water - a relevant contribution to atmospheric deposition in the eastern Erzgebirge, Germany. Atmospheric Environment 37: 3731-3739.
+
+  Lindberg SE, Owens JG. 1993. Throughfall studies of deposition to forest edges and gaps in montane ecosystems. Biochemistry 19: 173-194.
+
+  Linder S. 1995. Foliar analysis for detecting and correcting nutrient imbalances in Norway spruce. Ecological Bulletins 44: 178-190.
+
+  Liu JC, Huttl RF. 1991. Relations between damage symptoms and nutritional status of Norway spruce stands (Picea abies Karst.) in southwestern Germany. Fertilizer Research 27: 9-22.
+
+  Lovett GM. 1988. A comparison of methods for estimating cloud water deposition to a New Hampshire (USA) subalpine forest. In Acid Deposition at High Elevation Sites Unswoth MH, Fowler D (eds). Kluwer Academics Publishers: London; 309-320.
+
+  Lovett GM, Reiners WA, Olson RK. 1982. Cloud droplet deposition in subalpine balsam fir forest: hydrological and chemical inputs. Science 218: 1303-1304.
+
+  Lovett GM, Lindberg SE. 1993. Atmospheric deposition and canopy interactions of nitrogen in forests. Canadian Journal of Forest Research 23: 1603-1616.
+
+  Marloth H. 1906. About water, which is intercepted by shrubs and trees from clouds. Meteorologische Zeitschrift 23: 547-553.
+
+  Marques MC, Gravenhorst G, Ibrom A. 2001. Input of atmospheric particles into forest stands by dry deposition. Water, Air, and Soil Pollution 130: 571-576.
+
+  Matzner E. 1984. Deposition und Umsatz chemischer Elemente im Kronenraum von Waldbestanden. Berichte des Forschungszentrums Waldokosysteme 2: 61-87.
+
+  McNulty SG, Aber JD, Newman SD. 1996. Nitrogen saturation in a high elevation New England spruce-fir stand. Forest Ecology and Management 84: 109-121.
+
+  Meesenburg H, Eichhorn J, Meiwes KJ. 2009. Atmospheric deposition and canopy interactions. In Functioning and Management of European Beech Ecosystems. Ecological Studies 208, Brumme R, Khanna PK (eds). Springer: Berlin, Heidelberg; 265-302.
+
+  Michopoulos P, Baloutsos G, Economou A. 2008. Nitrogen cycling in a mature mountainous beech forest. Silva Fennica 42: 5-17.
+
+  Miller EK, Friedland AJ, Arons EA, Mohnen VA, Battles JJ, Panek JA, Kadlecek J, Johnson AH. 1993. Atmospheric deposition to forests along an elevational gradient at Whiteface Mountain, NY, USA. Atmospheric Environment 27: 2121-2136.
+
+  Nihlgard B. 1985. The ammonium hypothesis: an additional explanation to the forest dieback in Europe. Ambio 14: 2-8.
+
+  Novo A, Buffoni A, Tita M. 1992. Rain and throughfall chemistry in a Norway spruce forest in the Western Prealps. Environmental Pollution 75: 199-208.
+
+  Olson RK, Reiners WA, Cronan CS, Lang GE. 1981. The chemistry and flux of throughfall and stemflow in subalpine balsam fir forest. Holartic Ecology 4: 291-300.
+
+  Oren R, Werk KS, Schulze ED, Meyer J, Schneider BU, Schramel P. 1988. Performance of two Picea abies (L.) Karst. stands at different stages of decline. VI. Nutrient concentration. Oecologia 77: 151-162.
+
+  Pahl S, Winkler P, Schneider T, Arends B, Schell D, Maser R, Wobrock W. 1994. Deposition of trace substances via cloud interception on a coniferous forest at Kleiner Feldberg. Journal of Atmospheric Chemistry 19: 231-252.
+
+  Pahl S. 1996. Feuchte Depositionen auf Nadelwalder in den Hochlagen der Mittelgebirge. Berichte des Deutschen Wetterdienstes 198.
+
+  Parker GG. 1983. Throughfall and stemflow in forest nutrient cycle. Advances in Ecological Research 13: 57-133.
+
+  Phoenix GK, Hicks WK, Cinderby S, Kuylenstierna JCI, Stock WD, Dentener FJ, Giller KE, Austin AT, Lefroy RDB, Gimeno BS, Ashmore MR, Ineson P. 2006. Atmospheric nitrogen deposition in world biodiversity hotspots: the need for a greater global perspective in assessing N deposition impacts. Global Change Biology 12: 470-476.
+
+  Prada S, de Sequeira MM, Figueira C, Vasconcelos R. 2012. Cloud water interception in the high altitude tree heath forest (Erica arborea L.) of Paul da Serra Massif (Madeira, Portugal). Hydrological Processes 26: 202-212.
+
+  Pryet A, Dominguez C, Fuente Tomai P, Chaumont C, d'Ozouville N, Villacis M, Violette S. 2012. Quantification of cloud water interception along the windward slope of Santa Cruz Island, Galapagos (Ecuador). Agricultural and Forest Meteorology 161: 94-106.
+
+  Ritter A, Regalado CM, Aschan G. 2008. Fog water collection in a subtropical elfin laurel forest of the Garajonay National Park (Canary Islands): a combined approach using artificial fog catchers and a physically based impaction model. Journal of Hydrometeorology 9: 920-935.
+
+  Rollenbeck R, Bendix J, Fabian P. 2010. Spatial and temporal dynamics of atmospheric water and nutrient inputs in tropical mountain forests of southern Ecuador. In Tropical Montane Cloud Forests: Science for Conservation and Management Bruijnzeel LA, Scatena FN, Hamilton LS (eds). Cambridge Univ. Press: Cambridge, UK; 367-377.
+
+  Rubner K. 1931. Der Nebelniederschlag im Wald und seine Messung. Tharandter Forstliches Jahrbuch 83: 121-149.
+
+  Rutter AJ, Morton AJ, Robins PC. 1975. A predictive model of rainfall interception in forests. II. Generalization of the model and comparison with observations in some coniferous and hardwood stands. Journal of Applied Ecology 12: 367-380.
+
+  Schemenauer RS, Banic CM, Urquizo N. 1995. High elevation fog and precipitation chemistry in southern Quebec, Canada. Atmospheric Environment 29: 2235-2252.
+
+  Schmid S, Burkard R, Frumau KFA, Tobon C, Bruijnzeel LA, Siegwolf R, Eugster W. 2011. Using eddy covariance and stable isotope mass balance techniques to estimate fog water contributions to a Costa Rican cloud forest during the dry season. Hydrological Processes 25: 429-437.
+
+  Scholl MA, Giambelluca TW, Gingerich SB, Nullet MA, Loope LL. 2007. Cloud water in windward and leeward mountain forests: the stable isotope signature of orographic cloud water. Water Resources Research 43. DOI: 10.1029/2007WR006011.
+
+  Schulze ED. 1989. Air pollution and forest decline in spruce (Picea abies) forest. Science 244: 776-783.
+
+  Schulze ED, Oren R, Zimmermann R. 1987. Wirkungen von Immissionen auf 30jahrige Fichten in mittleren Hohenlagen des Fichtelgebirges auf Phyllit. Allgemeine Forstzeitung 27: 725-730.
+
+  Spangenberg A, Kolling C. 2003. Nitrogen deposition and nitrate leaching at forest edges exposed to high ammonia emissions in Southern Bavaria. Water, Air, and Soil Pollution 152: 233-255.
+
+  Stadtmuller U. 1987. Cloud forests in the humid tropics. A bibliographic review. The United Nations University, Tokyo and Centro Agronomico Tropical de Investigacion y Ensenanza, Turrialba, Costa Rica, 81 pp.
+
+  Throop HL, Lerdau MT. 2004. Effects of nitrogen deposition on insect herbivory: implications for community and ecosystem processes. Ecosystems 7: 109-133.
+
+  Uehara Y, Kume A. 2012. Canopy rainfall interception and fog capture by Pinus pumila Regal at Mt. Tateyama in the Northern Japan Alps, Japan. Arctic, Antarctic, and Alpine Research 44: 143-150.
+
+  Ulrich B. 1983: Interactions of forest canopies with atmospheric constituents: SO2, alkali and earth alkali cations and chloride. In Effects of Air Pollutants in Forest Ecosystems Ulrich B, Pankrath J (eds). Reidel: Dordrecht; 33-45.
+
+  Ulrich B. 1994. Nutrient and acid/base budget of central European forest ecosystems. In Effects of Acid Rain on Forest Processes Huttermann A, Godbold DL (eds). Wiley: New York; 1-43.
+
+  Ulrich B, Mayer R, Khanna PK. 1979. Deposition von Luftverunreinigungen und ihre Auswirkungen in Waldokosystemen im Solling. Schriften aus der Forstlichen Fakultat der Universitat Gottingen und der Niedersachsischen Forstlichen Versuchsanstalt 58.
+
+  Van Breemen N, Van Dijk HFG. 1988. Ecosystem effects of atmospheric deposition of nitrogen in The Netherlands. Environmental Pollution 54: 249-274.
+
+  Veneklaas EJ. 1990. Nutrient fluxes in bulk precipitation and throughfall in two montane tropical rain forests, Colombia. Journal of Ecology 78: 974-992.
+
+  Vitousek PM, Aber JD, Howarth RW, Likens GE, Matson PA, Schindler DW, Schlesinger WH, Tilman DG. 1997. Human alteration of the global nitrogen cycle: sources and consequences. Ecological Applications 7: 737-750.
+
+  Vong RJ, Sigmon JT, Mueller SF. 1991. Cloud water deposition to Appalachian forests. Environmental Science & Technology 25: 1014-1021.
+
+  Waldman JM, Munger JW, Jacob DJ, Flagan RC, Morgan JJ, Hoffmann MR. 1982. Chemical composition of acid fog. Science 218: 677-679.
+
+  Weathers KC, Likens GE, Bormann FH, Eaton JS, Bowden WB, Andersen JL, Cass DA, Galloway JN, Keene WC, Kimball KD, Huth P, Smiley D. 1986. A regional acidic cloud/fog water event in the eastern United States. Nature 319: 657-658.
+
+  Weathers KC, Lovett GM, Likens GE, Lathrop R. 2000. The effect of landscape features on deposition to Hunter Mountains, Catskill Mountains, New York. Ecological Applications 10: 528-540.
+
+  WHO. 2000. Air Quality Guidelines for Europe. WHO Regional Publications, Copenhagen, European Series 91.
+
+  Wilson EJ. 1992. Foliar uptake and release of inorganic nitrogen compounds in Pinus sylvestris and Picea abies (L.) Karst. New Phytologist 120: 407-416.
+
+  Wilson EJ, Tiley C. 1998. Foliar uptake of wet-deposited nitrogen by Norway spruce: an experiment using 15N. Atmospheric Environment 32: 513-518.
+
+  Zadroga F. 1981. The hydrological importance of a montane cloud forest area of Costa Rica. In Tropical Agricultural Hydrology Lal R, Russell EW (eds). Wiley: New York; 59-73.
+
+  Zimmermann L, Zimmermann F. 2002. Fog deposition to Norway Spruce stands at high-elevation sites in the Eastern Erzgebirge (Germany). Journal of Hydrology 256: 166-175.
+Language
+  English.
+Document Type
+  Research Articles.
+Journal Subset
+  Science.
+ISSN
+  1936-0584
+DOI Number
+  10.1002/eco.1563
+
+
+

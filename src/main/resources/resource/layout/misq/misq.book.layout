@@ -1,0 +1,21 @@
+\begin{author}
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbrCommas]{\author} 
+\end{author}
+\begin{editor}
+, \format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbrCommas]{\editor}, (eds.) 
+\end{editor}
+}{\\i \format[RTFChars]{\title}}{
+\begin{volume}
+, Vol. \volume
+\end{volume}
+\begin{publisher}
+, \format[RTFChars]{\publisher}
+\end{publisher}
+\begin{address}
+, \format[RTFChars]{\address}
+\end{address}
+\begin{year}
+, \format[RTFChars]{\year}
+\end{year}.
+\\par
+\\par

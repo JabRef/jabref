@@ -1,0 +1,6 @@
+jq
+jq.exe
+
+# python
+*.pyc
+*$py.class

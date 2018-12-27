@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:Tag>LocationTest</b:Tag>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>LocationTest</b:Last>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:City>Berlin</b:City>
+<b:StateProvince/>
+<b:CountryRegion/>
+</b:Source>
+</b:Sources>

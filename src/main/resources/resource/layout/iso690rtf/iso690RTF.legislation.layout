@@ -1,0 +1,8 @@
+\begin{address}\format[RTFChars]{\address}. \end{address}
+\begin{title}\format[RTFChars]{\title}. \end{title}
+\begin{journal}{\\i \format[RTFChars]{\journal}}, \end{journal}
+\begin{year}\format[RTFChars]{\year}.\end{year}
+\begin{number} \format[RTFChars]{núm.} \format[RTFChars]{\number}, \end{number}
+\begin{pages}p. \format[RTFChars]{\pages}.\end{pages}
+\\par
+\\par

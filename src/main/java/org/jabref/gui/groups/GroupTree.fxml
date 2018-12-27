@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0"
+            xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeView">
+    <center>
+        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0">
+            <columns>
+                <TreeTableColumn fx:id="mainColumn"/>
+                <TreeTableColumn fx:id="numberColumn" minWidth="50.0" maxWidth="70.0" prefWidth="60.0"
+                                 styleClass="numberColumn"/>
+                <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0"
+                                 styleClass="disclosureNodeColumn" text="Column X"/>
+            </columns>
+            <columnResizePolicy>
+                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TreeTableView>
+    </center>
+    <bottom>
+        <HBox fx:id="barBottom" alignment="CENTER">
+            <ButtonBar fx:id="buttonBarBottom">
+                <buttons>
+                    <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="icon-button"
+                            ButtonBar.buttonData="LEFT">
+                        <graphic>
+                            <JabRefIconView glyph="NEW_GROUP" glyphSize="18"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%New group"/>
+                        </tooltip>
+                    </Button>
+                </buttons>
+            </ButtonBar>
+            <Region prefWidth="20.0" HBox.hgrow="ALWAYS"/>
+            <CustomTextField fx:id="searchField" promptText="Filter groups"/>
+        </HBox>
+    </bottom>
+</BorderPane>

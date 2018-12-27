@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:Year>2012</b:Year>
+<b:BIBTEX_Entry>article</b:BIBTEX_Entry>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Title>Test</b:Title>
+<b:Tag>Test</b:Tag>
+<b:Author>
+<b:Author>
+<b:Corporate>JabRef Developers</b:Corporate>
+</b:Author>
+</b:Author>
+<b:JournalName>Test</b:JournalName>
+</b:Source>
+</b:Sources>

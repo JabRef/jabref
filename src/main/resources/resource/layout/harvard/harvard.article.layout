@@ -1,0 +1,13 @@
+\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year), 
+'\format[RTFChars]{\title}', }{\\i \format[RTFChars]{\journal}}{
+\begin{volume}
+ }{\\b \volume}{
+\end{volume}
+\begin{number}
+(\number)
+\end{number}
+\begin{pages}
+, \pages
+\end{pages}.
+\\par
+\\par

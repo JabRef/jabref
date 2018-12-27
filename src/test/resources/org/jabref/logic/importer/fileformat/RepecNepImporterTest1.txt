@@ -1,0 +1,16 @@
+nep.repec.org
+
+
+
+123. Innovation races: An experimental study on strategic research activities
+Date: 	2005-11-07
+By: 	Uwe Cantner (University of Jena, Faculty of Economics)
+Andreas Nicklisch (Max-Planck-Institute for Research into Collective Goods)
+Torsten Weiland (Max-Planck-Institute for Economics, Strategic Interactions Group)
+URL: 	http://d.repec.org/n?u=RePEc:jen:jenasw:2005-17&r=all
+Lorem ipsum abstract
+Keywords: 	Innovation, Imitation, Patent Tournament,Trial and Error Process
+JEL: 	D81 O31
+
+
+

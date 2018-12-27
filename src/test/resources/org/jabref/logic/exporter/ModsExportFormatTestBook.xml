@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mods:modsCollection xmlns="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods>
+        <mods:genre>book</mods:genre>
+        <mods:identifier type="issn">987654321</mods:identifier>
+        <mods:subject>
+            <mods:topic>note</mods:topic>
+        </mods:subject>
+        <mods:subject>
+            <mods:topic>and another note</mods:topic>
+        </mods:subject>
+        <mods:identifier type="isbn">123456789</mods:identifier>
+        <mods:originInfo/>
+        <mods:relatedItem type="host">
+            <mods:part>
+                <mods:extent>
+                    <mods:start>67</mods:start>
+                    <mods:end>68</mods:end>
+                </mods:extent>
+            </mods:part>
+        </mods:relatedItem>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</mods:modsCollection>

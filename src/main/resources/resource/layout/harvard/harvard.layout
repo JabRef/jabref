@@ -1,0 +1,36 @@
+\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,RTFChars]{\author} (\year), 
+'\format[RTFChars]{\title}'
+\begin{journal}
+, }{\\i \format[RTFChars]{\journal}} {\\b \volume}{
+\end{journal}
+\begin{number}
+(\number)
+\end{number}
+\begin{editor}
+, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RTFChars]{\editor}, ed., \end{editor}
+\begin{booktitle}
+'\format[RTFChars]{\booktitle}'
+\end{booktitle}
+\begin{organization}
+, \format[RTFChars]{\organization}
+\end{organization}
+\begin{institution}
+, Technical report, \format[RTFChars]{\institution}
+\end{institution}
+\begin{publisher}
+, \format[RTFChars]{\publisher}
+\end{publisher}
+\begin{howpublished}
+, \format[RTFChars]{\howpublished}
+\end{howpublished}
+\begin{address}
+, \format[RTFChars]{\address}
+\end{address}
+\begin{note}
+, \format[RTFChars]{\note}
+\end{note}
+\begin{pages}
+, \pages
+\end{pages}.
+\\par
+\\par

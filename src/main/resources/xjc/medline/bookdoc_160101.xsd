@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Source: https://github.com/lstern/psilibrary/blob/master/doc/medline/bookdoc_160101.xsd-->
+<!--
+  
+  	PubMed Books and Documents DTD
+  
+  This DTD was created in December 2009 to accommodate the loading of book and 
+  book chapter records to PubMed. 
+  
+  Use the PUBLIC Identifier
+  
+  "-//NLM-NCBI//DTD PubMed Books Documents, 12-16-2009 v.1//EN"
+  
+  Delivered as "bookdoc.dtd"
+  
+  1/29/2010 - changed "FirstPage" to "StartPage"
+  2/3/2010 - added ArticleIdList to BookDocument and added bookaccession as value in %art.id.type.int;
+  
+-->
+<!--
+  ENTITY % personal.name "( ForeName?, LastName, Initials, Suffix? )">
+  <!ENTITY % author.name "((%personal.name; | CollectiveName), Affiliation?)"
+-->
+<!-- ENTITY % normal.date "Year,Month,Day,(Hour,(Minute,Second?)?)?" -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:attributeGroup name="booklinkatts">
+    <xs:attribute name="book"/>
+    <xs:attribute name="part"/>
+    <xs:attribute name="sec"/>
+  </xs:attributeGroup>
+  <xs:element name="BookDocumentSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="BookDocument"/>
+        <xs:element minOccurs="0" ref="DeleteDocument"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BookDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PMID"/>
+        <xs:element ref="ArticleIdList"/>
+        <xs:element ref="Book"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="LocationLabel"/>
+        <xs:element minOccurs="0" ref="ArticleTitle"/>
+        <xs:element minOccurs="0" ref="VernacularTitle"/>
+        <xs:element minOccurs="0" ref="Pagination"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Language"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AuthorList"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PublicationType"/>
+        <xs:element minOccurs="0" ref="Abstract"/>
+        <xs:element minOccurs="0" ref="Sections"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="KeywordList"/>
+        <xs:element minOccurs="0" ref="ContributionDate"/>
+        <xs:element minOccurs="0" ref="DateRevised"/>
+        <xs:element minOccurs="0" ref="CitationString"/>
+        <xs:element minOccurs="0" ref="GrantList"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ItemList"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Book">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Publisher"/>
+        <xs:element ref="BookTitle"/>
+        <xs:element ref="PubDate"/>
+        <xs:element minOccurs="0" ref="BeginningDate"/>
+        <xs:element minOccurs="0" ref="EndingDate"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="AuthorList"/>
+        <xs:element minOccurs="0" ref="Volume"/>
+        <xs:element minOccurs="0" ref="VolumeTitle"/>
+        <xs:element minOccurs="0" ref="Edition"/>
+        <xs:element minOccurs="0" ref="CollectionTitle"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Isbn"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ELocationID"/>
+        <xs:element minOccurs="0" ref="Medium"/>
+        <xs:element minOccurs="0" ref="ReportNumber"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Publisher">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PublisherName"/>
+        <xs:element minOccurs="0" ref="PublisherLocation"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PublisherName" type="text"/>
+  <xs:element name="PublisherLocation" type="xs:string"/>
+  <xs:element name="BookTitle">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="text">
+          <xs:attributeGroup ref="attlist.BookTitle"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.BookTitle">
+    <xs:attributeGroup ref="booklinkatts"/>
+  </xs:attributeGroup>
+  <xs:element name="ContributionDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year"/>
+        <xs:choice minOccurs="0">
+          <xs:sequence>
+            <xs:element ref="Month"/>
+            <xs:element minOccurs="0" ref="Day"/>
+          </xs:sequence>
+          <xs:element ref="Season"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeginningDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year"/>
+        <xs:choice minOccurs="0">
+          <xs:sequence>
+            <xs:element ref="Month"/>
+            <xs:element minOccurs="0" ref="Day"/>
+          </xs:sequence>
+          <xs:element ref="Season"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EndingDate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Year"/>
+        <xs:choice minOccurs="0">
+          <xs:sequence>
+            <xs:element ref="Month"/>
+            <xs:element minOccurs="0" ref="Day"/>
+          </xs:sequence>
+          <xs:element ref="Season"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="VolumeTitle" type="text"/>
+  <xs:element name="Edition" type="xs:string"/>
+  <xs:element name="CollectionTitle">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="text">
+          <xs:attributeGroup ref="attlist.CollectionTitle"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.CollectionTitle">
+    <xs:attributeGroup ref="booklinkatts"/>
+  </xs:attributeGroup>
+  <xs:element name="Isbn" type="xs:string"/>
+  <xs:element name="Medium" type="xs:string"/>
+  <xs:element name="ReportNumber" type="xs:string"/>
+  <xs:element name="ContractNumber" type="xs:string"/>
+  <xs:element name="CitationString" type="text"/>
+  <xs:attributeGroup name="attlist.ArticleTitle">
+    <xs:attributeGroup ref="booklinkatts"/>
+  </xs:attributeGroup>
+  <xs:element name="LocationLabel">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="attlist.LocationLabel"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.LocationLabel">
+    <xs:attribute name="Type">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="part"/>
+          <xs:enumeration value="chapter"/>
+          <xs:enumeration value="section"/>
+          <xs:enumeration value="appendix"/>
+          <xs:enumeration value="figure"/>
+          <xs:enumeration value="table"/>
+          <xs:enumeration value="box"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="DeleteDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PMID"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PubmedBookArticle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="BookDocument"/>
+        <xs:element minOccurs="0" ref="PubmedBookData"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PubmedBookData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="History"/>
+        <xs:element ref="PublicationStatus"/>
+        <xs:element ref="ArticleIdList"/>
+        <xs:element minOccurs="0" ref="ObjectList"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sections">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="Section"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="LocationLabel"/>
+        <xs:element ref="SectionTitle"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Section"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SectionTitle">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="text">
+          <xs:attributeGroup ref="attlist.SectionTitle"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.SectionTitle">
+    <xs:attributeGroup ref="booklinkatts"/>
+  </xs:attributeGroup>
+  <xs:element name="PubmedBookArticleSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PubmedBookArticle"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ItemList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="Item"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="attlist.ItemList"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.ItemList">
+    <xs:attribute name="ListType" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="Item" type="xs:string"/>
+</xs:schema>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- METS XLink Schema, v. 2, Nov. 15, 2004 -->
+<schema targetNamespace="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" elementFormDefault="qualified">
+  <!--  global attributes  --> 
+  <attribute name="href"  type="anyURI"/>
+  <attribute name="role" type="string"/>
+  <attribute name="arcrole" type="string"/>
+  <attribute name="title" type="string" /> 
+  <attribute name="show">
+    <simpleType>
+      <restriction base="string">
+	<enumeration value="new" /> 
+	<enumeration value="replace" /> 
+	<enumeration value="embed" /> 
+	<enumeration value="other" /> 
+	<enumeration value="none" /> 
+      </restriction>
+    </simpleType>
+  </attribute>
+  <attribute name="actuate">
+    <simpleType>
+      <restriction base="string">
+	<enumeration value="onLoad" /> 
+	<enumeration value="onRequest" /> 
+	<enumeration value="other" /> 
+	<enumeration value="none" /> 
+      </restriction>
+    </simpleType>
+  </attribute>
+  <attribute name="label" type="string" /> 
+  <attribute name="from" type="string" /> 
+  <attribute name="to" type="string" /> 
+  <attributeGroup name="simpleLink">
+    <attribute name="type" type="string" fixed="simple" form="qualified" /> 
+    <attribute ref="xlink:href" use="optional" /> 
+    <attribute ref="xlink:role" use="optional" /> 
+    <attribute ref="xlink:arcrole" use="optional" /> 
+    <attribute ref="xlink:title" use="optional" /> 
+    <attribute ref="xlink:show" use="optional" /> 
+    <attribute ref="xlink:actuate" use="optional" /> 
+  </attributeGroup>
+  <attributeGroup name="extendedLink">
+    <attribute name="type" type="string" fixed="extended" form="qualified" /> 
+    <attribute ref="xlink:role" use="optional" /> 
+    <attribute ref="xlink:title" use="optional" /> 
+  </attributeGroup>
+  <attributeGroup name="locatorLink">
+    <attribute name="type" type="string" fixed="locator" form="qualified" /> 
+    <attribute ref="xlink:href" use="required" /> 
+    <attribute ref="xlink:role" use="optional" /> 
+    <attribute ref="xlink:title" use="optional" /> 
+    <attribute ref="xlink:label" use="optional" /> 
+  </attributeGroup>
+  <attributeGroup name="arcLink">
+    <attribute name="type" type="string" fixed="arc" form="qualified" /> 
+    <attribute ref="xlink:arcrole" use="optional" /> 
+    <attribute ref="xlink:title" use="optional" /> 
+    <attribute ref="xlink:show" use="optional" /> 
+    <attribute ref="xlink:actuate" use="optional" /> 
+    <attribute ref="xlink:from" use="optional" /> 
+    <attribute ref="xlink:to" use="optional" /> 
+  </attributeGroup>
+  <attributeGroup name="resourceLink">
+    <attribute name="type" type="string" fixed="resource" form="qualified" /> 
+    <attribute ref="xlink:role" use="optional" /> 
+    <attribute ref="xlink:title" use="optional" /> 
+    <attribute ref="xlink:label" use="optional" /> 
+  </attributeGroup>
+  <attributeGroup name="titleLink">
+    <attribute name="type" type="string" fixed="title" form="qualified" /> 
+  </attributeGroup>
+  <attributeGroup name="emptyLink">
+    <attribute name="type" type="string" fixed="none" form="qualified" /> 
+  </attributeGroup>
+</schema>

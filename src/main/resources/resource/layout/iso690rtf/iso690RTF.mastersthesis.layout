@@ -1,0 +1,10 @@
+\begin{author}\format[Iso690NamesAuthors,RTFChars]{\author}. \end{author}
+\begin{chapter}"\format[RTFChars]{\chapter}". \end{chapter}
+\begin{editor}\format[RTFChars]{\editor}. \end{editor}
+\begin{title}{\\i \format[RTFChars]{\title}}. \end{title}
+\begin{type}[\format[RTFChars]{\type}]. \end{type}
+\begin{school}\format[RTFChars]{\school}, \end{school}
+\begin{address}\format[RTFChars]{\address}, \end{address}
+\begin{year}\format[RTFChars]{\year}.\end{year}
+\\par
+\\par

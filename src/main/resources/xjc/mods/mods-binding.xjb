@@ -1,0 +1,96 @@
+<jxb:bindings version="2.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <jxb:bindings schemaLocation="mods-3-7.xsd" node="/xsd:schema">
+
+        <jxb:bindings node="//xsd:complexType[@name='namePartDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//xsd:complexType[@name='noteDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='text']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='languageAttributeGroup']">
+			<jxb:bindings node=".//xsd:attribute[@name='lang']">
+				<jxb:property name="atlang" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='titleInfoDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+		<jxb:bindings node="//*[@name='relatedItemDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='subjectNameDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='subjectTitleInfoDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='tableOfContentsDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='physicalDescriptionNote']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='nameDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='copyInformationDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='physicalLocationDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='accessConditionDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+        <jxb:bindings node="//*[@name='abstractDefinition']">
+			<jxb:bindings node=".//xsd:attribute[@name='type']">
+				<jxb:property name="atType" />
+			</jxb:bindings>
+		</jxb:bindings>
+
+    </jxb:bindings>
+</jxb:bindings>

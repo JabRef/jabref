@@ -1,0 +1,43 @@
+TY  - JOUR
+
+JO  - Geoscience and Remote Sensing Letters, IEEE
+
+TI  - Improving Urban Road Extraction in High-Resolution
+Images Exploiting Directional Filtering, Perceptual
+Grouping, and Simple Topological Concepts
+
+IS  - 3
+
+SN  - 1545-598X  
+
+SP  -  387
+
+EP  -  391
+
+AU  - Gamba, P.
+
+AU  - Dell'Acqua, F.
+
+AU  - Lisini, G.
+
+PY  - 2006
+
+KW  - Perceptual grouping
+
+KW  - street extraction
+
+KW  - urban remote sensing
+
+KW  - Perceptual grouping
+
+KW  - street extraction
+
+KW  - urban remote sensing
+
+VL  - 4
+
+JA  - Geoscience and Remote Sensing Letters, IEEE
+
+AB  -  Lorem ipsum abstract
+
+ER  - 

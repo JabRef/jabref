@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="1080.0"
+            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="org.jabref.gui.errorconsole.ErrorConsoleView">
+    <content>
+        <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="list-content"
+                  BorderPane.alignment="CENTER"/>
+    </content>
+    <header>
+        <Label fx:id="descriptionLabel" styleClass="info-section"
+               text="%We now give you insight into the inner workings of JabRef's internals. This information might be helpful to diagnose the root cause of a problem. Please feel free to inform the developers about an issue."
+               wrapText="true"/>
+    </header>
+    <buttonTypes>
+        <ButtonType fx:constant="CLOSE"/>
+        <ButtonType fx:id="copyLogButton" text="%Copy Log" buttonData="LEFT"/>
+        <ButtonType fx:id="clearLogButton" text="%Clear Log" buttonData="LEFT"/>
+        <ButtonType fx:id="createIssueButton" text="%Report Issue" buttonData="LEFT"/>
+    </buttonTypes>
+</DialogPane>

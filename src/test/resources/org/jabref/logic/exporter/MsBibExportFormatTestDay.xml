@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:BIBTEX_Entry>techreport</b:BIBTEX_Entry>
+<b:SourceType>Report</b:SourceType>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Sam</b:Last>
+</b:Person>
+<b:Person>
+<b:Last>jason</b:Last>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Year>2002</b:Year>
+<b:Month>7</b:Month>
+<b:Day>3</b:Day>
+<b:ThesisType>Tech. rep.</b:ThesisType>
+</b:Source>
+</b:Sources>

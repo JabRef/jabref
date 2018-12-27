@@ -1,0 +1,16 @@
+--AU-- Sa, M. CM.; Kascheres, A.
+--TI-- Electronically Mediated Selectivity IN Ring Opening OF 1-azirines - THE 3-x Mode - Convenient Route To 3-oxazolines
+--ST-- Journal of Organic Chemistry
+--YP-- 1996
+--VL-- 61
+--NB-- 11
+--PS-- 3749
+--PE-- 3752
+--RT-- Journal Article
+--TW-- Article
+--QT-- Chemistry.
+--IS-- 0022-3263
+--AB-- The mild base-promoted reaction of methyl 2-phenyl-1-azirine-3-acetate (1) with aldehydes and acetone provides a new and simple route to the 3-oxazolines 5, which are formed in good yields by the electrophilic trapping of an imino anion produced by C-N bond cleavage in the 1-azirine enolate intermediate 6. Chloranil oxidation of 5 containing an aromatic substituent at C-2 affords oxazoles 7, while reaction of 5 containing an aliphaticgroup at C-2 produces 5-methylene-3-oxazolines 8 and 5-spiro-2-oxazolines 9 in addition to 7. [References: 11]
+--AD-- Reprint available from: Kascheres A UNIV ESTADUAL CAMPINAS INST QUIM CP 6154 BR-13083970 SAO PAULO BRAZIL UNIV ESTADUAL CAMPINAS INST QUIM BR-13083970 SAO PAULO BRAZIL
+--LG-- English
+------

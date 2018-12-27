@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+<zs:version>1.1</zs:version>
+<zs:numberOfRecords>1</zs:numberOfRecords>
+<zs:records>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="001@">
+    <subfield code="0">31</subfield>
+  </datafield>
+  <datafield tag="001A">
+    <subfield code="0">0027:26-09-14</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">0027:26-09-14</subfield>
+    <subfield code="t">09:39:19.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">0027:26-09-14</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="001X">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Afu</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">797485368</subfield>
+  </datafield>
+  <datafield tag="007G">
+    <subfield code="c">GBV</subfield>
+    <subfield code="0">797485368</subfield>
+  </datafield>
+  <datafield tag="010@">
+    <subfield code="a">ger</subfield>
+  </datafield>
+  <datafield tag="011@">
+    <subfield code="a">2014</subfield>
+  </datafield>
+  <datafield tag="019@">
+    <subfield code="a">XA-DE</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">@L - N</subfield>
+  </datafield>
+  <datafield tag="028C">
+    <subfield code="d">Anita</subfield>
+    <subfield code="a">Maas</subfield>
+  </datafield>
+  <datafield tag="033A">
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas und Peither GMP Verl.</subfield>
+  </datafield>
+  <datafield tag="034D">
+    <subfield code="a">Losebl.-Ausg.</subfield>
+  </datafield>
+  <datafield tag="036C">
+    <subfield code="a">GMP-Berater</subfield>
+    <subfield code="y">Nachschlagewerk für Pharmaindustrie und Lieferanten. Die praxisorientierte Loseblattsammlung für die Gute Herstellungspraxis (Good Manufacturing Practice) </subfield>
+    <subfield code="c">hrsg. von Anita Maas ...</subfield>
+    <subfield code="l">Bd. I</subfield>
+  </datafield>
+  <datafield tag="036D">
+    <subfield code="X">I.2014</subfield>
+    <subfield code="9">327753609</subfield>
+    <subfield code="a">GMP-Berater</subfield>
+    <subfield code="d">Nachschlagewerk für Pharmaindustrie und Lieferanten. Die praxisorientierte Loseblattsammlung für die Gute Herstellungspraxis (Good Manufacturing Practice)</subfield>
+    <subfield code="a">Maas</subfield>
+    <subfield code="d">Anita</subfield>
+    <subfield code="p">Schopfheim</subfield>
+    <subfield code="n">Maas und Peither GMP Verl.</subfield>
+    <subfield code="n">2000-</subfield>
+    <subfield code="l">Bd. I</subfield>
+    <subfield code="x">_I 2014</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">31</subfield>
+    <subfield code="c">PICA</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201B">
+    <subfield code="0">31-03-15</subfield>
+    <subfield code="t">16:54:04.000</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201D">
+    <subfield code="0">31-03-15</subfield>
+    <subfield code="b">7681</subfield>
+    <subfield code="a">0027</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="201U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="203@">
+    <subfield code="0">150373661X</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="208@">
+    <subfield code="a">26-09-14</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209A">
+    <subfield code="f">J 36/PT2</subfield>
+    <subfield code="a">PHA:RG:5500:Maa:I:2000</subfield>
+    <subfield code="d">f</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209C">
+    <subfield code="a">U501697/2</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield occurrence="01" tag="209G">
+    <subfield code="a">27$027697738</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>1</zs:recordPosition>
+</zs:record>
+</zs:records>
+<zs:echoedSearchRetrieveRequest>
+<zs:version>1.1</zs:version>
+<zs:query>pica.all=797485368</zs:query>
+<zs:maximumRecords>50</zs:maximumRecords>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:sortKeys>Year,,1</zs:sortKeys>
+</zs:echoedSearchRetrieveRequest>
+</zs:searchRetrieveResponse>

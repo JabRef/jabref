@@ -1,0 +1,10 @@
+
+--te
+
+--AU-- Baklouti, F.
+--YP-- 1999
+--KW-- Cells; Rna; Isoforms
+--RT-- book section
+--ST-- Test2
+--TI-- Test
+------

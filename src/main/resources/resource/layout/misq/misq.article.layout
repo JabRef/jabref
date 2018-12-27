@@ -1,0 +1,18 @@
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbrCommas]{\author}
+ "\format[RTFChars]{\title}," }{\\i \format[RTFChars]{\journal}}{
+ (
+\begin{volume}
+\volume
+\end{volume}
+\begin{number}
+:\number
+\end{number}
+)
+\begin{year}
+, \year
+\end{year}
+\begin{pages}
+, pp. \pages
+\end{pages}.
+\\par
+\\par

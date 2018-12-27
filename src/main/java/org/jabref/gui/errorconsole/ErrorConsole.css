@@ -1,0 +1,26 @@
+.list-content {
+	-fx-padding: 10px;
+}
+
+.info-section {
+	-fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
+.info-section .glyph-icon {
+	-fx-font-size: 24.0;
+}
+
+.exception .glyph-icon {
+    -fx-font-size: 18.0;
+    -fx-fill: -jr-error;
+}
+
+.log .glyph-icon {
+    -fx-font-size: 18.0;
+    -fx-fill: -jr-info;
+}
+
+.custom-buttons {
+	-fx-padding: 5px;
+}

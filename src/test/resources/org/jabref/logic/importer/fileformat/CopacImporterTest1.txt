@@ -1,0 +1,9 @@
+
+TI- The SIS project : software reuse with a natural language approach
+AU- Prechelt, Lutz
+AU- Universität Karlsruhe. Fakultät für Informatik
+SE- Interner Bericht ; Nr.2/92
+PU- Karlsruhe : Universitat Karlsruhe, Fakultat fur Informatik
+PY- 1992
+HL- Edinburgh
+DT- TXT

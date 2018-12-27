@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112" styleClass="tag"
+         fx:controller="org.jabref.gui.util.component.Tag">
+    <Label fx:id="text">
+        <HBox.margin>
+            <Insets right="5" left="3"/>
+        </HBox.margin>
+    </Label>
+    <Button
+            styleClass="icon-button"
+            onAction="#removeButtonClicked">
+        <graphic>
+            <JabRefIconView glyph="CLOSE"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="%Remove"/>
+        </tooltip>
+    </Button>
+</fx:root>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <misc>
+            <author>Max Mustermann</author>
+            <title>Java Misc</title>
+            <howpublished>Internet</howpublished>
+            <month>February</month>
+            <year>2016</year>
+            <keywords>java</keywords>
+        </misc>
+    </entry>
+</file>

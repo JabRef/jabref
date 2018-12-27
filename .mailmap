@@ -1,0 +1,145 @@
+
+# Generate AUTHORS: scripts/generate-authors.sh
+
+# Tip for finding duplicates (besides scanning the output of AUTHORS for name
+# duplicates that aren't also email duplicates): scan the output of:
+#   git log --format='%aE - %aN' | sort --unique --ignore-case
+#
+# One can find out the real name by using the GitHub user page and API.
+# https://github.com/sauliusg
+# https://api.github.com/users/sauliusg/events/public
+#
+# For explanation on this file format: man git-shortlog
+Ruy Minoru Ito Takata <ruy.takata@gmail.com>
+Ruy Minoru Ito Takata <ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
+Stefan Kolb <stefan-kolb@web.de>
+<stefan-kolb@web.de> <stefan-kolb@users.noreply.github.com>
+Nicolas Pavillon <pavillon.nicolas@gmail.com>
+<pavillon.nicolas@gmail.com> <userid-1711535@users.sf.net>
+Koji Yokota <yokota33@gmail.com> <yokota33@gmail.com>
+Koji Yokota <yokota33@gmail.com> <kojiyokota@users.sourceforge.net>
+Koji Yokota <yokota33@gmail.com> <yokota6@gmail.com>
+Koji Yokota <yokota33@gmail.com> <kojiyokota@users.noreply.github.com>
+Koji Yokota <yokota33@gmail.com> <koji33@users.noreply.github.com>
+Dominik Waßenhoven <domwass@users.sourceforge.net> <domwass@users.sourceforge.net>
+<domwass@users.sourceforge.net> <domwass@Dominik-Waenhovens-MacBook-Air.local>
+Thomas Arildsen <tha@es.aau.dk> ThomasArildsen <tha@es.aau.dk>
+Thomas Arildsen <tha@es.aau.dk> ThomasA <tha@es.aau.dk>
+Thomas Arildsen <tha@es.aau.dk> <ThomasArildsen@users.sourceforge.net>
+Thomas Arildsen <tha@es.aau.dk> <thomasarildsen@users.sf.net>
+Tobias Diez <tobiasdiez@gmx.de>
+<tobiasdiez@gmx.de> <webmaster@altertoby.de>
+<olenz@icp.uni-stuttgart.de> <olaf@lenz.name>
+<jan@kubovy.eu> <jkubovy@faw.jku.at>
+<kai.mindermann@studi.informatik.uni-stuttgart.de> <minderki@studi.informatik.uni-stuttgart.de>
+<igorsteinmacher@gmail.com> <ifsteinm@yahoo.com.br>
+<igorsteinmacher@gmail.com> <igorfs@utfpr.edu.br>
+<adrian.daerr@univ-paris-diderot.fr> <adaerr@users.sf.net>
+Waluyo Adi Siswanto <was.uthm@gmail.com> <was123@users.sourceforge.net>
+Michael Falkenthal <michael.falkenthal@googlemail.com>
+Michael Falkenthal <michael.falkenthal@googlemail.com> <michael.falkenthal@iaas.uni-stuttgart.de>
+Ambrogio Oliva <ambro2@users.noreply.github.com>
+Ambrogio Oliva <ambro2@users.noreply.github.com> <ambro2@users.sourceforge.net>
+Eduardo Greco <eduardogreco93@gmail.com>
+Daniel Bruehl <bruehl.dev@gmail.com>
+Egon Willighagen <egon.willighagen@gmail.com> <egonw@users.sourceforge.net>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr> <fdar@users.sourceforge.net>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr> <mlep@users.noreply.github.com>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr> <mlep@github.com>
+Florian Straßer <strassfn@studi.informatik.uni-stuttgart.de>
+Gregor Herrmann <gregoa@debian.org>
+Hakan Duran <ehakanduran@gmail.com> hakova <ehakanduran@gmail.com>
+Hakan Duran <ehakanduran@gmail.com> hakova <hakova@users.sourceforge.net>
+Hakan Duran <ehakanduran@gmail.com> Hakan E. Duran <ehakanduran@gmail.com>
+Jorge Tornero <jtorlistas@gmail.com> <jtorlistas@gmail.com>
+Mark Schenk <Mark-Schenk@users.sourceforge.net>
+Nathan Sheffield <sheffien@users.noreply.github.com>
+Oscar Gustafsson <ogib@users.sourceforge.net> <Oscar@Oscar-THINK>
+Renato Massao <renato.massao@live.com>
+Lorenzo Genta <lorenzo.genta@fastwebnet.it>
+Morten Alver <mortenalver@gmail.com> <mortenalver@users.sourceforge.net>
+Morten Alver <mortenalver@gmail.com> <alver@alver-1001PX.(none)>
+Morten Alver <mortenalver@gmail.com> <mortenalver@gmail.com>
+Oliver Kopp <kopp.dev@gmail.com>
+Oliver Kopp <kopp.dev@gmail.com> <olly98@users.sf.net>
+Oliver Kopp <kopp.dev@gmail.com> <olly98@users.sourceforge.net>
+Oliver Kopp <kopp.dev@gmail.com> <kopp.dev+format@gmail.com>
+Oliver Kopp <kopp.dev@gmail.com> <kopp.dev+cleanup@github.com>
+Oliver Kopp <kopp.dev@gmail.com> Apple Inc <no@mail>
+Nizar N. Batada <nbatada@users.sourceforge.net>
+Christopher Oezbek <coezbek@users.sourceforge.net>
+Andreas Rudert <arudert@users.sourceforge.net>
+Michael Spiegel <mspiegel@users.sourceforge.net>
+Jörg Wegner <wegner@users.sourceforge.net>
+Michael Wrighton <mwrighton@users.sourceforge.net>
+Jörg Zieren <jzieren@users.sourceforge.net>
+Brian Van Essen <vanessen@users.sourceforge.net>
+Luciana de Melo e Abud <lucianaabud@uol.com.br>
+Seb Wills <sebwills@users.sourceforge.net>
+Waluyo Adi Siswanto <was.uthm@gmail.com>
+Dale Visser <dwvisser@users.sourceforge.net>
+Erik Putrycz <eputrycz@users.sourceforge.net>
+Gert Renckens <gert_@users.sourceforge.net>
+Guillaume Gardey <glinmac@users.sourceforge.net>
+Kolja Brix <kbx@users.sourceforge.net>
+Raik Nagel <kiar@users.sourceforge.net>
+Carlos Silla <silla@users.sourceforge.net>
+S M Mahbub Murshed <udvranto@users.sourceforge.net>
+Robert Jäschke <rjoberon@users.sf.net>
+Ulrik Stervbo <ulriks@users.sourceforge.net>
+Stefano Gariazzo <steog88@gmail.com>
+Lee Patton <lpatton@users.sourceforge.net>
+Jörg Lenhard <joerg.lenhard@kau.se>
+<joerg.lenhard@kau.se> <joerg@lenhard.info>
+<joerg.lenhard@kau.se> <lenhard@users.noreply.github.com>
+Jörg Lenhard <joerg.lenhard@kau.se> <joerg.lenhard@uni-bamberg.de>
+Matthias Geiger <matthias.geiger@uni-bamberg.de>
+Christoph Braun <braunch.dev@gmail.com>
+Felix Wilke <horstilaemmer@yahoo.com>
+Dennis Tschechlov <tschechlov.dev@gmail.com>
+Dennis Tschechlov <tschechlov.dev@gmail.com> <tschechlovdev@gmail.com>
+Christian Bartsch <bartsch.dev@gmail.com>
+Joshua Ramon Enslin <joshua.enslin@yahoo.com>
+Vincent W. Yang <solrex@gmail.com>
+Jorge Tornero <portpel@portpel.cd.ieo.es>
+Mélanie Tremblay <mel_4_7@yahoo.ca>
+Christoph Schwentker <cschwentker@gmail.com>
+Christoph Schwentker <cschwentker@gmail.com> <siedlerkiller@gmail.com>
+Jens Döcke <jens.doecke@gmail.com>
+Jürgen Lange <juergen.lange@unitybox.de>
+Sascha Zeller <zeller.dev@gmail.com>
+Ali Ayan <ali.ayan@hotmail.de>
+Arno Blouin <blouin.arno@gmail.com>
+Jeff Miller <miller@psy.otago.ac.nz>
+Alain Vaucher <avaucher@users.noreply.github.com>
+Daniel Mair <mairdl.dev@gmail.com> <mairdl.dev@googlemail.com>
+Sven Jäger <svenjaeger@gmx.de>
+Tim van Rossum <trvanrossum@gmail.com>
+Saulius Gražulis <grazulis@ibt.lt>
+Rolf Starre <RolfStarre@users.noreply.github.com>
+Owen Huang <ohuang12@users.noreply.github.com>
+Anita Armbruster <armbruan@gmail.com>
+Fabian Bauer <125m125@users.noreply.github.com>
+Jong-Ho Shinn <jhshinn@kaist.edu>
+Nadeem Mahmood <mahmoodn@purdue.edu>
+Foivos Christoulakis <halx4@users.noreply.github.com>
+Predrag Milanovic <pmilanovic@gmail.com>
+Karsten Hiekmann <sammann-fnordbedarf-de@users.noreply.github.com>
+Karsten Hiekmann <h.k.hiekmann@nanooq.org>
+Andrew Levit <dreyskiy@gmail.com>
+Berk Gureken <berkgureken@gmail.com>
+Abhishek Rai <abhisheksavitarai@gmail.com>
+Abhishek Rai <betheunique@users.noreply.github.com>
+Stéphane Curet <stephane.curet@orange.fr>
+Erdem Derebasoglu <erdemderebasoglu@hotmail.com>
+Domenico Cufalo <cufalo@gmail.com>
+Tobias Bouschen <tobias.bouschen@googlemail.com>
+József Pallagi <pallagijoe@gmail.com>
+Mattia Bunel <MBunel@users.noreply.github.com>
+Waida Fan <31742543+weidafan@users.noreply.github.com>
+Johannes Manner <johannes.manner@web.de>
+Dominik Traczyk <dominik646@gmail.com>
+Cerrianne Santos <cerrianne.santos@gmail.com>
+Stefan Scheffel <st155160@stud.uni-stuttgart.de>
+Stefan Gerzmann <steppery@gmx.de>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="484.0"
+            prefWidth="604.0" xmlns="http://javafx.com/javafx/8.0.141"
+            fx:controller="org.jabref.gui.copyfiles.CopyFilesDialogView">
+   <content>
+      <BorderPane>
+         <center>
+            <TableView fx:id="tvResult">
+              <columns>
+                <TableColumn fx:id="colStatus" prefWidth="60.0" text="%Status" />
+                <TableColumn fx:id="colMessage" prefWidth="230.0" text="%Message" />
+                  <TableColumn fx:id="colFile" prefWidth="500.0" text="%File" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </center>
+      </BorderPane>
+   </content>
+</DialogPane>

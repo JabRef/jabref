@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <conference>
+            <author>Max Mustermann</author>
+            <title>Java Conference</title>
+            <booktitle>Java Booktitle</booktitle>
+            <year>2016</year>
+            <editor>Maxima Musterfrau</editor>
+            <volume>1</volume>
+            <number>1</number>
+            <series>1</series>
+            <pages>3-9</pages>
+            <address>Stuttgart</address>
+            <month>February</month>
+            <organization>Java Org</organization>
+            <publisher>Java Publisher</publisher>
+            <keywords>java</keywords>
+        </conference>
+    </entry>
+</file>

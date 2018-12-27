@@ -1,0 +1,45 @@
+<div class="bibtex_entry">
+
+	<div class="bibtex_header">
+		<div class="bibtex_key">
+			<a name="\bibtexkey">\bibtexkey</a>
+		</div>
+
+		\begin{file}
+		<div class="bibtex_pdf">
+			\format[FileLink(pdf),WrapContent(<a href=",">pdf</a>)]{\file}
+		</div>
+		\end{file}
+
+		\begin{url}
+		<div class="bibtex_url">
+			<a href="\url">url</a>
+		</div>
+		\end{url}
+	</div>
+
+	<div class="bibtex_content">
+
+		\begin{title}
+		<div class="bibtex_title">
+			\format[HTMLChars,RemoveLatexCommands]{\title}
+		</div>
+		\end{title}
+
+		\begin{author}
+		<div class="bibtex_author">
+			\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}
+		</div>
+		\end{author}
+
+		\begin{school}
+		<div class="bibtex_journal">
+			\format[HTMLChars]{\school}
+		</div>,
+		\end{school}
+
+		<div class="bibtex_year">
+			\year
+		</div>
+	</div>
+</div>

@@ -1,0 +1,42 @@
+%0
+%A testA0
+%A testA1
+%E testE0
+%E testE1
+%T testT
+%0 Journal
+%0 Book Section
+%0 Book
+%0 Edited Book
+%0 Conference
+%0 Report
+%0 Review
+%0 Thesis
+%0 Test0
+%7 test7
+%C testC
+%D testD
+%8 test8
+%J testJ
+%J testJ1
+%B testB2
+%0 Journal
+%B testB0
+%0 Book
+%B testB1
+%I testI0
+%0 Thesis
+%I testI1
+%P testP
+%V testV
+%N testN
+%U testU
+%R testRw
+%R doi:testR
+%O Artn \\s testO0
+%O testO1
+%K testK
+%X testX
+%9 Ph.D.
+%9 Masters
+%F testF

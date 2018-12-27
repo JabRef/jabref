@@ -1,0 +1,19 @@
+
+--AU-- Baklouti, F.; Huang, S. C.; Tang, T. K.; Delaunay, J.; Marchesi, V. T.; Benz, E. J.
+--TI-- Asynchronous Regulation OF Splicing Events Within Protein 4.1 Pre-mrna During Erythroid Differentiation
+--ST-- Blood
+--YP-- 1996
+--VL-- 87
+--NB-- 9
+--PS-- 3934
+--PE-- 3941
+--KW-- Membrane skeletal protein-4.1; Insertion deletion mutations; Actin binding domain; Molecular analysis; Hereditary elliptocytosis; Expression; Spectrin; Cells; Rna; Isoforms
+--RT-- Journal Article
+--TW-- Article
+--QT-- Clinical medicine.
+--IS-- 0006-4971
+--AB-- Protein 4.1 is an 80-kD structural component of the red blood cell (RBC) cytoskeleton. It is critical for the formation of the spectrin/actin/protein 4.1 junctional complex, the integrity of which is important for the horizontal strength and elasticity of RBCs.
+--AD-- Reprint available from: Baklouti F INST PASTEUR LYON CNRS URA 1171 AVE TONY GARNIER F-69365 LYON 07 FRANCE YALE UNIV DEPT INTERNAL MED NEW HAVEN,CT USA YALE UNIV DEPT PATHOL NEW HAVEN, CT USA YALE
+--LG-- English
+--AT-- ftp://www.google.de/
+------

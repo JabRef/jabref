@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+<zs:version>1.1</zs:version>
+<zs:numberOfRecords>1</zs:numberOfRecords>
+<zs:records>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="021A">
+    <subfield code="d"></subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>1</zs:recordPosition>
+</zs:record>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="021A">
+    <subfield code="d">c</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>2</zs:recordPosition>
+</zs:record>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="021A">
+    <subfield code="d">word</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>3</zs:recordPosition>
+</zs:record>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="021A">
+    <subfield code="d">word1 word2</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>4</zs:recordPosition>
+</zs:record>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="021A">
+    <subfield code="d">Word1 word2</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>5</zs:recordPosition>
+</zs:record>
+</zs:records>
+<zs:echoedSearchRetrieveRequest>
+<zs:version>1.1</zs:version>
+<zs:query>pica.all=797485368</zs:query>
+<zs:maximumRecords>50</zs:maximumRecords>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:sortKeys>Year,,1</zs:sortKeys>
+</zs:echoedSearchRetrieveRequest>
+</zs:searchRetrieveResponse>

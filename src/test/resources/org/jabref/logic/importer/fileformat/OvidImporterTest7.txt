@@ -1,0 +1,34 @@
+<3>
+Score
+  *****
+Accession Number
+  00012097-900000000-99899.
+Author
+  Shapiro, Edward S. 1;  Dennis, Minyi Shih 1;  Fu, Qiong 1
+Institution
+  (1)Center for Promoting Research to Practice, College of Education, Lehigh University
+Title
+  Comparing Computer Adaptive and Curriculum-Based Measures of Math in Progress Monitoring.[Article]
+Source
+  School Psychology Quarterly. 
+Status
+  Publish Ahead of Print, published online before print, 16 March 2015
+Abstract
+  Lorem ipsum abstract
+Author Keywords
+  computer adaptive test;  curriculum-based measurement;  mathematics assessment;  progress monitoring.
+Language
+  English.
+Document Type
+  Article:  PDF Only.
+Journal Subset
+  Behavioral & Social Sciences.  PsycARTICLES.
+ISSN
+  1045-3830
+NLM Journal Code
+  9102245
+DOI Number
+  10.1037/spq0000116
+Link to the Ovid Full Text or citation
+ http://ovidsp.ovid.com/ovidweb.cgi?T=JS&CSC=Y&NEWS=N&PAGE=fulltext&D=ppvovftq&AN=00012097-900000000-99899
+

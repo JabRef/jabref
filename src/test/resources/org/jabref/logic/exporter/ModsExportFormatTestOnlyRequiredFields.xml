@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mods:modsCollection xmlns="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods ID="ShruthiVinodhkumarSelvamani2016">
+        <mods:identifier type="citekey">ShruthiVinodhkumarSelvamani2016</mods:identifier>
+        <mods:genre>article</mods:genre>
+        <mods:name type="personal">
+            <mods:namePart type="family">Shruthi</mods:namePart>
+            <mods:namePart type="given">Basavaradhya</mods:namePart>
+            <mods:namePart type="given">Sahukar</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family"> Vinodhkumar</mods:namePart>
+            <mods:namePart type="given">Palani</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family"> Selvamani</mods:namePart>
+        </mods:name>
+        <mods:titleInfo>
+            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
+        </mods:titleInfo>
+        <mods:originInfo>
+            <mods:dateIssued keyDate="yes">2016</mods:dateIssued>
+        </mods:originInfo>
+        <mods:relatedItem type="host">
+            <mods:titleInfo>
+                <mods:title>Advanced biomedical research</mods:title>
+            </mods:titleInfo>
+            <mods:part/>
+        </mods:relatedItem>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</mods:modsCollection>

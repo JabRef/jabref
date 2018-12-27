@@ -1,0 +1,318 @@
+package org.jabref.logic.exporter;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
+import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
+import org.jabref.logic.bibtex.comparator.FieldComparator;
+import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import org.jabref.logic.bibtex.comparator.IdComparator;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.FieldChange;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.strings.StringUtil;
+
+public abstract class BibDatabaseWriter {
+
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+    protected final Writer writer;
+    protected final SavePreferences preferences;
+    protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
+
+    public BibDatabaseWriter(Writer writer, SavePreferences preferences) {
+        this.writer = Objects.requireNonNull(writer);
+        this.preferences = preferences;
+    }
+
+    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+        List<FieldChange> changes = new ArrayList<>();
+
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        saveActions.ifPresent(actions -> {
+            // save actions defined -> apply for every entry
+            for (BibEntry entry : toChange) {
+                changes.addAll(actions.applySaveActions(entry));
+            }
+        });
+
+        return changes;
+    }
+
+    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData) {
+        return applySaveActions(Collections.singletonList(entry), metaData);
+    }
+
+    private static List<Comparator<BibEntry>> getSaveComparators(MetaData metaData, SavePreferences preferences) {
+        List<Comparator<BibEntry>> comparators = new ArrayList<>();
+        Optional<SaveOrderConfig> saveOrder = getSaveOrder(metaData, preferences);
+
+        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
+        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
+        comparators.add(new CrossRefEntryComparator());
+
+        if (!saveOrder.isPresent()) {
+            // entries will be sorted based on their internal IDs
+            comparators.add(new IdComparator());
+        } else {
+            // use configured sorting strategy
+            List<FieldComparator> fieldComparators = saveOrder.get()
+                                                              .getSortCriteria().stream()
+                                                              .map(FieldComparator::new)
+                                                              .collect(Collectors.toList());
+            comparators.addAll(fieldComparators);
+            comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
+        }
+
+        return comparators;
+    }
+
+    /**
+     * We have begun to use getSortedEntries() for both database save operations and non-database save operations.  In a
+     * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
+     * saving in standard order.
+     */
+    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort, SavePreferences preferences) {
+        Objects.requireNonNull(bibDatabaseContext);
+        Objects.requireNonNull(entriesToSort);
+
+        //if no meta data are present, simply return in original order
+        if (bibDatabaseContext.getMetaData() == null) {
+            return new LinkedList<>(entriesToSort);
+        }
+
+        List<Comparator<BibEntry>> comparators = getSaveComparators(bibDatabaseContext.getMetaData(), preferences);
+        FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
+
+        List<BibEntry> sorted = new ArrayList<>(entriesToSort);
+        sorted.sort(comparatorStack);
+        return sorted;
+    }
+
+    private static Optional<SaveOrderConfig> getSaveOrder(MetaData metaData, SavePreferences preferences) {
+        /* three options:
+         * 1. original order
+         * 2. order specified in metaData
+         * 3. order specified in preferences
+         */
+
+        if (preferences.isSaveInOriginalOrder()) {
+            return Optional.empty();
+        }
+
+        if (preferences.takeMetadataSaveOrderInAccount()) {
+            return metaData.getSaveOrderConfig();
+        }
+
+        return Optional.ofNullable(preferences.getSaveOrder());
+    }
+
+    public List<FieldChange> getSaveActionsFieldChanges() {
+        return Collections.unmodifiableList(saveActionsFieldChanges);
+    }
+
+    /**
+     * Saves the complete database.
+     */
+    public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
+        savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries());
+    }
+
+    /**
+     * Saves the database, including only the specified entries.
+     */
+    public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
+        Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
+
+        if (sharedDatabaseIDOptional.isPresent()) {
+            writeDatabaseID(sharedDatabaseIDOptional.get());
+        }
+
+        // Map to collect entry type definitions that we must save along with entries using them.
+        Map<String, EntryType> typesToWrite = new TreeMap<>();
+
+        // Some file formats write something at the start of the file (like the encoding)
+        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            writePrelogue(bibDatabaseContext, preferences.getEncoding());
+        }
+
+        // Write preamble if there is one.
+        writePreamble(bibDatabaseContext.getDatabase().getPreamble().orElse(""));
+
+        // Write strings if there are any.
+        writeStrings(bibDatabaseContext.getDatabase());
+
+        // Write database entries.
+        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
+        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        saveActionsFieldChanges.addAll(saveActionChanges);
+        if (preferences.generateBibtexKeysBeforeSaving()) {
+            List<FieldChange> keyChanges = generateBibtexKeys(bibDatabaseContext, sortedEntries);
+            saveActionsFieldChanges.addAll(keyChanges);
+        }
+
+        for (BibEntry entry : sortedEntries) {
+            // Check if we must write the type definition for this
+            // entry, as well. Our criterion is that all non-standard
+            // types (*not* all customized standard types) must be written.
+            if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+                // If user-defined entry type, then add it
+                // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
+                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
+                        entryType -> typesToWrite.put(entryType.getName(), entryType));
+            }
+
+            writeEntry(entry, bibDatabaseContext.getMode());
+        }
+
+        if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+            // Write meta data.
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
+
+            // Write type definitions, if any:
+            writeEntryTypeDefinitions(typesToWrite);
+        }
+
+        //finally write whatever remains of the file, but at least a concluding newline
+        writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
+
+        writer.close();
+    }
+
+    protected abstract void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException;
+
+    protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException;
+
+    protected abstract void writeEpilogue(String epilogue) throws IOException;
+
+    /**
+     * Writes all data to the specified writer, using each object's toString() method.
+     */
+    protected void writeMetaData(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) throws IOException {
+        Objects.requireNonNull(metaData);
+
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+                globalCiteKeyPattern);
+
+        for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
+            writeMetaDataItem(metaItem);
+        }
+    }
+
+    protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException;
+
+    protected abstract void writePreamble(String preamble) throws IOException;
+
+    protected abstract void writeDatabaseID(String sharedDatabaseID) throws IOException;
+
+    /**
+     * Write all strings in alphabetical order, modified to produce a safe (for BibTeX) order of the strings if they
+     * reference each other.
+     *
+     * @param database The database whose strings we should write.
+     */
+    private void writeStrings(BibDatabase database) throws IOException {
+        List<BibtexString> strings = database.getStringKeySet()
+                                             .stream()
+                                             .map(database::getString)
+                                             .sorted(new BibtexStringComparator(true))
+                                             .collect(Collectors.toList());
+        // First, make a Map of all entries:
+        Map<String, BibtexString> remaining = new HashMap<>();
+        int maxKeyLength = 0;
+        for (BibtexString string : strings) {
+            remaining.put(string.getName(), string);
+            maxKeyLength = Math.max(maxKeyLength, string.getName().length());
+        }
+
+        for (BibtexString.Type t : BibtexString.Type.values()) {
+            boolean isFirstStringInType = true;
+            for (BibtexString bs : strings) {
+                if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
+                    writeString(bs, isFirstStringInType, remaining, maxKeyLength);
+                    isFirstStringInType = false;
+                }
+            }
+        }
+    }
+
+    protected void writeString(BibtexString bibtexString, boolean isFirstString, Map<String, BibtexString> remaining, int maxKeyLength)
+            throws IOException {
+        // First remove this from the "remaining" list so it can't cause problem with circular refs:
+        remaining.remove(bibtexString.getName());
+
+        // Then we go through the string looking for references to other strings. If we find references
+        // to strings that we will write, but still haven't, we write those before proceeding. This ensures
+        // that the string order will be acceptable for BibTeX.
+        String content = bibtexString.getContent();
+        Matcher m;
+        while ((m = REFERENCE_PATTERN.matcher(content)).find()) {
+            String foundLabel = m.group(1);
+            int restIndex = content.indexOf(foundLabel) + foundLabel.length();
+            content = content.substring(restIndex);
+            String label = foundLabel.substring(1, foundLabel.length() - 1);
+
+            // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
+            if (remaining.containsKey(label)) {
+                BibtexString referred = remaining.get(label);
+                writeString(referred, isFirstString, remaining, maxKeyLength);
+            }
+        }
+
+        writeString(bibtexString, isFirstString, maxKeyLength);
+    }
+
+    protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength)
+            throws IOException;
+
+    protected void writeEntryTypeDefinitions(Map<String, EntryType> types) throws IOException {
+        for (EntryType type : types.values()) {
+            if (type instanceof CustomEntryType) {
+                writeEntryTypeDefinition((CustomEntryType) type);
+            }
+        }
+    }
+
+    protected abstract void writeEntryTypeDefinition(CustomEntryType customType) throws IOException;
+
+    /**
+     * Generate keys for all entries that are lacking keys.
+     */
+    protected List<FieldChange> generateBibtexKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+        List<FieldChange> changes = new ArrayList<>();
+        BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(databaseContext, preferences.getBibtexKeyPatternPreferences());
+        for (BibEntry bes : entries) {
+            Optional<String> oldKey = bes.getCiteKeyOptional();
+            if (StringUtil.isBlank(oldKey)) {
+                Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
+                change.ifPresent(changes::add);
+            }
+        }
+        return changes;
+    }
+}

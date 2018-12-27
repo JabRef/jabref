@@ -1,0 +1,119 @@
+FN ISI Export Format
+VR 1.0
+PT J
+AU Gamernyk, RV
+   Gnatenko, YP
+   Bukivskij, PM
+   Skubenko, PA
+   Slivka, VY
+TI Optical and photoelectric spectroscopy of photorefractive Sn2P2S6
+   crystals
+SO JOURNAL OF PHYSICS-CONDENSED MATTER
+LA English
+DT Article
+ID ELECTRIC-FIELD
+AB Lorem ipsum abstract
+C1 NAS Ukraine, Inst Phys, UA-03028 Kiev, Ukraine.
+   Lviv Natl Univ, UA-29005 Lvov, Ukraine.
+RP Gnatenko, YP, NAS Ukraine, Inst Phys, 46 Prospect Nauky, UA-03028 Kiev,
+   Ukraine.
+EM gnatenko@iop.kiev.ua
+CR BERCHA DM, 1997, FIZ TVERD TELA, V39, P1219
+   BRAVINA SL, 1997, FERROELECTRICS, V192, P197
+   CARPENTIER CD, 1974, MAT RES B, V9, P401
+   ENJALBERT R, 1999, EUR PHYS J B, V8, P169
+   FENCHAK VY, 1997, FERROELECTRICS, V192, P129
+   GNATENKO YP, 2003, J APPL PHYS, V94, P4896
+   GRABAR AA, 1997, FERROELECTRICS, V192, P155
+   GRABAR AA, 2001, OPT COMMUN, V188, P187
+   HLINKA J, 2002, PHYS REV B, V65
+   KEDYULICH VM, 2001, FERROELECTRICS, V254, P243
+   KITYK IV, 1995, FIZ TEKH POLUPROV, V29, P697
+   KUEPPER E, 2003, PHYS REV B, V67
+   LUPASCU DC, 2006, J AM CERAM SOC, V89, P224
+   ODOULOV SG, 1996, J OPT SOC AM B, V13, P2352
+   PETROV MP, 1990, J APPL PHYS, V68, P2216
+   RUEDIGER A, 2001, OPT MATER, V18, P123
+   SHUMELYUK A, 2001, APPL PHYS B-LASERS O, V72, P707
+NR 17
+TC 0
+PU IOP PUBLISHING LTD
+PI BRISTOL
+PA DIRAC HOUSE, TEMPLE BACK, BRISTOL BS1 6BE, ENGLAND
+SN 0953-8984
+J9 J PHYS-CONDENS MATTER
+JI J. Phys.-Condes. Matter
+PD JUN 14
+PY 2006
+VL 18
+IS 23
+BP 5323
+EP 5331
+PG 9
+SC Physics, Condensed Matter
+GA 057JR
+UT ISI:000238592600006
+ER
+
+PT J
+AU Guarino, A
+   Jazbinsek, M
+   Herzog, C
+   Degl'Innocenti, R
+   Poberaj, G
+   Gunter, P
+TI Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation
+SO OPTICS EXPRESS
+LA English
+DT Article
+ID REFRACTIVE-INDEX PROFILES; INFRARED WAVELENGTHS; PHASE-CONJUGATION;
+   KNBO3; MODES
+AB Planar waveguides in nonlinear optical crystals of Sn2P2S6 have been
+   produced by He+ ion implantation. The effective indices of the
+   waveguide have been determined and refractive index profiles have been
+   evaluated for the indices along all three principal axes of the optical
+   indicatrix. The depth of the induced optical barrier is. Delta n(1) = -
+   0.07, Delta n(2) = - 0.07 and Delta n(3) = - 0.09 lambda = 0.633 mu m
+   for a fluence Phi = 0.5 x 10(15) ions/cm(2). Propagation losses for
+   hybrid-n(1) modes are alpha similar or equal to 10dB/cm. (c) 2006
+   Optical Society of America.
+C1 ETH, Inst Quantum Elect, Nonlinear Opt Lab, CH-8093 Zurich, Switzerland.
+RP Guarino, A, ETH, Inst Quantum Elect, Nonlinear Opt Lab, CH-8093 Zurich,
+   Switzerland.
+EM guarino@phys.ethz.ch
+CR BACH T, 2005, OPT EXPRESS, V13, P9890
+   CHANDLER PJ, 1986, OPT ACTA, V33, P127
+   CHIANG KS, 1985, J LIGHTWAVE TECHNOL, V3, P385
+   DEROSSI A, 2005, J APPL PHYS, V97
+   FLUCK D, 1992, FERROELECTRICS, V128, P79
+   FLUCK D, 1993, J APPL PHYS, V74, P6023
+   GUARINO A, 2005, OPT LETT, V18, P2412
+   HAERTLE D, 2005, OPT EXPRESS, V13, P2047
+   HAERTLE D, 2005, OPT EXPRESS, V13, P3765
+   JAZBINSEK M, 2005, J OPT SOC AM B, V22, P2459
+   MALDONADO TA, 1996, J LIGHTWAVE TECHNOL, V14, P486
+   MARCUSE D, 1978, IEEE J QUANTUM ELECT, V14, P736
+   TOWNSEND PD, 1994, OPTICAL EFFECTS ION
+   YARIV A, 1984, OPTICAL WAVES CRYSTA
+   ZHA M, 1993, OPT LETT, V18, P577
+NR 15
+TC 0
+PU OPTICAL SOC AMER
+PI WASHINGTON
+PA 2010 MASSACHUSETTS AVE NW, WASHINGTON, DC 20036 USA
+SN 1094-4087
+J9 OPT EXPRESS
+JI Opt. Express
+PD MAR 20
+PY 2006
+VL 14
+IS 6
+BP 2344
+EP 2358
+PG 15
+SC Optics
+GA 024NR
+UT ISI:000236202800037
+ER
+
+EF

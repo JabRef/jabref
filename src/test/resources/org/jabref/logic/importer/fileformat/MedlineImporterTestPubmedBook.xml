@@ -1,0 +1,143 @@
+<PubmedBookArticle>
+    <BookDocument>
+        <PMID Version="1">21413195</PMID>
+        <ArticleIdList>
+            <ArticleId IdType="bookaccession">NBK51812</ArticleId>
+        </ArticleIdList>
+        <Book>
+            <Publisher>
+                <PublisherName>Royal College of Physicians (UK)</PublisherName>
+                <PublisherLocation>London</PublisherLocation>
+            </Publisher>
+            <BookTitle book="nicecg79">Rheumatoid Arthritis: National Clinical Guideline for Management and Treatment in Adults</BookTitle>
+            <PubDate>
+                <Year>2009</Year>
+                <Month>02</Month>
+            </PubDate>
+            <AuthorList Type="authors">
+                <Author>
+                    <CollectiveName>National Collaborating Centre for Chronic Conditions (UK)</CollectiveName>
+                </Author>
+                                <Author>
+                    <LastName>Williams</LastName>
+                    <ForeName>Darlisha A</ForeName>
+                    <Initials>DA</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA; Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <CollectionTitle book="nicecollect">National Institute for Health and Clinical Excellence: Guidance</CollectionTitle>
+            <Isbn>9781860163593</Isbn>
+        </Book>
+        <Language>eng</Language>
+        <PublicationType UI="D016454">Review</PublicationType>
+        <PublicationType UI="D017065">Practice Guideline</PublicationType>
+        <Abstract>
+            <AbstractText>just a dummy.</AbstractText>
+            <CopyrightInformation>Copyright from somwhere</CopyrightInformation>
+        </Abstract>
+        <Sections>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.guideline">Guideline Development Group members</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.acknowledgements">Acknowledgements</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.preface">Preface</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="glossary">Acronyms, abbreviations and glossary</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="development">Development of the Guideline</SectionTitle>
+                <Section>
+                    <LocationLabel Type="chapter">1</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch1">Introduction</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">2</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch2">Methodology</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">3</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch3">Key messages of the guideline</SectionTitle>
+                </Section>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="theguideline">The Guideline</SectionTitle>
+                <Section>
+                    <LocationLabel Type="chapter">4</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch4">Referral, diagnosis and investigations</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">5</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch5">Communication and education</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">6</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch6">The multidisciplinary team</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">7</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch7">Pharmacological management</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">8</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch8">Monitoring rheumatoid arthritis</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">9</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch9">Other aspects and treatment</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">10</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch10">NICE technology appraisal related recommendations</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">11</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch11">Areas for future research</SectionTitle>
+                </Section>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="references.rl1">References</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="appendixes.appgroup1">Appendices</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.evidencetables">Evidence Tables</SectionTitle>
+            </Section>
+        </Sections>
+    </BookDocument>
+    <PubmedBookData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">21413195</ArticleId>
+        </ArticleIdList>
+    </PubmedBookData>
+</PubmedBookArticle>

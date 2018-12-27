@@ -1,0 +1,69 @@
+<div class="bibtex_entry">
+
+	<div class="bibtex_header">
+		<div class="bibtex_key">
+			<a name="\bibtexkey">\bibtexkey</a>
+		</div>
+
+		\begin{doi}
+		<div class="bibtex_doi">
+			<a href="\format[DOICheck]{\doi}">doi</a>
+		</div>
+		\end{doi}
+
+		\begin{pmid}
+		<div class="bibtex_pmid">
+			<a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&query_hl=1&itool=pubmed_docsum&list_uids=\pmid">pmid</a>
+		</div>
+		\end{pmid}
+
+        \begin{file}
+		<div class="bibtex_pdf">
+			\format[FileLink(pdf),WrapContent(<a href=",">pdf</a>)]{\file}
+		</div>
+		\end{file}
+
+		\begin{url}
+		<div class="bibtex_url">
+			<a href="\url">url</a>
+		</div>
+		\end{url}
+	</div>
+
+	<div class="bibtex_content">
+
+		\begin{title}
+		<div class="bibtex_title">
+			In: \format[HTMLChars,RemoveLatexCommands]{\title}
+		</div>
+		\end{title}
+
+		\begin{author}
+		<div class="bibtex_author">
+			\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}
+		</div>
+		\end{author}
+
+		\begin{publisher}
+		<div class="bibtex_journal">
+			\format[HTMLChars]{\publisher}
+		</div>,
+		\end{publisher}
+
+		\begin{volume}
+		<div class="bibtex_volume">
+			Vol. \volume
+		</div>,
+		\end{volume}
+
+		\begin{pages}
+		<div class="bibtex_pages">
+			pp. \format[FormatPagesForHTML]{\pages}
+		</div>,
+		\end{pages}
+
+		<div class="bibtex_year">
+			\year
+		</div>
+	</div>
+</div>

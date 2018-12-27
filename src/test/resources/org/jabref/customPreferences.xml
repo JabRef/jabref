@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+    <root type="user">
+        <map/>
+        <node name="org">
+            <map/>
+            <node name="jabref">
+                <map>
+                    <entry key="dummykey" value="dummyvalue"/>
+                </map>
+                <node name="bibtexKeyPattern">
+                    <map/>
+                </node>
+            </node>
+        </node>
+    </root>
+</preferences>

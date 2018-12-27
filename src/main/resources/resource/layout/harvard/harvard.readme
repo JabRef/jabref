@@ -1,0 +1,55 @@
+************************************************
+
+*******                                 ********
+*******  Readme: Harvard Export Filter  ********
+*******                                 ******** 
+*******           for JabRef            ********
+*******                                 ********
+*******           version 1.0           ********
+*******            04/12/01             ********
+*******                                 ******** 
+************************************************
+
+
+written by gottfried (vosgerau@uni-tuebingen.de)
+
+
+
+The harvard export filter allows you to export your biliography entries into an Rich Text Format file (*.rtf) according to the Harvard citation standards often used in arts and humanities. The Rich Text Format file can be opened with word processing programms like Word, Open Office, Star Writer, etc. on all systems and then be copied directly into the other files.
+
+
+Installation
+************
+
+The following 11 files are needed for the harvard export filter:
+	harvard.article.layout
+	harvard.begin.layout
+	harvard.book.layout
+	harvard.end.layout
+	harvard.inbook.layout
+	harvard.incollection.layout
+	harvard.inproceedings.layout
+	harvard.layout
+	harvard.mastersthesis.layout
+	harvard.phdthesis.layout
+	harvard.proceedings.layout
+
+Put all of these 11 files in one directory. Note that all have to be in the same directory.
+
+Start JabRef. In the "Options" menu you will find the button "Manage costum exports". The "Manage costum exports" interface will appear. Click the "Add new" button. You can choose a name for the export filter (e.g. "Harvard"). Specify the location of the main layout file (which is the file "harvard.layout") by typing the full path or by using the "Browse" button. The file extension should be set to ".rtf". Click "OK".
+
+Now you will find the new costum export filter in the "File" menu under the pop-up menu "Custom export". To export the entries of your database just click on the name of the new filter and specify the output file.
+
+
+Important Notes
+***************
+
+Although we tried to make the filter as good as possible, please note that formatting command like \emph or \textbf are ignored. 
+
+The use of special characters such as \"a or \`a may lead to strange results. Therefore, if you use special characters check the output and use the find and replace command to correct the output.
+
+The ordering of the entries may not match the usual alphabetic order in some cases. Please check your file before usage.
+
+
+**************************
+end of file harvard.readme

@@ -1,0 +1,6 @@
+coverage:
+  ignore:
+  - src/gen/.*
+  status:
+    patch: false
+comment: off

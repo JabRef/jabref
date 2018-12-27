@@ -1,0 +1,37 @@
+<8>
+Score
+  *****
+Accession Number
+  00042637-900000000-99667.
+Author
+  Holstiege, Jakob 1;  Mathes, Tim 2;  Pieper, Dawid 2
+Institution
+  (1)Institute of Research in Rehabilitational Medicine at Ulm University, Bad Buchau, Germany
+  (2)Institute for Research in Operative Medicine, University Witten/Herdecke, Cologne, Germany
+Title
+  Effects of computer-aided clinical decision support systems in improving antibiotic prescribing by primary care providers: a systematic review.[Review]
+Source
+  Journal of the American Medical Informatics Association. 
+Status
+  Publish Ahead of Print, POST AUTHOR CORRECTIONS, 18 August 2014
+Abstract
+  Lorem ipsum abstract
+Author Keywords
+  computer-aided clinical decision support;  CDSS;  medical decision-making;  electronic health record;  antibiotic prescribing;  primary care.
+Language
+  English.
+Document Type
+  Review:  PDF Only.
+Journal Subset
+  Science.
+ISSN
+  1067-5027
+NLM Journal Code
+  b92, 9430800
+DOI Number
+  10.1136/amiajnl-2014-002886
+Link to the Ovid Full Text or citation
+ http://ovidsp.ovid.com/ovidweb.cgi?T=JS&CSC=Y&NEWS=N&PAGE=fulltext&D=ppvovftq&AN=00042637-900000000-99667
+
+
+

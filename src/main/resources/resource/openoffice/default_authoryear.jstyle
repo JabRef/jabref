@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: MIT
+
+NAME
+Default [Author year] style file
+
+JOURNALS
+Journal name 1
+Journal name 2
+
+PROPERTIES
+Title="References"
+IsSortByPosition="false"
+IsNumberEntries="false"
+ReferenceParagraphFormat="Text body"
+ReferenceHeaderParagraphFormat="Heading 2"
+
+CITATION
+BibtexKeyCitations=false
+AuthorField="author/editor"
+YearField="year"
+MaxAuthors="2"
+MaxAuthorsFirst="6"
+AuthorSeparator=","
+AuthorLastSeparator=" & "
+AuthorLastSeparatorInText=" and "
+EtAlString=" et al."
+ItalicEtAl="false"
+YearSeparator=" "
+InTextYearSeparator=" "
+BracketBefore="["
+BracketAfter="]"
+BracketBeforeInList="["
+BracketAfterInList="] "
+CitationSeparator="; "
+UniquefierSeparator=","
+GroupedNumbersSeparator="-"
+MinimumGroupingCount="3"
+FormatCitations="false"
+CitationCharacterFormat="Default"
+MultiCiteChronological="true"
+PageInfoSeparator="; "
+
+LAYOUT
+article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+
+book=\format[Authors(LastFirst,Semicolon)]{\author}\begin{editor}\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)\end{editor}, <b>\year\uniq</b>. <i>\title</i>. \publisher, \address.
+
+incollection=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\booktitle</i>, \publisher.
+
+inbook=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\chapter</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\title</i>, \publisher.
+
+phdthesis=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \school.
+
+default=\format[Authors(LastFirst,Semicolon)]{\author} (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+
