@@ -44,7 +44,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private final DialogService dialogService;
     private final StyleLoader loader;
-    private PreviewPanel preview;
+    private PreviewPanel previewArticle;
+    private PreviewPanel previewBook;
 
     public StyleSelectDialogView(DialogService dialogService, StyleLoader loader) {
         this.dialogService = dialogService;
@@ -70,10 +71,13 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        preview = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
-        preview.setEntry(TestEntry.getTestEntry());
+        previewArticle = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+        previewArticle.setEntry(TestEntry.getTestEntry());
+        vbox.getChildren().add(previewArticle);
 
-        vbox.getChildren().add(preview);
+        previewBook = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+        previewBook.setEntry(TestEntry.getTestEntryBook());
+        vbox.getChildren().add(previewBook);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
@@ -115,7 +119,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             tvStyles.getSelectionModel().select(style);
-            preview.setLayout(style.getStyle().getReferenceFormat("default"));
+            previewArticle.setLayout(style.getStyle().getReferenceFormat("default"));
+            previewBook.setLayout(style.getStyle().getReferenceFormat("default"));
         });
     }
 
