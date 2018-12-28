@@ -6,6 +6,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.IEEETranEntryTypes;
+
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
