@@ -181,7 +181,7 @@ public class SilverPlatterImporter extends Importer {
 
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getType(type).get());
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
             // create one here
             b.setField(h);
 

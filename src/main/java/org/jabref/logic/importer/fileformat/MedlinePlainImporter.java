@@ -209,7 +209,7 @@ public class MedlinePlainImporter extends Importer {
                 fields.put(FieldName.COMMENT, comment);
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getType(type).get());
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
 
             // Remove empty fields:
             fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);

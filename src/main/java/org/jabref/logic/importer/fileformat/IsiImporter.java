@@ -302,7 +302,7 @@ public class IsiImporter extends Importer {
                 continue;
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getType(Type).get());
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:

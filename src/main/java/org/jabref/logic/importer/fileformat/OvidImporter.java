@@ -208,7 +208,7 @@ public class OvidImporter extends Importer {
                 // Move the "chaptertitle" to just "title":
                 h.put(FieldName.TITLE, h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(BibtexEntryTypes.getType(entryType).get());
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
 
             bibitems.add(b);

@@ -30,7 +30,7 @@ public class BibTeXConverter {
         Map<String, String> fieldValues = new HashMap<>();
 
         String bibTexEntryType = MSBibMapping.getBiblatexEntryType(entry.getType());
-        result = new BibEntry(BibtexEntryTypes.getType(bibTexEntryType).get());
+        result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(bibTexEntryType));
 
         // add String fields
         for (Map.Entry<String, String> field : entry.fields.entrySet()) {

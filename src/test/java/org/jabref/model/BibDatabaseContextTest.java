@@ -47,6 +47,6 @@ public class BibDatabaseContextTest {
         db.insertEntry(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
-        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+        assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
     }
 }
