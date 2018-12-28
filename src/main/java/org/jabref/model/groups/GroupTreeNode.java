@@ -222,15 +222,11 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param entries list of entries to be searched
      * @return number of hits
      */
-    public int calculateNumberOfMatches(List<BibEntry> entries) {
-        int hits = 0;
+    public long calculateNumberOfMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
-        for (BibEntry entry : entries) {
-            if (matcher.isMatch(entry)) {
-                hits++;
-            }
-        }
-        return hits;
+        return entries.stream()
+                      .filter(matcher::isMatch)
+                      .count();
     }
 
     /**
@@ -238,7 +234,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param database database to be searched
      * @return number of hits
      */
-    public int calculateNumberOfMatches(BibDatabase database) {
+    public long calculateNumberOfMatches(BibDatabase database) {
         return calculateNumberOfMatches(database.getEntries());
     }
 
