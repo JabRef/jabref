@@ -819,7 +819,7 @@ public class BibEntry implements Cloneable {
                 latexFreeFields.put(name, entryName);
                 return Optional.of(entryName);
             } else {
-                return Optional.empty();
+                return Optional.of(StringUtil.capitalizeFirst(getType()));
             }
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
