@@ -24,7 +24,7 @@ import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -45,19 +45,17 @@ public class NewDroppedFileHandler {
     public NewDroppedFileHandler(DialogService dialogService,
                                  BibDatabaseContext bibDatabaseContext,
                                  ExternalFileTypes externalFileTypes,
-                                 FileDirectoryPreferences fileDirectoryPreferences,
-                                 String fileDirPattern,
+                                 FilePreferences filePreferences,
                                  ImportFormatPreferences importFormatPreferences,
                                  UpdateFieldPreferences updateFieldPreferences,
-                                 FileUpdateMonitor fileupdateMonitor,
-                                 String fileNamePattern) {
+                                 FileUpdateMonitor fileupdateMonitor) {
 
         this.dialogService = dialogService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.updateFieldPreferences = updateFieldPreferences;
         this.fileUpdateMonitor = fileupdateMonitor;
 
-        this.linker = new ExternalFilesEntryLinker(externalFileTypes, fileDirectoryPreferences, fileDirPattern, bibDatabaseContext, fileNamePattern);
+        this.linker = new ExternalFilesEntryLinker(externalFileTypes, filePreferences, bibDatabaseContext);
         this.contentImporter = new ExternalFilesContentImporter(importFormatPreferences);
     }
 

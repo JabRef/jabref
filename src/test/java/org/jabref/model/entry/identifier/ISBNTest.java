@@ -70,5 +70,4 @@ public class ISBNTest {
     public void testIsIsbn13Incorrect() {
         assertFalse(new ISBN("0-123456-47-9").isIsbn13());
     }
-
 }

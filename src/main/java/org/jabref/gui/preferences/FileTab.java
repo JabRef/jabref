@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -22,7 +23,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -95,11 +96,13 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(backup, 1, 3);
         Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.add(label, 1, 4);
+        final ToggleGroup resolveGroup = new ToggleGroup();
         builder.add(nonWrappableFields, 2, 4);
         builder.add(resolveStringsStandard,  1, 5);
         builder.add(resolveStringsAll, 1, 6);
         builder.add(doNotResolveStringsFor, 2, 6);
-
+        resolveStringsStandard.setToggleGroup(resolveGroup);
+        resolveStringsAll.setToggleGroup(resolveGroup);
         Label newlineSeparatorLabel = new Label(Localization.lang("Newline separator") + ":");
         builder.add(newlineSeparatorLabel, 1, 7);
         builder.add(newlineSeparator, 2, 7);
@@ -125,10 +128,14 @@ class FileTab extends Pane implements PrefsTab {
         });
         builder.add(browse, 3, 12);
         builder.add(bibLocAsPrimaryDir, 1, 13);
+        final ToggleGroup autolinkGroup = new ToggleGroup();
         builder.add(matchStartsWithKey,  1, 14);
         builder.add(matchExactKeyOnly,  1, 15);
         builder.add(useRegExpComboBox, 1, 16);
         builder.add(regExpTextField, 2, 16);
+        matchStartsWithKey.setToggleGroup(autolinkGroup);
+        matchExactKeyOnly.setToggleGroup(autolinkGroup);
+        useRegExpComboBox.setToggleGroup(autolinkGroup);
 
         Button help = new Button("?");
         help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
@@ -152,7 +159,7 @@ class FileTab extends Pane implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.getAsOptional(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX).orElse(""));
+        fileDir.setText(prefs.getAsOptional(FieldName.FILE + FilePreferences.DIR_SUFFIX).orElse(""));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -193,7 +200,7 @@ class FileTab extends Pane implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + FilePreferences.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());

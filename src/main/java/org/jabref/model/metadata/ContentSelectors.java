@@ -21,7 +21,7 @@ public class ContentSelectors {
     }
 
     public List<String> getSelectorValuesForField(String fieldName) {
-        for (ContentSelector selector: contentSelectors) {
+        for (ContentSelector selector : contentSelectors) {
             if (selector.getFieldName().equals(fieldName)) {
                 return selector.getValues();
             }
@@ -33,7 +33,7 @@ public class ContentSelectors {
     public void removeSelector(String fieldName) {
         ContentSelector toRemove = null;
 
-        for (ContentSelector selector: contentSelectors) {
+        for (ContentSelector selector : contentSelectors) {
             if (selector.getFieldName().equals(fieldName)) {
                 toRemove = selector;
                 break;
@@ -61,7 +61,7 @@ public class ContentSelectors {
     public List<String> getFieldNamesWithSelectors() {
         List<String> result = new ArrayList<>(contentSelectors.size());
 
-        for (ContentSelector selector: contentSelectors) {
+        for (ContentSelector selector : contentSelectors) {
             result.add(selector.getFieldName());
         }
 
@@ -70,8 +70,12 @@ public class ContentSelectors {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ContentSelectors that = (ContentSelectors) o;
         return Objects.equals(contentSelectors, that.contentSelectors);
     }

@@ -122,7 +122,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             toOnMouseClickedEvent.apply(rowItem, item).handle(event);
                         }
 
-                        if (menuFactory != null && !event.isConsumed()) {
+                        if ((menuFactory != null) && !event.isConsumed()) {
                             if (event.getButton() == MouseButton.PRIMARY) {
                                 ContextMenu menu = menuFactory.apply(rowItem, item);
                                 if (menu != null) {

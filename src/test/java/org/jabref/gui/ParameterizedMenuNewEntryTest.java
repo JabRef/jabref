@@ -61,5 +61,4 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
         );
         // @formatter:on
     }
-
 }

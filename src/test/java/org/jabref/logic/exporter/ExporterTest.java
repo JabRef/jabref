@@ -7,9 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -44,7 +42,7 @@ public class ExporterTest {
     private static Stream<Object[]> exportFormats() {
         Collection<Object[]> result = new ArrayList<>();
 
-        Map<String, TemplateExporter> customFormats = new HashMap<>();
+        List<TemplateExporter> customFormats = new ArrayList<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
@@ -68,7 +66,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, ()->{
+        assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(null, tmpFile, charset, entries);
@@ -78,7 +76,7 @@ public class ExporterTest {
     @ParameterizedTest
     @MethodSource("exportFormats")
     public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, ()->{
+        assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
             exportFormat.export(databaseContext, tmpFile, charset, null);

@@ -112,8 +112,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase().ifPresent(database ->
-                    file.findIn(database, Globals.prefs.getFileDirectoryPreferences())
-                            .ifPresent(this::setCurrentDocument));
+                    file.findIn(database, Globals.prefs.getFilePreferences())
+                        .ifPresent(this::setCurrentDocument));
         }
     }
 

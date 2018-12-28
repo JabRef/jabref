@@ -13,8 +13,8 @@ import org.jabref.model.entry.Month;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
@@ -25,11 +25,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(TempDirectory.class)
 class XmpUtilWriterTest {
 
-    private XmpPreferences xmpPreferences;
-
     private static BibEntry olly2018;
     private static BibEntry toral2006;
     private static BibEntry vapnik2000;
+    private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
 
@@ -113,7 +112,6 @@ class XmpUtilWriterTest {
 
         // compare the two entries
         assertEquals(entry, entryWritten);
-
     }
 
     /**
@@ -130,7 +128,6 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
         assertEquals(3, entryList.size());
-
     }
 
     private Path createDefaultFile(String fileName, Path tempDir) throws IOException {

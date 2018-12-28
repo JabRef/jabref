@@ -20,8 +20,8 @@ public class ProtectTermsFormatterTest {
     @BeforeEach
     public void setUp() {
         formatter = new ProtectTermsFormatter(
-                        new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
-                                Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
+                new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
     }
 
     @Test

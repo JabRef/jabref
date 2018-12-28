@@ -22,17 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * This class tests the BibtexImporter.
- * That importer is only used for --importToOpen, which is currently untested
+ * This class tests the BibtexImporter. That importer is only used for --importToOpen, which is currently untested
  * <p>
- * TODO:
- * 1. Add test for --importToOpen
- * 2. Move these tests to the code opening a bibtex file
+ * TODO: 1. Add test for --importToOpen 2. Move these tests to the code opening a bibtex file
  */
 public class BibtexImporterTest {
 
     private BibtexImporter importer;
-
 
     @BeforeEach
     public void setUp() {
@@ -68,23 +64,23 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("13"), entry.getField("number"));
                 assertEquals(Optional.of("3027-3036"), entry.getField("pages"));
                 assertEquals(Optional
-                        .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
-                                + "carbenes in {Mizoroki-Heck} reactions"),
+                                .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
+                                        + "carbenes in {Mizoroki-Heck} reactions"),
                         entry.getField("title"));
                 assertEquals(Optional.of("691"), entry.getField("volume"));
             } else if (entry.getCiteKeyOptional().get().equals("stdmodel")) {
                 assertEquals(Optional
-                        .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
-                                + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
-                                + "each set member entry is needed only when using BibTeX as the backend"),
+                                .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
+                                        + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
+                                        + "each set member entry is needed only when using BibTeX as the backend"),
                         entry.getField("annotation"));
                 assertEquals(Optional.of("stdmodel"), entry.getField("bibtexkey"));
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField("entryset"));
             } else if (entry.getCiteKeyOptional().get().equals("set")) {
                 assertEquals(Optional
-                        .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
-                                + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
-                                + "BibTeX as the backend"),
+                                .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
+                                        + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
+                                        + "BibTeX as the backend"),
                         entry.getField("annotation"));
                 assertEquals(Optional.of("set"), entry.getField("bibtexkey"));
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField("entryset"));

@@ -70,7 +70,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
+        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
 
         Path workingDir = file.orElse(preferences.getWorkingDir());
         String fileName = Paths.get(fileText).getFileName().toString();
@@ -127,8 +127,8 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
-        return FileUtil.shortenFileName(filePath, fileDirectories).toString();
+        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 
 }

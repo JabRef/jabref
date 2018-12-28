@@ -43,7 +43,7 @@ public class FieldEditors {
 
         final FieldCheckers fieldCheckers = new FieldCheckers(
                 databaseContext,
-                preferences.getFileDirectoryPreferences(),
+                preferences.getFilePreferences(),
                 journalAbbreviationRepository,
                 preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 

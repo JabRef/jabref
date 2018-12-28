@@ -3,6 +3,8 @@ package org.jabref.gui.maintable;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.control.TableColumn.SortType;
+
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.specialfields.SpecialField;
 
@@ -16,8 +18,9 @@ public class ColumnPreferences {
     private final List<SpecialField> specialFieldColumns;
     private final List<String> extraFileColumns;
     private final Map<String, Double> columnWidths;
+    private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths) {
+    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
         this.showFileColumn = showFileColumn;
         this.showUrlColumn = showUrlColumn;
         this.preferDoiOverUrl = preferDoiOverUrl;
@@ -26,6 +29,7 @@ public class ColumnPreferences {
         this.specialFieldColumns = specialFieldColumns;
         this.extraFileColumns = extraFileColumns;
         this.columnWidths = columnWidths;
+        this.columnSortType = columnSortType;
     }
 
     public boolean showFileColumn() {
@@ -58,5 +62,9 @@ public class ColumnPreferences {
 
     public double getPrefColumnWidth(String columnName) {
         return columnWidths.getOrDefault(columnName, BibtexSingleField.DEFAULT_FIELD_LENGTH);
+    }
+
+    public Map<String, SortType> getSortTypesForColumns() {
+        return columnSortType;
     }
 }

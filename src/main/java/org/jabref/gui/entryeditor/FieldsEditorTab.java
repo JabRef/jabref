@@ -120,14 +120,12 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             setCompressedRowLayout(gridPane, rows);
         } else {
-            rows = fields.size();
-
             addColumn(gridPane, 0, labels);
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane, rows);
+            setRegularRowLayout(gridPane);
         }
 
         // Warp everything in a scroll-pane
@@ -140,17 +138,17 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    private void setRegularRowLayout(GridPane gridPane, int rows) {
-        List<RowConstraints> constraints = new ArrayList<>(rows);
+    private void setRegularRowLayout(GridPane gridPane) {
+        double totalWeight = fields.stream()
+                                   .mapToDouble(field -> editors.get(field).getWeight())
+                                   .sum();
+
+        List<RowConstraints> constraints = new ArrayList<>();
         for (String field : fields) {
             RowConstraints rowExpand = new RowConstraints();
             rowExpand.setVgrow(Priority.ALWAYS);
             rowExpand.setValignment(VPos.TOP);
-            if (rows == 0) {
-                rowExpand.setPercentHeight(100);
-            } else {
-                rowExpand.setPercentHeight(100 / rows * editors.get(field).getWeight());
-            }
+            rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);
             constraints.add(rowExpand);
         }
         gridPane.getRowConstraints().addAll(constraints);
@@ -163,7 +161,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         if (rows == 0) {
             rowExpand.setPercentHeight(100);
         } else {
-            rowExpand.setPercentHeight(100 / rows);
+            rowExpand.setPercentHeight(100 / (double) rows);
         }
         for (int i = 0; i < rows; i++) {
             gridPane.getRowConstraints().add(rowExpand);

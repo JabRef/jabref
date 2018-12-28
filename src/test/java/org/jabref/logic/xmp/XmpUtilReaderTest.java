@@ -14,12 +14,10 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.io.Resources;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -30,10 +28,7 @@ import static org.mockito.Mockito.when;
 
 class XmpUtilReaderTest {
 
-    private static final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-
     private XmpPreferences xmpPreferences;
-
     private BibtexParser parser;
 
     /**
@@ -49,7 +44,7 @@ class XmpUtilReaderTest {
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
-        parser = new BibtexParser(importFormatPreferences, fileMonitor);
+        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     /**
@@ -104,5 +99,4 @@ class XmpUtilReaderTest {
 
         assertEquals(entryFromBibFile.get(), entries.get(0));
     }
-
 }

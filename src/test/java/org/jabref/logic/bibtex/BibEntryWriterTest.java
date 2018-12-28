@@ -12,6 +12,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -85,7 +87,24 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void writeReallyunknownTypeTest() throws Exception {
+    void writeEntryWithFile() throws Exception {
+        BibEntry entry = new BibEntry(BiblatexEntryTypes.ARTICLE);
+        LinkedFile file = new LinkedFile("test", "/home/uers/test.pdf", "PDF");
+        entry.addFile(file);
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                "@Article{,"
+                + OS.NEWLINE
+                + "  file = {test:/home/uers/test.pdf:PDF},"
+                + OS.NEWLINE
+                + "}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    public void writeReallyUnknownTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
@@ -490,5 +509,4 @@ public class BibEntryWriterTest {
 
         assertEquals(expected, actual);
     }
-
 }

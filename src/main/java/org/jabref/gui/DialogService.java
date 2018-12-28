@@ -188,7 +188,7 @@ public interface DialogService {
     <V> void showCanceableProgressDialogAndWait(Task<V> task);
 
     /**
-     * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
      */

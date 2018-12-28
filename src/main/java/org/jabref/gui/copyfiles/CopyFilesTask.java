@@ -74,7 +74,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
                     LinkedFile fileName = files.get(j);
 
-                    Optional<Path> fileToExport = fileName.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+                    Optional<Path> fileToExport = fileName.findIn(databaseContext, Globals.prefs.getFilePreferences());
 
                     newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 

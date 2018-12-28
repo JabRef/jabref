@@ -25,7 +25,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -87,9 +87,9 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)
-                && (Globals.prefs.hasKey(FieldName.PDF + FileDirectoryPreferences.DIR_SUFFIX)
-                || Globals.prefs.hasKey(FieldName.PS + FileDirectoryPreferences.DIR_SUFFIX));
+        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FilePreferences.DIR_SUFFIX)
+                && (Globals.prefs.hasKey(FieldName.PDF + FilePreferences.DIR_SUFFIX)
+                || Globals.prefs.hasKey(FieldName.PS + FilePreferences.DIR_SUFFIX));
 
         // First check if this warning is disabled:
         return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)
@@ -141,10 +141,10 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
             formBuilder.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
-            if (Globals.prefs.hasKey(FieldName.PDF + FileDirectoryPreferences.DIR_SUFFIX)) {
-                fileDir.setText(Globals.prefs.get(FieldName.PDF + FileDirectoryPreferences.DIR_SUFFIX));
+            if (Globals.prefs.hasKey(FieldName.PDF + FilePreferences.DIR_SUFFIX)) {
+                fileDir.setText(Globals.prefs.get(FieldName.PDF + FilePreferences.DIR_SUFFIX));
             } else {
-                fileDir.setText(Globals.prefs.get(FieldName.PS + FileDirectoryPreferences.DIR_SUFFIX));
+                fileDir.setText(Globals.prefs.get(FieldName.PS + FilePreferences.DIR_SUFFIX));
             }
             JPanel builderPanel = new JPanel();
             builderPanel.add(setFileDir);
@@ -220,7 +220,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX, fileDir);
+            Globals.prefs.put(FieldName.FILE + FilePreferences.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {

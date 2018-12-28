@@ -110,7 +110,6 @@ public class IdFetcherDialogTest extends AbstractUITest {
         entryTable.requireRowCount(1);
     }
 
-
     public static Stream<Object[]> instancesToTest() {
         return Stream.of(
                 new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
@@ -119,5 +118,4 @@ public class IdFetcherDialogTest extends AbstractUITest {
                 new Object[]{"biblatex", "ISBN", "9780321356680"}
         );
     }
-
 }

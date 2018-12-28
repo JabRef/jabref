@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class AuthorListParameterTest {
 
     private static Stream<Arguments> data() {

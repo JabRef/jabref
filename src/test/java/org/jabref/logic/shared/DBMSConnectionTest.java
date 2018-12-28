@@ -26,6 +26,6 @@ public class DBMSConnectionTest {
     @Test
     public void testGetConnectionFail(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
         assertThrows(SQLException.class,
-                () -> new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX")).getConnection());
+                () -> new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX", false, "XXXX")).getConnection());
     }
 }

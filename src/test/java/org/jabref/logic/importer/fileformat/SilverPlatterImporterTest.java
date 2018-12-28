@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 class SilverPlatterImporterTest {
 
     private static final String FILE_ENDING = ".txt";
@@ -63,5 +62,4 @@ class SilverPlatterImporterTest {
     void testGetDescription() {
         assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
-
 }

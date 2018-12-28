@@ -17,7 +17,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
+    @FXML private EditorTextField textField;
 
     public JournalEditor(String fieldName, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
@@ -26,12 +26,12 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textField.textProperty().bindBidirectional(viewModel.textProperty());
+        textField.addToContextMenu(EditorMenus.getDefaultMenu(textField));
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
+        AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public JournalEditorViewModel getViewModel() {

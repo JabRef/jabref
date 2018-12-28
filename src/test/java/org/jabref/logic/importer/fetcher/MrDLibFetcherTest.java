@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
@@ -20,7 +21,7 @@ public class MrDLibFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new MrDLibFetcher("", "");
+        fetcher = new MrDLibFetcher("", Version.parse(""));
     }
 
     @Test
@@ -56,5 +57,4 @@ public class MrDLibFetcherTest {
     public void testGetName() {
         assertEquals("MDL_FETCHER", fetcher.getName());
     }
-
 }

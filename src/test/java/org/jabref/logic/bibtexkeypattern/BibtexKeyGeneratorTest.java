@@ -227,8 +227,8 @@ public class BibtexKeyGeneratorTest {
     }
 
     /**
-     * Tests if checkLegalKey replaces Non-ASCII chars.
-     * There are quite a few chars that should be replaced. Perhaps there is a better method than the current.
+     * Tests if checkLegalKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps
+     * there is a better method than the current.
      *
      * @see BibtexKeyGenerator#checkLegalKey(String)
      */
@@ -799,8 +799,8 @@ public class BibtexKeyGeneratorTest {
     }
 
     /**
-    * Tests [camel]
-    */
+     * Tests [camel]
+     */
     @Test
     public void camel() {
         // camel capitalises and concatenates all the words of the title

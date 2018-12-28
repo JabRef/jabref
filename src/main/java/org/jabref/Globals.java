@@ -7,7 +7,6 @@ import java.util.UUID;
 import javafx.stage.Screen;
 
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
@@ -60,8 +59,6 @@ public class Globals {
     public static ExporterFactory exportFactory;
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
-    // Background tasks
-    private static GlobalFocusListener focusListener;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
@@ -78,13 +75,11 @@ public class Globals {
     }
 
     // Background tasks
-    public static void startBackgroundTasks() {
-        Globals.focusListener = new GlobalFocusListener();
-
+    public static void startBackgroundTasks() throws JabRefException {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        themeLoader = new ThemeLoader(fileUpdateMonitor);
+        themeLoader = new ThemeLoader(fileUpdateMonitor, prefs);
 
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
@@ -115,10 +110,6 @@ public class Globals {
         telemetryClient.getContext().getDevice().setScreenResolution(Screen.getPrimary().getVisualBounds().toString());
 
         telemetryClient.trackSessionState(SessionState.Start);
-    }
-
-    public static GlobalFocusListener getFocusListener() {
-        return focusListener;
     }
 
     public static FileUpdateMonitor getFileUpdateMonitor() {

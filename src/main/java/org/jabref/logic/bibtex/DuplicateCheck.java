@@ -117,10 +117,10 @@ public class DuplicateCheck {
     }
 
     private static boolean haveDifferentChaptersOrPagesOfTheSameBook(final BibEntry one, final BibEntry two) {
-        return compareSingleField(AUTHOR, one, two) == EQUAL &&
-                compareSingleField(TITLE, one, two) == EQUAL &&
-                (compareSingleField(CHAPTER, one, two) == NOT_EQUAL ||
-                        compareSingleField(PAGES, one, two) == NOT_EQUAL);
+        return (compareSingleField(AUTHOR, one, two) == EQUAL) &&
+                (compareSingleField(TITLE, one, two) == EQUAL) &&
+                ((compareSingleField(CHAPTER, one, two) == NOT_EQUAL) ||
+                        (compareSingleField(PAGES, one, two) == NOT_EQUAL));
 
     }
 
@@ -289,12 +289,9 @@ public class DuplicateCheck {
     public static Optional<BibEntry> containsDuplicate(final BibDatabase database,
                                                        final BibEntry entry,
                                                        final BibDatabaseMode bibDatabaseMode) {
-        for (final BibEntry other : database.getEntries()) {
-            if (DuplicateCheck.isDuplicate(entry, other, bibDatabaseMode)) {
-                return Optional.of(other); // Duplicate found.
-            }
-        }
-        return Optional.empty(); // No duplicate found.
+
+        return database.getEntries().stream().filter(other -> DuplicateCheck.isDuplicate(entry, other, bibDatabaseMode)).findFirst();
+
     }
 
     /**
@@ -342,7 +339,7 @@ public class DuplicateCheck {
             return 1.0;
         }
         final double distanceIgnoredCase = new StringSimilarity().editDistanceIgnoreCase(longer, shorter);
-        final double similarity = (longerLength - distanceIgnoredCase) / (double) longerLength;
+        final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
         LOGGER.debug("Longer string: " + longer + " Shorter string: " + shorter + " Similarity: " + similarity);
         return similarity;
     }

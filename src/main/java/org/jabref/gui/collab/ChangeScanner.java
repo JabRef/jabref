@@ -1,5 +1,6 @@
 package org.jabref.gui.collab;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -16,12 +17,10 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
+import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -105,10 +104,9 @@ public class ChangeScanner implements Runnable {
                                                                         .getEncoding()
                                                                         .orElse(Globals.prefs.getDefaultEncoding()));
 
-                BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
-                SaveSession ss = databaseWriter.saveDatabase(databaseInTemp, prefs);
-                ss.commit(tempFile);
-            } catch (SaveException ex) {
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(new AtomicFileWriter(tempFile, prefs.getEncoding()), prefs);
+                databaseWriter.saveDatabase(databaseInTemp);
+            } catch (IOException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }
         });

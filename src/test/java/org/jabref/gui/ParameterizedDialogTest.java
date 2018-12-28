@@ -36,13 +36,13 @@ public class ParameterizedDialogTest extends AbstractUITest {
             findDialog(matcher).withTimeout(10_000).using(robot()).close();
         } else {
             findDialog(matcher).withTimeout(10_000).using(robot())
-                    .button(new GenericTypeMatcher<JButton>(JButton.class) {
+                               .button(new GenericTypeMatcher<JButton>(JButton.class) {
 
-                        @Override
-                        protected boolean isMatching(@Nonnull JButton jButton) {
-                            return buttonName.equals(jButton.getText());
-                        }
-                    }).click();
+                                   @Override
+                                   protected boolean isMatching(@Nonnull JButton jButton) {
+                                       return buttonName.equals(jButton.getText());
+                                   }
+                               }).click();
         }
         if (createDatabase) {
             closeDatabase();
@@ -130,5 +130,4 @@ public class ParameterizedDialogTest extends AbstractUITest {
         );
         // @formatter:on
     }
-
 }

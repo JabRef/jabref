@@ -17,15 +17,15 @@ public class TestConnector {
     public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
 
         if (dbmsType == DBMSType.MYSQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "");
+            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "", false, "");
         }
 
         if (dbmsType == DBMSType.POSTGRESQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "postgres", "");
+            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "postgres", "", false, "");
         }
 
         if (dbmsType == DBMSType.ORACLE) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis");
+            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis", false, "");
         }
 
         return new DBMSConnectionProperties();

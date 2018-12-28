@@ -52,9 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test the BibtexParser
- */
 class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
@@ -329,7 +326,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
-                .withField("author", "Ed von T@st");
+                                                   .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
@@ -941,7 +938,6 @@ class BibtexParserTest {
                         + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
                         + "	Year = 2002" + "}"));
 
-
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1342,7 +1338,7 @@ class BibtexParserTest {
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
         assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
-                new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
+                        new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
                 saveOrderConfig.get());
     }
 
@@ -1445,12 +1441,11 @@ class BibtexParserTest {
         assertEquals(Collections.singletonList(expectedEntry), entries);
     }
 
-
     @Test
     void parseRecognizesDatabaseID() throws Exception {
         String expectedDatabaseID = "q1w2e3r4t5z6";
         StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("% DBID: ").append(expectedDatabaseID)
+                .append("\\% DBID: ").append(expectedDatabaseID)
                 .append(OS.NEWLINE)
                 .append("@Article{a}");
 
@@ -1463,8 +1458,8 @@ class BibtexParserTest {
     @Test
     void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
         StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("% Encoding: UTF-8").append(OS.NEWLINE)
-                .append("% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
+                .append("\\% Encoding: UTF-8").append(OS.NEWLINE)
+                .append("\\% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
                 .append("@Article{a}");
 
         ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));

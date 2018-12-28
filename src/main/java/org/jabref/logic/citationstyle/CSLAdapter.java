@@ -64,7 +64,8 @@ public class CSLAdapter {
      */
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
         if (cslInstance == null || !Objects.equals(newStyle, style)) {
-            cslInstance = new CSL(dataProvider, newStyle);
+            // lang and forceLang are set to the default values of other CSL constructors
+            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), newStyle, "en-US", false);
             style = newStyle;
         }
 

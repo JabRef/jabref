@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
@@ -30,7 +30,6 @@ class ProtectedTermsLoaderTest {
     void setUp() {
         loader = new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
-
     }
 
     @Test
@@ -43,7 +42,7 @@ class ProtectedTermsLoaderTest {
         assertTrue(loader.getProtectedTermsLists().isEmpty());
         String filename = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         loader.addProtectedTermsListFromFile(filename, true);
         assertEquals(Arrays.asList("Einstein"), loader.getProtectedTerms());
     }
@@ -52,7 +51,7 @@ class ProtectedTermsLoaderTest {
     void testAddProtectedTermsListFromFile() throws URISyntaxException {
         String filename = Paths
                 .get(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                        .toURI())
+                                               .toURI())
                 .toFile().getPath();
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), loader.getProtectedTermsLists().size());
         loader.addProtectedTermsListFromFile(filename, false);
@@ -63,7 +62,7 @@ class ProtectedTermsLoaderTest {
     void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals("Term list", list.getDescription());
     }
@@ -72,7 +71,7 @@ class ProtectedTermsLoaderTest {
     void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
         assertFalse(list.isEnabled());
     }
@@ -81,7 +80,7 @@ class ProtectedTermsLoaderTest {
     void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertTrue(list.isEnabled());
     }
@@ -90,7 +89,7 @@ class ProtectedTermsLoaderTest {
     void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertFalse(list.isInternalList());
     }
@@ -100,8 +99,8 @@ class ProtectedTermsLoaderTest {
             throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/unnamedterms.terms")
-                        .toURI())
-                .toFile();
+                                          .toURI())
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals(Localization.lang("The text after the last line starting with # will be used"),
                 list.getDescription());

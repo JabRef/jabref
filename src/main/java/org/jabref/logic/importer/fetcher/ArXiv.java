@@ -263,8 +263,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        String cleanedIdentifier = identifier.trim();
-        cleanedIdentifier = identifier.replaceAll(" ", "");
+        String cleanedIdentifier = identifier.replaceAll(" ", "");
+        cleanedIdentifier = ArXivEntry.createIdString(cleanedIdentifier);
 
         return searchForEntryById(cleanedIdentifier).map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
@@ -372,17 +372,18 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
          * Returns the arXiv identifier
          */
         public Optional<String> getIdString() {
+            return urlAbstractPage.map(ArXivEntry::createIdString);
+        }
 
-            return urlAbstractPage.map(abstractUrl -> {
-                Matcher matcher = URL_PATTERN.matcher(abstractUrl);
+        public static String createIdString(String id) {
+                Matcher matcher = URL_PATTERN.matcher(id);
                 if (matcher.find()) {
-                    // remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
-                    return abstractUrl.substring(matcher.group(1).length());
+                    // Remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
+                    return id.substring(matcher.group(1).length());
                 } else {
-                    return abstractUrl;
+                    return id;
                 }
 
-            });
         }
 
         public Optional<ArXivIdentifier> getId() {

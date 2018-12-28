@@ -29,9 +29,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,50 +41,50 @@ public class ImporterTest {
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, ()-> format.isRecognizedFormat((BufferedReader) null));
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, ()-> format.isRecognizedFormat((String) null));
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, ()-> format.importDatabase((BufferedReader) null));
+        assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void importDatabaseWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, ()-> format.importDatabase((String) null));
+        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void getFormatterNameDoesNotReturnNull(Importer format) {
-         assertNotNull(format.getName());
+        assertNotNull(format.getName());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void getFileTypeDoesNotReturnNull(Importer format) {
-         assertNotNull(format.getFileType());
+        assertNotNull(format.getFileType());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void getIdDoesNotReturnNull(Importer format) {
-         assertNotNull(format.getId());
+        assertNotNull(format.getId());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void getIdDoesNotContainWhitespace(Importer format) {
         Pattern whitespacePattern = Pattern.compile("\\s");
-         assertFalse(whitespacePattern.matcher(format.getId()).find());
+        assertFalse(whitespacePattern.matcher(format.getId()).find());
     }
 
     @ParameterizedTest
@@ -92,15 +92,14 @@ public class ImporterTest {
     public void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
         Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
-         assertEquals("testimporter", importer.getId());
+        assertEquals("testimporter", importer.getId());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
     public void getDescriptionDoesNotReturnNull(Importer format) {
-         assertNotNull(format.getDescription());
+        assertNotNull(format.getDescription());
     }
-
 
     public static Stream<Importer> instancesToTest() {
         // all classes implementing {@link Importer}
@@ -131,5 +130,4 @@ public class ImporterTest {
         );
         // @formatter:on
     }
-
 }

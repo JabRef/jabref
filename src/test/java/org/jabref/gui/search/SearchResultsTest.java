@@ -21,7 +21,6 @@ public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
     private FrameFixture frameFixture;
 
-
     @BeforeAll
     public static void before() {
         FailOnThreadViolationRepaintManager.uninstall();
@@ -94,5 +93,4 @@ public class SearchResultsTest extends AssertJSwingJUnitTestCase {
         Assert.assertTrue(entries.stream().noneMatch(entry -> entry.isSearchHit()));
         */
     }
-
 }

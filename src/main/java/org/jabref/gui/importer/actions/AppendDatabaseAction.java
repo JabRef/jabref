@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.CompoundEdit;
 
@@ -12,12 +13,11 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.MergeDialog;
 import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableInsertString;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -35,6 +35,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -146,24 +147,21 @@ public class AppendDatabaseAction implements BaseAction {
     @Override
     public void action() {
         filesToOpen.clear();
-        final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
-        dialog.setVisible(true);
-        if (dialog.isOkPressed()) {
-
+        final AppendDatabaseDialog dialog = new AppendDatabaseDialog();
+        Optional<Boolean> response = dialog.showAndWait();
+        if (OptionalUtil.isPresentAndTrue(response)) {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withDefaultExtension(StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
 
-            List<Path> chosen = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+            List<Path> chosen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
             if (chosen.isEmpty()) {
                 return;
             }
             filesToOpen.addAll(chosen);
 
-            // Run the actual open in a thread to prevent the program
-            // locking until the file is loaded.
+            // Run the actual open in a thread to prevent the program locking until the file is loaded.
             JabRefExecutorService.INSTANCE.execute(
                     () -> openIt(dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()));
         }

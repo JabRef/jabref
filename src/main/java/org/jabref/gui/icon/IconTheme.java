@@ -308,7 +308,7 @@ public class IconTheme {
         LOOKUP_IDENTIFIER(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
         FETCH_FULLTEXT(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
         FETCH_BY_IDENTIFIER(MaterialDesignIcon.CLIPBOARD_ARROW_DOWN),
-        TOGGLE_ABBREVIATION(MaterialDesignIcon.TEXT_SHADOW),
+        TOGGLE_ABBREVIATION(MaterialDesignIcon.FORMAT_ALIGN_CENTER),
         NEW_FILE(MaterialDesignIcon.PLUS),
         DOWNLOAD(MaterialDesignIcon.DOWNLOAD),
         OWNER(MaterialDesignIcon.ACCOUNT),

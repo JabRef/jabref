@@ -48,7 +48,7 @@ public class IntegrityCheckAction extends SimpleCommand {
     @Override
     public void execute() {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                Globals.prefs.getFileDirectoryPreferences(),
+                Globals.prefs.getFilePreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
