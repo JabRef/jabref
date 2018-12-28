@@ -32,16 +32,6 @@ public class CopyFilesAction extends SimpleCommand {
         this.dialogService = frame.getDialogService();
     }
 
-    private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
-
-        dialogService.showCanceableProgressDialogAndWait(exportService);
-
-        exportService.run();
-        exportService.setOnSucceeded((e) -> {
-            showDialog(exportService.getValue());
-        });
-    }
-
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
         if (data.isEmpty()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
@@ -64,7 +54,12 @@ public class CopyFilesAction extends SimpleCommand {
             databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
 
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
-            startServiceAndshowProgessDialog(exportTask);
+            dialogService.showProgressDialogAndWait(
+                    Localization.lang("Copy linked files to folder..."),
+                    Localization.lang("Copy linked files to folder..."),
+                    exportTask);
+            Globals.TASK_EXECUTOR.execute(exportTask);
+            exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue()));
         });
 
     }

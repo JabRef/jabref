@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -693,11 +694,12 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
-        bibDatabaseContext.getDatabase().getEntryById(entryId).ifPresent(entry -> {
-            clearAndSelect(entry);
-            showAndEdit(entry);
+    public void editEntryAndFocusField(BibEntry entry, String fieldName) {
+        showAndEdit(entry);
+        Platform.runLater(() -> {
+            // Focus field and entry in main table (async to give entry editor time to load)
             entryEditor.setFocusToField(fieldName);
+            clearAndSelect(entry);
         });
     }
 
