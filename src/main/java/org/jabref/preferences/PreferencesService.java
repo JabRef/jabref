@@ -43,9 +43,9 @@ public interface PreferencesService {
 
     void setCustomTabsNameAndFields(String name, String fields, int defNumber);
 
-    public void purgeSeries(String prefix, int number);
+    void purgeSeries(String prefix, int number);
 
-    public void updateEntryEditorTabList();
+    void updateEntryEditorTabList();
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
 
