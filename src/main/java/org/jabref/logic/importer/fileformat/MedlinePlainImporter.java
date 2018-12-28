@@ -16,6 +16,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 /**
@@ -208,7 +209,7 @@ public class MedlinePlainImporter extends Importer {
                 fields.put(FieldName.COMMENT, comment);
             }
 
-            BibEntry b = new BibEntry(type);
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
 
             // Remove empty fields:
             fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);

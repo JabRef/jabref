@@ -29,7 +29,7 @@ class CiteKeyBasedFileFinderTest {
 
     @BeforeEach
     void setUp(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
-        entry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setCiteKey("HipKro03");
 
         rootDir = temporaryFolder;

@@ -74,6 +74,7 @@ import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
@@ -262,7 +263,7 @@ public class MedlineImporter extends Importer implements Parser {
             putIfValueNotNull(fields, "pubstatus", bookData.getPublicationStatus());
         }
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField(fields);
 
         bibItems.add(entry);
@@ -410,7 +411,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField(fields);
 
         bibItems.add(entry);
