@@ -1,5 +1,7 @@
 #sideMenu {
     -fx-background-color: -jr-white;
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1;
 }
 
 #sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {

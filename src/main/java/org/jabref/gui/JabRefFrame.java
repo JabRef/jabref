@@ -454,9 +454,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         fileHistory.storeHistory();
-        prefs.customExports.store(Globals.prefs);
-        prefs.customImports.store();
-
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
@@ -928,7 +925,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
                 factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
@@ -1335,7 +1332,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
                 if (!saveAction.save()) {
                     // The action was either canceled or unsuccessful.
                     output(Localization.lang("Unable to save library"));

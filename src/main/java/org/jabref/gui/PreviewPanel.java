@@ -46,6 +46,9 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -351,7 +354,19 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     private void copyPreviewToClipBoard() {
-        String previewContent = (String) previewView.getEngine().executeScript("document.documentElement.outerHTML");
-        clipBoardManager.setContent(previewContent);
+        StringBuilder previewStringContent = new StringBuilder();
+        Document document = previewView.getEngine().getDocument();
+        NodeList nodeList = document.getElementsByTagName("*");
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element element = (Element) nodeList.item(i);
+            previewStringContent.append(element.getNodeValue()).append("\n");
+        }
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString(previewStringContent.toString());
+        content.putHtml((String) previewView.getEngine().executeScript("document.documentElement.outerHTML"));
+
+        clipBoardManager.setContent(content);
     }
 }

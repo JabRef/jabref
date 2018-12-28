@@ -7,10 +7,15 @@ import java.util.stream.Collectors;
 
 import javafx.scene.text.Text;
 
-import difflib.Delta;
-import difflib.DiffUtils;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DiffHighlighting {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiffHighlighting.class);
 
     private DiffHighlighting() {
     }
@@ -18,20 +23,26 @@ public class DiffHighlighting {
     public static List<Text> generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
         List<Text> result = stringList.stream().map(DiffHighlighting::forUnchanged).collect(Collectors.toList());
-        List<Delta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
-            Collections.reverse(deltaList);
-            for (Delta<String> delta : deltaList) {
-                int startPos = delta.getOriginal().getPosition();
-                List<String> lines = delta.getOriginal().getLines();
-                int offset = 0;
-                switch (delta.getType()) {
+        List<AbstractDelta<String>> deltaList;
+        try {
+            deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
+        } catch (DiffException e) {
+            LOGGER.error("Error while generating diff of " + baseString + " and " + modifiedString);
+            return Collections.emptyList();
+        }
+        Collections.reverse(deltaList);
+        for (AbstractDelta<String> delta : deltaList) {
+            int startPos = delta.getSource().getPosition();
+            List<String> lines = delta.getSource().getLines();
+            int offset = 0;
+            switch (delta.getType()) {
                 case CHANGE:
                     for (String line : lines) {
                         result.set(startPos + offset, forRemoved(line + separator));
                         offset++;
                     }
                     result.set(startPos + offset - 1, forRemoved(stringList.get((startPos + offset) - 1) + separator));
-                    result.add(startPos + offset, forAdded(String.join(separator, delta.getRevised().getLines())));
+                    result.add(startPos + offset, forAdded(String.join(separator, delta.getTarget().getLines())));
                     break;
                 case DELETE:
                     for (String line : lines) {
@@ -40,12 +51,12 @@ public class DiffHighlighting {
                     }
                     break;
                 case INSERT:
-                    result.add(delta.getOriginal().getPosition(), forAdded(String.join(separator, delta.getRevised().getLines())));
+                    result.add(delta.getSource().getPosition(), forAdded(String.join(separator, delta.getTarget().getLines())));
                     break;
                 default:
                     break;
-                }
             }
+        }
         return result;
     }
 
@@ -76,13 +87,19 @@ public class DiffHighlighting {
     public static List<Text> generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
         List<Text> result = stringList.stream().map(text -> DiffHighlighting.forUnchanged(text + separator)).collect(Collectors.toList());
-        List<Delta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
-            Collections.reverse(deltaList);
-            for (Delta<String> delta : deltaList) {
-                int startPos = delta.getOriginal().getPosition();
-                List<String> lines = delta.getOriginal().getLines();
-                int offset = 0;
-                switch (delta.getType()) {
+        List<AbstractDelta<String>> deltaList;
+        try {
+            deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
+        } catch (DiffException e) {
+            LOGGER.error("Error while generating diff of " + baseString + " and " + modifiedString);
+            return Collections.emptyList();
+        }
+        Collections.reverse(deltaList);
+        for (AbstractDelta<String> delta : deltaList) {
+            int startPos = delta.getSource().getPosition();
+            List<String> lines = delta.getSource().getLines();
+            int offset = 0;
+            switch (delta.getType()) {
                 case CHANGE:
                     for (String line : lines) {
                         result.set(startPos + offset, forChanged(line + separator));
@@ -99,10 +116,9 @@ public class DiffHighlighting {
                     break;
                 default:
                     break;
-                }
             }
+        }
 
         return result;
     }
-
 }
