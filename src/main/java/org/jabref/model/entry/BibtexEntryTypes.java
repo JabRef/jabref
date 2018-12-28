@@ -289,10 +289,6 @@ public class BibtexEntryTypes {
     }
 
     public static EntryType getTypeOrDefault(String name) {
-        Optional<EntryType> optType = getType(name);
-        if (optType.isPresent()) {
-            return optType.get();
-        }
-        return new CustomEntryType(name,"required","optional");
+        return getType(name).orElseGet(() -> new CustomEntryType(name, "required", "optional"));
     }
 }
