@@ -1,7 +1,6 @@
 package org.jabref.logic.util;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryType;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
