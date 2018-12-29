@@ -29,6 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
@@ -504,7 +505,8 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(entryType);
+        BibEntry result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();
