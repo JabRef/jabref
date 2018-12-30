@@ -210,7 +210,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
         }
 
-        for (BibEntry bibEntry : dbmsProcessor.getSharedEntriesByIdList(entriesToDrag)) {
+        for (BibEntry bibEntry : dbmsProcessor.getSharedEntryByIdList(entriesToDrag)) {
             bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
         }
     }

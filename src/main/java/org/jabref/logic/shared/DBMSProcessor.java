@@ -428,7 +428,7 @@ public abstract class DBMSProcessor {
         return Optional.empty();
     }
 
-    public List<BibEntry> getSharedEntriesByIdList(List<Integer> idList) {
+    public List<BibEntry> getSharedEntryByIdList(List<Integer> idList) {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder();
