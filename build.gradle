@@ -98,7 +98,7 @@ dependencies {
 
     compile 'org.apache.pdfbox:pdfbox:2.0.13'
     compile 'org.apache.pdfbox:fontbox:2.0.13'
-    compile 'org.apache.pdfbox:xmpbox:2.0.12'
+    compile 'org.apache.pdfbox:xmpbox:2.0.13'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.60'
