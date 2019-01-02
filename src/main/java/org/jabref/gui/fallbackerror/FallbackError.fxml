@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<DialogPane xmlns="http://javafx.com/javafx/8.0.60" 
+	xmlns:fx="http://javafx.com/fxml/1" prefHeight="150.0" prefWidth="325.0" 
+	fx:controller="org.jabref.gui.fallbackerror.FallbackErrorView">
+    <content>
+		<Label prefWidth="300" wrapText="true" text="%An uncaught exception occurred. Please check the logfiles for more details."/>
+    </content>
+    <header>
+    </header>
+    <buttonTypes>
+        <ButtonType fx:constant="CLOSE"/>
+    </buttonTypes>
+</DialogPane>
