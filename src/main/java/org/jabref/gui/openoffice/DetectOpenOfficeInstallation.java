@@ -31,7 +31,6 @@ public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences preferences;
     private final DialogService dialogService;
-    private FXDialog progressDialog;
 
     public DetectOpenOfficeInstallation(OpenOfficePreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
@@ -52,8 +51,7 @@ public class DetectOpenOfficeInstallation {
         DialogPane dialogPane = new DialogPane();
         ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         dialogPane.setContent(indicator);
-
-        progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
+        FXDialog progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
         progressDialog.show();
 
         return progressDialog;

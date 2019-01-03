@@ -297,6 +297,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
+    public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
+    public static final String SEND_OS_DATA = "sendOSData";
+    public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -574,6 +577,9 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
+        defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
+        defaults.put(SEND_OS_DATA, Boolean.FALSE);
+        defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
