@@ -1,17 +1,28 @@
 package org.jabref.model.util;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FilePreferences;
+
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.parser.AutoDetectParser;
 
 public class FileHelper {
 
@@ -32,16 +43,37 @@ public class FileHelper {
      * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
+        Metadata metadata = new Metadata();
+        metadata.add(Metadata.RESOURCE_NAME_KEY, fileName);
+
         if (isUrl(fileName)) {
+            try (InputStream is = new URL(fileName).openStream()) {
+                return detectExtension(is, metadata);
+            } catch (IOException | MimeTypeException e) {
+                return Optional.empty();
+            }
+        }
+
+        try (InputStream is = new FileInputStream(fileName)) {
+            return detectExtension(is, metadata);
+        } catch (IOException | MimeTypeException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<String> detectExtension(InputStream is, Metadata metaData) throws IOException, MimeTypeException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        AutoDetectParser parser = new AutoDetectParser();
+        Detector detector = parser.getDetector();
+        MediaType mediaType = detector.detect(bis, metaData);
+        MimeType mimeType = TikaConfig.getDefaultConfig().getMimeRepository().forName(mediaType.toString());
+        String extension = mimeType.getExtension();
+
+        if (extension.isEmpty()) {
             return Optional.empty();
         }
 
-        int dotPosition = fileName.lastIndexOf('.');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.of(extension.substring(1, extension.length()));
     }
 
     /**

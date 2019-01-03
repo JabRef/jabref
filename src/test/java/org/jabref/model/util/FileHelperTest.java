@@ -4,18 +4,18 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileHelperTest {
     @Test
     public void extractFileExtension() {
-        final String filePath = "somefilepath/file.pdf";
+        final String filePath = FileHelperTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileHelper.getFileExtension(filePath));
     }
 
     @Test
-    public void urlIsNoFileExtension() {
-        final String filePath = "https://someurl.io";
-        assertEquals(Optional.empty(), FileHelper.getFileExtension(filePath));
+    public void fileExtensionFromUrl() {
+        final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
+        assertEquals(Optional.of("pdf"), FileHelper.getFileExtension(filePath));
     }
 }
