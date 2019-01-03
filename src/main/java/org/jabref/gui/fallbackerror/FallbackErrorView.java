@@ -5,7 +5,6 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-
 public class FallbackErrorView extends BaseDialog<Void> {
 
     public FallbackErrorView() {
