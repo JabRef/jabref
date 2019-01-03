@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import javax.swing.AbstractAction;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,11 +41,10 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
 class TableColumnsTab extends Pane implements PrefsTab {
-
-    //private static final Logger LOGGER = LoggerFactory.getLogger(TableColumnsTab.class);
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -109,7 +109,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         field.setCellFactory(TextFieldTableCell.forTableColumn());
         field.setEditable(true);
         field.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, String> t) -> { // t.getNewValue()
+                (TableColumn.CellEditEvent<TableRow, String> t) -> {
                     t.getTableView().getItems().get(
                             t.getTablePosition().getRow()).setName(t.getNewValue());
                     // Since data is an ObservableList, updating it updates the displayed field name.
@@ -398,13 +398,21 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public static class TableRow {
 
         private SimpleStringProperty name;
+        private SimpleDoubleProperty length;
 
         public TableRow() {
             name = new SimpleStringProperty("");
+            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
             this.name = new SimpleStringProperty(name);
+            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+        }
+
+        public TableRow(String name, double length) {
+            this.name = new SimpleStringProperty(name);
+            this.length = new SimpleDoubleProperty(length);
         }
 
         public String getName() {
@@ -415,6 +423,13 @@ class TableColumnsTab extends Pane implements PrefsTab {
             this.name.set(name);
         }
 
+        public double getLength() {
+            return length.get();
+        }
+
+        public void setLength(double length) {
+            this.length.set(length);
+        }
     }
 
     class UpdateOrderAction extends AbstractAction {
@@ -584,13 +599,16 @@ class TableColumnsTab extends Pane implements PrefsTab {
             }
             // Then we make arrays
             List<String> names = new ArrayList<>(tableRows.size());
+            List<String> widths = new ArrayList<>(tableRows.size());
 
             for (TableRow tr : tableRows) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
+                widths.add(String.valueOf(tr.getLength()));
             }
 
             // Finally, we store the new preferences.
             prefs.putStringList(JabRefPreferences.COLUMN_NAMES, names);
+            prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }
