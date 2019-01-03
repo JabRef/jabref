@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,11 +55,11 @@ public class FileHelper {
             }
         }
 
-        try (InputStream is = new FileInputStream(fileName)) {
-            return detectExtension(is, metadata);
-        } catch (IOException | MimeTypeException e) {
-            return Optional.empty();
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
         }
+        return Optional.empty();
     }
 
     private static Optional<String> detectExtension(InputStream is, Metadata metaData) throws IOException, MimeTypeException {
