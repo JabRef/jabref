@@ -65,7 +65,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
                 Dialog<Void> dialog = new IntegrityCheckDialog(messages, frame.getCurrentBasePanel());
-                dialogService.showCustomDialogAndWait(dialog);
+                dialog.showAndWait();
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
