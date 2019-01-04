@@ -16,6 +16,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
@@ -265,7 +266,7 @@ public class RisImporter extends Importer {
 
             // create one here
             // type is set in the loop above
-            BibEntry entry = new BibEntry(type);
+            BibEntry entry = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
             entry.setField(fields);
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
             month.ifPresent(entry::setMonth);

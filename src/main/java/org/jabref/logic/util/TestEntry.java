@@ -1,6 +1,7 @@
 package org.jabref.logic.util;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 public class TestEntry {
@@ -10,7 +11,7 @@ public class TestEntry {
 
     public static BibEntry getTestEntry() {
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setCiteKey("Smith2016");
         entry.setField(FieldName.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(FieldName.EDITOR, "Taylor, Phil");

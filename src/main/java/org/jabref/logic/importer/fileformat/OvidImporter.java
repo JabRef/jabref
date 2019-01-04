@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 /**
@@ -207,7 +208,7 @@ public class OvidImporter extends Importer {
                 // Move the "chaptertitle" to just "title":
                 h.put(FieldName.TITLE, h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(entryType);
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
 
             bibitems.add(b);
