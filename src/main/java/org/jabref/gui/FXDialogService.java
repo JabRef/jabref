@@ -24,9 +24,11 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.jabref.JabRefGUI;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -226,8 +228,13 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public <V> void showCanceableProgressDialogAndWait(Task<V> task) {
+    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setHeaderText(null);
+        progressDialog.setTitle(title);
+        progressDialog.setContentText(content);
+        progressDialog.setGraphic(null);
+        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImageFX());
         progressDialog.setOnCloseRequest(evt -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);
