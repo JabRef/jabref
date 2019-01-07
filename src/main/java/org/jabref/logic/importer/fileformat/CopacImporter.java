@@ -11,6 +11,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 /**
@@ -98,7 +99,7 @@ public class CopacImporter extends Importer {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry("book");
+            BibEntry b = new BibEntry(BibtexEntryTypes.BOOK);
 
             String[] lines = entry.split("\n");
 

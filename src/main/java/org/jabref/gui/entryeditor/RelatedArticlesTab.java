@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
@@ -125,10 +126,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
-        Text line1 = new Text(Localization.lang("Mr. DLib is an external service which provides article recommendations based on the currently selected entry. Data about the selected entry must be sent to Mr. DLib in order to provide these recommendations. Do you agree that this data may be sent?"));
 
+        Text line1 = new Text(Localization.lang("JabRef requests recommendations from Mr. DLib, which is an external service. To enable Mr. DLib to calculate recommendations, some of your data must be shared with Mr. DLib. Generally, the more data is shared the better recommendations can be calculated. However, we understand that some of your data in JabRef is sensitive, and you may not want to share it. Therefore, Mr. DLib offers a choice of which data you would like to share."));
         line1.setWrappingWidth(1300.0);
-        Text line2 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
+        Text line2 = new Text(Localization.lang("Whatever option you choose, Mr. DLib may share its data with research partners to further improve recommendation quality as part of a 'living lab'. Mr. DLib may also release public datasets that may contain anonymized information about you and the recommendations (sensitive information such as metadata of your articles will be anonymised through e.g. hashing). Research partners are obliged to adhere to the same strict data protection policy as Mr. DLib."));
+        line2.setWrappingWidth(1300.0);
+        Text line3 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr DLib. for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
@@ -138,15 +141,30 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 dialogService.showErrorDialogAndWait(e);
             }
         });
+        VBox vb = new VBox();
+        CheckBox cbTitle = new CheckBox(Localization.lang("Entry Title (Required to deliver recommendations.)"));
+        cbTitle.setSelected(true);
+        cbTitle.setDisable(true);
+        CheckBox cbVersion = new CheckBox(Localization.lang("JabRef Version (Required to ensure backwards compatibility with Mr. DLib's Web Service)"));
+        cbVersion.setSelected(true);
+        cbVersion.setDisable(true);
+        CheckBox cbLanguage = new CheckBox(Localization.lang("JabRef Language (Provides for better recommendations by giving an indication of user's preferred language.)"));
+        CheckBox cbOS = new CheckBox(Localization.lang("Operating System (Provides for better recommendations by giving an indication of user's system set-up.)"));
+        CheckBox cbTimezone = new CheckBox(Localization.lang("Timezone (Provides for better recommendations by indicating the time of day the request is being made.)"));
+        vb.getChildren().addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
+        vb.setSpacing(10);
 
         button.setOnAction(event -> {
             JabRefPreferences prefs = JabRefPreferences.getInstance();
             prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, true);
+            prefs.putBoolean(JabRefPreferences.SEND_LANGUAGE_DATA, cbLanguage.isSelected());
+            prefs.putBoolean(JabRefPreferences.SEND_OS_DATA, cbOS.isSelected());
+            prefs.putBoolean(JabRefPreferences.SEND_TIMEZONE_DATA, cbTimezone.isSelected());
             dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
             setContent(getRelatedArticlesPane(entry));
         });
 
-        vbox.getChildren().addAll(line1, mdlLink, line2, button);
+        vbox.getChildren().addAll(line1, line2, mdlLink, line3, vb, button);
         root.setContent(vbox);
 
         return root;
