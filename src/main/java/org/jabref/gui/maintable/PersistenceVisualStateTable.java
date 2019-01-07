@@ -33,6 +33,7 @@ public class PersistenceVisualStateTable {
     }
 
     private void onColumnWidthChange() {
+        List<String> columnNames = new ArrayList<>();
         List<String> columnsWidths = new ArrayList<>();
 
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
@@ -42,8 +43,10 @@ public class PersistenceVisualStateTable {
                 columnsWidths.add(String.valueOf(normalColumn.getWidth()));
             }
         }
-
-        preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        if (columnNames.size() == columnsWidths.size()) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        }
     }
 
     private void onColumnsChanged(ListChangeListener.Change<? extends TableColumn<BibEntryTableViewModel, ?>> change) {
@@ -79,8 +82,9 @@ public class PersistenceVisualStateTable {
             }
         }
 
-        // Finally, we store the new preferences.
-        preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
-        preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        if (columnNames.size() == columnsWidths.size()) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        }
     }
 }
