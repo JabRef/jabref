@@ -40,6 +40,7 @@ public class PersistenceVisualStateTable {
             if (column instanceof NormalTableColumn) {
                 NormalTableColumn normalColumn = (NormalTableColumn) column;
 
+                columnNames.add(normalColumn.getColumnName());
                 columnsWidths.add(String.valueOf(normalColumn.getWidth()));
             }
         }
