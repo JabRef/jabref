@@ -62,6 +62,10 @@ class TableColumnsTab extends Pane implements PrefsTab {
     private final RadioButton preferUrl;
     private final RadioButton preferDoi;
     /*** begin: special fields ***/
+    private final Button addRow;
+    private final Button deleteRow;
+    private final Button down;
+    private final Button up;
     private final CheckBox specialFieldsEnabled;
     private final CheckBox rankingColumn;
     private final CheckBox qualityColumn;
@@ -135,7 +139,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         tabPanel.setCenter(sp);
 
         HBox toolBar = new HBox();
-        Button addRow = new Button("Add");
+        addRow = new Button("Add");
         addRow.setPrefSize(80, 20);
         addRow.setOnAction(e -> {
             TableRow tableRow = new TableRow(addName.getText());
@@ -149,7 +153,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         });
 
-        Button deleteRow = new Button("Delete");
+        deleteRow = new Button("Delete");
         deleteRow.setPrefSize(80, 20);
         deleteRow.setOnAction(e -> {
             if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
@@ -163,7 +167,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 colSetup.refresh();
             }
         });
-        Button up = new Button("Up");
+        up = new Button("Up");
         up.setPrefSize(80, 20);
         up.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
@@ -183,7 +187,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 return;
             }
         });
-        Button down = new Button("Down");
+        down = new Button("Down");
         down.setPrefSize(80, 20);
         down.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
