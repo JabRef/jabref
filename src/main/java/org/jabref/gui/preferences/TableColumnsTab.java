@@ -49,7 +49,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
     private final JabRefPreferences prefs;
     private boolean tableChanged;
     private final TableView colSetup;
-    private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
     private final CheckBox urlColumn;
@@ -99,9 +98,10 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /* Populate the data of Entry table columns */
         List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
+        List<String> prefColWidths= this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
         this.data = FXCollections.observableArrayList();
         for (int i = 0; i < prefColNames.size(); i++) {
-            this.data.add(new TableRow(prefColNames.get(i)));
+            this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
         }
 
         /* UI for Entry table columns */
@@ -124,8 +124,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                     this.prefs.putStringList(this.prefs.COLUMN_NAMES,tempColumnNames);
                 });
 
-        tableRows.clear();
-        tableRows.addAll(data);
         colSetup.setItems(data);
         colSetup.getColumns().add(field);
 
@@ -145,8 +143,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
             TableRow tableRow = new TableRow(addName.getText());
             addName.clear();
             data.add(tableRow);
-            tableRows.clear();
-            tableRows.addAll(data);
             colSetup.setItems(data);
             tableChanged = true;
             colSetup.refresh();
@@ -161,8 +157,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 TableRow tableRow = data.get(row);
                 data.remove(tableRow);
-                tableRows.clear();
-                tableRows.addAll(data);
                 colSetup.setItems(data);
                 colSetup.refresh();
             }
@@ -179,8 +173,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 TableRow tableRow2 = data.get(row - 1);
                 data.set(row - 1, tableRow1);
                 data.set(row, tableRow2);
-                tableRows.clear();
-                tableRows.addAll(data);
                 colSetup.setItems(data);
                 colSetup.refresh();
             } else {
@@ -199,8 +191,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 TableRow tableRow2 = data.get(row + 1);
                 data.set(row + 1, tableRow1);
                 data.set(row, tableRow2);
-                tableRows.clear();
-                tableRows.addAll(data);
                 colSetup.setItems(data);
                 colSetup.refresh();
             } else {
@@ -390,10 +380,11 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /*** end: special fields ***/
 
-        tableRows.clear();
-        List<String> names = prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-        for (int i = 0; i < names.size(); i++) {
-            tableRows.add(new TableRow(names.get(i)));
+        data.clear();
+        List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
+        List<String> prefColWidths= this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
+        for (int i = 0; i < prefColNames.size(); i++) {
+            this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
         }
     }
 
@@ -452,7 +443,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             // everything not inside hash/mainTable as it was
             final HashMap<String, Integer> map = new HashMap<>();
 
-            // first element (#) not inside tableRows
+            // first element (#) not inside data
             /*
             for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
                 String name = column.getText();
@@ -461,7 +452,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 }
             }
             */
-            Collections.sort(tableRows, (o1, o2) -> {
+            Collections.sort(data, (o1, o2) -> {
                 Integer n1 = map.get(o1.getName());
                 Integer n2 = map.get(o2.getName());
                 if ((n1 == null) || (n2 == null)) {
@@ -470,8 +461,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 return n1.compareTo(n2);
             });
 
-            data.clear();
-            data.addAll(tableRows);
             colSetup.setItems(data);
             colSetup.refresh();
             tableChanged = true;
@@ -497,11 +486,11 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 try {
                     String name = panel.getMainTable().getColumnName(i).toLowerCase(Locale.ROOT);
                     int width = colMod.getColumn(i).getWidth();
-                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
+                    if ((i <= data.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);
                     } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
-                            if ((j < tableRows.size()) && ((String) colSetup.getValueAt(j, 0)).equalsIgnoreCase(name)) {
+                            if ((j < data.size()) && ((String) colSetup.getValueAt(j, 0)).equalsIgnoreCase(name)) {
                                 colSetup.setValueAt(String.valueOf(width), j, 1);
                                 break;
                             }
@@ -594,18 +583,18 @@ class TableColumnsTab extends Pane implements PrefsTab {
         if (tableChanged) {
             // First we remove all rows with empty names.
             int i = 0;
-            while (i < tableRows.size()) {
-                if (tableRows.get(i).getName().isEmpty()) {
-                    tableRows.remove(i);
+            while (i < data.size()) {
+                if (data.get(i).getName().isEmpty()) {
+                    data.remove(i);
                 } else {
                     i++;
                 }
             }
             // Then we make arrays
-            List<String> names = new ArrayList<>(tableRows.size());
-            List<String> widths = new ArrayList<>(tableRows.size());
+            List<String> names = new ArrayList<>(data.size());
+            List<String> widths = new ArrayList<>(data.size());
 
-            for (TableRow tr : tableRows) {
+            for (TableRow tr : data) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
                 widths.add(String.valueOf(tr.getLength()));
             }

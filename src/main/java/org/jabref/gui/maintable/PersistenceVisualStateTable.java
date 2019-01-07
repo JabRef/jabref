@@ -28,26 +28,8 @@ public class PersistenceVisualStateTable {
         mainTable.getColumns().addListener(this::onColumnsChanged);
         mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(obs ->
                 updateColumnSortType(col.getText(), col.getSortType())));
-        mainTable.getColumns().forEach(col -> col.widthProperty().addListener(obs -> onColumnWidthChange()));
+        mainTable.getColumns().forEach(col -> col.widthProperty().addListener(obs -> updateColumnPreferences()));
 
-    }
-
-    private void onColumnWidthChange() {
-        List<String> columnNames = new ArrayList<>();
-        List<String> columnsWidths = new ArrayList<>();
-
-        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
-            if (column instanceof NormalTableColumn) {
-                NormalTableColumn normalColumn = (NormalTableColumn) column;
-
-                columnNames.add(normalColumn.getColumnName());
-                columnsWidths.add(String.valueOf(normalColumn.getWidth()));
-            }
-        }
-        if (columnNames.size() == columnsWidths.size()) {
-            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
-            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
-        }
     }
 
     private void onColumnsChanged(ListChangeListener.Change<? extends TableColumn<BibEntryTableViewModel, ?>> change) {
@@ -83,7 +65,8 @@ public class PersistenceVisualStateTable {
             }
         }
 
-        if (columnNames.size() == columnsWidths.size()) {
+        if (columnNames.size() == columnsWidths.size() &&
+                columnNames.size() == preferences.getStringList(preferences.COLUMN_NAMES).size()) {
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
             preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
         }
