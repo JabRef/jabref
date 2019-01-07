@@ -183,9 +183,11 @@ public interface DialogService {
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
      *
+     * @param title title of the dialog
+     * @param content message to show above the progress bar
      * @param task The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showCanceableProgressDialogAndWait(Task<V> task);
+    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /**
      * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
