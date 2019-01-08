@@ -98,7 +98,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /* Populate the data of Entry table columns */
         List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
-        List<String> prefColWidths= this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
+        List<String> prefColWidths = this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
         this.data = FXCollections.observableArrayList();
         for (int i = 0; i < prefColNames.size(); i++) {
             this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
@@ -143,9 +143,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             TableRow tableRow = new TableRow(addName.getText());
             addName.clear();
             data.add(tableRow);
-            colSetup.setItems(data);
             tableChanged = true;
-            colSetup.refresh();
 
         });
 
@@ -157,8 +155,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 TableRow tableRow = data.get(row);
                 data.remove(tableRow);
-                colSetup.setItems(data);
-                colSetup.refresh();
             }
         });
         up = new Button("Up");
@@ -173,8 +169,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 TableRow tableRow2 = data.get(row - 1);
                 data.set(row - 1, tableRow1);
                 data.set(row, tableRow2);
-                colSetup.setItems(data);
-                colSetup.refresh();
             } else {
                 return;
             }
@@ -191,8 +185,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 TableRow tableRow2 = data.get(row + 1);
                 data.set(row + 1, tableRow1);
                 data.set(row, tableRow2);
-                colSetup.setItems(data);
-                colSetup.refresh();
             } else {
                 return;
             }
@@ -382,7 +374,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         data.clear();
         List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
-        List<String> prefColWidths= this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
+        List<String> prefColWidths = this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
         for (int i = 0; i < prefColNames.size(); i++) {
             this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
         }
