@@ -49,6 +49,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option in the preference dialog box that allows user to choose behavior after dragging and dropping files in Entry Editor. [#4356](https://github.com/JabRef/jabref/issues/4356)
 - We added the ability to have an export preference where previously "File"-->"Export"/"Export selected entries" would not save the user's preference[#4495](https://github.com/JabRef/jabref/issues/4495)
 - We added the ability to add field names from the Preferences Dialog [#4546](https://github.com/JabRef/jabref/issues/4546)
+- We added the ability change the column widths directly in the main table. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 
 
@@ -106,7 +107,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
-
+- We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 
 
