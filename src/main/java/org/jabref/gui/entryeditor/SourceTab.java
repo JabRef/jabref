@@ -100,9 +100,13 @@ public class SourceTab extends EntryEditorTab {
         });
         this.setContent(codeArea);
 
-        // Store source for every change in the source code
+        // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
-        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
+        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {
+            if (!onFocus) {
+                storeSource(codeArea.textProperty().getValue());
+            }
+        }, fields -> {
             DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
@@ -110,7 +114,7 @@ public class SourceTab extends EntryEditorTab {
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                     LOGGER.debug("Incorrect entry", ex);
                 }
             });
