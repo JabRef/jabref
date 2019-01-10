@@ -83,17 +83,6 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Constructs a new BibEntry with the given type
-     *
-     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
-     * @deprecated use {{@link #BibEntry(EntryType)}} instead
-     */
-    @Deprecated
-    public BibEntry(String type) {
-        this(IdGenerator.next(), type);
-    }
-
-    /**
      * Constructs a new BibEntry with the given ID and given type
      *
      * @param id   The ID to be used
