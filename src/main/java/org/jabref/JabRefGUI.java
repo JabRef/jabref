@@ -3,7 +3,6 @@ package org.jabref;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javafx.scene.Scene;
@@ -20,6 +19,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -54,14 +54,14 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
-                                    .findFirst()
-                                    .flatMap(ParserResult::getFile)
-                                    .map(File::getAbsolutePath)
-                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                   .findFirst()
+                                   .flatMap(ParserResult::getFile)
+                                   .map(File::getAbsolutePath)
+                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
         new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
-                .checkForNewVersionAsync(false);
+                                                                                                                                                                                         .checkForNewVersionAsync(false);
     }
 
     private void openWindow(Stage mainStage) {
@@ -88,49 +88,6 @@ public class JabRefGUI {
         JabRefGUI.mainFrame = new JabRefFrame(mainStage);
 
         // Add all bibDatabases databases to the frame:
-        boolean first = false;
-        if (!bibDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
-                ParserResult pr = parserResultIterator.next();
-                // Define focused tab
-                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
-                    first = true;
-                }
-
-                if (pr.isInvalid()) {
-                    failed.add(pr);
-                    parserResultIterator.remove();
-                } else if (pr.getDatabase().isShared()) {
-                    try {
-                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                            NotASharedDatabaseException e) {
-                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
-                        pr.getDatabase().clearSharedDatabaseID();
-
-                        LOGGER.error("Connection error", e);
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Connection error"),
-                                Localization.lang("A local copy will be opened."),
-                                e);
-                    }
-                    toOpenTab.add(pr);
-                } else if (pr.toOpenTab()) {
-                    // things to be appended to an opened tab should be done after opening all tabs
-                    // add them to the list
-                    toOpenTab.add(pr);
-                } else {
-                    JabRefGUI.getMainFrame().addParserResult(pr, first);
-                    first = false;
-                }
-            }
-        }
-
-        // finally add things to the currently opened tab
-        for (ParserResult pr : toOpenTab) {
-            JabRefGUI.getMainFrame().addParserResult(pr, first);
-            first = false;
-        }
 
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
@@ -166,7 +123,7 @@ public class JabRefGUI {
 
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                    + pr.getErrorMessage();
+                             + pr.getErrorMessage();
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
@@ -196,6 +153,45 @@ public class JabRefGUI {
         LOGGER.debug("Finished adding panels");
     }
 
+    private void addTabs(ParserResult pr) {
+        boolean first = false;
+
+        // Define focused tab
+        if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
+            first = true;
+        }
+
+        if (pr.isInvalid()) {
+            failed.add(pr);
+        } else if (pr.getDatabase().isShared()) {
+            try {
+                new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+            } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                     NotASharedDatabaseException e) {
+                pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                pr.getDatabase().clearSharedDatabaseID();
+
+                LOGGER.error("Connection error", e);
+                dialogService.showErrorDialogAndWait(
+                                                     Localization.lang("Connection error"),
+                                                     Localization.lang("A local copy will be opened."),
+                                                     e);
+            }
+            toOpenTab.add(pr);
+        } else if (pr.toOpenTab()) {
+            // things to be appended to an opened tab should be done after opening all tabs
+            // add them to the list
+            toOpenTab.add(pr);
+        } else {
+            JabRefGUI.getMainFrame().addParserResult(pr, first);
+            first = false;
+        }
+
+        // finally add things to the currently opened tab
+        JabRefGUI.getMainFrame().addParserResult(pr, first);
+
+    }
+
     private void saveWindowState(Stage mainStage) {
         Globals.prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, mainStage.isMaximized());
         Globals.prefs.putDouble(JabRefPreferences.POS_X, mainStage.getX());
@@ -222,15 +218,26 @@ public class JabRefGUI {
                 BackupUIManager.showRestoreBackupDialog(dialogService, dbFile.toPath());
             }
 
-            ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+            BackgroundTask.wrap(() -> {
+                return loadDB(fileName);
 
-            if (parsedDatabase.isEmpty()) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
-            } else {
-                bibDatabases.add(parsedDatabase);
-            }
+            }).onSuccess(parsedDatabase -> {
+                if (parsedDatabase.isEmpty()) {
+                    LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
+                } else {
+                    bibDatabases.add(parsedDatabase);
+                    addTabs(parsedDatabase);
+                }
+
+            }).executeWith(Globals.TASK_EXECUTOR);
+
         }
+
+    }
+
+    private ParserResult loadDB(String fileName) {
+        return OpenDatabase.loadDatabase(fileName, Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+
     }
 
     private boolean isLoaded(File fileToOpen) {
