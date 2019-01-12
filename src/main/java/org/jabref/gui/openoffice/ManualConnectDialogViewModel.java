@@ -9,6 +9,8 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.util.OS;
+import org.jabref.preferences.PreferencesService;
 
 public class ManualConnectDialogViewModel {
 
@@ -19,13 +21,17 @@ public class ManualConnectDialogViewModel {
     private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration;
     private final DirectoryDialogConfiguration dirDialogConfiguration;
+    private final OpenOfficePreferences ooPreferences;
+    private final PreferencesService preferencesService;
 
-    public ManualConnectDialogViewModel(OpenOfficePreferences preferences, DialogService dialogService) {
+    public ManualConnectDialogViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
 
-        ooPathProperty().setValue(preferences.getInstallationPath());
-        ooExecProperty().setValue(preferences.getExecutablePath());
-        ooJarsProperty().setValue(preferences.getJarsPath());
+        ooPreferences = preferencesService.getOpenOfficePreferences();
+        ooPathProperty().setValue(ooPreferences.getInstallationPath());
+        ooExecProperty().setValue(ooPreferences.getExecutablePath());
+        ooJarsProperty().setValue(ooPreferences.getJarsPath());
 
         dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                                                                            .withInitialDirectory(nativeDesktop.getApplicationDirectory())
@@ -58,6 +64,16 @@ public class ManualConnectDialogViewModel {
 
     public StringProperty ooJarsProperty() {
         return ooJars;
+    }
+
+    public void save() {
+        if (OS.WINDOWS || OS.OS_X) {
+            ooPreferences.updateConnectionParams(ooPath.getValue(), ooPath.getValue(), ooPath.getValue());
+        } else {
+            ooPreferences.updateConnectionParams(ooPath.getValue(), ooExec.getValue(), ooJars.getValue());
+        }
+
+        preferencesService.setOpenOfficePreferences(ooPreferences);
     }
 
 }

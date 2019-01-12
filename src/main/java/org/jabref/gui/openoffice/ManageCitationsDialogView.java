@@ -1,5 +1,7 @@
 package org.jabref.gui.openoffice;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
@@ -26,19 +28,19 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     private static final String HTML_BOLD_END_TAG = "</b>";
     private static final String HTML_BOLD_START_TAG = "<b>";
 
-    private final DialogService dialogService;
     private final OOBibBase ooBase;
 
     @FXML private TableView<CitationEntryViewModel> citationsTableView;
     @FXML private TableColumn<CitationEntryViewModel, String> citation;
     @FXML private TableColumn<CitationEntryViewModel, String> extraInfo;
 
+    @Inject private DialogService dialogService;
 
     private ManageCitationsDialogViewModel viewModel;
 
-    public ManageCitationsDialogView(OOBibBase ooBase, DialogService dialogService) {
+    public ManageCitationsDialogView(OOBibBase ooBase) {
         this.ooBase = ooBase;
-        this.dialogService = dialogService;
+
 
         ViewLoader.view(this)
                   .load()

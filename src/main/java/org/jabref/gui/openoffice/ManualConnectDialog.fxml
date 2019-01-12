@@ -24,7 +24,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="OOPathLabel" minWidth="-Infinity" text="%Path to OpenOffice/LibreOffice directory" />
+            <Label fx:id="OOPathLabel" minWidth="-Infinity" text="%Path to OpenOffice/LibreOffice directory" managed="${ooPath.visible}" />
             <TextField fx:id="ooPath" GridPane.columnIndex="1" />
             <Button fx:id="browseOOPath" mnemonicParsing="false" onAction="#browseOOPath" text="%Browse" GridPane.columnIndex="2" />
             <Button fx:id="browseOOExec" mnemonicParsing="false" onAction="#browseOOExec" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="1" />

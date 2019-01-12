@@ -37,18 +37,20 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
+
+    @Inject private PreferencesService preferencesService;
+    @Inject private DialogService dialogService;
+
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
-    @Inject private PreferencesService preferencesService;
+    private final StyleLoader loader;
 
     private StyleSelectDialogViewModel viewModel;
-    private final DialogService dialogService;
-    private final StyleLoader loader;
     private PreviewPanel previewArticle;
     private PreviewPanel previewBook;
 
-    public StyleSelectDialogView(DialogService dialogService, StyleLoader loader) {
-        this.dialogService = dialogService;
+    public StyleSelectDialogView(StyleLoader loader) {
+
         this.loader = loader;
 
         ViewLoader.view(this)

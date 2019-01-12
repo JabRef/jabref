@@ -5,9 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ProgressIndicator;
@@ -37,10 +34,8 @@ public class DetectOpenOfficeInstallation {
         this.dialogService = dialogService;
     }
 
-    public Future<Boolean> isInstalled() {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
-        future.complete(autoDetectPaths());
-        return future;
+    public boolean isInstalled() {
+        return autoDetectPaths();
     }
 
     public boolean isExecutablePathDefined() {

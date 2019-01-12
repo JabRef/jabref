@@ -12,7 +12,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
@@ -31,9 +30,8 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
     @FXML private Label ooJarsLabel;
 
     @Inject private PreferencesService preferencesService;
+    @Inject private final DialogService dialogService;
 
-    private final DialogService dialogService;
-    private OpenOfficePreferences preferences;
     private ManualConnectDialogViewModel viewModel;
 
     public ManualConnectDialogView(DialogService dialogService) {
@@ -45,14 +43,7 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                if (OS.WINDOWS || OS.OS_X) {
-                    preferences.updateConnectionParams(viewModel.ooPathProperty().getValue(), viewModel.ooPathProperty().getValue(), viewModel.ooPathProperty().getValue());
-                } else {
-                    preferences.updateConnectionParams(viewModel.ooPathProperty().getValue(), viewModel.ooExecProperty().getValue(), viewModel.ooJarsProperty().getValue());
-                }
-
-                preferencesService.setOpenOfficePreferences(preferences);
-
+                viewModel.save();
                 return true;
             }
             return null;
@@ -60,11 +51,11 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
         setTitle(Localization.lang("Set connection parameters"));
     }
+
     @FXML
     private void initialize() {
-        this.preferences = preferencesService.getOpenOfficePreferences();
 
-        viewModel = new ManualConnectDialogViewModel(preferencesService.getOpenOfficePreferences(), dialogService);
+        viewModel = new ManualConnectDialogViewModel(preferencesService, dialogService);
 
         OOPathLabel.managedProperty().bind(ooPath.visibleProperty());
         ooPath.managedProperty().bind(ooPath.visibleProperty());

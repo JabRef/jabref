@@ -166,7 +166,7 @@ public class OpenOfficePanel {
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
 
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(dialogService, loader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
             styleDialog.showAndWait().ifPresent(selectedStyle -> {
                 style = selectedStyle;
                 try {
@@ -257,7 +257,7 @@ public class OpenOfficePanel {
         settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(e -> {
-            ManageCitationsDialogView dlg = new ManageCitationsDialogView(ooBase, dialogService);
+            ManageCitationsDialogView dlg = new ManageCitationsDialogView(ooBase);
             dlg.showAndWait();
         });
 
@@ -344,7 +344,7 @@ public class OpenOfficePanel {
             FXDialog progressDialog = officeInstallation.initProgressDialog();
             BackgroundTask
                           .wrap(() -> {
-                              boolean installed = officeInstallation.isInstalled().get();
+                              boolean installed = officeInstallation.isInstalled();
                               if (!installed) {
                                   throw new IllegalStateException("OpenOffice Installation could not be detected.");
                               }
