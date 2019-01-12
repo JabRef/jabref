@@ -29,11 +29,13 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
     @Override
     public void beforeClosing() {
         ooPrefs.setShowPanel(false);
+        preferences.setOpenOfficePreferences(ooPrefs);
     }
 
     @Override
     public void afterOpening() {
         ooPrefs.setShowPanel(true);
+        preferences.setOpenOfficePreferences(ooPrefs);
     }
 
     @Override
