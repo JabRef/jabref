@@ -130,6 +130,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
+        preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
     }
 

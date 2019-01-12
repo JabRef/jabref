@@ -57,20 +57,9 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
         viewModel = new ManualConnectDialogViewModel(preferencesService, dialogService);
 
-        OOPathLabel.managedProperty().bind(ooPath.visibleProperty());
-        ooPath.managedProperty().bind(ooPath.visibleProperty());
         ooPath.textProperty().bindBidirectional(viewModel.ooPathProperty());
-        browseOOPath.managedProperty().bind(ooPath.visibleProperty());
-
-        ooExecLabel.managedProperty().bind(ooExec.visibleProperty());
-        ooExec.managedProperty().bind(ooExec.visibleProperty());
         ooExec.textProperty().bindBidirectional(viewModel.ooExecProperty());
-        browseOOExec.managedProperty().bind(ooExec.visibleProperty());
-
-        ooJarsLabel.managedProperty().bind(ooJars.visibleProperty());
-        ooJars.managedProperty().bind(ooJars.visibleProperty());
         ooJars.textProperty().bind(viewModel.ooJarsProperty());
-        browseOOJars.managedProperty().bind(ooJars.visibleProperty());
 
         if (OS.WINDOWS || OS.OS_X) {
             ooPath.setVisible(true);
@@ -81,7 +70,6 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
             ooExec.setVisible(false);
             ooJars.setVisible(true);
         }
-
     }
 
     @FXML

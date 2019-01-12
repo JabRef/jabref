@@ -86,17 +86,20 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         colFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>().withGraphic(internalStyle -> {
-            if (!internalStyle) {
-                return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-            }
-            return null;
-
-        }).withOnMouseClickedEvent(item -> {
-            return evt -> viewModel.deleteStyle();
-        }).withTooltip(item -> {
-            return Localization.lang("Remove style");
-        }).install(colDeleteIcon);
+        new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>()
+                                                                      .withGraphic(internalStyle -> {
+                                                                          if (!internalStyle) {
+                                                                              return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                                                                          }
+                                                                          return null;
+                                                                      })
+                                                                      .withOnMouseClickedEvent(item -> {
+                                                                          return evt -> viewModel.deleteStyle();
+                                                                      })
+                                                                      .withTooltip(item -> {
+                                                                          return Localization.lang("Remove style");
+                                                                      })
+                                                                      .install(colDeleteIcon);
 
         edit.setOnAction(e -> viewModel.editStyle());
 
@@ -105,8 +108,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                                                                     if (event.getClickCount() == 2) {
                                                                         viewModel.viewStyle(item);
                                                                     }
-                                                                }).withContextMenu(item -> createContextMenu())
+                                                                })
+                                                                .withContextMenu(item -> createContextMenu())
                                                                 .install(tvStyles);
+
         tvStyles.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
             if (newvalue == null) {
                 viewModel.selectedItemProperty().setValue(oldvalue);

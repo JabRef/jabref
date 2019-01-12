@@ -428,7 +428,7 @@ public class OpenOfficePanel {
         List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
         if (!filePaths.stream().allMatch(Optional::isPresent)) {
-            throw new IOException("(Not all) required Open Office Jars were found inside installation path.");
+            throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS);
         }
 
         List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
@@ -483,13 +483,12 @@ public class OpenOfficePanel {
             Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = citeDialog.showAndWait();
 
             if (citeDialogViewModel.isPresent()) {
-                {
-                    AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
-                    if (!model.pageInfoProperty().getValue().isEmpty()) {
-                        pageInfo = model.pageInfoProperty().getValue();
-                    }
-                    inParenthesis = model.citeInParProperty().getValue();
+
+                AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
+                if (!model.pageInfoProperty().getValue().isEmpty()) {
+                    pageInfo = model.pageInfoProperty().getValue();
                 }
+                inParenthesis = model.citeInParProperty().getValue();
             }
         }
 
