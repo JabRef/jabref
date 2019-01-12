@@ -294,14 +294,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
         entryTableColumns.getStyleClass().add("sectionHeader");
         builder.add(entryTableColumns, 1, 4);
         builder.add(tabPanel, 1, 5);
-
-        Button buttonWidth = new Button("Update to current column widths");
-        buttonWidth.setPrefSize(300, 30);
-        buttonWidth.setOnAction(e -> new UpdateWidthsAction());
         Button buttonOrder = new Button("Update to current column order");
         buttonOrder.setPrefSize(300, 30);
         buttonOrder.setOnAction(e -> new UpdateOrderAction());
-        builder.add(buttonWidth, 1, 6);
         builder.add(buttonOrder, 1, 7);
     }
 
@@ -459,45 +454,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         }
     }
 
-    class UpdateWidthsAction extends AbstractAction {
 
-        public UpdateWidthsAction() {
-            super(Localization.lang("Update to current column widths"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.getCurrentBasePanel();
-            if (panel == null) {
-                return;
-            }
-            /*
-            TableColumnModel colMod = panel.getMainTable().getColumnModel();
-            colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
-            for (int i = 1; i < colMod.getColumnCount(); i++) {
-                try {
-                    String name = panel.getMainTable().getColumnName(i).toLowerCase(Locale.ROOT);
-                    int width = colMod.getColumn(i).getWidth();
-                    if ((i <= data.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
-                        colSetup.setValueAt(String.valueOf(width), i, 1);
-                    } else { // Doesn't match; search for a matching col in our table
-                        for (int j = 0; j < colSetup.getRowCount(); j++) {
-                            if ((j < data.size()) && ((String) colSetup.getValueAt(j, 0)).equalsIgnoreCase(name)) {
-                                colSetup.setValueAt(String.valueOf(width), j, 1);
-                                break;
-                            }
-                        }
-                    }
-                } catch (Throwable ex) {
-                    LOGGER.warn("Problem with table columns", ex);
-                }
-                colSetup.revalidate();
-                colSetup.repaint();
-            }
-            */
-
-        }
-    }
 
     /**
      * Store changes to table preferences. This method is called when
