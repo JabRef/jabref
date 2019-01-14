@@ -48,6 +48,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -131,6 +132,8 @@ import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
+import com.jfoenix.controls.JFXSnackbarLayout;
 import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
 import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -147,6 +150,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
@@ -1012,11 +1016,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /**
      * Displays the given message at the bottom of the main frame
      *
-     * @deprecated use {@link DialogService#notify(String)} instead
+     * @deprecated use {@link DialogService#notify(String)} instead. However, do not remove this method, it's called from the dialogService
      */
     @Deprecated
-    public void output(final String s) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.show(s, 3000));
+    public void output(final String message) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null)));
     }
 
     private void initActions() {

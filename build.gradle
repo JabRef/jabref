@@ -16,12 +16,11 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.16'
-    id 'com.install4j.gradle' version '7.0.8'
-    id 'com.github.johnrengelman.shadow' version '2.0.4'
-    id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
+    id 'com.install4j.gradle' version '7.0.9'
+    id 'com.github.johnrengelman.shadow' version '4.0.2'
     id "com.simonharrer.modernizer" version '1.6.0-1'
-    id 'me.champeau.gradle.jmh' version '0.4.7'
-    id 'net.ltgt.errorprone' version '0.6'
+    id 'me.champeau.gradle.jmh' version '0.4.8'
+    id 'net.ltgt.errorprone' version '0.6.1'
     id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
@@ -138,7 +137,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.9.2'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
-    compile 'com.jfoenix:jfoenix:8.0.7'
+    compile 'com.jfoenix:jfoenix:8.0.8'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
@@ -419,6 +418,7 @@ modernizer {
 
 // Release tasks
 shadowJar {
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
     classifier 'fat'
 }
 
