@@ -13,15 +13,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.concurrent.Task;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -43,6 +42,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -99,12 +99,14 @@ public class OpenOfficePanel {
     private OpenOfficePreferences ooPrefs;
     private final JabRefPreferences jabRefPreferences;
     private final StyleLoader loader;
+    private final TaskExecutor taskExecutor;
 
     public OpenOfficePanel(JabRefFrame frame, JabRefPreferences jabRefPreferences, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.frame = frame;
         this.ooPrefs = ooPrefs;
         this.jabRefPreferences = jabRefPreferences;
+        this.taskExecutor = Globals.TASK_EXECUTOR;
         dialogService = frame.getDialogService();
 
         connect = new Button();
@@ -355,6 +357,7 @@ public class OpenOfficePanel {
                               connect();
                           })
                           .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+
                           .executeWith(Globals.TASK_EXECUTOR);
         }
 
@@ -365,41 +368,53 @@ public class OpenOfficePanel {
     }
 
     private void connect() {
-        DialogPane dialogPane = new DialogPane();
-        ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-        dialogPane.setContent(indicator);
-        FXDialog progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
-        progressDialog.show();
+
+        // dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), , ButtonType.CANCEL);
 
         try {
+
+            Task<OOBibBase> task = new Task<OOBibBase>() {
+
+                @Override
+                protected OOBibBase call() throws Exception {
+
+                    updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
+
+                    //TODO: Executed on FX thread, must be background
+                    return createBibBase();
+
+                }
+
+            };
+
+            task.setOnSucceeded(value -> {
+                ooBase = task.getValue();
+
+                if (ooBase.isConnectedToDocument()) {
+                    dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
+                }
+
+                // Enable actions that depend on Connect:
+                selectDocument.setDisable(false);
+                pushEntries.setDisable(false);
+                pushEntriesInt.setDisable(false);
+                pushEntriesEmpty.setDisable(false);
+                pushEntriesAdvanced.setDisable(false);
+                update.setDisable(false);
+                merge.setDisable(false);
+                manageCitations.setDisable(false);
+                exportCitations.setDisable(false);
+
+            });
+            task.setOnFailed(value -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), task.getException()));
+
+            dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), task);
+
+            taskExecutor.execute(task);
+
             ooPrefs = jabRefPreferences.getOpenOfficePreferences();
             // Add OO JARs to the classpath
             loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
-
-            BackgroundTask
-                          .wrap(this::createBibBase)
-                          .onFinished(() -> progressDialog.close())
-                          .onSuccess(ooBase -> {
-                              this.ooBase = ooBase;
-
-                              if (ooBase.isConnectedToDocument()) {
-                                  dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
-                              }
-
-                              // Enable actions that depend on Connect:
-                              selectDocument.setDisable(false);
-                              pushEntries.setDisable(false);
-                              pushEntriesInt.setDisable(false);
-                              pushEntriesEmpty.setDisable(false);
-                              pushEntriesAdvanced.setDisable(false);
-                              update.setDisable(false);
-                              merge.setDisable(false);
-                              manageCitations.setDisable(false);
-                              exportCitations.setDisable(false);
-
-                          })
-                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
-                          .executeWith(Globals.TASK_EXECUTOR);
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
@@ -416,11 +431,6 @@ public class OpenOfficePanel {
                                                                                                                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                                                                                                                             + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
                                                  e);
-
-        } finally {
-            if (progressDialog != null) {
-                progressDialog.close();
-            }
         }
     }
 
@@ -465,8 +475,7 @@ public class OpenOfficePanel {
 
     private Optional<Boolean> showManualConnectionDialog() {
 
-        ManualConnectDialogView manualConnect = new ManualConnectDialogView(dialogService);
-        return manualConnect.showAndWait();
+        return new ManualConnectDialogView(dialogService).showAndWait();
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
