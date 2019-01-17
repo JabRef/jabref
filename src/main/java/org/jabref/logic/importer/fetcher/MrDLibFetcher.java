@@ -140,7 +140,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost("localhost:5000");
+        builder.setHost("api.mr-dlib.org");
         builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
@@ -158,9 +158,5 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             LOGGER.error(e.getMessage(), e);
         }
         return "";
-    }
-
-    private String getMdlUrl() {
-        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.mr-dlib.org";
     }
 }
