@@ -6,12 +6,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.ProgressIndicator;
-
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -21,18 +16,21 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
 public class DetectOpenOfficeInstallation {
 
-    private final OpenOfficePreferences preferences;
+    private final OpenOfficePreferences ooPrefs;
     private final DialogService dialogService;
+    private final JabRefPreferences preferences;
 
-    public DetectOpenOfficeInstallation(OpenOfficePreferences preferences, DialogService dialogService) {
+    public DetectOpenOfficeInstallation(JabRefPreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.ooPrefs = preferences.getOpenOfficePreferences();
     }
 
     public boolean isInstalled() {
@@ -40,18 +38,9 @@ public class DetectOpenOfficeInstallation {
     }
 
     public boolean isExecutablePathDefined() {
-        return checkAutoDetectedPaths(preferences);
+        return checkAutoDetectedPaths(ooPrefs);
     }
 
-    public FXDialog initProgressDialog() {
-        DialogPane dialogPane = new DialogPane();
-        ProgressIndicator indicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-        dialogPane.setContent(indicator);
-        FXDialog progressDialog = dialogService.showCustomDialog(Localization.lang("Autodetecting paths..."), dialogPane, ButtonType.CANCEL);
-        progressDialog.show();
-
-        return progressDialog;
-    }
 
     private Optional<Path> selectInstallationPath() {
 
@@ -105,9 +94,10 @@ public class DetectOpenOfficeInstallation {
         Optional<Path> jarFilePath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
 
         if (execPath.isPresent() && jarFilePath.isPresent()) {
-            preferences.setInstallationPath(installDir.toString());
-            preferences.setExecutablePath(execPath.get().toString());
-            preferences.setJarsPath(jarFilePath.get().getParent().toString());
+            ooPrefs.setInstallationPath(installDir.toString());
+            ooPrefs.setExecutablePath(execPath.get().toString());
+            ooPrefs.setJarsPath(jarFilePath.get().getParent().toString());
+            preferences.setOpenOfficePreferences(ooPrefs);
             return true;
         }
 

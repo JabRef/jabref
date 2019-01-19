@@ -32,7 +32,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -41,7 +40,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -337,30 +335,32 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(ooPrefs, dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(jabRefPreferences, dialogService);
 
         if (officeInstallation.isExecutablePathDefined()) {
             connect();
         } else {
 
-            FXDialog progressDialog = officeInstallation.initProgressDialog();
-            BackgroundTask
-                          .wrap(() -> {
-                              boolean installed = officeInstallation.isInstalled();
-                              if (!installed) {
-                                  throw new IllegalStateException("OpenOffice Installation could not be detected.");
-                              }
-                              return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
-                          })
-                          .onSuccess(x -> {
-                              progressDialog.close();
-                              connect();
-                          })
-                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+            Task<Void> taskConnectIfInstalled = new Task<Void>() {
 
-                          .executeWith(Globals.TASK_EXECUTOR);
+                @Override
+                protected Void call() throws Exception {
+                    updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
+
+                    boolean installed = officeInstallation.isInstalled();
+                    if (!installed) {
+                        throw new IllegalStateException("OpenOffice Installation could not be detected.");
+                    }
+                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
+                }
+            };
+
+            taskConnectIfInstalled.setOnSucceeded(value -> connect());
+            taskConnectIfInstalled.setOnFailed(value -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), taskConnectIfInstalled.getException()));
+
+            dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), taskConnectIfInstalled);
+            taskExecutor.execute(taskConnectIfInstalled);
         }
-
     }
 
     private void connectManually() {
@@ -368,77 +368,70 @@ public class OpenOfficePanel {
     }
 
     private void connect() {
+        ooPrefs = jabRefPreferences.getOpenOfficePreferences();
 
-        // dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), , ButtonType.CANCEL);
+        Task<OOBibBase> connectTask = new Task<OOBibBase>() {
 
-        try {
+            @Override
+            protected OOBibBase call() throws Exception {
+                updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
+                loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
 
-            Task<OOBibBase> task = new Task<OOBibBase>() {
+                return createBibBase();
+            }
+        };
 
-                @Override
-                protected OOBibBase call() throws Exception {
+        connectTask.setOnSucceeded(value -> {
+            ooBase = connectTask.getValue();
 
-                    updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
+            if (ooBase.isConnectedToDocument()) {
+                dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
+            }
 
-                    //TODO: Executed on FX thread, must be background
-                    return createBibBase();
+            // Enable actions that depend on Connect:
+            selectDocument.setDisable(false);
+            pushEntries.setDisable(false);
+            pushEntriesInt.setDisable(false);
+            pushEntriesEmpty.setDisable(false);
+            pushEntriesAdvanced.setDisable(false);
+            update.setDisable(false);
+            merge.setDisable(false);
+            manageCitations.setDisable(false);
+            exportCitations.setDisable(false);
 
-                }
+        });
+        connectTask.setOnFailed(value -> {
+            Throwable ex = connectTask.getException();
+            if (ex instanceof UnsatisfiedLinkError) {
+                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-            };
+                dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                                                                       + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
 
-            task.setOnSucceeded(value -> {
-                ooBase = task.getValue();
+            } else if (ex instanceof IOException) {
+                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-                if (ooBase.isConnectedToDocument()) {
-                    dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
-                }
+                dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                                                     Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
+                                                                                                                                + "\n"
+                                                                                                                                + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                                                                                                                + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
+                                                     ex);
+            } else {
+                dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
+            }
+        });
 
-                // Enable actions that depend on Connect:
-                selectDocument.setDisable(false);
-                pushEntries.setDisable(false);
-                pushEntriesInt.setDisable(false);
-                pushEntriesEmpty.setDisable(false);
-                pushEntriesAdvanced.setDisable(false);
-                update.setDisable(false);
-                merge.setDisable(false);
-                manageCitations.setDisable(false);
-                exportCitations.setDisable(false);
+        dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), connectTask);
+        taskExecutor.execute(connectTask);
 
-            });
-            task.setOnFailed(value -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), task.getException()));
-
-            dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), task);
-
-            taskExecutor.execute(task);
-
-            ooPrefs = jabRefPreferences.getOpenOfficePreferences();
-            // Add OO JARs to the classpath
-            loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
-
-        } catch (UnsatisfiedLinkError e) {
-            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
-
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                                                                   + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
-
-        } catch (IOException e) {
-            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
-
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                                                 Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
-                                                                                                                            + "\n"
-                                                                                                                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                                                                                                                            + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
-                                                 e);
-        }
     }
 
     private void loadOpenOfficeJars(Path configurationPath) throws IOException {
         List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
         if (!filePaths.stream().allMatch(Optional::isPresent)) {
-            throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS);
+            throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS + " in " + configurationPath);
         }
 
         List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
@@ -474,7 +467,6 @@ public class OpenOfficePanel {
     }
 
     private Optional<Boolean> showManualConnectionDialog() {
-
         return new ManualConnectDialogView(dialogService).showAndWait();
     }
 
@@ -648,6 +640,7 @@ public class OpenOfficePanel {
         });
         clearConnectionSettings.setOnAction(e -> {
             ooPrefs.clearConnectionSettings();
+            dialogService.notify(Localization.lang("Cleared connection settings"));
             jabRefPreferences.setOpenOfficePreferences(ooPrefs);
         });
 
