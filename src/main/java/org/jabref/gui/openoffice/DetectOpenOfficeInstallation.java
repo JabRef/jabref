@@ -41,7 +41,6 @@ public class DetectOpenOfficeInstallation {
         return checkAutoDetectedPaths(ooPrefs);
     }
 
-
     private Optional<Path> selectInstallationPath() {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
