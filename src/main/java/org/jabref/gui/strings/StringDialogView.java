@@ -3,11 +3,11 @@ package org.jabref.gui.strings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
@@ -28,29 +28,37 @@ public class StringDialogView extends BaseDialog<Void> {
     @FXML private Button btnNewString;
     @FXML private Button btnRemove;
     @FXML private Button btnHelp;
-    @FXML private Button btnCancel;
-    @FXML private Button btnSave;
+    @FXML private ButtonType saveButton;
+
+    @FXML private TextField stringLabel;
     @FXML private TableView<StringViewModel> tblStrings;
     @FXML private TableColumn<StringViewModel, String> colLabel;
     @FXML private TableColumn<StringViewModel, String> colContent;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-    private final StringDialogViewModel viewModel;
+    private StringDialogViewModel viewModel;
+    private BibDatabase database;
 
     public StringDialogView(BibDatabase database) {
-        viewModel = new StringDialogViewModel(database);
+        this.database = database;
 
-        ButtonType save = new ButtonType("Save", ButtonData.OK_DONE);
-        this.getDialogPane().getButtonTypes().addAll(save);
+        setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                viewModel.save();
 
+            }
+            return null;
+        });
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
+
     }
 
     @FXML
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
+        viewModel = new StringDialogViewModel(database);
 
         btnHelp.setGraphic(JabRefIcons.HELP.getGraphicNode());
         btnHelp.setTooltip(new Tooltip(Localization.lang("Open Help page")));
@@ -60,7 +68,6 @@ public class StringDialogView extends BaseDialog<Void> {
 
         btnRemove.setGraphic(JabRefIcons.REMOVE.getGraphicNode());
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove string")));
-
 
         colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
         colLabel.setCellFactory(column -> new TextFieldTableCell<StringViewModel, String>(new DefaultStringConverter()) {
@@ -105,15 +112,17 @@ public class StringDialogView extends BaseDialog<Void> {
         });
 
         colLabel.setOnEditCommit((CellEditEvent<StringViewModel, String> cell) -> {
-                                     cell.getRowValue().setLabel(cell.getNewValue());
-                                 });
+            cell.getRowValue().setLabel(cell.getNewValue());
+        });
         colContent.setOnEditCommit((CellEditEvent<StringViewModel, String> cell) -> {
-                                       cell.getRowValue().setContent(cell.getNewValue());
-                                   });
+            cell.getRowValue().setContent(cell.getNewValue());
+        });
 
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
         tblStrings.setEditable(true);
 
+        viewModel.seletedItemProperty().bind(tblStrings.getSelectionModel().selectedItemProperty());
+        viewModel.newStringLabelProperty().bindBidirectional(stringLabel.textProperty());
     }
 
     @FXML
@@ -128,12 +137,7 @@ public class StringDialogView extends BaseDialog<Void> {
 
     @FXML
     private void removeString(ActionEvent event) {
-        StringViewModel selected = tblStrings.getSelectionModel().getSelectedItem();
-        viewModel.removeString(selected);
+        viewModel.removeString();
     }
 
-    @FXML
-    private void save() {
-        viewModel.save();
-    }
 }

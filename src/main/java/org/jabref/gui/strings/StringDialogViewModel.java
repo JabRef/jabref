@@ -5,7 +5,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
@@ -16,7 +20,8 @@ import org.jabref.model.entry.BibtexString;
 public class StringDialogViewModel extends AbstractViewModel {
 
     private final ListProperty<StringViewModel> allStrings = new SimpleListProperty<>(FXCollections.observableArrayList());
-
+    private final ObjectProperty<StringViewModel> selectedItemProperty = new SimpleObjectProperty<>();
+    private final StringProperty newStringLabelProperty = new SimpleStringProperty("");
     private final BibDatabase db;
 
     public StringDialogViewModel(BibDatabase bibDatabase) {
@@ -27,11 +32,11 @@ public class StringDialogViewModel extends AbstractViewModel {
     private void addAllStringsFromDB() {
 
         Set<StringViewModel> strings = db.getStringKeySet()
-                .stream()
-                .map(string -> db.getString(string))
-                .sorted(new BibtexStringComparator(false))
-                .map(this::convertFromBibTexString)
-                .collect(Collectors.toSet());
+                                         .stream()
+                                         .map(string -> db.getString(string))
+                                         .sorted(new BibtexStringComparator(false))
+                                         .map(this::convertFromBibTexString)
+                                         .collect(Collectors.toSet());
         allStrings.addAll(strings);
     }
 
@@ -40,16 +45,24 @@ public class StringDialogViewModel extends AbstractViewModel {
     }
 
     public void addNewString() {
-        allStrings.add(new StringViewModel("new Label", "New Content"));
+        allStrings.add(new StringViewModel(newStringLabelProperty.getValue(), "New Content"));
     }
 
-    public void removeString(StringViewModel selected) {
-        allStrings.remove(selected);
+    public void removeString() {
+        allStrings.remove(selectedItemProperty.getValue());
     }
 
     private StringViewModel convertFromBibTexString(BibtexString bibtexString) {
         return new StringViewModel(bibtexString.getName(), bibtexString.getContent());
 
+    }
+
+    public ObjectProperty<StringViewModel> seletedItemProperty() {
+        return this.selectedItemProperty;
+    }
+
+    public StringProperty newStringLabelProperty() {
+        return this.newStringLabelProperty;
     }
 
     public void save() {

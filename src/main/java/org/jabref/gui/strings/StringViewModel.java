@@ -23,7 +23,7 @@ public class StringViewModel {
             System.out.println("Null checker");
             return ValidationMessage.error("May not be null2");
         } else if (input.trim().isEmpty()) {
-            System.out.println("Should not empty");
+            System.out.println("Should not be empty");
             return ValidationMessage.error("Should not be empty");
         } else {
             return null; // everything is ok
