@@ -1,15 +1,16 @@
 package org.jabref.logic.net;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class URLUtilTest {
+class URLUtilTest {
 
     @Test
-    public void cleanGoogleSearchURL() throws Exception {
+    void cleanGoogleSearchURL() throws Exception {
         // empty text
         assertEquals("", URLUtil.cleanGoogleSearchURL(""));
         assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));
@@ -61,14 +62,42 @@ public class URLUtilTest {
     }
 
     @Test
-    public void isURLshouldAcceptValidURL() {
+    void isURLshouldAcceptValidURL() {
         assertTrue(URLUtil.isURL("http://www.google.com"));
         assertTrue(URLUtil.isURL("https://www.google.com"));
     }
 
     @Test
-    public void isURLshouldRejectInvalidURL() {
+    void isURLshouldRejectInvalidURL() {
         assertFalse(URLUtil.isURL("www.google.com"));
         assertFalse(URLUtil.isURL("google.com"));
+    }
+
+    @Test
+    void appendSingleWord() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        URLUtil.addPath(builder, "/example");
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendSingleWordWithSlash() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        URLUtil.addPath(builder, "/example");
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendSlash() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        URLUtil.addPath(builder, "/");
+        assertEquals("http://example.com/test", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendTwoWords() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        URLUtil.addPath(builder, "example two");
+        assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());
     }
 }

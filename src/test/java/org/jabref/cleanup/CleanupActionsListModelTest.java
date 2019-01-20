@@ -68,7 +68,6 @@ public class CleanupActionsListModelTest {
         ArgumentCaptor<ListDataEvent> argument = ArgumentCaptor.forClass(ListDataEvent.class);
         verify(listener).intervalRemoved(argument.capture());
         assertEquals(ListDataEvent.INTERVAL_REMOVED, argument.getValue().getType());
-
     }
 
     @Test
@@ -91,7 +90,5 @@ public class CleanupActionsListModelTest {
         model.removeAtIndex((getDefaultFieldFormatterCleanups().size() + 1));
 
         verifyZeroInteractions(listener);
-
     }
-
 }

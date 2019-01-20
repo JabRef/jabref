@@ -4,20 +4,16 @@ import java.util.Optional;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.strings.StringUtil;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
-    private final JournalAbbreviationLoader journalAbbreviationLoader;
-    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public JournalEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, FieldCheckers fieldCheckers) {
+    public JournalEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JournalAbbreviationRepository journalAbbreviationRepository, FieldCheckers fieldCheckers) {
         super(fieldName, suggestionProvider, fieldCheckers);
 
-        this.journalAbbreviationLoader = journalAbbreviationLoader;
-        this.journalAbbreviationPreferences = journalAbbreviationPreferences;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     public void toggleAbbreviation() {
@@ -25,9 +21,8 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             return;
         }
 
-        JournalAbbreviationRepository abbreviationRepository = journalAbbreviationLoader.getRepository(journalAbbreviationPreferences);
-        if (abbreviationRepository.isKnownName(text.get())) {
-            Optional<String> nextAbbreviation = abbreviationRepository.getNextAbbreviation(text.get());
+        if (journalAbbreviationRepository.isKnownName(text.get())) {
+            Optional<String> nextAbbreviation = journalAbbreviationRepository.getNextAbbreviation(text.get());
 
             if (nextAbbreviation.isPresent()) {
                 text.set(nextAbbreviation.get());

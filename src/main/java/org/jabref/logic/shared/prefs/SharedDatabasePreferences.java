@@ -30,10 +30,12 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
     private static final String SHARED_DATABASE_PASSWORD = "sharedDatabasePassword";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
+    private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
+    private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
+    private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
-
 
     public SharedDatabasePreferences() {
         this(DEFAULT_NODE);
@@ -67,8 +69,20 @@ public class SharedDatabasePreferences {
         return getOptionalValue(SHARED_DATABASE_PASSWORD);
     }
 
+    public Optional<String> getKeyStoreFile() {
+        return getOptionalValue(SHARED_DATABASE_KEYSTORE_FILE);
+    }
+
+    public Optional<String> getServerTimezone() {
+        return getOptionalValue(SHARED_DATABASE_SERVER_TIMEZONE);
+    }
+
     public boolean getRememberPassword() {
         return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
+    }
+
+    public boolean isUseSSL() {
+        return internalPrefs.getBoolean(SHARED_DATABASE_USE_SSL, false);
     }
 
     public void setType(String type) {
@@ -99,6 +113,18 @@ public class SharedDatabasePreferences {
         internalPrefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);
     }
 
+    public void setUseSSL(boolean useSSL) {
+        internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
+    }
+
+    public void setKeystoreFile(String keystoreFile) {
+        internalPrefs.put(SHARED_DATABASE_KEYSTORE_FILE, keystoreFile);
+    }
+
+    public void setServerTimezone(String serverTimezone) {
+        internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);
+    }
+
     public void clearPassword() {
         internalPrefs.remove(SHARED_DATABASE_PASSWORD);
     }
@@ -123,6 +149,9 @@ public class SharedDatabasePreferences {
         setPort(String.valueOf(properties.getPort()));
         setName(properties.getDatabase());
         setUser(properties.getUser());
+        setUseSSL(properties.isUseSSL());
+        setKeystoreFile(properties.getKeyStore());
+        setServerTimezone(properties.getServerTimezone());
 
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());

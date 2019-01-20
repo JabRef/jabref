@@ -16,6 +16,7 @@ import org.jabref.model.entry.identifier.DOI;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -48,9 +49,10 @@ public class DoiResolution implements FulltextFetcher {
                     connection.followRedirects(true);
                     connection.ignoreHttpErrors(true);
                     // some publishers are quite slow (default is 3s)
-                    connection.timeout(5000);
+                    connection.timeout(10000);
 
                     Document html = connection.get();
+
                     // scan for PDF
                     Elements elements = html.body().select("a[href]");
                     List<Optional<URL>> links = new ArrayList<>();
@@ -70,11 +72,22 @@ public class DoiResolution implements FulltextFetcher {
                         LOGGER.info("Fulltext PDF found @ " + sciLink);
                         pdfLink = links.get(0);
                     }
+                } catch (UnsupportedMimeTypeException type) {
+                    // this might be the PDF already as we follow redirects
+                    if (type.getMimeType().startsWith("application/pdf")) {
+                        return Optional.of(new URL(type.getUrl()));
+                    }
+                    LOGGER.warn("DoiResolution fetcher failed: ", type);
                 } catch (IOException e) {
                     LOGGER.warn("DoiResolution fetcher failed: ", e);
                 }
             }
         }
         return pdfLink;
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.SOURCE;
     }
 }

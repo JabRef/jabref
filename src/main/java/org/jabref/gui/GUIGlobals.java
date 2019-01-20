@@ -2,12 +2,12 @@ package org.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Toolkit;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -17,17 +17,18 @@ import org.slf4j.LoggerFactory;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
+
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
     public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;
     public static Font currentFont;
-    public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
 
-    public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
-    public static final int WIDTH_ICON_COL = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL) + 12; // add some additional space to improve appearance
+    public static CustomLocalDragboard localDragboard = new CustomLocalDragboard();
 
-    public static final int WIDTH_ICON_COL_RANKING = 5 * JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL); // Width of Ranking Icon Column
+    public static final int WIDTH_ICON_COL = 16 + 12; // add some additional space to improve appearance
+
+    public static final int WIDTH_ICON_COL_RANKING = 5 * 16; // Width of Ranking Icon Column
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
 
@@ -59,21 +60,9 @@ public class GUIGlobals {
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
 
+        IconTheme.loadFonts();
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
-
-        // Set WM_CLASS using reflection for certain Un*x window managers
-        if (!OS.WINDOWS && !OS.OS_X) {
-            try {
-                Toolkit xToolkit = Toolkit.getDefaultToolkit();
-                java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
-                awtAppClassNameField.setAccessible(true);
-                awtAppClassNameField.set(xToolkit, "org-jabref-JabRefMain");
-            } catch (Exception e) {
-                // ignore any error since this code only works for certain toolkits
-            }
-        }
-
+                                          Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
     }
 
     public static void setFont(int size) {
@@ -81,5 +70,4 @@ public class GUIGlobals {
         // update preferences
         Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, size);
     }
-
 }

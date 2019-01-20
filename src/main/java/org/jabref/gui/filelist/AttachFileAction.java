@@ -6,6 +6,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -36,20 +37,20 @@ public class AttachFileAction extends SimpleCommand {
                                                                                                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
-            LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), "");
 
-            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(newLinkedFile);
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
 
-            Optional<LinkedFile> editedLinkeDfile = dialog.showAndWait();
-            editedLinkeDfile.ifPresent(file -> {
+            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
-                Optional<FieldChange> fieldChange = entry.addFile(file);
-                fieldChange.ifPresent(change -> {
-                    UndoableFieldChange ce = new UndoableFieldChange(change);
-                    panel.getUndoManager().addEdit(ce);
-                    panel.markBaseChanged();
-                });
-            });
+            dialog.showAndWait()
+                  .ifPresent(editedLinkedFile -> {
+                      Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
+                      fieldChange.ifPresent(change -> {
+                          UndoableFieldChange ce = new UndoableFieldChange(change);
+                          panel.getUndoManager().addEdit(ce);
+                          panel.markBaseChanged();
+                      });
+                  });
         });
     }
 }

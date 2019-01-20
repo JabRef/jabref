@@ -73,7 +73,7 @@ public class ChangeEntryTypeMenu {
             populateSubMenu(items, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
         } else {
             // Default BibTeX
-            populateSubMenu(items, Localization.BIBTEX, BibtexEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(items, BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypes.ALL, entry, undoManager);
             items.remove(0); // Remove separator
 
             // IEEETran

@@ -1,7 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
@@ -9,67 +9,66 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
+import org.mockito.Answers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-public class LinkedFileViewModelTest {
+@ExtendWith(TempDirectory.class)
+class LinkedFileViewModelTest {
 
-    @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
-    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
-    private final JournalAbbreviationLoader abbreviationLoader = mock(JournalAbbreviationLoader.class);
+    private Path tempFile;
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private LinkedFile linkedFile;
     private BibEntry entry;
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
-    private final FileDirectoryPreferences fileDirectoryPreferences = mock(FileDirectoryPreferences.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp(@TempDirectory.TempDir Path tempFolder) throws Exception {
         entry = new BibEntry();
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
 
+        tempFile = tempFolder.resolve("temporaryFile");
+        Files.createFile(tempFile);
     }
 
     @Test
-    public void deleteWhenFilePathNotPresentReturnsTrue() {
+    void deleteWhenFilePathNotPresentReturnsTrue() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
         linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
-        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FileDirectoryPreferences.class));
+        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
         verifyZeroInteractions(dialogService); // dialog was never shown
     }
 
     @Test
-    public void deleteWhenRemoveChosenReturnsTrue() throws IOException {
-        File tempFile = tempFolder.newFile();
-        linkedFile = new LinkedFile("", tempFile.getAbsolutePath(), "");
+    void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
+        linkedFile = new LinkedFile("", tempFile.toString(), "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
                 anyString(),
@@ -79,16 +78,15 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
-        assertTrue(tempFile.exists());
+        assertTrue(Files.exists(tempFile));
     }
 
     @Test
-    public void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() throws IOException {
-        File tempFile = tempFolder.newFile();
-        linkedFile = new LinkedFile("", tempFile.getAbsolutePath(), "");
+    void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
+        linkedFile = new LinkedFile("", tempFile.toString(), "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
                 anyString(),
@@ -98,14 +96,14 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
-        assertFalse(tempFile.exists());
+        assertFalse(Files.exists(tempFile));
     }
 
     @Test
-    public void deleteWhenDeleteChosenAndFileMissingReturnsFalse() throws IOException {
+    void deleteMissingFileReturnsTrue() {
         linkedFile = new LinkedFile("", "!!nonexistent file!!", "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -116,16 +114,14 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
-        verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
-        assertFalse(removed);
+        assertTrue(removed);
     }
 
     @Test
-    public void deleteWhenDialogCancelledReturnsFalse() throws IOException {
-        File tempFile = tempFolder.newFile();
-        linkedFile = new LinkedFile("desc", tempFile.getAbsolutePath(), "pdf");
+    void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
+        linkedFile = new LinkedFile("desc", tempFile.toString(), "pdf");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
                 anyString(),
@@ -135,9 +131,9 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertFalse(removed);
-        assertTrue(tempFile.exists());
+        assertTrue(Files.exists(tempFile));
     }
 }

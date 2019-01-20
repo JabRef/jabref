@@ -17,4 +17,6 @@ public interface JabRefIcon extends GlyphIcons {
     JabRefIcon disabled();
 
     JabRefIcon withColor(Color color);
+
+    String name();
 }

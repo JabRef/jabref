@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,10 +34,9 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
     private JComponent infoShown;
     private boolean okPressed;
 
-
-    public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
-            BibDatabase secondary, final DefaultMutableTreeNode root) {
-        super(owner, Localization.lang("External changes"), true, ChangeDisplayDialog.class);
+    public ChangeDisplayDialog(final BasePanel panel,
+                               BibDatabase secondary, final DefaultMutableTreeNode root) {
+        super(Localization.lang("External changes"), true, ChangeDisplayDialog.class);
         BibDatabase localSecondary;
 
         // Just to be sure, put in an empty secondary base if none is given:

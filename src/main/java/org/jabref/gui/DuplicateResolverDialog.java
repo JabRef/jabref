@@ -6,9 +6,11 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import javafx.scene.Scene;
+
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.mergeentries.MergeEntries;
@@ -46,7 +48,7 @@ public class DuplicateResolverDialog extends JabRefDialog {
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        super((JFrame) null, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
+        super(Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = frame;
         init(one, two, type);
     }
@@ -120,7 +122,7 @@ public class DuplicateResolverDialog extends JabRefDialog {
             }
         });
 
-        getContentPane().add(me.getMergeEntryPanel());
+        getContentPane().add(CustomJFXPanel.wrap(new Scene(me)));
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 

@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-
 <DialogPane minHeight="-Infinity" prefHeight="150.0" prefWidth="536.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.LinkedFileEditDialogView">
    <content>
       <GridPane>

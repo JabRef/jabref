@@ -2,9 +2,9 @@ package org.jabref.gui.journals;
 
 import javax.inject.Inject;
 
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -13,11 +13,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -34,12 +34,12 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML public Label loadingLabel;
     @FXML public ProgressIndicator progressIndicator;
+    @FXML private ButtonType saveButton;
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
     @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableEditColumn;
     @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableDeleteColumn;
-    @FXML private Button cancelButton;
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
     @FXML private Button addJournalFileButton;
     @FXML private Button addNewJournalFileButton;
@@ -52,11 +52,12 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     public ManageJournalAbbreviationsView() {
         this.setTitle(Localization.lang("Journal abbreviations"));
-        this.setResizable(true);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveAbbreviationsAndCloseDialog());
     }
 
     @FXML
@@ -129,11 +130,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     private void setBindings() {
         journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
-
-        viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) ->
-                journalFilesBox.getSelectionModel().select(newvalue));
-        journalFilesBox.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldvalue, newvalue) -> viewModel.currentFileProperty().set(newvalue));
+        journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
 
         viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) ->
                 journalAbbreviationsTable.getSelectionModel().select(newvalue));
@@ -186,23 +183,9 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     }
 
     @FXML
-    private void closeDialog() {
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
-    }
-
-    @FXML
     private void saveAbbreviationsAndCloseDialog() {
-        Task<Void> task = new Task<Void>() {
-
-            @Override
-            protected Void call() {
-                viewModel.saveEverythingAndUpdateAutoCompleter();
-                return null;
-            }
-        };
-        new Thread(task).start();
-        closeDialog();
+        viewModel.saveEverythingAndUpdateAutoCompleter();
+        close();
     }
 
 

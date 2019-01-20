@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class OvidImporterTest {
 
-    private OvidImporter importer;
-
     private static final String FILE_ENDING = ".txt";
+    private OvidImporter importer;
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("OvidImporterTest")
@@ -59,7 +58,7 @@ public class OvidImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.OVID, importer.getFileType());
+        assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
@@ -153,7 +152,7 @@ public class OvidImporterTest {
             Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
             try (InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
                 List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
-                        .getEntries();
+                                                 .getEntries();
                 assertNotNull(entries);
                 assertEquals(1, entries.size());
                 BibEntryAssert.assertEquals(nis, entries.get(0));

@@ -7,6 +7,10 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import org.jabref.model.strings.StringUtil;
+
+import org.apache.http.client.utils.URIBuilder;
+
 public class URLUtil {
     private static final String URL_EXP = "^(https?|ftp)://.+";
 
@@ -72,6 +76,30 @@ public class URLUtil {
      */
     public static boolean isURL(String url) {
         return url.contains("://");
+    }
+
+    /**
+     * @implNote slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
+     */
+    public static URIBuilder addPath(URIBuilder base, String subPath) {
+        if (StringUtil.isBlank(subPath) || "/".equals(subPath)) {
+            return base;
+        } else {
+            base.setPath(appendSegmentToPath(base.getPath(), subPath));
+            return base;
+        }
+    }
+
+    private static String appendSegmentToPath(String path, String segment) {
+        if (StringUtil.isBlank(path)) {
+            path = "/";
+        }
+
+        if (path.charAt(path.length() - 1) == '/' || segment.startsWith("/")) {
+            return path + segment;
+        }
+
+        return path + "/" + segment;
     }
 
 }

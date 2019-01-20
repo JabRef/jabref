@@ -41,7 +41,6 @@ public class DocumentViewerView extends BaseDialog<Void> {
     public DocumentViewerView() {
         this.setTitle(Localization.lang("Document viewer"));
         this.initModality(Modality.NONE);
-        this.setResizable(true);
 
         ViewLoader.view(this)
                   .load()

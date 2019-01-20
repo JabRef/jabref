@@ -29,15 +29,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class SynchronizationTestSimulator {
 
-    private BibDatabaseContext clientContextA;
-    private BibDatabaseContext clientContextB;
-
-    private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
-
-    private DBMSConnection dbmsConnection;
-
     @Parameter
     public DBMSType dbmsType;
+    private BibDatabaseContext clientContextA;
+    private BibDatabaseContext clientContextB;
+    private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
+    private DBMSConnection dbmsConnection;
+
+    @Parameters(name = "Test with {0} database system")
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        return TestManager.getDBMSTypeTestParameter();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
@@ -55,11 +57,6 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
-    }
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test

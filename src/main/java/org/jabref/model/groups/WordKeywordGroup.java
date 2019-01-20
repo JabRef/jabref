@@ -55,7 +55,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         Objects.requireNonNull(entriesToAdd);
 
         List<FieldChange> changes = new ArrayList<>();
-        for (BibEntry entry : entriesToAdd) {
+        for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
                 KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
@@ -71,7 +71,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     public List<FieldChange> remove(List<BibEntry> entriesToRemove) {
         Objects.requireNonNull(entriesToRemove);
         List<FieldChange> changes = new ArrayList<>();
-        for (BibEntry entry : entriesToRemove) {
+        for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
                 KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);

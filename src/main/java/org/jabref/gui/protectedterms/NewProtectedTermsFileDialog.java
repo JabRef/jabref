@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
@@ -23,7 +22,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -49,7 +48,7 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     }
 
     public NewProtectedTermsFileDialog(DialogService dialogService, ProtectedTermsLoader loader) {
-        super((JFrame) null, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
+        super(Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
         this.dialogService = dialogService;
         setupDialog();
@@ -59,9 +58,10 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.TERMS)
-                .withDefaultExtension(FileType.TERMS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
 
         browse.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor

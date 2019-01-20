@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class ParserResult {
     private final List<String> duplicateKeys = new ArrayList<>();
     private BibDatabase database;
     private MetaData metaData = new MetaData();
-    private File file;
+    private Path file;
     private boolean invalid;
     private boolean toOpenTab;
     private boolean changedOnMigration = false;
@@ -94,11 +95,11 @@ public class ParserResult {
     }
 
     public Optional<File> getFile() {
-        return Optional.ofNullable(file);
+        return Optional.ofNullable(file).map(Path::toFile);
     }
 
     public void setFile(File f) {
-        file = f;
+        file = f.toPath();
     }
 
     /**
@@ -174,7 +175,7 @@ public class ParserResult {
         Objects.requireNonNull(bibDatabaseContext);
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
-        file = bibDatabaseContext.getDatabaseFile().orElse(null);
+        file = bibDatabaseContext.getDatabasePath().orElse(null);
     }
 
     public boolean isEmpty() {

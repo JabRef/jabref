@@ -9,6 +9,8 @@ import java.util.Objects;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Month;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -62,7 +64,8 @@ public class CSLAdapter {
      */
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
         if (cslInstance == null || !Objects.equals(newStyle, style)) {
-            cslInstance = new CSL(dataProvider, newStyle);
+            // lang and forceLang are set to the default values of other CSL constructors
+            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), newStyle, "en-US", false);
             style = newStyle;
         }
 
@@ -94,7 +97,13 @@ public class CSLAdapter {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
-                        .ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
+                        .ifPresent(value -> {
+                            if (FieldName.MONTH.equals(key)) {
+                                // Change month from #mon# to mon because CSL does not support the former format
+                                value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
+                            }
+                            bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
+                        });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }

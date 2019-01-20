@@ -3,40 +3,35 @@ package org.jabref.gui.entryeditor;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 public class EntryEditorPreferences {
-    private Map<String, List<String>> entryEditorTabList;
-    private LatexFieldFormatterPreferences latexFieldFormatterPreferences;
-    private ImportFormatPreferences importFormatPreferences;
-    private List<String> customTabFieldNames;
-    private boolean shouldShowRecommendationsTab;
-    private boolean showSourceTabByDefault;
-    private KeyBindingRepository keyBindings;
 
-    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean showSourceTabByDefault, KeyBindingRepository keyBindings) {
+    private final Map<String, List<String>> entryEditorTabList;
+    private final LatexFieldFormatterPreferences latexFieldFormatterPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final List<String> customTabFieldNames;
+    private final boolean shouldShowRecommendationsTab;
+    private final boolean isMrdlibAccepted;
+    private boolean showSourceTabByDefault;
+    private final KeyBindingRepository keyBindings;
+    private boolean avoidOverwritingCiteKey;
+
+    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.customTabFieldNames = customTabFieldNames;
         this.shouldShowRecommendationsTab = shouldShowRecommendationsTab;
+        this.isMrdlibAccepted = isMrdlibAccepted;
         this.showSourceTabByDefault = showSourceTabByDefault;
+        this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
-    }
-
-    public static EntryEditorPreferences from(JabRefPreferences preferences) {
-        return new EntryEditorPreferences(
-                preferences.getEntryEditorTabList(),
-                preferences.getLatexFieldFormatterPreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getCustomTabFieldNames(),
-                preferences.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS),
-                preferences.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE),
-                Globals.getKeyPrefs());
+        this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
     }
 
     public Map<String, List<String>> getEntryEditorTabList() {
@@ -59,11 +54,31 @@ public class EntryEditorPreferences {
         return shouldShowRecommendationsTab;
     }
 
+    public boolean isMrdlibAccepted() {
+        return isMrdlibAccepted;
+    }
+
     public boolean showSourceTabByDefault() {
         return showSourceTabByDefault;
     }
 
     public KeyBindingRepository getKeyBindings() {
         return keyBindings;
+    }
+
+    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
+        return bibtexKeyPatternPreferences;
+    }
+
+    public boolean isShowSourceTabByDefault() {
+        return showSourceTabByDefault;
+    }
+
+    public void setShowSourceTabByDefault(boolean showSourceTabByDefault) {
+        this.showSourceTabByDefault = showSourceTabByDefault;
+    }
+
+    public boolean avoidOverwritingCiteKey() {
+        return avoidOverwritingCiteKey;
     }
 }

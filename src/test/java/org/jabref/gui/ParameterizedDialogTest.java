@@ -1,44 +1,25 @@
 package org.jabref.gui;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import org.jabref.testutils.category.GUITest;
-
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
-@RunWith(Parameterized.class)
-@Category(GUITest.class)
+@Tag("GUITest")
 public class ParameterizedDialogTest extends AbstractUITest {
 
-    private final boolean createDatabase;
-    private final String[] menuPath;
-    private final String dialogTitle;
-    private final String buttonName;
-    private final boolean closeButton;
-
-
-    public ParameterizedDialogTest(boolean createDatabase, String[] menuPath, String dialogTitle, String buttonName,
-            boolean closeButton) {
-        this.createDatabase = createDatabase;
-        this.menuPath = menuPath;
-        this.dialogTitle = dialogTitle;
-        this.buttonName = buttonName;
-        this.closeButton = closeButton;
-    }
-
-    @Test
-    public void openAndExitDialog() {
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void openAndExitDialog(boolean createDatabase, String[] menuPath, String dialogTitle, String buttonName,
+                                  boolean closeButton) {
         if (createDatabase) {
             newDatabase();
         }
@@ -55,13 +36,13 @@ public class ParameterizedDialogTest extends AbstractUITest {
             findDialog(matcher).withTimeout(10_000).using(robot()).close();
         } else {
             findDialog(matcher).withTimeout(10_000).using(robot())
-                    .button(new GenericTypeMatcher<JButton>(JButton.class) {
+                               .button(new GenericTypeMatcher<JButton>(JButton.class) {
 
-                        @Override
-                        protected boolean isMatching(@Nonnull JButton jButton) {
-                            return buttonName.equals(jButton.getText());
-                        }
-                    }).click();
+                                   @Override
+                                   protected boolean isMatching(@Nonnull JButton jButton) {
+                                       return buttonName.equals(jButton.getText());
+                                   }
+                               }).click();
         }
         if (createDatabase) {
             closeDatabase();
@@ -69,13 +50,12 @@ public class ParameterizedDialogTest extends AbstractUITest {
         exitJabRef();
     }
 
-    @Parameterized.Parameters(name = "{index}: {1} -> {2} : {3}")
-    public static Collection<Object[]> instancesToTest() {
+    public static Stream<Object[]> instancesToTest() {
         // Opening and closing (in different ways) the dialogs accessible from the menus without doing anything else
         // Structure:
         // {create new database, {"Menu", "Submenu", "Sub-sub-menu"}, "Dialog title", "Button name", use close button}
         // @formatter:off
-        return Arrays.asList(
+        return Stream.of(
                 new Object[]{false, new String[]{"File", "Open library"}, "Open", "Cancel", false},
                 new Object[]{false, new String[]{"File", "Open library"}, "Open", "Close button", true},
                 new Object[]{true, new String[]{"File", "Append library"}, "Append library", "Cancel", false},
@@ -150,5 +130,4 @@ public class ParameterizedDialogTest extends AbstractUITest {
         );
         // @formatter:on
     }
-
 }

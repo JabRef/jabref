@@ -287,4 +287,8 @@ public class BibtexEntryTypes {
     public static Optional<EntryType> getType(String name) {
         return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
     }
+
+    public static EntryType getTypeOrDefault(String name) {
+        return getType(name).orElseGet(() -> new CustomEntryType(name, "required", "optional"));
+    }
 }

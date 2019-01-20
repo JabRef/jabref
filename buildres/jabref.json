@@ -1,0 +1,9 @@
+{
+  "name": "org.jabref.jabref",
+  "description": "JabRef",
+  "path": "JabRef.bat",
+  "type": "stdio",
+  "allowed_extensions": [
+    "@jabfox"
+  ]
+}

@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@FetcherTest //we mark this as fetcher test, because it depends on the avaiability of the FreeCite online library
 public class FreeCiteImporterTest {
 
     private FreeCiteImporter importer;
@@ -44,7 +46,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.FREECITE, importer.getFileType());
+        assertEquals(StandardFileType.FREECITE, importer.getFileType());
     }
 
     @Test

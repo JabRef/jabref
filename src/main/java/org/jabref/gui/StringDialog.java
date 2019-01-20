@@ -66,7 +66,7 @@ class StringDialog extends JabRefDialog {
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
-        super(null, StringDialog.class);
+        super(StringDialog.class);
         this.panel = panel;
         this.base = base;
 

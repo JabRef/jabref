@@ -27,8 +27,12 @@ public class MathSciNetId implements Identifier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MathSciNetId that = (MathSciNetId) o;
         return Objects.equals(identifier, that.identifier);
     }
@@ -49,7 +53,7 @@ public class MathSciNetId implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.ams.org/mathscinet-getitem?mr=" + identifier));
+            return Optional.of(new URI("https://www.ams.org/mathscinet-getitem?mr=" + identifier));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

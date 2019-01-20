@@ -9,7 +9,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
-public class BaseDialog<T> extends Dialog<T> {
+public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T> {
 
     protected BaseDialog() {
         getDialogPane().getScene().setOnKeyPressed(event -> {
@@ -20,8 +20,8 @@ public class BaseDialog<T> extends Dialog<T> {
         });
 
         setDialogIcon(IconTheme.getJabRefImageFX());
-
-        Globals.getThemeLoader().installBaseCss(getDialogPane().getScene());
+        setResizable(true);
+        Globals.getThemeLoader().installCss(getDialogPane().getScene(), Globals.prefs);
     }
 
     private void setDialogIcon(Image image) {

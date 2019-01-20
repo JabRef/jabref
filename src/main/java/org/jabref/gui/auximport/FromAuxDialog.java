@@ -13,7 +13,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -32,7 +31,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.auxparser.AuxParser;
 import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
@@ -69,7 +68,7 @@ public class FromAuxDialog extends JabRefDialog {
     private final JabRefFrame parentFrame;
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, TabPane viewedDBs) {
-        super((JFrame) null, title, modal, FromAuxDialog.class);
+        super(title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
@@ -161,8 +160,8 @@ public class FromAuxDialog extends JabRefDialog {
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.AUX)
-                .withDefaultExtension(FileType.AUX)
+                .addExtensionFilter(StandardFileType.AUX)
+                .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
         browseAuxFileButton.addActionListener(e -> {

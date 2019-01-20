@@ -119,7 +119,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void copyVersionToClipboard() {
-        clipBoardManager.setClipboardContents(versionInfo);
+        clipBoardManager.setContent(versionInfo);
         dialogService.notify(Localization.lang("Copied version to clipboard"));
     }
 

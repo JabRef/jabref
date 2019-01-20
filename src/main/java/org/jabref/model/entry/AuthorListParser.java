@@ -264,7 +264,8 @@ public class AuthorListParser {
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
+        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
+            && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
@@ -378,7 +379,7 @@ public class AuthorListParser {
             }
             if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
                 if (bracesLevel == 0) {
-                    tokenCase = Character.isUpperCase(c);
+                    tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);
                 } else {
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"

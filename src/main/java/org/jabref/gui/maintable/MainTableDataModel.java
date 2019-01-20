@@ -1,23 +1,21 @@
 package org.jabref.gui.maintable;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import org.jabref.Globals;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.preferences.JabRefPreferences;
 
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
@@ -60,8 +58,7 @@ public class MainTableDataModel {
             return Optional.empty();
         }
 
-        final MatcherSet searchRules = MatcherSets.build(
-                Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS) ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+        final MatcherSet searchRules = MatcherSets.build(Globals.prefs.getGroupViewMode() == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
         for (GroupTreeNode node : selectedGroups) {
             searchRules.addRule(node.getSearchMatcher());
@@ -69,11 +66,7 @@ public class MainTableDataModel {
         return Optional.of(searchRules);
     }
 
-    public ObservableList<BibEntryTableViewModel> getEntriesFiltered() {
+    public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesSorted;
-    }
-
-    public void bindComparator(ReadOnlyObjectProperty<Comparator<BibEntryTableViewModel>> comparator) {
-        entriesSorted.comparatorProperty().bind(comparator);
     }
 }

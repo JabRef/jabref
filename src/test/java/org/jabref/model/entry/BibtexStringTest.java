@@ -33,7 +33,6 @@ public class BibtexStringTest {
         bs2.setContent("Oscar Gustafsson");
         assertEquals("aOG", bs2.getName());
         assertEquals("Oscar Gustafsson", bs2.getContent());
-
     }
 
     @Test

@@ -45,6 +45,7 @@ public enum HelpFile {
     FETCHER_ISBN("ISBNtoBibTeX"),
     FETCHER_MEDLINE("Medline"),
     FETCHER_OAI2_ARXIV("arXiv"),
+    FETCHER_RFC("RFCtoBibTeX"),
     FETCHER_SPRINGER("Springer"),
     FETCHER_TITLE("TitleToBibTeX"),
     FETCHER_SCIENCEDIRECT(""),

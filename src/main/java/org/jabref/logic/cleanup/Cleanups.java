@@ -36,12 +36,8 @@ public class Cleanups {
 
         List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
         recommendedBibTeXFormatters.addAll(defaultFormatters);
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.JOURNAL, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.AUTHOR, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.EDITOR, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new HtmlToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter()));
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
@@ -49,6 +45,7 @@ public class Cleanups {
         recommendedBiblatexFormatters.addAll(defaultFormatters);
         recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
         recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        // DO NOT ADD OrdinalsToSuperscriptFormatter here, because this causes issues. See https://github.com/JabRef/jabref/issues/2596.
         RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBiblatexFormatters);
     }
 

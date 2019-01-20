@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
+ *
+ * This class implements the "Advanced Search Mode" described in the help
  */
 public class GrammarBasedSearchRule implements SearchRule {
 

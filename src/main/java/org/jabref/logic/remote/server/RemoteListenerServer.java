@@ -1,12 +1,15 @@
 package org.jabref.logic.remote.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import javafx.util.Pair;
+
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.shared.Protocol;
+import org.jabref.logic.remote.shared.RemoteMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +26,7 @@ public class RemoteListenerServer implements Runnable {
 
 
     public RemoteListenerServer(MessageHandler messageHandler, int port) throws IOException {
-        this.serverSocket = new ServerSocket(port, BACKLOG, InetAddress.getByName("localhost"));
+        this.serverSocket = new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());
         this.messageHandler = messageHandler;
     }
 
@@ -34,15 +37,10 @@ public class RemoteListenerServer implements Runnable {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(ONE_SECOND_TIMEOUT);
 
-                    Protocol protocol = new Protocol(socket);
-                    protocol.sendMessage(Protocol.IDENTIFIER);
-                    String message = protocol.receiveMessage();
-                    protocol.close();
-                    if (message.isEmpty()) {
-                        continue;
+                    try (Protocol protocol = new Protocol(socket)) {
+                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
+                        handleMessage(protocol, input.getKey(), input.getValue());
                     }
-                    messageHandler.handleMessage(message);
-
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
@@ -51,6 +49,24 @@ public class RemoteListenerServer implements Runnable {
             }
         } finally {
             closeServerSocket();
+        }
+    }
+
+    private void handleMessage(Protocol protocol, RemoteMessage type, Object argument) throws IOException {
+        switch (type) {
+            case PING:
+                protocol.sendMessage(RemoteMessage.PONG, Protocol.IDENTIFIER);
+                break;
+            case SEND_COMMAND_LINE_ARGUMENTS:
+                if (argument instanceof String[]) {
+                    messageHandler.handleCommandLineArguments((String[]) argument);
+                    protocol.sendMessage(RemoteMessage.OK);
+                } else {
+                    throw new IOException("Argument for 'SEND_COMMAND_LINE_ARGUMENTS' is not of type String[]. Got " + argument);
+                }
+                break;
+            default:
+                throw new IOException("Unhandled message to server " + type);
         }
     }
 

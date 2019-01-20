@@ -29,5 +29,4 @@ public class ShippedJournalAbbreviationDuplicateTest {
             assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent(), "duplicate medline " + abbreviation.toString());
         });
     }
-
 }

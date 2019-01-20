@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -53,10 +54,9 @@ import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
 import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;
 import org.slf4j.Logger;
@@ -70,11 +70,15 @@ import org.slf4j.LoggerFactory;
 public class ModsImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);
-    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
-            .getKeywordSeparator() + " ";
-
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
+
+    private final String keywordSeparator;
+
     private JAXBContext context;
+
+    public ModsImporter(ImportFormatPreferences importFormatPreferences) {
+        keywordSeparator = importFormatPreferences.getKeywordSeparator() + " ";
+    }
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
@@ -191,7 +195,7 @@ public class ModsImporter extends Importer implements Parser {
         }
 
         //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
-        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR);
+        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, this.keywordSeparator);
         //same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");
@@ -412,7 +416,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putIfListIsNotEmpty(Map<String, String> fields, List<String> list, String key, String separator) {
         if (!list.isEmpty()) {
-            fields.put(key, Joiner.on(separator).join(list));
+            fields.put(key, list.stream().collect(Collectors.joining(separator)));
         }
     }
 
@@ -473,8 +477,8 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MODS;
+    public StandardFileType getFileType() {
+        return StandardFileType.XML;
     }
 
     @Override

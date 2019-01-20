@@ -42,6 +42,11 @@ public class OpenAccessDoi implements FulltextFetcher {
         }
     }
 
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
+
     public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {
         HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
                 .header("accept", "application/json")

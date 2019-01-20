@@ -8,8 +8,7 @@ import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
@@ -43,23 +42,7 @@ public class BindingsHelper {
     }
 
     public static void includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
-        BooleanProperty pseudoClassState = new BooleanPropertyBase(false) {
-            @Override
-            protected void invalidated() {
-                node.pseudoClassStateChanged(pseudoClass, get());
-            }
-
-            @Override
-            public Object getBean() {
-                return node;
-            }
-
-            @Override
-            public String getName() {
-                return pseudoClass.getPseudoClassName();
-            }
-        };
-        pseudoClassState.bind(condition);
+        condition.addListener((obs, oldValue, newValue) -> node.pseudoClassStateChanged(pseudoClass, newValue));
     }
 
     /**
@@ -170,6 +153,15 @@ public class BindingsHelper {
             @Override
             protected boolean computeValue() {
                 return value;
+            }
+        };
+    }
+
+    public static ObservableValue<? extends String> emptyString() {
+        return new StringBinding() {
+            @Override
+            protected String computeValue() {
+                return "";
             }
         };
     }

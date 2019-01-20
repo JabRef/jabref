@@ -15,8 +15,9 @@ import java.util.regex.Pattern;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
@@ -50,8 +51,8 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ISI;
+    public StandardFileType getFileType() {
+        return StandardFileType.ISI;
     }
 
     @Override
@@ -301,7 +302,7 @@ public class IsiImporter extends Importer {
                 continue;
             }
 
-            BibEntry b = new BibEntry(Type);
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(Type));
             // id assumes an existing database so don't
 
             // Remove empty fields:

@@ -34,7 +34,7 @@ public class BasePanelPreferences {
         BasePanelPreferences basePanelPreferences = new BasePanelPreferences(
                 preferences.getMainTablePreferences(),
                 preferences.getAutoCompletePreferences(),
-                EntryEditorPreferences.from(preferences),
+                preferences.getEntryEditorPreferences(),
                 Globals.getKeyPrefs(),
                 preferences.getPreviewPreferences(),
                 preferences.getDouble(JabRefPreferences.ENTRY_EDITOR_HEIGHT));

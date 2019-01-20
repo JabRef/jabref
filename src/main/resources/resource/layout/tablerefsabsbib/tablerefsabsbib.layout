@@ -1,6 +1,6 @@
 <tr id="\format{\bibtexkey}" class="entry">
 	<td>\format[Authors(LastFirst,InitialsNoSpace),HTMLChars]{\author}</td>
-	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>] \end{abstract}\begin{review}[<a href="javascript:toggleInfo('\format{\bibtexkey}','review')">Review</a>] \end{review}[<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]</p></td>
+	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>] \end{abstract}\begin{comment}[<a href="javascript:toggleInfo('\format{\bibtexkey}','comment')">Comment</a>] \end{comment}[<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]</p></td>
 	<td>\year</td>
 	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
 	<td>\format[ToLowerCase]{\entrytype}</td>
@@ -8,10 +8,10 @@
 </tr>\begin{abstract}
 <tr id="abs_\format{\bibtexkey}" class="abstract noshow">
 	<td colspan="6"><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
-</tr>\end{abstract}\begin{review}
-<tr id="rev_\format{\bibtexkey}" class="review noshow">
-	<td colspan="6"><b>Review</b>: \format[HTMLChars]{\review}</td>
-</tr>\end{review}
+</tr>\end{abstract}\begin{comment}
+<tr id="rev_\format{\bibtexkey}" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: \format[HTMLChars]{\comment}</td>
+</tr>\end{comment}
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
 <td colspan="6"><b>BibTeX</b>:
 <pre>

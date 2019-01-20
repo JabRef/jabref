@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -40,10 +41,10 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -76,9 +77,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Pane to manage the interaction between JabRef and OpenOffice.
  */
-public class OpenOfficePanel extends AbstractWorker {
+public class OpenOfficePanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
+    private final DialogService dialogService;
 
     private JPanel content;
 
@@ -103,7 +105,6 @@ public class OpenOfficePanel extends AbstractWorker {
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
-    private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
@@ -123,13 +124,14 @@ public class OpenOfficePanel extends AbstractWorker {
         update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         update.setPreferredSize(new Dimension(24, 24));
-        preferences = new OpenOfficePreferences(Globals.prefs);
+        preferences = Globals.prefs.getOpenOfficePreferences();
         loader = new StyleLoader(preferences,
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
 
         this.frame = jabRefFrame;
         initPanel();
+        dialogService = frame.getDialogService();
     }
 
     public JPanel getContent() {
@@ -138,8 +140,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void initPanel() {
 
-        connect.addActionListener(e -> connect(true));
-        manualConnect.addActionListener(e -> connect(false));
+        connect.addActionListener(e -> connectAutomatically());
+        manualConnect.addActionListener(e -> connectManually());
 
         selectDocument.setToolTipText(Localization.lang("Select which open Writer document to work on"));
         selectDocument.addActionListener(e -> {
@@ -151,7 +153,7 @@ public class OpenOfficePanel extends AbstractWorker {
             } catch (UnknownPropertyException | WrappedTargetException | IndexOutOfBoundsException |
                     NoSuchElementException | NoDocumentException ex) {
                 LOGGER.warn("Problem connecting", ex);
-                frame.getDialogService().showErrorDialogAndWait(ex);
+                dialogService.showErrorDialogAndWait(ex);
             }
 
         });
@@ -202,7 +204,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
                     ooBase.rebuildBibTextSection(databases, style);
                     if (!unresolvedKeys.isEmpty()) {
-                        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
+                        dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
                                 Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                         unresolvedKeys.get(0)));
 
@@ -215,12 +217,12 @@ public class OpenOfficePanel extends AbstractWorker {
                     showConnectionLostErrorMessage();
                 } catch (IOException ex) {
                     LOGGER.warn("Problem with style file", ex);
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("No valid style file defined"),
+                    dialogService.showErrorDialogAndWait(Localization.lang("No valid style file defined"),
                             Localization.lang("You must select either a valid style file, or use one of the default styles."));
 
                 } catch (BibEntryNotFoundException ex) {
                     LOGGER.debug("BibEntry not found", ex);
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"), Localization.lang(
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"), Localization.lang(
                             "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                             ex.getBibtexKey()));
 
@@ -248,7 +250,7 @@ public class OpenOfficePanel extends AbstractWorker {
         settingsB.addActionListener(e -> showSettingsPopup());
         manageCitations.addActionListener(e -> {
             try {
-                CitationManager cm = new CitationManager(frame, ooBase);
+                CitationManager cm = new CitationManager(ooBase, dialogService);
                 cm.showDialog();
             } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
                 LOGGER.warn("Problem showing citation manager", ex);
@@ -318,7 +320,7 @@ public class OpenOfficePanel extends AbstractWorker {
             BibDatabase newDatabase = ooBase.generateDatabase(databases);
             if (!unresolvedKeys.isEmpty()) {
 
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Unable to generate new library"),
+                dialogService.showErrorDialogAndWait(Localization.lang("Unable to generate new library"),
                         Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                 unresolvedKeys.get(0)));
 
@@ -331,7 +333,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
                     Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                             ex.getBibtexKey()));
 
@@ -345,7 +347,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferences.useAllDatabases()) {
+        if (preferences.getUseAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.getDatabase());
             }
@@ -356,22 +358,33 @@ public class OpenOfficePanel extends AbstractWorker {
         return databases;
     }
 
-    private void connect(boolean autoDetect) {
-        if (autoDetect) {
-            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, frame.getDialogService());
+    private void connectAutomatically() {
+        BackgroundTask
+                .wrap(() -> {
+                    DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
 
-            if (!officeInstallation.isInstalled()) {
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"));
-                return;
-            }
-            diag.dispose();
-        } else {
-            showManualConnectionDialog();
-            if (!dialogOkPressed) {
-                return;
-            }
+                    Boolean installed = officeInstallation.isInstalled().get();
+                    if (installed == null || !installed) {
+                        throw new IllegalStateException("OpenOffice Installation could not be detected.");
+                    }
+                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
+                })
+                .onSuccess(x -> connect())
+                .onFailure(ex ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+                .executeWith(Globals.TASK_EXECUTOR);
+    }
+
+    private void connectManually() {
+        showManualConnectionDialog();
+        if (!dialogOkPressed) {
+            return;
         }
 
+        connect();
+    }
+
+    private void connect() {
         JDialog progressDialog = null;
 
         try {
@@ -379,45 +392,56 @@ public class OpenOfficePanel extends AbstractWorker {
             loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
 
             // Show progress dialog:
-            progressDialog = new DetectOpenOfficeInstallation(diag, preferences, frame.getDialogService())
+            progressDialog = new DetectOpenOfficeInstallation(diag, preferences, dialogService)
                     .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
-            getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
-            progressDialog.dispose();
+            JDialog finalProgressDialog = progressDialog;
+            BackgroundTask
+                    .wrap(this::createBibBase)
+                    .onFinished(() -> SwingUtilities.invokeLater(() -> {
+                        finalProgressDialog.dispose();
+                        diag.dispose();
+                    }))
+                    .onSuccess(ooBase -> {
+                        this.ooBase = ooBase;
+
+                        if (ooBase.isConnectedToDocument()) {
+                            frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
+                        }
+
+                        // Enable actions that depend on Connect:
+                        selectDocument.setEnabled(true);
+                        pushEntries.setEnabled(true);
+                        pushEntriesInt.setEnabled(true);
+                        pushEntriesEmpty.setEnabled(true);
+                        pushEntriesAdvanced.setEnabled(true);
+                        update.setEnabled(true);
+                        merge.setEnabled(true);
+                        manageCitations.setEnabled(true);
+                        exportCitations.setEnabled(true);
+
+                    })
+                    .onFailure(ex ->
+                            dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+                    .executeWith(Globals.TASK_EXECUTOR);
             diag.dispose();
-            if (ooBase == null) {
-                throw connectException;
-            }
-
-            if (ooBase.isConnectedToDocument()) {
-                frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
-            }
-
-            // Enable actions that depend on Connect:
-            selectDocument.setEnabled(true);
-            pushEntries.setEnabled(true);
-            pushEntriesInt.setEnabled(true);
-            pushEntriesEmpty.setEnabled(true);
-            pushEntriesAdvanced.setEnabled(true);
-            update.setEnabled(true);
-            merge.setEnabled(true);
-            manageCitations.setEnabled(true);
-            exportCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                    + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
+            DefaultTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                            + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode.")));
 
         } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                    Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
-                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                            + Localization.lang("If connecting manually, please verify program and library paths.")
-                            + "\n" + "\n" + Localization.lang("Error message:"),
-                    e);
+            DefaultTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                            Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
+                                    + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                    + Localization.lang("If connecting manually, please verify program and library paths.")
+                                    + "\n" + "\n" + Localization.lang("Error message:"),
+                            e));
 
         } finally {
             if (progressDialog != null) {
@@ -440,17 +464,11 @@ public class OpenOfficePanel extends AbstractWorker {
         addURL(jarURLs);
     }
 
-    @Override
-    public void run() {
-        try {
-            // Connect
-            ooBase = new OOBibBase(preferences.getExecutablePath(), true);
-        } catch (UnknownPropertyException |
-                CreationException | NoSuchElementException | WrappedTargetException | IOException |
-                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
-            ooBase = null;
-            connectException = new IOException(e.getMessage());
-        }
+    private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
+            WrappedTargetException, BootstrapException, UnknownPropertyException, NoDocumentException,
+            NoSuchElementException, CreationException {
+        // Connect
+        return new OOBibBase(preferences.getExecutablePath(), true);
     }
 
     private static void addURL(List<URL> jarList) throws IOException {
@@ -475,7 +493,7 @@ public class OpenOfficePanel extends AbstractWorker {
         final JDialog cDiag = new JDialog((JFrame) null, Localization.lang("Set connection parameters"), true);
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        final DialogService dialogService = frame.getDialogService();
+        final DialogService dialogService = this.dialogService;
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(nativeDesktop.getApplicationDirectory())
                 .build();
@@ -556,7 +574,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
         if (!ooBase.isConnectedToDocument()) {
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"), Localization.lang("Not connected to any Writer document. Please"
                             + " make sure a document is open, and use the 'Select Writer document' button to connect to it.")));
 
@@ -589,10 +607,10 @@ public class OpenOfficePanel extends AbstractWorker {
                         style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                            preferences.syncWhenCiting());
+                            preferences.getSyncWhenCiting());
                 } catch (FileNotFoundException ex) {
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(
+                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(
                             Localization.lang("No valid style file defined"),
                             Localization.lang("You must select either a valid style file, or use one of the default styles.")));
 
@@ -638,7 +656,7 @@ public class OpenOfficePanel extends AbstractWorker {
         }
 
         // Ask if keys should be generated
-        boolean citePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Cite"),
+        boolean citePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Cite"),
                 Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
@@ -668,14 +686,14 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void showConnectionLostErrorMessage() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection lost"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Connection lost"),
                 Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
                         + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect.")));
 
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
                 Localization.lang("Your style file specifies the paragraph format '%0', "
                         + "which is undefined in your current OpenOffice/LibreOffice document.",
                         ex.getFormatName())
@@ -685,7 +703,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined character format"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Undefined character format"),
                 Localization.lang(
                         "Your style file specifies the character format '%0', "
                                 + "which is undefined in your current OpenOffice/LibreOffice document.",
@@ -700,28 +718,38 @@ public class OpenOfficePanel extends AbstractWorker {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                preferences.syncWhenCiting());
+                preferences.getSyncWhenCiting());
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in all open libraries"));
         final JMenuItem clearConnectionSettings = new JMenuItem(Localization.lang("Clear connection settings"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(useActiveBase);
-        bg.add(useAllBases);
-        if (preferences.useAllDatabases()) {
+
+        ButtonGroup lookupButtonGroup = new ButtonGroup();
+        lookupButtonGroup.add(useActiveBase);
+        lookupButtonGroup.add(useAllBases);
+        if (preferences.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(e -> preferences.setSyncWhenCiting(autoSync.isSelected()));
-
-        useAllBases.addActionListener(e -> preferences.setUseAllDatabases(useAllBases.isSelected()));
-
-        useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
-
-        clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
+        autoSync.addActionListener(e -> {
+            preferences.setSyncWhenCiting(autoSync.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useAllBases.addActionListener(e -> {
+            preferences.setUseAllDatabases(useAllBases.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useActiveBase.addActionListener(e -> {
+            preferences.setUseAllDatabases(!useActiveBase.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        clearConnectionSettings.addActionListener(e -> {
+            preferences.clearConnectionSettings();
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
 
         menu.add(autoSync);
         menu.addSeparator();

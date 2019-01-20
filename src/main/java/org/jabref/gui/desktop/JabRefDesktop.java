@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -58,7 +57,7 @@ public class JabRefDesktop {
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFileDirectoryPreferences());
+            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFilePreferences());
 
             Optional<Path> file = FileHelper.expandFilename(link, dir);
 
@@ -93,13 +92,13 @@ public class JabRefDesktop {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else if (FieldName.PDF.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PDF);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
@@ -129,15 +128,16 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
-        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
+        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFilePreferences());
+        if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we did not know the file type.
-            return false;
+            // No file matched the name, try to open it directly using the given app
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
     }
 
@@ -155,6 +155,10 @@ public class JabRefDesktop {
             } else {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
+        } else {
+            //File type is not given and therefore no application specified
+            //Let the OS handle the opening of the file
+            NATIVE_DESKTOP.openFile(filePath, "");
         }
     }
 
@@ -192,7 +196,7 @@ public class JabRefDesktop {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            new ClipBoardManager().setClipboardContents(url);
+            Globals.clipboardManager.setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);

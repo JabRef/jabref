@@ -1,6 +1,6 @@
 MIT License
 
-Copyright © 2003-2016 [JabRef Authors](https://github.com/JabRef/jabref/blob/master/AUTHORS)
+Copyright © 2003-2018 [JabRef Authors](https://github.com/JabRef/jabref/blob/master/AUTHORS)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

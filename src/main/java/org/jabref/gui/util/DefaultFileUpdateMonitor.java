@@ -69,6 +69,10 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
+        if (watcher == null) {
+            throw new IllegalStateException("You need to start the file monitor before watching files");
+        }
+
         // We can't watch files directly, so monitor their parent directory for updates
         Path directory = file.toAbsolutePath().getParent();
         directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);

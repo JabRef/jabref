@@ -9,23 +9,23 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
+    private final FilePreferences filePreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final boolean enforceLegalKey;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-                          FileDirectoryPreferences fileDirectoryPreferences,
+                          FilePreferences filePreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean enforceLegalKey) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
+        this.filePreferences = Objects.requireNonNull(filePreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.enforceLegalKey = enforceLegalKey;
@@ -41,14 +41,14 @@ public class IntegrityCheck {
         return result;
     }
 
-    private List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
+    public List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {
             return result;
         }
 
-        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, fileDirectoryPreferences, journalAbbreviationRepository, enforceLegalKey);
+        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, filePreferences, journalAbbreviationRepository, enforceLegalKey);
         for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }

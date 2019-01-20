@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="7.0.3" transformSequenceNumber="7">
-  <directoryPresets config="build/releases/${compiler:buildFileName}" />
+<install4j version="7.0.8" transformSequenceNumber="7">
+  <directoryPresets config="./buildres/jabref.json" />
   <application name="JabRef" distributionSourceDir="" applicationId="0034-7691-1464-4754" mediaDir="build/install4j" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="JabRef" publisher="JabRef Community" publisherWeb="https://www.jabref.org/" version="DEV" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" macVolumeId="780dfea2d33a0244" javaMinVersion="1.8" javaMaxVersion="1.8" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="true" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -42,7 +42,10 @@
       <variable name="version" value="3.1dev" description="" category="" />
     </variables>
     <mergedProjects />
-    <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" />
+    <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" windowsPkcs11Library="" windowsPkcs11Slot="">
+      <windowsKeystoreIdentifier issuer="" serial="" subject="" />
+      <windowsPkcs11Identifier issuer="" serial="" subject="" />
+    </codeSigning>
   </application>
   <files keepModificationTimes="false" missingFilesStrategy="warn" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets />
@@ -51,10 +54,13 @@
       <mountPoint id="22" root="" location="" mode="755" />
     </mountPoints>
     <entries>
-      <fileEntry mountPoint="22" file="build/releases/${compiler:buildFileName}" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="22" file="./LICENSE.md" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="22" file="./AUTHORS" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="22" file="build/releases/${compiler:buildFileName}" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="22" file="./build/JabRef.ps1" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="22" file="./buildres/JabRef.VisualElementsManifest.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="22" file="./buildres/JabRef.bat" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="22" file="./buildres/jabref.json" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
     </entries>
     <components />
   </files>
@@ -89,7 +95,7 @@
       </customScript>
       <infoPlist mode="3" file="">
         <content>&lt;key&gt;NSSupportsAutomaticGraphicsSwitching&lt;/key&gt;
-&lt;string&gt;YES&lt;/string&gt;</content>
+&lt;true/&gt;</content>
       </infoPlist>
       <iconImageFiles />
     </launcher>
@@ -102,7 +108,7 @@
       <customAttributes />
     </autoUpdate>
     <applications>
-      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" styleId="" fileset="" customIcnsFile="./src/main/resources/icons/jabref.icns" customIcoFile="./src/main/resources/icons/jabref.ico" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" styleId="326" fileset="" customIcnsFile="./src/main/resources/icons/jabref.icns" customIcoFile="./src/main/resources/icons/jabref.ico" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.InstallerApplication">
@@ -113,6 +119,9 @@
           </java>
         </serializedBean>
         <styleOverrides />
+        <customScript mode="1" file="">
+          <content />
+        </customScript>
         <launcherIds />
         <variables />
         <startup>
@@ -141,7 +150,7 @@
           </screen>
         </startup>
         <screens>
-          <screen name="" id="2" customizedId="" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" styleId="332" rollbackBarrier="false" rollbackBarrierExitCode="1" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="2" customizedId="" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" styleId="" rollbackBarrier="false" rollbackBarrierExitCode="1" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.WelcomeScreen" />
@@ -183,7 +192,7 @@
     context.setInstallationDirectory(new File(System.getenv("LOCALAPPDATA"), "JabRef"));
   } else {
     context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));
-  }   
+  }
 }
 return true;</string>
                           </void>
@@ -561,6 +570,27 @@ return console.askOkCancel(message, true);
                     </serializedBean>
                     <condition>!(Util.hasFullAdminRights() || Util.isAdminGroup())</condition>
                   </action>
+                  <action name="" id="352" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" rollbackBarrierExitCode="0" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref</string>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_LOCAL_MACHINE</string>
+                            </object>
+                          </void>
+                          <void property="value">
+                            <string>${installer:sys.installationDir}\jabref.json</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                 </beans>
               </group>
             </actions>
@@ -742,6 +772,9 @@ return console.askOkCancel(message, true);
           </java>
         </serializedBean>
         <styleOverrides />
+        <customScript mode="1" file="">
+          <content />
+        </customScript>
         <launcherIds />
         <variables />
         <startup>
@@ -896,6 +929,27 @@ return console.askYesNo(message, true);
                     </serializedBean>
                     <condition>!(Util.hasFullAdminRights() || Util.isAdminGroup())</condition>
                   </action>
+                  <action name="" id="353" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" rollbackBarrierExitCode="0" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref</string>
+                          </void>
+                          <void property="onlyIfEmpty">
+                            <boolean>false</boolean>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_LOCAL_MACHINE</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                 </beans>
               </group>
             </actions>
@@ -1009,7 +1063,7 @@ return console.askYesNo(message, true);
                         <boolean>false</boolean>
                       </void>
                       <void property="labelText">
-                        <string>install4j</string>
+                        <string>JabRef</string>
                       </void>
                     </object>
                   </java>
@@ -1217,7 +1271,7 @@ return console.askYesNo(message, true);
                       </void>
                       <void property="imageFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>icon:${installer:sys.installerApplicationMode}_header.png</string>
+                          <string>./src/main/resources/icons/JabRef-icon-64.png</string>
                         </object>
                       </void>
                       <void property="imageInsets">
@@ -1410,7 +1464,7 @@ return console.askYesNo(message, true);
     </styles>
   </installerGui>
   <mediaSets>
-    <windows name="Windows 32bit JRE" id="73" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_152" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-x86-1.8.0_152.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+    <windows name="Windows 32bit JRE" id="73" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_172" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-x86-1.8.0_172.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers />
@@ -1423,7 +1477,7 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <windows name="Windows 64bit JRE" id="74" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_152" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-amd64-1.8.0_152.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+    <windows name="Windows 64bit JRE" id="74" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_172" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-amd64-1.8.0_172.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers />
@@ -1436,7 +1490,7 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <macos name="Mac OS X Single Bundle JRE" id="77" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_152_unpacked" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/macosx-amd64-1.8.0_152_unpacked.tar.gz" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="23">
+    <macos name="Mac OS X Single Bundle JRE" id="77" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_172_unpacked" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/macosx-amd64-1.8.0_172_unpacked.tar.gz" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="23">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedBeans />

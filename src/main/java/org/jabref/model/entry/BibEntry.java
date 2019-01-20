@@ -59,12 +59,13 @@ public class BibEntry implements Cloneable {
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
     private final EventBus eventBus = new EventBus();
     private String id;
-    private StringProperty type = new SimpleStringProperty();
+    private final StringProperty type = new SimpleStringProperty();
+
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
-    private String parsedSerialization;
+    private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
@@ -76,18 +77,9 @@ public class BibEntry implements Cloneable {
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
-
     public BibEntry() {
         this(IdGenerator.next(), DEFAULT_TYPE);
-    }
 
-    /**
-     * Constructs a new BibEntry with the given type
-     *
-     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
-     */
-    public BibEntry(String type) {
-        this(IdGenerator.next(), type);
     }
 
     /**
@@ -102,6 +94,13 @@ public class BibEntry implements Cloneable {
         this.id = id;
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    /**
+     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+     */
+    public BibEntry(EntryType type) {
+        this(IdGenerator.next(),type.getName());
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -123,8 +122,6 @@ public class BibEntry implements Cloneable {
      * @return The resolved field value or null if not found.
      */
     public Optional<String> getResolvedFieldOrAlias(String field, BibDatabase database) {
-        Objects.requireNonNull(this, "entry cannot be null");
-
         if (TYPE_HEADER.equals(field) || OBSOLETE_TYPE_HEADER.equals(field)) {
             Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
             if (entryType.isPresent()) {
@@ -329,8 +326,9 @@ public class BibEntry implements Cloneable {
                     return parsedDate.get().getDay().map(Object::toString);
                 }
             } else {
-                LOGGER.warn("Could not parse date " + date.get());
-                return Optional.empty(); // Date field not in valid format
+                // Date field not in valid format
+                LOGGER.debug("Could not parse date " + date.get());
+                return Optional.empty();
             }
         }
         return Optional.empty();
@@ -535,7 +533,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(type.getValue());
+        BibEntry clone = new BibEntry(IdGenerator.next(),type.getValue());
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
@@ -575,7 +573,7 @@ public class BibEntry implements Cloneable {
      */
     public String getAuthorTitleYear(int maxCharacters) {
         String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
-                getField(FieldName.YEAR).orElse("N/A")};
+            getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -680,12 +678,12 @@ public class BibEntry implements Cloneable {
 
     public KeywordList getKeywords(Character delimiter) {
         Optional<String> keywordsContent = getField(FieldName.KEYWORDS);
-        return KeywordList.parse(keywordsContent, delimiter);
+        return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
     }
 
     public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
         Optional<String> keywordsContent = getResolvedFieldOrAlias(FieldName.KEYWORDS, database);
-        return KeywordList.parse(keywordsContent, delimiter);
+        return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
     }
 
     public Optional<FieldChange> removeKeywords(KeywordList keywordsToRemove, Character keywordDelimiter) {
@@ -695,7 +693,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
-                                                 Character keywordDelimiter) {
+            Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
 
@@ -851,6 +849,10 @@ public class BibEntry implements Cloneable {
         return Bindings.valueAt(fields, fieldName);
     }
 
+    public ObjectBinding<String> getCiteKeyBinding() {
+        return getFieldBinding(KEY_FIELD);
+    }
+
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
@@ -865,11 +867,11 @@ public class BibEntry implements Cloneable {
      * Returns a list of observables that represent the data of the entry.
      */
     public Observable[] getObservables() {
-        return new Observable[]{fields};
+        return new Observable[] {fields};
     }
 
     private interface GetFieldInterface {
-
         Optional<String> getValueForField(String fieldName);
     }
+
 }

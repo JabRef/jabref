@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jabref.JabRefMain;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -59,10 +58,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
-
-        File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile();
-
+        File defFile = Paths.get(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                            .toFile();
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isFromResource());
@@ -76,7 +73,6 @@ public class OOBibStyleTest {
 
     @Test
     public void testNumerical() throws IOException {
-
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         assertTrue(style.isValid());
@@ -86,7 +82,6 @@ public class OOBibStyleTest {
         assertFalse(style.isItalicCitations());
         assertTrue(style.isNumberEntries());
         assertTrue(style.isSortByPosition());
-
     }
 
     @Test
@@ -120,7 +115,7 @@ public class OOBibStyleTest {
                 style.getNumCitationMarker(Arrays.asList(1, 2, 3, 0), 1, true));
 
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; " + OOBibStyle.UNDEFINED_CITATION_MARKER + "; "
-                + OOBibStyle.UNDEFINED_CITATION_MARKER + "] ",
+                        + OOBibStyle.UNDEFINED_CITATION_MARKER + "] ",
                 style.getNumCitationMarker(Arrays.asList(0, 0, 0), 1, true));
     }
 
@@ -137,6 +132,9 @@ public class OOBibStyleTest {
         assertTrue(journals.contains("Journal name 1"));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
@@ -153,11 +151,14 @@ public class OOBibStyleTest {
         assertEquals("[Boström et al., 2006]",
                 style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, null));
         assertEquals("Boström et al. [2006]",
-                style.getCitationMarker(Arrays.asList(entry), entryDBMap, false, null, new int[] {3}));
+                style.getCitationMarker(Arrays.asList(entry), entryDBMap, false, null, new int[]{3}));
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
-                style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, new int[] {5}));
+                style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, new int[]{5}));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
@@ -344,7 +345,7 @@ public class OOBibStyleTest {
         assertEquals("[Beta, 2000; Beta, 2000; Epsilon, 2001]",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
         assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
-                style.getCitationMarker(entries, entryDBMap, true, new String[] {"a", "b", ""}, new int[] {1, 1, 1}));
+                style.getCitationMarker(entries, entryDBMap, true, new String[]{"a", "b", ""}, new int[]{1, 1, 1}));
     }
 
     @Test
@@ -380,7 +381,7 @@ public class OOBibStyleTest {
         assertEquals("Beta [2000]; Beta [2000]; Epsilon [2001]",
                 style.getCitationMarker(entries, entryDBMap, false, null, null));
         assertEquals("Beta [2000a,b]; Epsilon [2001]",
-                style.getCitationMarker(entries, entryDBMap, false, new String[] {"a", "b", ""}, new int[] {1, 1, 1}));
+                style.getCitationMarker(entries, entryDBMap, false, new String[]{"a", "b", ""}, new int[]{1, 1, 1}));
     }
 
     @Test
@@ -415,7 +416,7 @@ public class OOBibStyleTest {
         }
 
         assertEquals("[Beta, 2000a,b,c]",
-                style.getCitationMarker(entries, entryDBMap, true, new String[] {"a", "b", "c"}, new int[] {1, 1, 1}));
+                style.getCitationMarker(entries, entryDBMap, true, new String[]{"a", "b", "c"}, new int[]{1, 1, 1}));
     }
 
     @Test
@@ -450,7 +451,7 @@ public class OOBibStyleTest {
         }
 
         assertEquals("Beta [2000a,b,c]",
-                style.getCitationMarker(entries, entryDBMap, false, new String[] {"a", "b", "c"}, new int[] {1, 1, 1}));
+                style.getCitationMarker(entries, entryDBMap, false, new String[]{"a", "b", "c"}, new int[]{1, 1, 1}));
     }
 
     @Test
@@ -509,7 +510,5 @@ public class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals("von Beta, Epsilon, & Tau, 2016",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
-
     }
-
 }

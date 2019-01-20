@@ -84,12 +84,9 @@ public class FileListEntryEditor {
     //Do not make this variable final, as then the lambda action listener will fail on compiöe
     private BibDatabaseContext databaseContext;
     private final ActionListener browsePressed = e -> {
-
-
-
         String fileText = link.getText().trim();
         Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
-                Globals.prefs.getFileDirectoryPreferences());
+                Globals.prefs.getFilePreferences());
 
         Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
         String fileName = Paths.get(fileText).getFileName().toString();
@@ -111,8 +108,8 @@ public class FileListEntryEditor {
 
             // If the file is below the file directory, make the path relative:
             List<Path> fileDirectories = this.databaseContext
-                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-            newFile = FileUtil.shortenFileName(newFile, fileDirectories);
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
+            newFile = FileUtil.relativize(newFile, fileDirectories);
 
             link.setText(newFile.toString());
             link.requestFocus();
@@ -349,7 +346,7 @@ public class FileListEntryEditor {
         String fileLink = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+            List<String> dirs = databaseContext.getFileDirectories(Globals.prefs.getFilePreferences());
             if (dirs.isEmpty()) {
                 fileLink = this.link.getText().trim();
             } else {

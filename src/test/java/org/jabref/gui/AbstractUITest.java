@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jabref.JabRefMain;
-import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.fixture.AbstractWindowFixture;
 import org.assertj.swing.fixture.FrameFixture;
@@ -17,12 +16,12 @@ import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.image.ScreenshotTaker;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.timing.Pause;
-import org.junit.Assert;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Category(GUITest.class)
+@Tag("GUITest")
 public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
 
     protected final static int SPEED_NORMAL = 50;
@@ -46,18 +45,14 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
     }
 
     /**
-     * Returns the absolute Path of the given relative Path
-     * The backlashes are replaced with forwardslashes b/c assertJ can't type the former one on windows
+     * Returns the absolute Path of the given relative Path The backlashes are replaced with forwardslashes b/c assertJ
+     * can't type the former one on windows
+     *
      * @param relativePath the relative path to the resource database
      */
-    protected String getAbsolutePath(String relativePath) {
+    protected String getAbsolutePath(String relativePath) throws URISyntaxException {
         final URL resource = this.getClass().getClassLoader().getResource(relativePath);
-        try {
-            return Paths.get(resource.toURI()).toAbsolutePath().toString().replace("\\", "/");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return Paths.get(resource.toURI()).toAbsolutePath().toString().replace("\\", "/");
     }
 
     /**
@@ -100,11 +95,11 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
         screenshotTaker.saveComponentAsPng(dialog.target(), file.toString());
     }
 
-    protected void assertColumnValue(JTableFixture table, int rowIndex, int columnIndex, String selectionValue){
+    protected void assertColumnValue(JTableFixture table, int rowIndex, int columnIndex, String selectionValue) {
         String[][] tableContent;
         tableContent = table.contents();
 
         String value = tableContent[rowIndex][columnIndex];
-        Assert.assertEquals(value, selectionValue);
+        assertEquals(value, selectionValue);
     }
 }

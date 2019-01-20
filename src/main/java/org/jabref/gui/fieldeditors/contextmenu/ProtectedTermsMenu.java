@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -23,9 +23,9 @@ class ProtectedTermsMenu extends Menu {
 
     private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final Menu externalFiles;
-    private final TextArea opener;
+    private final TextInputControl opener;
 
-    public ProtectedTermsMenu(TextArea opener) {
+    public ProtectedTermsMenu(final TextInputControl opener) {
         super(Localization.lang("Protect terms"));
         this.opener = opener;
         MenuItem protectItem = new MenuItem(Localization.lang("Add {} around selected text"));

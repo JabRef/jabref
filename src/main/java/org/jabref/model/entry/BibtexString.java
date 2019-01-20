@@ -140,7 +140,7 @@ public class BibtexString implements Cloneable {
     }
 
     /*
-    * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
+     * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
      */
     public String getUserComments() {
         if (parsedSerialization != null) {
@@ -197,5 +197,4 @@ public class BibtexString implements Cloneable {
     public int hashCode() {
         return Objects.hash(name, content, id, type, parsedSerialization, hasChanged);
     }
-
 }

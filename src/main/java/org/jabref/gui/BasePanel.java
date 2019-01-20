@@ -1,34 +1,25 @@
 package org.jabref.gui;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -43,6 +34,8 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
+import org.jabref.gui.actions.GenerateBibtexKeyAction;
+import org.jabref.gui.actions.WriteXMPAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -52,23 +45,23 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
-import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -78,29 +71,17 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -116,7 +97,6 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.LinkedFile;
@@ -124,20 +104,16 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.lang3.NotImplementedException;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasePanel extends StackPane implements ClipboardOwner {
+public class BasePanel extends StackPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
 
@@ -153,9 +129,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager;
     // Keeps track of the string dialog if it is open.
-    private final Map<Actions, Object> actions = new HashMap<>();
+    private final Map<Actions, BaseAction> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-    private PreviewPanel preview;
+    private final PreviewPanel preview;
     private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
@@ -200,7 +176,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
 
         setupMainPanel();
 
@@ -229,37 +205,16 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService);
+        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService));
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
-    }
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService, externalFileTypes);
+        frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
 
-    public static void runWorker(AbstractWorker worker) throws Exception {
-        // This part uses Spin's features:
-        Runnable wrk = worker.getWorker();
-        // The Worker returned by getWorker() has been wrapped
-        // by Spin.off(), which makes its methods be run in
-        // a different thread from the EDT.
-        CallBack clb = worker.getCallBack();
-
-        worker.init(); // This method runs in this same thread, the EDT.
-        // Useful for initial GUI actions, like printing a message.
-
-        // The CallBack returned by getCallBack() has been wrapped
-        // by Spin.over(), which makes its methods be run on
-        // the EDT.
-        wrk.run(); // Runs the potentially time-consuming action
-        // without freezing the GUI. The magic is that THIS line
-        // of execution will not continue until run() is finished.
-        clb.update(); // Runs the update() method on the EDT.
     }
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        // TODO:
-        //SwingUtilities.invokeLater(() -> this.markBaseChanged());
-
+        this.markBaseChanged();
     }
 
     /**
@@ -318,30 +273,30 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     }
 
     private void setupActions() {
-        SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
+        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs);
         CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
 
         // The action for opening an entry editor.
-        actions.put(Actions.EDIT, (BaseAction) this::showAndEdit);
+        actions.put(Actions.EDIT, this::showAndEdit);
 
         // The action for saving a database.
-        actions.put(Actions.SAVE, saveAction);
+        actions.put(Actions.SAVE, saveAction::save);
 
-        actions.put(Actions.SAVE_AS, (BaseAction) saveAction::saveAs);
+        actions.put(Actions.SAVE_AS, saveAction::saveAs);
 
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
 
         // The action for copying selected entries.
-        actions.put(Actions.COPY, (BaseAction) mainTable::copy);
+        actions.put(Actions.COPY, this::copy);
 
         actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
-        actions.put(Actions.CUT, (BaseAction) mainTable::cut);
+        actions.put(Actions.CUT, this::cut);
 
-        actions.put(Actions.DELETE, (BaseAction) () -> delete(false));
+        actions.put(Actions.DELETE, () -> delete(false));
 
         // The action for pasting entries or cell contents.
         //  - more robust detection of available content flavors (doesn't only look at first one offered)
@@ -349,12 +304,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, (BaseAction) mainTable::paste);
+        actions.put(Actions.PASTE, this::paste);
 
-        actions.put(Actions.SELECT_ALL, (BaseAction) mainTable.getSelectionModel()::selectAll);
+        actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
         // The action for opening the string editor
-        actions.put(Actions.EDIT_STRINGS, (BaseAction) () -> {
+        actions.put(Actions.EDIT_STRINGS, () -> {
             if (stringDialog == null) {
                 StringDialog form = new StringDialog(frame, BasePanel.this, bibDatabaseContext.getDatabase());
                 form.setVisible(true);
@@ -364,121 +319,41 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        /*   actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
-            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(null, frame, BasePanel.this);
-            dialog.setVisible(true);
-        });*/
-
         // The action for auto-generating keys.
-        actions.put(Actions.MAKE_KEY, new AbstractWorker() {
-
-            List<BibEntry> entries;
-            int numSelected;
-            boolean canceled;
-
-            // Run first, in EDT:
-            @Override
-            public void init() {
-                entries = getSelectedEntries();
-                numSelected = entries.size();
-
-                if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
-                    dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate BibTeX keys"),
-                                                           Localization.lang("First select the entries you want keys to be generated for."));
-                    return;
-                }
-                output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), numSelected));
-            }
-
-            // Run second, on a different thread:
-            @Override
-            public void run() {
-                // We don't want to generate keys for entries which already have one thus remove the entries
-                if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                    entries.removeIf(BibEntry::hasCiteKey);
-
-                    // if we're going to override some cite keys warn the user about it
-                } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                    if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
-
-                        boolean overwriteKeysPressed = dialogService.showConfirmationDialogWithOptOutAndWait(
-                                                                                                             Localization.lang("Overwrite keys"),
-                                                                                                             Localization.lang("One or more keys will be overwritten. Continue?"),
-                                                                                                             Localization.lang("Overwrite keys"),
-                                                                                                             Localization.lang("Cancel"),
-                                                                                                             Localization.lang("Disable this confirmation dialog"),
-                                                                                                             optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
-
-                        // The user doesn't want to overide cite keys
-                        if (!overwriteKeysPressed) {
-                            canceled = true;
-                            return;
-                        }
-                    }
-                }
-
-                // generate the new cite keys for each entry
-                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-                BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
-                for (BibEntry entry : entries) {
-                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(entry);
-                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
-                }
-                ce.end();
-
-                // register the undo event only if new cite keys were generated
-                if (ce.hasEdits()) {
-                    getUndoManager().addEdit(ce);
-                }
-            }
-
-            // Run third, on EDT:
-            @Override
-            public void update() {
-                if (canceled) {
-                    return;
-                }
-                markBaseChanged();
-                numSelected = entries.size();
-                output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), numSelected));
-            }
-        });
+        actions.put(Actions.MAKE_KEY, new GenerateBibtexKeyAction(this, frame.getDialogService()));
 
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this, dialogService));
-
-        actions.put(Actions.SEARCH, (BaseAction) frame.getGlobalSearchBar()::focus);
-        actions.put(Actions.GLOBAL_SEARCH, (BaseAction) frame.getGlobalSearchBar()::performGlobalSearch);
+        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame).execute());
 
         // The action for copying the selected entry's key.
-        actions.put(Actions.COPY_KEY, (BaseAction) () -> copyKey());
+        actions.put(Actions.COPY_KEY, this::copyKey);
 
         // The action for copying the selected entry's title.
-        actions.put(Actions.COPY_TITLE, (BaseAction) () -> copyTitle());
+        actions.put(Actions.COPY_TITLE, this::copyTitle);
 
         // The action for copying a cite for the selected entry.
-        actions.put(Actions.COPY_CITE_KEY, (BaseAction) () -> copyCiteKey());
+        actions.put(Actions.COPY_CITE_KEY, this::copyCiteKey);
 
         // The action for copying the BibTeX key and the title for the first selected entry
-        actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
+        actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
 
-        actions.put(Actions.COPY_CITATION_ASCII_DOC, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
-        actions.put(Actions.COPY_CITATION_XSLFO, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
-        actions.put(Actions.COPY_CITATION_HTML, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
-        actions.put(Actions.COPY_CITATION_RTF, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
-        actions.put(Actions.COPY_CITATION_TEXT, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
+        actions.put(Actions.COPY_CITATION_ASCII_DOC, () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
+        actions.put(Actions.COPY_CITATION_XSLFO, () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
+        actions.put(Actions.COPY_CITATION_HTML, () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
+        actions.put(Actions.COPY_CITATION_RTF, () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
+        actions.put(Actions.COPY_CITATION_TEXT, () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
 
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable));
+        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
-        actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> openExternalFile());
+        actions.put(Actions.OPEN_EXTERNAL_FILE, this::openExternalFile);
 
-        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+        actions.put(Actions.OPEN_FOLDER, () -> JabRefExecutorService.INSTANCE.execute(() -> {
+            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
             for (final Path f : files) {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
@@ -488,13 +363,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         }));
 
-        actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
-                                                                          .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
+        actions.put(Actions.OPEN_CONSOLE, () -> JabRefDesktop.openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
-        actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel()
-                                                         .getBibDatabaseContext()
-                                                         .getDBMSSynchronizer();
+        actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
+            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
 
@@ -502,82 +374,51 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
-        actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
-            final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
-            rsd.setVisible(true);
-            if (!rsd.okPressed()) {
-                return;
-            }
-            int counter = 0;
-            final NamedCompound ce = new NamedCompound(Localization.lang("Replace string"));
-            if (rsd.selOnly()) {
-                for (BibEntry be : mainTable.getSelectedEntries()) {
-                    counter += rsd.replace(be, ce);
-                }
-            } else {
-                for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-                    counter += rsd.replace(entry, ce);
-                }
-            }
+        actions.put(Actions.REPLACE_ALL, ()-> (new ReplaceStringAction(this)).execute());
 
-            output(Localization.lang("Replaced") + ' ' + counter + ' '
-                    + (counter == 1 ? Localization.lang("occurrence") : Localization.lang("occurrences")) + '.');
-            if (counter > 0) {
-                ce.end();
-                getUndoManager().addEdit(ce);
-                markBaseChanged();
-            }
-        });
-
-        /*     actions.put(Actions.DUPLI_CHECK,
-                (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
-        */
-
-        // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
+                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
+                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
+                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
             actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
-                        new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
+                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
             actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
-                        new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
+                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
-                        new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
+                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
-        actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_PREVIEW, () -> {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
             boolean enabled = !previewPreferences.isPreviewPanelEnabled();
             PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
-                                                                         .withPreviewPanelEnabled(enabled)
-                                                                         .build();
+                    .withPreviewPanelEnabled(enabled)
+                    .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
         });
 
-        actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) this::nextPreviewStyle);
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) this::previousPreviewStyle);
+        actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
 
-        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(null, frame, BasePanel.this, false, null);
+        actions.put(Actions.MANAGE_SELECTORS, () -> {
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, BasePanel.this, false, null);
             csd.setVisible(true);
         });
 
-        actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
-        actions.put(Actions.WRITE_XMP, new WriteXMPActionWorker(this));
+        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
@@ -589,7 +430,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(frame.getDialogService(), this));
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
 
     /**
@@ -625,14 +466,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             return;
         }
 
-        // TODO: check if needed
-        // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        //if (mainTable.getSelectedRow() != (mainTable.getRowCount() - 1)) {
-        //    selectNextEntry();
-        //} else {
-        //    selectPreviousEntry();
-        //}
-
         NamedCompound compound;
         if (cut) {
             compound = new NamedCompound((entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
@@ -663,16 +496,15 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         if (!selectedBibEntries.isEmpty()) {
             // Collect all non-null titles.
             List<String> titles = selectedBibEntries.stream()
-                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                    .map(bibEntry -> bibEntry.getTitle().get())
-                                                    .collect(Collectors.toList());
+                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                    .map(bibEntry -> bibEntry.getTitle().get())
+                    .collect(Collectors.toList());
 
             if (titles.isEmpty()) {
                 output(Localization.lang("None of the selected entries have titles."));
                 return;
             }
-            StringSelection ss = new StringSelection(String.join("\n", titles));
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(String.join("\n", titles));
 
             if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
@@ -698,10 +530,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                                         .filter(cite -> cite.contains("\\")) // must contain \
-                                         .orElse("\\cite");
-            StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+                    .filter(cite -> cite.contains("\\")) // must contain \
+                    .orElse("\\cite");
+            Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
@@ -725,8 +556,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            StringSelection ss = new StringSelection(String.join(",", keys));
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(String.join(",", keys));
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
@@ -745,7 +575,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             Layout layout;
             try {
                 layout = new LayoutHelper(sr, Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                                                                                                                             .getLayoutFromText();
+                        .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -767,8 +597,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            final StringSelection ss = new StringSelection(sb.toString());
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(sb.toString());
 
             if (copied == bes.size()) {
                 // All entries had keys.
@@ -781,13 +610,13 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private void openExternalFile() {
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() != 1) {
+            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+            if (selectedEntries.size() != 1) {
                 output(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
 
-            final BibEntry entry = bes.get(0);
+            final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -801,7 +630,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
             FileListEntry flEntry = fileListTableModel.getEntry(0);
-            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), "", flEntry.getLink(), flEntry.getType().get().getIcon().getSmallIcon(), bibDatabaseContext, flEntry.getType());
+            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), "", flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).map(JabRefIcon::getSmallIcon).orElse(null), bibDatabaseContext, flEntry.getType());
             item.doClick();
         });
     }
@@ -818,150 +647,23 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             return;
         }
 
-        Object o = actions.get(command);
+        BaseAction action = actions.get(command);
         try {
-            if (o instanceof BaseAction) {
-                ((BaseAction) o).action();
-            } else {
-                runWorker((AbstractWorker) o);
-            }
+            action.action();
         } catch (Throwable ex) {
             LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, Charset enc, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SaveSession session;
-        final String SAVE_DATABASE = Localization.lang("Save library");
-        try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                                                   .withEncoding(enc)
-                                                   .withSaveType(saveType);
-            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
-            if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
-            } else {
-                session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
-            }
-
-            registerUndoableChanges(session);
-        }
-        // FIXME: not sure if this is really thrown anywhere
-        catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + ' '
-                    + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()), SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
-            throw new SaveException("rt");
-        } catch (SaveException ex) {
-            if (ex.specificEntry()) {
-                // Error occurred during processing of the entry. Highlight it:
-                clearAndSelect(ex.getEntry());
-                showAndEdit(ex.getEntry());
-            } else {
-                LOGGER.warn("Could not save", ex);
-            }
-
-            dialogService.showErrorDialogAndWait(SAVE_DATABASE, Localization.lang("Could not save file."), ex);
-            throw new SaveException("rt");
-        }
-
-        boolean commit = true;
-        if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create()
-                                             .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
-            JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
-            ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:", session.getEncoding().displayName())).xy(1, 1);
-            builder.add(ta).xy(3, 1);
-            builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
-            String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), SAVE_DATABASE, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
-
-            if (answer == JOptionPane.NO_OPTION) {
-
-                // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE, JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, enc);
-                if (choice == null) {
-                    commit = false;
-                } else {
-                    Charset newEncoding = Charset.forName((String) choice);
-                    return saveDatabase(file, selectedOnly, newEncoding, saveType);
-                }
-            } else if (answer == JOptionPane.CANCEL_OPTION) {
-                commit = false;
-            }
-        }
-
-        if (commit) {
-            session.commit(file.toPath());
-            this.bibDatabaseContext.getMetaData().setEncoding(enc); // Make sure to remember which encoding we used.
-        } else {
-            session.cancel();
-        }
-
-        return commit;
-    }
-
-    public void registerUndoableChanges(SaveSession session) {
+    public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
-        for (FieldChange change : session.getFieldChanges()) {
+        for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
         }
         ce.end();
         if (ce.hasEdits()) {
             getUndoManager().addEdit(ce);
         }
-    }
-
-    /**
-     * This method is called from JabRefFrame when the user wants to create a new entry. If the argument is null, the
-     * user is prompted for an entry type.
-     *
-     * @param type The type of the entry to create.
-     * @return The newly created BibEntry or null the operation was canceled by the user.
-     */
-    public BibEntry newEntry(EntryType type) {
-        EntryType actualType = type;
-        if (actualType == null) {
-            // Find out what type is wanted.
-            final EntryTypeDialog etd = new EntryTypeDialog(frame);
-            // We want to center the dialog, to make it look nicer.
-            etd.setVisible(true);
-            actualType = etd.getChoice();
-        }
-        if (actualType != null) { // Only if the dialog was not canceled.
-            final BibEntry be = new BibEntry(actualType.getName());
-            try {
-                bibDatabaseContext.getDatabase().insertEntry(be);
-                // Set owner/timestamp if options are enabled:
-                List<BibEntry> list = new ArrayList<>();
-                list.add(be);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
-
-                // Create an UndoableInsertEntry object.
-                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be));
-                output(Localization.lang("Added new '%0' entry.", actualType.getName().toLowerCase(Locale.ROOT)));
-
-                // We are going to select the new entry. Before that, make sure that we are in
-                // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
-                // mode which makes sure the selection will trigger display of the entry editor
-                // and adjustment of the splitter.
-                if (mode != BasePanelMode.SHOWING_EDITOR) {
-                    mode = BasePanelMode.WILL_SHOW_EDITOR;
-                }
-
-                clearAndSelect(be);
-
-                // The database just changed.
-                markBaseChanged();
-
-                this.showAndEdit(be);
-
-                return be;
-            } catch (KeyCollisionException ex) {
-                LOGGER.info(ex.getMessage(), ex);
-            }
-        }
-        return null;
     }
 
     /**
@@ -973,10 +675,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         if (bibEntry != null) {
             try {
                 bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
-                    // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
-                }
+
+                // Set owner and timestamp
+                UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
+
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
                 output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
@@ -992,12 +694,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
     }
 
-    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
-        bibDatabaseContext.getDatabase().getEntryById(entryId).ifPresent(entry -> {
-            clearAndSelect(entry);
-            //selectionListener.editSignalled();
-            showAndEdit(entry);
+    public void editEntryAndFocusField(BibEntry entry, String fieldName) {
+        showAndEdit(entry);
+        Platform.runLater(() -> {
+            // Focus field and entry in main table (async to give entry editor time to load)
             entryEditor.setFocusToField(fieldName);
+            clearAndSelect(entry);
         });
     }
 
@@ -1017,12 +719,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                                                         .stream()
-                                                         .findFirst()
-                                                         .ifPresent(entry -> {
-                                                             preview.setEntry(entry);
-                                                             entryEditor.setEntry(entry);
-                                                         }));
+                .stream()
+                .findFirst()
+                .ifPresent(entry -> {
+                    preview.setEntry(entry);
+                    entryEditor.setEntry(entry);
+                }));
 
         // TODO: Register these actions globally
         /*
@@ -1084,36 +786,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 }
             }
         });
-
-        mainTable.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                final int keyCode = e.getKeyCode();
-
-                if (e.isControlDown()) {
-                    switch (keyCode) {
-                        case KeyEvent.VK_PAGE_DOWN:
-                            frame.nextTab.actionPerformed(null);
-                            e.consume();
-                            break;
-                        case KeyEvent.VK_PAGE_UP:
-                            frame.prevTab.actionPerformed(null);
-                            e.consume();
-                            break;
-                        default:
-                            break;
-                    }
-                } else if (keyCode == KeyEvent.VK_ENTER) {
-                    e.consume();
-                    try {
-                        runCommand(Actions.EDIT);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not run action based on key press", ex);
-                    }
-                }
-            }
-        });
         */
     }
 
@@ -1121,9 +793,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
-
-        // TODO: check whether a mainTable already existed and a floatSearch was active
-        //boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1142,16 +811,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         setupAutoCompletion();
 
-        // TODO: restore floating search result
-        // (needed if preferences have been changed which causes a recreation of the main table)
-        //if (floatSearchActive) {
-        //    mainTable.showFloatSearch();
-        //}
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                                              .flatMap(SplitPane.Divider::positionProperty)
-                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+                .flatMap(SplitPane.Divider::positionProperty)
+                .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
     }
 
     /**
@@ -1237,17 +901,14 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 pane = entryEditor;
                 break;
             default:
-                throw new NotImplementedException("new mode not recognized: " + newMode.name());
+                throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
         }
-
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
         } else {
             splitPane.getItems().add(1, pane);
         }
-
         mode = newMode;
-
         adjustSplitter();
     }
 
@@ -1284,9 +945,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private void cyclePreview(int newPosition) {
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                             .getBuilder()
-                                                             .withPreviewCyclePosition(newPosition)
-                                                             .build();
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
         Globals.prefs.storePreviewPreferences(previewPreferences);
 
         preview.updateLayout(previewPreferences);
@@ -1308,36 +969,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         mainTable.clearAndSelect(bibEntry);
     }
 
-    /**
-     * This method selects the entry on the given position, and scrolls it into view in the table.
-     * If an entryEditor is shown, it is given focus afterwards.
-     *
-     * @deprecated use select by entry not by row
-     */
-    @Deprecated
-    private void clearAndSelect(int pos) {
-        if ((pos >= 0) && (pos < mainTable.getItems().size())) {
-            mainTable.getSelectionModel().clearAndSelect(pos);
-        }
-    }
-
     public void selectPreviousEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectPrevious();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }
 
     public void selectNextEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectNext();
-    }
-
-    public void selectFirstEntry() {
-        clearAndSelect(0);
-    }
-
-    public void selectLastEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectLast();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
     }
 
     /**
@@ -1360,7 +997,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -1390,12 +1027,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
-        // If the status line states that the base has been saved, we
-        // remove this message, since it is no longer relevant. If a
-        // different message is shown, we leave it.
-        if (frame.getStatusLineText().startsWith(Localization.lang("Saved library"))) {
-            frame.output(" ");
-        }
     }
 
     public void markNonUndoableBaseChanged() {
@@ -1474,37 +1105,13 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
 
             return dialogService.showConfirmationDialogWithOptOutAndWait(title,
-                                                                         message,
-                                                                         okButton,
-                                                                         cancelButton,
-                                                                         Localization.lang("Disable this confirmation dialog"),
-                                                                         optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
+                    message,
+                    okButton,
+                    cancelButton,
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
         } else {
             return true;
-        }
-    }
-
-    /**
-     * If the relevant option is set, autogenerate keys for all entries that are lacking keys.
-     */
-    public void autoGenerateKeysBeforeSaving() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-
-            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
-            for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
-                Optional<String> oldKey = bes.getCiteKeyOptional();
-                if (StringUtil.isBlank(oldKey)) {
-                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
-                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
-                }
-            }
-
-            // Store undo information, if any:
-            if (ce.hasEdits()) {
-                ce.end();
-                getUndoManager().addEdit(ce);
-            }
         }
     }
 
@@ -1518,20 +1125,15 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                                 .getBuilder()
-                                                                 .withPreviewPanelDividerPosition(position)
-                                                                 .build();
+                    .getBuilder()
+                    .withPreviewPanelDividerPosition(position)
+                    .build();
             Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }
     }
 
-    // Method pertaining to the ClipboardOwner interface.
-    @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-        // Nothing
-    }
 
     /**
      * Perform necessary cleanup when this BasePanel is closed.
@@ -1623,10 +1225,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         return mainTable;
     }
 
-    public BibDatabaseContext getDatabaseContext() {
-        return bibDatabaseContext;
-    }
-
     public Optional<SearchQuery> getCurrentSearchQuery() {
         return currentSearchQuery;
     }
@@ -1665,6 +1263,18 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
+    public void copy() {
+        mainTable.copy();
+    }
+
+    public void paste() {
+        mainTable.paste();
+    }
+
+    public void cut() {
+        mainTable.cut();
+    }
+
     private static class SearchAndOpenFile {
 
         private final BibEntry entry;
@@ -1680,12 +1290,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 /*  The search can lead to an unexpected 100% CPU usage which is perceived
                     as a bug, if the search incidentally starts at a directory with lots
                     of stuff below. It is now disabled by default. */
-
                 return;
             }
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
             final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
             // Run the search operation:
@@ -1716,15 +1325,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            // TODO:
             // Automatically add new entry to the selected group (or set of groups)
-            /*
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+                                                                                  selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
-            */
         }
     }
 
@@ -1824,8 +1430,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
                     Optional<LinkedFile> linkedFile = files.stream()
                                                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                                                   || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                                                   || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
                                                            .findFirst();
 
                     if (linkedFile.isPresent()) {
@@ -1833,8 +1439,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                         try {
 
                             JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext,
-                                                                    linkedFile.get().getLink(),
-                                                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
+                                    linkedFile.get().getLink(),
+                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
 
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
@@ -1870,35 +1476,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private class PrintPreviewAction implements BaseAction {
 
         @Override
-        public void action() throws Exception {
+        public void action() {
             showPreview();
             preview.print();
-        }
-    }
-
-    private class SaveSelectedAction implements BaseAction {
-
-        private final SavePreferences.DatabaseSaveType saveType;
-
-        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
-            this.saveType = saveType;
-        }
-
-        @Override
-        public void action() throws SaveException {
-            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                                   .withDefaultExtension(FileType.BIBTEX_DB)
-                                                                                                   .addExtensionFilter(FileType.BIBTEX_DB)
-                                                                                                   .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                                   .build();
-
-            Optional<Path> chosenFile = dialogService.showFileSaveDialog(fileDialogConfiguration);
-            if (chosenFile.isPresent()) {
-                Path path = chosenFile.get();
-                saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
-                frame.getFileHistory().newFile(path.toString());
-                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
-            }
         }
     }
 }

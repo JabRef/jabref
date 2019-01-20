@@ -39,7 +39,6 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
     public KeyBindingsDialogView() {
         this.setTitle(Localization.lang("Key bindings"));
         this.getDialogPane().setPrefSize(375, 475);
-        this.setResizable(true);
 
         ViewLoader.view(this)
                   .load()

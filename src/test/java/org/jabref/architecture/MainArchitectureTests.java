@@ -34,11 +34,12 @@ public class MainArchitectureTests {
     private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
     private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
     private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
+    private static final String EXCEPTION_CLASS_JAVA_FX_PAIR = "javafx.util.Pair";
 
     private static Map<String, List<String>> exceptions;
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         exceptions = new HashMap<>();
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
@@ -48,6 +49,7 @@ public class MainArchitectureTests {
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
         logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_PAIR);
 
         List<String> modelExceptions = new ArrayList<>(4);
         modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
@@ -59,7 +61,7 @@ public class MainArchitectureTests {
         exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
     }
 
-    public static Stream<Arguments> getPackages() {
+    private static Stream<Arguments> getPackages() {
 
         return Stream.of(
                 Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT),
@@ -78,12 +80,12 @@ public class MainArchitectureTests {
 
     @ParameterizedTest(name = "{index} -- is {0} independent of {1}?")
     @MethodSource("getPackages")
-    public void firstPackageIsIndependentOfSecondPackage(String firstPackage, String secondPackage) throws IOException {
+    void firstPackageIsIndependentOfSecondPackage(String firstPackage, String secondPackage) throws IOException {
         Predicate<String> isExceptionPackage = (s) -> (s.startsWith("import " + secondPackage)
                 || s.startsWith("import static " + secondPackage))
                 && exceptions.getOrDefault(firstPackage, Collections.emptyList())
-                        .stream()
-                        .noneMatch(exception -> s.startsWith("import " + exception));
+                             .stream()
+                             .noneMatch(exception -> s.startsWith("import " + exception));
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 

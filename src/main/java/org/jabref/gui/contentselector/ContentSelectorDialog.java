@@ -3,7 +3,6 @@ package org.jabref.gui.contentselector;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -82,14 +81,13 @@ public class ContentSelectorDialog extends JabRefDialog {
 
     /**
      *
-     * @param owner the parent Window (Dialog or Frame)
      * @param frame the JabRef Frame
      * @param panel the currently selected BasePanel
      * @param modal should this dialog be modal?
      * @param fieldName the field this selector is initialized for. May be null.
      */
-    public ContentSelectorDialog(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, String fieldName) {
-        super(owner, Localization.lang("Manage content selectors"), ContentSelectorDialog.class);
+    public ContentSelectorDialog(JabRefFrame frame, BasePanel panel, boolean modal, String fieldName) {
+        super(Localization.lang("Manage content selectors"), ContentSelectorDialog.class);
         this.setModal(modal);
         this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;

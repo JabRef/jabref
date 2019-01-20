@@ -45,7 +45,6 @@ public class DBLPFetcherTest {
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
         entry.setField("biburl", "https://dblp.org/rec/bib/journals/stt/GeigerHL16");
         entry.setField("bibsource", "dblp computer science bibliography, https://dblp.org");
-
     }
 
     @Test
@@ -64,4 +63,8 @@ public class DBLPFetcherTest {
         assertEquals(Collections.singletonList(entry), result);
     }
 
+    @Test
+    public void findNothing() throws Exception {
+        assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
+    }
 }

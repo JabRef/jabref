@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.Globals;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.groups.GroupSidePane;
-import org.jabref.gui.importer.fetcher.GeneralFetcher;
+import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.preferences.JabRefPreferences;
@@ -29,21 +29,27 @@ public class SidePaneManager {
         this.preferences = preferences;
         this.sidePane = new SidePane();
 
-        OpenOfficePreferences openOfficePreferences = new OpenOfficePreferences(preferences);
+        OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
         Stream.of(
-                new FileUpdatePanel(this),
-                new GroupSidePane(this, preferences),
-                new GeneralFetcher(this, preferences, frame),
-                new OpenOfficeSidePanel(this, openOfficePreferences, frame))
+                  new FileUpdatePanel(this),
+                  new GroupSidePane(this, preferences, frame.getDialogService()),
+                new WebSearchPane(this, preferences, frame),
+                  new OpenOfficeSidePanel(this, openOfficePreferences, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
             show(SidePaneType.GROUPS);
         }
 
-        if (openOfficePreferences.showPanel()) {
+        if (openOfficePreferences.getShowPanel()) {
             show(SidePaneType.OPEN_OFFICE);
         }
+
+        if (preferences.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
+            show(SidePaneType.WEB_SEARCH);
+        }
+
+        updateView();
     }
 
     public SidePane getPane() {

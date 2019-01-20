@@ -1,0 +1,19 @@
+#sideMenu {
+    -fx-background-color: -jr-white;
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1;
+}
+
+#sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 8 8 8 8;
+    -fx-background: -jr-white;
+}
+
+.preferencePaneContainer {
+    -fx-padding: 0em 1em 0em 3em;
+}
+
+.sectionHeader {
+    -fx-font-size: 1.5em;
+    -fx-padding: 1em 0em 1em 0em;
+}

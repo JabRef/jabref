@@ -36,11 +36,10 @@
 	-fx-padding: 5px;
 }
 
-.custom-buttons {
-	-fx-padding: 10 0 0 0;
+.logo-pane {
+    fx-fill: transparent;
 }
 
-.dialog-pane *.button-bar {
-	-fx-max-height: 0;
-	-fx-pref-height: 0;
+.logo-pane SVGPath {
+    -fx-fill: #4f5f8f;
 }

@@ -16,9 +16,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
+import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -119,16 +118,16 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding
+            SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
                     (charset).withMakeBackup(false);
-            new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
-                    (backupPath);
-        } catch (SaveException e) {
-            logIfCritical(e);
+            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences)
+                    .saveDatabase(bibDatabaseContext);
+        } catch (IOException e) {
+            logIfCritical(backupPath, e);
         }
     }
 
-    private void logIfCritical(SaveException e) {
+    private void logIfCritical(Path backupPath, IOException e) {
         Throwable innermostCause = e;
         while (innermostCause.getCause() != null) {
             innermostCause = innermostCause.getCause();
@@ -137,7 +136,7 @@ public class BackupManager {
 
         // do not print errors in field values into the log during autosave
         if (!isErrorInField) {
-            LOGGER.error("Error while saving file.", e);
+            LOGGER.error("Error while saving to file" + backupPath, e);
         }
     }
 

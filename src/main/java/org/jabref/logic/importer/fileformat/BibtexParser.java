@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
@@ -30,6 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
@@ -108,10 +108,6 @@ public class BibtexParser implements Parser {
         } catch (IOException e) {
             throw new ParseException(e);
         }
-    }
-
-    public List<BibEntry> parseEntries(String bibtexString) throws ParseException {
-        return parseEntries(new StringReader(bibtexString));
     }
 
     public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
@@ -509,7 +505,8 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(entryType);
+        BibEntry result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -127,8 +128,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_MEDLINE;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_MEDLINE);
     }
 
     @Override

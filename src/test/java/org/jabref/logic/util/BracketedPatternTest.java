@@ -44,7 +44,6 @@ public class BracketedPatternTest {
 
         database = new BibDatabase();
         database.insertEntry(dbentry);
-
     }
 
     @Test
@@ -58,6 +57,38 @@ public class BracketedPatternTest {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
+    }
+
+    @Test
+    public void pureauthReturnsAuthorIfEditorIsAbsent() {
+        BibDatabase emptyDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        assertEquals("Kitsune", pattern.expand(bibentry, emptyDatabase));
+    }
+
+    @Test
+    public void pureauthReturnsAuthorIfEditorIsPresent() {
+        BibDatabase emptyDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        bibentry.setField(FieldName.EDITOR, "Editorlastname, Editorfirstname");
+        assertEquals("Kitsune", pattern.expand(bibentry, emptyDatabase));
+    }
+
+    @Test
+    public void pureauthReturnsEmptyStringIfAuthorIsAbsent() {
+        BibDatabase emptyDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        bibentry.clearField(FieldName.AUTHOR);
+        assertEquals("", pattern.expand(bibentry, emptyDatabase));
+    }
+
+    @Test
+    public void pureauthReturnsEmptyStringIfAuthorIsAbsentAndEditorIsPresent() {
+        BibDatabase emptyDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        bibentry.clearField(FieldName.AUTHOR);
+        bibentry.setField(FieldName.EDITOR, "Editorlastname, Editorfirstname");
+        assertEquals("", pattern.expand(bibentry, emptyDatabase));
     }
 
     @Test
@@ -82,19 +113,13 @@ public class BracketedPatternTest {
     }
 
     @Test
-    public void unbalancedBracketExpansionTest() {
-        // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
-        // exception for some reason; the exception should not occur in the application! Should figure
-        // out how to suppress it.
+    public void unbalancedBracketsExpandToSomething() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth_[firstpage]");
         assertNotEquals("", pattern.expand(bibentry));
     }
 
     @Test
-    public void unbalancedLastBracketExpansionTest() {
-        // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
-        // exception for some reason; the exception should not occur in the application! Should figure
-        // out how to suppress it.
+    public void unbalancedLastBracketExpandsToSomething() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage");
         assertNotEquals("", pattern.expand(bibentry));
     }
@@ -138,23 +163,47 @@ public class BracketedPatternTest {
     }
 
     @Test
-    public void testFieldAndFormat() {
+    public void unknownKeyExpandsToEmptyString() {
+        Character separator = ';';
+        assertEquals("", BracketedPattern.expandBrackets("[unknownkey]", separator, dbentry, database));
+    }
+
+    @Test
+    public void emptyPatternAndEmptyModifierExpandsToEmptyString() {
+        Character separator = ';';
+        assertEquals("", BracketedPattern.expandBrackets("[:]", separator, dbentry, database));
+    }
+
+    @Test
+    public void emptyPatternAndValidModifierExpandsToEmptyString() {
+        Character separator = ';';
+        assertEquals("", BracketedPattern.expandBrackets("[:lower]", separator, dbentry, database));
+    }
+
+    @Test
+    public void bibtexkeyPatternExpandsToBibTeXKey() {
+        Character separator = ';';
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
+    }
+
+    @Test
+    public void bibtexkeyPatternWithEmptyModifierExpandsToBibTeXKey() {
+        Character separator = ';';
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", separator, dbentry, database));
+    }
+
+    @Test
+    public void authorPatternTreatsVonNamePrefixCorrectly() {
         Character separator = ';';
         assertEquals("Eric von Hippel and Georg von Krogh",
                 BracketedPattern.expandBrackets("[author]", separator, dbentry, database));
+    }
 
-        assertEquals("", BracketedPattern.expandBrackets("[unknownkey]", separator, dbentry, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[:]", separator, dbentry, database));
-
-        assertEquals("", BracketedPattern.expandBrackets("[:lower]", separator, dbentry, database));
-
+    @Test
+    public void lowerFormatterWorksOnVonNamePrefixes() {
+        Character separator = ';';
         assertEquals("eric von hippel and georg von krogh",
                 BracketedPattern.expandBrackets("[author:lower]", separator, dbentry, database));
-
-        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
-
-        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", separator, dbentry, database));
     }
 
     @Test
@@ -191,5 +240,4 @@ public class BracketedPatternTest {
 
         assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
     }
-
 }

@@ -14,9 +14,9 @@ import org.jabref.model.TreeNodeTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RecursiveTreeItemTest {
+class RecursiveTreeItemTest {
 
     private RecursiveTreeItem<TreeNodeTestData.TreeNodeMock> rootTreeItem;
     private TreeNodeTestData.TreeNodeMock root;
@@ -24,7 +24,7 @@ public class RecursiveTreeItemTest {
     private TreeNodeTestData.TreeNodeMock node;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         root = new TreeNodeTestData.TreeNodeMock();
         node = TreeNodeTestData.getNodeInSimpleTree(root);
         node.setName("test node");
@@ -35,19 +35,19 @@ public class RecursiveTreeItemTest {
     }
 
     @Test
-    public void addsAllChildrenNodes() throws Exception {
+    void addsAllChildrenNodes() throws Exception {
         assertEquals(root.getChildren(), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
     }
 
     @Test
-    public void addsAllChildrenOfChildNode() throws Exception {
+    void addsAllChildrenOfChildNode() throws Exception {
         assertEquals(
                 root.getChildAt(1).get().getChildren(),
                 rootTreeItem.getChildren().get(1).getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
     }
 
     @Test
-    public void respectsFilter() throws Exception {
+    void respectsFilter() throws Exception {
         filterPredicate.setValue(item -> item.getName().contains("test"));
 
         assertEquals(Collections.singletonList(node.getParent().get()), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));

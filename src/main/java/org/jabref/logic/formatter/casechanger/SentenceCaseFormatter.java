@@ -3,7 +3,7 @@ package org.jabref.logic.formatter.casechanger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class SentenceCaseFormatter implements Formatter {
+public class SentenceCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -37,5 +37,4 @@ public class SentenceCaseFormatter implements Formatter {
     public String getExampleInput() {
         return "i have {Aa} DREAM";
     }
-
 }

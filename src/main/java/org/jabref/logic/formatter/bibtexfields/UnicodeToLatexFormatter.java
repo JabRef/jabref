@@ -11,7 +11,7 @@ import org.jabref.model.cleanup.Formatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
+public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnicodeToLatexFormatter.class);
 

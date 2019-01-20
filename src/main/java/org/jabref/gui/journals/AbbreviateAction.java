@@ -10,8 +10,9 @@ import java.util.concurrent.Future;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -23,11 +24,10 @@ import org.slf4j.LoggerFactory;
  * Converts journal full names to either iso or medline abbreviations for all
  * selected entries.
  */
-public class AbbreviateAction extends AbstractWorker {
+public class AbbreviateAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
     private final BasePanel panel;
-    private String message = "";
     private final boolean iso;
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
@@ -36,12 +36,16 @@ public class AbbreviateAction extends AbstractWorker {
     }
 
     @Override
-    public void init() {
-        panel.output(Localization.lang("Abbreviating..."));
+    public void action() {
+        BackgroundTask.wrap(this::abbreviate)
+                      .onSuccess(panel::output)
+                      .executeWith(Globals.TASK_EXECUTOR);
+
     }
 
-    @Override
-    public void run() {
+    private String abbreviate() {
+        panel.output(Localization.lang("Abbreviating..."));
+
         List<BibEntry> entries = panel.getSelectedEntries();
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
@@ -80,14 +84,9 @@ public class AbbreviateAction extends AbstractWorker {
             ce.end();
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
-            message = Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
+            return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
         } else {
-            message = Localization.lang("No journal names could be abbreviated.");
+            return Localization.lang("No journal names could be abbreviated.");
         }
-    }
-
-    @Override
-    public void update() {
-        panel.output(message);
     }
 }

@@ -1,52 +1,45 @@
 package org.jabref.logic.util.io;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileHistoryTest {
+class FileHistoryTest {
+    private FileHistory history;
 
-    @Test
-    public void testFileHistory() {
-        FileHistory fh = new FileHistory(new ArrayList<>());
-
-        fh.newFile("aa");
-        assertEquals("aa", fh.getFileName(0));
-        fh.newFile("bb");
-        assertEquals("bb", fh.getFileName(0));
-
-        fh.newFile("aa");
-        assertEquals("aa", fh.getFileName(0));
-
-        fh.newFile("cc");
-        assertEquals("cc", fh.getFileName(0));
-        assertEquals("aa", fh.getFileName(1));
-        assertEquals("bb", fh.getFileName(2));
-
-        fh.newFile("dd");
-        assertEquals("dd", fh.getFileName(0));
-        assertEquals("cc", fh.getFileName(1));
-        assertEquals("aa", fh.getFileName(2));
-        fh.newFile("ee");
-        fh.newFile("ff");
-        fh.newFile("gg");
-        fh.newFile("hh");
-        assertEquals("bb", fh.getFileName(7));
-        assertEquals(8, fh.size());
-        fh.newFile("ii");
-        assertEquals("aa", fh.getFileName(7));
-        fh.removeItem("ff");
-        assertEquals(7, fh.size());
-        fh.removeItem("ee");
-        fh.removeItem("dd");
-        fh.removeItem("cc");
-        fh.removeItem("cc");
-        fh.removeItem("aa");
-
-        assertEquals(Arrays.asList("ii", "hh", "gg"), fh.getHistory());
+    @BeforeEach
+    void setUp() {
+        history = new FileHistory(new ArrayList<>());
     }
 
+    @Test
+    void newItemsAreAddedInRightOrder() {
+        history.newFile(Paths.get("aa"));
+        history.newFile(Paths.get("bb"));
+        assertEquals(Arrays.asList(Paths.get("bb"), Paths.get("aa")), history.getHistory());
+    }
+
+    @Test
+    void itemsAlreadyInListIsMovedToTop() {
+        history.newFile(Paths.get("aa"));
+        history.newFile(Paths.get("bb"));
+        history.newFile(Paths.get("aa"));
+        assertEquals(Arrays.asList(Paths.get("aa"), Paths.get("bb")), history.getHistory());
+    }
+
+    @Test
+    void removeItemsLeavesOtherItemsInRightOrder() {
+        history.newFile(Paths.get("aa"));
+        history.newFile(Paths.get("bb"));
+        history.newFile(Paths.get("cc"));
+
+        history.removeItem(Paths.get("bb"));
+
+        assertEquals(Arrays.asList(Paths.get("cc"), Paths.get("aa")), history.getHistory());
+    }
 }

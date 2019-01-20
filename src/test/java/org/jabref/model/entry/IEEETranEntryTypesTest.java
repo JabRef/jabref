@@ -16,5 +16,4 @@ public class IEEETranEntryTypesTest {
 
         assertTrue(ctlFields.containsAll(ynFields));
     }
-
 }

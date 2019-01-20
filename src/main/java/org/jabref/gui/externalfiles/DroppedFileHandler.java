@@ -23,6 +23,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -64,8 +65,6 @@ public class DroppedFileHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DroppedFileHandler.class);
 
-    private final JabRefFrame frame;
-
     private final BasePanel panel;
 
     private final JRadioButton linkInPlace = new JRadioButton();
@@ -79,10 +78,12 @@ public class DroppedFileHandler {
     private final JTextField renameToTextBox = new JTextField(50);
 
     private final JPanel optionsPanel = new JPanel();
+    private final DialogService dialogService;
+    private JabRefPreferences preferences;
 
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {
-
-        this.frame = frame;
+        this.dialogService = frame.getDialogService();
+        this.preferences = frame.prefs();
         this.panel = panel;
 
         ButtonGroup grp = new ButtonGroup();
@@ -146,9 +147,9 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : Paths.get(fileName).toString();
             if (copyRadioButton.isSelected()) {
@@ -198,9 +199,9 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -266,10 +267,10 @@ public class DroppedFileHandler {
         // reply == JOptionPane.YES_OPTION)
 
         /*
-         * TODO Extract Import functionality from ImportMenuItem then we could
+         * TODO Extract Import functionality from ImportAction then we could
          * do:
          *
-         * ImportMenuItem importer = new ImportMenuItem(frame, (mainTable ==
+         * ImportAction importer = new ImportAction(frame, (mainTable ==
          * null), new PdfXmpImporter());
          *
          * importer.automatedImport(new String[] { fileName });
@@ -283,9 +284,9 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             if (renameCheckBox.isSelected() || (single == null)) {
                 destFilename = fileName;
@@ -324,7 +325,7 @@ public class DroppedFileHandler {
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
 
         Optional<Path> dir = panel.getBibDatabaseContext()
-                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+                                  .getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
         if (!dir.isPresent()) {
             destDirLabel.setText(Localization.lang("File directory is not set or does not exist!"));
@@ -368,10 +369,10 @@ public class DroppedFileHandler {
             renameToTextBox
                     .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
         }
-        linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
-        copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
-        moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
-        renameCheckBox.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
+        linkInPlace.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
+        copyRadioButton.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
+        moveRadioButton.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
+        renameCheckBox.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
 
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
@@ -382,10 +383,10 @@ public class DroppedFileHandler {
                     JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
                 return true;
             } else {
                 return false;
@@ -415,7 +416,7 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             List<Path> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+                                   .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -474,7 +475,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename, NamedCompound edits) {
         Optional<Path> dir = panel.getBibDatabaseContext()
-                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+                                  .getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
         if (dir.isPresent()) {
             Path destFile = dir.get().resolve(destFilename);
@@ -499,10 +500,10 @@ public class DroppedFileHandler {
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
             } else {
-                JOptionPane.showMessageDialog(null,
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Move file failed"),
                         Localization.lang("Could not move file '%0'.", destFile.toString())
-                                + Localization.lang("Please move the file manually and link in place."),
-                        Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
+                                + Localization.lang("Please move the file manually and link in place."));
                 return false;
             }
         }
@@ -521,7 +522,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
         List<String> dirs = panel.getBibDatabaseContext()
-                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                 .getFileDirectories(Globals.prefs.getFilePreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

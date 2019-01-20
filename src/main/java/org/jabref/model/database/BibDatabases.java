@@ -36,6 +36,8 @@ public class BibDatabases {
      * an unsucessful import (wrong format) that returns a number of empty entries.
      */
     public static List<BibEntry> purgeEmptyEntries(Collection<BibEntry> entries) {
-        return entries.stream().filter(e -> !e.getFieldNames().isEmpty()).collect(Collectors.toList());
+        return entries.stream()
+                      .filter(entry -> !entry.getFieldNames().isEmpty())
+                      .collect(Collectors.toList());
     }
 }

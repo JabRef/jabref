@@ -31,10 +31,7 @@ public class ISBN implements Identifier {
 
     public boolean isValidFormat() {
         Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);
-        if (isbnMatcher.matches()) {
-            return true;
-        }
-        return false;
+        return isbnMatcher.matches();
     }
 
     public boolean isValidChecksum() {
@@ -104,7 +101,7 @@ public class ISBN implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.worldcat.org/isbn/" + isbnString));
+            return Optional.of(new URI("https://www.worldcat.org/isbn/" + isbnString));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

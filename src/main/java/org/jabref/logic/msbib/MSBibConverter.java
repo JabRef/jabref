@@ -67,7 +67,7 @@ public class MSBibConverter {
         // Value must be converted
         //Currently only english is supported
         entry.getLatexFreeField(FieldName.LANGUAGE)
-                .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
+             .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();
         entry.getLatexFreeField(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
         entry.getLatexFreeField(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
@@ -106,21 +106,28 @@ public class MSBibConverter {
             result.publicationTitle = entry.getLatexFreeField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getLatexFreeField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
-        entry.getLatexFreeField(FieldName.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(translator));
+        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(entry, authors, FieldName.AUTHOR));
+        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(entry, editors, FieldName.EDITOR));
+        entry.getField(FieldName.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(entry, translator, FieldName.EDITOR));
 
         return result;
     }
 
-    private static List<MsBibAuthor> getAuthors(String authors) {
+    private static List<MsBibAuthor> getAuthors(BibEntry entry, String authors, String fieldName) {
         List<MsBibAuthor> result = new ArrayList<>();
         boolean corporate = false;
-        //Only one corporate authors is supported
+        //Only one corporate author is supported
+        //We have the possible rare case that are multiple authors which start and end with latex , this is currently not considered
         if (authors.startsWith("{") && authors.endsWith("}")) {
             corporate = true;
         }
-        AuthorList authorList = AuthorList.parse(authors);
+        //FIXME: #4152 This is an ugly hack because the latex2unicode formatter kills of all curly braces, so no more corporate author parsing possible
+        String authorLatexFree = entry.getLatexFreeField(fieldName).orElse("");
+        if (corporate) {
+            authorLatexFree = "{" + authorLatexFree + "}";
+        }
+
+        AuthorList authorList = AuthorList.parse(authorLatexFree);
 
         for (Author author : authorList.getAuthors()) {
             result.add(new MsBibAuthor(author, corporate));

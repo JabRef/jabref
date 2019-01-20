@@ -43,7 +43,7 @@ import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.TypeOfResourceDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -61,7 +61,7 @@ class ModsExporter extends Exporter {
     private JAXBContext context;
 
     public ModsExporter() {
-        super("mods", FileType.MODS.getDescription(), FileType.MODS);
+        super("mods", "MODS", StandardFileType.XML);
     }
 
     @Override

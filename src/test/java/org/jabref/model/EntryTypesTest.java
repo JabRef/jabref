@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BiblatexEntryTypes;
@@ -14,40 +15,45 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@RunWith(Parameterized.class)
-public class EntryTypesTest {
-
-    private final BibDatabaseMode mode;
-    private final BibDatabaseMode otherMode;
-    private final EntryType standardArticleType;
-    private final EntryType defaultType;
+class EntryTypesTest {
 
     private CustomEntryType newCustomType;
     private CustomEntryType overwrittenStandardType;
 
-    public EntryTypesTest(BibDatabaseMode mode) {
-        this.mode = mode;
-        this.otherMode = (mode == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBTEX : BibDatabaseMode.BIBLATEX;
-        this.standardArticleType = (mode == BibDatabaseMode.BIBLATEX) ? BiblatexEntryTypes.ARTICLE : BibtexEntryTypes.ARTICLE;
-        this.defaultType = (mode == BibDatabaseMode.BIBLATEX) ? BiblatexEntryTypes.MISC : BibtexEntryTypes.MISC;
+    private static Stream<Object> mode() {
+        return Stream.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX);
     }
 
-    @Parameterized.Parameters
-    public static Object[] data() {
-        return new Object[] {BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX};
+    private static Stream<Arguments> defaultTypeAndMode() {
+        return Stream.of(
+                Arguments.of(BiblatexEntryTypes.MISC, BibDatabaseMode.BIBLATEX),
+                Arguments.of(BibtexEntryTypes.MISC, BibDatabaseMode.BIBTEX));
     }
 
-    @Before
-    public void setUp() {
+    private static Stream<Arguments> modeAndOtherMode() {
+        return Stream.of(
+                Arguments.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX),
+                Arguments.of(BibDatabaseMode.BIBLATEX, BibDatabaseMode.BIBTEX));
+    }
+
+    private static Stream<Arguments> standardArticleTypeAndMode() {
+        return Stream.of(
+                Arguments.of(BiblatexEntryTypes.ARTICLE, BibDatabaseMode.BIBLATEX),
+                Arguments.of(BibtexEntryTypes.ARTICLE, BibDatabaseMode.BIBTEX));
+    }
+
+    @BeforeEach
+    void setUp() {
         newCustomType = new CustomEntryType("customType", "required", "optional");
         List<String> newRequiredFields = new ArrayList<>(BibtexEntryTypes.ARTICLE.getRequiredFields());
         newRequiredFields.add("additional");
@@ -55,13 +61,13 @@ public class EntryTypesTest {
                 Collections.singletonList("optional"));
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         EntryTypes.removeAllCustomEntryTypes();
     }
 
     @Test
-    public void assertDefaultValuesBibtex() {
+    void assertDefaultValuesBibtex() {
         List<EntryType> sortedDefaultType = new ArrayList<>(BibtexEntryTypes.ALL);
         sortedDefaultType.addAll(IEEETranEntryTypes.ALL);
         Collections.sort(sortedDefaultType);
@@ -73,7 +79,7 @@ public class EntryTypesTest {
     }
 
     @Test
-    public void assertDefaultValuesBiblatex() {
+    void assertDefaultValuesBiblatex() {
         List<EntryType> sortedDefaultType = new ArrayList<>(BiblatexEntryTypes.ALL);
         Collections.sort(sortedDefaultType);
 
@@ -83,77 +89,88 @@ public class EntryTypesTest {
         assertEquals(sortedDefaultType, sortedEntryTypes);
     }
 
-    @Test
-    public void unknownTypeIsNotFound() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void unknownTypeIsNotFound(BibDatabaseMode mode) {
         assertEquals(Optional.empty(), EntryTypes.getType("aaaaarticle", mode));
         assertEquals(Optional.empty(), EntryTypes.getStandardType("aaaaarticle", mode));
     }
 
-    @Test
-    public void unknownTypeIsConvertedToMiscByGetTypeOrDefault() {
+    @ParameterizedTest
+    @MethodSource("defaultTypeAndMode")
+    void unknownTypeIsConvertedToMiscByGetTypeOrDefault(EntryType defaultType, BibDatabaseMode mode) {
         assertEquals(defaultType, EntryTypes.getTypeOrDefault("unknowntype", mode));
     }
 
-    @Test
-    public void registerCustomEntryType() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void registerCustomEntryType(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertEquals(Optional.of(newCustomType), EntryTypes.getType("customType", mode));
     }
 
-    @Test
-    public void registeredCustomEntryTypeIsContainedInListOfCustomizedEntryTypes() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void registeredCustomEntryTypeIsContainedInListOfCustomizedEntryTypes(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertEquals(Arrays.asList(newCustomType), EntryTypes.getAllCustomTypes(mode));
     }
 
-    @Test
-    public void registerCustomEntryTypeDoesNotAffectOtherMode() {
+    @ParameterizedTest
+    @MethodSource("modeAndOtherMode")
+    void registerCustomEntryTypeDoesNotAffectOtherMode(BibDatabaseMode mode, BibDatabaseMode otherMode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(newCustomType));
     }
 
-    @Test
-    public void overwriteCustomEntryTypeFields() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void overwriteCustomEntryTypeFields(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         CustomEntryType newCustomEntryTypeAuthorRequired = new CustomEntryType("customType", FieldName.AUTHOR, "optional");
         EntryTypes.addOrModifyCustomEntryType(newCustomEntryTypeAuthorRequired, mode);
         assertEquals(Optional.of(newCustomEntryTypeAuthorRequired), EntryTypes.getType("customType", mode));
     }
 
-    @Test
-    public void overwriteStandardTypeRequiredFields() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void overwriteStandardTypeRequiredFields(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Optional.of(overwrittenStandardType), EntryTypes.getType(overwrittenStandardType.getName(), mode));
     }
 
-    @Test
-    public void registeredCustomizedStandardEntryTypeIsContainedInListOfCustomizedEntryTypes() {
+    @ParameterizedTest
+    @MethodSource("mode")
+    void registeredCustomizedStandardEntryTypeIsContainedInListOfCustomizedEntryTypes(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Arrays.asList(overwrittenStandardType), EntryTypes.getAllModifiedStandardTypes(mode));
     }
 
-
-    @Test
-    public void standardTypeIsStillAcessibleIfOverwritten() {
+    @ParameterizedTest
+    @MethodSource("standardArticleTypeAndMode")
+    void standardTypeIsStillAcessibleIfOverwritten(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Optional.of(standardArticleType), EntryTypes.getStandardType(overwrittenStandardType.getName(), mode));
     }
 
-    @Test
-    public void standardTypeIsRestoredAfterDeletionOfOverwrittenType() {
+    @ParameterizedTest
+    @MethodSource("standardArticleTypeAndMode")
+    void standardTypeIsRestoredAfterDeletionOfOverwrittenType(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         EntryTypes.removeType(overwrittenStandardType.getName(), mode);
         assertEquals(Optional.of(standardArticleType), EntryTypes.getType(overwrittenStandardType.getName(), mode));
     }
 
-    @Test
-    public void standardTypeCannotBeRemoved() {
+    @ParameterizedTest
+    @MethodSource("standardArticleTypeAndMode")
+    void standardTypeCannotBeRemoved(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.removeType(standardArticleType.getName(), mode);
         assertEquals(Optional.of(standardArticleType), EntryTypes.getType(standardArticleType.getName(), mode));
     }
 
-    @Test
-    public void overwriteStandardTypeRequiredFieldsDoesNotAffectOtherMode() {
+    @ParameterizedTest
+    @MethodSource("modeAndOtherMode")
+    void overwriteStandardTypeRequiredFieldsDoesNotAffectOtherMode(BibDatabaseMode mode, BibDatabaseMode otherMode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(overwrittenStandardType));
     }

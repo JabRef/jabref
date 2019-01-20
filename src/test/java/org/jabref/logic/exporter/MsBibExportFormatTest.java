@@ -11,36 +11,33 @@ import java.util.List;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(TempDirectory.class)
 public class MsBibExportFormatTest {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public Path tempFile;
     public MSBibExporter msBibExportFormat;
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();
-        tempFile = testFolder.newFile().toPath();
     }
 
     @Test
-    public final void testPerformExportWithNoEntry() throws IOException, SaveException {
+    public final void testPerformExportWithNoEntry(@TempDirectory.TempDir Path tempFile) throws IOException, SaveException {
+        Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
+        Files.createFile(path);
         List<BibEntry> entries = Collections.emptyList();
-        msBibExportFormat.export(databaseContext, tempFile, charset, entries);
-        assertEquals(Collections.emptyList(), Files.readAllLines(tempFile));
+        msBibExportFormat.export(databaseContext, path, charset, entries);
+        assertEquals(Collections.emptyList(), Files.readAllLines(path));
     }
 }

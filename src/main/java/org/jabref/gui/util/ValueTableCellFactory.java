@@ -27,7 +27,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Function<T, String> toTooltip;
+    private BiFunction<S, T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
 
@@ -46,8 +46,13 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withTooltip(Function<T, String> toTooltip) {
+    public ValueTableCellFactory<S, T> withTooltip(BiFunction<S, T, String> toTooltip) {
         this.toTooltip = toTooltip;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withTooltip(Function<T, String> toTooltip) {
+        this.toTooltip = (rowItem, value) -> toTooltip.apply(value);
         return this;
     }
 
@@ -95,7 +100,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         setGraphic(toGraphic.apply(rowItem, item));
                     }
                     if (toTooltip != null) {
-                        String tooltipText = toTooltip.apply(item);
+                        String tooltipText = toTooltip.apply(rowItem, item);
                         if (StringUtil.isNotBlank(tooltipText)) {
                             setTooltip(new Tooltip(tooltipText));
                         }
@@ -117,7 +122,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             toOnMouseClickedEvent.apply(rowItem, item).handle(event);
                         }
 
-                        if (menuFactory != null && !event.isConsumed()) {
+                        if ((menuFactory != null) && !event.isConsumed()) {
                             if (event.getButton() == MouseButton.PRIMARY) {
                                 ContextMenu menu = menuFactory.apply(rowItem, item);
                                 if (menu != null) {

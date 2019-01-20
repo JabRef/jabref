@@ -12,9 +12,10 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 /**
@@ -44,8 +45,8 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ENDNOTE;
+    public StandardFileType getFileType() {
+        return StandardFileType.ENDNOTE;
     }
 
     @Override
@@ -253,7 +254,7 @@ public class EndnoteImporter extends Importer {
                 hm.put(FieldName.PAGES, artnum);
             }
 
-            BibEntry b = new BibEntry(type);
+            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
             b.setField(hm);
             if (!b.getFieldNames().isEmpty()) {
                 bibitems.add(b);

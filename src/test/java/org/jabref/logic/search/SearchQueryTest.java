@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 public class SearchQueryTest {
 
     @Test
@@ -21,15 +20,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -59,7 +58,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchingForOpenBraketInBooktitle() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField(FieldName.BOOKTITLE, "Super Conference (SC)");
 
         SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
@@ -68,7 +67,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeywordNotPart() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("keywords", "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
@@ -77,7 +76,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeyword() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("keywords", "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
@@ -86,7 +85,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFields() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
@@ -96,7 +95,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsNotForSpecificField() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
@@ -106,7 +105,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsAndSpecificField() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
@@ -183,7 +182,14 @@ public class SearchQueryTest {
         entry.setField("abstract", "text");
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
-
     }
 
+    @Test
+    public void testSimpleTerm() {
+        String query = "progress";
+
+        SearchQuery result = new SearchQuery(query, false, false);
+
+        assertFalse(result.isGrammarBasedSearch());
+    }
 }

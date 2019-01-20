@@ -1,3 +1,4 @@
+#!/bin/bash
 # no need for databases for the integrationTest -> save memory overflow
 # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
 sudo service postgresql stop

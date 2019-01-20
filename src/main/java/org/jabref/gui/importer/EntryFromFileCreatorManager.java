@@ -2,14 +2,13 @@ package org.jabref.gui.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.gui.BasePanel;
@@ -67,22 +66,21 @@ public final class EntryFromFileCreatorManager {
     }
 
     /**
-     * Returns a EntryFromFileCreator object that is capable of creating a
-     * BibEntry for the given File.
+     * Returns a {@link EntryFromFileCreator} object that is capable of creating a entry for the given file.
      *
-     * @param file the pdf file
-     * @return null if there is no EntryFromFileCreator for this File.
+     * @param file the external file
+     * @return an empty optional if there is no EntryFromFileCreator for this file.
      */
-    public EntryFromFileCreator getEntryCreator(File file) {
-        if ((file == null) || !file.exists()) {
-            return null;
+    public Optional<EntryFromFileCreator> getEntryCreator(Path file) {
+        if (!Files.exists(file)) {
+            return Optional.empty();
         }
         for (EntryFromFileCreator creator : entryCreators) {
-            if (creator.accept(file)) {
-                return creator;
+            if (creator.accept(file.toFile())) {
+                return Optional.of(creator);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -93,43 +91,32 @@ public final class EntryFromFileCreatorManager {
      * @param entryType
      * @return List of unexpected import event messages including failures.
      */
-    public List<String> addEntrysFromFiles(List<File> files,
-            BibDatabase database, EntryType entryType,
-            boolean generateKeywordsFromPathToFile) {
-        List<String> importGUIMessages = new LinkedList<>();
-        addEntriesFromFiles(files, database, null, entryType,
-                generateKeywordsFromPathToFile, null, importGUIMessages);
-        return importGUIMessages;
+    public List<String> addEntrysFromFiles(List<Path> files,
+                                           BibDatabase database, EntryType entryType,
+                                           boolean generateKeywordsFromPathToFile) {
+        return addEntriesFromFiles(files, database, null, entryType, generateKeywordsFromPathToFile);
     }
 
     /**
      * Tries to add a entry for each file in the List.
      *
-     * @param files
-     * @param database
-     * @param panel
-     * @param entryType
-     * @param generateKeywordsFromPathToFile
-     * @param changeListener
-     * @param importGUIMessages list of unexpected import event - Messages including
-     *         failures
-     * @return Returns The number of entries added
+     * @return Returns a list of unexpected failures while importing
      */
-    public int addEntriesFromFiles(List<File> files,
-            BibDatabase database, BasePanel panel, EntryType entryType,
-            boolean generateKeywordsFromPathToFile,
-            ChangeListener changeListener, List<String> importGUIMessages) {
+    public List<String> addEntriesFromFiles(List<Path> files,
+                                            BibDatabase database, BasePanel panel, EntryType entryType,
+                                            boolean generateKeywordsFromPathToFile) {
 
+        List<String> importGUIMessages = new ArrayList<>();
         int count = 0;
         CompoundEdit ce = new CompoundEdit();
-        for (File f : files) {
-            EntryFromFileCreator creator = getEntryCreator(f);
-            if (creator == null) {
-                importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
+        for (Path f : files) {
+            Optional<EntryFromFileCreator> creator = getEntryCreator(f);
+            if (!creator.isPresent()) {
+                importGUIMessages.add("Problem importing " + f.toAbsolutePath() + ": Unknown filetype.");
             } else {
-                Optional<BibEntry> entry = creator.createEntry(f, generateKeywordsFromPathToFile);
+                Optional<BibEntry> entry = creator.get().createEntry(f.toFile(), generateKeywordsFromPathToFile);
                 if (!entry.isPresent()) {
-                    importGUIMessages.add("Problem importing " + f.getPath() + ": Entry could not be created.");
+                    importGUIMessages.add("Problem importing " + f.toAbsolutePath() + ": Entry could not be created.");
                     continue;
                 }
                 if (entryType != null) {
@@ -147,7 +134,7 @@ public final class EntryFromFileCreatorManager {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
                     if (database.insertEntry(entry.get())) {
-                        importGUIMessages.add("Problem importing " + f.getPath() + ": Insert into BibDatabase failed.");
+                        importGUIMessages.add("Problem importing " + f.toAbsolutePath() + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {
@@ -156,17 +143,13 @@ public final class EntryFromFileCreatorManager {
                     }
                 }
             }
-
-            if (changeListener != null) {
-                changeListener.stateChanged(new ChangeEvent(this));
-            }
         }
 
         if ((count > 0) && (panel != null)) {
             ce.end();
             panel.getUndoManager().addEdit(ce);
         }
-        return count;
+        return importGUIMessages;
 
     }
 
@@ -211,12 +194,9 @@ public final class EntryFromFileCreatorManager {
      * @return A List of all known possible file filters.
      */
     public List<FileFilter> getFileFilterList() {
-
         List<FileFilter> filters = new ArrayList<>();
         filters.add(getFileFilter());
-        for (FileFilter creator : entryCreators) {
-            filters.add(creator);
-        }
+        filters.addAll(entryCreators);
         return filters;
     }
 }

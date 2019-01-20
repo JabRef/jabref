@@ -50,7 +50,7 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
-    static {
+    public static void loadFonts() {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
         } catch (FontFormatException | IOException e) {
@@ -230,6 +230,8 @@ public class IconTheme {
         GROUP_INCLUDING(MaterialDesignIcon.FILTER_OUTLINE) /*css: filter-outline*/,
         GROUP_REFINING(MaterialDesignIcon.FILTER) /*css: filter*/,
         AUTO_GROUP(MaterialDesignIcon.AUTO_FIX), /*css: auto-fix*/
+        GROUP_INTERSECTION(JabRefMaterialDesignIcon.SET_CENTER),
+        GROUP_UNION(JabRefMaterialDesignIcon.SET_ALL),
         EMAIL(MaterialDesignIcon.EMAIL) /*css: email*/,
         EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT) /*css: clipboard-arrow-left */,
         ATTACH_FILE(MaterialDesignIcon.PAPERCLIP) /*css: paperclip*/,
@@ -288,7 +290,7 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.MENU_RIGHT),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
@@ -306,7 +308,7 @@ public class IconTheme {
         LOOKUP_IDENTIFIER(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
         FETCH_FULLTEXT(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
         FETCH_BY_IDENTIFIER(MaterialDesignIcon.CLIPBOARD_ARROW_DOWN),
-        TOGGLE_ABBREVIATION(MaterialDesignIcon.TEXT_SHADOW),
+        TOGGLE_ABBREVIATION(MaterialDesignIcon.FORMAT_ALIGN_CENTER),
         NEW_FILE(MaterialDesignIcon.PLUS),
         DOWNLOAD(MaterialDesignIcon.DOWNLOAD),
         OWNER(MaterialDesignIcon.ACCOUNT),
@@ -360,14 +362,14 @@ public class IconTheme {
         public Button asButton() {
             Button button = new Button();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
 
         public ToggleButton asToggleButton() {
             ToggleButton button = new ToggleButton();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
     }
@@ -381,7 +383,7 @@ public class IconTheme {
         public FontBasedIcon(String code, Color iconColor) {
             this.iconCode = code;
             this.iconColor = iconColor;
-            this.size = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE);
+            this.size = 24;
         }
 
         public FontBasedIcon(String code, Color iconColor, int size) {
@@ -424,7 +426,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon createSmallIcon() {
-            return new FontBasedIcon(this.iconCode, this.iconColor, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+            return new FontBasedIcon(this.iconCode, this.iconColor, 16);
         }
 
         public FontBasedIcon createWithNewColor(Color newColor) {

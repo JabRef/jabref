@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.OptionalUtil;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String NAME = "DOI";
@@ -38,14 +39,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DOI;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DOI);
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
-
         try {
             if (doi.isPresent()) {
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
@@ -76,9 +76,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<BibEntry> bibEntry = performSearchById(entry.getField(FieldName.DOI).orElse(""));
-        List<BibEntry> list = new ArrayList<>();
-        bibEntry.ifPresent(list::add);
-        return list;
+        Optional<String> doi = entry.getField(FieldName.DOI);
+        if (doi.isPresent()) {
+            return OptionalUtil.toList(performSearchById(doi.get()));
+        } else {
+            return Collections.emptyList();
+        }
     }
 }
