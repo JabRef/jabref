@@ -7,49 +7,46 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.EntryTypeView">
+<DialogPane prefWidth="476.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.EntryTypeView">
+      <buttonTypes>
+        <ButtonType fx:constant="CANCEL" />
+        <ButtonType fx:id="generateButton" buttonData="OK_DONE" text="%Generate" />
+      </buttonTypes>
    <content>
-      <BorderPane>
-         <top>
-            <VBox prefHeight="200.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="200.0" prefWidth="400.0">
+         <children>
+            <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
+               <content>
+                  <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+            <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
+               <content>
+                  <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+            <TitledPane fx:id="ieeeTranTitlePane" animated="false" collapsible="false" text="IEEETran">
+               <content>
+                  <FlowPane fx:id="ieeetranPane" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+            <TitledPane fx:id="customTitlePane" animated="false" collapsible="false" text="%Custom">
+               <content>
+                  <FlowPane fx:id="customPane" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+            <GridPane alignment="CENTER">
                <children>
-                  <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
-                     <content>
-                        <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
-                     <content>
-                        <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane fx:id="ieeeTranTitlePane" animated="false" collapsible="false" text="IEEETran">
-                     <content>
-                        <FlowPane fx:id="ieeetranPane" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane fx:id="customTitlePane" animated="false" collapsible="false" text="%Custom">
-                     <content>
-                        <FlowPane fx:id="customPane" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </TitledPane>
-               </children>
-            </VBox>
-         </top>
-         <bottom>
-            <GridPane alignment="CENTER" BorderPane.alignment="CENTER">
-               <children>
-                  <Label text="%ID type" />
-                  <ComboBox fx:id="idBasedFetchers" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" onAction="#focusTextField" />                  	
+                  <Label text="%ID type"/>
+                  <ComboBox fx:id="idBasedFetchers" onAction="#focusTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" />            
                   <Label text="%ID" GridPane.rowIndex="1" />
-                  <TextField fx:id="idTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" onAction="#runFetcherWorker"/>
+                  <TextField fx:id="idTextField" onAction="#runFetcherWorker" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="100.0" />
@@ -59,18 +56,11 @@
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                </opaqueInsets>
                <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
-               <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-               </padding>
             </GridPane>
-         </bottom>
-      </BorderPane>
+         </children>
+      </VBox>
    </content>
-      <buttonTypes>
-        <ButtonType fx:constant="CANCEL" />
-        <ButtonType fx:id="generateButton" buttonData="OK_DONE" text="%Generate" />
-      </buttonTypes>
 </DialogPane>
