@@ -11,11 +11,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
+
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class StringDialogViewModel extends AbstractViewModel {
 
@@ -23,10 +25,12 @@ public class StringDialogViewModel extends AbstractViewModel {
     private final ObjectProperty<StringViewModel> selectedItemProperty = new SimpleObjectProperty<>();
     private final StringProperty newStringLabelProperty = new SimpleStringProperty("");
     private final BibDatabase db;
+    private final CompositeValidator formValidator = new CompositeValidator();
 
     public StringDialogViewModel(BibDatabase bibDatabase) {
         this.db = bibDatabase;
         addAllStringsFromDB();
+
     }
 
     private void addAllStringsFromDB() {
@@ -38,6 +42,7 @@ public class StringDialogViewModel extends AbstractViewModel {
                                          .map(this::convertFromBibTexString)
                                          .collect(Collectors.toSet());
         allStrings.addAll(strings);
+
     }
 
     public ListProperty<StringViewModel> allStringsProperty() {
@@ -54,7 +59,6 @@ public class StringDialogViewModel extends AbstractViewModel {
 
     private StringViewModel convertFromBibTexString(BibtexString bibtexString) {
         return new StringViewModel(bibtexString.getName(), bibtexString.getContent());
-
     }
 
     public ObjectProperty<StringViewModel> seletedItemProperty() {
@@ -80,5 +84,9 @@ public class StringDialogViewModel extends AbstractViewModel {
             }
         }
 
+    }
+
+    public ValidationStatus formValidation() {
+        return formValidator.getValidationStatus();
     }
 }

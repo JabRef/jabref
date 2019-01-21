@@ -39,6 +39,14 @@ public class StringViewModel {
         contentValidator = new FunctionBasedValidator<>(this.content, function);
     }
 
+    public Validator getlabelValidator() {
+        return labelValidator;
+    }
+
+    public Validator getContentValidator() {
+        return contentValidator;
+    }
+
     public ValidationStatus labelValidation() {
         return labelValidator.getValidationStatus();
     }

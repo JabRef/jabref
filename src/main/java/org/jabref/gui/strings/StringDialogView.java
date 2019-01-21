@@ -37,28 +37,31 @@ public class StringDialogView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private StringDialogViewModel viewModel;
-    private BibDatabase database;
 
     public StringDialogView(BibDatabase database) {
-        this.database = database;
+        viewModel = new StringDialogViewModel(database);
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
+
+        btnSave.disableProperty().bind(viewModel.formValidation().validProperty().not());
 
         setResultConverter(btn -> {
-            if (btn == ButtonType.OK) {
+            if (saveButton.equals(btn)) {
                 viewModel.save();
 
             }
             return null;
         });
-        ViewLoader.view(this)
-                  .load()
-                  .setAsContent(this.getDialogPane());
 
     }
 
     @FXML
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new StringDialogViewModel(database);
 
         btnHelp.setGraphic(JabRefIcons.HELP.getGraphicNode());
         btnHelp.setTooltip(new Tooltip(Localization.lang("Open Help page")));
