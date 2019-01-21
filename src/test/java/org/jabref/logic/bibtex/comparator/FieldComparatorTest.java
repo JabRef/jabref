@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.jupiter.api.Test;
 
@@ -94,7 +95,7 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldIdentity() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry equal = new BibEntry("article");
+        BibEntry equal = new BibEntry(BibtexEntryTypes.ARTICLE);
 
         assertEquals(0, comparator.compare(equal, equal));
     }
@@ -102,9 +103,9 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldEquality() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry equal = new BibEntry("article");
+        BibEntry equal = new BibEntry(BibtexEntryTypes.ARTICLE);
         equal.setId("1");
-        BibEntry equal2 = new BibEntry("article");
+        BibEntry equal2 = new BibEntry(BibtexEntryTypes.ARTICLE);
         equal2.setId("1");
 
         assertEquals(0, comparator.compare(equal, equal2));
@@ -113,8 +114,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerAscending() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry smaller = new BibEntry("article");
-        BibEntry bigger = new BibEntry("book");
+        BibEntry smaller = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry bigger = new BibEntry(BibtexEntryTypes.BOOK);
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }
@@ -122,8 +123,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerDescending() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype", true);
-        BibEntry bigger = new BibEntry("article");
-        BibEntry smaller = new BibEntry("book");
+        BibEntry bigger = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry smaller = new BibEntry(BibtexEntryTypes.BOOK);
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }

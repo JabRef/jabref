@@ -35,6 +35,7 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
+import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -199,6 +200,11 @@ class MainTableColumnFactory {
 
         if (specialField == SpecialField.RANKING) {
             column.setComparator(new RankingFieldComparator());
+        }
+
+        // Added comparator for Read Status
+        if (specialField == SpecialField.READ_STATUS) {
+            column.setComparator(new ReadStatusFieldComparator());
         }
 
         column.setSortable(true);

@@ -37,7 +37,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
+        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
     }
 
     @Override

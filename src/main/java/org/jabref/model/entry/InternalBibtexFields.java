@@ -28,14 +28,8 @@ import org.jabref.model.entry.specialfields.SpecialField;
  * - add a additional properties functionality into the BibtexSingleField class
  */
 public class InternalBibtexFields {
-    /**
-     * These are the fields JabRef always displays as default
-     * {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
-     *
-     * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as separate preferences object
-     */
-    public static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(
-            FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.GROUPS, FieldName.OWNER, FieldName.TIMESTAMP
+    private static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(
+            FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.GROUPS, FieldName.OWNER, FieldName.TIMESTAMP
     );
 
     // Lists of fields with special properties
@@ -88,8 +82,10 @@ public class InternalBibtexFields {
 
     private static final List<String> SPECIAL_FIELDS = Arrays.asList(
             SpecialField.PRINTED.getFieldName(),
-            SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
-            SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
+            SpecialField.PRIORITY.getFieldName(),
+            SpecialField.QUALITY.getFieldName(),
+            SpecialField.RANKING.getFieldName(),
+            SpecialField.READ_STATUS.getFieldName(),
             SpecialField.RELEVANCE.getFieldName()
     );
 
@@ -471,6 +467,18 @@ public class InternalBibtexFields {
 
     public static List<String> getIEEETranBSTctlYesNoFields() {
         return YES_NO_FIELDS;
+    }
+
+    /**
+     * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     *
+     * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
+     * separate preferences object
+     */
+    public static List<String> getDefaultGeneralFields() {
+        List<String> defaultGeneralFields = new ArrayList<>(DEFAULT_GENERAL_FIELDS);
+        defaultGeneralFields.addAll(SPECIAL_FIELDS);
+        return defaultGeneralFields;
     }
 
     /**

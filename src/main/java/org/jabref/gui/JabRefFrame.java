@@ -48,6 +48,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -62,7 +63,6 @@ import org.jabref.gui.actions.CustomizeKeyBindingAction;
 import org.jabref.gui.actions.DatabasePropertiesAction;
 import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
-import org.jabref.gui.actions.IntegrityCheckAction;
 import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageCustomExportsAction;
 import org.jabref.gui.actions.ManageCustomImportsAction;
@@ -94,6 +94,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
@@ -131,6 +132,8 @@ import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
+import com.jfoenix.controls.JFXSnackbarLayout;
 import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
 import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -147,6 +150,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
@@ -454,9 +458,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         fileHistory.storeHistory();
-        prefs.customExports.store(Globals.prefs);
-        prefs.customImports.store();
-
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
@@ -928,7 +929,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
                 factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
@@ -1015,11 +1016,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /**
      * Displays the given message at the bottom of the main frame
      *
-     * @deprecated use {@link DialogService#notify(String)} instead
+     * @deprecated use {@link DialogService#notify(String)} instead. However, do not remove this method, it's called from the dialogService
      */
     @Deprecated
-    public void output(final String s) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.show(s, 3000));
+    public void output(final String message) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null)));
     }
 
     private void initActions() {
@@ -1335,7 +1336,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
                 if (!saveAction.save()) {
                     // The action was either canceled or unsuccessful.
                     output(Localization.lang("Unable to save library"));

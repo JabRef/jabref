@@ -35,7 +35,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-
+<?import com.jfoenix.controls.JFXColorPicker?>
 <AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.styletester.StyleTesterView">
     <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -383,6 +383,7 @@
                                     <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink (Visited)"
                                                visited="true"/>
                                     <Separator prefWidth="200.0"/>
+                                    <JFXColorPicker/>
                                 </children>
                             </VBox>
                             <Separator orientation="VERTICAL" prefHeight="200.0"/>

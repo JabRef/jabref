@@ -18,6 +18,7 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
     private static final String MDL_JABREF_PARTNER_ID = "1";
+    private static final String MDL_URL = "api.mr-dlib.org";
     private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching recommendations from Mr.DLib.");
     private final String LANGUAGE;
     private final Version VERSION;
@@ -90,13 +92,12 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         try {
             URIBuilder builder = new URIBuilder();
             builder.setScheme("http");
-            builder.setHost("localhost:5000");
+            builder.setHost(MDL_URL);
             builder.setPath("/v2/recommendations/" + recommendationSetId + "/status/" + status);
             try {
                 URI uri = builder.build();
                 URLDownload urlDownload = new URLDownload(uri.toString());
                 URLDownload.bypassSSLVerification();
-                urlDownload.setPostData(recommendationSetId);
                 urlDownload.asString();
             }
             catch (URISyntaxException se) {
@@ -140,16 +141,23 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost("api.mr-dlib.org");
+        builder.setHost(MDL_URL);
         builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
-        builder.addParameter("app_lang", LANGUAGE);
-        builder.addParameter("os", System.getProperty("os.name"));
-        builder.addParameter("os_version", System.getProperty("os.version"));
-        builder.addParameter("java_version", System.getProperty("java.version"));
-        builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
+
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        if (prefs.getBoolean(JabRefPreferences.SEND_LANGUAGE_DATA)) {
+            builder.addParameter("app_lang", LANGUAGE);
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_OS_DATA)) {
+            builder.addParameter("os", System.getProperty("os.name"));
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_TIMEZONE_DATA)) {
+            builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
+        }
+
         try {
             URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());

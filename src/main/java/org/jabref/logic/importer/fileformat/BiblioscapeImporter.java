@@ -13,6 +13,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
 /**
@@ -255,7 +256,7 @@ public class BiblioscapeImporter extends Importer {
                 if (!comments.isEmpty()) { // set comment if present
                     hm.put(FieldName.COMMENT, String.join(";", comments));
                 }
-                BibEntry b = new BibEntry(bibtexType);
+                BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(bibtexType));
                 b.setField(hm);
                 bibItems.add(b);
 

@@ -103,7 +103,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         actionsList = new ListView<>(actions);
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         new ViewModelListCellFactory<FieldFormatterCleanup>()
-                .withText(action -> action.getFormatter().getName())
+                .withText(action -> action.getField() + ": " + action.getFormatter().getName())
                 .withTooltip(action -> action.getFormatter().getDescription())
                 .install(actionsList);
         add(actionsList, 1, 1, 3, 1);
