@@ -88,7 +88,7 @@ public class VersionWorker {
             }
         } else {
             // notify the user about a newer version
-            new NewVersionDialog(installedVersion, newerVersion.get());
+            new NewVersionDialog(installedVersion, newerVersion.get()).showAndWait();
         }
     }
 }
