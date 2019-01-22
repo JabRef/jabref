@@ -124,8 +124,7 @@ public class DuplicateSearch extends SimpleCommand {
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
-        dialog.setVisible(true);
-        dialog.dispose();
+
 
         DuplicateResolverResult resolverResult = dialog.getSelected();
 

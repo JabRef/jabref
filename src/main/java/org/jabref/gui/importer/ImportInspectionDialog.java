@@ -1055,8 +1055,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
                     ImportInspectionDialog.this.toFront();
                     if (diag.getSelected() == DuplicateResolverResult.KEEP_LEFT) {
                         // Remove old entry. Or... add it to a list of entries
@@ -1116,8 +1115,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 if (other.isPresent()) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
                                                                                other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
                     ImportInspectionDialog.this.toFront();
                     DuplicateResolverResult answer = diag.getSelected();
                     if (answer == DuplicateResolverResult.KEEP_LEFT) {

@@ -1,7 +1,6 @@
 package org.jabref.gui.bibtexkeypattern;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +16,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -59,11 +51,11 @@ class ResolveDuplicateLabelDialog {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
-            previewPanel.setEntry(entry);
-            JFXPanel container = CustomJFXPanel.wrap(new Scene(previewPanel));
-            container.setPreferredSize(new Dimension(800, 90));
-            b.add(container).xy(3, row);
+            // PreviewPanel previewPanel = new PreviewPanel(null, panel.getBibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
+            //previewPanel.setEntry(entry);
+            //JFXPanel container = CustomJFXPanel.wrap(new Scene(previewPanel));
+            // container.setPreferredSize(new Dimension(800, 90));
+            // b.add(container).xy(3, row);
             row += 2;
             cbs.add(cb);
             first = false;
