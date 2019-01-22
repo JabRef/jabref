@@ -61,6 +61,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private final DialogService dialogService;
     private final KeyBindingRepository keyBindingRepository;
 
+    private String previewStyle;
+    private final String defaultPreviewStyle = "Preview";
     private Optional<BasePanel> basePanel = Optional.empty();
 
     private boolean fixedLayout;
@@ -220,21 +222,26 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         }
 
         String style = previewPreferences.getCurrentPreviewStyle();
-        if (CitationStyle.isCitationStyleFile(style)) {
-            if (basePanel.isPresent()) {
+        if (previewStyle == null) {
+            previewStyle = style;
+        }
+        if (basePanel.isPresent() && !previewStyle.equals(style)) {
+            if (CitationStyle.isCitationStyleFile(style)) {
                 layout = Optional.empty();
                 CitationStyle.createCitationStyleFromFile(style)
-                             .ifPresent(citationStyle -> {
-                                 basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
-                                 if (!init) {
-                                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                                 }
-                             });
-            }
-        } else {
-            updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
-            if (!init) {
-                basePanel.ifPresent(panel -> panel.output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview"))));
+                        .ifPresent(citationStyle -> {
+                            basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
+                            if (!init) {
+                                basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                            }
+                        });
+                previewStyle = style;
+            } else {
+                previewStyle = defaultPreviewStyle;
+                updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
+                if (!init) {
+                    basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
+                }
             }
         }
 
