@@ -8,6 +8,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
@@ -15,6 +16,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
+
+import org.jabref.model.strings.StringUtil;
 
 import org.reactfx.util.TriConsumer;
 
@@ -33,6 +36,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     private BiConsumer<S, ? super DragEvent> toOnDragExited;
     private BiConsumer<S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
+    private Callback<S, String> toTooltip;
 
     public ViewModelTableRowFactory<S> withOnMouseClickedEvent(BiConsumer<S, ? super MouseEvent> onMouseClickedEvent) {
         this.onMouseClickedEvent = onMouseClickedEvent;
@@ -84,9 +88,21 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
+    public ViewModelTableRowFactory<S> withTooltip(Callback<S, String> toTooltip) {
+        this.toTooltip = toTooltip;
+        return this;
+    }
+
     @Override
     public TableRow<S> call(TableView<S> tableView) {
         TableRow<S> row = new TableRow<>();
+
+        if (toTooltip != null) {
+            String tooltipText = toTooltip.call(row.getItem());
+            if (StringUtil.isNotBlank(tooltipText)) {
+                row.setTooltip(new Tooltip(tooltipText));
+            }
+        }
 
         if (onMouseClickedEvent != null) {
             row.setOnMouseClicked(event -> {
