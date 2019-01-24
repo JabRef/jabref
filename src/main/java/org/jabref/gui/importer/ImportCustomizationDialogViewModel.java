@@ -75,9 +75,9 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
 
             if (isArchive) {
                 try {
-                    Optional<String> selectedFileInArchive = dialogService.showFileOpenFromArchiveDialog(selectedFile.get());
+                    Optional<Path> selectedFileInArchive = dialogService.showFileOpenFromArchiveDialog(selectedFile.get());
                     if (selectedFileInArchive.isPresent()) {
-                        String className = selectedFileInArchive.get().substring(0, selectedFileInArchive.get().lastIndexOf('.')).replace(
+                        String className = selectedFileInArchive.get().toString().substring(0, selectedFileInArchive.get().toString().lastIndexOf('.')).replace(
                                 "/", ".");
                         CustomImporter importer = new CustomImporter(selectedFile.get().toAbsolutePath().toString(), className);
                         importers.add(importer);

@@ -1,14 +1,14 @@
 package org.jabref.gui.util;
 
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyLongWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -24,29 +24,43 @@ import org.jabref.logic.l10n.Localization;
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
  */
-public class ZipFileChooser extends BaseDialog<String> {
+public class ZipFileChooser extends BaseDialog<Path> {
 
     /**
      * New ZIP file chooser.
      *
      * @param zipFile                   ZIP-Fle to choose from, must be readable
      */
-    public ZipFileChooser(ZipFile zipFile) {
+    public ZipFileChooser(FileSystem zipFile) throws IOException {
         setTitle(Localization.lang("Select file from ZIP-archive"));
 
-        TableView<ZipEntry> table = new TableView<>(getSelectableZipEntries(zipFile));
-        TableColumn<ZipEntry, String> nameColumn = new TableColumn<>(Localization.lang("Name"));
-        TableColumn<ZipEntry, String> modifiedColumn = new TableColumn<>(Localization.lang("Last modified"));
-        TableColumn<ZipEntry, Number> sizeColumn = new TableColumn<>(Localization.lang("Size"));
+        TableView<Path> table = new TableView<>(getSelectableZipEntries(zipFile));
+        TableColumn<Path, String> nameColumn = new TableColumn<>(Localization.lang("Name"));
+        TableColumn<Path, String> modifiedColumn = new TableColumn<>(Localization.lang("Last modified"));
+        TableColumn<Path, Number> sizeColumn = new TableColumn<>(Localization.lang("Size"));
         table.getColumns().add(nameColumn);
         table.getColumns().add(modifiedColumn);
         table.getColumns().add(sizeColumn);
-        nameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getName()));
-        modifiedColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(
-                ZonedDateTime.ofInstant(new Date(data.getValue().getTime()).toInstant(),
-                        ZoneId.systemDefault())
-                             .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))));
-        sizeColumn.setCellValueFactory(data -> new ReadOnlyLongWrapper(data.getValue().getSize()));
+        nameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().toString()));
+        modifiedColumn.setCellValueFactory(data -> {
+            try {
+                return new ReadOnlyStringWrapper(
+                        ZonedDateTime.ofInstant(Files.getLastModifiedTime(data.getValue()).toInstant(),
+                                ZoneId.systemDefault())
+                                     .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
+            } catch (IOException e) {
+                // Ignore
+                return new ReadOnlyStringWrapper("");
+            }
+        });
+        sizeColumn.setCellValueFactory(data -> {
+            try {
+                return new ReadOnlyLongWrapper(Files.size(data.getValue()));
+            } catch (IOException e) {
+                // Ignore
+                return new ReadOnlyLongWrapper(0);
+            }
+        });
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         getDialogPane().setContent(table);
@@ -58,7 +72,7 @@ public class ZipFileChooser extends BaseDialog<String> {
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return table.getSelectionModel().getSelectedItem().getName();
+                return table.getSelectionModel().getSelectedItem();
             } else {
                 return null;
             }
@@ -71,14 +85,12 @@ public class ZipFileChooser extends BaseDialog<String> {
      * @param zipFile ZIP-File
      * @return entries that can be selected
      */
-    private static ObservableList<ZipEntry> getSelectableZipEntries(ZipFile zipFile) {
-        ObservableList<ZipEntry> entries = FXCollections.observableArrayList();
-        Enumeration<? extends ZipEntry> e = zipFile.entries();
-        for (ZipEntry entry : Collections.list(e)) {
-            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                entries.add(entry);
-            }
-        }
-        return entries;
+    private static ObservableList<Path> getSelectableZipEntries(FileSystem zipFile) throws IOException {
+        Path rootDir = zipFile.getRootDirectories().iterator().next();
+
+        return FXCollections.observableArrayList(
+                Files.walk(rootDir)
+                     .filter(file -> file.endsWith(".class"))
+                     .collect(Collectors.toList()));
     }
 }

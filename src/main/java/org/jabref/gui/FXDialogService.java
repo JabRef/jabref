@@ -2,6 +2,8 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.zip.ZipFile;
 
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
@@ -305,8 +306,8 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public Optional<String> showFileOpenFromArchiveDialog(Path archivePath) throws IOException {
-        try (ZipFile zipFile = new ZipFile(archivePath.toFile(), ZipFile.OPEN_READ)) {
+    public Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException {
+        try (FileSystem zipFile = FileSystems.newFileSystem(archivePath, null)) {
             return new ZipFileChooser(zipFile).showAndWait();
         } catch (NoClassDefFoundError exc) {
             throw new IOException("Could not instantiate ZIP-archive reader.", exc);
