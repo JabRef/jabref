@@ -1,21 +1,22 @@
 package org.jabref.gui;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 
 import org.jabref.Globals;
+import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-public class DuplicateResolverDialog {
+public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
@@ -44,21 +45,28 @@ public class DuplicateResolverDialog {
     private final FlowPane options = new FlowPane();
     private DuplicateResolverResult status = DuplicateResolverResult.NOT_CHOSEN;
     private MergeEntries me;
-    private final DialogPane pane = new DialogPane();
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
         this.frame = frame;
         init(one, two, type);
+
     }
 
     public DuplicateResolverDialog(ImportInspectionDialog dialog, BibEntry one, BibEntry two,
                                    DuplicateResolverType type) {
+
         //super(dialog, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = dialog.getFrame();
         init(one, two, type);
+
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
+
+        this.setResultConverter(button -> {
+            return status;
+        });
+
         Button both;
         Button second;
         Button first;
@@ -107,18 +115,14 @@ public class DuplicateResolverDialog {
         }
 
         cancel.setOnAction(e -> buttonPressed(DuplicateResolverResult.BREAK));
-
         BorderPane borderPane = new BorderPane(me);
         borderPane.setBottom(options);
 
+        getDialogPane().setContent(borderPane);
     }
 
     private void buttonPressed(DuplicateResolverResult result) {
         status = result;
-    }
-
-    public DuplicateResolverResult getSelected() {
-        return status;
     }
 
     public BibEntry getMergedEntry() {

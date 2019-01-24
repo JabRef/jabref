@@ -58,7 +58,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         JabRefExecutorService.INSTANCE
-                .executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
+                                      .executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -125,11 +125,10 @@ public class DuplicateSearch extends SimpleCommand {
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
 
-
-        DuplicateResolverResult resolverResult = dialog.getSelected();
+        DuplicateResolverResult resolverResult = dialog.showAndWait().get();
 
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
-                || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
+            || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
             result.remove(second);
             if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                 autoRemoveExactDuplicates.set(true); // Remember choice
@@ -170,7 +169,7 @@ public class DuplicateSearch extends SimpleCommand {
             }
 
             panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
-                    + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+                         + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
             compoundEdit.end();
             panel.getUndoManager().addEdit(compoundEdit);
         });
