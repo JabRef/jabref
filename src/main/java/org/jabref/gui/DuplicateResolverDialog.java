@@ -1,15 +1,14 @@
 package org.jabref.gui;
 
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.help.HelpFile;
@@ -26,7 +25,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     public enum DuplicateResolverResult {
-        NOT_CHOSEN,
         KEEP_BOTH,
         KEEP_LEFT,
         KEEP_RIGHT,
@@ -38,91 +36,88 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
 
     HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
-    Button helpButton = factory.createIconButton(StandardActions.HELP, helpCommand.getCommand());
-    private final Button cancel = new Button(Localization.lang("Cancel"));
-    private final Button merge = new Button(Localization.lang("Keep merged entry only"));
+    ButtonType helpButton = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
+    private final ButtonType cancel = ButtonType.CANCEL;
+    private final ButtonType merge = new ButtonType(Localization.lang("Keep merged entry only"), ButtonData.APPLY);
     private final JabRefFrame frame;
-    private final FlowPane options = new FlowPane();
-    private DuplicateResolverResult status = DuplicateResolverResult.NOT_CHOSEN;
+    private final ButtonBar options = new ButtonBar();
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
         this.frame = frame;
-        init(one, two, type);
-
-    }
-
-    public DuplicateResolverDialog(ImportInspectionDialog dialog, BibEntry one, BibEntry two,
-                                   DuplicateResolverType type) {
-
-        //super(dialog, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
-        this.frame = dialog.getFrame();
+        this.setTitle(Localization.lang("Possible duplicate entries"));
         init(one, two, type);
 
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
 
-        this.setResultConverter(button -> {
-            return status;
-        });
+        ButtonType both;
+        ButtonType second;
+        ButtonType first;
+        ButtonType removeExact = new ButtonType(Localization.lang("Automatically remove exact duplicates"), ButtonData.APPLY);
+        boolean removeExactVisible = false;
 
-        Button both;
-        Button second;
-        Button first;
-        Button removeExact = null;
         switch (type) {
             case DUPLICATE_SEARCH:
-                first = new Button(Localization.lang("Keep left"));
-                second = new Button(Localization.lang("Keep right"));
-                both = new Button(Localization.lang("Keep both"));
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
             case INSPECTION:
-                first = new Button(Localization.lang("Remove old entry"));
-                second = new Button(Localization.lang("Remove entry from import"));
-                both = new Button(Localization.lang("Keep both"));
+                first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
+                second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
                                       Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
-                first = new Button(Localization.lang("Keep left"));
-                second = new Button(Localization.lang("Keep right"));
-                both = new Button(Localization.lang("Keep both"));
-                removeExact = new Button(Localization.lang("Automatically remove exact duplicates"));
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
+
+                removeExactVisible = true;
+
                 me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
             default:
-                first = new Button(Localization.lang("Import and remove old entry"));
-                second = new Button(Localization.lang("Do not import entry"));
-                both = new Button(Localization.lang("Import and keep old entry"));
+                first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
+                second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
+                both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
                                       Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
         }
-
-        if (removeExact != null) {
-            options.getChildren().add(removeExact);
-        }
-        options.getChildren().addAll(first, second, both, merge, cancel, helpButton);
-
-        first.setOnAction(e -> buttonPressed(DuplicateResolverResult.KEEP_LEFT));
-        second.setOnAction(e -> buttonPressed(DuplicateResolverResult.KEEP_RIGHT));
-        both.setOnAction(e -> buttonPressed(DuplicateResolverResult.KEEP_BOTH));
-        merge.setOnAction(e -> buttonPressed(DuplicateResolverResult.KEEP_MERGE));
-        if (removeExact != null) {
-            removeExact.setOnAction(e -> buttonPressed(DuplicateResolverResult.AUTOREMOVE_EXACT));
+        if (removeExactVisible) {
+            this.getDialogPane().getButtonTypes().add(removeExact);
         }
 
-        cancel.setOnAction(e -> buttonPressed(DuplicateResolverResult.BREAK));
+        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, helpButton);
+
         BorderPane borderPane = new BorderPane(me);
         borderPane.setBottom(options);
 
-        getDialogPane().setContent(borderPane);
-    }
+        this.setResultConverter(button -> {
+            if (button.equals(first)) {
+                return DuplicateResolverResult.KEEP_LEFT;
+            }
+            if (button.equals(second)) {
+                return DuplicateResolverResult.KEEP_RIGHT;
+            }
+            if (button.equals(both)) {
+                return DuplicateResolverResult.KEEP_BOTH;
+            }
+            if (button.equals(merge)) {
+                return DuplicateResolverResult.KEEP_MERGE;
+            }
+            if (button.equals(removeExact)) {
+                return DuplicateResolverResult.AUTOREMOVE_EXACT;
+            }
+            return DuplicateResolverResult.BREAK;
+        });
 
-    private void buttonPressed(DuplicateResolverResult result) {
-        status = result;
+        getDialogPane().setContent(borderPane);
     }
 
     public BibEntry getMergedEntry() {

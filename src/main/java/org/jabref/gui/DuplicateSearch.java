@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -148,31 +146,30 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        SwingUtilities.invokeLater(() -> {
-            BasePanel panel = frame.getCurrentBasePanel();
-            final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
-            // Now, do the actual removal:
-            if (!result.getToRemove().isEmpty()) {
-                for (BibEntry entry : result.getToRemove()) {
-                    panel.getDatabase().removeEntry(entry);
-                    compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
-                }
-                panel.markBaseChanged();
+        BasePanel panel = frame.getCurrentBasePanel();
+        final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
+        // Now, do the actual removal:
+        if (!result.getToRemove().isEmpty()) {
+            for (BibEntry entry : result.getToRemove()) {
+                panel.getDatabase().removeEntry(entry);
+                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             }
-            // and adding merged entries:
-            if (!result.getToAdd().isEmpty()) {
-                for (BibEntry entry : result.getToAdd()) {
-                    panel.getDatabase().insertEntry(entry);
-                    compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
-                }
-                panel.markBaseChanged();
+            panel.markBaseChanged();
+        }
+        // and adding merged entries:
+        if (!result.getToAdd().isEmpty()) {
+            for (BibEntry entry : result.getToAdd()) {
+                panel.getDatabase().insertEntry(entry);
+                compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
+            panel.markBaseChanged();
+        }
 
-            panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
-                         + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-            compoundEdit.end();
-            panel.getUndoManager().addEdit(compoundEdit);
-        });
+        panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
+                     + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+        compoundEdit.end();
+        panel.getUndoManager().addEdit(compoundEdit);
+
     }
 
     /**

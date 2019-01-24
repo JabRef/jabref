@@ -1051,7 +1051,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
 
                     DuplicateResolverResult result = diag.showAndWait().get();
@@ -1113,7 +1113,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 // Check if the duplicate is of another entry in the import:
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), first,
                                                                                other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
 
                     ImportInspectionDialog.this.toFront();
