@@ -1546,6 +1546,7 @@ public class JabRefPreferences implements PreferencesService {
                                   getKeywordDelimiter());
     }
 
+    @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
                                          this.get(JabRefPreferences.OO_JARS_PATH),
@@ -1558,6 +1559,7 @@ public class JabRefPreferences implements PreferencesService {
                                          this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
+    @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
         this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
         this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
@@ -1598,6 +1600,7 @@ public class JabRefPreferences implements PreferencesService {
         return this;
     }
 
+    @Override
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);

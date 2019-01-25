@@ -1,8 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import javax.swing.SwingUtilities;
-
-import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 
@@ -14,26 +11,31 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
 
-    private OpenOfficePreferences preferences;
-    private JabRefFrame frame;
+    private final JabRefPreferences preferences;
+    private final JabRefFrame frame;
+    private final OpenOfficePreferences ooPrefs;
 
-    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, OpenOfficePreferences preferences, JabRefFrame frame) {
+    public OpenOfficeSidePanel(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
         super(sidePaneManager, IconTheme.JabRefIcons.FILE_OPENOFFICE, "OpenOffice/LibreOffice");
-        this.preferences = preferences;
         this.frame = frame;
+        this.preferences = preferences;
+        this.ooPrefs = preferences.getOpenOfficePreferences();
     }
 
     @Override
     public void beforeClosing() {
-        preferences.setShowPanel(false);
+        ooPrefs.setShowPanel(false);
+        preferences.setOpenOfficePreferences(ooPrefs);
     }
 
     @Override
     public void afterOpening() {
-        preferences.setShowPanel(true);
+        ooPrefs.setShowPanel(true);
+        preferences.setOpenOfficePreferences(ooPrefs);
     }
 
     @Override
@@ -48,9 +50,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        SwingNode swingNode = new SwingNode();
-        SwingUtilities.invokeLater(() -> swingNode.setContent(new OpenOfficePanel(frame).getContent()));
-        return swingNode;
+        return new OpenOfficePanel(frame, preferences, ooPrefs, preferences.getKeyBindingRepository()).getContent();
     }
 
     @Override

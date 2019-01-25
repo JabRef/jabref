@@ -74,7 +74,7 @@ public class FXDialogService implements DialogService {
     }
 
     private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = new FXDialog(type, title, true);
         // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
         alert.getDialogPane().applyCss();
@@ -180,7 +180,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel) {
+                                                 String okButtonLabel, String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -190,7 +190,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
@@ -198,8 +198,8 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                           String okButtonLabel, String cancelButtonLabel,
+                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -209,7 +209,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
-            ButtonType... buttonTypes) {
+                                                              ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
@@ -217,7 +217,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
-            ButtonType... buttonTypes) {
+                                                        ButtonType... buttonTypes) {
         FXDialog alert = new FXDialog(AlertType.NONE, title);
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);

@@ -140,7 +140,7 @@ public interface DialogService {
      * @return true if the use clicked "YES" otherwise false
      */
     boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction);
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
      * Create and display a new confirmation dialog.
@@ -152,8 +152,8 @@ public interface DialogService {
      * @return true if the use clicked "YES" otherwise false
      */
     boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel,
-            String optOutMessage, Consumer<Boolean> optOutAction);
+                                                    String okButtonLabel, String cancelButtonLabel,
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
      * This will create and display a new dialog of the specified
@@ -163,7 +163,7 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-            ButtonType... buttonTypes);
+                                                       ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
