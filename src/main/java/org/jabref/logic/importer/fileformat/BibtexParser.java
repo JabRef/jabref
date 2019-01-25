@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentParser;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -70,7 +71,7 @@ public class BibtexParser implements Parser {
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
-    private MetaDataParser metaDataParser;
+    private final MetaDataParser metaDataParser;
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -211,7 +212,18 @@ public class BibtexParser implements Parser {
 
         parseRemainingContent();
 
+        checkEpilog();
+
         return parserResult;
+    }
+
+    private void checkEpilog() {
+        // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
+        // regex looks for something like 'identifier = blabla ,'
+        if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
+                parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+        }
+
     }
 
     private void parseRemainingContent() {
