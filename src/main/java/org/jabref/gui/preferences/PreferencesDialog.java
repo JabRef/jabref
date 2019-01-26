@@ -126,7 +126,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         exportPreferences.setOnAction(e -> exportPreferences());
         exportPreferences.setMaxWidth(Double.MAX_VALUE);
         Button showPreferences = new Button(Localization.lang("Show preferences"));
-        showPreferences.setOnAction(e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
+        showPreferences.setOnAction(e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).showAndWait());
         showPreferences.setMaxWidth(Double.MAX_VALUE);
         Button resetPreferences = new Button(Localization.lang("Reset preferences"));
         resetPreferences.setOnAction(e -> resetPreferences());

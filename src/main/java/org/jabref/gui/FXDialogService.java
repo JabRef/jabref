@@ -1,6 +1,9 @@
 package org.jabref.gui;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.dialog.ExceptionDialog;
@@ -70,7 +74,7 @@ public class FXDialogService implements DialogService {
     }
 
     private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = new FXDialog(type, title, true);
         // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
         alert.getDialogPane().applyCss();
@@ -176,7 +180,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel) {
+                                                 String okButtonLabel, String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -186,7 +190,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
@@ -194,8 +198,8 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel,
-            String optOutMessage, Consumer<Boolean> optOutAction) {
+                                                           String okButtonLabel, String cancelButtonLabel,
+                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -205,7 +209,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
-            ButtonType... buttonTypes) {
+                                                              ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
@@ -213,7 +217,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
-            ButtonType... buttonTypes) {
+                                                        ButtonType... buttonTypes) {
         FXDialog alert = new FXDialog(AlertType.NONE, title);
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
@@ -299,5 +303,14 @@ public class FXDialogService implements DialogService {
     @Override
     public boolean showPrintDialog(PrinterJob job) {
         return job.showPrintDialog(mainWindow);
+    }
+
+    @Override
+    public Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException {
+        try (FileSystem zipFile = FileSystems.newFileSystem(archivePath, null)) {
+            return new ZipFileChooser(zipFile).showAndWait();
+        } catch (NoClassDefFoundError exc) {
+            throw new IOException("Could not instantiate ZIP-archive reader.", exc);
+        }
     }
 }

@@ -41,22 +41,13 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(addButton, getDialogPane(), event -> addExporter());
-        ControlHelper.setAction(modifyButton, getDialogPane(), event -> modifyExporter());
-        ControlHelper.setAction(removeButton, getDialogPane(), event -> removeExporter());
-        ControlHelper.setAction(closeButton, getDialogPane(), event -> saveAndClose());
-    }
-
-    private void addExporter() {
-        viewModel.addExporter();
-    }
-
-    private void modifyExporter() {
-        viewModel.modifyExporter();
-    }
-
-    private void removeExporter() {
-        viewModel.removeExporters();
+        ControlHelper.setAction(addButton, getDialogPane(), event -> viewModel.addExporter());
+        ControlHelper.setAction(modifyButton, getDialogPane(), event -> viewModel.modifyExporter());
+        ControlHelper.setAction(removeButton, getDialogPane(), event -> viewModel.removeExporters());
+        ControlHelper.setAction(closeButton, getDialogPane(), event -> {
+            viewModel.saveToPrefs();
+            close();
+        });
     }
 
     @FXML
@@ -68,10 +59,5 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
-    }
-
-    private void saveAndClose() {
-        viewModel.saveToPrefs();
-        close();
     }
 }
