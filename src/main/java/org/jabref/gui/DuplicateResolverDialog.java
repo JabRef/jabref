@@ -1,13 +1,12 @@
 package org.jabref.gui;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.util.BaseDialog;
@@ -33,25 +32,24 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
-
-    HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
-    ButtonType helpButton = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
-    private final ButtonType cancel = ButtonType.CANCEL;
-    private final ButtonType merge = new ButtonType(Localization.lang("Keep merged entry only"), ButtonData.APPLY);
     private final JabRefFrame frame;
-    private final ButtonBar options = new ButtonBar();
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
         this.frame = frame;
         this.setTitle(Localization.lang("Possible duplicate entries"));
         init(one, two, type);
-
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
 
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
+        ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
+
+        ButtonType cancel = ButtonType.CANCEL;
+        ButtonType merge = new ButtonType(Localization.lang("Keep merged entry only"), ButtonData.APPLY);
+
+        ButtonBar options = new ButtonBar();
         ButtonType both;
         ButtonType second;
         ButtonType first;
@@ -93,31 +91,30 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             this.getDialogPane().getButtonTypes().add(removeExact);
         }
 
-        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, helpButton);
+        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
 
         BorderPane borderPane = new BorderPane(me);
         borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
+
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;
-            }
-            if (button.equals(second)) {
+            } else if (button.equals(second)) {
                 return DuplicateResolverResult.KEEP_RIGHT;
-            }
-            if (button.equals(both)) {
+            } else if (button.equals(both)) {
                 return DuplicateResolverResult.KEEP_BOTH;
-            }
-            if (button.equals(merge)) {
+            } else if (button.equals(merge)) {
                 return DuplicateResolverResult.KEEP_MERGE;
-            }
-            if (button.equals(removeExact)) {
+            } else if (button.equals(removeExact)) {
                 return DuplicateResolverResult.AUTOREMOVE_EXACT;
             }
-            return DuplicateResolverResult.BREAK;
+            return null;
         });
 
         getDialogPane().setContent(borderPane);
+        Button helpButton = (Button) this.getDialogPane().lookupButton(help);
+        helpButton.setOnAction(evt -> helpCommand.getCommand().execute());
     }
 
     public BibEntry getMergedEntry() {

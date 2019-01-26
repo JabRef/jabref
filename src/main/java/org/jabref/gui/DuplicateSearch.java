@@ -35,15 +35,17 @@ public class DuplicateSearch extends SimpleCommand {
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
+    private final DialogService dialogService;
 
-    public DuplicateSearch(JabRefFrame frame) {
+    public DuplicateSearch(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
+        this.dialogService = dialogService;
     }
 
     @Override
     public void execute() {
         BasePanel panel = frame.getCurrentBasePanel();
-        panel.output(Localization.lang("Searching for duplicates..."));
+        dialogService.notify(Localization.lang("Searching for duplicates..."));
 
         List<BibEntry> entries = panel.getDatabase().getEntries();
         duplicates.clear();
@@ -55,8 +57,7 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        JabRefExecutorService.INSTANCE
-                                      .executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -123,7 +124,7 @@ public class DuplicateSearch extends SimpleCommand {
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
 
-        DuplicateResolverResult resolverResult = dialog.showAndWait().get();
+        DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
             || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
@@ -165,8 +166,8 @@ public class DuplicateSearch extends SimpleCommand {
             panel.markBaseChanged();
         }
 
-        panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
-                     + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+        dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
+                             + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
         compoundEdit.end();
         panel.getUndoManager().addEdit(compoundEdit);
 

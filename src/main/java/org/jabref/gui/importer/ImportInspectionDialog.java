@@ -1054,7 +1054,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
 
-                    DuplicateResolverResult result = diag.showAndWait().get();
+                    DuplicateResolverResult result = diag.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
                     ImportInspectionDialog.this.toFront();
                     if (result == DuplicateResolverResult.KEEP_LEFT) {
