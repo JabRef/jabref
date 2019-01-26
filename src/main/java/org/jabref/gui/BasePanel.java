@@ -1362,7 +1362,7 @@ public class BasePanel extends StackPane {
 
     /**
      * Ensures that the results of the current search are updated when a new entry is inserted into the database
-     * Actual methods for performaing search  must run in javafx thread
+     * Actual methods for performing search must run in javafx thread
      */
     private class SearchListener {
 
