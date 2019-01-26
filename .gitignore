@@ -23,18 +23,6 @@ ui/
 jabref.xml
 *.sonargraph
 
-# Snapcraft - JabRef places the files into buildres/snapcraft
-snap/
-
-
-
-
-
-
-
-
-
-
 # Created by https://www.gitignore.io/api/gradle,java,jabref,intellij,eclipse,netbeans,windows,linux,macos,node,snapcraft
 
 ### Eclipse ###
