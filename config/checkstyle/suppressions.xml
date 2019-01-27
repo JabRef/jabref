@@ -6,5 +6,4 @@
 
 <suppressions>
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]gen[\\/]" />
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]test[\\/]" />
 </suppressions>

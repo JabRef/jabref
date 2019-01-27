@@ -1,16 +1,17 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Optional;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -47,7 +48,7 @@ public class RfcFetcherTest {
 
     @Test
     public void getHelpPageReturnsEqualHelpPage() {
-        assertEquals("RFCtoBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("RFCtoBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

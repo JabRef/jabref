@@ -35,6 +35,7 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
+import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -120,6 +121,7 @@ class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
+        column.setSortable(true);
         return column;
     }
 
@@ -156,6 +158,7 @@ class MainTableColumnFactory {
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);
+            column.setSortable(true);
             column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
             columns.add(column);
         }
@@ -199,6 +202,12 @@ class MainTableColumnFactory {
             column.setComparator(new RankingFieldComparator());
         }
 
+        // Added comparator for Read Status
+        if (specialField == SpecialField.READ_STATUS) {
+            column.setComparator(new ReadStatusFieldComparator());
+        }
+
+        column.setSortable(true);
         return column;
     }
 
@@ -374,7 +383,6 @@ class MainTableColumnFactory {
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                         .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList())))
                         .install(column);
-
         return column;
     }
 

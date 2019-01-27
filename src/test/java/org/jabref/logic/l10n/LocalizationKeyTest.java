@@ -1,13 +1,13 @@
 package org.jabref.logic.l10n;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LocalizationKeyTest {
+class LocalizationKeyTest {
 
     @Test
-    public void testConversionToPropertiesKey() {
+    void testConversionToPropertiesKey() {
         LocalizationKey localizationKey = new LocalizationKey("#test! : =");
         assertEquals("\\#test\\!\\ \\:\\ \\=", localizationKey.getPropertiesKey());
         assertEquals("#test! : =", localizationKey.getPropertiesKeyUnescaped());
@@ -15,9 +15,8 @@ public class LocalizationKeyTest {
     }
 
     @Test
-    public void underscoreIsPreserved() {
+    void underscoreIsPreserved() {
         LocalizationKey localizationKey = new LocalizationKey("test_with_underscore");
         assertEquals("test_with_underscore", localizationKey.getPropertiesKey());
     }
-
 }

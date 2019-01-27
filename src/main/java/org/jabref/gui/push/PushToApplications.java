@@ -13,7 +13,6 @@ public class PushToApplications {
         // Set up the current available choices:
 
         applications = new ArrayList<>();
-
         applications.add(new PushToEmacs(dialogService));
         applications.add(new PushToLyx(dialogService));
         applications.add(new PushToTexmaker(dialogService));

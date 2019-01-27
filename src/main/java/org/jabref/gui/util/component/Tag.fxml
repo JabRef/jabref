@@ -14,7 +14,7 @@
         </HBox.margin>
     </Label>
     <Button
-            styleClass="flatButton"
+            styleClass="icon-button"
             onAction="#removeButtonClicked">
         <graphic>
             <JabRefIconView glyph="CLOSE"/>

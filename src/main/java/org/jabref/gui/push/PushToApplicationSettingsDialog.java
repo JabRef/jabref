@@ -20,9 +20,9 @@ import org.jabref.logic.l10n.Localization;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class PushToApplicationSettingsDialog {
-    public static void showSettingsDialog(JFrame parent, PushToApplicationSettings toApp) {
+    public static void showSettingsDialog(JFrame parent, PushToApplicationSettings toApp, int n) {
         final JDialog diag = new JDialog(parent, Localization.lang("Settings"), true);
-        JPanel options = toApp.getSettingsPanel();
+        JPanel options = toApp.getSettingsPanel(n);
         options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();

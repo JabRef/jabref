@@ -43,18 +43,17 @@ public class EntryFromPDFCreatorTest {
 
     @Test
     public void testCreationOfEntryNoPDF() {
-        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
+        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF.toFile(), false);
         assertFalse(entry.isPresent());
     }
 
     @Test
     @Disabled //Can't mock basepanel and maintable
     public void testCreationOfEntryNotInDatabase() {
-        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
+        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE.toFile(), false);
         assertTrue(entry.isPresent());
         assertTrue(entry.get().getField("file").get().endsWith(":PDF"));
-        assertEquals(Optional.of(ImportDataTest.FILE_NOT_IN_DATABASE.getName()),
+        assertEquals(Optional.of(ImportDataTest.FILE_NOT_IN_DATABASE.getFileName().toString()),
                 entry.get().getField("title"));
-
     }
 }

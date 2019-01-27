@@ -28,7 +28,9 @@
                             <Tooltip text="%Copy Version" />
                         </tooltip>
                     </Label>
-                    <Label fx:id="devVersionLabel" managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading" text="${controller.viewModel.developmentVersion}" visible="${controller.viewModel.isDevelopmentVersion}" />
+                    <Label managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading"
+                           text="${controller.viewModel.developmentVersion}"
+                           visible="${controller.viewModel.isDevelopmentVersion}"/>
                     <Hyperlink onAction="#openChangeLog" styleClass="top-padding" text="%What's new in this version?" />
                     <Label styleClass="filler" />
                     <HBox alignment="CENTER_LEFT">
@@ -46,7 +48,8 @@
                 </VBox>
                 <BorderPane BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
                     <center>
-                        <StackPane onMouseClicked="#openJabrefWebsite" scaleX="0.6" scaleY="0.6" prefWidth="140" prefHeight="140" BorderPane.alignment="CENTER">
+                        <StackPane onMouseClicked="#openJabrefWebsite" prefHeight="140" prefWidth="140" scaleX="0.6"
+                                   scaleY="0.6" BorderPane.alignment="CENTER">
                             <!-- SVGPaths need to be wrapped in a Pane to get them to the same size -->
                             <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
                                 <SVGPath content="M97.2 87.1C93.2 33.8 18.4 14.6 18.2 15.6c-0.1 6.7-0.3 13.3-0.4 20 17.8 3.6 61.7 20.1 79.4 51.5" />
@@ -80,12 +83,10 @@
                     </bottom>
                 </BorderPane>
             </HBox>
-            <Label styleClass="sub-heading" text="%Developers">
-            </Label>
+            <Label styleClass="sub-heading" text="%Developers"/>
             <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.developers}" textAlignment="JUSTIFY" wrapText="true" />
-            <Label styleClass="sub-heading" text="%Authors">
-            </Label>
-            <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <Label styleClass="sub-heading" text="%Authors"/>
+            <HBox alignment="CENTER" VBox.vgrow="ALWAYS" prefHeight="100">
                 <ScrollPane fitToWidth="true">
                     <Label styleClass="info-sections" text="${controller.viewModel.authors}" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER" />
                 </ScrollPane>
@@ -95,6 +96,6 @@
     </content>
     <header>
     </header>
-    <ButtonType fx:id="copyVersionButton" text="%Copy Version" />
+    <ButtonType fx:id="copyVersionButton" text="%Copy Version" buttonData="LEFT"/>
     <ButtonType fx:constant="CLOSE" />
 </DialogPane>

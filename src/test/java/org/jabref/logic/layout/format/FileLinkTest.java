@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-
 public class FileLinkTest {
 
     private FileLinkPreferences prefs;
+
     @BeforeEach
     public void setUp() throws Exception {
         prefs = mock(FileLinkPreferences.class);
@@ -60,5 +60,4 @@ public class FileLinkTest {
         a.setArgument("doc");
         assertEquals("", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
-
 }

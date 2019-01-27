@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +18,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
 
 /**
@@ -154,16 +155,29 @@ public class LinkedFile implements Serializable {
         return isOnlineLink(link.get());
     }
 
-    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences);
+    public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(filePreferences);
         return findIn(dirs);
     }
 
+    /**
+     * Tries to find the file in the given directories and returns the path to the file (if found). Returns an empty
+     * optional if the file cannot be found.
+     */
     public Optional<Path> findIn(List<Path> directories) {
         try {
+            if (link.get().isEmpty()) {
+                // We do not want to match empty paths (which could be any file or none ?!)
+                return Optional.empty();
+            }
+
             Path file = Paths.get(link.get());
             if (file.isAbsolute() || directories.isEmpty()) {
-                return Optional.of(file);
+                if (Files.exists(file)) {
+                    return Optional.of(file);
+                } else {
+                    return Optional.empty();
+                }
             } else {
                 return FileHelper.expandFilenameAsPath(link.get(), directories);
             }
@@ -171,5 +185,4 @@ public class LinkedFile implements Serializable {
             return Optional.empty();
         }
     }
-
 }

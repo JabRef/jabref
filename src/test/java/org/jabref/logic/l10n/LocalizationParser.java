@@ -33,10 +33,10 @@ public class LocalizationParser {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
         Set<String> keysInJavaFiles = entries.stream()
-                .map(LocalizationEntry::getKey)
-                .distinct()
-                .sorted()
-                .collect(Collectors.toSet());
+                                             .map(LocalizationEntry::getKey)
+                                             .distinct()
+                                             .sorted()
+                                             .collect(Collectors.toSet());
 
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
@@ -118,11 +118,11 @@ public class LocalizationParser {
         Properties properties = getProperties(path);
 
         return properties.keySet().stream()
-                .sorted()
-                .map(Object::toString)
-                .map(String::trim)
-                .map(e -> new LocalizationKey(e).getPropertiesKey())
-                .collect(Collectors.toCollection(TreeSet::new));
+                         .sorted()
+                         .map(Object::toString)
+                         .map(String::trim)
+                         .map(e -> new LocalizationKey(e).getPropertiesKey())
+                         .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static Properties getProperties(String path) {
@@ -156,8 +156,8 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -175,8 +175,8 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -211,6 +211,7 @@ public class LocalizationParser {
         // TODO: removed access to internal API: Why was it used?
         Platform.startup(() -> {
         });
+
         try {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
@@ -219,13 +220,13 @@ public class LocalizationParser {
             // TODO: removed access to internal API.
 //            loader.impl_setStaticLoad(true);
             loader.load();
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result.stream()
-                .map(key -> new LocalizationEntry(path, new LocalizationKey(key).getPropertiesKey(), type))
-                .collect(Collectors.toList());
+                     .map(key -> new LocalizationEntry(path, new LocalizationKey(key).getPropertiesKey(), type))
+                     .collect(Collectors.toList());
     }
 
     static class JavaLocalizationEntryParser {

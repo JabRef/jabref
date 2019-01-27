@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -71,8 +72,8 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DBLP;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DBLP);
     }
 
 }

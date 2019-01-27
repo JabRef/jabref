@@ -77,7 +77,6 @@ public class BibtexCaseChangersTest {
 
         assertCaseChangerTitleLowers("On notions of information transfer in {VLSI} circuits",
                 "On Notions of Information Transfer in {VLSI} Circuits");
-
     }
 
     @Test
@@ -123,7 +122,6 @@ public class BibtexCaseChangersTest {
 
     private void assertCaseChangerTitleLowers(final String string, final String string2) {
         assertEquals(string, BibtexCaseChanger.changeCase(string2, FORMAT_MODE.TITLE_LOWERS));
-
     }
 
     private void assertCaseChangerAllLowers(final String string, final String string2) {

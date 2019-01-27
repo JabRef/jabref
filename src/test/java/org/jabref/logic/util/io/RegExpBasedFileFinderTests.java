@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RegExpBasedFileFinderTests {
 
-    private static final String filesDirectory = "src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder";
+    private static final String FILES_DIRECTORY = "src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder";
     private BibDatabase database;
     private BibEntry entry;
 
@@ -46,13 +46,13 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFiles() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInDatabase");
         localEntry.setField("year", "2001");
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
@@ -68,7 +68,7 @@ public class RegExpBasedFileFinderTests {
         //given
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
         //when
@@ -82,7 +82,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testAuthorWithDiacritics() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("Grazulis2017");
         localEntry.setField("year", "2017");
         localEntry.setField("author", "Gražulis, Saulius and O. Kitsune");
@@ -90,7 +90,7 @@ public class RegExpBasedFileFinderTests {
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
 
         //when
@@ -104,13 +104,13 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileInSubdirectory() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
@@ -124,13 +124,13 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileNonRecursive() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
@@ -169,5 +169,4 @@ public class RegExpBasedFileFinderTests {
                 RegExpBasedFileFinder.expandBrackets("[author] have published [title] in [journal].", entry, database,
                         ','));
     }
-
 }

@@ -26,7 +26,7 @@ class SpringerFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
         expected.setField("author", "Steinmacher, Igor and Gerosa, Marco and Conte, Tayana U. and Redmiles, David F.");
         expected.setField("date", "2018-06-14");
         expected.setField("doi", "10.1007/s10606-018-9335-z");
@@ -65,5 +65,10 @@ class SpringerFetcherTest {
         assertEquals(Optional.of("8"), bibEntry.getField("volume"));
         assertEquals(Optional.of("Springer"), bibEntry.getField("publisher"));
         assertEquals(Optional.of("1992-09-01"), bibEntry.getField("date"));
+    }
+
+    @Test
+    void searchByEmptyQueryFindsNothing() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

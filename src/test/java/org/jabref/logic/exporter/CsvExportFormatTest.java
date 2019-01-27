@@ -4,37 +4,36 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(TempDirectory.class)
 public class CsvExportFormatTest {
-    private Exporter exportFormat;
+
     public BibDatabaseContext databaseContext;
     public Charset charset;
+    private Exporter exportFormat;
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        Map<String, TemplateExporter> customFormats = new HashMap<>();
+        List<TemplateExporter> customFormats = new ArrayList<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
@@ -46,21 +45,22 @@ public class CsvExportFormatTest {
         charset = StandardCharsets.UTF_8;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         exportFormat = null;
     }
 
     @Test
-    public void testPerformExportForSingleAuthor() throws Exception {
-        File tmpFile = testFolder.newFile();
+    public void testPerformExportForSingleAuthor(@TempDirectory.TempDir Path testFolder) throws Exception {
+        Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
+
         BibEntry entry = new BibEntry();
         entry.setField("author", "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, path, charset, entries);
 
-        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
                 "10,\"\",\"\",\"Someone, Van Something\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
@@ -68,15 +68,16 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleAuthors() throws Exception {
-        File tmpFile = testFolder.newFile();
+    public void testPerformExportForMultipleAuthors(@TempDirectory.TempDir Path testFolder) throws Exception {
+        Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
+
         BibEntry entry = new BibEntry();
         entry.setField("author", "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, path, charset, entries);
 
-        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
                 "10,\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
@@ -84,8 +85,9 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForSingleEditor() throws Exception {
-        File tmpFile = testFolder.newFile();
+    public void testPerformExportForSingleEditor(@TempDirectory.TempDir Path testFolder) throws Exception {
+        Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
+        File tmpFile = path.toFile();
         BibEntry entry = new BibEntry();
         entry.setField("editor", "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
@@ -100,8 +102,9 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleEditors() throws Exception {
-        File tmpFile = testFolder.newFile();
+    public void testPerformExportForMultipleEditors(@TempDirectory.TempDir Path testFolder) throws Exception {
+        Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
+        File tmpFile = path.toFile();
         BibEntry entry = new BibEntry();
         entry.setField("editor", "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
@@ -114,5 +117,4 @@ public class CsvExportFormatTest {
                 "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
                 lines.get(1));
     }
-
 }

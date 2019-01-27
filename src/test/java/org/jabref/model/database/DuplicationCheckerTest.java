@@ -11,7 +11,6 @@ public class DuplicationCheckerTest {
 
     private BibDatabase database;
 
-
     @BeforeEach
     public void setUp() {
         database = new BibDatabase();
@@ -46,7 +45,6 @@ public class DuplicationCheckerTest {
         assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
     }
 
-
     @Test
     public void setCiteKeySameKeyDifferentEntries() {
         BibEntry entry0 = new BibEntry();
@@ -64,7 +62,7 @@ public class DuplicationCheckerTest {
     }
 
     @Test
-    public void removeMultipleCiteKeys(){
+    public void removeMultipleCiteKeys() {
         BibEntry entry0 = new BibEntry();
         entry0.setCiteKey("AAA");
         database.insertEntry(entry0);
@@ -87,7 +85,7 @@ public class DuplicationCheckerTest {
     }
 
     @Test
-    public void addEmptyCiteKey(){
+    public void addEmptyCiteKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("");
         database.insertEntry(entry);
@@ -96,7 +94,7 @@ public class DuplicationCheckerTest {
     }
 
     @Test
-    public void removeEmptyCiteKey(){
+    public void removeEmptyCiteKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
@@ -106,5 +104,4 @@ public class DuplicationCheckerTest {
         database.removeEntry(entry);
         assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
-
 }

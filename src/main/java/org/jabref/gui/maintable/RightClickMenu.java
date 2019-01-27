@@ -14,6 +14,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
@@ -34,7 +35,7 @@ public class RightClickMenu {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new OldCommandWrapper(Actions.COPY, panel)));
-        contextMenu.getItems().add(createCopySubMenu(panel, factory));
+        contextMenu.getItems().add(createCopySubMenu(panel, factory, dialogService));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new OldCommandWrapper(Actions.CUT, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
@@ -141,7 +142,7 @@ public class RightClickMenu {
         return command;
     }
 
-    private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory) {
+    private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory, DialogService dialogService) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
         copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_TITLE, new OldCommandWrapper(Actions.COPY_TITLE, panel)));
         copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY, new OldCommandWrapper(Actions.COPY_KEY, panel)));
@@ -164,7 +165,7 @@ public class RightClickMenu {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
         }
 
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new OldCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(panel, dialogService)));
         return copySpecialMenu;
     }
 

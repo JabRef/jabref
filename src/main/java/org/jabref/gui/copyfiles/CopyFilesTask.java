@@ -67,25 +67,38 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
             for (int i = 0; i < entries.size(); i++) {
 
+                if (isCancelled()) {
+                    break;
+                }
+
                 List<LinkedFile> files = entries.get(i).getFiles();
 
                 for (int j = 0; j < files.size(); j++) {
+
+                    if (isCancelled()) {
+                        break;
+                    }
+
                     updateMessage(Localization.lang("Copying file %0 of entry %1", Integer.toString(j + 1), Integer.toString(i + 1)));
 
                     LinkedFile fileName = files.get(j);
 
-                    Optional<Path> fileToExport = fileName.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+                    Optional<Path> fileToExport = fileName.findIn(databaseContext, Globals.prefs.getFilePreferences());
 
                     newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 
-                    newPath.ifPresent(newFile -> {
+                    if (newPath.isPresent()) {
+
+                        Path newFile = newPath.get();
                         boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
                         updateProgress(totalFilesCounter++, totalFilesCount);
                         try {
                             Thread.sleep(300);
                         } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            if (isCancelled()) {
+                                updateMessage("Cancelled");
+                                break;
+                            }
                         }
                         if (success) {
                             updateMessage(localizedSucessMessage);
@@ -99,7 +112,9 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             writeLogMessage(newFile, bw, localizedErrorMessage);
                             addResultToList(newFile, success, localizedErrorMessage);
                         }
-                    });
+
+                    }
+
                 }
             }
             updateMessage(Localization.lang("Finished copying"));

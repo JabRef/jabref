@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -20,9 +21,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
     public EditorTextArea(final String text) {
         super(text);
-
-        setMinHeight(1);
-        setMinWidth(200);
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
@@ -65,5 +63,32 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // not needed
+    }
+
+    /**
+     * Set pasteActionHandler variable to passed handler
+     * @param  handler an instance of PasteActionHandler that describes paste behavior
+     */
+    public void setPasteActionHandler(PasteActionHandler handler) {
+        Objects.requireNonNull(handler);
+        this.pasteActionHandler = handler;
+    }
+
+    /**
+     *  Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
+     */
+    @Override
+    public void paste() {
+        super.paste();
+        pasteActionHandler.handle();
+    }
+
+    /**
+     *  Interface presents user-described paste behaviour applying to paste method
+     */
+    @FunctionalInterface
+    public interface PasteActionHandler {
+
+        void handle();
     }
 }

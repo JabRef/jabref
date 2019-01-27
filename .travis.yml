@@ -48,7 +48,7 @@ before_script:
 script:
   # --scan enables the Gradle build scan, which can be used to investigate the time each action consumes
   # For more information see https://gradle.com/scans/get-started
-  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
+  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS -x checkstyleJmh -x checkstyleMain -x checkstyleTest --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
   - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport; bash <(curl -s https://codecov.io/bash); fi
@@ -72,3 +72,4 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+

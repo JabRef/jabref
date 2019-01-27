@@ -8,7 +8,6 @@ import java.util.List;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
-import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
@@ -44,12 +43,6 @@ public class OpenDatabase {
         }
 
         try {
-            if (!FileBasedLock.waitForFileLock(file.toPath())) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
-                        + "File is locked by another JabRef instance.");
-                return new ParserResult();
-            }
-
             ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
             pr.setFile(file);
             if (pr.hasWarnings()) {
@@ -70,7 +63,7 @@ public class OpenDatabase {
      * Opens a new database.
      */
     public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
-            throws IOException {
+        throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
                 importFormatPreferences.getEncoding());
 

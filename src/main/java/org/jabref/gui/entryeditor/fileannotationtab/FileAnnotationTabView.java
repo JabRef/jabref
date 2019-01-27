@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -63,7 +64,6 @@ public class FileAnnotationTabView {
         annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
         ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
-                .withTooltip(FileAnnotationViewModel::getMarking)
                 .withGraphic(this::createFileAnnotationNode);
         annotationList.setCellFactory(cellFactory);
         annotationList.setPlaceholder(new Label(Localization.lang("File has no attached annotations")));
@@ -94,12 +94,19 @@ public class FileAnnotationTabView {
         Label date = new Label(annotation.getDate());
         Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
-        marking.setStyle("-fx-font-weight: bold");
+        marking.setStyle("-fx-font-size: 0.75em; -fx-font-weight: bold");
         marking.setMaxHeight(30);
+
+        Tooltip markingTooltip = new Tooltip(annotation.getMarking());
+        markingTooltip.setMaxWidth(800);
+        markingTooltip.setWrapText(true);
+        marking.setTooltip(markingTooltip);
 
         // add alignment for text in the list
         marking.setTextAlignment(TextAlignment.LEFT);
         marking.setAlignment(Pos.TOP_LEFT);
+        marking.setMaxWidth(500);
+        marking.setWrapText(true);
         author.setTextAlignment(TextAlignment.LEFT);
         author.setAlignment(Pos.TOP_LEFT);
         date.setTextAlignment(TextAlignment.RIGHT);

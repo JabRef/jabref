@@ -1,6 +1,8 @@
 package org.jabref.gui.maintable;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,22 +15,32 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -47,35 +59,57 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final UndoManager undoManager;
 
     private final MainTableDataModel model;
+    private final NewDroppedFileHandler fileHandler;
+    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+                     BasePanel panel, BibDatabaseContext database,
+                     MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
+
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
+        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
+                                                Globals.prefs.getFilePreferences(),
+                                                Globals.prefs.getImportFormatPreferences(),
+                                                Globals.prefs.getUpdateFieldPreferences(),
+                                                Globals.getFileUpdateMonitor()
+
+        );
+
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
+
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                .withOnMouseClickedEvent((entry, event) -> {
-                    if (event.getClickCount() == 2) {
-                        panel.showAndEdit(entry.getEntry());
-                    }
-                })
-                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
-                .setOnDragDetected(this::handleOnDragDetected)
-                .setOnMouseDragEntered(this::handleOnDragEntered)
-                .install(this);
+                                                              .withOnMouseClickedEvent((entry, event) -> {
+                                                                  if (event.getClickCount() == 2) {
+                                                                      panel.showAndEdit(entry.getEntry());
+                                                                  }
+                                                              })
+                                                              .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
+                                                              .setOnDragDetected(this::handleOnDragDetected)
+                                                              .setOnDragDropped(this::handleOnDragDropped)
+                                                              .setOnDragOver(this::handleOnDragOver)
+                                                              .setOnMouseDragEntered(this::handleOnDragEntered)
+                                                              .install(this);
+
+        /*for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
+            Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
+            column.ifPresent(col -> {
+                col.setSortType(entries.getValue());
+                this.getSortOrder().add(col);
+            });
+        }*/
 
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.setItems(model.getEntriesFiltered());
-
+        this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
-        model.bindComparator(this.comparatorProperty());
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         this.panel = panel;
 
@@ -88,12 +122,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
 
-        // TODO: enable DnD
-        //setDragEnabled(true);
-        //TransferHandler xfer = new EntryTableTransferHandler(this, frame, panel);
-        //setTransferHandler(xfer);
-        //pane.setTransferHandler(xfer);
-
         // TODO: Float marked entries
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
@@ -101,12 +129,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
-        findEntry(bibEntry)
-                .ifPresent(entry -> {
-                    getSelectionModel().clearSelection();
-                    getSelectionModel().select(entry);
-                    scrollTo(entry);
-                });
+        findEntry(bibEntry).ifPresent(entry -> {
+            getSelectionModel().clearSelection();
+            getSelectionModel().select(entry);
+            scrollTo(entry);
+        });
     }
 
     public void copy() {
@@ -210,6 +237,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
+    private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
+        if ((event.getGestureSource() != originalItem) && localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+
+        }
+        if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
+            event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+        }
+        event.consume(); //need to consume it here to stop the DnDTabPane from getting the event
+
+    }
+
     private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {
         // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
         // We need to select all items between the starting row and the row where the user currently hovers the mouse over
@@ -222,6 +261,68 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void handleOnDragDetected(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseEvent event) {
         // Start drag'n'drop
         row.startFullDrag();
+
+        List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
+
+        //The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
+        //It doesn't work without
+        ClipboardContent content = new ClipboardContent();
+        Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+        content.put(DragAndDropDataFormats.ENTRIES, "");
+        dragboard.setContent(content);
+
+        if (!entries.isEmpty()) {
+            localDragboard.putBibEntries(entries);
+        }
+
+        event.consume();
+    }
+
+    private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
+
+        boolean success = false;
+
+        if (event.getDragboard().hasContent(DataFormat.FILES)) {
+
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+
+            List<Path> bibFiles = files.stream().filter(FileUtil::isBibFile).collect(Collectors.toList());
+
+            if (!bibFiles.isEmpty()) {
+                for (Path file : bibFiles) {
+                    fileHandler.importEntriesFromDroppedBibFiles(file);
+                }
+                success = true;
+
+            }
+            if (event.getGestureTarget() instanceof TableRow) {
+
+                BibEntry entry = originalItem.getEntry();
+
+                if ((event.getTransferMode() == TransferMode.MOVE)) {
+
+                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+                    fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
+                    success = true;
+                }
+
+                if (event.getTransferMode() == TransferMode.LINK) {
+                    LOGGER.debug("LINK"); //alt on win
+                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    success = true;
+
+                }
+                if (event.getTransferMode() == TransferMode.COPY) {
+                    LOGGER.debug("Mode Copy"); //ctrl on win
+                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    success = true;
+                }
+            }
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
+
     }
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
@@ -237,98 +338,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public BibEntry getEntryAt(int row) {
-        return model.getEntriesFiltered().get(row).getEntry();
+        return model.getEntriesFilteredAndSorted().get(row).getEntry();
     }
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                .getSelectedItems().stream()
-                .map(BibEntryTableViewModel::getEntry)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * This method sets up what Comparators are used for the various table columns.
-     * The ComparatorChooser enables and disables such Comparators as the user clicks
-     * columns, but this is where the Comparators are defined. Also, the ComparatorChooser
-     * is initialized with the sort order defined in Preferences.
-     */
-    private void setupComparatorChooser() {
-        // TODO: Proper sorting
-
-        /*
-        // Set initial sort columns:
-
-        // Default sort order:
-        String[] sortFields = new String[] {
-                Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD)
-        };
-        boolean[] sortDirections = new boolean[] {
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
-        }; // descending
-
-        model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().lock();
-        try {
-            for (int i = 0; i < sortFields.length; i++) {
-                int index = -1;
-
-                // TODO where is this prefix set?
-        //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
-                if (sortFields[i].startsWith("iconcol:")) {
-                    for (int j = 0; j < tableFormat.getColumnCount(); j++) {
-                        if (sortFields[i].equals(tableFormat.getColumnName(j))) {
-                            index = j;
-                            break;
-                        }
-                    }
-                } else {
-                    index = tableFormat.getColumnIndex(sortFields[i]);
-                }
-                if (index >= 0) {
-                    comparatorChooser.appendComparator(index, 0, sortDirections[i]);
-                }
-            }
-        } finally {
-            model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().unlock();
-        }
-
-        // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(e -> {
-            // Get the information about the current sort order:
-            List<String> fields = getCurrentSortFields();
-            List<Boolean> order = getCurrentSortOrder();
-            // Update preferences:
-            int count = Math.min(fields.size(), order.size());
-            if (count >= 1) {
-                Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-            }
-            if (count >= 2) {
-                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-            } else {
-                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-            }
-            if (count >= 3) {
-                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-            } else {
-                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-            }
-        });
-        */
+                                  .getSelectedItems()
+                                  .stream()
+                                  .map(BibEntryTableViewModel::getEntry)
+                                  .collect(Collectors.toList());
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFiltered().stream()
-                .filter(viewModel -> viewModel.getEntry().equals(entry))
-                .findFirst();
+        return model.getEntriesFilteredAndSorted()
+                    .stream()
+                    .filter(viewModel -> viewModel.getEntry().equals(entry))
+                    .findFirst();
     }
 
     /**

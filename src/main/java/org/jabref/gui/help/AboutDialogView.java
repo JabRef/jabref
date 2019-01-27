@@ -36,6 +36,10 @@ public class AboutDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
     }
 
+    public AboutDialogViewModel getViewModel() {
+        return viewModel;
+    }
+
     @FXML
     private void initialize() {
         viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);

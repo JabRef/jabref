@@ -2,6 +2,7 @@ package org.jabref.logic.net;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,6 +97,7 @@ public class URLDownload {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
+
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
@@ -249,8 +251,14 @@ public class URLDownload {
      * Takes the web resource as the source for a monitored input stream.
      */
     public ProgressInputStream asInputStream() throws IOException {
-        URLConnection urlConnection = this.openConnection();
-        long fileSize = urlConnection.getContentLength();
+        HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
+
+        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST))
+        {
+            LOGGER.error("Response message {} returned for url {}", urlConnection.getResponseMessage(), urlConnection.getURL());
+            return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
+        }
+        long fileSize = urlConnection.getContentLengthLong();
         return new ProgressInputStream(new BufferedInputStream(urlConnection.getInputStream()), fileSize);
     }
 
@@ -311,8 +319,8 @@ public class URLDownload {
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
                 if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("Location");
                     // open the new connnection again

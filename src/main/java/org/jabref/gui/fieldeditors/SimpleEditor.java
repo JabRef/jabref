@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -16,7 +15,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final SimpleEditorViewModel viewModel;
+    private final SimpleEditorViewModel viewModel;
+    private final TextInputControl textInput;
 
     public SimpleEditor(final String fieldName,
                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
@@ -25,10 +25,11 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final boolean isSingleLine) {
         this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
 
-        TextInputControl textInput = isSingleLine
+        textInput = isSingleLine
                 ? new EditorTextField()
                 : new EditorTextArea();
         HBox.setHgrow(textInput, Priority.ALWAYS);
+
         textInput.textProperty().bindBidirectional(viewModel.textProperty());
         ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getDefaultMenu(textInput));
         this.getChildren().add(textInput);
@@ -58,5 +59,10 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     @Override
     public Parent getNode() {
         return this;
+    }
+
+    @Override
+    public void requestFocus() {
+        textInput.requestFocus();
     }
 }

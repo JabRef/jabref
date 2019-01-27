@@ -147,9 +147,9 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : Paths.get(fileName).toString();
             if (copyRadioButton.isSelected()) {
@@ -199,9 +199,9 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -284,9 +284,9 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
-                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
-                    .toString();
+            destFilename = FileUtil.relativize(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()))
+                                   .toString();
         } else {
             if (renameCheckBox.isSelected() || (single == null)) {
                 destFilename = fileName;
@@ -325,7 +325,7 @@ public class DroppedFileHandler {
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
 
         Optional<Path> dir = panel.getBibDatabaseContext()
-                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+                                  .getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
         if (!dir.isPresent()) {
             destDirLabel.setText(Localization.lang("File directory is not set or does not exist!"));
@@ -416,7 +416,7 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             List<Path> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+                                   .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -475,7 +475,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename, NamedCompound edits) {
         Optional<Path> dir = panel.getBibDatabaseContext()
-                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+                                  .getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
         if (dir.isPresent()) {
             Path destFile = dir.get().resolve(destFilename);
@@ -522,7 +522,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
         List<String> dirs = panel.getBibDatabaseContext()
-                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                 .getFileDirectories(Globals.prefs.getFilePreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

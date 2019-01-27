@@ -1,42 +1,29 @@
 package org.jabref.gui;
 
-
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.testutils.category.GUITest;
-
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.timing.Condition;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.assertj.swing.timing.Pause.pause;
 
-@RunWith(Parameterized.class)
-@Category(GUITest.class)
+@Tag("GUITest")
 public class IdFetcherDialogTest extends AbstractUITest {
 
-    private final String databaseMode, fetcherType, fetchID;
-
-    public IdFetcherDialogTest(String databaseMode, String fetcherType, String fetchID) {
-        this.databaseMode = databaseMode;
-        this.fetcherType = fetcherType;
-        this.fetchID = fetchID;
-    }
-
-    @Test
-    public void insertEmptySearchID() {
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void insertEmptySearchID(String databaseMode, String fetcherType, String fetchID) {
         mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
         JTableFixture entryTable = mainFrame.table();
 
@@ -76,8 +63,9 @@ public class IdFetcherDialogTest extends AbstractUITest {
         entryTable.requireRowCount(0);
     }
 
-    @Test
-    public void testFetcherDialog() {
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void testFetcherDialog(String databaseMode, String fetcherType, String fetchID) {
         mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
         JTableFixture entryTable = mainFrame.table();
 
@@ -122,15 +110,12 @@ public class IdFetcherDialogTest extends AbstractUITest {
         entryTable.requireRowCount(1);
     }
 
-
-    @Parameterized.Parameters(name = "{index}: {0} : {1} : {2}")
-    public static Collection<Object[]> instancesToTest() {
-        return Arrays.asList(
+    public static Stream<Object[]> instancesToTest() {
+        return Stream.of(
                 new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
                 new Object[]{"biblatex", "DOI", "10.1002/9781118257517"},
                 new Object[]{"BibTeX", "ISBN", "9780321356680"},
                 new Object[]{"biblatex", "ISBN", "9780321356680"}
         );
     }
-
 }

@@ -13,7 +13,7 @@ public class CustomJFXPanel {
 
     public static JFXPanel wrap(Scene scene) {
         JFXPanel container = new JFXPanel();
-        Globals.getThemeLoader().installBaseCss(scene);
+        Globals.getThemeLoader().installCss(scene, Globals.prefs);
         DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
         return container;
     }

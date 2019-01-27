@@ -53,7 +53,7 @@ public class Localization {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
             LOGGER.error("Messages are not initialized before accessing key: " + key);
-            setLanguage("en");
+            setLanguage(Language.English);
         }
         return lookup(localizedMessages, key, params);
     }
@@ -64,12 +64,12 @@ public class Localization {
      *
      * @param language Language identifier like "en", "de", etc.
      */
-    public static void setLanguage(String language) {
-        Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
+    public static void setLanguage(Language language) {
+        Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (!knownLanguage.isPresent()) {
             LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
-            setLanguage("en");
+            setLanguage(Language.English);
             return;
         }
         // avoid reinitialization of the language bundles
@@ -86,7 +86,7 @@ public class Localization {
         } catch (MissingResourceException ex) {
             // should not happen as we have scripts to enforce this
             LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", ex);
-            setLanguage("en");
+            setLanguage(Language.English);
         }
     }
 
@@ -98,7 +98,7 @@ public class Localization {
     public static LocalizationBundle getMessages() {
         // avoid situations where this function is called before any language was set
         if (locale == null) {
-            setLanguage("en");
+            setLanguage(Language.English);
         }
         return localizedMessages;
     }

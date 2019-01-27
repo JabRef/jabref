@@ -12,9 +12,9 @@ public class PushToVimSettings extends PushToApplicationSettings {
     private final JTextField vimServer = new JTextField(30);
 
     @Override
-    public JPanel getSettingsPanel() {
+    public JPanel getSettingsPanel(int n) {
         vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        return super.getSettingsPanel();
+        return super.getSettingsPanel(n);
     }
 
     @Override

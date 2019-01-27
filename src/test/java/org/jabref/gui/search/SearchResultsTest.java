@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 
 import org.jabref.testutils.TestUtils;
-import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.ComponentFinder;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
@@ -13,17 +12,16 @@ import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
-@Category(GUITest.class)
+@Tag("GUITest")
 public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
     private FrameFixture frameFixture;
 
-
-    @BeforeClass
+    @BeforeAll
     public static void before() {
         FailOnThreadViolationRepaintManager.uninstall();
     }
@@ -95,5 +93,4 @@ public class SearchResultsTest extends AssertJSwingJUnitTestCase {
         Assert.assertTrue(entries.stream().noneMatch(entry -> entry.isSearchHit()));
         */
     }
-
 }

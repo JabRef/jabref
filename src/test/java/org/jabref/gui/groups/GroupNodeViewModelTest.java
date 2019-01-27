@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -153,11 +154,11 @@ public class GroupNodeViewModelTest {
     @Test
     public void entriesAreAddedCorrectly() {
         String groupName = "group";
-        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT,',');
+        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
         model.addEntriesToGroup(databaseContext.getEntries());
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
@@ -165,10 +166,10 @@ public class GroupNodeViewModelTest {
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
     }
 
     private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
     }
 }

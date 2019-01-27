@@ -228,7 +228,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_IEEEXPLORE;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 }

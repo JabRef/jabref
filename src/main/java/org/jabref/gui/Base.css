@@ -10,6 +10,7 @@
     -jr-theme: #50618F;
     -jr-accent: #a3b7e6;
     -jr-selected: -jr-accent;
+    -jr-checked: -jr-theme;
     -jr-hover: #0002;
 
     /* The base gray. Most gray-tones in the application are derived from this color. */
@@ -241,11 +242,13 @@
 /*
  * The base css file defining the style that is valid for every pane and dialog.
  */
+
 .hyperlink {
     -fx-padding: 0;
     -fx-underline: false;
     -fx-border-style: null;
     -fx-border-color: null;
+    -fx-text-fill: -jr-theme;
 }
 
 .hyperlink:visited {
@@ -282,57 +285,136 @@
     -fx-font-family: monospace;
 }
 
-.flatButtonNoSpaceBottom,
-.flatButtonNoSpaceTop,
-.flatButton {
-    -fx-shadow-highlight-color: black;
-    -fx-outer-border: red;
-    -fx-inner-border: purple;
-    -fx-faint-focus-color: transparent;
-    -fx-background-color: -jr-icon-background;
-    -fx-text-background-color: blue;
-    -fx-padding: 0.5em;
-}
-
-.flatButtonNoSpaceBottom:hover,
-.flatButtonNoSpaceTop:hover,
-.flatButton:hover {
-    -fx-background-color: -jr-icon-background-active;
-}
-
-.flatButtonNoSpaceBottom:armed,
-.flatButtonNoSpaceTop:armed,
-.flatButton:armed {
-    -fx-background-color: -jr-icon-background-armed;
-}
-
-.flatButton:selected {
-    -fx-background-color: -jr-icon-background-active;
-    -fx-text-fill: white;
-    -fx-fill: white;
-}
-
-.flatButtonNoSpaceBottom {
-    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
-}
-
-.flatButtonNoSpaceTop {
-    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
-}
-
 .button,
 .toggle-button,
 .radio-button > .radio,
 .check-box > .box,
 .menu-button,
 .choice-box,
-.color-picker.split-button > .color-picker-label,
 .combo-box-base,
 .combo-box-base:editable > .arrow-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0, 0, 0, 0.23);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+}
+
+.button:focused,
+.button:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+}
+
+.button:default {
+    -fx-background-color: -fx-default-button;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-fx-default-button, -10%);
+}
+
+.button:default:focused,
+.button:default:pressed {
+    -fx-background-color: derive(-fx-default-button, -20%);
+}
+
+.text-button {
+    -fx-border-width: 0px;
+}
+
+.contained-button {
+    -fx-background-color: -jr-accent;
+    -fx-border-color: -jr-accent;
+}
+
+.icon-buttonNoSpaceBottom,
+.icon-buttonNoSpaceTop,
+.icon-button {
+    -fx-border-width: 0px;
+    -fx-background-color: -jr-icon-background;
+    -fx-padding: 0.5em;
+}
+
+.icon-buttonNoSpaceBottom:hover,
+.icon-buttonNoSpaceTop:hover,
+.icon-button:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.icon-buttonNoSpaceBottom:armed,
+.icon-buttonNoSpaceTop:armed,
+.icon-button:armed {
+    -fx-background-color: -jr-icon-background-armed;
+}
+
+.icon-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.icon-buttonNoSpaceBottom {
+    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
+}
+
+.icon-buttonNoSpaceTop {
+    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.check-box {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.check-box > .box {
+    -fx-border-color: rgba(0, 0, 0, 0.54);
+    -fx-border-width: 2px;
+    -fx-border-radius: 1px;
+    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
+}
+
+.check-box:selected > .box {
+    -fx-background-insets: 2px;
+    -fx-border-color: -jr-checked;
+    -fx-background-color: -jr-checked;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
+    -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
+    -fx-stroke-width: 5;
+}
+
+.radio-button > .radio {
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
+    -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
+    -fx-background-insets: 0, 2px;
+}
+
+.radio-button:selected > .radio {
+    -fx-background-color: -jr-checked, -fx-background;
+}
+
+.radio-button > .radio > .dot {
+    -fx-padding: 0.25em; /* radius of the inner dot when selected */
+    -fx-background-insets: 0;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -jr-checked;
 }
 
 .menu-bar {
@@ -463,9 +545,9 @@
 .table-view:focused,
 .tree-table-view:focused,
 .html-editor:contains-focus {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
-    -fx-background-insets: 0, 1;
-    -fx-background-radius: 0, 0;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
 }
 
 /* Selected rows */
@@ -490,8 +572,7 @@
     -fx-background: -jr-selected;
     -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
-    -fx-fill: white;
-    -fx-text-fill: green;
+    -fx-text-fill: -jr-black;
 }
 
 .combo-box-base {
@@ -533,8 +614,11 @@
     -fx-text-fill: -fx-text-base-color;
 }
 
+.stack-pane,
 .scroll-pane,
+.scroll-pane > .viewport,
 .split-pane {
+    -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
@@ -546,8 +630,10 @@
 }
 
 .text-input:focused {
+    -fx-highlight-fill: derive(-jr-accent, 20%);
     -fx-background-color: -jr-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 .text-area {
@@ -604,6 +690,7 @@
     -fx-background-radius: 0em;
 }
 
+
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
     -fx-background-color: -jr-scrollbar-thumb;
@@ -651,7 +738,8 @@
 .tree-view:hover .scroll-bar,
 .table-view:hover .scroll-bar,
 .tree-table-view:hover .scroll-bar,
-.text-input:hover .scroll-bar {
+.text-input:hover .scroll-bar,
+.scroll-pane:hover .scroll-bar {
     -fx-opacity: 1;
 }
 
@@ -835,4 +923,55 @@ We want to have a look that matches our icons in the tool-bar */
 /* This is awful, but I don't know a better way*/
 .mainToolbar .context-menu * {
     -fx-background-color: -fx-control-inner-background;
+}
+
+#sidePane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.sidePaneComponent {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.jfx-snackbar-content {
+    -fx-background-color: -jr-gray-3;
+    -fx-background-radius: 4px;
+    -fx-padding: 0ex 0ex 0ex 0ex;
+}
+
+.jfx-snackbar-toast {
+    -fx-text-fill: -fx-light-text-color;
+    -fx-padding: -1ex -0.5ex -1ex -0.5ex;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -jr-theme;
+}
+
+.progress-bar:indeterminate > .bar {
+    -fx-background-color: -jr-theme;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -jr-accent;
+}
+
+.jfx-color-picker:armed,
+.jfx-color-picker:hover,
+.jfx-color-picker:focused,
+.jfx-color-picker {
+    -fx-background-color: transparent, transparent, transparent, transparent;
+    -fx-background-radius: 0px;
+    -fx-background-insets: 0px;
+    -fx-effect: null;
+}
+
+.color-palette {
+    -fx-background-color: -fx-background;
+    -fx-background-radius: 0px;
+    -fx-background-insets: 0px;
+}
+
+.color-palette-region .button {
+    -fx-border-width: 0px;
 }

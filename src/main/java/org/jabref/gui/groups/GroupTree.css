@@ -1,3 +1,8 @@
+#groupTree:focused,
+#groupTree:filled:selected {
+    -fx-background-color: -jr-sidepane-background;
+}
+
 .tree-table-view, .tree-table-row-cell {
     -fx-background-color: -jr-sidepane-background;
     -fx-table-cell-border-color: transparent; /* hide grid lines */

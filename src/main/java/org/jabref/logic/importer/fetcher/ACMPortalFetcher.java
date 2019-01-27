@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -31,8 +32,8 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ACM;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ACM);
     }
 
     private static String createQueryString(String query) {

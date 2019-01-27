@@ -1,10 +1,10 @@
 package org.jabref.logic.l10n;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,50 +21,43 @@ class LocalizationTest {
     void restoreDefaultLocale() {
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
-        Localization.setLanguage("en");
+        Localization.setLanguage(Language.English);
     }
 
     @Test
     void testSetKnownLanguage() {
         Locale.setDefault(Locale.CHINA);
-        Localization.setLanguage("en");
-        assertEquals("en", Locale.getDefault().toString());
-    }
-
-    @Test
-    void testSetUnknownLanguage() {
-        Locale.setDefault(Locale.CHINA);
-        Localization.setLanguage("WHATEVER");
+        Localization.setLanguage(Language.English);
         assertEquals("en", Locale.getDefault().toString());
     }
 
     @Test
     void testKnownTranslationWithGroups() {
-        Localization.setLanguage("en");
+        Localization.setLanguage(Language.English);
         assertEquals("Groups", Localization.lang("Groups"));
     }
 
     @Test
     void testKnownEnglishTranslationOfUndo() {
-        Localization.setLanguage("en");
+        Localization.setLanguage(Language.English);
         assertEquals("Undo", Localization.lang("Undo"));
     }
 
     @Test
     void testKnownGermanTranslation() {
-        Localization.setLanguage("de");
+        Localization.setLanguage(Language.German);
         assertEquals("Zeige Einstellungen", Localization.lang("Show preferences"));
     }
 
     @Test
     void testKnownTranslationWithCountryModifier() {
-        Localization.setLanguage("en_US");
-        assertEquals("Groups", Localization.lang("Groups"));
+        Localization.setLanguage(Language.BrazilianPortuguese);
+        assertEquals("Grupos", Localization.lang("Groups"));
     }
 
     @Test
     void testUnknownTranslation() {
-        Localization.setLanguage("en");
+        Localization.setLanguage(Language.English);
         assertEquals("WHATEVER", Localization.lang("WHATEVER"));
     }
 
@@ -72,5 +65,4 @@ class LocalizationTest {
     void testUnsetLanguageTranslation() {
         assertEquals("Groups", Localization.lang("Groups"));
     }
-
 }

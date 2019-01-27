@@ -8,8 +8,9 @@ import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class EntryAnnotationImporterTest {
 
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final BibEntry entry = new BibEntry("EntryKey");
+    private final BibEntry entry = new BibEntry(new CustomEntryType("EntryKey","required","optional"));
 
     @BeforeEach
     public void setUp() {
@@ -37,7 +38,7 @@ public class EntryAnnotationImporterTest {
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
         //when
-        Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FileDirectoryPreferences.class));
+        Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FilePreferences.class));
 
         //then
         int fileCounter = 0;

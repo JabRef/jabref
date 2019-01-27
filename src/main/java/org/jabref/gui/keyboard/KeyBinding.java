@@ -11,6 +11,7 @@ public enum KeyBinding {
     CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "ctrl+F8", KeyBindingCategory.QUALITY),
     CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "alt+F8", KeyBindingCategory.QUALITY),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
+    CLOSE_ENTRY("Close entry", Localization.lang("Close entry"), "ctrl+E", KeyBindingCategory.VIEW),
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
@@ -24,6 +25,7 @@ public enum KeyBinding {
     ENTRY_EDITOR_PREVIOUS_PANEL_2("Entry editor, previous panel 2", Localization.lang("Entry editor, previous panel 2"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
+    DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Look up full text documents", Localization.lang("Look up full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
@@ -86,7 +88,8 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl+alt+shift+A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS);
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS),
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH);
 
     private final String constant;
     private final String localization;

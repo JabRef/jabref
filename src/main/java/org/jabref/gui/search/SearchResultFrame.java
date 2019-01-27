@@ -43,6 +43,7 @@ import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.icon.IconTheme;
@@ -81,9 +82,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchResultFrame {
 
-    private static final String[] FIELDS = new String[] {
-            FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
-    };
+    private static final String[] FIELDS = new String[] {FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL};
     private static final int DATABASE_COL = 0;
     private static final int FILE_COL = 1;
     private static final int URL_COL = 2;
@@ -110,7 +109,6 @@ public class SearchResultFrame {
     private final SearchQuery searchQuery;
     private final boolean globalSearch;
 
-
     public SearchResultFrame(JabRefFrame frame, String title, SearchQuery searchQuery, boolean globalSearch) {
         this.frame = Objects.requireNonNull(frame);
         this.searchQuery = searchQuery;
@@ -124,25 +122,24 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImages(IconTheme.getLogoSet());
 
-        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService(), ExternalFileTypes.getInstance());
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
-                new EntryTableFormat());
+                                                                                                       new EntryTableFormat());
         entryTable = new JTable(model);
 
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
         entryTable.setDefaultRenderer(String.class, renderer);
         setWidths();
-        TableComparatorChooser<BibEntry> tableSorter =
-                TableComparatorChooser.install(entryTable, sortedEntries,
-                        AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+        TableComparatorChooser<BibEntry> tableSorter = TableComparatorChooser.install(entryTable, sortedEntries,
+                                                                                      AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
         final DefaultEventSelectionModel<BibEntry> selectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedEntries);
+                                                                                                                           .eventSelectionModelWithThreadProxyList(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -154,6 +151,7 @@ public class SearchResultFrame {
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -170,24 +168,28 @@ public class SearchResultFrame {
         inputMap = entryTable.getInputMap();
         //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
         actionMap.put("selectNextColumnCell", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectNextEntry();
             }
         });
         actionMap.put("selectPreviousColumnCell", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectPreviousEntry();
             }
         });
         actionMap.put("selectNextRow", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectNextEntry();
             }
         });
         actionMap.put("selectPreviousRow", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectPreviousEntry();
@@ -197,6 +199,7 @@ public class SearchResultFrame {
         String selectFirst = "selectFirst";
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
         actionMap.put(selectFirst, new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent event) {
                 selectFirstEntry();
@@ -206,6 +209,7 @@ public class SearchResultFrame {
         String selectLast = "selectLast";
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
         actionMap.put(selectLast, new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent event) {
                 selectLastEntry();
@@ -213,6 +217,7 @@ public class SearchResultFrame {
         });
 
         actionMap.put("copy", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
@@ -232,6 +237,7 @@ public class SearchResultFrame {
         // override standard enter-action; enter opens the selected entry
         entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
         actionMap.put("Enter", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent ae) {
                 BibEntry entry = sortedEntries.get(entryTable.getSelectedRow());
@@ -240,6 +246,7 @@ public class SearchResultFrame {
         });
 
         searchResultFrame.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
@@ -259,6 +266,7 @@ public class SearchResultFrame {
         searchResultFrame.setLocation(searchPreferences.getSearchDialogPosX(), searchPreferences.getSearchDialogPosY());
 
         searchResultFrame.addComponentListener(new ComponentAdapter() {
+
             @Override
             public void componentResized(ComponentEvent e) {
                 new SearchPreferences(Globals.prefs)
@@ -269,8 +277,8 @@ public class SearchResultFrame {
             @Override
             public void componentMoved(ComponentEvent e) {
                 new SearchPreferences(Globals.prefs)
-                        .setSearchDialogPosX(searchResultFrame.getLocation().x)
-                        .setSearchDialogPosY(searchResultFrame.getLocation().y);
+                                                    .setSearchDialogPosX(searchResultFrame.getLocation().x)
+                                                    .setSearchDialogPosY(searchResultFrame.getLocation().y);
             }
         });
     }
@@ -518,7 +526,7 @@ public class SearchResultFrame {
                         description = flEntry.getLink();
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), description, flEntry.getLink(),
-                            flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
+                                                      flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
                     count++;
                 }
 
@@ -579,37 +587,36 @@ public class SearchResultFrame {
         public Object getColumnValue(BibEntry entry, int column) {
             if (column < PAD) {
                 switch (column) {
-                case DATABASE_COL:
-                    return entryHome.get(entry).getTabTitle();
-                case FILE_COL:
-                    if (entry.hasField(FieldName.FILE)) {
-                        FileListTableModel tmpModel = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(tmpModel::setContent);
-                        fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
-                        if (tmpModel.getRowCount() > 0) {
-                            if (tmpModel.getEntry(0).getType().isPresent()) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon().getSmallIcon());
-                            } else {
-                                fileLabel.setIcon(IconTheme.JabRefIcons.FILE.getSmallIcon());
+                    case DATABASE_COL:
+                        return entryHome.get(entry).getTabTitle();
+                    case FILE_COL:
+                        if (entry.hasField(FieldName.FILE)) {
+                            FileListTableModel tmpModel = new FileListTableModel();
+                            entry.getField(FieldName.FILE).ifPresent(tmpModel::setContent);
+                            fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
+                            if (tmpModel.getRowCount() > 0) {
+                                if (tmpModel.getEntry(0).getType().isPresent()) {
+                                    fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon().getSmallIcon());
+                                } else {
+                                    fileLabel.setIcon(IconTheme.JabRefIcons.FILE.getSmallIcon());
+                                }
                             }
+                            return fileLabel;
+                        } else {
+                            return null;
                         }
-                        return fileLabel;
-                    } else {
+                    case URL_COL: {
+                        Optional<String> urlField = entry.getField(FieldName.URL);
+                        if (urlField.isPresent()) {
+                            urlLabel.setToolTipText(urlField.get());
+                            return urlLabel;
+                        }
                         return null;
                     }
-                case URL_COL: {
-                    Optional<String> urlField = entry.getField(FieldName.URL);
-                    if (urlField.isPresent()) {
-                        urlLabel.setToolTipText(urlField.get());
-                        return urlLabel;
-                    }
-                    return null;
+                    default:
+                        return null;
                 }
-                default:
-                    return null;
-                }
-            }
-            else {
+            } else {
                 String field = FIELDS[column - PAD];
                 String fieldContent = entry.getLatexFreeField(field).orElse("");
 

@@ -1,9 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -71,40 +68,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         listView.setCellFactory(cellFactory);
 
-        setUpFilesDragAndDrop();
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
         setUpKeyBindings();
-    }
-
-    private void setUpFilesDragAndDrop() {
-        listView.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
-            }
-        });
-
-        listView.setOnDragDropped(event -> {
-            Dragboard dragboard = event.getDragboard();
-            boolean success = false;
-            ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
-
-            if (dragboard.hasFiles()) {
-                List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-                items.addAll(linkedFiles);
-                success = true;
-            }
-            event.setDropCompleted(success);
-            event.consume();
-        });
-
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.LINKED_FILE)) {
             event.acceptTransferModes(TransferMode.MOVE);
-        }
-        if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
         }
     }
 
@@ -143,10 +113,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             items.set(thisIdx, transferedItem);
             success = true;
         }
-        if (dragboard.hasFiles()) {
-            List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
-            items.addAll(linkedFiles);
-        }
+
         event.setDropCompleted(success);
         event.consume();
 
@@ -172,13 +139,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
-        acceptAutoLinkedFile.getStyleClass().setAll("flatButton");
+        acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeXMPMetadata = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.IMPORT);
         writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP-metadata to PDF.")));
         writeXMPMetadata.visibleProperty().bind(linkedFile.canWriteXMPMetadataProperty());
         writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());
-        writeXMPMetadata.getStyleClass().setAll("flatButton");
+        writeXMPMetadata.getStyleClass().setAll("icon-button");
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);

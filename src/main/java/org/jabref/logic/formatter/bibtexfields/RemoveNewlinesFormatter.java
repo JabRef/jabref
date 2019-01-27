@@ -10,7 +10,7 @@ import org.jabref.model.cleanup.Formatter;
  * Removes all line breaks in the string.
  */
 public class RemoveNewlinesFormatter extends Formatter {
-    private static final Pattern LINEBREAKS = Pattern.compile("(\r?\n|\r)");
+    private static final Pattern LINEBREAKS = Pattern.compile("\\R");
 
     @Override
     public String getName() {

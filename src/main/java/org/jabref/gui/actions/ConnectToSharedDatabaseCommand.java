@@ -1,7 +1,7 @@
 package org.jabref.gui.actions;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.shared.ConnectToSharedDatabaseDialog;
+import org.jabref.gui.shared.SharedDatabaseLoginDialogView;
 
 /**
  * Opens a shared database.
@@ -16,7 +16,6 @@ public class ConnectToSharedDatabaseCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        ConnectToSharedDatabaseDialog connectToSharedDatabaseDialog = new ConnectToSharedDatabaseDialog(jabRefFrame);
-        connectToSharedDatabaseDialog.setVisible(true);
+        new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
     }
 }

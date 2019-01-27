@@ -49,7 +49,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new TexGroup(name, context, filePath, auxParser, fileMonitor);
+            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor);
         } catch (IOException ex) {
             // This should never happen because we were able to monitor the file just fine until now
             LOGGER.error("Problem creating copy of group", ex);
@@ -59,9 +59,15 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         TexGroup group = (TexGroup) o;
         return Objects.equals(filePath, group.filePath);
     }

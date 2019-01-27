@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.customizefields.CustomizeGeneralFieldsDialogView">
+    <content>
+        <VBox prefHeight="300.0" prefWidth="650.0">
+            <children>
+                <Label text="%General Fields" />
+                <Label text="%Create custom fields for each BibTeX entry" />
+                <TextArea fx:id="fieldsTextArea" minHeight="200.0" minWidth="628.0" />
+                <Label text="%Format: Tab:field;field;... (e.g. General:url;pdf;note...)" />
+            </children>
+        </VBox>
+    </content>
+    <ButtonType fx:id="okButton" fx:constant="OK" />
+    <ButtonType fx:id="resetButton" buttonData="LEFT" text="%Default" />
+    <ButtonType fx:id="helpButton" text="%Help" />
+    <ButtonType fx:constant="CANCEL" />
+</DialogPane>

@@ -197,7 +197,7 @@ public class StringUtil {
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-        addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount, newline); // See
+        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline); // See
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
@@ -209,7 +209,7 @@ public class StringUtil {
                 result.append(newline);
                 result.append('\t');
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
+                String line = CharMatcher.whitespace().trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount, newline);
             }
         }

@@ -35,5 +35,4 @@ public class AuthorTest {
         assertEquals("Moore, O. and O. Moore and Moore, O. O.",
                 Author.addDotIfAbbreviation("Moore, O. and O. Moore and Moore, O. O."));
     }
-
 }

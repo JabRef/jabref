@@ -46,5 +46,4 @@ public class DBMSTypeTest {
         assertEquals(5432, DBMSType.POSTGRESQL.getDefaultPort());
         assertEquals(1521, DBMSType.ORACLE.getDefaultPort());
     }
-
 }

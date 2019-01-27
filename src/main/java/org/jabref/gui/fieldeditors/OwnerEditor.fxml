@@ -9,7 +9,7 @@
          fx:controller="org.jabref.gui.fieldeditors.OwnerEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button onAction="#setOwner"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="OWNER"/>
         </graphic>

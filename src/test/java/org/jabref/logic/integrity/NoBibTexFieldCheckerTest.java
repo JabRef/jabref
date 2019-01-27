@@ -9,27 +9,26 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-public class NoBibTexFieldCheckerTest {
+class NoBibTexFieldCheckerTest {
 
     private final NoBibtexFieldChecker checker = new NoBibtexFieldChecker();
 
     @Test
-    public void abstractIsNotRecognizedAsBiblatexOnlyField() {
+    void abstractIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("abstract", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void addressIsNotRecognizedAsBiblatexOnlyField() {
+    void addressIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("address", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void afterwordIsRecognizedAsBiblatexOnlyField() {
+    void afterwordIsRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("afterword", "test");
         IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "afterword");
@@ -38,35 +37,35 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
-    public void arbitraryNonBiblatexFieldIsNotRecognizedAsBiblatexOnlyField() {
+    void arbitraryNonBiblatexFieldIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("fieldNameNotDefinedInThebiblatexManual", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void commentIsNotRecognizedAsBiblatexOnlyField() {
+    void commentIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("comment", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void instituationIsNotRecognizedAsBiblatexOnlyField() {
+    void instituationIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("institution", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void journalIsNotRecognizedAsBiblatexOnlyField() {
+    void journalIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("journal", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void journaltitleIsRecognizedAsBiblatexOnlyField() {
+    void journaltitleIsRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("journaltitle", "test");
         IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "journaltitle");
@@ -75,14 +74,14 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
-    public void keywordsNotRecognizedAsBiblatexOnlyField() {
+    void keywordsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    public void locationIsRecognizedAsBiblatexOnlyField() {
+    void locationIsRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("location", "test");
         IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "location");
@@ -91,10 +90,9 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
-    public void reviewIsNotRecognizedAsBiblatexOnlyField() {
+    void reviewIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("review", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
-
 }

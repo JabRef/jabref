@@ -21,23 +21,20 @@ public class DBMSConnection implements DatabaseConnection {
     private final Connection connection;
     private final DBMSConnectionProperties properties;
 
+    public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
 
-    public DBMSConnection(DBMSConnectionProperties properties) throws SQLException, InvalidDBMSConnectionPropertiesException {
-
-        if (!properties.isValid()) {
+        if (!connectionProperties.isValid()) {
             throw new InvalidDBMSConnectionPropertiesException();
         }
-        this.properties = properties;
+        this.properties = connectionProperties;
 
         try {
             DriverManager.setLoginTimeout(3);
             // ensure that all SQL drivers are loaded - source: http://stackoverflow.com/a/22384826/873282
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
+            this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
 
-            this.connection = DriverManager.getConnection(
-                    properties.getType().getUrl(properties.getHost(), properties.getPort(), properties.getDatabase()),
-                    properties.getUser(), properties.getPassword());
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.

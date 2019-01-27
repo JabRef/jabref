@@ -90,7 +90,7 @@ public class SendAsEMailAction implements BaseAction {
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<Path> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
-                                                                      .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+                                                                      .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
         for (Path f : fileList) {
             attachments.add(f.toAbsolutePath().toString());
             if (openFolders) {

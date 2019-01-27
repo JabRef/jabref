@@ -12,16 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SilverPlatterImporterTest {
+class SilverPlatterImporterTest {
 
     private static final String FILE_ENDING = ".txt";
 
     private Importer testImporter;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         testImporter = new SilverPlatterImporter();
     }
 
@@ -37,30 +37,29 @@ public class SilverPlatterImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+    void testIsNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 
     @Test
-    public void testsGetExtensions() {
+    void testsGetExtensions() {
         assertEquals(StandardFileType.SILVER_PLATTER, testImporter.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    void testGetDescription() {
         assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
-
 }

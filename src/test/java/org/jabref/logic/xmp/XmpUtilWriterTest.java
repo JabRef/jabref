@@ -1,7 +1,7 @@
 package org.jabref.logic.xmp;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -13,23 +13,22 @@ import org.jabref.model.entry.Month;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XmpUtilWriterTest {
-
-    @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    private XmpPreferences xmpPreferences;
+@ExtendWith(TempDirectory.class)
+class XmpUtilWriterTest {
 
     private static BibEntry olly2018;
     private static BibEntry toral2006;
     private static BibEntry vapnik2000;
+    private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
 
@@ -79,8 +78,8 @@ public class XmpUtilWriterTest {
     /**
      * Create a temporary PDF-file with a single empty page.
      */
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
@@ -95,9 +94,9 @@ public class XmpUtilWriterTest {
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
     @Test
-    public void testWriteXmp() throws IOException, TransformerException {
+    void testWriteXmp(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
 
-        File pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf");
+        Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
         // read a bib entry from the tests before
         BibEntry entry = vapnik2000;
@@ -105,41 +104,39 @@ public class XmpUtilWriterTest {
         entry.setId("ID4711");
 
         // write the changed bib entry to the create PDF
-        XmpUtilWriter.writeXmp(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(pdfFile.toAbsolutePath().toString(), entry, null, xmpPreferences);
 
         // read entry again
-        List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.getPath(), xmpPreferences);
+        List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
 
         // compare the two entries
-        Assert.assertEquals(entry, entryWritten);
-
+        assertEquals(entry, entryWritten);
     }
 
     /**
      * Test, which writes multiple metadata entries to a PDF and reads them again to test the size.
      */
     @Test
-    public void testWriteMultipleBibEntries() throws IOException, TransformerException {
+    void testWriteMultipleBibEntries(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
 
-        File pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf");
+        Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
 
-        XmpUtilWriter.writeXmp(Paths.get(pdfFile.getAbsolutePath()), entries, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(Paths.get(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
 
-        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.getAbsolutePath()), xmpPreferences);
-        Assert.assertEquals(3, entryList.size());
-
+        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
+        assertEquals(3, entryList.size());
     }
 
-    private File createDefaultFile(String fileName) throws IOException {
+    private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
         // create a default PDF
-        File pdfFile = tempFolder.newFile(fileName);
+        Path pdfFile = tempDir.resolve(fileName);
         try (PDDocument pdf = new PDDocument()) {
             // Need a single page to open in Acrobat
             pdf.addPage(new PDPage());
-            pdf.save(pdfFile.getPath());
+            pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
         return pdfFile;

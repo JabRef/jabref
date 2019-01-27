@@ -5,14 +5,14 @@ import org.jabref.model.entry.BibEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MakeLabelWithoutDatabaseTest {
+class MakeLabelWithoutDatabaseTest {
 
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         entry = new BibEntry();
         entry.setField("author", "John Doe");
         entry.setField("year", "2016");
@@ -20,13 +20,13 @@ public class MakeLabelWithoutDatabaseTest {
     }
 
     @Test
-    public void makeLabelForFileSearch() {
+    void makeLabelForFileSearch() {
         String label = BibtexKeyGenerator.generateKey(entry, "auth");
         assertEquals("Doe", label);
     }
 
     @Test
-    public void makeEditorLabelForFileSearch() {
+    void makeEditorLabelForFileSearch() {
         BibEntry localEntry = new BibEntry();
         localEntry.setField("editor", "John Doe");
         localEntry.setField("year", "2016");
@@ -35,5 +35,4 @@ public class MakeLabelWithoutDatabaseTest {
         String label = BibtexKeyGenerator.generateKey(localEntry, "auth");
         assertEquals("Doe", label);
     }
-
 }

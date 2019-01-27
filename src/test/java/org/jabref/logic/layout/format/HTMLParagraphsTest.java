@@ -2,8 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLParagraphsTest {
 
@@ -17,7 +18,5 @@ public class HTMLParagraphsTest {
         assertEquals("<p>\nHello\nWorld\n</p>", f.format("Hello\nWorld"));
         assertEquals("<p>\nHello World\n</p>\n<p>\nWhat a lovely day\n</p>", f.format("Hello World\n   \nWhat a lovely day\n"));
         assertEquals("<p>\nHello World\n</p>\n<p>\nCould not be any better\n</p>\n<p>\nWhat a lovely day\n</p>", f.format("Hello World\n \n\nCould not be any better\n\nWhat a lovely day\n"));
-
     }
-
 }

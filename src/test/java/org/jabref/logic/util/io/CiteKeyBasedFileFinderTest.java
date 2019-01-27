@@ -10,20 +10,16 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
-public class CiteKeyBasedFileFinderTest {
+@ExtendWith(TempDirectory.class)
+class CiteKeyBasedFileFinderTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private BibEntry entry;
     private Path rootDir;
     private Path graphicsDir;
@@ -31,12 +27,12 @@ public class CiteKeyBasedFileFinderTest {
     private Path jpgFile;
     private Path pdfFile;
 
-    @Before
-    public void setUp() throws IOException {
-        entry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+    @BeforeEach
+    void setUp(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
+        entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setCiteKey("HipKro03");
 
-        rootDir = temporaryFolder.getRoot().toPath();
+        rootDir = temporaryFolder;
 
         Path subDir = Files.createDirectory(rootDir.resolve("Organization Science"));
         pdfsDir = Files.createDirectory(rootDir.resolve("pdfs"));
@@ -65,7 +61,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesInSubDirectories() throws Exception {
+    void findAssociatedFilesInSubDirectories() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Arrays.asList(graphicsDir, pdfsDir);
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
@@ -76,7 +72,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesIgnoresFilesStartingWithKeyButContinueWithText() throws Exception {
+    void findAssociatedFilesIgnoresFilesStartingWithKeyButContinueWithText() throws Exception {
         Files.createFile(pdfsDir.resolve("HipKro03a - Hello second paper.pdf"));
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
@@ -86,7 +82,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesFindsFilesStartingWithKey() throws Exception {
+    void findAssociatedFilesFindsFilesStartingWithKey() throws Exception {
         Path secondPdfFile = Files.createFile(pdfsDir.resolve("HipKro03_Hello second paper.pdf"));
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
@@ -96,7 +92,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesInNonExistingDirectoryFindsNothing() throws Exception {
+    void findAssociatedFilesInNonExistingDirectoryFindsNothing() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
         CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
@@ -105,5 +101,4 @@ public class CiteKeyBasedFileFinderTest {
 
         assertEquals(Collections.emptyList(), results);
     }
-
 }

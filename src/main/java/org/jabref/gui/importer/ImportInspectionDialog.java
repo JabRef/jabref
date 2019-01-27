@@ -84,7 +84,6 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -144,7 +143,7 @@ import org.slf4j.LoggerFactory;
  * receiving this call).
  */
 
-public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
+public class ImportInspectionDialog extends JabRefDialog implements OutputPrinter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
@@ -168,7 +167,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      */
     private final List<BibEntry> entriesToDelete = new ArrayList<>();
     private final String undoName;
-    private final List<CallBack> callBacks = new ArrayList<>();
     private final boolean newDatabase;
     private final JPopupMenu popup = new JPopupMenu();
     private final JButton deselectAllDuplicates = new JButton(Localization.lang("Deselect all duplicates"));
@@ -200,7 +198,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImages(IconTheme.getLogoSet());
-        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService()));
+        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService(), ExternalFileTypes.getInstance()));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -286,7 +284,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         generate.setEnabled(false);
         ok.addActionListener(new OkListener());
         cancel.addActionListener(e -> {
-            signalStopFetching();
             dispose();
             frame.output(Localization.lang("Import canceled by user"));
         });
@@ -297,7 +294,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             generateKeys(); // Generate the keys.
         });
         stop.addActionListener(e -> {
-            signalStopFetching();
             entryListComplete();
         });
         selectAll.addActionListener(new SelectionButton(true));
@@ -343,29 +339,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
 
-    }
-
-    /* (non-Javadoc)
-     * @see package org.jabref.logic.importer.ImportInspector#setProgress(int, int)
-     */
-    @Override
-    public void setProgress(int current, int max) {
-        SwingUtilities.invokeLater(() -> {
-            progressBar.setIndeterminate(false);
-            progressBar.setMinimum(0);
-            progressBar.setMaximum(max);
-            progressBar.setValue(current);
-        });
-    }
-
-    /* (non-Javadoc)
-     * @see package org.jabref.logic.importer.ImportInspector#addEntry(org.jabref.model.entry.BibEntry)
-     */
-    @Override
-    public void addEntry(BibEntry entry) {
-        List<BibEntry> list = new ArrayList<>();
-        list.add(entry);
-        addEntries(list);
     }
 
     public void addEntries(Collection<BibEntry> entriesToAdd) {
@@ -559,14 +532,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         return action;
     }
 
-    public void addCallBack(CallBack cb) {
-        callBacks.add(cb);
-    }
-
-    private void signalStopFetching() {
-        callBacks.forEach(CallBack::stopFetching);
-    }
-
     private void setWidths() {
         TableColumnModel cm = glTable.getColumnModel();
         cm.getColumn(0).setPreferredWidth(55);
@@ -730,14 +695,12 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
 
-                        boolean continuePressed =
-                                DefaultTaskExecutor.runInJavaFXThread(() ->
-                                        frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                                                                                                                   Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                                                                                                                   Localization.lang("Continue"),
-                                                                                                                   Localization.lang("Cancel"),
-                                                                                                                   Localization.lang("Disable this confirmation dialog"),
-                                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
+                        boolean continuePressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                                                                                                                                                               Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                                                                                                                                                               Localization.lang("Continue"),
+                                                                                                                                                               Localization.lang("Cancel"),
+                                                                                                                                                               Localization.lang("Disable this confirmation dialog"),
+                                                                                                                                                               optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
 
                         if (!continuePressed) {
                             return;
@@ -1088,12 +1051,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
+                    DuplicateResolverResult result = diag.showAndWait().orElse(DuplicateResolverResult.BREAK);
+
                     ImportInspectionDialog.this.toFront();
-                    if (diag.getSelected() == DuplicateResolverResult.KEEP_LEFT) {
+                    if (result == DuplicateResolverResult.KEEP_LEFT) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1109,7 +1073,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                             entries.getReadWriteLock().writeLock().unlock();
                         }
 
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_RIGHT) {
+                    } else if (result == DuplicateResolverResult.KEEP_RIGHT) {
                         // Remove the entry from the import inspection dialog.
                         entries.getReadWriteLock().writeLock().lock();
                         try {
@@ -1117,7 +1081,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_BOTH) {
+                    } else if (result == DuplicateResolverResult.KEEP_BOTH) {
                         // Do nothing.
                         entries.getReadWriteLock().writeLock().lock();
                         try {
@@ -1125,7 +1089,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_MERGE) {
+                    } else if (result == DuplicateResolverResult.KEEP_MERGE) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1149,12 +1113,11 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 // Check if the duplicate is of another entry in the import:
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), first,
                                                                                other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
                     ImportInspectionDialog.this.toFront();
-                    DuplicateResolverResult answer = diag.getSelected();
+                    DuplicateResolverResult answer = diag.showAndWait().get();
                     if (answer == DuplicateResolverResult.KEEP_LEFT) {
                         entries.remove(other.get());
                         first.setGroupHit(false);
