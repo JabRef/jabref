@@ -12,13 +12,14 @@ apps:
   jabref:
     command: desktop-launch java -jar $SNAP/jar/JabRef-$SNAP_VERSION.jar
     environment:
-      JAVA_OPTS: "-Djava.util.prefs.systemRoot=$SNAP_USER_DATA/.java -Djava.util.prefs.userRoot=$SNAP_USER_DATA/.java/.userPrefs"
+      _JAVA_OPTIONS: "-Djava.util.prefs.systemRoot=$SNAP_USER_DATA/.java/etc/.java -Djava.util.prefs.userRoot=$SNAP_USER_DATA/.java/.userPrefs"
     plugs:
       - desktop
       - desktop-legacy
       - wayland
       - unity7
       - home
+      - opengl
       - network-bind
 
 parts:
