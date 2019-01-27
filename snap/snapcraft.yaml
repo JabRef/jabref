@@ -1,0 +1,35 @@
+name: jabref
+version: "git"
+version-script: cat build.gradle | grep "^version =" | cut -d'"' -f2
+#icon: snap/gui/icon.png
+summary: Bibliography manager
+description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+
+grade: devel
+confinement: strict
+
+apps:
+  jabref:
+    command: desktop-launch java -jar $SNAP/jar/JabRef-$SNAP_VERSION.jar
+    environment:
+      _JAVA_OPTIONS: "-Djava.util.prefs.systemRoot=$SNAP_USER_DATA/.java/etc/.java -Djava.util.prefs.userRoot=$SNAP_USER_DATA/.java/.userPrefs"
+    plugs:
+      - desktop
+      - desktop-legacy
+      - wayland
+      - unity7
+      - home
+      - opengl
+      - network-bind
+
+parts:
+  jabref:
+    plugin: gradle
+    source: .
+    stage-packages:
+      - openjdk-8-jre
+      - openjfx
+      - x11-utils
+    gradle-options: [snapJar]
+    gradle-output-dir: 'build/releases'
+    after: [desktop-gtk3]
