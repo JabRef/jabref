@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -58,4 +59,10 @@ public interface PreferencesService {
     void setExportWorkingDirectory(String layoutFileDirString);
 
     String getExportWorkingDirectory();
+
+    Charset getDefaultEncoding();
+
+    void setDefaultEncoding(Charset encoding);
+
+    String getUser();
 }

@@ -1,7 +1,7 @@
 package org.jabref.gui.dbproperties;
 
 import java.nio.charset.Charset;
-import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -13,9 +13,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.PreferencesService;
 
 public class LibraryPropertiesDialogViewModel {
 
@@ -25,15 +28,25 @@ public class LibraryPropertiesDialogViewModel {
     private final ObjectProperty<Charset> selectedEncodingPropety = new SimpleObjectProperty<>(Encodings.getCharsets().get(0));
     private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
+    private final MetaData metaData;
+    private final PreferencesService preferencesService;
 
-    public LibraryPropertiesDialogViewModel(DialogService dialogService, Path workingDir) {
+    private String oldUserSpecificFileDir;
+    private String oldGeneralFileDir;
+    private boolean oldLibraryProtected;
+
+    public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
+        this.preferencesService = preferencesService;
 
         directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                 .withInitialDirectory(workingDir).build();
+                                                                                 .withInitialDirectory(preferencesService.getWorkingDir()).build();
+
     }
 
     public StringProperty generalFileDirectoryPropertyProperty() {
@@ -69,7 +82,36 @@ public class LibraryPropertiesDialogViewModel {
         return this.saveInSpecifiedOrderProperty;
     }
 
-    public void storeSettings() {
-        //TODO
+    public BooleanProperty libraryProtectedProperty() {
+        return this.libraryProtectedProperty;
+    }
+
+    public void setValues() {
+        Optional<Charset> charset = metaData.getEncoding();
+        selectedEncodingPropety.setValue(charset.orElse(preferencesService.getDefaultEncoding()));
+
+        Optional<String> fileD = metaData.getDefaultFileDirectory();
+        fileD.ifPresent(path -> generalFileDirectoryProperty.setValue(path.trim()));
+
+        Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
+        fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
+
+        oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
+        oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
+
+        libraryProtectedProperty.setValue(metaData.isProtected());
+        oldLibraryProtected = libraryProtectedProperty.getValue();
+    }
+
+    public boolean generalFileDirChanged() {
+        return !oldGeneralFileDir.equals(generalFileDirectoryProperty.getValue());
+    }
+
+    public boolean userFileDirChanged() {
+        return !oldUserSpecificFileDir.equals(userSpecificFileDirectoryProperty.getValue());
+    }
+
+    public boolean protectedValueChanged() {
+        return !oldLibraryProtected == libraryProtectedProperty.getValue();
     }
 }
