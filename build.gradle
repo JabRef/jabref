@@ -97,7 +97,7 @@ repositories {
 configurations {
     antlr3
     antlr4
-    errorprone
+    //errorprone
 }
 
 dependencies {
