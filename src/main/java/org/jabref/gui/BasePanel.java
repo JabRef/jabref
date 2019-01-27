@@ -1345,39 +1345,41 @@ public class BasePanel extends StackPane {
     /**
      * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
      * harvest words from the entry
+     * Actual methods for autocomplete indexing  must run in javafx thread
      */
     private class SearchAutoCompleteListener {
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
-            searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry());
+            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry()));
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry());
+            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry()));
         }
     }
 
     /**
      * Ensures that the results of the current search are updated when a new entry is inserted into the database
+     * Actual methods for performing search must run in javafx thread
      */
     private class SearchListener {
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 
         @Subscribe
         public void listen(EntryRemovedEvent removedEntryEvent) {
             // IMO only used to update the status (found X entries)
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
     }
 
