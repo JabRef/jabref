@@ -17,12 +17,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-
-<DialogPane prefHeight="516.0" prefWidth="922.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.dbproperties.LibraryPropertiesDialogView">
+<DialogPane minHeight="-Infinity" prefHeight="784.0" prefWidth="921.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.dbproperties.LibraryPropertiesDialogView">
    <content>
-      <VBox fx:id="contentVbox" prefHeight="200.0" prefWidth="100.0">
+      <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
          <children>
-            <GridPane>
+            <GridPane minHeight="-Infinity">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="218.0" minWidth="10.0" prefWidth="200.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="797.0" minWidth="10.0" prefWidth="529.0" />
@@ -37,9 +36,15 @@
                <children>
                   <Label text="Library encoding" />
                   <ComboBox fx:id="encoding" prefWidth="250.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                  <Label text="General file directory" GridPane.rowIndex="2" />
+                  <TextField fx:id="generalFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button fx:id="browseGeneralFileDir" mnemonicParsing="false" onAction="#browseGeneralFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label text="User-specific file directory" GridPane.rowIndex="3" />
+                  <TextField fx:id="userSpecificFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Button fx:id="browseUserSpefiicFileDir" mnemonicParsing="false" onAction="#browseUserSpecificFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
                      <children>
-                        <Label alignment="BOTTOM_LEFT" text="%Override default file directories" />
+                        <Label alignment="TOP_LEFT" text="%Override default file directories" />
                         <Separator halignment="LEFT" valignment="BOTTOM" HBox.hgrow="ALWAYS">
                            <opaqueInsets>
                               <Insets left="10.0" right="10.0" top="10.0" />
@@ -52,37 +57,12 @@
                            </padding>
                         </Separator>
                      </children>
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
                   </HBox>
-                  <Label text="General file directory" GridPane.rowIndex="2" />
-                  <TextField fx:id="generalFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Button fx:id="browseGeneralFileDir" mnemonicParsing="false" onAction="#browseGeneralFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                  <Label text="User-specific file directory" GridPane.rowIndex="3" />
-                  <TextField fx:id="userSpecificFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Button fx:id="browseUserSpefiicFileDir" mnemonicParsing="false" onAction="#browseUserSpecificFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                </children>
             </GridPane>
-            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
-               <children>
-                  <Label alignment="BOTTOM_LEFT" text="%Save sort order" />
-                  <Separator halignment="LEFT" valignment="BOTTOM" HBox.hgrow="ALWAYS">
-                     <opaqueInsets>
-                        <Insets left="10.0" right="10.0" top="10.0" />
-                     </opaqueInsets>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding>
-                  </Separator>
-               </children>
-            </HBox>
-            <VBox fx:id="saveOrdervbox">
-             <fx:define>
-              <ToggleGroup fx:id="saveOrderToggleGroup" />
+            <VBox fx:id="saveOrdervbox" minHeight="-Infinity">
+               <fx:define>
+                 <ToggleGroup fx:id="saveOrderToggleGroup" />
                </fx:define>
                <children>
                   <RadioButton fx:id="saveInOriginalOrder" mnemonicParsing="false" text="%Save entries in their original order" toggleGroup="$saveOrderToggleGroup" />
@@ -91,7 +71,7 @@
             </VBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
                <children>
-                  <Label alignment="BOTTOM_LEFT" text="%Library protection" />
+                  <Label alignment="TOP_LEFT" text="%Library protection" />
                   <Separator halignment="LEFT" valignment="BOTTOM" HBox.hgrow="ALWAYS">
                      <opaqueInsets>
                         <Insets left="10.0" right="10.0" top="10.0" />
@@ -108,7 +88,7 @@
             <CheckBox fx:id="protect" mnemonicParsing="false" text="%Refuse to save the library before external changes have been reviewed" />
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
                <children>
-                  <Label alignment="BOTTOM_LEFT" text="%Save actions" />
+                  <Label alignment="TOP_LEFT" text="%Save actions" />
                   <Separator halignment="LEFT" valignment="BOTTOM" HBox.hgrow="ALWAYS">
                      <opaqueInsets>
                         <Insets left="10.0" right="10.0" top="10.0" />

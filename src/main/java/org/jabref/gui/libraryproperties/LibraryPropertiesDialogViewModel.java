@@ -1,4 +1,4 @@
-package org.jabref.gui.dbproperties;
+package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package org.jabref.gui.dbproperties;
+package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -76,7 +76,8 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
 
-        encoding.valueProperty().bind(viewModel.selectedEncodingProperty());
+        encoding.itemsProperty().bind(viewModel.encodingsProperty());
+        encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
         saveOrderPanel = new SaveOrderConfigDisplay();
         saveOrdervbox.getChildren().add(saveOrderPanel.getJFXPanel());
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
