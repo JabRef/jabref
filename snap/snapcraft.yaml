@@ -31,6 +31,7 @@ parts:
   jabref:
     plugin: gradle
     source: .
+    source-type: git
     stage-packages:
       - openjdk-8-jre
       - openjfx
