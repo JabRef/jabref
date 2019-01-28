@@ -34,12 +34,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Library encoding" />
+                  <Label text="%Library encoding" />
                   <ComboBox fx:id="encoding" prefWidth="250.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                  <Label text="General file directory" GridPane.rowIndex="2" />
+                  <Label text="%General file directory" GridPane.rowIndex="2" />
                   <TextField fx:id="generalFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Button fx:id="browseGeneralFileDir" mnemonicParsing="false" onAction="#browseGeneralFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                  <Label text="User-specific file directory" GridPane.rowIndex="3" />
+                  <Label text="%User-specific file directory" GridPane.rowIndex="3" />
                   <TextField fx:id="userSpecificFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Button fx:id="browseUserSpefiicFileDir" mnemonicParsing="false" onAction="#browseUserSpecificFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                   <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
@@ -85,7 +85,7 @@
                   </Separator>
                </children>
             </HBox>
-            <CheckBox fx:id="protect" mnemonicParsing="false" text="%Refuse to save the library before external changes have been reviewed" />
+            <CheckBox fx:id="protect" mnemonicParsing="false" text="%Refuse to save the library before external changes have been reviewed." />
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
                <children>
                   <Label alignment="TOP_LEFT" text="%Save actions" />
