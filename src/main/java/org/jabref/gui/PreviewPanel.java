@@ -301,7 +301,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                                                         .doLayout(entry, databaseContext.getDatabase())));
             setPreviewLabel(sb.toString());
         } else if (basePanel.isPresent() && bibEntry.isPresent()) {
-            if (citationStyle != null && previewStyle != defaultPreviewStyle) {
+            if (citationStyle != null && !previewStyle.equals(defaultPreviewStyle)) {
                 basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
             }
             Future<?> citationStyleWorker = BackgroundTask
