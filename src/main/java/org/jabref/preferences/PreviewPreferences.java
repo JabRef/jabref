@@ -8,7 +8,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 public class PreviewPreferences {
 
     private final List<String> previewCycle;
-    private int previewCyclePosition;
+    private final int previewCyclePosition;
     private final Number previewPanelDividerPosition;
     private final boolean previewPanelEnabled;
     private final String previewStyle;
@@ -60,13 +60,13 @@ public class PreviewPreferences {
     }
 
     public static class Builder {
+
         private List<String> previewCycle;
         private int previeCyclePosition;
         private Number previewPanelDividerPosition;
         private boolean previewPanelEnabled;
         private String previewStyle;
         private final String previewStyleDefault;
-
 
         public Builder(PreviewPreferences previewPreferences) {
             this.previewCycle = previewPreferences.getPreviewCycle();
@@ -83,11 +83,15 @@ public class PreviewPreferences {
         }
 
         public Builder withPreviewCyclePosition(int position) {
-            previeCyclePosition = position;
-            while (previeCyclePosition < 0) {
-                previeCyclePosition += previewCycle.size();
+            if (previewCycle.isEmpty()) {
+                previeCyclePosition = 0;
+            } else {
+                previeCyclePosition = position;
+                while (previeCyclePosition < 0) {
+                    previeCyclePosition += previewCycle.size();
+                }
+                previeCyclePosition %= previewCycle.size();
             }
-            previeCyclePosition %= previewCycle.size();
             return this;
         }
 
