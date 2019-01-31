@@ -62,6 +62,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private final KeyBindingRepository keyBindingRepository;
 
     private String previewStyle;
+    private CitationStyle citationStyle;
     private final String defaultPreviewStyle = "Preview";
     private Optional<BasePanel> basePanel = Optional.empty();
 
@@ -224,13 +225,14 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         String style = previewPreferences.getCurrentPreviewStyle();
         if (previewStyle == null) {
             previewStyle = style;
+            CitationStyle.createCitationStyleFromFile(style).ifPresent(cs -> citationStyle = cs);
         }
         if (basePanel.isPresent() && !previewStyle.equals(style)) {
             if (CitationStyle.isCitationStyleFile(style)) {
                 layout = Optional.empty();
                 CitationStyle.createCitationStyleFromFile(style)
-                        .ifPresent(citationStyle -> {
-                            basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
+                        .ifPresent(cs -> {
+                            citationStyle = cs;
                             if (!init) {
                                 basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
                             }
@@ -299,6 +301,9 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                                                         .doLayout(entry, databaseContext.getDatabase())));
             setPreviewLabel(sb.toString());
         } else if (basePanel.isPresent() && bibEntry.isPresent()) {
+            if (citationStyle != null && !previewStyle.equals(defaultPreviewStyle)) {
+                basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
+            }
             Future<?> citationStyleWorker = BackgroundTask
                                                           .wrap(() -> basePanel.get().getCitationStyleCache().getCitationFor(bibEntry.get()))
                                                           .onRunning(() -> {

@@ -264,6 +264,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 .withPreviewCycle(styles)
                 .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
                 .build();
+        if (!chosen.getSelectionModel().isEmpty()) {
+            previewPreferences = previewPreferences.getBuilder().withPreviewCyclePosition(chosen.getSelectionModel().getSelectedIndex()).build();
+        }
         Globals.prefs.storePreviewPreferences(previewPreferences);
 
         // update preview
