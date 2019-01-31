@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
-import javax.swing.JPanel;
-import javax.swing.SwingWorker;
-
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -21,14 +19,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
@@ -38,11 +35,9 @@ import org.jabref.preferences.PreviewPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PreviewPrefsTab extends JPanel implements PrefsTab {
+public class PreviewPrefsTab implements PrefsTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPrefsTab.class);
-
-    private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
     private final ObservableList<Object> availableModel = FXCollections.observableArrayList();
     private final ObservableList<Object> chosenModel = FXCollections.observableArrayList();
@@ -61,25 +56,24 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final ScrollPane scrollPane = new ScrollPane(layout);
     private final DialogService dialogService;
     private final ExternalFileTypes externalFileTypes;
+    private final TaskExecutor taskExecutor;
+
+    private Task<List<CitationStyle>> citationDiscovery;
 
     public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes) {
         this.dialogService = dialogService;
         this.externalFileTypes = externalFileTypes;
+        this.taskExecutor = Globals.TASK_EXECUTOR;
         setupLogic();
         setupGui();
     }
 
     private void setupLogic() {
-        chosen.getSelectionModel().selectedItemProperty().addListener(event -> {
-            if (chosen.getSelectionModel().getSelectedIndices().isEmpty()) {
-                btnLeft.setDisable(true);
-                btnDown.setDisable(true);
-                btnUp.setDisable(true);
-            }
-        });
 
-        available.getSelectionModel().selectedItemProperty().addListener(
-                e -> btnRight.setDisable(available.getSelectionModel().getSelectedIndices().isEmpty()));
+        btnLeft.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
+        btnDown.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
+        btnUp.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
+        btnRight.disableProperty().bind(Bindings.isEmpty(available.getSelectionModel().getSelectedItems()));
 
         btnRight.setOnAction(event -> {
             for (Object object : available.getSelectionModel().getSelectedItems()) {
@@ -110,9 +104,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnDown.setOnAction(event -> {
             List<Integer> newSelectedIndices = new ArrayList<>();
-            ObservableList selectedIndices = chosen.getSelectionModel().getSelectedIndices();
+            ObservableList<Integer> selectedIndices = chosen.getSelectionModel().getSelectedIndices();
             for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-                int oldIndex = (int)selectedIndices.get(i);
+                int oldIndex = selectedIndices.get(i);
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
                 int newIndex = ((oldIndex < (chosenModel.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
@@ -122,41 +116,34 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
 
         btnDefault.setOnAction(event -> layout.setText(Globals.prefs.getPreviewPreferences()
-                .getPreviewStyleDefault()
-                .replace("__NEWLINE__", "\n")));
+                                                                    .getPreviewStyleDefault()
+                                                                    .replace("__NEWLINE__", "\n")));
 
         btnTest.setOnAction(event -> {
             try {
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    PreviewPanel testPane = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
-                    if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
-                        testPane.setFixedLayout(layout.getText());
-                        testPane.setEntry(TestEntry.getTestEntry());
-                    }
-                    else {
-                        int indexStyle = chosen.getSelectionModel().getSelectedIndex();
-                        PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
-                        preferences = new PreviewPreferences(preferences.getPreviewCycle(),indexStyle,preferences.getPreviewPanelDividerPosition(),preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(),preferences.getPreviewStyleDefault());
 
-                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService, externalFileTypes);
-                        testPane.setEntry(TestEntry.getTestEntry());
-                        testPane.updateLayout(preferences);
-                    }
+                PreviewPanel testPane = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
+                if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
+                    testPane.setFixedLayout(layout.getText());
+                    testPane.setEntry(TestEntry.getTestEntry());
+                } else {
+                    int indexStyle = chosen.getSelectionModel().getSelectedIndex();
+                    PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
+                    preferences = new PreviewPreferences(preferences.getPreviewCycle(), indexStyle, preferences.getPreviewPanelDividerPosition(), preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(), preferences.getPreviewStyleDefault());
 
-                    DialogPane pane = new DialogPane();
-                    pane.setContent(testPane);
+                    testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService, externalFileTypes);
+                    testPane.setEntry(TestEntry.getTestEntry());
+                    testPane.updateLayout(preferences);
+                }
 
-                    dialogService.showCustomDialogAndWait(Localization.lang("Preview"), pane, ButtonType.OK);
+                DialogPane pane = new DialogPane();
+                pane.setContent(testPane);
 
-                });
+                dialogService.showCustomDialogAndWait(Localization.lang("Preview"), pane, ButtonType.OK);
 
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
-
-              DefaultTaskExecutor.runInJavaFXThread(()->  dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"),
-                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"),
-                        exception));
-
+                dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
             }
         });
     }
@@ -167,9 +154,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnLeft.setPrefSize(80, 20);
         btnUp.setPrefSize(80, 20);
         btnDown.setPrefSize(80, 20);
-        vBox.getChildren().addAll(new Label(""),  new Label(""), new Label(""), new Label(""), new Label(""),
-                new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
-                btnUp, btnDown);
+        vBox.getChildren().addAll(new Label(""), new Label(""), new Label(""), new Label(""), new Label(""),
+                                  new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
+                                  btnUp, btnDown);
         Label currentPreview = new Label(Localization.lang("Current Preview"));
         currentPreview.getStyleClass().add("sectionHeader");
         gridPane.add(currentPreview, 1, 1);
@@ -180,8 +167,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         gridPane.add(btnDefault, 3, 6);
         layout.setPrefSize(600, 300);
         gridPane.add(scrollPane, 1, 9);
+
     }
 
+    @Override
     public Node getBuilder() {
         return gridPane;
     }
@@ -212,39 +201,27 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             availableModel.add(Localization.lang("Preview"));
         }
 
-        btnLeft.setDisable(!chosen.getSelectionModel().getSelectedItems().isEmpty());
-        btnRight.setDisable(available.getSelectionModel().getSelectedIndices().isEmpty());
-        btnUp.setDisable(!chosen.getSelectionModel().getSelectedIndices().isEmpty());
-        btnDown.setDisable(!chosen.getSelectionModel().getSelectedIndices().isEmpty());
-
-        if (discoverCitationStyleWorker != null) {
-            discoverCitationStyleWorker.cancel(true);
+        if (citationDiscovery != null) {
+            citationDiscovery.cancel();
         }
+        citationDiscovery = new Task<List<CitationStyle>>() {
 
-        discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
             @Override
-            protected List<CitationStyle> doInBackground() throws Exception {
+            protected List<CitationStyle> call() throws Exception {
                 return CitationStyle.discoverCitationStyles();
             }
 
-            @Override
-            public void done() {
-                if (this.isCancelled()) {
-                    return;
-                }
-                try {
-                    get().stream()
-                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
-                            .sorted(Comparator.comparing(CitationStyle::getTitle))
-                            .forEach(availableModel::add);
-
-                    btnRight.setDisable(availableModel.isEmpty());
-                } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ");
-                }
-            }
         };
-        discoverCitationStyleWorker.execute();
+
+        citationDiscovery.setOnSucceeded(value -> {
+            citationDiscovery.getValue().stream()
+                             .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
+                             .sorted(Comparator.comparing(CitationStyle::getTitle))
+                             .forEach(availableModel::add);
+        });
+
+        citationDiscovery.setOnFailed(value -> LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", citationDiscovery.getException()));
+        taskExecutor.execute(citationDiscovery);
 
         layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
@@ -252,6 +229,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
         List<String> styles = new ArrayList<>();
+
+        if (chosenModel.isEmpty()) {
+            chosenModel.add(Localization.lang("Preview"));
+        }
         for (Object obj : chosenModel) {
             if (obj instanceof CitationStyle) {
                 styles.add(((CitationStyle) obj).getFilePath());
@@ -260,10 +241,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             }
         }
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCycle(styles)
-                .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
-                .build();
+                                                             .getBuilder()
+                                                             .withPreviewCycle(styles)
+                                                             .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
+                                                             .build();
         if (!chosen.getSelectionModel().isEmpty()) {
             previewPreferences = previewPreferences.getBuilder().withPreviewCyclePosition(chosen.getSelectionModel().getSelectedIndex()).build();
         }
