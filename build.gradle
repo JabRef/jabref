@@ -171,7 +171,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
     testCompile 'org.mockito:mockito-core:2.23.4'
-    testCompile 'com.github.tomakehurst:wiremock:2.20.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.21.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
