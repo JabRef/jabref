@@ -368,11 +368,13 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private void copyPreviewToClipBoard() {
         StringBuilder previewStringContent = new StringBuilder();
         Document document = previewView.getEngine().getDocument();
-        NodeList nodeList = document.getElementsByTagName("*");
 
+        NodeList nodeList = document.getElementsByTagName("html");
+
+        //Nodelist does not implement iterable
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            previewStringContent.append(element.getNodeValue()).append("\n");
+            previewStringContent.append(element.getTextContent());
         }
 
         ClipboardContent content = new ClipboardContent();
