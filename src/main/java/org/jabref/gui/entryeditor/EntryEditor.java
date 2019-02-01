@@ -300,7 +300,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new RelatedArticlesTab(preferences, dialogService));
 
         // Source tab
-        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);
+        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor, dialogService);
         tabs.add(sourceTab);
         return tabs;
     }

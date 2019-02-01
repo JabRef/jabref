@@ -30,4 +30,17 @@ public class TestEntry {
                 "This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.");
         return entry;
     }
+
+    public static BibEntry getTestEntryBook() {
+        BibEntry entry = new BibEntry(BibtexEntryTypes.BOOK);
+        entry.setCiteKey("Harrer2018");
+        entry.setField(FieldName.AUTHOR, "Simon Harrer and Jörg Lenhard and Linus Dietz");
+        entry.setField(FieldName.EDITOR, "Andrea Steward");
+        entry.setField(FieldName.TITLE, "Java by Comparison");
+        entry.setField(FieldName.YEAR, "2018");
+        entry.setField(FieldName.MONTH, "March");
+        entry.setField(FieldName.PUBLISHER, "Pragmatic Bookshelf");
+        entry.setField(FieldName.ADDRESS, "Raleigh, NC");
+        return entry;
+    }
 }

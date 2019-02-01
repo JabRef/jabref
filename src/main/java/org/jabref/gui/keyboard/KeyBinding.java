@@ -25,6 +25,7 @@ public enum KeyBinding {
     ENTRY_EDITOR_PREVIOUS_PANEL_2("Entry editor, previous panel 2", Localization.lang("Entry editor, previous panel 2"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
+    DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Look up full text documents", Localization.lang("Look up full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),

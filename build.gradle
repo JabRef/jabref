@@ -120,7 +120,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.13'
+    compile 'mysql:mysql-connector-java:8.0.14'
 
     compile 'org.postgresql:postgresql:42.2.5'
 
@@ -171,7 +171,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
     testCompile 'org.mockito:mockito-core:2.23.4'
-    testCompile 'com.github.tomakehurst:wiremock:2.20.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.21.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
@@ -181,7 +181,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.16'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.17'
 }
 
 jacoco {

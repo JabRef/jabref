@@ -860,7 +860,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this)),
 
                 new SeparatorMenuItem(),
@@ -925,24 +925,23 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         options.getItems().addAll(
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this)),
+                                  factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR)),
 
-                new SeparatorMenuItem(),
+                                  new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction()),
-                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction()),
-                factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
-                factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
-                factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
-                factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
+                                  factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction()),
+                                  factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction()),
+                                  factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction()),
+                                  factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
+                                  factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
+                                  factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
+                                  factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
 
-                new SeparatorMenuItem(),
+                                  new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
-        );
+                                  factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
+                                  factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
+                                  factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)));
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, HelpAction.getMainHelpPageCommand()),
