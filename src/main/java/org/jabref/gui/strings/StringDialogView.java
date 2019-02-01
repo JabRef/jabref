@@ -1,5 +1,7 @@
 package org.jabref.gui.strings;
 
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,7 +23,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.fxmisc.easybind.EasyBind;
 
 public class StringDialogView extends BaseDialog<Void> {
 
@@ -47,7 +51,10 @@ public class StringDialogView extends BaseDialog<Void> {
 
         Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
 
-        btnSave.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        ObservableList<ValidationStatus> labelsValid = EasyBind.map(viewModel.allStringsProperty(), StringViewModel::labelValidation).removeAll((ValidationStatus::isValid);
+        ObservableList<ValidationStatus> contentsValid = EasyBind.map(viewModel.allStringsProperty(), StringViewModel::contentValidation).filtered(ValidationStatus::isValid);
+
+        btnSave.disableProperty().bind(Bindings.isNotEmpty(labelsValid).or(Bindings.isNotEmpty(contentsValid)));
 
         setResultConverter(btn -> {
             if (saveButton.equals(btn)) {

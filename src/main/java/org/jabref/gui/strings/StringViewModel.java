@@ -20,10 +20,8 @@ public class StringViewModel {
 
     private final Function<String, ValidationMessage> function = input -> {
         if (input == null) {
-            System.out.println("Null checker");
-            return ValidationMessage.error("May not be null2");
+            return ValidationMessage.error("May not be null");
         } else if (input.trim().isEmpty()) {
-            System.out.println("Should not be empty");
             return ValidationMessage.error("Should not be empty");
         } else {
             return null; // everything is ok

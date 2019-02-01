@@ -36,7 +36,7 @@ class StringRemoveChangeViewModel extends ChangeViewModel {
 
         try {
             panel.getDatabase().removeString(inMem.getId());
-            undoEdit.addEdit(new UndoableRemoveString(panel, panel.getDatabase(), string));
+            undoEdit.addEdit(new UndoableRemoveString(panel.getDatabase(), string));
         } catch (Exception ex) {
             LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }

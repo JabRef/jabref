@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -16,13 +15,10 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
     private final BibDatabase base;
     private final BibtexString string;
 
-    private final BasePanel panel;
 
-    public UndoableRemoveString(BasePanel panel,
-            BibDatabase base, BibtexString string) {
+    public UndoableRemoveString(BibDatabase base, BibtexString string) {
         this.base = base;
         this.string = string;
-        this.panel = panel;
     }
 
     @Override
@@ -41,7 +37,6 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
             LOGGER.warn("Problem to undo `remove string`", ex);
         }
 
-        panel.updateStringDialog();
     }
 
     @Override
@@ -51,7 +46,6 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
         // Redo the change.
         base.removeString(string.getId());
 
-        panel.updateStringDialog();
     }
 
 }
