@@ -30,6 +30,7 @@ open module org.jabref {
 	requires javafx.web;
 	requires javafx.fxml;
 	requires afterburner.fx;
+	requires com.jfoenix;
 //	requires de.jensd.fx.glyphs.commons;
 //	requires de.jensd.fx.glyphs.materialdesignicons;
 
