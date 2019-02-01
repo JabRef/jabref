@@ -97,6 +97,7 @@ repositories {
 configurations {
     antlr3
     antlr4
+    libreoffice
     
     compile {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
@@ -122,10 +123,10 @@ dependencies {
     compile 'commons-cli:commons-cli:1.4'
 
     // TODO: LibreOffice has a split package, temporarily removed
-    /*compile "org.libreoffice:juh:5.4.2"
-    compile "org.libreoffice:jurt:5.4.2"
-    compile "org.libreoffice:ridl:5.4.2"
-    compile "org.libreoffice:unoil:5.4.2"*/
+    libreoffice "org.libreoffice:juh:5.4.2"
+    libreoffice "org.libreoffice:jurt:5.4.2"
+    libreoffice "org.libreoffice:ridl:5.4.2"
+    libreoffice "org.libreoffice:unoil:5.4.2"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.1.0'
@@ -554,4 +555,16 @@ task downloadDependencies {
             }
         }
     }
+}
+
+task bundleLibreOffice(type: Jar) {
+    from configurations.libreoffice.collect { zipTree it }
+
+    manifest {
+        attributes 'Automatic-Module-Name': 'org.jabref.thirdparty.libreoffice'
+    }
+
+    
+    destinationDir = file('lib')
+    archiveName = 'libreoffice.jar'
 }

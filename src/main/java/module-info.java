@@ -65,7 +65,5 @@ open module org.jabref {
     requires mvvmfx;
 
     // Libre Office
-	/*requires ridl;
-	requires unoil;
-	requires juh;*/
+	requires org.jabref.thirdparty.libreoffice;
 }
