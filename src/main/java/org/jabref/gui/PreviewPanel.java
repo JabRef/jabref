@@ -94,10 +94,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.keyBindingRepository = keyBindingRepository;
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
-                Globals.prefs.getFilePreferences(),
+                                                Globals.prefs.getFilePreferences(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                Globals.getFileUpdateMonitor());
+                                                Globals.getFileUpdateMonitor());
 
         // Set up scroll pane for preview pane
         setFitToHeight(true);
@@ -231,19 +231,19 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
             if (CitationStyle.isCitationStyleFile(style)) {
                 layout = Optional.empty();
                 CitationStyle.createCitationStyleFromFile(style)
-                        .ifPresent(cs -> {
-                            citationStyle = cs;
-                            if (!init) {
-                                basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                            }
-                        });
+                             .ifPresent(cs -> {
+                                 citationStyle = cs;
+                                 if (!init) {
+                                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                                 }
+                             });
                 previewStyle = style;
-            } else {
-                previewStyle = defaultPreviewStyle;
-                updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
-                if (!init) {
-                    basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
-                }
+            }
+        } else {
+            previewStyle = defaultPreviewStyle;
+            updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
+            if (!init) {
+                basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
             }
         }
 
@@ -301,7 +301,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                                                         .doLayout(entry, databaseContext.getDatabase())));
             setPreviewLabel(sb.toString());
         } else if (basePanel.isPresent() && bibEntry.isPresent()) {
-            if (citationStyle != null && !previewStyle.equals(defaultPreviewStyle)) {
+            if ((citationStyle != null) && !previewStyle.equals(defaultPreviewStyle)) {
                 basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
             }
             Future<?> citationStyleWorker = BackgroundTask
@@ -368,11 +368,13 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private void copyPreviewToClipBoard() {
         StringBuilder previewStringContent = new StringBuilder();
         Document document = previewView.getEngine().getDocument();
-        NodeList nodeList = document.getElementsByTagName("*");
 
+        NodeList nodeList = document.getElementsByTagName("html");
+
+        //Nodelist does not implement iterable
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            previewStringContent.append(element.getNodeValue()).append("\n");
+            previewStringContent.append(element.getTextContent());
         }
 
         ClipboardContent content = new ClipboardContent();
