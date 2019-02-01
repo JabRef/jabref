@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -26,6 +26,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -59,21 +60,21 @@ public class PreviewPrefsTab implements PrefsTab {
     private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
 
-    private Task<List<CitationStyle>> citationDiscovery;
-
-    public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes) {
+    public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.externalFileTypes = externalFileTypes;
-        this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.taskExecutor = taskExecutor;
         setupLogic();
         setupGui();
     }
 
     private void setupLogic() {
 
-        btnLeft.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
-        btnDown.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
-        btnUp.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
+        BooleanBinding nothingSelectedFromChosen = Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems());
+
+        btnLeft.disableProperty().bind(nothingSelectedFromChosen);
+        btnDown.disableProperty().bind(nothingSelectedFromChosen);
+        btnUp.disableProperty().bind(nothingSelectedFromChosen);
         btnRight.disableProperty().bind(Bindings.isEmpty(available.getSelectionModel().getSelectedItems()));
 
         btnRight.setOnAction(event -> {
@@ -168,7 +169,6 @@ public class PreviewPrefsTab implements PrefsTab {
         gridPane.add(btnDefault, 3, 6);
         layout.setPrefSize(600, 300);
         gridPane.add(scrollPane, 1, 9);
-
     }
 
     @Override
@@ -202,27 +202,17 @@ public class PreviewPrefsTab implements PrefsTab {
             availableModel.add(Localization.lang("Preview"));
         }
 
-        if (citationDiscovery != null) {
-            citationDiscovery.cancel();
-        }
-        citationDiscovery = new Task<List<CitationStyle>>() {
-
-            @Override
-            protected List<CitationStyle> call() throws Exception {
-                return CitationStyle.discoverCitationStyles();
-            }
-
-        };
-
-        citationDiscovery.setOnSucceeded(value -> {
-            citationDiscovery.getValue().stream()
-                             .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
-                             .sorted(Comparator.comparing(CitationStyle::getTitle))
-                             .forEach(availableModel::add);
-        });
-
-        citationDiscovery.setOnFailed(value -> LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", citationDiscovery.getException()));
-        taskExecutor.execute(citationDiscovery);
+        BackgroundTask.wrap(() -> CitationStyle.discoverCitationStyles())
+                      .onSuccess(value -> {
+                          value.stream()
+                               .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
+                               .sorted(Comparator.comparing(CitationStyle::getTitle))
+                               .forEach(availableModel::add);
+                      })
+                      .onFailure(ex -> {
+                          LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", ex);
+                          dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
+                      }).executeWith(taskExecutor);
 
         layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
