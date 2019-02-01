@@ -140,7 +140,6 @@ public class PreviewPrefsTab implements PrefsTab {
 
                 DialogPane pane = new DialogPane();
                 pane.setContent(testPane);
-
                 dialogService.showCustomDialogAndWait(Localization.lang("Preview"), pane, ButtonType.OK);
 
             } catch (StringIndexOutOfBoundsException exception) {
