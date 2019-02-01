@@ -15,6 +15,13 @@ import javafx.scene.input.KeyEvent;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
 
+    /**
+     *  Variable that contains user-defined behavior for paste action.
+     */
+    private PasteActionHandler pasteActionHandler = () -> {
+        // Set empty paste behavior by default
+    };
+    
     public EditorTextArea() {
         this("");
     }
