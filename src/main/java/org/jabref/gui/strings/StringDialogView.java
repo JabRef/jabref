@@ -87,15 +87,12 @@ public class StringDialogView extends BaseDialog<Void> {
             public void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (!empty) {
-                    if (getTableRow() != null) {
-                        Object rowItem = getTableRow().getItem();
+                if (!empty && (getTableRow() != null)) {
+                    Object rowItem = getTableRow().getItem();
 
-                        if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
-                            StringViewModel vm = (StringViewModel) rowItem;
-
-                            visualizer.initVisualization(vm.labelValidation(), this);
-                        }
+                    if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
+                        StringViewModel vm = (StringViewModel) rowItem;
+                        visualizer.initVisualization(vm.labelValidation(), this);
                     }
                 }
             }
@@ -108,17 +105,15 @@ public class StringDialogView extends BaseDialog<Void> {
             public void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (!empty) {
-                    if (getTableRow() != null) {
-                        Object rowItem = getTableRow().getItem();
+                if (!empty && (getTableRow() != null)) {
+                    Object rowItem = getTableRow().getItem();
 
-                        if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
-                            StringViewModel vm = (StringViewModel) rowItem;
-
-                            visualizer.initVisualization(vm.contentValidation(), this);
-                        }
+                    if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
+                        StringViewModel vm = (StringViewModel) rowItem;
+                        visualizer.initVisualization(vm.contentValidation(), this);
                     }
                 }
+
             }
         });
 
