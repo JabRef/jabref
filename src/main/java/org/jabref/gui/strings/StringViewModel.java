@@ -1,10 +1,15 @@
 package org.jabref.gui.strings;
 
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.l10n.Localization;
+
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -12,17 +17,36 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class StringViewModel {
 
+    private final static Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
+
     private final StringProperty label = new SimpleStringProperty();
     private final StringProperty content = new SimpleStringProperty();
 
     private final Validator labelValidator;
     private final Validator contentValidator;
+    private final CompositeValidator combinedValidator;
 
-    private final Function<String, ValidationMessage> function = input -> {
+    private final Function<String, ValidationMessage> labelValidatorFunction = input -> {
         if (input == null) {
             return ValidationMessage.error("May not be null");
         } else if (input.trim().isEmpty()) {
-            return ValidationMessage.error("Should not be empty");
+            return ValidationMessage.error(Localization.lang("Please enter the string's label"));
+        } else if (IS_NUMBER.matcher(input).matches()) {
+            return ValidationMessage.error(Localization.lang("The label of the string cannot be a number."));
+        } else if (input.contains("#")) {
+            return ValidationMessage.error(Localization.lang("The label of the string cannot contain the '#' character."));
+        } else if (input.contains(" ")) {
+            return ValidationMessage.error(Localization.lang("The label of the string cannot contain spaces."));
+        } else {
+            return null; // everything is ok
+        }
+
+    };
+    private final Function<String, ValidationMessage> contentValidatorFunction = input -> {
+        if (input == null) {
+            return ValidationMessage.error("May not be null");
+        } else if (input.trim().isEmpty()) {
+            return ValidationMessage.error(Localization.lang("Must not be empty!"));
         } else {
             return null; // everything is ok
         }
@@ -33,8 +57,9 @@ public class StringViewModel {
         this.label.setValue(label);
         this.content.setValue(content);
 
-        labelValidator = new FunctionBasedValidator<>(this.label, function);
-        contentValidator = new FunctionBasedValidator<>(this.content, function);
+        labelValidator = new FunctionBasedValidator<>(this.label, labelValidatorFunction);
+        contentValidator = new FunctionBasedValidator<>(this.content, contentValidatorFunction);
+        combinedValidator = new CompositeValidator(labelValidator, contentValidator);
     }
 
     public Validator getlabelValidator() {
@@ -53,6 +78,14 @@ public class StringViewModel {
         return contentValidator.getValidationStatus();
     }
 
+    public ValidationStatus combinedValidation() {
+        return combinedValidator.getValidationStatus();
+    }
+
+    public ReadOnlyBooleanProperty combinedValidationValidProperty() {
+        return combinedValidator.getValidationStatus().validProperty();
+    }
+
     public StringProperty getLabel() {
         return label;
     }
@@ -68,4 +101,5 @@ public class StringViewModel {
     public void setContent(String content) {
         this.content.setValue(content);
     }
+
 }

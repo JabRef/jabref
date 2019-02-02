@@ -1,6 +1,6 @@
 package org.jabref.gui.strings;
 
-import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +23,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.fxmisc.easybind.EasyBind;
 
@@ -40,7 +39,7 @@ public class StringDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<StringViewModel, String> colContent;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-    private StringDialogViewModel viewModel;
+    private final StringDialogViewModel viewModel;
 
     public StringDialogView(BibDatabase database) {
         viewModel = new StringDialogViewModel(database);
@@ -51,10 +50,11 @@ public class StringDialogView extends BaseDialog<Void> {
 
         Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
 
-        ObservableList<ValidationStatus> labelsValid = EasyBind.map(viewModel.allStringsProperty(), StringViewModel::labelValidation).removeAll((ValidationStatus::isValid);
-        ObservableList<ValidationStatus> contentsValid = EasyBind.map(viewModel.allStringsProperty(), StringViewModel::contentValidation).filtered(ValidationStatus::isValid);
-
-        btnSave.disableProperty().bind(Bindings.isNotEmpty(labelsValid).or(Bindings.isNotEmpty(contentsValid)));
+        //Adapted from the EasyBind Tutorial: https://github.com/TomasMikula/EasyBind#example-disable-save-all-button-on-no-unsaved-changes
+        //Disable the button, if any of the validators is not valid
+        ObservableList<ObservableValue<Boolean>> allValidProperty = EasyBind.map(viewModel.allStringsProperty(), StringViewModel::combinedValidationValidProperty);
+        ObservableValue<Boolean> anyNotValid = EasyBind.combine(allValidProperty, stream -> stream.anyMatch(valid -> !valid));
+        btnSave.disableProperty().bind(anyNotValid);
 
         setResultConverter(btn -> {
             if (saveButton.equals(btn)) {
@@ -64,6 +64,7 @@ public class StringDialogView extends BaseDialog<Void> {
             return null;
         });
 
+        setTitle(Localization.lang("Strings for library"));
     }
 
     @FXML
@@ -77,7 +78,7 @@ public class StringDialogView extends BaseDialog<Void> {
         btnNewString.setTooltip(new Tooltip(Localization.lang("New string")));
 
         btnRemove.setGraphic(JabRefIcons.REMOVE.getGraphicNode());
-        btnRemove.setTooltip(new Tooltip(Localization.lang("Remove string")));
+        btnRemove.setTooltip(new Tooltip(Localization.lang("Remove selected strings")));
 
         colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
         colLabel.setCellFactory(column -> new TextFieldTableCell<StringViewModel, String>(new DefaultStringConverter()) {
