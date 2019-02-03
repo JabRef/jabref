@@ -15,7 +15,6 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
     private final BibDatabase base;
     private final BibtexString string;
 
-
     public UndoableRemoveString(BibDatabase base, BibtexString string) {
         this.base = base;
         this.string = string;
@@ -29,23 +28,18 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
     @Override
     public void undo() {
         super.undo();
-
         // Revert the change.
         try {
             base.addString(string);
         } catch (KeyCollisionException ex) {
             LOGGER.warn("Problem to undo `remove string`", ex);
         }
-
     }
 
     @Override
     public void redo() {
         super.redo();
-
         // Redo the change.
         base.removeString(string.getId());
-
     }
-
 }

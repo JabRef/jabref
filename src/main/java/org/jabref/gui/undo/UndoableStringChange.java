@@ -31,13 +31,11 @@ public class UndoableStringChange extends AbstractUndoableJabRefEdit {
         super.undo();
 
         // Revert the change.
-
         if (nameChange) {
             string.setName(oldValue);
         } else {
             string.setContent(oldValue);
         }
-
     }
 
     @Override
@@ -45,13 +43,10 @@ public class UndoableStringChange extends AbstractUndoableJabRefEdit {
         super.redo();
 
         // Redo the change.
-
         if (nameChange) {
             string.setName(newValue);
         } else {
             string.setContent(newValue);
         }
-
     }
-
 }

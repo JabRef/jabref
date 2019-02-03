@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
@@ -131,7 +132,7 @@ public class BibDatabase {
             allFields.addAll(e.getFieldNames());
         }
         return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
-                .collect(Collectors.toSet());
+                        .collect(Collectors.toSet());
     }
 
     /**
@@ -225,7 +226,6 @@ public class BibDatabase {
         }
         entries.addAll(newEntries);
     }
-
 
     /**
      * Removes the given entry.
@@ -321,12 +321,7 @@ public class BibDatabase {
      * Returns the string with the given name/label
      */
     public Optional<BibtexString> getStringByName(String name) {
-        for (BibtexString string : getStringValues()) {
-            if (string.getName().equals(name)) {
-                return Optional.of(string);
-            }
-        }
-        return Optional.empty();
+        return getStringValues().stream().filter(string -> string.getName().equals(name)).findFirst();
     }
 
     /**
@@ -356,12 +351,7 @@ public class BibDatabase {
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (BibtexString value : bibtexStrings.values()) {
-            if (value.getName().equals(label)) {
-                return true;
-            }
-        }
-        return false;
+        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /**

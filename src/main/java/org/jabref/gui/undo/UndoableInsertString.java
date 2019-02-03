@@ -32,7 +32,6 @@ public class UndoableInsertString extends AbstractUndoableJabRefEdit {
 
         // Revert the change.
         base.removeString(string.getId());
-
     }
 
     @Override
@@ -45,7 +44,5 @@ public class UndoableInsertString extends AbstractUndoableJabRefEdit {
         } catch (KeyCollisionException ex) {
             LOGGER.warn("Problem to redo `insert entry`", ex);
         }
-
     }
-
 }
