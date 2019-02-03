@@ -17,5 +17,4 @@ public class BibtexStringEditorAction extends SimpleCommand {
         BibDatabase database = frame.getCurrentBasePanel().getDatabase();
         new BibtexStringEditorDialogView(database).showAndWait();
     }
-
 }
