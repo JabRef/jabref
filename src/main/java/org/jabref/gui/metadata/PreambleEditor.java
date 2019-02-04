@@ -13,7 +13,7 @@ import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-class PreambleEditor extends SimpleCommand {
+public class PreambleEditor extends SimpleCommand {
 
     private final TextArea editor = new TextArea();
 
