@@ -288,8 +288,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
-    public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
-    public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
@@ -720,9 +718,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DROPPEDFILEHANDLER_COPY, Boolean.TRUE);
         defaults.put(DROPPEDFILEHANDLER_MOVE, Boolean.FALSE);
         defaults.put(DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
-
-        defaults.put(IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);

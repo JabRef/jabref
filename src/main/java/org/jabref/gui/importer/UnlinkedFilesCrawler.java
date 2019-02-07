@@ -32,7 +32,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
     }
 
     @Override
-    protected CheckBoxTreeItem<FileNodeWrapper> call() throws Exception {
+    protected CheckBoxTreeItem<FileNodeWrapper> call() {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext);
         return searchDirectory(directory.toFile(), unlinkedPDFFileFilter);
     }
@@ -40,8 +40,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
     /**
      * Searches recursively all files in the specified directory. <br>
      * <br>
-     * All {@link File}s, which match the {@link FileFilter} that comes with the
-     * {@link EntryFromFileCreatorManager}, are taken into the resulting tree. <br>
+     * All files matched by the given {@link UnlinkedPDFFileFilter} are taken into the resulting tree. <br>
      * <br>
      * The result will be a tree structure of nodes of the type
      * {@link CheckBoxTreeItem}. <br>
