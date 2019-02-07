@@ -4,7 +4,7 @@ import org.junit.rules.ExternalResource;
 
 /**
  * JUnit by default ignores exceptions, which are reported via {@link Thread.UncaughtExceptionHandler}. With this rule
- * also these kind of exceptions result in a failure of the test.
+ * also these kinds of exceptions result in a failure of the test.
  */
 public class CatchExceptionsFromThread extends ExternalResource {
     @Override
