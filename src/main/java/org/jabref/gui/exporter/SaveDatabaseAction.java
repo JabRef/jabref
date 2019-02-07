@@ -14,7 +14,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -53,18 +52,20 @@ public class SaveDatabaseAction {
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final DialogService dialogService;
+    private final JabRefPreferences prefs;
 
-    public SaveDatabaseAction(BasePanel panel) {
+    public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
+        this.prefs = prefs;
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
         try {
-            SavePreferences preferences = Globals.prefs.loadForSaveFromPreferences()
-                                                       .withEncoding(encoding)
-                                                       .withSaveType(saveType);
+            SavePreferences preferences = prefs.loadForSaveFromPreferences()
+                                               .withEncoding(encoding)
+                                               .withSaveType(saveType);
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
@@ -124,7 +125,7 @@ public class SaveDatabaseAction {
                     panel.getBibDatabaseContext()
                          .getMetaData()
                          .getEncoding()
-                         .orElse(Globals.prefs.getDefaultEncoding()),
+                         .orElse(prefs.getDefaultEncoding()),
                     SavePreferences.DatabaseSaveType.ALL);
 
             if (success) {
@@ -182,10 +183,10 @@ public class SaveDatabaseAction {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        selectedPath.ifPresent(path -> Globals.prefs.setWorkingDir(path.getParent()));
+        selectedPath.ifPresent(path -> prefs.setWorkingDir(path.getParent()));
         return selectedPath;
     }
 
@@ -228,7 +229,7 @@ public class SaveDatabaseAction {
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                        && prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
                 context.getDatabasePath().isPresent();
     }
@@ -240,7 +241,7 @@ public class SaveDatabaseAction {
     public void saveSelectedAsPlain() {
         getSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, Globals.prefs.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
+                saveDatabase(path, true, prefs.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
                 frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {

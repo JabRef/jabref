@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -272,7 +273,7 @@ public class BasePanel extends StackPane {
     }
 
     private void setupActions() {
-        SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
+        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs);
         CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
 
         actions.put(Actions.UNDO, undoAction);
@@ -429,7 +430,7 @@ public class BasePanel extends StackPane {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(frame.getDialogService(), this));
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
 
     /**
@@ -693,11 +694,12 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
-        bibDatabaseContext.getDatabase().getEntryById(entryId).ifPresent(entry -> {
-            clearAndSelect(entry);
-            showAndEdit(entry);
+    public void editEntryAndFocusField(BibEntry entry, String fieldName) {
+        showAndEdit(entry);
+        Platform.runLater(() -> {
+            // Focus field and entry in main table (async to give entry editor time to load)
             entryEditor.setFocusToField(fieldName);
+            clearAndSelect(entry);
         });
     }
 
@@ -1343,39 +1345,41 @@ public class BasePanel extends StackPane {
     /**
      * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
      * harvest words from the entry
+     * Actual methods for autocomplete indexing  must run in javafx thread
      */
     private class SearchAutoCompleteListener {
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
-            searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry());
+            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry()));
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry());
+            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry()));
         }
     }
 
     /**
      * Ensures that the results of the current search are updated when a new entry is inserted into the database
+     * Actual methods for performing search must run in javafx thread
      */
     private class SearchListener {
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 
         @Subscribe
         public void listen(EntryRemovedEvent removedEntryEvent) {
             // IMO only used to update the status (found X entries)
-            frame.getGlobalSearchBar().performSearch();
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
     }
 

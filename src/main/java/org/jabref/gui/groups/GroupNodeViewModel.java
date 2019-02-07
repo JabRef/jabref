@@ -63,16 +63,16 @@ public class GroupNodeViewModel {
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
-        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayName = formatter.format(groupNode.getName());
+        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
-            children = automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries()).stream()
-                    .map(this::toViewModel)
-                    .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
+                                     .stream()
+                                     .map(this::toViewModel)
+                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
         }

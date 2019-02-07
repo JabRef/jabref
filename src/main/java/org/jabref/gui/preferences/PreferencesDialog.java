@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences;
 
-import java.util.Map;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
@@ -25,6 +25,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
@@ -57,7 +58,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
     private final JabRefPreferences prefs;
     private final ObservableList<PrefsTab> preferenceTabs;
 
-    public PreferencesDialog(JabRefFrame parent) {
+    public PreferencesDialog(JabRefFrame parent, TaskExecutor taskExecutor) {
         setTitle(Localization.lang("JabRef preferences"));
         getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
 
@@ -68,7 +69,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
             close();
         });
 
-        prefs = JabRefPreferences.getInstance();
+        prefs = Globals.prefs;
         frame = parent;
         dialogService = frame.getDialogService();
 
@@ -77,7 +78,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new FileTab(dialogService, prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
-        preferenceTabs.add(new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance()));
+        preferenceTabs.add(new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance(), taskExecutor));
         preferenceTabs.add(new ExternalTab(frame, this, prefs));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
         preferenceTabs.add(new EntryEditorPrefsTab(prefs));
@@ -116,35 +117,35 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
+        buttonContainer.setSpacing(3.0);
         Button importPreferences = new Button(Localization.lang("Import preferences"));
         importPreferences.setTooltip(new Tooltip(Localization.lang("Import preferences from file")));
         importPreferences.setOnAction(e -> importPreferences());
-        importPreferences.getStyleClass().add("text-button");
+        importPreferences.setMaxWidth(Double.MAX_VALUE);
         Button exportPreferences = new Button(Localization.lang("Export preferences"));
         exportPreferences.setTooltip(new Tooltip(Localization.lang("Export preferences to file")));
         exportPreferences.setOnAction(e -> exportPreferences());
-        exportPreferences.getStyleClass().add("text-button");
+        exportPreferences.setMaxWidth(Double.MAX_VALUE);
         Button showPreferences = new Button(Localization.lang("Show preferences"));
-        showPreferences.setOnAction(e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
-        showPreferences.getStyleClass().add("text-button");
+        showPreferences.setOnAction(e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).showAndWait());
+        showPreferences.setMaxWidth(Double.MAX_VALUE);
         Button resetPreferences = new Button(Localization.lang("Reset preferences"));
         resetPreferences.setOnAction(e -> resetPreferences());
-        resetPreferences.getStyleClass().add("text-button");
+        resetPreferences.setMaxWidth(Double.MAX_VALUE);
         buttonContainer.getChildren().addAll(
                 importPreferences,
                 exportPreferences,
                 showPreferences,
-                resetPreferences
-        );
+                resetPreferences);
 
         VBox spacer = new VBox();
+        spacer.setPrefHeight(10.0);
         VBox.setVgrow(tabsList, Priority.ALWAYS);
         VBox.setVgrow(spacer, Priority.SOMETIMES);
         vBox.getChildren().addAll(
                 tabsList,
                 spacer,
-                buttonContainer
-        );
+                buttonContainer);
 
         container.setLeft(vBox);
 
@@ -193,7 +194,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
+        List<TemplateExporter> customExporters = prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = prefs.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = prefs.getXMPPreferences();

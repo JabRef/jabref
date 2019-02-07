@@ -44,7 +44,6 @@ class ResolveDuplicateLabelDialog {
     private boolean okPressed;
     private boolean cancelPressed;
 
-
     public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {
         diag = new JDialog((JFrame) null, Localization.lang("Duplicate BibTeX key"), true);
 
@@ -59,7 +58,7 @@ class ResolveDuplicateLabelDialog {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
+            PreviewPanel previewPanel = new PreviewPanel(null, panel.getBibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
             previewPanel.setEntry(entry);
             JFXPanel container = CustomJFXPanel.wrap(new Scene(previewPanel));
             container.setPreferredSize(new Dimension(800, 90));
@@ -86,8 +85,8 @@ class ResolveDuplicateLabelDialog {
         diag.pack();
 
         ok.addActionListener(e -> {
-                okPressed = true;
-                diag.dispose();
+            okPressed = true;
+            diag.dispose();
         });
 
         ignore.addActionListener(e -> diag.dispose());

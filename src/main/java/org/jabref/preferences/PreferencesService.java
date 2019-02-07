@@ -5,10 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.metadata.FilePreferences;
 
 public interface PreferencesService {
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -23,6 +29,12 @@ public interface PreferencesService {
 
     void setWorkingDir(Path dir);
 
+    OpenOfficePreferences getOpenOfficePreferences();
+
+    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
+
+    PreviewPreferences getPreviewPreferences();
+
     Map<String, List<String>> getEntryEditorTabList();
 
     Boolean getEnforceLegalKeys();
@@ -31,8 +43,19 @@ public interface PreferencesService {
 
     void setCustomTabsNameAndFields(String name, String fields, int defNumber);
 
-    public void purgeSeries(String prefix, int number);
+    void purgeSeries(String prefix, int number);
 
-    public void updateEntryEditorTabList();
+    void updateEntryEditorTabList();
 
+    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
+
+    void storeCustomExportFormats(List<TemplateExporter> exporters);
+
+    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+
+    SavePreferences loadForExportFromPreferences();
+
+    String getExportWorkingDirectory();
+
+    void setExportWorkingDirectory(String layoutFileDirString);
 }

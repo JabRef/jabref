@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -37,15 +35,17 @@ public class DuplicateSearch extends SimpleCommand {
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
+    private final DialogService dialogService;
 
-    public DuplicateSearch(JabRefFrame frame) {
+    public DuplicateSearch(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
+        this.dialogService = dialogService;
     }
 
     @Override
     public void execute() {
         BasePanel panel = frame.getCurrentBasePanel();
-        panel.output(Localization.lang("Searching for duplicates..."));
+        dialogService.notify(Localization.lang("Searching for duplicates..."));
 
         List<BibEntry> entries = panel.getDatabase().getEntries();
         duplicates.clear();
@@ -57,8 +57,7 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        JabRefExecutorService.INSTANCE
-                .executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -124,10 +123,8 @@ public class DuplicateSearch extends SimpleCommand {
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
-        dialog.setVisible(true);
-        dialog.dispose();
 
-        DuplicateResolverResult resolverResult = dialog.getSelected();
+        DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
                 || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
@@ -150,31 +147,30 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        SwingUtilities.invokeLater(() -> {
-            BasePanel panel = frame.getCurrentBasePanel();
-            final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
-            // Now, do the actual removal:
-            if (!result.getToRemove().isEmpty()) {
-                for (BibEntry entry : result.getToRemove()) {
-                    panel.getDatabase().removeEntry(entry);
-                    compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
-                }
-                panel.markBaseChanged();
+        BasePanel panel = frame.getCurrentBasePanel();
+        final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
+        // Now, do the actual removal:
+        if (!result.getToRemove().isEmpty()) {
+            for (BibEntry entry : result.getToRemove()) {
+                panel.getDatabase().removeEntry(entry);
+                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             }
-            // and adding merged entries:
-            if (!result.getToAdd().isEmpty()) {
-                for (BibEntry entry : result.getToAdd()) {
-                    panel.getDatabase().insertEntry(entry);
-                    compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
-                }
-                panel.markBaseChanged();
+            panel.markBaseChanged();
+        }
+        // and adding merged entries:
+        if (!result.getToAdd().isEmpty()) {
+            for (BibEntry entry : result.getToAdd()) {
+                panel.getDatabase().insertEntry(entry);
+                compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
+            panel.markBaseChanged();
+        }
 
-            panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
-                    + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-            compoundEdit.end();
-            panel.getUndoManager().addEdit(compoundEdit);
-        });
+        dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
+                + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+        compoundEdit.end();
+        panel.getUndoManager().addEdit(compoundEdit);
+
     }
 
     /**

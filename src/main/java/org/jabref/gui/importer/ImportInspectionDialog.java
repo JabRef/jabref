@@ -695,14 +695,12 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
 
-                        boolean continuePressed =
-                                DefaultTaskExecutor.runInJavaFXThread(() ->
-                                        frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                                                                                                                   Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                                                                                                                   Localization.lang("Continue"),
-                                                                                                                   Localization.lang("Cancel"),
-                                                                                                                   Localization.lang("Disable this confirmation dialog"),
-                                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
+                        boolean continuePressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                                Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                                Localization.lang("Continue"),
+                                Localization.lang("Cancel"),
+                                Localization.lang("Disable this confirmation dialog"),
+                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
 
                         if (!continuePressed) {
                             return;
@@ -1053,12 +1051,13 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
+                    DuplicateResolverResult result = diag.showAndWait().orElse(DuplicateResolverResult.BREAK);
+
                     ImportInspectionDialog.this.toFront();
-                    if (diag.getSelected() == DuplicateResolverResult.KEEP_LEFT) {
+                    if (result == DuplicateResolverResult.KEEP_LEFT) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1073,8 +1072,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_RIGHT) {
+                    } else if (result == DuplicateResolverResult.KEEP_RIGHT) {
                         // Remove the entry from the import inspection dialog.
                         entries.getReadWriteLock().writeLock().lock();
                         try {
@@ -1082,7 +1080,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_BOTH) {
+                    } else if (result == DuplicateResolverResult.KEEP_BOTH) {
                         // Do nothing.
                         entries.getReadWriteLock().writeLock().lock();
                         try {
@@ -1090,7 +1088,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_MERGE) {
+                    } else if (result == DuplicateResolverResult.KEEP_MERGE) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1114,12 +1112,11 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 // Check if the duplicate is of another entry in the import:
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), first,
                                                                                other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
-                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
-                    diag.setVisible(true);
+
                     ImportInspectionDialog.this.toFront();
-                    DuplicateResolverResult answer = diag.getSelected();
+                    DuplicateResolverResult answer = diag.showAndWait().get();
                     if (answer == DuplicateResolverResult.KEEP_LEFT) {
                         entries.remove(other.get());
                         first.setGroupHit(false);

@@ -46,7 +46,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFiles() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInDatabase");
         localEntry.setField("year", "2001");
 
@@ -82,7 +82,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testAuthorWithDiacritics() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("Grazulis2017");
         localEntry.setField("year", "2017");
         localEntry.setField("author", "Gražulis, Saulius and O. Kitsune");
@@ -104,7 +104,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileInSubdirectory() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 
@@ -124,7 +124,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileNonRecursive() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 

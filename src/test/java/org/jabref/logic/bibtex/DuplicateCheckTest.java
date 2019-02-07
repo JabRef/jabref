@@ -21,22 +21,22 @@ public class DuplicateCheckTest {
 
     @BeforeEach
     public void setUp() {
-        simpleArticle = new BibEntry(BibtexEntryTypes.ARTICLE.getName())
+        simpleArticle = new BibEntry(BibtexEntryTypes.ARTICLE)
                 .withField(FieldName.AUTHOR, "Single Author")
                 .withField(FieldName.TITLE, "A serious paper about something")
                 .withField(FieldName.YEAR, "2017");
-        unrelatedArticle = new BibEntry(BibtexEntryTypes.ARTICLE.getName())
+        unrelatedArticle = new BibEntry(BibtexEntryTypes.ARTICLE)
                 .withField(FieldName.AUTHOR, "Completely Different")
                 .withField(FieldName.TITLE, "Holy Moly Uffdada und Trallalla")
                 .withField(FieldName.YEAR, "1992");
-        simpleInbook = new BibEntry(BibtexEntryTypes.INBOOK.getName())
+        simpleInbook = new BibEntry(BibtexEntryTypes.INBOOK)
                 .withField(FieldName.TITLE, "Alice in Wonderland")
                 .withField(FieldName.AUTHOR, "Charles Lutwidge Dodgson")
                 .withField(FieldName.CHAPTER, "Chapter One – Down the Rabbit Hole")
                 .withField(FieldName.LANGUAGE, "English")
                 .withField(FieldName.PUBLISHER, "Macmillan")
                 .withField(FieldName.YEAR, "1865");
-        simpleIncollection = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName())
+        simpleIncollection = new BibEntry(BibtexEntryTypes.INCOLLECTION)
                 .withField(FieldName.TITLE, "Innovation and Intellectual Property Rights")
                 .withField(FieldName.AUTHOR, "Ove Grandstrand")
                 .withField(FieldName.BOOKTITLE, "The Oxford Handbook of Innovation")
@@ -46,9 +46,9 @@ public class DuplicateCheckTest {
 
     @Test
     public void testDuplicateDetection() {
-        BibEntry one = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry one = new BibEntry(BibtexEntryTypes.ARTICLE);
 
-        BibEntry two = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry two = new BibEntry(BibtexEntryTypes.ARTICLE);
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");
@@ -204,14 +204,14 @@ public class DuplicateCheckTest {
 
     @Test
     public void twoBooksWithDifferentEditionsAreNotDuplicates() {
-        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK);
         editionOne.setField(FieldName.TITLE, "Effective Java");
         editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
         editionOne.setField(FieldName.DATE, "2001");
         editionOne.setField(FieldName.EDITION, "1");
 
-        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK);
         editionTwo.setField(FieldName.TITLE, "Effective Java");
         editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
@@ -223,13 +223,13 @@ public class DuplicateCheckTest {
 
     @Test
     public void sameBooksWithMissingEditionAreDuplicates() {
-        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK);
         editionOne.setField(FieldName.TITLE, "Effective Java");
         editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
         editionOne.setField(FieldName.DATE, "2001");
 
-        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK);
         editionTwo.setField(FieldName.TITLE, "Effective Java");
         editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
@@ -240,13 +240,13 @@ public class DuplicateCheckTest {
 
     @Test
     public void sameBooksWithPartiallyMissingEditionAreDuplicates() {
-        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK);
         editionOne.setField(FieldName.TITLE, "Effective Java");
         editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
         editionOne.setField(FieldName.DATE, "2001");
 
-        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK);
         editionTwo.setField(FieldName.TITLE, "Effective Java");
         editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
         editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
@@ -258,7 +258,7 @@ public class DuplicateCheckTest {
 
     @Test
     public void sameBooksWithDifferentEditionsAreNotDuplicates() {
-        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK);
         editionTwo.setCiteKey("Sutton17reinfLrnIntroBook");
         editionTwo.setField(FieldName.TITLE, "Reinforcement learning:An introduction");
         editionTwo.setField(FieldName.PUBLISHER, "MIT Press");
@@ -269,7 +269,7 @@ public class DuplicateCheckTest {
         editionTwo.setField(FieldName.JOURNAL, "MIT Press");
         editionTwo.setField(FieldName.URL, "https://webdocs.cs.ualberta.ca/~sutton/book/the-book-2nd.html");
 
-        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK);
         editionOne.setCiteKey("Sutton98reinfLrnIntroBook");
         editionOne.setField(FieldName.TITLE, "Reinforcement learning: An introduction");
         editionOne.setField(FieldName.PUBLISHER, "MIT press Cambridge");
