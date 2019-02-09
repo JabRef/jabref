@@ -16,15 +16,13 @@ import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class AutoSetFileLinksUtilTest {
 
     private final FilePreferences fileDirPrefs = mock(FilePreferences.class);
@@ -34,7 +32,7 @@ public class AutoSetFileLinksUtilTest {
     private final BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path folder) throws Exception {
+    public void setUp(@TempDir Path folder) throws Exception {
         Path path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCiteKey("CiteKey");
