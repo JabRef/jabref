@@ -4,7 +4,6 @@ class BibEntryNotFoundException extends Exception {
 
     private final String bibtexKey;
 
-
     public BibEntryNotFoundException(String bibtexKey, String message) {
         super(message);
 

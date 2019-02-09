@@ -14,14 +14,12 @@ import org.jabref.logic.l10n.Localization;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(TempDirectory.class)
 class ProtectedTermsLoaderTest {
 
     private ProtectedTermsLoader loader;
@@ -166,7 +164,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListAddsList(@TempDirectory.TempDir Path tempDir) {
+    void testAddNewTermListAddsList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -176,7 +174,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListNewListInList(@TempDirectory.TempDir Path tempDir) {
+    void testAddNewTermListNewListInList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -187,7 +185,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testRemoveTermList(@TempDirectory.TempDir Path tempDir) {
+    void testRemoveTermList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -197,7 +195,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testRemoveTermListReduceTheCount(@TempDirectory.TempDir Path tempDir) {
+    void testRemoveTermListReduceTheCount(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -209,7 +207,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void testAddNewTermListSetsCorrectDescription(@TempDirectory.TempDir Path tempDir) {
+    void testAddNewTermListSetsCorrectDescription(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),

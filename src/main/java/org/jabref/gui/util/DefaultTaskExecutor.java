@@ -89,8 +89,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> Future<?> execute(BackgroundTask<V> task) {
-        return EXECUTOR.submit(getJavaFXTask(task));
+    public <V> Future<V> execute(BackgroundTask<V> task) {
+        return execute(getJavaFXTask(task));
+    }
+
+    @Override
+    public <V> Future<V> execute(Task<V> task) {
+        EXECUTOR.submit(task);
+        return task;
     }
 
     @Override

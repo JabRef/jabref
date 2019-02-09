@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="950.0"
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.preferences.PreferencesFilterDialog">
+
+    <content>
+        <BorderPane>
+            <bottom>
+                <HBox>
+                    <CheckBox fx:id="showOnlyDeviatingPreferenceOptions"
+                              text="%Show only preferences deviating from their default value"/>
+                    <HBox HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="count"/>
+                </HBox>
+            </bottom>
+            <center>
+                <TableView fx:id="table">
+                    <columns>
+                        <TableColumn fx:id="columnType" text="%type"/>
+                        <TableColumn fx:id="columnKey" text="%key"/>
+                        <TableColumn fx:id="columnValue" text="%value"/>
+                        <TableColumn fx:id="columnDefaultValue" text="%default"/>
+                    </columns>
+                    <padding>
+                        <Insets bottom="30.0"/>
+                    </padding>
+                </TableView>
+            </center>
+        </BorderPane>
+    </content>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>

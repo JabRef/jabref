@@ -297,6 +297,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
+    public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
+    public static final String SEND_OS_DATA = "sendOSData";
+    public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -574,6 +577,9 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
+        defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
+        defaults.put(SEND_OS_DATA, Boolean.FALSE);
+        defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
@@ -1540,6 +1546,7 @@ public class JabRefPreferences implements PreferencesService {
                                   getKeywordDelimiter());
     }
 
+    @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
                                          this.get(JabRefPreferences.OO_JARS_PATH),
@@ -1552,6 +1559,7 @@ public class JabRefPreferences implements PreferencesService {
                                          this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
+    @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
         this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
         this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
@@ -1592,6 +1600,7 @@ public class JabRefPreferences implements PreferencesService {
         return this;
     }
 
+    @Override
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);

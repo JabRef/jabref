@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
+    private static final String MDL_JABREF_PARTNER_ID = "1";
     private final String LANGUAGE;
     private final Version VERSION;
 
@@ -104,11 +107,22 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
         builder.setHost(getMdlUrl());
-        builder.setPath("/v2/items/" + queryWithTitle + "/related_items");
-        builder.addParameter("partner_id", "jabref");
+        builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
+        builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
-        builder.addParameter("app_lang", LANGUAGE);
+
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        if (prefs.getBoolean(JabRefPreferences.SEND_LANGUAGE_DATA)) {
+            builder.addParameter("app_lang", LANGUAGE);
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_OS_DATA)) {
+            builder.addParameter("os", System.getProperty("os.name"));
+        }
+        if (prefs.getBoolean(JabRefPreferences.SEND_TIMEZONE_DATA)) {
+            builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
+        }
+
         try {
             URI uri = builder.build();
             LOGGER.trace("Request: " + uri.toString());
@@ -120,6 +134,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     private String getMdlUrl() {
-        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.darwingoliath.com";
+        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.mr-dlib.org";
     }
 }

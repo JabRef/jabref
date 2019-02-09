@@ -50,8 +50,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
-    private Collection<String> fields;
+    private Collection<String> fields = new ArrayList<>();
     private final DialogService dialogService;
+    private GridPane gridPane;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         this.isCompressed = compressed;
@@ -69,14 +70,17 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
-        // The preferences might be not initialized in tests -> return empty node
+    private void setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        // The preferences might be not initialized in tests -> return immediately
         // TODO: Replace this ugly workaround by proper injection propagation
         if (Globals.prefs == null) {
-            return new Region();
+            return;
         }
 
         editors.clear();
+        gridPane.getChildren().clear();
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
         fields = determineFieldsToShow(entry, entryType);
@@ -97,9 +101,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             labels.add(new FieldNameLabel(fieldName));
         }
-
-        GridPane gridPane = new GridPane();
-        gridPane.getStyleClass().add("editorPane");
 
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
@@ -127,15 +128,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             setRegularRowLayout(gridPane);
         }
-
-        // Warp everything in a scroll-pane
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setContent(gridPane);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        return scrollPane;
     }
 
     private void setRegularRowLayout(GridPane gridPane) {
@@ -222,8 +214,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                                                     .map(Map.Entry::getKey)
                                                     .findFirst();
 
-        Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
-        setContent(panel);
+        initPanel();
+        setupPanel(entry, isCompressed, suggestionProviders, undoManager);
 
         Platform.runLater(() -> {
             // Restore focus to field (run this async so that editor is already initialized correctly)
@@ -235,5 +227,22 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     public Collection<String> getShownFields() {
         return fields;
+    }
+
+    private void initPanel() {
+        if (gridPane == null) {
+            gridPane = new GridPane();
+            gridPane.getStyleClass().add("editorPane");
+
+            // Warp everything in a scroll-pane
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setContent(gridPane);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+
+            setContent(scrollPane);
+        }
     }
 }

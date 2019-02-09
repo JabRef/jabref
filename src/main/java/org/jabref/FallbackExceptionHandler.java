@@ -1,5 +1,7 @@
 package org.jabref;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,5 +19,11 @@ public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
         LOGGER.error("Uncaught exception occurred in " + thread, exception);
+
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                JabRefGUI.getMainFrame()
+                         .getDialogService()
+                         .showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception)
+        );
     }
 }

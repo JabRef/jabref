@@ -18,15 +18,13 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class XmpExporterTest {
 
     private Exporter exporter;
@@ -48,7 +46,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void exportSingleEntry(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void exportSingleEntry(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
@@ -76,7 +74,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void writeMultipleEntriesInASingleFile(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void writeMultipleEntriesInASingleFile(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
@@ -128,7 +126,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void writeMultipleEntriesInDifferentFiles(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void writeMultipleEntriesInDifferentFiles(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("split");
         Files.createFile(file);
 
@@ -194,7 +192,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void exportSingleEntryWithPrivacyFilter(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
         when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author"));
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
 
