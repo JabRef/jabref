@@ -12,16 +12,14 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(TempDirectory.class)
 class FileDialogConfigurationTest {
 
     @Test
-    void testWithValidDirectoryString(@TempDirectory.TempDir Path folder) {
+    void testWithValidDirectoryString(@TempDir Path folder) {
         String tempFolder = folder.toAbsolutePath().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -31,7 +29,7 @@ class FileDialogConfigurationTest {
     }
 
     @Test
-    void testWithValidDirectoryPath(@TempDirectory.TempDir Path tempFolder) {
+    void testWithValidDirectoryPath(@TempDir Path tempFolder) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 

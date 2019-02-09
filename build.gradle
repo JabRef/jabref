@@ -165,7 +165,6 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.4.0'
 
-    testCompile 'org.junit-pioneer:junit-pioneer:0.3.0'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
     testCompile 'org.mockito:mockito-core:2.24.0'
@@ -189,9 +188,6 @@ jacoco {
 dependencyUpdates {
     outputFormatter = "json"
 }
-
-//We have to use this as long as junit-pioneer has no official release
-dependencyUpdates.revision = 'integration'
 
 // We have some dependencies which cannot be updated due to various reasons.
 dependencyUpdates.resolutionStrategy = {

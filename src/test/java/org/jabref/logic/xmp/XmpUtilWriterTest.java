@@ -15,14 +15,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class XmpUtilWriterTest {
 
     private static BibEntry olly2018;
@@ -94,7 +92,7 @@ class XmpUtilWriterTest {
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
     @Test
-    void testWriteXmp(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
+    void testWriteXmp(@TempDir Path tempDir) throws IOException, TransformerException {
 
         Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
@@ -118,7 +116,7 @@ class XmpUtilWriterTest {
      * Test, which writes multiple metadata entries to a PDF and reads them again to test the size.
      */
     @Test
-    void testWriteMultipleBibEntries(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
+    void testWriteMultipleBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
 
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
 

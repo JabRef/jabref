@@ -18,8 +18,7 @@ import org.jabref.model.util.FileHelper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 class FileUtilTest {
     private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     private Path existingTestFile;
@@ -38,7 +36,7 @@ class FileUtilTest {
     private Path rootDir;
 
     @BeforeEach
-    void setUpViewModel(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
+    void setUpViewModel(@TempDir Path temporaryFolder) throws IOException {
         rootDir = temporaryFolder;
         Path subDir = rootDir.resolve("1");
         Files.createDirectory(subDir);
@@ -322,7 +320,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testRenameFileSuccessful(@TempDirectory.TempDir Path otherTemporaryFolder) {
+    void testRenameFileSuccessful(@TempDir Path otherTemporaryFolder) {
         // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
         // in the @BeforeEach method.
         Path temp = Paths.get(otherTemporaryFolder.resolve("123").toString());
