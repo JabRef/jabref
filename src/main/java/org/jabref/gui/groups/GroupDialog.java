@@ -121,6 +121,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         explicitRadioButton.setSelected(true);
 
         descriptionWebView.setPrefWidth(585);
+        //added to change the edit group window to fit screen
+        descriptionWebView.setPrefHeight(115);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
