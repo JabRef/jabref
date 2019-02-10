@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
@@ -11,9 +12,11 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -65,7 +68,7 @@ public class ImportHandler {
     public void importAsNewEntries(List<Path> files) {
         CompoundEdit ce = new CompoundEdit();
         for (Path file : files) {
-            List<BibEntry> entriesToAdd = new ArrayList<>();
+            List<BibEntry> entriesToAdd;
             if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
                 List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
                 List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
@@ -73,7 +76,7 @@ public class ImportHandler {
                 // First try xmp import, if empty try pdf import, otherwise create empty entry
                 if (!xmpEntriesInFile.isEmpty()) {
                     if (!pdfResult.isEmpty()) {
-                        //FIXME: Show merge dialog if working again properly
+                        //FIXME: Show merge dialog?
                         entriesToAdd = xmpEntriesInFile;
                     } else {
                         entriesToAdd = xmpEntriesInFile;
@@ -89,10 +92,8 @@ public class ImportHandler {
                 entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
             }
 
-            if (!entriesToAdd.isEmpty()) {
-                insertEntries(entriesToAdd);
-                entriesToAdd.forEach(entry -> ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entry)));
-            }
+            insertEntries(entriesToAdd);
+            entriesToAdd.forEach(entry -> ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entry)));
         }
         ce.end();
         undoManager.addEdit(ce);
