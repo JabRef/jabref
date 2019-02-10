@@ -36,5 +36,4 @@ public class CitationEntryViewModel {
     public void setExtraInfo(String extraInfo) {
         extraInformation.setValue(extraInfo);
     }
-
 }

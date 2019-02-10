@@ -46,10 +46,10 @@ public class DetectOpenOfficeInstallation {
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                                                   Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
+                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                                        .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                                                        .build();
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .build();
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
 
     }
@@ -113,10 +113,10 @@ public class DetectOpenOfficeInstallation {
         }
 
         String content = Localization.lang("Found more than one OpenOffice/LibreOffice executable.")
-                         + "\n" + Localization.lang("Please choose which one to connect to:");
+                + "\n" + Localization.lang("Please choose which one to connect to:");
 
         Optional<Path> selectedPath = dialogService.showChoiceDialogAndWait(Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                                                                            content, Localization.lang("Use selected instance"), installDirs);
+                content, Localization.lang("Use selected instance"), installDirs);
 
         return selectedPath;
     }

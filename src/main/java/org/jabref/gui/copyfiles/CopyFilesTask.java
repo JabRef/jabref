@@ -112,7 +112,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             writeLogMessage(newFile, bw, localizedErrorMessage);
                             addResultToList(newFile, success, localizedErrorMessage);
                         }
-
                     }
 
                 }

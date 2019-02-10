@@ -97,8 +97,8 @@ class TableColumnsTab extends Pane implements PrefsTab {
         this.frame = frame;
 
         /* Populate the data of Entry table columns */
-        List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
-        List<String> prefColWidths = this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
+        List<String> prefColNames = this.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> prefColWidths = this.prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         this.data = FXCollections.observableArrayList();
         for (int i = 0; i < prefColNames.size(); i++) {
             this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
@@ -119,9 +119,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
                     // Since data is an ObservableList, updating it updates the displayed field name.
                     this.data.set(t.getTablePosition().getRow(), new TableRow(t.getNewValue()));
                     // Update the User Preference of COLUMN_NAMES
-                    List<String> tempColumnNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
+                    List<String> tempColumnNames = this.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
                     tempColumnNames.set(t.getTablePosition().getRow(), t.getNewValue());
-                    this.prefs.putStringList(this.prefs.COLUMN_NAMES,tempColumnNames);
+                    this.prefs.putStringList(JabRefPreferences.COLUMN_NAMES, tempColumnNames);
                 });
 
         colSetup.setItems(data);
@@ -368,8 +368,8 @@ class TableColumnsTab extends Pane implements PrefsTab {
         /*** end: special fields ***/
 
         data.clear();
-        List<String> prefColNames = this.prefs.getStringList(this.prefs.COLUMN_NAMES);
-        List<String> prefColWidths = this.prefs.getStringList(this.prefs.COLUMN_WIDTHS);
+        List<String> prefColNames = this.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> prefColWidths = this.prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < prefColNames.size(); i++) {
             this.data.add(new TableRow(prefColNames.get(i), Double.parseDouble(prefColWidths.get(i))));
         }
@@ -413,48 +413,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
             this.length.set(length);
         }
     }
-
-    class UpdateOrderAction extends AbstractAction {
-
-        public UpdateOrderAction() {
-            super(Localization.lang("Update to current column order"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.getCurrentBasePanel();
-            if (panel == null) {
-                return;
-            }
-            // idea: sort elements according to value stored in hash, keep
-            // everything not inside hash/mainTable as it was
-            final HashMap<String, Integer> map = new HashMap<>();
-
-            // first element (#) not inside data
-            /*
-            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
-                String name = column.getText();
-                if ((name != null) && !name.isEmpty()) {
-                    map.put(name.toLowerCase(Locale.ROOT), i);
-                }
-            }
-            */
-            Collections.sort(data, (o1, o2) -> {
-                Integer n1 = map.get(o1.getName());
-                Integer n2 = map.get(o2.getName());
-                if ((n1 == null) || (n2 == null)) {
-                    return 0;
-                }
-                return n1.compareTo(n2);
-            });
-
-            colSetup.setItems(data);
-            colSetup.refresh();
-            tableChanged = true;
-        }
-    }
-
-
 
     /**
      * Store changes to table preferences. This method is called when
@@ -553,6 +511,46 @@ class TableColumnsTab extends Pane implements PrefsTab {
             prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
+    }
+
+    class UpdateOrderAction extends AbstractAction {
+
+        public UpdateOrderAction() {
+            super(Localization.lang("Update to current column order"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BasePanel panel = frame.getCurrentBasePanel();
+            if (panel == null) {
+                return;
+            }
+            // idea: sort elements according to value stored in hash, keep
+            // everything not inside hash/mainTable as it was
+            final HashMap<String, Integer> map = new HashMap<>();
+
+            // first element (#) not inside data
+            /*
+            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
+                String name = column.getText();
+                if ((name != null) && !name.isEmpty()) {
+                    map.put(name.toLowerCase(Locale.ROOT), i);
+                }
+            }
+            */
+            Collections.sort(data, (o1, o2) -> {
+                Integer n1 = map.get(o1.getName());
+                Integer n2 = map.get(o2.getName());
+                if ((n1 == null) || (n2 == null)) {
+                    return 0;
+                }
+                return n1.compareTo(n2);
+            });
+
+            colSetup.setItems(data);
+            colSetup.refresh();
+            tableChanged = true;
+        }
     }
 
     @Override

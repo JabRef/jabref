@@ -24,7 +24,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
-import org.jabref.gui.externalfiles.NewDroppedFileHandler;
+import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -61,9 +61,9 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private final DialogService dialogService;
     private final KeyBindingRepository keyBindingRepository;
 
+    private final String defaultPreviewStyle = "Preview";
     private String previewStyle;
     private CitationStyle citationStyle;
-    private final String defaultPreviewStyle = "Preview";
     private Optional<BasePanel> basePanel = Optional.empty();
 
     private boolean fixedLayout;
@@ -80,7 +80,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private final WebView previewView;
     private Optional<Future<?>> citationStyleFuture = Optional.empty();
 
-    private final NewDroppedFileHandler fileHandler;
+    private final ExternalFilesEntryLinker fileLinker;
 
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
@@ -93,11 +93,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.clipBoardManager = Globals.clipboardManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
-                                                Globals.prefs.getFilePreferences(),
-                                                Globals.prefs.getImportFormatPreferences(),
-                                                Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor());
+        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), databaseContext);
 
         // Set up scroll pane for preview pane
         setFitToHeight(true);
@@ -135,19 +131,18 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
-
                     LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); //alt on win
-                    fileHandler.addToEntry(entry, files);
-
+                    fileLinker.addFilesToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
-                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                 }
+                success = true;
             }
 
             event.setDropCompleted(success);

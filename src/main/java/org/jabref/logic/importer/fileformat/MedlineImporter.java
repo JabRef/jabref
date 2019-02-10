@@ -511,7 +511,7 @@ public class MedlineImporter extends Importer implements Parser {
                 for (PersonalNameSubject personalName : personalNameSubject) {
                     String name = personalName.getLastName();
                     if (personalName.getForeName() != null) {
-                        name += ", " + personalName.getForeName().toString();
+                        name += ", " + personalName.getForeName();
                     }
                     personalNames.add(name);
                 }

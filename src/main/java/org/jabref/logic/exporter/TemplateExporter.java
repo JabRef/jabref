@@ -74,12 +74,12 @@ public class TemplateExporter extends Exporter {
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.
      *
-     * @param name to display to the user and to call this format in the console.
-     * @param lfFileName  Name of the main layout file.
-     * @param directory   Directory in which to find the layout file.
-     * @param extension   May or may not contain the . (for instance .txt).
+     * @param name              to display to the user and to call this format in the console.
+     * @param lfFileName        Name of the main layout file.
+     * @param directory         Directory in which to find the layout file.
+     * @param extension         May or may not contain the . (for instance .txt).
      * @param layoutPreferences Preferences for the layout
-     * @param savePreferences Preferences for saving
+     * @param savePreferences   Preferences for saving
      */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
                             SavePreferences savePreferences) {
@@ -348,7 +348,6 @@ public class TemplateExporter extends Exporter {
                         layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
                     }
                 }
-
             } catch (IOException ex) {
                 // TODO: show error message here?
                 LOGGER.warn("Problem opening formatter file.", ex);

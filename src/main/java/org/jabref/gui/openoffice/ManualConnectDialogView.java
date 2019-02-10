@@ -19,6 +19,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class ManualConnectDialogView extends BaseDialog<Boolean> {
 
+    @Inject private final DialogService dialogService;
     @FXML private Label OOPathLabel;
     @FXML private TextField ooPath;
     @FXML private Button browseOOPath;
@@ -28,10 +29,7 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
     @FXML private TextField ooJars;
     @FXML private Label ooExecLabel;
     @FXML private Label ooJarsLabel;
-
     @Inject private PreferencesService preferencesService;
-    @Inject private final DialogService dialogService;
-
     private ManualConnectDialogViewModel viewModel;
 
     public ManualConnectDialogView(DialogService dialogService) {
@@ -86,5 +84,4 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
     private void browseOOJars(ActionEvent event) {
         viewModel.browseOOJars();
     }
-
 }

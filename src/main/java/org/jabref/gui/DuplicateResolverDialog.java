@@ -68,7 +68,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                                      Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
@@ -84,7 +84,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                                      Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                 break;
         }
         if (removeExactVisible) {

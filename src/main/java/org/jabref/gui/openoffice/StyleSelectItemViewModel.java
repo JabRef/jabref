@@ -55,5 +55,4 @@ public class StyleSelectItemViewModel {
     public String getStylePath() {
         return style.getPath();
     }
-
 }

@@ -288,8 +288,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
-    public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
-    public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
@@ -729,9 +727,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DROPPEDFILEHANDLER_COPY, Boolean.TRUE);
         defaults.put(DROPPEDFILEHANDLER_MOVE, Boolean.FALSE);
         defaults.put(DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
-
-        defaults.put(IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
@@ -1549,14 +1544,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                                         this.get(JabRefPreferences.OO_JARS_PATH),
-                                         this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                                         this.get(JabRefPreferences.OO_PATH),
-                                         this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                                         this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                                         this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                                         this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                                         this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                this.get(JabRefPreferences.OO_JARS_PATH),
+                this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                this.get(JabRefPreferences.OO_PATH),
+                this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
@@ -2011,7 +2006,7 @@ public class JabRefPreferences implements PreferencesService {
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                                                           layoutPreferences, savePreferences);
+                    layoutPreferences, savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;
@@ -2045,12 +2040,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void setExportWorkingDirectory(String layoutFileDirString) {
-        put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
+    public String getExportWorkingDirectory() {
+        return get(EXPORT_WORKING_DIRECTORY);
     }
 
     @Override
-    public String getExportWorkingDirectory() {
-        return get(EXPORT_WORKING_DIRECTORY);
+    public void setExportWorkingDirectory(String layoutFileDirString) {
+        put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
     }
 }

@@ -55,7 +55,7 @@ public interface PreferencesService {
 
     SavePreferences loadForExportFromPreferences();
 
-    void setExportWorkingDirectory(String layoutFileDirString);
-
     String getExportWorkingDirectory();
+
+    void setExportWorkingDirectory(String layoutFileDirString);
 }

@@ -41,7 +41,7 @@ public class DocBook5ExporterTest {
     private Exporter exportFormat;
 
     @BeforeEach
-    public void setUp() throws URISyntaxException {
+    void setUp() throws URISyntaxException {
         xmlFile = Paths.get(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
 
         List<TemplateExporter> customFormats = new ArrayList<>();
@@ -66,8 +66,7 @@ public class DocBook5ExporterTest {
     }
 
     @Test
-    public void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
-
+    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         exportFormat.export(databaseContext, path, charset, entries);
@@ -78,5 +77,4 @@ public class DocBook5ExporterTest {
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
-
 }

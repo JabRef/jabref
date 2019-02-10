@@ -100,7 +100,7 @@ public class BibEntry implements Cloneable {
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
     public BibEntry(EntryType type) {
-        this(IdGenerator.next(),type.getName());
+        this(IdGenerator.next(), type.getName());
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -533,7 +533,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(IdGenerator.next(),type.getValue());
+        BibEntry clone = new BibEntry(IdGenerator.next(), type.getValue());
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }

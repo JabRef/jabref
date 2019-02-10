@@ -48,7 +48,7 @@ class ResolveDuplicateLabelDialog {
         diag = new JDialog((JFrame) null, Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
-                                                                   "left:pref, 4dlu, fill:pref", "p"));
+                "left:pref, 4dlu, fill:pref", "p"));
         b.add(new JLabel(Localization.lang("Duplicate BibTeX key") + ": " + key)).xyw(1, 1, 3);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
