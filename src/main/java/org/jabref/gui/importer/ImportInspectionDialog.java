@@ -1051,6 +1051,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
+                    //TODO: this could be where duplicate resolving bug starts
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(getFrame(), other.get(),
                                                                                first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
 
