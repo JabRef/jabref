@@ -9,32 +9,32 @@
    <authorgroup>
 <!--AUTHORS-->
        <author><personname><firstname>Stefan</firstname><surname>Kolb</surname></personname></author>
-       <author><personname><firstname>Tobias</firstname><surname>Diez</surname></personname></author>
+       <author><personname><firstname>Tobias</firstname><surname>Diez</surname></personname></author> 
 <!--EDITORS-->
 
    </authorgroup>
    <!--TITLE-->
-           <citetitle pubwork="book">my paper title</citetitle>
-
+           <citetitle pubwork="book">my paper title</citetitle> 
+    
 <!--BOOK booktitle, edition, (pages), publisher-->
     <biblioset relation="book">
-
-
+        
+		
         <pubdate>2018</pubdate>
-
-
+        
+        
 		<publishername></publishername>
         <address></address>
-
+        
 	</biblioset>
-
+    
     
 <!-- IDENTIFIERS-->
-
-
-
+    
+    
+    
         <biblioid class="isbn">1&#45;2&#45;34</biblioid>
-
+    
 <!--ABSTRACT-->
-
+    
 </biblioentry></bibliography>
