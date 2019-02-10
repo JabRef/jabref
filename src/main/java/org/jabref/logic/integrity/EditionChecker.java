@@ -39,19 +39,18 @@ public class EditionChecker implements ValueChecker {
             return Optional.empty();
         }
 
+        if (value.equals(FIRST_EDITION)) {
+            return Optional.of(Localization.lang("edition of book reported as just 1"));
+        }
+
         //biblatex
         if (bibDatabaseContextEdition.isBiblatexMode() && !ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
             return Optional.of(Localization.lang("should contain an integer or a literal"));
         }
 
         //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim()) &&
-                !value.equals(FIRST_EDITION)) {
+        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));
-        }
-
-        if (value.equals(FIRST_EDITION)) {
-            return Optional.of(Localization.lang("edition of book reported as just 1"));
         }
 
         return Optional.empty();
