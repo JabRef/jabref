@@ -1,10 +1,8 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
@@ -12,11 +10,9 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -27,12 +23,7 @@ import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ImportHandler {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
 
     private final BibDatabaseContext database;
     private final UpdateFieldPreferences updateFieldPreferences;
