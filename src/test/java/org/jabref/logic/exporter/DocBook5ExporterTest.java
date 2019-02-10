@@ -20,8 +20,7 @@ import org.jabref.model.entry.FieldName;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
@@ -32,7 +31,6 @@ import org.xmlunit.matchers.CompareMatcher;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class DocBook5ExporterTest {
 
     public BibDatabaseContext databaseContext;
@@ -68,7 +66,7 @@ public class DocBook5ExporterTest {
     }
 
     @Test
-    void testPerformExportForSingleEntry(@TempDirectory.TempDir Path testFolder) throws Exception {
+    void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         exportFormat.export(databaseContext, path, charset, entries);

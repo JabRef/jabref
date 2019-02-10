@@ -17,14 +17,12 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class RenamePdfCleanupTest {
 
     private BibEntry entry;
@@ -33,7 +31,7 @@ class RenamePdfCleanupTest {
     private RenamePdfCleanup cleanup;
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path testFolder) {
+    void setUp(@TempDir Path testFolder) {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
@@ -51,7 +49,7 @@ class RenamePdfCleanupTest {
      * Test for #466
      */
     @Test
-    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("toot.tmp");
         Files.createFile(path);
 
@@ -66,7 +64,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesWithMultipleFiles(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesWithMultipleFiles(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
@@ -84,7 +82,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
@@ -100,7 +98,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileInSameFolder(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileInSameFolder(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
