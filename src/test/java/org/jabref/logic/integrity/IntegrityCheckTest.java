@@ -84,6 +84,7 @@ class IntegrityCheckTest {
                 withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+        assertWrong(createContext("edition", "1"));
     }
 
     @Test
