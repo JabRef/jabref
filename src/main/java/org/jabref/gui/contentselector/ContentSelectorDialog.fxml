@@ -17,21 +17,21 @@
             <Label prefHeight="27.0" prefWidth="108.0" text="Field names" />
             <HBox prefHeight="140.0" prefWidth="385.0">
                <children>
+                  <ListView fx:id="fieldNamesListView" prefHeight="140.0" prefWidth="297.0"/>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Button fx:id="addFieldNameButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="Add">
+                        <Button fx:id="addFieldNameButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="\%Add" onAction="#addNewFieldName">
                            <VBox.margin>
                               <Insets top="5.0" />
                            </VBox.margin>
                         </Button>
-                        <Button fx:id="removeFieldNameButton" mnemonicParsing="false" text="Remove">
+                        <Button fx:id="removeFieldNameButton" mnemonicParsing="false" text="\%Remove" onAction="#removeFieldName">
                            <VBox.margin>
                               <Insets top="5.0" />
                            </VBox.margin>
                         </Button>
                      </children>
                   </VBox>
-                  <ListView fx:id="fieldNamesListView" prefHeight="140.0" prefWidth="297.0" />
                </children>
             </HBox>
             <Separator prefWidth="200.0">
@@ -42,21 +42,21 @@
              <Label prefHeight="27.0" prefWidth="108.0" text="Keywords" />
              <HBox prefHeight="140.0" prefWidth="385.0">
                  <children>
+                     <ListView fx:id="keywordsListView" prefHeight="140.0" prefWidth="297.0" />
                      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                          <children>
-                             <Button fx:id="addKeywordButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="Add">
+                             <Button fx:id="addKeywordButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="\%Add">
                                  <VBox.margin>
                                      <Insets top="5.0" />
                                  </VBox.margin>
                              </Button>
-                             <Button fx:id="removeKeywordButton" mnemonicParsing="false" text="Remove">
+                             <Button fx:id="removeKeywordButton" mnemonicParsing="false" text="\%Remove">
                                  <VBox.margin>
                                      <Insets top="5.0" />
                                  </VBox.margin>
                              </Button>
                          </children>
                      </VBox>
-                     <ListView fx:id="keywordsListView" prefHeight="140.0" prefWidth="297.0" />
                  </children>
              </HBox>
          </children>
