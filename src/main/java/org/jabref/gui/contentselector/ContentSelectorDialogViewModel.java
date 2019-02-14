@@ -38,7 +38,7 @@ class ContentSelectorDialogViewModel {
         );
     }
 
-    ObservableList<String> loadFieldNames() {
+    ObservableList<String> getFieldNamesBackingList() {
         fieldNames.addAll(fieldNameKeywordsMap.keySet());
 
         if (fieldNames.isEmpty()) {

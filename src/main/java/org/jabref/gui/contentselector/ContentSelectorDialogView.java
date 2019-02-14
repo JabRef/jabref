@@ -112,7 +112,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
             viewModel.populateKeywordsFor(newValue);
             removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
         });
-        fieldNamesListView.setItems(viewModel.loadFieldNames());
+        fieldNamesListView.setItems(viewModel.getFieldNamesBackingList());
         fieldNamesListView.getSelectionModel().select(FIRST_ELEMENT);
     }
 }
