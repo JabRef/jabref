@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionModel;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -15,7 +16,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
+import java.util.Optional;
+
 public class ContentSelectorDialogView extends BaseDialog<Void> {
+
+    private static final int FIRST_ELEMENT = 0;
 
     @FXML private Button addFieldNameButton;
     @FXML private Button removeFieldNameButton;
@@ -51,8 +56,14 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ContentSelectorDialogViewModel(metaData, dialogService);
-
         initFieldNameListView();
+        initKeywordsListView();
+    }
+
+    private void initKeywordsListView() {
+        keywordsListView.setItems(viewModel.getKeywordsBackingList());
+        keywordsListView.getSelectionModel().select(FIRST_ELEMENT);
+        keywordsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> removeKeywordButton.setDisable(viewModel.shouldBeRemoveKeywordButtonDisabled()));
     }
 
     @FXML
@@ -62,11 +73,40 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     @FXML
     private void removeFieldName() {
-        String selectedFieldName = fieldNamesListView.getFocusModel().getFocusedItem();
-        viewModel.showRemoveFieldNameConfirmationDialog(selectedFieldName);
+        getSelectedFieldName().ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);
+    }
+
+    @FXML
+    private void addNewKeyword() {
+        getSelectedFieldName().ifPresent(viewModel::showInputKeywordDialog);
+    }
+
+    @FXML
+    private void removeKeyword() {
+        Optional<String> fieldName = getSelectedFieldName();
+        Optional<String> keywordToRemove = getSelectedKeyword();
+        if (fieldName.isPresent() && keywordToRemove.isPresent()) {
+            viewModel.showRemoveKeywordConfirmationDialog(fieldName.get(), keywordToRemove.get());
+        }
+    }
+
+    private Optional<String> getSelectedFieldName() {
+        return Optional.of(fieldNamesListView).map(ListView::getSelectionModel).map(SelectionModel::getSelectedItem);
+    }
+
+    private Optional<String> getSelectedKeyword() {
+        return Optional.of(keywordsListView).map(ListView::getSelectionModel).map(SelectionModel::getSelectedItem);
     }
 
     private void initFieldNameListView() {
+        fieldNamesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.populateKeywordsFor(newValue);
+            if (!keywordsListView.getItems().isEmpty()) {
+                keywordsListView.getSelectionModel().select(FIRST_ELEMENT);
+            }
+            removeKeywordButton.setDisable(viewModel.shouldBeRemoveKeywordButtonDisabled());
+        });
         fieldNamesListView.setItems(viewModel.loadFieldNames());
+        fieldNamesListView.getSelectionModel().select(FIRST_ELEMENT);
     }
 }
