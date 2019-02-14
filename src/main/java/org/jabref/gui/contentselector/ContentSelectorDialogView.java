@@ -22,13 +22,20 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     private static final int FIRST_ELEMENT = 0;
 
-    @FXML private Button addFieldNameButton;
-    @FXML private Button removeFieldNameButton;
-    @FXML private Button addKeywordButton;
-    @FXML private Button removeKeywordButton;
-    @FXML private ListView<String> fieldNamesListView;
-    @FXML private ListView<String> keywordsListView;
-    @FXML private ButtonType saveButton;
+    @FXML
+    private Button addFieldNameButton;
+    @FXML
+    private Button removeFieldNameButton;
+    @FXML
+    private Button addKeywordButton;
+    @FXML
+    private Button removeKeywordButton;
+    @FXML
+    private ListView<String> fieldNamesListView;
+    @FXML
+    private ListView<String> keywordsListView;
+    @FXML
+    private ButtonType saveButton;
 
     private ContentSelectorDialogViewModel viewModel;
 
@@ -63,7 +70,9 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     private void initKeywordsListView() {
         keywordsListView.setItems(viewModel.getKeywordsBackingList());
         keywordsListView.getSelectionModel().select(FIRST_ELEMENT);
-        keywordsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> removeKeywordButton.setDisable(viewModel.shouldBeRemoveKeywordButtonDisabled()));
+        keywordsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                removeKeywordButton.setDisable(!getSelectedKeyword().isPresent())
+        );
     }
 
     @FXML
@@ -101,10 +110,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     private void initFieldNameListView() {
         fieldNamesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.populateKeywordsFor(newValue);
-            if (!keywordsListView.getItems().isEmpty()) {
-                keywordsListView.getSelectionModel().select(FIRST_ELEMENT);
-            }
-            removeKeywordButton.setDisable(viewModel.shouldBeRemoveKeywordButtonDisabled());
+            removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
         });
         fieldNamesListView.setItems(viewModel.loadFieldNames());
         fieldNamesListView.getSelectionModel().select(FIRST_ELEMENT);
