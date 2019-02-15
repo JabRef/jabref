@@ -4,18 +4,19 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-
-<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.ManageCitationsDialogView">
-	<content>
-		<TableView fx:id="citationsTableView" prefHeight="208.0" prefWidth="662.0">
-			<columns>
-				<TableColumn fx:id="citation" prefWidth="251.0" text="%Citation" />
-				<TableColumn fx:id="extraInfo" prefWidth="425.0" text="%Extra information (e.g. page number)" />
-			</columns>
-		</TableView>
-	</content>
-	<buttonTypes>
-		<ButtonType fx:constant="CANCEL" />
-		<ButtonType fx:constant="OK" />
-	</buttonTypes>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0"
+            prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="org.jabref.gui.openoffice.ManageCitationsDialogView">
+    <content>
+        <TableView fx:id="citationsTableView" prefHeight="208.0" prefWidth="662.0">
+            <columns>
+                <TableColumn fx:id="citation" prefWidth="251.0" text="%Citation"/>
+                <TableColumn fx:id="extraInfo" prefWidth="425.0" text="%Extra information (e.g. page number)"/>
+            </columns>
+        </TableView>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType fx:constant="OK"/>
+    </buttonTypes>
 </DialogPane>

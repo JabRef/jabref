@@ -30,6 +30,9 @@ import org.fxmisc.easybind.EasyBind;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
+    private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
+    private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
+    private final StyleLoader loader;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colJournals;
@@ -37,14 +40,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
-
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
-
-    private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
-    private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
-    private final StyleLoader loader;
-
     private StyleSelectDialogViewModel viewModel;
     private PreviewPanel previewArticle;
     private PreviewPanel previewBook;
@@ -63,7 +60,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                 return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
-
         });
         setTitle(Localization.lang("Style selection"));
     }
@@ -87,30 +83,30 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>()
-                                                                      .withGraphic(internalStyle -> {
-                                                                          if (!internalStyle) {
-                                                                              return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                                                                          }
-                                                                          return null;
-                                                                      })
-                                                                      .withOnMouseClickedEvent(item -> {
-                                                                          return evt -> viewModel.deleteStyle();
-                                                                      })
-                                                                      .withTooltip(item -> {
-                                                                          return Localization.lang("Remove style");
-                                                                      })
-                                                                      .install(colDeleteIcon);
+                .withGraphic(internalStyle -> {
+                    if (!internalStyle) {
+                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                    }
+                    return null;
+                })
+                .withOnMouseClickedEvent(item -> {
+                    return evt -> viewModel.deleteStyle();
+                })
+                .withTooltip(item -> {
+                    return Localization.lang("Remove style");
+                })
+                .install(colDeleteIcon);
 
         edit.setOnAction(e -> viewModel.editStyle());
 
         new ViewModelTableRowFactory<StyleSelectItemViewModel>()
-                                                                .withOnMouseClickedEvent((item, event) -> {
-                                                                    if (event.getClickCount() == 2) {
-                                                                        viewModel.viewStyle(item);
-                                                                    }
-                                                                })
-                                                                .withContextMenu(item -> createContextMenu())
-                                                                .install(tvStyles);
+                .withOnMouseClickedEvent((item, event) -> {
+                    if (event.getClickCount() == 2) {
+                        viewModel.viewStyle(item);
+                    }
+                })
+                .withContextMenu(item -> createContextMenu())
+                .install(tvStyles);
 
         tvStyles.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
             if (newvalue == null) {
@@ -141,5 +137,4 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void addStyleFile() {
         viewModel.addStyleFile();
     }
-
 }

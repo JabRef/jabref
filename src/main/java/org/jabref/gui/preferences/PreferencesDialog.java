@@ -112,8 +112,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
         });
         tabsList.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<PrefsTab>()
-                                                .withText(PrefsTab::getTabName)
-                                                .install(tabsList);
+                .withText(PrefsTab::getTabName)
+                .install(tabsList);
 
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
@@ -133,19 +133,19 @@ public class PreferencesDialog extends BaseDialog<Void> {
         resetPreferences.setOnAction(e -> resetPreferences());
         resetPreferences.setMaxWidth(Double.MAX_VALUE);
         buttonContainer.getChildren().addAll(
-                                             importPreferences,
-                                             exportPreferences,
-                                             showPreferences,
-                                             resetPreferences);
+                importPreferences,
+                exportPreferences,
+                showPreferences,
+                resetPreferences);
 
         VBox spacer = new VBox();
         spacer.setPrefHeight(10.0);
         VBox.setVgrow(tabsList, Priority.ALWAYS);
         VBox.setVgrow(spacer, Priority.SOMETIMES);
         vBox.getChildren().addAll(
-                                  tabsList,
-                                  spacer,
-                                  buttonContainer);
+                tabsList,
+                spacer,
+                buttonContainer);
 
         container.setLeft(vBox);
 
@@ -154,16 +154,16 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void resetPreferences() {
         boolean resetPreferencesConfirmed = dialogService.showConfirmationDialogAndWait(
-                                                                                        Localization.lang("Reset preferences"),
-                                                                                        Localization.lang("Are you sure you want to reset all settings to default values?"),
-                                                                                        Localization.lang("Reset preferences"),
-                                                                                        Localization.lang("Cancel"));
+                Localization.lang("Reset preferences"),
+                Localization.lang("Are you sure you want to reset all settings to default values?"),
+                Localization.lang("Reset preferences"),
+                Localization.lang("Cancel"));
         if (resetPreferencesConfirmed) {
             try {
                 prefs.clear();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                                                       Localization.lang("You must restart JabRef for this to come into effect."));
+                        Localization.lang("You must restart JabRef for this to come into effect."));
             } catch (BackingStoreException ex) {
                 LOGGER.error("Error while resetting preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
@@ -174,9 +174,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void importPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.XML)
-                                                                                               .withDefaultExtension(StandardFileType.XML)
-                                                                                               .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
+                .addExtensionFilter(StandardFileType.XML)
+                .withDefaultExtension(StandardFileType.XML)
+                .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
@@ -184,7 +184,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 updateAfterPreferenceChanges();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                                                       Localization.lang("You must restart JabRef for this to come into effect."));
+                        Localization.lang("You must restart JabRef for this to come into effect."));
             } catch (JabRefException ex) {
                 LOGGER.error("Error while importing preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
@@ -229,10 +229,10 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void exportPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.XML)
-                                                                                               .withDefaultExtension(StandardFileType.XML)
-                                                                                               .withInitialDirectory(prefs.setLastPreferencesExportPath())
-                                                                                               .build();
+                .addExtensionFilter(StandardFileType.XML)
+                .withDefaultExtension(StandardFileType.XML)
+                .withInitialDirectory(prefs.setLastPreferencesExportPath())
+                .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(exportFile -> {

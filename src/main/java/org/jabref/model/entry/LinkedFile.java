@@ -33,6 +33,14 @@ public class LinkedFile implements Serializable {
     private transient StringProperty link = new SimpleStringProperty();
     private transient StringProperty fileType = new SimpleStringProperty();
 
+    public LinkedFile(String description, Path link, String fileType) {
+        this(description, link.toString(), fileType);
+    }
+
+    /**
+     * @deprecated use the other constructor {@link #LinkedFile(String, Path, String)}
+     */
+    @Deprecated
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
         this.fileType.setValue(Objects.requireNonNull(fileType));

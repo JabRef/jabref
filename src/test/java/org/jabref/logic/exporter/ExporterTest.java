@@ -16,16 +16,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.TempDirectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class ExporterTest {
 
     public BibDatabaseContext databaseContext;
@@ -56,7 +54,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void testExportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) throws Exception {
+    public void testExportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
         exportFormat.export(databaseContext, tmpFile, charset, entries);
@@ -65,7 +63,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
+    public void testExportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);
@@ -75,7 +73,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDirectory.TempDir Path testFolder) {
+    public void testExportingNullEntriesThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);

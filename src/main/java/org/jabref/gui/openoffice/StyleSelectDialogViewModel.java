@@ -54,7 +54,6 @@ public class StyleSelectDialogViewModel {
         } else {
             selectedItem.setValue(styles.get(0));
         }
-
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
@@ -67,10 +66,10 @@ public class StyleSelectDialogViewModel {
 
     public void addStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                                                                                               .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                                                                                               .withInitialDirectory(preferencesService.getWorkingDir())
-                                                                                               .build();
+                .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                .withInitialDirectory(preferencesService.getWorkingDir())
+                .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
             if (loader.addStyleIfValid(stylePath)) {
@@ -80,7 +79,6 @@ public class StyleSelectDialogViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file."));
             }
         });
-
     }
 
     public List<StyleSelectItemViewModel> loadStyles() {
@@ -97,7 +95,6 @@ public class StyleSelectDialogViewModel {
         if (loader.removeStyle(style)) {
             styles.remove(selectedItem.get());
         }
-
     }
 
     public void editStyle() {
@@ -106,7 +103,7 @@ public class StyleSelectDialogViewModel {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
 
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath().toString(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }
@@ -122,7 +119,6 @@ public class StyleSelectDialogViewModel {
         scrollPane.setContent(styleView);
         pane.setContent(scrollPane);
         dialogService.showCustomDialogAndWait(item.getStyle().getName(), pane, ButtonType.OK);
-
     }
 
     public ObjectProperty<StyleSelectItemViewModel> selectedItemProperty() {
@@ -133,5 +129,4 @@ public class StyleSelectDialogViewModel {
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
     }
-
 }

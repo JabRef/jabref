@@ -28,7 +28,7 @@ public class ExporterFactory {
     }
 
     public static ExporterFactory create(List<TemplateExporter> customFormats,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
+                                         LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
 

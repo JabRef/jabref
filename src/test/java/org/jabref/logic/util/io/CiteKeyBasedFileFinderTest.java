@@ -12,12 +12,10 @@ import org.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(TempDirectory.class)
 class CiteKeyBasedFileFinderTest {
 
     private BibEntry entry;
@@ -28,7 +26,7 @@ class CiteKeyBasedFileFinderTest {
     private Path pdfFile;
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
+    void setUp(@TempDir Path temporaryFolder) throws IOException {
         entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setCiteKey("HipKro03");
 

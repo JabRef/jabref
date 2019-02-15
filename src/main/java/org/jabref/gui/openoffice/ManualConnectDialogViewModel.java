@@ -34,11 +34,11 @@ public class ManualConnectDialogViewModel {
         ooJarsProperty().setValue(ooPreferences.getJarsPath());
 
         dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                           .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                           .build();
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .build();
         fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                       .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                                                                       .build();
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .build();
     }
 
     public void browseOOPath() {
@@ -47,7 +47,6 @@ public class ManualConnectDialogViewModel {
 
     public void browseOOExec() {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> ooExec.setValue(f.toAbsolutePath().toString()));
-
     }
 
     public void browseOOJars() {
@@ -75,5 +74,4 @@ public class ManualConnectDialogViewModel {
 
         preferencesService.setOpenOfficePreferences(ooPreferences);
     }
-
 }

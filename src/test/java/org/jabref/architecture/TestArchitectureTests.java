@@ -41,7 +41,6 @@ public class TestArchitectureTests {
         exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
         exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
         exceptions.add(CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST);
-
     }
 
     public static Stream<String[]> data() {

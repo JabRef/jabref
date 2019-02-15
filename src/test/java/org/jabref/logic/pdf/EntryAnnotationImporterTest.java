@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class EntryAnnotationImporterTest {
 
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final BibEntry entry = new BibEntry(new CustomEntryType("EntryKey","required","optional"));
+    private final BibEntry entry = new BibEntry(new CustomEntryType("EntryKey", "required", "optional"));
 
     @BeforeEach
     public void setUp() {

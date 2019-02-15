@@ -43,8 +43,8 @@ public class FindFullTextAction extends SimpleCommand {
     @Override
     public void execute() {
         BackgroundTask.wrap(this::findFullTexts)
-                .onSuccess(this::downloadFullTexts)
-                .executeWith(Globals.TASK_EXECUTOR);
+                      .onSuccess(this::downloadFullTexts)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private Map<Optional<URL>, BibEntry> findFullTexts() {
@@ -100,8 +100,7 @@ public class FindFullTextAction extends SimpleCommand {
 
                 //Download full text
                 addLinkedFileFromURL(result.get(), entry);
-
-           } else {
+            } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
@@ -115,7 +114,8 @@ public class FindFullTextAction extends SimpleCommand {
     /**
      * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
      * from the findFullTexts map
-     * @param url the url "key"
+     *
+     * @param url   the url "key"
      * @param entry the entry "value"
      */
     private void addLinkedFileFromURL(URL url, BibEntry entry) {

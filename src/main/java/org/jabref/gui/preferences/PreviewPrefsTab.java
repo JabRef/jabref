@@ -156,8 +156,8 @@ public class PreviewPrefsTab implements PrefsTab {
         btnUp.setPrefSize(80, 20);
         btnDown.setPrefSize(80, 20);
         vBox.getChildren().addAll(new Label(""), new Label(""), new Label(""), new Label(""), new Label(""),
-                                  new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
-                                  btnUp, btnDown);
+                new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
+                btnUp, btnDown);
         Label currentPreview = new Label(Localization.lang("Current Preview"));
         currentPreview.getStyleClass().add("sectionHeader");
         gridPane.add(currentPreview, 1, 1);

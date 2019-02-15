@@ -34,8 +34,7 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,14 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class CleanupWorkerTest {
 
     private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void setUp(@TempDir Path bibFolder) throws IOException {
 
         Path path = bibFolder.resolve("ARandomlyNamedFolder");
         Files.createDirectory(path);
@@ -82,7 +80,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupDoesNothingByDefault(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void cleanupDoesNothingByDefault(@TempDir Path bibFolder) throws IOException {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
         entry.setField("pdf", "aPdfFile");
@@ -220,7 +218,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupMoveFilesMovesFileFromSubfolder(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void cleanupMoveFilesMovesFileFromSubfolder(@TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MOVE_PDF);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
@@ -238,7 +236,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupRelativePathsConvertAbsoluteToRelativePath(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void cleanupRelativePathsConvertAbsoluteToRelativePath(@TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFile");
@@ -254,7 +252,7 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesRelativeFile(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void cleanupRenamePdfRenamesRelativeFile(@TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
         Path path = bibFolder.resolve("AnotherRandomlyNamedFile.tmp");

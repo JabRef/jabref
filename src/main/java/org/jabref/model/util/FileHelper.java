@@ -73,7 +73,7 @@ public class FileHelper {
             return Optional.empty();
         }
 
-        return Optional.of(extension.substring(1, extension.length()));
+        return Optional.of(extension.substring(1));
     }
 
     /**

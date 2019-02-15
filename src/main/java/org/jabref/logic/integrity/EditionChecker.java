@@ -14,6 +14,7 @@ public class EditionChecker implements ValueChecker {
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
     private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9].+)$")
             .asPredicate();
+    private static final String FIRST_EDITION = "1";
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
@@ -36,6 +37,10 @@ public class EditionChecker implements ValueChecker {
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
+        }
+
+        if (value.equals(FIRST_EDITION)) {
+            return Optional.of(Localization.lang("edition of book reported as just 1"));
         }
 
         //biblatex

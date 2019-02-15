@@ -9,9 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -19,7 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -34,24 +34,24 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.EntryFromFileCreator;
-import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -65,17 +65,15 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
-    private final EntryFromFileCreatorManager creatorManager;
+    private final ImportHandler importHandler;
     private final JabRefPreferences preferences = Globals.prefs;
     private final DialogService dialogService;
     private Button buttonScan;
     private Button buttonExport;
     private Button buttonApply;
-    private CheckBox checkboxCreateKeywords;
     private TextField textfieldDirectoryPath;
     private TreeView<FileNodeWrapper> tree;
-    private ComboBox<FileFilter> comboBoxFileTypeSelection;
-    private ComboBox<EntryType> comboBoxEntryTypeSelection;
+    private ComboBox<FileChooser.ExtensionFilter> comboBoxFileTypeSelection;
     private VBox panelSearchProgress;
     private BackgroundTask findUnlinkedFilesTask;
 
@@ -86,7 +84,16 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
         dialogService = frame.getDialogService();
 
         databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
-        creatorManager = new EntryFromFileCreatorManager(ExternalFileTypes.getInstance());
+        importHandler = new ImportHandler(
+                dialogService,
+                databaseContext,
+                ExternalFileTypes.getInstance(),
+                Globals.prefs.getFilePreferences(),
+                Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getUpdateFieldPreferences(),
+                Globals.getFileUpdateMonitor(),
+                frame.getUndoManager()
+        );
 
         initialize();
     }
@@ -166,9 +173,6 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
             root.setExpanded(true);
         });
 
-        checkboxCreateKeywords = new CheckBox(Localization.lang("Create directory based keywords"));
-        checkboxCreateKeywords.setTooltip(new Tooltip((Localization.lang("Creates keywords in created entrys with directory pathnames"))));
-
         textfieldDirectoryPath = new TextField();
         Path initialPath = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences())
                                           .orElse(preferences.getWorkingDir());
@@ -177,7 +181,6 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
         Label labelDirectoryDescription = new Label(Localization.lang("Select a directory where the search shall start."));
         Label labelFileTypesDescription = new Label(Localization.lang("Select file type:"));
         Label labelFilesDescription = new Label(Localization.lang("These files are not linked in the active library."));
-        Label labelEntryTypeDescription = new Label(Localization.lang("Entry type to be created:"));
         Label labelSearchingDirectoryInfo = new Label(Localization.lang("Searching file system..."));
 
         tree = new TreeView<>();
@@ -211,28 +214,20 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                     }
                 })
                 .install(tree);
-        List<FileFilter> fileFilterList = creatorManager.getFileFilterList();
+        List<FileChooser.ExtensionFilter> fileFilterList = Arrays.asList(
+                FileFilterConverter.ANY_FILE,
+                FileFilterConverter.toExtensionFilter(StandardFileType.PDF),
+                FileFilterConverter.toExtensionFilter(StandardFileType.BIBTEX_DB)
+        );
+
         comboBoxFileTypeSelection = new ComboBox<>(FXCollections.observableArrayList(fileFilterList));
         comboBoxFileTypeSelection.getSelectionModel().selectFirst();
-        new ViewModelListCellFactory<FileFilter>()
-                .withText(Object::toString)
-                .withIcon(fileFilter -> {
-                    if (fileFilter instanceof EntryFromFileCreator) {
-                        EntryFromFileCreator creator = (EntryFromFileCreator) fileFilter;
-                        if (creator.getExternalFileType() != null) {
-                            return creator.getExternalFileType().getIcon();
-                        }
-                    }
-                    return null;
-                })
+        new ViewModelListCellFactory<FileChooser.ExtensionFilter>()
+                .withText(fileFilter -> fileFilter.getDescription() + fileFilter.getExtensions().stream().collect(Collectors.joining(", ", " (", ")")))
+                .withIcon(fileFilter -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileFilter.getExtensions().get(0))
+                                                         .map(ExternalFileType::getIcon)
+                                                         .orElse(null))
                 .install(comboBoxFileTypeSelection);
-
-        Collection<EntryType> entryTypes = EntryTypes.getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        comboBoxEntryTypeSelection = new ComboBox<>(FXCollections.observableArrayList(entryTypes));
-        comboBoxEntryTypeSelection.getSelectionModel().selectFirst();
-        new ViewModelListCellFactory<EntryType>()
-                .withText(EntryType::getName)
-                .install(comboBoxEntryTypeSelection);
 
         panelSearchProgress = new VBox(5, labelSearchingDirectoryInfo, progressBarSearching);
         panelSearchProgress.toFront();
@@ -261,17 +256,10 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
         panelFiles.setCenter(stackPaneTree);
         panelFiles.setBottom(new HBox(5, buttonOptionSelectAll, buttonOptionDeselectAll, buttonOptionExpandAll, buttonOptionCollapseAll, buttonExport));
 
-        VBox panelEntryTypesSelection = new VBox(5);
-        panelEntryTypesSelection.getChildren().setAll(
-                new HBox(15, labelEntryTypeDescription, comboBoxEntryTypeSelection),
-                checkboxCreateKeywords
-        );
-
         VBox container = new VBox(20);
         container.getChildren().addAll(
                 panelDirectory,
-                panelFiles,
-                panelEntryTypesSelection
+                panelFiles
         );
         container.setPrefWidth(600);
         getDialogPane().setContent(container);
@@ -295,7 +283,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
      */
     private void startSearch() {
         Path directory = getSearchDirectory();
-        FileFilter selectedFileFilter = comboBoxFileTypeSelection.getValue();
+        FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(comboBoxFileTypeSelection.getValue());
 
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, databaseContext)
                 .onRunning(() -> {
@@ -343,27 +331,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
             return;
         }
 
-        final EntryType entryType = comboBoxEntryTypeSelection.getValue();
-
-        List<String> errors = creatorManager.addEntriesFromFiles(
-                fileList,
-                databaseContext.getDatabase(),
-                frame.getCurrentBasePanel(),
-                entryType,
-                checkboxCreateKeywords.isSelected());
-
-        if (!errors.isEmpty()) {
-            String message;
-            if (errors.size() == 1) {
-                message = Localization.lang("There was one file that could not be imported.");
-            } else {
-                message = Localization.lang("There were %0 files which could not be imported.",
-                        Integer.toString(errors.size()));
-            }
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Warning"),
-                    Localization.lang("The import finished with warnings:") + "\n" + message);
-        }
+        importHandler.importAsNewEntries(fileList);
     }
 
     /**

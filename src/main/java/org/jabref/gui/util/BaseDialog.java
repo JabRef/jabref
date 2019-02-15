@@ -36,9 +36,9 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
     private ButtonType getDefaultButtonType() {
         return getDialogPane().getButtonTypes().stream()
-                .filter(buttonType -> buttonType.getButtonData().isDefaultButton())
-                .findFirst()
-                .orElse(ButtonType.OK);
+                              .filter(buttonType -> buttonType.getButtonData().isDefaultButton())
+                              .findFirst()
+                              .orElse(ButtonType.OK);
     }
 
     private void setDialogIcon(Image image) {

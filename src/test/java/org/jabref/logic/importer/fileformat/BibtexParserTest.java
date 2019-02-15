@@ -327,7 +327,7 @@ class BibtexParserTest {
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(BibEntry.KEY_FIELD, "test")
-                                                   .withField("author", "Ed von T@st");
+                                                                  .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
