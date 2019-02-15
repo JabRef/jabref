@@ -9,12 +9,12 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelTextFieldTableCellVisualizationFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
@@ -68,41 +68,10 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove selected strings")));
 
         colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
-        colLabel.setCellFactory(column -> new TextFieldTableCell<BibtexStringViewModel, String>(new DefaultStringConverter()) {
-
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (!empty && (getTableRow() != null)) {
-                    Object rowItem = getTableRow().getItem();
-
-                    if ((rowItem != null) && (rowItem instanceof BibtexStringViewModel)) {
-                        BibtexStringViewModel vm = (BibtexStringViewModel) rowItem;
-                        visualizer.initVisualization(vm.labelValidation(), this);
-                    }
-                }
-            }
-        });
+        new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colLabel, new DefaultStringConverter());
 
         colContent.setCellValueFactory(cellData -> cellData.getValue().getContent());
-        colContent.setCellFactory(column -> new TextFieldTableCell<BibtexStringViewModel, String>(new DefaultStringConverter()) {
-
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (!empty && (getTableRow() != null)) {
-                    Object rowItem = getTableRow().getItem();
-
-                    if ((rowItem != null) && (rowItem instanceof BibtexStringViewModel)) {
-                        BibtexStringViewModel vm = (BibtexStringViewModel) rowItem;
-                        visualizer.initVisualization(vm.contentValidation(), this);
-                    }
-                }
-
-            }
-        });
+        new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colContent, new DefaultStringConverter());
 
         colLabel.setOnEditCommit((CellEditEvent<BibtexStringViewModel, String> cell) -> {
             cell.getRowValue().setLabel(cell.getNewValue());
@@ -115,7 +84,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         tblStrings.setEditable(true);
 
         viewModel.seletedItemProperty().bind(tblStrings.getSelectionModel().selectedItemProperty());
-        viewModel.newStringLabelProperty().bindBidirectional(stringLabel.textProperty());
     }
 
     @FXML
@@ -132,5 +100,4 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
     private void removeString(ActionEvent event) {
         viewModel.removeString();
     }
-
 }

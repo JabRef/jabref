@@ -26,7 +26,6 @@ public class BibtexStringViewModel {
     private final CompositeValidator combinedValidator;
 
     public BibtexStringViewModel(String label, String content) {
-
         this.label.setValue(label);
         this.content.setValue(content);
 

@@ -10,8 +10,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,7 +27,6 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
 
     private final ListProperty<BibtexStringViewModel> allStrings = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<BibtexStringViewModel> selectedItemProperty = new SimpleObjectProperty<>();
-    private final StringProperty newStringLabelProperty = new SimpleStringProperty("");
     private final BibDatabase bibDatabase;
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
@@ -71,10 +68,6 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
 
     public ObjectProperty<BibtexStringViewModel> seletedItemProperty() {
         return this.selectedItemProperty;
-    }
-
-    public StringProperty newStringLabelProperty() {
-        return this.newStringLabelProperty;
     }
 
     public void save() {
