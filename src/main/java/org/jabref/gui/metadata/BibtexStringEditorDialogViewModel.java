@@ -72,8 +72,8 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
 
     public void save() {
         for (BibtexStringViewModel model : allStrings) {
-            String label = model.getLabel().getValue();
-            String content = model.getContent().getValue();
+            String label = model.labelProperty().getValue();
+            String content = model.contentProperty().getValue();
 
             Optional<BibtexString> bibtexString = bibDatabase.getStringByName(label);
             if (bibtexString.isPresent()) {

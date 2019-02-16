@@ -18,28 +18,20 @@ public class BibtexStringViewModel {
 
     private final static Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-    private final StringProperty label = new SimpleStringProperty();
-    private final StringProperty content = new SimpleStringProperty();
+    private final StringProperty labelProperty = new SimpleStringProperty();
+    private final StringProperty contentProperty = new SimpleStringProperty();
 
     private final Validator labelValidator;
     private final Validator contentValidator;
     private final CompositeValidator combinedValidator;
 
     public BibtexStringViewModel(String label, String content) {
-        this.label.setValue(label);
-        this.content.setValue(content);
+        this.labelProperty.setValue(label);
+        this.contentProperty.setValue(content);
 
-        labelValidator = new FunctionBasedValidator<>(this.label, BibtexStringViewModel::validateLabel);
-        contentValidator = new FunctionBasedValidator<>(this.content, BibtexStringViewModel::validateContent);
+        labelValidator = new FunctionBasedValidator<>(this.labelProperty, BibtexStringViewModel::validateLabel);
+        contentValidator = new FunctionBasedValidator<>(this.contentProperty, BibtexStringViewModel::validateContent);
         combinedValidator = new CompositeValidator(labelValidator, contentValidator);
-    }
-
-    public Validator getlabelValidator() {
-        return labelValidator;
-    }
-
-    public Validator getContentValidator() {
-        return contentValidator;
     }
 
     public ValidationStatus labelValidation() {
@@ -50,28 +42,24 @@ public class BibtexStringViewModel {
         return contentValidator.getValidationStatus();
     }
 
-    public ValidationStatus combinedValidation() {
-        return combinedValidator.getValidationStatus();
-    }
-
     public ReadOnlyBooleanProperty combinedValidationValidProperty() {
         return combinedValidator.getValidationStatus().validProperty();
     }
 
-    public StringProperty getLabel() {
-        return label;
+    public StringProperty labelProperty() {
+        return this.labelProperty;
     }
 
-    public StringProperty getContent() {
-        return content;
+    public StringProperty contentProperty() {
+        return this.contentProperty;
     }
 
     public void setLabel(String label) {
-        this.label.setValue(label);
+        this.labelProperty.setValue(label);
     }
 
     public void setContent(String content) {
-        this.content.setValue(content);
+        this.contentProperty.setValue(content);
     }
 
     private static ValidationMessage validateLabel(String input) {
@@ -91,7 +79,6 @@ public class BibtexStringViewModel {
     }
 
     private static ValidationMessage validateContent(String input) {
-
         if (input == null) {
             return ValidationMessage.error(Localization.lang("Must not be empty!"));
         } else if (input.trim().isEmpty()) {

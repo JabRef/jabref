@@ -65,10 +65,10 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         btnNewString.setTooltip(new Tooltip(Localization.lang("New string")));
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove selected strings")));
 
-        colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
+        colLabel.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colLabel, new DefaultStringConverter());
 
-        colContent.setCellValueFactory(cellData -> cellData.getValue().getContent());
+        colContent.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colContent, new DefaultStringConverter());
 
         colLabel.setOnEditCommit((CellEditEvent<BibtexStringViewModel, String> cell) -> {
