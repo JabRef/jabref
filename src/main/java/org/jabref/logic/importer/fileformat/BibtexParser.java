@@ -221,9 +221,8 @@ public class BibtexParser implements Parser {
         // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
         // regex looks for something like 'identifier = blabla ,'
         if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
-                parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+            parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
         }
-
     }
 
     private void parseRemainingContent() {

@@ -6,25 +6,26 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
-<DialogPane prefHeight="182.0" prefWidth="390.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.AdvancedCiteDialogView">
-   <content>
-      <VBox>
-         <fx:define>
-              <ToggleGroup fx:id="citeToggleGroup" />
-         </fx:define>
-         <children>
-            <RadioButton fx:id="inPar" minWidth="-Infinity" mnemonicParsing="false" text="%Cite selected entries between parenthesis" toggleGroup="$citeToggleGroup" />
-            <RadioButton fx:id="inText" minWidth="-Infinity" mnemonicParsing="false" text="%Cite selected entries with in-text citation" toggleGroup="$citeToggleGroup" />
-            <Label minWidth="-Infinity" text="%Extra information (e.g. page number)" />
-            <TextField fx:id="pageInfo" />
-         </children>
-      </VBox>
-   </content>
-  <buttonTypes>
-    <ButtonType fx:constant="CANCEL" />
-    <ButtonType fx:constant="OK" />
-  </buttonTypes>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="182.0" prefWidth="390.0"
+            xmlns="http://javafx.com/javafx/8.0.171" fx:controller="org.jabref.gui.openoffice.AdvancedCiteDialogView">
+    <content>
+        <VBox>
+            <fx:define>
+                <ToggleGroup fx:id="citeToggleGroup"/>
+            </fx:define>
+            <children>
+                <RadioButton fx:id="inPar" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries between parenthesis" toggleGroup="$citeToggleGroup"/>
+                <RadioButton fx:id="inText" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries with in-text citation" toggleGroup="$citeToggleGroup"/>
+                <Label minWidth="-Infinity" text="%Extra information (e.g. page number)"/>
+                <TextField fx:id="pageInfo"/>
+            </children>
+        </VBox>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType fx:constant="OK"/>
+    </buttonTypes>
 </DialogPane>

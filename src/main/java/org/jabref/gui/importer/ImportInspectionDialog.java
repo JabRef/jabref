@@ -696,11 +696,11 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                     if (entry.isGroupHit()) {
 
                         boolean continuePressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                                                                                                                                                               Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                                                                                                                                                               Localization.lang("Continue"),
-                                                                                                                                                               Localization.lang("Cancel"),
-                                                                                                                                                               Localization.lang("Disable this confirmation dialog"),
-                                                                                                                                                               optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
+                                Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                                Localization.lang("Continue"),
+                                Localization.lang("Cancel"),
+                                Localization.lang("Disable this confirmation dialog"),
+                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
 
                         if (!continuePressed) {
                             return;
@@ -1072,7 +1072,6 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         } finally {
                             entries.getReadWriteLock().writeLock().unlock();
                         }
-
                     } else if (result == DuplicateResolverResult.KEEP_RIGHT) {
                         // Remove the entry from the import inspection dialog.
                         entries.getReadWriteLock().writeLock().lock();

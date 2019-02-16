@@ -25,6 +25,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
@@ -57,7 +58,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
     private final JabRefPreferences prefs;
     private final ObservableList<PrefsTab> preferenceTabs;
 
-    public PreferencesDialog(JabRefFrame parent) {
+    public PreferencesDialog(JabRefFrame parent, TaskExecutor taskExecutor) {
         setTitle(Localization.lang("JabRef preferences"));
         getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
 
@@ -68,7 +69,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
             close();
         });
 
-        prefs = JabRefPreferences.getInstance();
+        prefs = Globals.prefs;
         frame = parent;
         dialogService = frame.getDialogService();
 
@@ -77,7 +78,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new FileTab(dialogService, prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
-        preferenceTabs.add(new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance()));
+        preferenceTabs.add(new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance(), taskExecutor));
         preferenceTabs.add(new ExternalTab(frame, this, prefs));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
         preferenceTabs.add(new EntryEditorPrefsTab(prefs));
@@ -135,8 +136,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 importPreferences,
                 exportPreferences,
                 showPreferences,
-                resetPreferences
-        );
+                resetPreferences);
 
         VBox spacer = new VBox();
         spacer.setPrefHeight(10.0);
@@ -145,8 +145,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         vBox.getChildren().addAll(
                 tabsList,
                 spacer,
-                buttonContainer
-        );
+                buttonContainer);
 
         container.setLeft(vBox);
 

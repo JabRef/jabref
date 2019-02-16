@@ -120,7 +120,7 @@ public class SourceTab extends EntryEditorTab {
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
-                                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                     LOGGER.debug("Incorrect entry", ex);
                 }
             });

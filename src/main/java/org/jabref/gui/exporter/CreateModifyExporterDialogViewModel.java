@@ -21,12 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * This view model can be used both for "add exporter" and "modify exporter" functionalities.
  * It takes an optional exporter which is empty for "add exporter," and takes the selected exporter
  * for "modify exporter."  It returns an optional exporter which empty if an invalid or no exporter is
  * created, and otherwise contains the exporter to be added or that is modified.
- *
  */
 
 public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
@@ -65,7 +63,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
         // Check that there are no empty strings.
         if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
-            || !layoutFile.get().endsWith(".layout")) {
+                || !layoutFile.get().endsWith(".layout")) {
 
             LOGGER.info("One of the fields is empty or invalid!");
             return null;
@@ -75,7 +73,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
-                                                       layoutPreferences, savePreferences);
+                layoutPreferences, savePreferences);
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }
@@ -86,9 +84,9 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     public void browse() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-            .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
-            .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
-            .withInitialDirectory(getExportWorkingDirectory()).build();
+                .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
+                .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
+                .withInitialDirectory(getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));
     }
 
@@ -103,5 +101,4 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     public StringProperty getExtension() {
         return extension;
     }
-
 }

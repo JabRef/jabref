@@ -38,7 +38,7 @@ class LayoutTest {
 
     @Test
     void entryTypeForUnknown() throws IOException {
-        BibEntry entry = new BibEntry(new CustomEntryType("unknown","required","optional")).withField("author", "test");
+        BibEntry entry = new BibEntry(new CustomEntryType("unknown", "required", "optional")).withField("author", "test");
 
         assertEquals("Unknown", layout("\\bibtextype", entry));
     }

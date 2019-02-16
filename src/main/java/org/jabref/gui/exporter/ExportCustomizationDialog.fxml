@@ -5,25 +5,24 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
-
-<DialogPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.exporter.ExportCustomizationDialogView">
-   <content>
-      <VBox prefHeight="200.0" prefWidth="500.0">
-         <children>
-            <TableView fx:id="exporterTable" prefHeight="150.0" prefWidth="500.0">
-              <columns>
-                <TableColumn fx:id="nameColumn" prefWidth="150.0" text="%Export name" />
-                <TableColumn fx:id="layoutColumn" prefWidth="250.0" text="%Main layout file" />
-                <TableColumn fx:id="extensionColumn" prefWidth="100.0" text="%Extension" />
-              </columns>
-            </TableView>
-         </children>
-      </VBox>
-   </content>
-   <ButtonType fx:id="addButton" text="%Add" />
-   <ButtonType fx:id="modifyButton" text="%Modify" />
-   <ButtonType fx:id="removeButton" text="%Remove" />
-   <ButtonType fx:id="closeButton" fx:constant="OK" />
-   <ButtonType fx:constant="CANCEL" />
+    <content>
+        <VBox prefHeight="200.0" prefWidth="500.0">
+            <children>
+                <TableView fx:id="exporterTable" prefHeight="150.0" prefWidth="500.0">
+                    <columns>
+                        <TableColumn fx:id="nameColumn" prefWidth="150.0" text="%Export name"/>
+                        <TableColumn fx:id="layoutColumn" prefWidth="250.0" text="%Main layout file"/>
+                        <TableColumn fx:id="extensionColumn" prefWidth="100.0" text="%Extension"/>
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+    </content>
+    <ButtonType fx:id="addButton" text="%Add"/>
+    <ButtonType fx:id="modifyButton" text="%Modify"/>
+    <ButtonType fx:id="removeButton" text="%Remove"/>
+    <ButtonType fx:id="closeButton" fx:constant="OK"/>
+    <ButtonType fx:constant="CANCEL"/>
 </DialogPane>

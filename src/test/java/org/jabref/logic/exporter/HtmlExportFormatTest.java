@@ -16,14 +16,12 @@ import org.jabref.model.entry.BibEntry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class HtmlExportFormatTest {
     public BibDatabaseContext databaseContext;
     public Charset charset;
@@ -55,7 +53,7 @@ public class HtmlExportFormatTest {
     }
 
     @Test
-    public void emitWellFormedHtml(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void emitWellFormedHtml(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         exportFormat.export(databaseContext, path, charset, entries);
         List<String> lines = Files.readAllLines(path);

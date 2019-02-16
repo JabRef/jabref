@@ -33,9 +33,9 @@ public class OpenOfficePreferences {
             String jarsPath,
             String executablePath,
             String installationPath,
-                                 boolean useAllDatabases,
-                                 boolean syncWhenCiting,
-                                 boolean showPanel,
+            boolean useAllDatabases,
+            boolean syncWhenCiting,
+            boolean showPanel,
             List<String> externalStyles,
             String currentStyle
     ) {

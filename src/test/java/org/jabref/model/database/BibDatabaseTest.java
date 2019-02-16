@@ -253,7 +253,7 @@ public class BibDatabaseTest {
 
     @Test
     public void getUsedStrings() {
-        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(),"required","optional"));
+        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(), "required", "optional"));
         entry.setField("author", "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");

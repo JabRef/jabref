@@ -358,7 +358,7 @@ public class MedlinePlainImporter extends Importer {
             if (value.contains("Copyright")) {
                 int copyrightIndex = value.lastIndexOf("Copyright");
                 //remove the copyright from the field since the name of the field is copyright
-                String copyrightInfo = value.substring(copyrightIndex, value.length()).replaceAll("Copyright ", "");
+                String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
                 hm.put("copyright", copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);
             } else {

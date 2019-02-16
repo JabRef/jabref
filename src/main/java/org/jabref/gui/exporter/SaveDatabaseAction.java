@@ -64,8 +64,8 @@ public class SaveDatabaseAction {
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
         try {
             SavePreferences preferences = prefs.loadForSaveFromPreferences()
-                                                       .withEncoding(encoding)
-                                                       .withSaveType(saveType);
+                                               .withEncoding(encoding)
+                                               .withSaveType(saveType);
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);

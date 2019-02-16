@@ -58,8 +58,8 @@ public class ExportCommand extends SimpleCommand {
 
         //Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
-                .sorted(Comparator.comparing(Exporter::getName))
-                .collect(Collectors.toList());
+                                                        .sorted(Comparator.comparing(Exporter::getName))
+                                                        .collect(Collectors.toList());
 
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()

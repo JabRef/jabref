@@ -56,8 +56,6 @@ public interface PreferencesService {
 
     SavePreferences loadForExportFromPreferences();
 
-    void setExportWorkingDirectory(String layoutFileDirString);
-
     String getExportWorkingDirectory();
 
     Charset getDefaultEncoding();
@@ -65,4 +63,6 @@ public interface PreferencesService {
     void setDefaultEncoding(Charset encoding);
 
     String getUser();
+
+    void setExportWorkingDirectory(String layoutFileDirString);
 }
