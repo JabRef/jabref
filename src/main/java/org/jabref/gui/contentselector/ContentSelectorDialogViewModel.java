@@ -2,14 +2,15 @@ package org.jabref.gui.contentselector;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableList.of;
 import static java.lang.String.format;
@@ -20,30 +21,37 @@ class ContentSelectorDialogViewModel {
 
     private final MetaData metaData;
     private final DialogService dialogService;
+    private final BasePanel basePanel;
     private final Map<String, List<String>> fieldNameKeywordsMap = new HashMap<>();
 
     private ObservableList<String> fieldNames = FXCollections.observableArrayList();
     private ObservableList<String> keywords = FXCollections.observableArrayList();
 
-    ContentSelectorDialogViewModel(MetaData metaData, DialogService dialogService) {
+    ContentSelectorDialogViewModel(MetaData metaData, BasePanel basePanel, DialogService dialogService) {
         this.metaData = metaData;
         this.dialogService = dialogService;
-        initFieldNameKeywordsMapWithExistingValues();
-
+        this.basePanel = basePanel;
+        populateFieldNameKeywordsMapWithExistingValues();
+        populateFieldNamesListWithValues();
     }
 
-    private void initFieldNameKeywordsMapWithExistingValues() {
-        metaData.getContentSelectors().getContentSelectors().forEach(
-                existingContentSelector -> fieldNameKeywordsMap.put(existingContentSelector.getFieldName(), existingContentSelector.getValues())
-        );
-    }
-
-    ObservableList<String> getFieldNamesBackingList() {
-        fieldNames.addAll(fieldNameKeywordsMap.keySet());
+    private void populateFieldNamesListWithValues() {
+        List<String> existingFieldNames = new ArrayList<>(fieldNameKeywordsMap.keySet());
+        Collections.sort(existingFieldNames);
+        fieldNames.addAll(existingFieldNames);
 
         if (fieldNames.isEmpty()) {
             DEFAULT_FIELD_NAMES.forEach(this::addFieldNameIfUnique);
         }
+    }
+
+    private void populateFieldNameKeywordsMapWithExistingValues() {
+        metaData.getContentSelectors().getContentSelectors().forEach(
+                existingContentSelector -> fieldNameKeywordsMap.put(existingContentSelector.getFieldName(), new ArrayList<>(existingContentSelector.getValues()))
+        );
+    }
+
+    ObservableList<String> getFieldNamesBackingList() {
         return fieldNames;
     }
 
@@ -51,10 +59,15 @@ class ContentSelectorDialogViewModel {
         return keywords;
     }
 
+    void showInputFieldNameDialog() {
+        dialogService.showInputDialogAndWait(Localization.lang(Localization.lang("Add new field name")), Localization.lang("Field name:"))
+                .ifPresent(this::addFieldNameIfUnique);
+    }
+
     private void addFieldNameIfUnique(String fieldNameToAdd) {
         boolean exists = fieldNameKeywordsMap.containsKey(fieldNameToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(format("Field name \"%s\" already exists", fieldNameToAdd));
+            dialogService.showErrorDialogAndWait(Localization.lang(format("Field name \"%s\" already exists", fieldNameToAdd)));
             return;
         }
 
@@ -62,42 +75,44 @@ class ContentSelectorDialogViewModel {
         fieldNames.add(fieldNameToAdd);
     }
 
-    private void removeFieldName(String fieldNameToRemove) {
-        fieldNameKeywordsMap.remove(fieldNameToRemove);
-        fieldNames.remove(fieldNameToRemove);
-    }
-
-    void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait("Add new field name", "Field name:")
-                .ifPresent(this::addFieldNameIfUnique);
-    }
-
     void showRemoveFieldNameConfirmationDialog(String fieldNameToRemove) {
         if (fieldNameToRemove == null) {
-            dialogService.showErrorDialogAndWait("No field name selected!");
+            dialogService.showErrorDialogAndWait(Localization.lang("No field name selected!"));
             return;
         }
 
-        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait("Remove field name", "Are you sure you want to remove field name: \"" + fieldNameToRemove + "\"");
+        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove field name"),
+                Localization.lang(format("Are you sure you want to remove field name: \"%s\"", fieldNameToRemove))
+        );
+
         if (deleteConfirmed) {
             removeFieldName(fieldNameToRemove);
         }
     }
 
+    private void removeFieldName(String fieldNameToRemove) {
+        fieldNameKeywordsMap.remove(fieldNameToRemove);
+        fieldNames.remove(fieldNameToRemove);
+    }
+
     void populateKeywordsFor(String selectedFieldName) {
         keywords.clear();
-        keywords.addAll(fieldNameKeywordsMap.get(selectedFieldName));
+        if (selectedFieldName != null) {
+            keywords.addAll(fieldNameKeywordsMap.get(selectedFieldName));
+        }
+
     }
 
     void showInputKeywordDialog(String selectedFieldName) {
-        dialogService.showInputDialogAndWait("Add new field name", "Field name:")
+        dialogService.showInputDialogAndWait(Localization.lang("Add new keyword"), Localization.lang("Keyword:"))
                 .ifPresent(newKeyword -> addKeyword(selectedFieldName, newKeyword));
     }
 
     private void addKeyword(String fieldName, String keywordToAdd) {
         boolean exists = fieldNameKeywordsMap.get(fieldName).contains(keywordToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(format("Keyword \"%s\" already exists", keywordToAdd));
+            dialogService.showErrorDialogAndWait(Localization.lang(format("Keyword \"%s\" already exists", keywordToAdd)));
             return;
         }
 
@@ -109,7 +124,7 @@ class ContentSelectorDialogViewModel {
     }
 
     void showRemoveKeywordConfirmationDialog(String fieldName, String keywordToRemove) {
-        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait("Remove field name", "Are you sure you want to remove field name: \"" + keywordToRemove + "\"");
+        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang("Remove field name"), Localization.lang("Are you sure you want to remove field name: \"%s\"", keywordToRemove));
         if (deleteConfirmed) {
             removeKeyword(fieldName, keywordToRemove);
         }
@@ -120,7 +135,46 @@ class ContentSelectorDialogViewModel {
         keywords.remove(keywordToRemove);
     }
 
-    boolean shouldBeRemoveKeywordButtonDisabled() {
-        return keywords.isEmpty();
+    void saveChanges() {
+        List<String> metaDataFieldNames = metaData.getContentSelectors().getFieldNamesWithSelectors();
+        fieldNameKeywordsMap.forEach((fieldName, keywords) -> updateMetaDataContentSelector(metaDataFieldNames, fieldName, keywords));
+
+        List<String> fieldNamesToRemove = filterFieldNamesToRemove();
+        fieldNamesToRemove.forEach(metaData::clearContentSelectors);
+
+        basePanel.setupMainPanel();
+        basePanel.markNonUndoableBaseChanged();
+    }
+
+    private List<String> filterFieldNamesToRemove() {
+        Set<String> newlyAddedKeywords = fieldNameKeywordsMap.keySet();
+        return metaData.getContentSelectors().getFieldNamesWithSelectors().stream()
+                .filter(fieldName -> !newlyAddedKeywords.contains(fieldName))
+                .collect(Collectors.toList());
+    }
+
+    private void updateMetaDataContentSelector(List<String> existingFieldNames, String fieldName, List<String> keywords) {
+        boolean fieldNameDoNotExists = !existingFieldNames.contains(fieldName);
+        if (fieldNameDoNotExists) {
+            metaData.addContentSelector(new ContentSelector(fieldName, keywords));
+        }
+
+        if (keywordsHaveChanged(fieldName, keywords)) {
+            metaData.clearContentSelectors(fieldName);
+            metaData.addContentSelector(new ContentSelector(fieldName, keywords));
+        }
+    }
+
+    private boolean keywordsHaveChanged(String fieldName, List<String> keywords) {
+        HashSet<String> keywordsSet = asHashSet(keywords);
+        List<String> existingKeywords = metaData.getContentSelectorValuesForField(fieldName);
+        if (!keywordsSet.equals(asHashSet(existingKeywords))) {
+            return true;
+        }
+        return !keywordsSet.isEmpty() && existingKeywords.isEmpty();
+    }
+
+    private HashSet<String> asHashSet(List<String> listToConvert) {
+        return new HashSet<>(listToConvert);
     }
 }

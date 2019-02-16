@@ -81,6 +81,7 @@ import org.jabref.gui.actions.ShowDocumentViewerAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.ManageContentSelectorAction;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.exporter.ExportCommand;
@@ -941,7 +942,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this)),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)));
 

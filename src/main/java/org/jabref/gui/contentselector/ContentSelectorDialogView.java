@@ -1,22 +1,23 @@
 package org.jabref.gui.contentselector;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionModel;
-import org.jabref.Globals;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
@@ -39,40 +40,31 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     private ContentSelectorDialogViewModel viewModel;
 
-    private final JabRefFrame jabRefFrame;
+    private final BasePanel basePanel;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final MetaData metaData;
 
     public ContentSelectorDialogView(JabRefFrame jabRefFrame) {
         this.setTitle(Localization.lang("Manage content selectors"));
         this.getDialogPane().setPrefSize(375, 475);
 
-        this.jabRefFrame = jabRefFrame;
+        this.basePanel = jabRefFrame.getCurrentBasePanel();
         this.dialogService = jabRefFrame.getDialogService();
-        this.stateManager = Globals.stateManager;
-        this.metaData = stateManager.getActiveDatabase().map(BibDatabaseContext::getMetaData).orElseGet(MetaData::new);
+        this.metaData = basePanel.getBibDatabaseContext().getMetaData();
 
         ViewLoader.view(this)
                 .load()
                 .setAsDialogPane(this);
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> System.out.println("test"));
+        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndClose());
     }
 
     @FXML
     public void initialize() {
-        viewModel = new ContentSelectorDialogViewModel(metaData, dialogService);
-        initFieldNameListView();
-        initKeywordsListView();
-    }
+        viewModel = new ContentSelectorDialogViewModel(metaData, basePanel, dialogService);
 
-    private void initKeywordsListView() {
-        keywordsListView.setItems(viewModel.getKeywordsBackingList());
-        keywordsListView.getSelectionModel().select(FIRST_ELEMENT);
-        keywordsListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                removeKeywordButton.setDisable(!getSelectedKeyword().isPresent())
-        );
+        initListView(fieldNamesListView, viewModel::getFieldNamesBackingList, (observable, oldValue, newValue) -> onFieldNameSelected(newValue));
+        initListView(keywordsListView, viewModel::getKeywordsBackingList, (observable, oldValue, newValue) -> onKeywordSelected());
     }
 
     @FXML
@@ -99,20 +91,33 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
         }
     }
 
+    private void initListView(ListView<String> listViewToInit, Supplier<ObservableList<String>> backingList, ChangeListener<String> onSelectedListener) {
+        listViewToInit.setItems(backingList.get());
+        listViewToInit.getSelectionModel().selectedItemProperty().addListener(onSelectedListener);
+        listViewToInit.getSelectionModel().select(FIRST_ELEMENT);
+    }
+
+    private void onFieldNameSelected(String newValue) {
+        removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
+        removeFieldNameButton.setDisable(!getSelectedFieldName().isPresent());
+        addKeywordButton.setDisable(newValue == null);
+        viewModel.populateKeywordsFor((newValue));
+    }
+
+    private void onKeywordSelected() {
+        removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
+    }
+
     private Optional<String> getSelectedFieldName() {
-        return Optional.of(fieldNamesListView).map(ListView::getSelectionModel).map(SelectionModel::getSelectedItem);
+        return Optional.of(fieldNamesListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
     }
 
     private Optional<String> getSelectedKeyword() {
-        return Optional.of(keywordsListView).map(ListView::getSelectionModel).map(SelectionModel::getSelectedItem);
+        return Optional.of(keywordsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
     }
 
-    private void initFieldNameListView() {
-        fieldNamesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.populateKeywordsFor(newValue);
-            removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
-        });
-        fieldNamesListView.setItems(viewModel.getFieldNamesBackingList());
-        fieldNamesListView.getSelectionModel().select(FIRST_ELEMENT);
+    private void saveChangesAndClose() {
+        viewModel.saveChanges();
+        close();
     }
 }
