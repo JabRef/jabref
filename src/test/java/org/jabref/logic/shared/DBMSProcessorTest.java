@@ -118,7 +118,9 @@ class DBMSProcessorTest {
     void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
+        firstEntry.setId("1");
         BibEntry secondEntry = getBibEntryExample();
+        secondEntry.setId("2");
 
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
