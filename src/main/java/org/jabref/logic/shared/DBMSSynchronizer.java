@@ -324,10 +324,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     *Checks whether the current SQL connection is valid.
-     *In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     *  Checks whether the current SQL connection is valid.
+     *  In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
      *
-     *@return <code>true</code> if the connection is valid, else <code>false</code>.
+     *  @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
     public boolean checkCurrentConnection() {
         try {
