@@ -433,25 +433,26 @@ public abstract class DBMSProcessor {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ")
-                .append(escape("ENTRY") + "." + escape("SHARED_ID")).append(", ")
-                .append(escape("ENTRY") + "." + escape("TYPE")).append(", ")
-                .append(escape("ENTRY") + "." + escape("VERSION")).append(", ")
-                .append("F." + escape("ENTRY_SHARED_ID")).append(", ")
-                .append("F." + escape("NAME")).append(", ")
-                .append("F." + escape("VALUE"))
+                .append(escape("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
+                .append(escape("ENTRY")).append(".").append(escape("TYPE")).append(", ")
+                .append(escape("ENTRY")).append(".").append(escape("VERSION")).append(", ")
+                .append("F.").append(escape("ENTRY_SHARED_ID")).append(", ")
+                .append("F.").append(escape("NAME")).append(", ")
+                .append("F.").append(escape("VALUE"))
                 .append(" FROM ")
                 .append(escape("ENTRY"))
                 .append(" inner join ")
                 .append(escape("FIELD"))
                 .append(" F on ")
-                .append(escape("ENTRY") + ".")
-                .append(escape("SHARED_ID") + " = F." + escape("ENTRY_SHARED_ID"))
+                .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
+                .append(" = F.").append(escape("ENTRY_SHARED_ID"))
                 .append(" where ")
                 .append(escape("SHARED_ID")).append(" in (");
 
-        idList.stream().map(id -> String.valueOf(id)).collect(Collectors.joining(", "));
+        String idListAsString = idList.stream().map(String::valueOf).collect(Collectors.joining(", "));
 
-        query.append(idList.get(idList.size() - 1))
+        query.append(idListAsString)
+                .append(idList.get(idList.size() - 1))
                 .append(") order by ")
                 .append(escape("SHARED_ID"))
                 .append(";");
