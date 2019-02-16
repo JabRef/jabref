@@ -7,7 +7,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.util.converter.DefaultStringConverter;
 
@@ -28,7 +27,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
     @FXML private Button btnHelp;
     @FXML private ButtonType saveButton;
 
-    @FXML private TextField stringLabel;
     @FXML private TableView<BibtexStringViewModel> tblStrings;
     @FXML private TableColumn<BibtexStringViewModel, String> colLabel;
     @FXML private TableColumn<BibtexStringViewModel, String> colContent;
