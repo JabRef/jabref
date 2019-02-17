@@ -287,6 +287,16 @@ public class BibDatabase {
         bibtexStrings.put(string.getId(), string);
     }
 
+    public void addStrings(Collection<BibtexString> stringsToAdd) {
+        for (BibtexString str : stringsToAdd) {
+            Optional<BibtexString> bibtexString = getStringByName(str.getName());
+            if (bibtexString.isPresent() && !(bibtexString.get().getContent().equals(str.getContent()))) {
+                bibtexString.get().setContent(str.getContent());
+            } else {
+                addString(str);
+            }
+        }
+    }
     /**
      * Removes the string with the given id.
      */
@@ -605,5 +615,4 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
-
 }

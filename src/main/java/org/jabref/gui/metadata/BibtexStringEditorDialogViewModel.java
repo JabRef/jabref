@@ -1,6 +1,6 @@
 package org.jabref.gui.metadata;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,19 +71,15 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     }
 
     public void save() {
-        for (BibtexStringViewModel model : allStrings) {
-            String label = model.labelProperty().getValue();
-            String content = model.contentProperty().getValue();
+        List<BibtexString> stringsToAdd = allStrings.stream().map(this::fromBibtexStringViewModel).collect(Collectors.toList());
+        bibDatabase.addStrings(stringsToAdd);
+    }
 
-            Optional<BibtexString> bibtexString = bibDatabase.getStringByName(label);
-            if (bibtexString.isPresent()) {
-                if (!(bibtexString.get().getContent().equals(content))) {
-                    bibtexString.get().setContent(content);
-                }
-            } else {
-                bibDatabase.addString(new BibtexString(label, content));
-            }
-        }
+    private BibtexString fromBibtexStringViewModel(BibtexStringViewModel viewModel) {
+        String label = viewModel.labelProperty().getValue();
+        String content = viewModel.contentProperty().getValue();
+        return new BibtexString(label, content);
+
     }
 
     public BooleanProperty validProperty() {
