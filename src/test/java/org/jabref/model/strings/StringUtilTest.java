@@ -145,7 +145,9 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        // Should be added
+        assertEquals("", StringUtil.getPart("", 0, false));
+        assertEquals("a", StringUtil.getPart("{a}", 0, false));
+        assertEquals("{a}", StringUtil.getPart(" {a}", 0, true));
     }
 
     @Test
