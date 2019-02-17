@@ -67,7 +67,7 @@ class ContentSelectorDialogViewModel {
     private void addFieldNameIfUnique(String fieldNameToAdd) {
         boolean exists = fieldNameKeywordsMap.containsKey(fieldNameToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(Localization.lang(format("Field name \"%s\" already exists", fieldNameToAdd)));
+            dialogService.showErrorDialogAndWait(Localization.lang("Field name \"%0\" already exists", fieldNameToAdd));
             return;
         }
 
@@ -83,7 +83,7 @@ class ContentSelectorDialogViewModel {
 
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),
-                Localization.lang(format("Are you sure you want to remove field name: \"%s\"", fieldNameToRemove))
+                Localization.lang("Are you sure you want to remove field name: \"%0\"?", fieldNameToRemove)
         );
 
         if (deleteConfirmed) {
@@ -112,7 +112,7 @@ class ContentSelectorDialogViewModel {
     private void addKeyword(String fieldName, String keywordToAdd) {
         boolean exists = fieldNameKeywordsMap.get(fieldName).contains(keywordToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(Localization.lang(format("Keyword \"%s\" already exists", keywordToAdd)));
+            dialogService.showErrorDialogAndWait(Localization.lang("Keyword \"%s\" already exists", keywordToAdd));
             return;
         }
 
@@ -124,7 +124,7 @@ class ContentSelectorDialogViewModel {
     }
 
     void showRemoveKeywordConfirmationDialog(String fieldName, String keywordToRemove) {
-        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang("Remove field name"), Localization.lang("Are you sure you want to remove field name: \"%s\"", keywordToRemove));
+        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang("Remove keyword"), Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keywordToRemove));
         if (deleteConfirmed) {
             removeKeyword(fieldName, keywordToRemove);
         }
