@@ -3,8 +3,8 @@ package org.jabref.gui.contentselector;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -93,8 +93,8 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
         }
     }
 
-    private void initListView(ListView<String> listViewToInit, Supplier<ObservableList<String>> backingList, ChangeListener<String> onSelectedListener) {
-        listViewToInit.setItems(backingList.get());
+    private void initListView(ListView<String> listViewToInit, Supplier<ListProperty<String>> backingList, ChangeListener<String> onSelectedListener) {
+        listViewToInit.itemsProperty().bind(backingList.get());
         listViewToInit.getSelectionModel().selectedItemProperty().addListener(onSelectedListener);
         listViewToInit.getSelectionModel().select(FIRST_ELEMENT);
     }

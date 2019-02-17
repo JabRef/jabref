@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
+import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
@@ -21,7 +23,7 @@ import org.jabref.model.metadata.MetaData;
 
 import static com.google.common.collect.ImmutableList.of;
 
-class ContentSelectorDialogViewModel {
+class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private static final List<String> DEFAULT_FIELD_NAMES = of(FieldName.AUTHOR, FieldName.JOURNAL, FieldName.KEYWORDS, FieldName.PUBLISHER);
 
@@ -30,8 +32,8 @@ class ContentSelectorDialogViewModel {
     private final BasePanel basePanel;
     private final Map<String, List<String>> fieldNameKeywordsMap = new HashMap<>();
 
-    private ObservableList<String> fieldNames = FXCollections.observableArrayList();
-    private ObservableList<String> keywords = FXCollections.observableArrayList();
+    private ListProperty<String> fieldNames = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     ContentSelectorDialogViewModel(MetaData metaData, BasePanel basePanel, DialogService dialogService) {
         this.metaData = metaData;
@@ -57,11 +59,11 @@ class ContentSelectorDialogViewModel {
         );
     }
 
-    ObservableList<String> getFieldNamesBackingList() {
+    ListProperty<String> getFieldNamesBackingList() {
         return fieldNames;
     }
 
-    ObservableList<String> getKeywordsBackingList() {
+    ListProperty<String> getKeywordsBackingList() {
         return keywords;
     }
 
