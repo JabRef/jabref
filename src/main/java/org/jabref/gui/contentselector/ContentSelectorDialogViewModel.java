@@ -1,7 +1,17 @@
 package org.jabref.gui.contentselector;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
@@ -9,11 +19,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static com.google.common.collect.ImmutableList.of;
-import static java.lang.String.format;
 
 class ContentSelectorDialogViewModel {
 
@@ -60,7 +66,7 @@ class ContentSelectorDialogViewModel {
     }
 
     void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait(Localization.lang(Localization.lang("Add new field name")), Localization.lang("Field name:"))
+        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name:"))
                 .ifPresent(this::addFieldNameIfUnique);
     }
 
@@ -112,7 +118,7 @@ class ContentSelectorDialogViewModel {
     private void addKeyword(String fieldName, String keywordToAdd) {
         boolean exists = fieldNameKeywordsMap.get(fieldName).contains(keywordToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Keyword \"%s\" already exists", keywordToAdd));
+            dialogService.showErrorDialogAndWait(Localization.lang("Keyword \"%0\" already exists", keywordToAdd));
             return;
         }
 

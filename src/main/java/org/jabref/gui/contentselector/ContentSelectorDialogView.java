@@ -1,6 +1,8 @@
 package org.jabref.gui.contentselector;
 
-import com.airhacks.afterburner.views.ViewLoader;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -8,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionModel;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -16,8 +19,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;
 
-import java.util.Optional;
-import java.util.function.Supplier;
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
