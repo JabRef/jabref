@@ -297,6 +297,7 @@ public class BibDatabase {
             }
         }
     }
+
     /**
      * Removes the string with the given id.
      */
