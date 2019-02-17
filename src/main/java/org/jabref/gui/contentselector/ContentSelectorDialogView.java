@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.beans.property.ListProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -20,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.easybind.EasyBind;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
@@ -65,8 +65,22 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     public void initialize() {
         viewModel = new ContentSelectorDialogViewModel(metaData, basePanel, dialogService);
 
-        initListView(fieldNamesListView, viewModel::getFieldNamesBackingList, (observable, oldValue, newValue) -> onFieldNameSelected(newValue));
-        initListView(keywordsListView, viewModel::getKeywordsBackingList, (observable, oldValue, newValue) -> onKeywordSelected());
+        initFieldNameComponents();
+        initKeywordsComponents();
+    }
+
+    private void initFieldNameComponents() {
+        initListView(fieldNamesListView, viewModel::getFieldNamesBackingList);
+        viewModel.selectedFieldNameProperty().bind(fieldNamesListView.getSelectionModel().selectedItemProperty());
+        removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());
+        EasyBind.subscribe(viewModel.selectedFieldNameProperty(), viewModel::populateKeywords);
+    }
+
+    private void initKeywordsComponents() {
+        initListView(keywordsListView, viewModel::getKeywordsBackingList);
+        viewModel.selectedKeywordProperty().bind(keywordsListView.getSelectionModel().selectedItemProperty());
+        addKeywordButton.disableProperty().bind(viewModel.isFieldNameListEmpty());
+        removeKeywordButton.disableProperty().bind(viewModel.isNoKeywordSelected());
     }
 
     @FXML
@@ -93,21 +107,9 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
         }
     }
 
-    private void initListView(ListView<String> listViewToInit, Supplier<ListProperty<String>> backingList, ChangeListener<String> onSelectedListener) {
+    private void initListView(ListView<String> listViewToInit, Supplier<ListProperty<String>> backingList) {
         listViewToInit.itemsProperty().bind(backingList.get());
-        listViewToInit.getSelectionModel().selectedItemProperty().addListener(onSelectedListener);
         listViewToInit.getSelectionModel().select(FIRST_ELEMENT);
-    }
-
-    private void onFieldNameSelected(String newValue) {
-        removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
-        removeFieldNameButton.setDisable(!getSelectedFieldName().isPresent());
-        addKeywordButton.setDisable(newValue == null);
-        viewModel.populateKeywordsFor((newValue));
-    }
-
-    private void onKeywordSelected() {
-        removeKeywordButton.setDisable(!getSelectedKeyword().isPresent());
     }
 
     private Optional<String> getSelectedFieldName() {

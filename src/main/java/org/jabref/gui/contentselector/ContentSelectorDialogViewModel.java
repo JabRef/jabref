@@ -9,8 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
@@ -34,6 +38,8 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private ListProperty<String> fieldNames = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private StringProperty selectedFieldName = new SimpleStringProperty();
+    private StringProperty selectedKeyword = new SimpleStringProperty();
 
     ContentSelectorDialogViewModel(MetaData metaData, BasePanel basePanel, DialogService dialogService) {
         this.metaData = metaData;
@@ -63,8 +69,28 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         return fieldNames;
     }
 
+    StringProperty selectedFieldNameProperty() {
+        return selectedFieldName;
+    }
+
+    BooleanBinding isFieldNameListEmpty() {
+        return Bindings.isEmpty(fieldNames);
+    }
+
+    BooleanBinding isNoFieldNameSelected() {
+        return Bindings.isEmpty(selectedFieldName);
+    }
+
     ListProperty<String> getKeywordsBackingList() {
         return keywords;
+    }
+
+    StringProperty selectedKeywordProperty() {
+        return selectedKeyword;
+    }
+
+    BooleanBinding isNoKeywordSelected() {
+        return Bindings.isEmpty(selectedKeyword);
     }
 
     void showInputFieldNameDialog() {
@@ -104,20 +130,19 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         fieldNames.remove(fieldNameToRemove);
     }
 
-    void populateKeywordsFor(String selectedFieldName) {
+    void populateKeywords(String selectedFieldName) {
         keywords.clear();
         if (selectedFieldName != null) {
             keywords.addAll(fieldNameKeywordsMap.get(selectedFieldName));
         }
-
     }
 
     void showInputKeywordDialog(String selectedFieldName) {
         dialogService.showInputDialogAndWait(Localization.lang("Add new keyword"), Localization.lang("Keyword:"))
-                .ifPresent(newKeyword -> addKeyword(selectedFieldName, newKeyword));
+                .ifPresent(newKeyword -> addKeywordIfUnique(selectedFieldName, newKeyword));
     }
 
-    private void addKeyword(String fieldName, String keywordToAdd) {
+    private void addKeywordIfUnique(String fieldName, String keywordToAdd) {
         boolean exists = fieldNameKeywordsMap.get(fieldName).contains(keywordToAdd);
         if (exists) {
             dialogService.showErrorDialogAndWait(Localization.lang("Keyword \"%0\" already exists", keywordToAdd));
@@ -128,7 +153,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         existingKeywords.add(keywordToAdd);
         fieldNameKeywordsMap.put(fieldName, existingKeywords);
         keywords.add(keywordToAdd);
-        populateKeywordsFor(fieldName);
+        populateKeywords(fieldName);
     }
 
     void showRemoveKeywordConfirmationDialog(String fieldName, String keywordToRemove) {
