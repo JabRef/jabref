@@ -71,9 +71,10 @@ public class RegexFormatter extends Formatter {
     @Override
     public String format(final String input) {
         Objects.requireNonNull(input);
-        if (regex == null) {
-            return input;
-        }
+        // This appears to be unnecessary bc the constructor requires non-null input string and regex is not modified anywhere else. JB 2/17/19
+        // if (regex == null) {
+        //    return input;
+        //}
 
         Matcher matcherOpeningCurlyBrace = PATTERN_ESCAPED_OPENING_CURLY_BRACE.matcher(input);
         final String openingCurlyBraceReplaced = matcherOpeningCurlyBrace.replaceAll(PLACEHOLDER_FOR_OPENING_CURLY_BRACE);

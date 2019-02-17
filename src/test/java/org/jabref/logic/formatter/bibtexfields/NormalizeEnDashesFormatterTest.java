@@ -1,5 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.jabref.logic.l10n.Language;
+import org.jabref.logic.l10n.Localization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,5 +52,27 @@ public class NormalizeEnDashesFormatterTest {
     @Test
     public void dashAtTheEndIsKept() {
         assertEquals("Example-", formatter.format("Example-"));
+    }
+
+    @Test
+    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenNormalizeEnDashesIsReturned(){
+        Localization.setLanguage(Language.English);
+        assertEquals("Normalize en dashes", formatter.getName());
+    }
+
+    @Test
+    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenNormalizesTheEnDashesIsReturned(){
+        Localization.setLanguage(Language.English);
+        assertEquals("Normalizes the en dashes.", formatter.getDescription());
+    }
+
+    @Test
+    public void whenGetKeyMethod_thenNormalize_En_DashesReturned(){
+        assertEquals("normalize_en_dashes", formatter.getKey());
+    }
+
+    @Test
+    public void whenGetExampleInputMethod_thenWineryMsgReturned(){
+        assertEquals("Winery - A Modeling Tool for TOSCA-based Cloud Applications", formatter.getExampleInput());
     }
 }
