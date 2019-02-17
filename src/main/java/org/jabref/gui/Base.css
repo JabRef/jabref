@@ -975,3 +975,21 @@ We want to have a look that matches our icons in the tool-bar */
 .color-palette-region .button {
     -fx-border-width: 0px;
 }
+
+
+.warning-icon {
+    -fx-fill: -jr-warn;
+}
+
+.error-icon {
+    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-error;
+}
+
+.tooltip-warning {
+    -fx-background-color: -jr-warn;
+}
+
+.tooltip-error {
+    -fx-background-color: -jr-error;
+}
