@@ -98,6 +98,8 @@ import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
+import org.jabref.gui.metadata.BibtexStringEditorAction;
+import org.jabref.gui.metadata.PreambleEditor;
 import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -848,7 +850,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                                   factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
-                factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
+                factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(this))
+
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -857,6 +860,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 
+        //@formatter:off
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this)),
@@ -971,7 +975,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
-
+        //@formatter:on
         MenuBar menu = new MenuBar();
         menu.getStyleClass().add("mainMenu");
         menu.getMenus().addAll(

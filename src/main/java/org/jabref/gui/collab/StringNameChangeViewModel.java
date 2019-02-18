@@ -50,13 +50,13 @@ class StringNameChangeViewModel extends ChangeViewModel {
             BibtexString bs = new BibtexString(disk, content);
             try {
                 panel.getDatabase().addString(bs);
-                undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
+                undoEdit.addEdit(new UndoableInsertString(panel.getDatabase(), bs));
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
         } else {
             string.setName(disk);
-            undoEdit.addEdit(new UndoableStringChange(panel, string, true, mem, disk));
+            undoEdit.addEdit(new UndoableStringChange(string, true, mem, disk));
         }
 
         // Update tmp database:

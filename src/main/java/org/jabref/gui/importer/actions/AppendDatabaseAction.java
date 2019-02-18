@@ -45,14 +45,12 @@ public class AppendDatabaseAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
-    private final JabRefFrame frame;
     private final BasePanel panel;
 
     private final List<Path> filesToOpen = new ArrayList<>();
     private final DialogService dialogService;
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
-        this.frame = frame;
         this.panel = panel;
         dialogService = frame.getDialogService();
     }
@@ -87,7 +85,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibtexString bs : fromDatabase.getStringValues()) {
                 if (!database.hasStringLabel(bs.getName())) {
                     database.addString(bs);
-                    ce.addEdit(new UndoableInsertString(panel, database, bs));
+                    ce.addEdit(new UndoableInsertString(database, bs));
                 }
             }
         }

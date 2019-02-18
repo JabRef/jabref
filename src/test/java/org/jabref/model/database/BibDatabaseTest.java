@@ -123,6 +123,32 @@ public class BibDatabaseTest {
     }
 
     @Test
+    public void addStringAsCollection() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        List<BibtexString> strings = Arrays.asList(string);
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void addStringAsCollectionWithUpdatedContent() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        List<BibtexString> strings = Arrays.asList(string, new BibtexString("DSP", "ABCD"));
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void addStringAsCollectionWithNewContent() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
+        List<BibtexString> strings = Arrays.asList(string, vlsi);
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+        assertEquals(Optional.of(vlsi), database.getStringByName("VLSI"));
+    }
+
+    @Test
     public void addSameStringLabelTwiceThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
