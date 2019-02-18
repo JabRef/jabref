@@ -23,8 +23,6 @@ import org.fxmisc.easybind.EasyBind;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
-    private static final int FIRST_ELEMENT = 0;
-
     @FXML
     private Button addFieldNameButton;
     @FXML
@@ -109,7 +107,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     private void initListView(ListView<String> listViewToInit, Supplier<ListProperty<String>> backingList) {
         listViewToInit.itemsProperty().bind(backingList.get());
-        listViewToInit.getSelectionModel().select(FIRST_ELEMENT);
+        listViewToInit.getSelectionModel().selectFirst();
     }
 
     private Optional<String> getSelectedFieldName() {
