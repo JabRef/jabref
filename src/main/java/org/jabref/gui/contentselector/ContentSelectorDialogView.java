@@ -3,6 +3,8 @@ package org.jabref.gui.contentselector;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,11 +14,9 @@ import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.metadata.MetaData;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -38,19 +38,16 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     @FXML
     private ButtonType saveButton;
 
+    @Inject
+    private DialogService dialogService;
+    private final BasePanel basePanel;
     private ContentSelectorDialogViewModel viewModel;
 
-    private final BasePanel basePanel;
-    private final DialogService dialogService;
-    private final MetaData metaData;
-
-    public ContentSelectorDialogView(JabRefFrame jabRefFrame) {
+    public ContentSelectorDialogView(BasePanel basePanel) {
         this.setTitle(Localization.lang("Manage content selectors"));
         this.getDialogPane().setPrefSize(375, 475);
 
-        this.basePanel = jabRefFrame.getCurrentBasePanel();
-        this.dialogService = jabRefFrame.getDialogService();
-        this.metaData = basePanel.getBibDatabaseContext().getMetaData();
+        this.basePanel = basePanel;
 
         ViewLoader.view(this)
                 .load()
@@ -61,7 +58,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ContentSelectorDialogViewModel(metaData, basePanel, dialogService);
+        viewModel = new ContentSelectorDialogViewModel(basePanel, dialogService);
 
         initFieldNameComponents();
         initKeywordsComponents();

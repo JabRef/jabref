@@ -31,9 +31,9 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private static final List<String> DEFAULT_FIELD_NAMES = of(FieldName.AUTHOR, FieldName.JOURNAL, FieldName.KEYWORDS, FieldName.PUBLISHER);
 
+    private final BasePanel basePanel;
     private final MetaData metaData;
     private final DialogService dialogService;
-    private final BasePanel basePanel;
     private final Map<String, List<String>> fieldNameKeywordsMap = new HashMap<>();
 
     private ListProperty<String> fieldNames = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -41,10 +41,10 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
     private StringProperty selectedFieldName = new SimpleStringProperty();
     private StringProperty selectedKeyword = new SimpleStringProperty();
 
-    ContentSelectorDialogViewModel(MetaData metaData, BasePanel basePanel, DialogService dialogService) {
-        this.metaData = metaData;
-        this.dialogService = dialogService;
+    ContentSelectorDialogViewModel(BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
+        this.metaData = basePanel.getBibDatabaseContext().getMetaData();
+        this.dialogService = dialogService;
         populateFieldNameKeywordsMapWithExistingValues();
         populateFieldNamesListWithValues();
     }

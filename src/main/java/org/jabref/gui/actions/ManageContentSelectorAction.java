@@ -15,11 +15,12 @@ public class ManageContentSelectorAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (noActiveConnectionExists(jabRefFrame.getCurrentBasePanel())) {
+        BasePanel basePanel = jabRefFrame.getCurrentBasePanel();
+        if (noActiveConnectionExists(basePanel)) {
             jabRefFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Active database connection do not exists!"));
             return;
         }
-        new ContentSelectorDialogView(jabRefFrame).showAndWait();
+        new ContentSelectorDialogView(basePanel).showAndWait();
     }
 
     private boolean noActiveConnectionExists(BasePanel basePanel) {
