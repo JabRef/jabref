@@ -96,7 +96,6 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     private void setValues() {
 
-        viewModel.setValues();
         Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
         boolean selected;
         if (!storedSaveOrderConfig.isPresent()) {

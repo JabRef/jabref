@@ -35,9 +35,9 @@ public class LibraryPropertiesDialogViewModel {
     private final MetaData metaData;
     private final PreferencesService preferencesService;
 
-    private String oldUserSpecificFileDir;
-    private String oldGeneralFileDir;
-    private boolean oldLibraryProtected;
+    private final String oldUserSpecificFileDir;
+    private final String oldGeneralFileDir;
+    private final boolean oldLibraryProtected;
 
     public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
@@ -47,6 +47,20 @@ public class LibraryPropertiesDialogViewModel {
         directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                                                                                  .withInitialDirectory(preferencesService.getWorkingDir()).build();
 
+        Optional<Charset> charset = metaData.getEncoding();
+        selectedEncodingPropety.setValue(charset.orElse(preferencesService.getDefaultEncoding()));
+
+        Optional<String> fileD = metaData.getDefaultFileDirectory();
+        fileD.ifPresent(path -> generalFileDirectoryProperty.setValue(path.trim()));
+
+        Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
+        fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
+
+        oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
+        oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
+
+        libraryProtectedProperty.setValue(metaData.isProtected());
+        oldLibraryProtected = libraryProtectedProperty.getValue();
     }
 
     public StringProperty generalFileDirectoryPropertyProperty() {
@@ -86,22 +100,6 @@ public class LibraryPropertiesDialogViewModel {
         return this.libraryProtectedProperty;
     }
 
-    public void setValues() {
-        Optional<Charset> charset = metaData.getEncoding();
-        selectedEncodingPropety.setValue(charset.orElse(preferencesService.getDefaultEncoding()));
-
-        Optional<String> fileD = metaData.getDefaultFileDirectory();
-        fileD.ifPresent(path -> generalFileDirectoryProperty.setValue(path.trim()));
-
-        Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
-        fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
-
-        oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
-        oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
-
-        libraryProtectedProperty.setValue(metaData.isProtected());
-        oldLibraryProtected = libraryProtectedProperty.getValue();
-    }
 
     public boolean generalFileDirChanged() {
         return !oldGeneralFileDir.equals(generalFileDirectoryProperty.getValue());
