@@ -69,7 +69,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colLabel, new DefaultStringConverter());
 
         colContent.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
-        new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::labelValidation, visualizer).install(colContent, new DefaultStringConverter());
+        new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::contentValidation, visualizer).install(colContent, new DefaultStringConverter());
 
         colLabel.setOnEditCommit((CellEditEvent<BibtexStringViewModel, String> cell) -> {
             cell.getRowValue().setLabel(cell.getNewValue());
