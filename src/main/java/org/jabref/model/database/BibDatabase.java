@@ -68,6 +68,11 @@ public class BibDatabase {
         this.registerListener(new KeyChangeListener(this));
     }
 
+    public BibDatabase(List<BibEntry> entries) {
+        this();
+        insertEntries(entries);
+    }
+
     /**
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
@@ -505,7 +510,7 @@ public class BibDatabase {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
-                    newRes.append(res.substring(piv, next));
+                    newRes.append(res, piv, next);
                 }
                 int stringEnd = res.indexOf('#', next + 1);
                 if (stringEnd >= 0) {
@@ -517,7 +522,7 @@ public class BibDatabase {
                     if (resolved == null) {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
-                        newRes.append(res.substring(next, stringEnd + 1));
+                        newRes.append(res, next, stringEnd + 1);
                     } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:

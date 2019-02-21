@@ -9,6 +9,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -62,6 +63,7 @@ public class Globals {
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
+    public static CountingUndoManager undoManager = new CountingUndoManager();
 
     private Globals() {
     }
