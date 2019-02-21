@@ -109,8 +109,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (currentDatabase.isPresent()) {
             addNewSubgroup(rootGroup.get());
         } else {
-            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a database first."));
-            //dialogService.notify(Localization.lang("Cannot create group. Please create a database first."));
+            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
         }
     }
 

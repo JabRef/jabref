@@ -612,12 +612,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         descriptionTextFlow.getChildren().setAll(createFormattedDescription(description));
     }
 
-    private ArrayList<Node> createFormattedDescription(String description) {
+    private ArrayList<Node> createFormattedDescription(String descriptionHTML) {
         ArrayList<Node> nodes = new ArrayList<>();
 
-        description = description.replaceAll("<p>|<br>", "\n");
+        descriptionHTML = descriptionHTML.replaceAll("<p>|<br>", "\n");
 
-        String[] boldSplit = description.split("(?=<b>)|(?<=</b>)|(?=<i>)|(?<=</i>)|(?=<tt>)|(?<=</tt>)|(?=<kbd>)|(?<=</kbd>)");
+        String[] boldSplit = descriptionHTML.split("(?=<b>)|(?<=</b>)|(?=<i>)|(?<=</i>)|(?=<tt>)|(?<=</tt>)|(?=<kbd>)|(?<=</kbd>)");
 
         for (String bs : boldSplit) {
 
