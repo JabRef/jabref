@@ -1,29 +1,31 @@
 package org.jabref.gui.collab;
 
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class EntryChangeViewModel extends ChangeViewModel {
+class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
+
+    private List<FieldChangeViewModel> fieldChanges = new ArrayList<>();
 
     public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
@@ -58,55 +60,47 @@ class EntryChangeViewModel extends ChangeViewModel {
             if ((tmp.isPresent()) && (disk.isPresent())) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
-                    add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
+                    fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
                 }
             } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
                     || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
                             && (mem.isPresent()) && !mem.get().isEmpty())) {
                 // Added externally.
-                add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
+                fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
                         disk.orElse(null)));
             }
         }
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        boolean allAccepted = true;
-
-        Enumeration<ChangeViewModel> e = children();
-        for (ChangeViewModel c : Collections.list(e)) {
-            if (c.isAcceptable() && c.isAccepted()) {
-                c.makeChange(panel, secondary, undoEdit);
-            } else {
-                allAccepted = false;
+    public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
+        for (DatabaseChangeViewModel c : fieldChanges) {
+            if (c.isAccepted()) {
+                c.makeChange(database, undoEdit);
             }
         }
-
-        /*panel.database().removeEntry(memEntry.getId());
-        try {
-          diskEntry.setId(Util.next());
-        } catch (KeyCollisionException ex) {}
-        panel.database().removeEntry(memEntry.getId());*/
-
-        return allAccepted;
     }
 
     @Override
-    public JComponent description() {
-        return new JLabel(name);
+    public Node description() {
+        VBox container = new VBox();
+        container.getChildren().add(new Label(name));
+
+        for (FieldChangeViewModel change : fieldChanges) {
+            container.getChildren().add(change.description());
+        }
+
+        return container;
     }
 
-    static class FieldChangeViewModel extends ChangeViewModel {
+    static class FieldChangeViewModel extends DatabaseChangeViewModel {
 
         private final BibEntry entry;
         private final BibEntry tmpEntry;
         private final String field;
         private final String inMem;
         private final String onDisk;
-        private final InfoPane tp = new InfoPane();
-        private final JScrollPane sp = new JScrollPane(tp);
-
+        private final WebView tp = new WebView();
 
         public FieldChangeViewModel(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
             super(field);
@@ -132,29 +126,22 @@ class EntryChangeViewModel extends ChangeViewModel {
             if ((onTmp != null) && !onTmp.isEmpty()) {
                 text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3> ").append(onTmp);
             }
-            tp.setContentType("text/html");
-            tp.setText(text.toString());
+            tp.getEngine().loadContent(text.toString());
         }
 
         @Override
-        public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
+        public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
             if (onDisk == null) {
                 entry.clearField(field);
             } else {
                 entry.setField(field, onDisk);
             }
             undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
-            if (onDisk == null) {
-                tmpEntry.clearField(field);
-            } else {
-                tmpEntry.setField(field, onDisk);
-            }
-            return true;
         }
 
         @Override
-        public JComponent description() {
-            return sp;
+        public Node description() {
+            return tp;
         }
 
     }

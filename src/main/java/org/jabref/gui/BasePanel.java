@@ -42,7 +42,7 @@ import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.FileUpdatePanel;
+import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -118,6 +118,7 @@ public class BasePanel extends StackPane {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
+    private final DatabaseChangePane changePane;
 
     private final CitationStyleCache citationStyleCache;
     private final FileAnnotationCache annotationCache;
@@ -191,7 +192,9 @@ public class BasePanel extends StackPane {
         Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
-            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+            changePane = new DatabaseChangePane(mainTable.getPane(), bibDatabaseContext, changeMonitor.get());
+            getChildren().add(changePane);
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
@@ -199,6 +202,7 @@ public class BasePanel extends StackPane {
                 // -> mark as changed
                 this.baseChanged = true;
             }
+            changePane = null;
         }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
@@ -1105,14 +1109,6 @@ public class BasePanel extends StackPane {
      */
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
-        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            if (fup.getPanel() == this) {
-                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            }
-        }
     }
 
     /**
@@ -1127,10 +1123,6 @@ public class BasePanel extends StackPane {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public boolean isUpdatedExternally() {
-        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
@@ -1217,15 +1209,11 @@ public class BasePanel extends StackPane {
 
     public void resetChangeMonitor() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
     }
 
     public void updateTimeStamp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
-    }
-
-    public Path getTempFile() {
-        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     public void copy() {
