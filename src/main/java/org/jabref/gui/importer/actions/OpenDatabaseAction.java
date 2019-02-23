@@ -57,9 +57,8 @@ public class OpenDatabaseAction extends SimpleCommand {
             new FileLinksUpgradeWarning(),
 
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            // Warning about and handling duplicate BibTeX keys:
-            new HandleDuplicateWarnings());
+            new CheckForNewEntryTypesAction()
+    );
 
     private final JabRefFrame frame;
 
