@@ -13,6 +13,7 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +26,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
 
-    private List<FieldChangeViewModel> fieldChanges = new ArrayList<>();
+    private final List<FieldChangeViewModel> fieldChanges = new ArrayList<>();
 
     public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
@@ -60,14 +61,14 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
             if ((tmp.isPresent()) && (disk.isPresent())) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
-                    fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
+                    DefaultTaskExecutor.runInJavaFXThread(()->fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get())));
                 }
             } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
                     || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
                             && (mem.isPresent()) && !mem.get().isEmpty())) {
                 // Added externally.
-                fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
-                        disk.orElse(null)));
+                DefaultTaskExecutor.runInJavaFXThread(() ->fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
+                        disk.orElse(null))));
             }
         }
     }
