@@ -17,6 +17,7 @@ class ImportFormatPreferencesTest {
 
     //first commit on rebase test branch
     //second commit
+    //third commit
 
     Charset charset = StandardCharsets.UTF_8;
     String testPath = "";
