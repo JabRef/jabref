@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ImportFormatPreferencesTest {
 
+    //first commit on rebase test branch
+
     Charset charset = StandardCharsets.UTF_8;
     String testPath = "";
     String testClassName = "";
