@@ -868,7 +868,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
