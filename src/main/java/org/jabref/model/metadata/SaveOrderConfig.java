@@ -61,6 +61,10 @@ public class SaveOrderConfig {
         return saveInOriginalOrder;
     }
 
+    public boolean saveInSpecifiedOrder() {
+        return !saveInOriginalOrder;
+    }
+
     public LinkedList<SortCriterion> getSortCriteria() {
         return sortCriteria;
     }
@@ -85,8 +89,8 @@ public class SaveOrderConfig {
     @Override
     public String toString() {
         return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder +
-                ", sortCriteria=" + sortCriteria +
-                '}';
+               ", sortCriteria=" + sortCriteria +
+               '}';
     }
 
     public void setSaveInOriginalOrder() {
@@ -139,8 +143,8 @@ public class SaveOrderConfig {
         @Override
         public String toString() {
             return "SortCriterion{" + "field='" + field + '\'' +
-                    ", descending=" + descending +
-                    '}';
+                   ", descending=" + descending +
+                   '}';
         }
 
         @Override
@@ -153,7 +157,7 @@ public class SaveOrderConfig {
             }
             SortCriterion that = (SortCriterion) o;
             return Objects.equals(descending, that.descending) &&
-                    Objects.equals(field, that.field);
+                   Objects.equals(field, that.field);
         }
 
         @Override

@@ -1706,6 +1706,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
+    @Override
     public void storeExportSaveOrder(SaveOrderConfig config) {
         putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
         putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
@@ -1728,6 +1729,7 @@ public class JabRefPreferences implements PreferencesService {
         return config;
     }
 
+    @Override
     public SaveOrderConfig loadExportSaveOrder() {
         return new SaveOrderConfig(true,
                 new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),

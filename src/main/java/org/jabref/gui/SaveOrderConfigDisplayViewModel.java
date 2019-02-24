@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -16,9 +15,9 @@ import javafx.collections.FXCollections;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
+import org.jabref.preferences.PreferencesService;
 
 public class SaveOrderConfigDisplayViewModel {
 
@@ -38,13 +37,14 @@ public class SaveOrderConfigDisplayViewModel {
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
 
-    private final MetaData metadata;
+    private final SaveOrderConfig config;
+    private final PreferencesService prefs;
 
-    public SaveOrderConfigDisplayViewModel(MetaData metaData) {
-        this.metadata = metaData;
+    public SaveOrderConfigDisplayViewModel(SaveOrderConfig config, PreferencesService prefs) {
+        this.config = config;
+        this.prefs = prefs;
 
-        Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
-
+        SaveOrderConfig storedSaveOrderConfig = config;
         List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
@@ -52,6 +52,16 @@ public class SaveOrderConfigDisplayViewModel {
         priSortFieldsProperty.addAll(fieldNames);
         secSortFieldsProperty.addAll(fieldNames);
         terSortFieldsProperty.addAll(fieldNames);
+
+        if (config.saveInOriginalOrder()) {
+            saveInOriginalProperty.setValue(true);
+        } else if (config.saveInSpecifiedOrder()) {
+            saveInSpecifiedOrderProperty.setValue(true);
+        } else {
+            saveInTableOrderProperty.setValue(true);
+        }
+        setSaveOrderConfig(config);
+
     }
 
     public ListProperty<String> priSortFieldsProperty() {
@@ -67,13 +77,12 @@ public class SaveOrderConfigDisplayViewModel {
     }
 
     public SaveOrderConfig getSaveOrderConfig() {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
+
         SortCriterion primary = new SortCriterion(getSelectedItemAsLowerCaseTrim(savePriSortSelectedValueProperty), savePriDescPropertySelected.getValue());
-        saveOrderConfig.getSortCriteria().add(primary);
         SortCriterion secondary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveSecSortSelectedValueProperty), saveSecDescPropertySelected.getValue());
-        saveOrderConfig.getSortCriteria().add(secondary);
         SortCriterion tertiary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveTerSortSelectedValueProperty), saveTerDescPropertySelected.getValue());
-        saveOrderConfig.getSortCriteria().add(tertiary);
+
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(saveInOriginalProperty.getValue(), primary, secondary, tertiary);
 
         return saveOrderConfig;
     }
@@ -87,6 +96,12 @@ public class SaveOrderConfigDisplayViewModel {
         saveSecDescPropertySelected.setValue(saveOrderConfig.getSortCriteria().get(1).descending);
         saveTerSortSelectedValueProperty.setValue(saveOrderConfig.getSortCriteria().get(2).field);
         saveTerDescPropertySelected.setValue(saveOrderConfig.getSortCriteria().get(2).descending);
+
+        if (saveInOriginalProperty.getValue()) {
+            saveOrderConfig.setSaveInOriginalOrder();
+        } else {
+            saveOrderConfig.setSaveInSpecifiedOrder();
+        }
     }
 
     private String getSelectedItemAsLowerCaseTrim(StringProperty string) {
@@ -118,7 +133,7 @@ public class SaveOrderConfigDisplayViewModel {
     }
 
     public void storeConfig() {
-        metadata.setSaveOrderConfig(this.getSaveOrderConfig());
+        prefs.storeExportSaveOrder(this.getSaveOrderConfig());
     }
 
     public BooleanProperty saveInOriginalProperty() {

@@ -1,14 +1,23 @@
 package org.jabref.gui;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
 
-import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.PreferencesService;
 
-public class SaveOrderConfigDisplayView {
+import com.airhacks.afterburner.views.ViewLoader;
+
+public class SaveOrderConfigDisplayView extends GridPane {
+
+    private final SaveOrderConfig config;
 
     @FXML private ToggleGroup saveOrderToggleGroup;
     @FXML private ComboBox<String> savePriSort;
@@ -20,17 +29,23 @@ public class SaveOrderConfigDisplayView {
     @FXML private CheckBox savePriDesc;
     @FXML private CheckBox saveSecDesc;
     @FXML private CheckBox saveTerDesc;
-    private SaveOrderConfigDisplayViewModel viewModel;
-    private final MetaData metadata;
+    @Inject private PreferencesService preferencesService;
 
-    public SaveOrderConfigDisplayView(MetaData metadata) {
-        this.metadata = metadata;
+    private SaveOrderConfigDisplayViewModel viewModel;
+
+    public SaveOrderConfigDisplayView(SaveOrderConfig config) {
+        this.config = config;
+
+        ViewLoader.view(this)
+                  .root(this)
+                  .controller(this)
+                  .load();
     }
 
     @FXML
     private void initialize() {
 
-        viewModel = new SaveOrderConfigDisplayViewModel(metadata);
+        viewModel = new SaveOrderConfigDisplayViewModel(config, preferencesService);
 
         exportInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
         exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
@@ -52,5 +67,9 @@ public class SaveOrderConfigDisplayView {
 
     public void storeConfig() {
         viewModel.storeConfig();
+    }
+
+    public Node getJFXPanel() {
+        return this;
     }
 }

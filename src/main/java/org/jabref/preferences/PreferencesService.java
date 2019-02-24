@@ -13,6 +13,7 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.metadata.FilePreferences;
+import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
@@ -65,4 +66,8 @@ public interface PreferencesService {
     String getUser();
 
     void setExportWorkingDirectory(String layoutFileDirString);
+
+    SaveOrderConfig loadExportSaveOrder();
+
+    void storeExportSaveOrder(SaveOrderConfig config);
 }
