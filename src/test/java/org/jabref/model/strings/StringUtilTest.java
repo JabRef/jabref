@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -145,9 +147,10 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        assertEquals("", StringUtil.getPart("", 0, false));
+        assertEquals("",StringUtil.getPart("", 0, false));
         assertEquals("a", StringUtil.getPart("{a}", 0, false));
-        assertEquals("{a}", StringUtil.getPart(" {a}", 0, true));
+        assertEquals("{a}", StringUtil.getPart("   {a}", 0, true));
+        assertEquals("a", StringUtil.getPart(" a ", 0, false));
     }
 
     @Test
@@ -344,5 +347,79 @@ class StringUtilTest {
         assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
         assertEquals("A", StringUtil.capitalizeFirst("a"));
         assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
+    }
+
+    @Test
+    void testStripNonValidXMLCharacters() {
+        assertEquals("", StringUtil.stripNonValidXMLCharacters(""));
+        String testStr = new String();
+        assertEquals("", StringUtil.stripNonValidXMLCharacters(testStr));
+        assertEquals("<test>", StringUtil.stripNonValidXMLCharacters("<test>"));
+        char badChar = 0x8;
+        StringBuilder badStr = new StringBuilder();
+        badStr.append(badChar);
+        assertEquals("", StringUtil.stripNonValidXMLCharacters(badStr.toString()));
+    }
+
+    @Test
+    void testTokenizeToList() {
+        List<String> tokens = Arrays.asList("a","b","c\n");
+        assertEquals(tokens, StringUtil.tokenizeToList("a,b,c", ","));
+    }
+
+    @Test
+    void testIsNullOrEmpty() {
+        assertTrue(StringUtil.isNullOrEmpty(""));
+        assertFalse(StringUtil.isNullOrEmpty("a"));
+        String nullStr = new String();
+        assertTrue(StringUtil.isNullOrEmpty(nullStr));
+    }
+
+    @Test
+    void testIsBlank() {
+        assertTrue(StringUtil.isBlank("   "));
+        assertFalse(StringUtil.isBlank("abc"));
+        Optional<String> nullStr = Optional.empty();
+        assertTrue(StringUtil.isBlank(nullStr));
+        String abc = new String("abc");
+        Optional<String> validStr = Optional.of(abc);
+        assertFalse(StringUtil.isBlank(validStr));
+    }
+
+    @Test
+    void testIsNotBlank() {
+        assertFalse(StringUtil.isNotBlank("   "));
+        assertTrue(StringUtil.isNotBlank("abc"));
+        Optional<String> nullStr = Optional.empty();
+        assertFalse(StringUtil.isNotBlank(nullStr));
+        String abc = new String("abc");
+        Optional<String> validStr = Optional.of(abc);
+        assertTrue(StringUtil.isNotBlank(validStr));
+    }
+
+    @Test
+    void testStripAccents() {
+        assertEquals("a", StringUtil.stripAccents("a"));
+    }
+
+    @Test
+    void testGetS5ringAsWords() {
+        List<String> list = Arrays.asList("a", "b", "c");
+        assertEquals(list, StringUtil.getStringAsWords("a b c"));
+    }
+
+    @Test
+    void testContainsIgnoreCase() {
+        assertTrue(StringUtil.containsIgnoreCase("A", "a"));
+    }
+
+    @Test
+    void testSubstringBetween() {
+        assertEquals("b", StringUtil.substringBetween("abc", "a", "c"));
+    }
+
+    @Test
+    void testStringUtil() {
+        StringUtil sut = new StringUtil();
     }
 }
