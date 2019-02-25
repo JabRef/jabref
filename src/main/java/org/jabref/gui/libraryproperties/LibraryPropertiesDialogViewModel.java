@@ -85,7 +85,6 @@ public class LibraryPropertiesDialogViewModel {
 
     public void browseUserDir() {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
-
     }
 
     public BooleanProperty saveInOriginalProperty() {
@@ -99,7 +98,6 @@ public class LibraryPropertiesDialogViewModel {
     public BooleanProperty libraryProtectedProperty() {
         return this.libraryProtectedProperty;
     }
-
 
     public boolean generalFileDirChanged() {
         return !oldGeneralFileDir.equals(generalFileDirectoryProperty.getValue());
