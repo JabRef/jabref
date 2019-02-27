@@ -703,21 +703,21 @@ public class BibtexParser implements Parser {
                     }
 
                     // Finished, now reverse newKey and remove whitespaces:
-                    parserResult.addWarning(
-                            Localization.lang("Line %0: Found corrupted BibTeX key.", String.valueOf(line)));
                     key = newKey.reverse();
+                    parserResult.addWarning(
+                            Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
                 }
             }
             break;
 
         case ',':
-            parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (contains whitespaces).",
-                    String.valueOf(line)));
+            parserResult.addWarning(
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
             break;
 
         case '\n':
             parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key (comma missing).", String.valueOf(line)));
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
             break;
 
         default:
