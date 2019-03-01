@@ -650,7 +650,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
         defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
