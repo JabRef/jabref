@@ -58,7 +58,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 ### Clone your forked repository on your local machine.
 
-* In command line go to a folder you want to place the source code locally (parent folder of `jabref/`)
+* In command line go to a folder you want to place the source code locally (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII) characters.
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Update submodules: `git submodule update --init`
 
