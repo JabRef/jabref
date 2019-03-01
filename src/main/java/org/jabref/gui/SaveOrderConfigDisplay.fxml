@@ -9,19 +9,19 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root type="javafx.scene.layout.GridPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.SaveOrderConfigDisplayView">
+<fx:root prefHeight="200.0" prefWidth="600.0" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.SaveOrderConfigDisplayView">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="100.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
-    <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
-      <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
-      <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
-      <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
-      <RowConstraints minHeight="-Infinity" prefHeight="30.0" />
+    <RowConstraints prefHeight="30.0" />
+    <RowConstraints prefHeight="30.0" />
+      <RowConstraints prefHeight="30.0" />
+      <RowConstraints prefHeight="30.0" />
+      <RowConstraints prefHeight="30.0" />
+      <RowConstraints prefHeight="30.0" />
   </rowConstraints>
      <fx:define>
        <ToggleGroup fx:id="saveOrderToggleGroup" />
@@ -30,14 +30,17 @@
       <ComboBox fx:id="savePriSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <ComboBox fx:id="saveSecSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <ComboBox fx:id="saveTerSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <RadioButton fx:id="exportInSpecifiedOrder" mnemonicParsing="false" prefHeight="5.0" prefWidth="206.0" text="%Export entries ordered as specified" GridPane.columnSpan="3" GridPane.rowIndex="2" toggleGroup="$saveOrderToggleGroup"/>
-      <RadioButton fx:id="exportInTableOrder" mnemonicParsing="false" text="%Export in current table sort order" GridPane.columnSpan="3" GridPane.rowIndex="1" toggleGroup="$saveOrderToggleGroup"/>
-      <RadioButton fx:id="exportInOriginalOrder" mnemonicParsing="false" text="%Export entries in their original order" GridPane.columnSpan="3" toggleGroup="$saveOrderToggleGroup"/>
-      <CheckBox fx:id="savePriDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="3" disable="${!exportInSpecifiedOrder.selected}"/>
-      <CheckBox fx:id="saveSecDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="4" disable="${!exportInSpecifiedOrder.selected}" />
-      <CheckBox fx:id="saveTerDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="5" disable="${!exportInSpecifiedOrder.selected}" />
-      <Label text="%Primary sort criterion" GridPane.rowIndex="3" disabled="${!exportInSpecifiedOrder.selected}" />
-      <Label text="%Secondary sort criterion" GridPane.rowIndex="4" disabled="${!exportInSpecifiedOrder.selected}" />
-      <Label text="%Tertiary sort criterion" GridPane.rowIndex="5" disabled="${!exportInSpecifiedOrder.selected}"/>
+      <RadioButton fx:id="exportInSpecifiedOrder" mnemonicParsing="false" prefHeight="5.0" prefWidth="206.0" text="%Export entries ordered as specified" GridPane.columnSpan="3" GridPane.rowIndex="2">
+         <toggleGroup>
+            <ToggleGroup fx:id="saveOrderToggleGroup" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="exportInTableOrder" mnemonicParsing="false" text="%Export in current table sort order" toggleGroup="$saveOrderToggleGroup" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+      <RadioButton fx:id="exportInOriginalOrder" mnemonicParsing="false" text="%Export entries in their original order" toggleGroup="$saveOrderToggleGroup" GridPane.columnSpan="3" />
+      <CheckBox fx:id="savePriDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+      <CheckBox fx:id="saveSecDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+      <CheckBox fx:id="saveTerDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+      <Label disabled="${!exportInSpecifiedOrder.selected}" text="%Primary sort criterion" GridPane.rowIndex="3" />
+      <Label disabled="${!exportInSpecifiedOrder.selected}" text="%Secondary sort criterion" GridPane.rowIndex="4" />
+      <Label disabled="${!exportInSpecifiedOrder.selected}" text="%Tertiary sort criterion" GridPane.rowIndex="5" />
    </children>
 </fx:root>
