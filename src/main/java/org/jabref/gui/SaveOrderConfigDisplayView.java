@@ -66,7 +66,11 @@ public class SaveOrderConfigDisplayView extends GridPane {
     }
 
     public void storeConfig() {
-        viewModel.storeConfig();
+        viewModel.storeConfigInPrefs();
+    }
+
+    public SaveOrderConfig getSaveOrderConfig() {
+        return viewModel.getSaveOrderConfig();
     }
 
     public Node getJFXPanel() {

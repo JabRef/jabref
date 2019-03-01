@@ -17,6 +17,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
@@ -26,14 +27,13 @@ public class LibraryPropertiesDialogViewModel {
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
     private final ObjectProperty<Charset> selectedEncodingPropety = new SimpleObjectProperty<>(Encodings.getCharsets().get(0));
-    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
-    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
+    private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
+    private final BooleanProperty protectDisableProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
     private final MetaData metaData;
-    private final PreferencesService preferencesService;
 
     private final String oldUserSpecificFileDir;
     private final String oldGeneralFileDir;
@@ -42,7 +42,11 @@ public class LibraryPropertiesDialogViewModel {
     public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        this.preferencesService = preferencesService;
+
+        DatabaseLocation location = panel.getBibDatabaseContext().getLocation();
+        boolean isShared = (location == DatabaseLocation.SHARED);
+        encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
+        protectDisableProperty.setValue(isShared);
 
         directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                                                                                  .withInitialDirectory(preferencesService.getWorkingDir()).build();
@@ -87,14 +91,6 @@ public class LibraryPropertiesDialogViewModel {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
-    public BooleanProperty saveInOriginalProperty() {
-        return this.saveInOriginalProperty;
-    }
-
-    public BooleanProperty saveInSpecifiedOrderProperty() {
-        return this.saveInSpecifiedOrderProperty;
-    }
-
     public BooleanProperty libraryProtectedProperty() {
         return this.libraryProtectedProperty;
     }
@@ -109,5 +105,13 @@ public class LibraryPropertiesDialogViewModel {
 
     public boolean protectedValueChanged() {
         return !oldLibraryProtected == libraryProtectedProperty.getValue();
+    }
+
+    public BooleanProperty encodingDisableProperty() {
+        return encodingDisableProperty;
+    }
+
+    public BooleanProperty protectDisableProperty() {
+        return protectDisableProperty;
     }
 }

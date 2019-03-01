@@ -11,19 +11,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.SaveOrderConfigDisplay;
+import org.jabref.gui.SaveOrderConfigDisplayView;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -38,18 +35,15 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private Button browseUserSpefiicFileDir;
-    @FXML private VBox saveOrdervbox;
-    @FXML private ToggleGroup saveOrderToggleGroup;
-    @FXML private RadioButton saveInOriginalOrder;
-    @FXML private RadioButton saveInSpecifiedOrder;
     @FXML private CheckBox protect;
-    private SaveOrderConfigDisplay saveOrderPanel;
+    @Inject private PreferencesService preferencesService;
+
     private BasePanel panel;
     private LibraryPropertiesDialogViewModel viewModel;
     private final DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
     private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
-    private Object oldSaveOrderConfig;
+    private SaveOrderConfigDisplayView saveOrderConfigDisplayView;
+    private SaveOrderConfig oldSaveOrderConfig;
 
     public LibraryPropertiesDialogView(BasePanel panel, DialogService dialogService) {
         this.dialogService = dialogService;
@@ -78,56 +72,29 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         encoding.itemsProperty().bind(viewModel.encodingsProperty());
         encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
-        saveOrderPanel = new SaveOrderConfigDisplay();
-        saveOrdervbox.getChildren().add(saveOrderPanel.getJFXPanel());
+        encoding.disableProperty().bind(viewModel.encodingDisableProperty());
+        protect.disableProperty().bind(viewModel.protectDisableProperty());
+
+        Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
+        if (storedSaveOrderConfig.isPresent()) {
+            saveOrderConfigDisplayView = new SaveOrderConfigDisplayView(storedSaveOrderConfig.get());
+            oldSaveOrderConfig = storedSaveOrderConfig.get();
+        } else {
+            oldSaveOrderConfig = preferencesService.loadExportSaveOrder();
+            saveOrderConfigDisplayView = new SaveOrderConfigDisplayView(preferencesService.loadExportSaveOrder());
+        }
+
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
                                                                       Cleanups.DEFAULT_SAVE_ACTIONS);
-
-        contentVbox.getChildren().add(fieldFormatterCleanupsPanel);
-        saveInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());
-        saveInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        contentVbox.getChildren().addAll(saveOrderConfigDisplayView, fieldFormatterCleanupsPanel);
 
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
-        saveOrderPanel.getJFXPanel().disableProperty().bind(viewModel.saveInOriginalProperty());
 
         setValues();
-        updateEnableStatus();
     }
 
     private void setValues() {
-
-        Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
-        boolean selected;
-        if (!storedSaveOrderConfig.isPresent()) {
-            viewModel.saveInOriginalProperty().setValue(true);
-            oldSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
-            selected = false;
-        } else {
-            SaveOrderConfig saveOrderConfig = storedSaveOrderConfig.get();
-            oldSaveOrderConfig = saveOrderConfig;
-            if (saveOrderConfig.saveInOriginalOrder()) {
-                viewModel.saveInOriginalProperty().setValue(true);
-                selected = false;
-            } else {
-                viewModel.saveInSpecifiedOrderProperty().setValue(true);
-                selected = true;
-            }
-            saveOrderPanel.setSaveOrderConfig(saveOrderConfig);
-
-        }
-        saveOrderPanel.setEnabled(selected);
-
         fieldFormatterCleanupsPanel.setValues(panel.getBibDatabaseContext().getMetaData());
-    }
-
-    public void updateEnableStatus() {
-        DatabaseLocation location = panel.getBibDatabaseContext().getLocation();
-        boolean isShared = (location == DatabaseLocation.SHARED);
-        encoding.setDisable(isShared); // the encoding of shared database is always UTF-8
-        saveInOriginalOrder.setDisable(isShared);
-        saveInSpecifiedOrder.setDisable(isShared);
-        saveOrderPanel.setEnabled(!isShared);
-        protect.setDisable(isShared);
     }
 
     @FXML
@@ -167,9 +134,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig = getNewSaveOrderConfig();
+        SaveOrderConfig newSaveOrderConfig = saveOrderConfigDisplayView.getSaveOrderConfig();
 
-        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);
+        boolean saveOrderConfigChanged = !newSaveOrderConfig.equals(oldSaveOrderConfig);
 
         // See if any of the values have been modified:
         if (saveOrderConfigChanged) {
@@ -188,8 +155,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
                 fieldFormatterCleanupsPanel.storeSettings(metaData);
             }
         }
+        boolean encodingChanged = !newEncoding.equals(oldEncoding);
 
-        boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
+        boolean changed = saveOrderConfigChanged || encodingChanged
                           || viewModel.generalFileDirChanged() || viewModel.userFileDirChanged()
                           || viewModel.protectedValueChanged() || saveActionsChanged;
         // ... if so, mark base changed. Prevent the Undo button from removing
@@ -197,17 +165,6 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         if (changed) {
             panel.markNonUndoableBaseChanged();
         }
-    }
-
-    private SaveOrderConfig getNewSaveOrderConfig() {
-        SaveOrderConfig saveOrderConfig = null;
-        if (saveInOriginalOrder.isSelected()) {
-            saveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
-        } else {
-            saveOrderConfig = saveOrderPanel.getSaveOrderConfig();
-            saveOrderConfig.setSaveInSpecifiedOrder();
-        }
-        return saveOrderConfig;
     }
 
 }

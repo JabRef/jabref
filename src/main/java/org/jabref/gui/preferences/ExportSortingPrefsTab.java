@@ -17,8 +17,6 @@ import org.jabref.preferences.JabRefPreferences;
  */
 class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
-    private final JabRefPreferences prefs;
-
     private final RadioButton exportInOriginalOrder;
     private final RadioButton exportInTableOrder;
     private final RadioButton exportInSpecifiedOrder;
@@ -26,7 +24,6 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
     private final GridPane builder = new GridPane();
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
-        this.prefs = prefs;
         // EXPORT SORT ORDER
         // create Components
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));

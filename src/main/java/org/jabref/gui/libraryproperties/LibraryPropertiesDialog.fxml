@@ -7,10 +7,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -19,7 +17,7 @@
 
 <DialogPane minHeight="-Infinity" prefHeight="784.0" prefWidth="921.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.libraryproperties.LibraryPropertiesDialogView">
    <content>
-      <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
+      <VBox fx:id="contentVbox" prefHeight="200.0" prefWidth="100.0">
          <children>
             <GridPane minHeight="-Infinity">
               <columnConstraints>
@@ -60,15 +58,6 @@
                   </HBox>
                </children>
             </GridPane>
-            <VBox fx:id="saveOrdervbox" minHeight="-Infinity">
-               <fx:define>
-                 <ToggleGroup fx:id="saveOrderToggleGroup" />
-               </fx:define>
-               <children>
-                  <RadioButton fx:id="saveInOriginalOrder" mnemonicParsing="false" text="%Save entries in their original order" toggleGroup="$saveOrderToggleGroup" />
-                  <RadioButton fx:id="saveInSpecifiedOrder" mnemonicParsing="false" text="%Save entries ordered as specified" toggleGroup="$saveOrderToggleGroup" />
-               </children>
-            </VBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
                <children>
                   <Label alignment="TOP_LEFT" text="%Library protection" />

@@ -44,7 +44,6 @@ public class SaveOrderConfigDisplayViewModel {
         this.config = config;
         this.prefs = prefs;
 
-        SaveOrderConfig storedSaveOrderConfig = config;
         List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
@@ -132,7 +131,7 @@ public class SaveOrderConfigDisplayViewModel {
         return saveTerSortSelectedValueProperty;
     }
 
-    public void storeConfig() {
+    public void storeConfigInPrefs() {
         prefs.storeExportSaveOrder(this.getSaveOrderConfig());
     }
 
@@ -147,5 +146,4 @@ public class SaveOrderConfigDisplayViewModel {
     public BooleanProperty saveInSpecifiedOrderProperty() {
         return this.saveInSpecifiedOrderProperty;
     }
-
 }
