@@ -95,7 +95,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.13'
+    compile 'org.apache.pdfbox:pdfbox:2.0.14'
     compile 'org.apache.pdfbox:fontbox:2.0.13'
     compile 'org.apache.pdfbox:xmpbox:2.0.14'
 
