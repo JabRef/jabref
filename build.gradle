@@ -97,7 +97,7 @@ dependencies {
 
     compile 'org.apache.pdfbox:pdfbox:2.0.13'
     compile 'org.apache.pdfbox:fontbox:2.0.13'
-    compile 'org.apache.pdfbox:xmpbox:2.0.13'
+    compile 'org.apache.pdfbox:xmpbox:2.0.14'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
 
