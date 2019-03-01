@@ -95,9 +95,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.13'
-    compile 'org.apache.pdfbox:fontbox:2.0.13'
-    compile 'org.apache.pdfbox:xmpbox:2.0.13'
+    compile 'org.apache.pdfbox:pdfbox:2.0.14'
+    compile 'org.apache.pdfbox:fontbox:2.0.14'
+    compile 'org.apache.pdfbox:xmpbox:2.0.14'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
 
@@ -178,7 +178,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.17'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.18'
 }
 
 jacoco {
