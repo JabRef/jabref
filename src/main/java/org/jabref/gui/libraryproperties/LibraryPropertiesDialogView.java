@@ -85,6 +85,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             saveOrderConfigDisplayView = new SaveOrderConfigDisplayView(preferencesService.loadExportSaveOrder());
         }
 
+        saveOrderConfigDisplayView.changeExportDescriptionToSave();
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
                                                                       Cleanups.DEFAULT_SAVE_ACTIONS);
         Label saveActions = new Label(Localization.lang("Save actions"));

@@ -10,6 +10,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
@@ -63,6 +64,12 @@ public class SaveOrderConfigDisplayView extends GridPane {
         saveSecDesc.selectedProperty().bindBidirectional(viewModel.saveSecDescPropertySelected());
         saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTerDescPropertySelected());
 
+    }
+
+    public void changeExportDescriptionToSave() {
+        exportInOriginalOrder.setText(Localization.lang("Save entries in their original order"));
+        exportInSpecifiedOrder.setText(Localization.lang("Save entries ordered as specified"));
+        exportInTableOrder.setText(Localization.lang("Save in current table sort order"));
     }
 
     public void storeConfig() {
