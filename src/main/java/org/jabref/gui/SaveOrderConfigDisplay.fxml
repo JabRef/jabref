@@ -33,11 +33,11 @@
       <RadioButton fx:id="exportInSpecifiedOrder" mnemonicParsing="false" prefHeight="5.0" prefWidth="206.0" text="%Export entries ordered as specified" GridPane.columnSpan="3" GridPane.rowIndex="2" toggleGroup="$saveOrderToggleGroup"/>
       <RadioButton fx:id="exportInTableOrder" mnemonicParsing="false" text="%Export in current table sort order" GridPane.columnSpan="3" GridPane.rowIndex="1" toggleGroup="$saveOrderToggleGroup"/>
       <RadioButton fx:id="exportInOriginalOrder" mnemonicParsing="false" text="%Export entries in their original order" GridPane.columnSpan="3" toggleGroup="$saveOrderToggleGroup"/>
-      <CheckBox fx:id="savePriDesc" mnemonicParsing="false" text="Descending" GridPane.columnIndex="2" GridPane.rowIndex="3" disable="${!exportInSpecifiedOrder.selected}"/>
-      <CheckBox fx:id="saveSecDesc" mnemonicParsing="false" text="Descending" GridPane.columnIndex="2" GridPane.rowIndex="4" disable="${!exportInSpecifiedOrder.selected}" />
-      <CheckBox fx:id="saveTerDesc" mnemonicParsing="false" text="Descending" GridPane.columnIndex="2" GridPane.rowIndex="5" disable="${!exportInSpecifiedOrder.selected}" />
-      <Label text="Primary sort criterion" GridPane.rowIndex="3" disabled="${!exportInSpecifiedOrder.selected}" />
-      <Label text="Secondary sort criterion" GridPane.rowIndex="4" disabled="${!exportInSpecifiedOrder.selected}" />
-      <Label text="Tertiary sort criterion" GridPane.rowIndex="5" disabled="${!exportInSpecifiedOrder.selected}"/>
+      <CheckBox fx:id="savePriDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="3" disable="${!exportInSpecifiedOrder.selected}"/>
+      <CheckBox fx:id="saveSecDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="4" disable="${!exportInSpecifiedOrder.selected}" />
+      <CheckBox fx:id="saveTerDesc" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="5" disable="${!exportInSpecifiedOrder.selected}" />
+      <Label text="%Primary sort criterion" GridPane.rowIndex="3" disabled="${!exportInSpecifiedOrder.selected}" />
+      <Label text="%Secondary sort criterion" GridPane.rowIndex="4" disabled="${!exportInSpecifiedOrder.selected}" />
+      <Label text="%Tertiary sort criterion" GridPane.rowIndex="5" disabled="${!exportInSpecifiedOrder.selected}"/>
    </children>
 </fx:root>
