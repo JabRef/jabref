@@ -5,6 +5,7 @@ import java.util.Objects;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -41,6 +42,13 @@ public class ActionFactory {
         setGraphic(menuItem, action);
 
         return menuItem;
+    }
+
+    public CheckMenuItem createCheckMenuItem(Action action, Command command) {
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        setGraphic(checkMenuItem, action);
+
+        return checkMenuItem;
     }
 
     public Menu createMenu(Action action) {
