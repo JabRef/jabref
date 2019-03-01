@@ -95,8 +95,8 @@ public enum StandardActions implements Action {
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
     COPY_LINKED_FILES(Localization.lang("Copy linked files to folder...")),
     ABBREVIATE(Localization.lang("Abbreviate journal names")),
-    ABBREVIATE_ISO(Localization.lang("ISO"), Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"), KeyBinding.ABBREVIATE),
-    ABBREVIATE_MEDLINE(Localization.lang("MEDLINE"), Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
+    ABBREVIATE_ISO("ISO", Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"), KeyBinding.ABBREVIATE),
+    ABBREVIATE_MEDLINE("MEDLINE", Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
     UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),
