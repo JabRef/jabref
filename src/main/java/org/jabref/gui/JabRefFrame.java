@@ -792,10 +792,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             boolean menuItemAdded = false;
-            /*if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager));
                 menuItemAdded = true;
-            }*/
+            }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory));
