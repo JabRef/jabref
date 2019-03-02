@@ -30,10 +30,7 @@
       <ComboBox fx:id="savePriSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <ComboBox fx:id="saveSecSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <ComboBox fx:id="saveTerSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <RadioButton fx:id="exportInSpecifiedOrder" mnemonicParsing="false" prefHeight="5.0" prefWidth="206.0" text="%Export entries ordered as specified" GridPane.columnSpan="3" GridPane.rowIndex="2">
-         <toggleGroup>
-            <ToggleGroup fx:id="saveOrderToggleGroup" />
-         </toggleGroup></RadioButton>
+      <RadioButton fx:id="exportInSpecifiedOrder" mnemonicParsing="false" prefHeight="5.0" prefWidth="206.0" text="%Export entries ordered as specified" toggleGroup="$saveOrderToggleGroup" GridPane.columnSpan="3" GridPane.rowIndex="2">
       <RadioButton fx:id="exportInTableOrder" mnemonicParsing="false" text="%Export in current table sort order" toggleGroup="$saveOrderToggleGroup" GridPane.columnSpan="3" GridPane.rowIndex="1" />
       <RadioButton fx:id="exportInOriginalOrder" mnemonicParsing="false" text="%Export entries in their original order" toggleGroup="$saveOrderToggleGroup" GridPane.columnSpan="3" />
       <CheckBox fx:id="savePriDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false" text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="3" />

@@ -33,7 +33,6 @@ public class LibraryPropertiesDialogViewModel {
 
     private final DialogService dialogService;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
-    private final MetaData metaData;
 
     private final String oldUserSpecificFileDir;
     private final String oldGeneralFileDir;
@@ -41,7 +40,7 @@ public class LibraryPropertiesDialogViewModel {
 
     public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.metaData = panel.getBibDatabaseContext().getMetaData();
+        MetaData metaData = panel.getBibDatabaseContext().getMetaData();
 
         DatabaseLocation location = panel.getBibDatabaseContext().getLocation();
         boolean isShared = (location == DatabaseLocation.SHARED);

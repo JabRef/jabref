@@ -37,11 +37,9 @@ public class SaveOrderConfigDisplayViewModel {
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
 
-    private final SaveOrderConfig config;
     private final PreferencesService prefs;
 
     public SaveOrderConfigDisplayViewModel(SaveOrderConfig config, PreferencesService prefs) {
-        this.config = config;
         this.prefs = prefs;
 
         List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
@@ -60,7 +58,6 @@ public class SaveOrderConfigDisplayViewModel {
             saveInTableOrderProperty.setValue(true);
         }
         setSaveOrderConfig(config);
-
     }
 
     public ListProperty<String> priSortFieldsProperty() {
@@ -76,7 +73,6 @@ public class SaveOrderConfigDisplayViewModel {
     }
 
     public SaveOrderConfig getSaveOrderConfig() {
-
         SortCriterion primary = new SortCriterion(getSelectedItemAsLowerCaseTrim(savePriSortSelectedValueProperty), savePriDescPropertySelected.getValue());
         SortCriterion secondary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveSecSortSelectedValueProperty), saveSecDescPropertySelected.getValue());
         SortCriterion tertiary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveTerSortSelectedValueProperty), saveTerDescPropertySelected.getValue());

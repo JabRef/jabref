@@ -105,7 +105,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     @FXML
     private void initalize() {
-
+        //FIXME: Model whole dialog as fxml
     }
 
     private void construct() {
