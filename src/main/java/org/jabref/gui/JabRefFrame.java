@@ -888,6 +888,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
         SidePaneComponent openOffice = sidePaneManager.getComponent(SidePaneType.OPEN_OFFICE);
 
+        view.getItems().add(new SeparatorMenuItem());
         view.setOnShowing(event -> {
             view.getItems().clear();
             view.getItems().addAll(
