@@ -48,26 +48,26 @@ public class LatexFieldFormatter {
             char item = text.charAt(i);
 
             boolean charBeforeIsEscape = false;
-            if (i > 0 && text.charAt(i - 1) == '\\') {
+            if ((i > 0) && (text.charAt(i - 1) == '\\')) {
                 charBeforeIsEscape = true;
             }
 
-            if (!charBeforeIsEscape && item == '{') {
+            if (!charBeforeIsEscape && (item == '{')) {
                 left++;
-            } else if (!charBeforeIsEscape && item == '}') {
+            } else if (!charBeforeIsEscape && (item == '}')) {
                 right++;
             }
         }
 
         // Then we throw an exception if the error criteria are met.
         if (!(right == 0) && (left == 0)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: "+ text);
         }
         if (!(right == 0) && (right < left)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: "+ text);
         }
         if (left != right) {
-            throw new InvalidFieldValueException("Braces don't match.");
+            throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
         }
     }
 
@@ -148,7 +148,7 @@ public class LatexFieldFormatter {
                         throw new InvalidFieldValueException(
                                 "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                        + "Note that the entry causing the problem has been selected.");
+                                        + "Note that the entry causing the problem has been selected. Field value: "+content);
                     }
                 }
             }
