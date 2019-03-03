@@ -191,7 +191,7 @@ public class BracketedPattern {
                         }
                     }
                 }
-                authString = BibtexKeyGenerator.cleanKey(authString, isEnforceLegalKey);
+
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 if ("auth".equals(val)) {
@@ -231,6 +231,7 @@ public class BracketedPattern {
                     // authN. First N chars of the first author's last
                     // name.
 
+                    authString = BibtexKeyGenerator.cleanKey(authString, isEnforceLegalKey);
                     String fa = firstAuthor(authString);
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
