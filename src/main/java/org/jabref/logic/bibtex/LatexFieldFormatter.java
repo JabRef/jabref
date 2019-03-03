@@ -61,10 +61,10 @@ public class LatexFieldFormatter {
 
         // Then we throw an exception if the error criteria are met.
         if (!(right == 0) && (left == 0)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: "+ text);
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (!(right == 0) && (right < left)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: "+ text);
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (left != right) {
             throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
