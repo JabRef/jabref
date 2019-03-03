@@ -92,6 +92,10 @@ public class BracketedPattern {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
+    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        return expandBrackets(pattern, keywordDelimiter, entry, database, false);
+    }
+
     /**
      * Expands a pattern
      *
@@ -101,7 +105,7 @@ public class BracketedPattern {
      * @param database The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database, boolean isEnforceLegalKey) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
@@ -122,10 +126,10 @@ public class BracketedPattern {
                     // check whether there is a modifier on the end such as
                     // ":lower":
                     if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(entry, token, keywordDelimiter, database));
+                        sb.append(getFieldValue(entry, token, keywordDelimiter, database, isEnforceLegalKey));
                     } else {
                         // apply modifiers:
-                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database, isEnforceLegalKey);
                         sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                     // Fetch and discard the closing ']'
@@ -156,7 +160,7 @@ public class BracketedPattern {
      *
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
-    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
+    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database, boolean isEnforceLegalKey) {
 
         String val = value;
         try {
@@ -187,7 +191,7 @@ public class BracketedPattern {
                         }
                     }
                 }
-
+                authString = BibtexKeyGenerator.cleanKey(authString, isEnforceLegalKey);
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 if ("auth".equals(val)) {

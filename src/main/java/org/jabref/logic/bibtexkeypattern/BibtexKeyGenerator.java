@@ -123,7 +123,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
-                    String label = expandBrackets(pattern, delimiter, entry, database);
+                    String label = expandBrackets(pattern, delimiter, entry, database, bibtexKeyPatternPreferences.isEnforceLegalKey());
                     // apply modifier if present
                     if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
