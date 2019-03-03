@@ -146,7 +146,7 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta4'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta5'
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
     compile 'org.apache.logging.log4j:log4j-jcl:2.11.2'
     compile 'org.apache.logging.log4j:log4j-api:2.11.2'
@@ -158,8 +158,8 @@ dependencies {
 
     errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.2'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.4.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.0'
