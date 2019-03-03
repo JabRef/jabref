@@ -650,7 +650,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
         defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RANKING, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
         defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
@@ -658,7 +658,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SERIALIZESPECIALFIELDS, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
-        defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
+        defaults.put(OVERWRITE_OWNER, Boolean.TURE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
