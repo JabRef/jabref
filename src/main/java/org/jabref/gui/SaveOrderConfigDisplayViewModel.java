@@ -50,13 +50,6 @@ public class SaveOrderConfigDisplayViewModel {
         secSortFieldsProperty.addAll(fieldNames);
         terSortFieldsProperty.addAll(fieldNames);
 
-        if (config.saveInOriginalOrder()) {
-            saveInOriginalProperty.setValue(true);
-        } else if (config.saveInSpecifiedOrder()) {
-            saveInSpecifiedOrderProperty.setValue(true);
-        } else {
-            saveInTableOrderProperty.setValue(true);
-        }
         setSaveOrderConfig(config);
     }
 
@@ -92,11 +85,14 @@ public class SaveOrderConfigDisplayViewModel {
         saveTerSortSelectedValueProperty.setValue(saveOrderConfig.getSortCriteria().get(2).field);
         saveTerDescPropertySelected.setValue(saveOrderConfig.getSortCriteria().get(2).descending);
 
-        if (saveInOriginalProperty.getValue()) {
-            saveOrderConfig.setSaveInOriginalOrder();
+        if (saveOrderConfig.saveInOriginalOrder()) {
+            saveInOriginalProperty.setValue(true);
+        } else if (saveOrderConfig.saveInSpecifiedOrder()) {
+            saveInSpecifiedOrderProperty.setValue(true);
         } else {
-            saveOrderConfig.setSaveInSpecifiedOrder();
+            saveInTableOrderProperty.setValue(true);
         }
+
     }
 
     private String getSelectedItemAsLowerCaseTrim(StringProperty string) {
