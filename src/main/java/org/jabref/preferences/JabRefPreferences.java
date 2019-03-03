@@ -183,10 +183,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREAMBLE_SIZE_X = "preambleSizeX";
     public static final String PREAMBLE_POS_Y = "preamblePosY";
     public static final String PREAMBLE_POS_X = "preamblePosX";
-    public static final String TERMS_SIZE_Y = "termsSizeY";
-    public static final String TERMS_SIZE_X = "termsSizeX";
-    public static final String TERMS_POS_Y = "termsPosY";
-    public static final String TERMS_POS_X = "termsPosX";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
     public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
     public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
@@ -563,10 +559,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREAMBLE_POS_Y, 0);
         defaults.put(PREAMBLE_SIZE_X, 600);
         defaults.put(PREAMBLE_SIZE_Y, 400);
-        defaults.put(TERMS_POS_X, 0);
-        defaults.put(TERMS_POS_Y, 0);
-        defaults.put(TERMS_SIZE_X, 500);
-        defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
