@@ -1447,9 +1447,10 @@ public class JabRefPreferences implements PreferencesService {
         return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS));
     }
 
+    @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
     public ImportFormatPreferences getImportFormatPreferences() {
@@ -1725,6 +1726,7 @@ public class JabRefPreferences implements PreferencesService {
         );
     }
 
+    @Override
     public Character getKeywordDelimiter() {
         return get(KEYWORD_SEPARATOR).charAt(0);
     }

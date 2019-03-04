@@ -2,6 +2,8 @@ package org.jabref.gui.edit;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -9,13 +11,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldTableCell;
 
-import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -27,6 +29,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableColumn<String, Boolean> keywordsTableDeleteColumn;
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
+    @Inject private PreferencesService preferences;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -47,7 +50,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(Globals.prefs, entries);
+        viewModel = new ManageKeywordsViewModel(preferences, entries);
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {

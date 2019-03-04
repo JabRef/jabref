@@ -16,7 +16,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -24,11 +24,11 @@ public class ManageKeywordsViewModel {
 
     private final List<BibEntry> entries;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(JabRefPreferences preferences, List<BibEntry> entries) {
+    public ManageKeywordsViewModel(PreferencesService preferences, List<BibEntry> entries) {
         this.preferences = preferences;
         this.entries = entries;
         this.keywords = FXCollections.observableArrayList();
@@ -62,8 +62,7 @@ public class ManageKeywordsViewModel {
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
-            for (int i = 1; i < entries.size(); i++) {
-                BibEntry entry = entries.get(i);
+            for (BibEntry entry : entries) {
                 separatedKeywords = entry.getKeywords(preferences.getKeywordDelimiter());
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
