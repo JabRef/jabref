@@ -377,13 +377,13 @@ Also, note:
  *   Don’t try to be too clever
  *   Don’t substitute another type for `Object` in the equals declaration
 
-##Files and Paths
+## Files and Paths
 Always try to use the methods from the nio-package. For interoperability, they provide methods to convert between file and path.
 https://docs.oracle.com/javase/tutorial/essential/io/path.html
 Mapping between old methods and new methods
 https://docs.oracle.com/javase/tutorial/essential/io/legacy.html#mapping
 
-##JavaFX
+## JavaFX
 
 The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#attributes)
 
@@ -395,4 +395,24 @@ Attribute variable | `$idOfControl` or `$variable` | named control or variable i
 Expression binding | `${expression}` | expression, for example `textField.text` | changes to source are propagated
 Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX, see [feature request](https://bugs.openjdk.java.net/browse/JDK-8090665))
 Event handler | `#nameOfEventHandler` | name of the event handler method in the controller | 
-Constant | `<text><Strings fx:constant="MYSTRING"/></text>` | constant (here `MYSTRING` in the `Strings` class) | 
+Constant | `<text><Strings fx:constant="MYSTRING"/></text>` | constant (here `MYSTRING` in the `Strings` class) |
+
+### JavaFX Radio Buttons example:
+All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code
+Example:    
+
+```
+<VBox>
+            <fx:define>
+                <ToggleGroup fx:id="citeToggleGroup"/>
+            </fx:define>
+            <children>
+                <RadioButton fx:id="inPar" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries between parenthesis" toggleGroup="$citeToggleGroup"/>
+                <RadioButton fx:id="inText" minWidth="-Infinity" mnemonicParsing="false"
+                             text="%Cite selected entries with in-text citation" toggleGroup="$citeToggleGroup"/>
+                <Label minWidth="-Infinity" text="%Extra information (e.g. page number)"/>
+                <TextField fx:id="pageInfo"/>
+            </children>
+</VBox>
+```
