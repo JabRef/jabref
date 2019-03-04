@@ -4,6 +4,7 @@ import org.jabref.gui.util.BaseDialog;
 
 public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
 
+    // TODO: Re-implement customize entry types feature (https://github.com/JabRef/jabref/issues/4719)
     /*
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();

@@ -941,6 +941,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this)),
+                // TODO: Reenable customize entry types feature (https://github.com/JabRef/jabref/issues/4719)
                 //factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)));
 
