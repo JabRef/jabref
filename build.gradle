@@ -95,9 +95,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.13'
-    compile 'org.apache.pdfbox:fontbox:2.0.13'
-    compile 'org.apache.pdfbox:xmpbox:2.0.13'
+    compile 'org.apache.pdfbox:pdfbox:2.0.14'
+    compile 'org.apache.pdfbox:fontbox:2.0.14'
+    compile 'org.apache.pdfbox:xmpbox:2.0.14'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
 
@@ -134,7 +134,7 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.2'
+    compile 'org.fxmisc.richtext:richtextfx:0.9.3'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:8.0.8'
