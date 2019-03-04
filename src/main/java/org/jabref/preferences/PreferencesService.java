@@ -20,6 +20,8 @@ public interface PreferencesService {
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
+    Character getKeywordDelimiter();
+
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
     KeyBindingRepository getKeyBindingRepository();
@@ -55,6 +57,8 @@ public interface PreferencesService {
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+
+    boolean isKeywordSyncEnabled();
 
     SavePreferences loadForExportFromPreferences();
 
