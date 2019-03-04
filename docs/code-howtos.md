@@ -146,7 +146,7 @@ If you want to catch the event you'll have to register your listener class with 
 ## Logging
 
 JabRef uses the logging facade [SLF4j](https://www.slf4j.org/).
-All log messages are passed internally to the [log4j2] [https://logging.apache.org/log4j/2.x/] which handles any filterting, formatting and writing of log messages. 
+All log messages are passed internally to [log4j2](https://logging.apache.org/log4j/2.x/) which handles any filtering, formatting and writing of log messages. 
 - Obtaining a Logger for a Class: 
 
   ```java
@@ -165,14 +165,14 @@ All log messages are passed internally to the [log4j2] [https://logging.apache.o
 
 
 ## Using Localization correctly
-*(More information about this topic from the translator side is provided [here] (https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
-[here] (https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) about the JabRef help files)*
+*(More information about this topic from the translator side is provided under this link: [Translating JabRef Interface](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
+[Translating JabRef Help](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) about the JabRef help files)*
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
 JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized. 
 
-To show an localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to optain translated strings:
+To show an localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to obtain translated strings:
 
 ```java
     public static String lang(String key);
@@ -208,7 +208,7 @@ The tests check whether translation strings appear correctly in the resource bun
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test. 
 
-Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src/main/java/net/sf/jabref/logic/formatter/bibtexfields/PageNumbersFormatter.java]
+Example: [PageNumbersFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/net/sf/jabref/logic/formatter/bibtexfields/PageNumbersFormatter.java)
 
 ## Drag and Drop
 
@@ -261,7 +261,7 @@ When adding a new preference, following steps have to be taken:
 
 When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used.
 
-Defaults should go into the model package. See [here](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484) for the comment.
+Defaults should go into the model package. See [Comments in this Commit](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484)
 
 See https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java (via https://github.com/JabRef/jabref/pull/3092) for the current way how to deal with preferences.
 
@@ -308,7 +308,7 @@ class TestClass{
     }
 }
 ````
-to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [junit-pioneer doc](https://junit-pioneer.org/docs/temp-directory/)for more details.
+to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [junit-pioneer doc](https://junit-pioneer.org/docs/temp-directory/) for more details.
 
 ### Loading Files from Resources:
 Sometimes it is necessary to load a specific resource or to access the resource directory 
