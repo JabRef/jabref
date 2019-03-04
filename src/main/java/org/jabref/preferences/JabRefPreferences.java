@@ -183,10 +183,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREAMBLE_SIZE_X = "preambleSizeX";
     public static final String PREAMBLE_POS_Y = "preamblePosY";
     public static final String PREAMBLE_POS_X = "preamblePosX";
-    public static final String TERMS_SIZE_Y = "termsSizeY";
-    public static final String TERMS_SIZE_X = "termsSizeX";
-    public static final String TERMS_POS_Y = "termsPosY";
-    public static final String TERMS_POS_X = "termsPosX";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
     public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
     public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
@@ -563,10 +559,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREAMBLE_POS_Y, 0);
         defaults.put(PREAMBLE_SIZE_X, 600);
         defaults.put(PREAMBLE_SIZE_Y, 400);
-        defaults.put(TERMS_POS_X, 0);
-        defaults.put(TERMS_POS_Y, 0);
-        defaults.put(TERMS_SIZE_X, 500);
-        defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
@@ -650,7 +642,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
         defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
@@ -1455,9 +1447,10 @@ public class JabRefPreferences implements PreferencesService {
         return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS));
     }
 
+    @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
     public ImportFormatPreferences getImportFormatPreferences() {
@@ -1631,6 +1624,7 @@ public class JabRefPreferences implements PreferencesService {
                                              getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
+    @Override
     public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
         List<String> enabledExternalList = new ArrayList<>();
         List<String> disabledExternalList = new ArrayList<>();
@@ -1657,7 +1651,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
-
     }
 
     @Override
@@ -1733,6 +1726,7 @@ public class JabRefPreferences implements PreferencesService {
         );
     }
 
+    @Override
     public Character getKeywordDelimiter() {
         return get(KEYWORD_SEPARATOR).charAt(0);
     }
