@@ -68,7 +68,6 @@ import org.jabref.gui.actions.ManageCustomExportsAction;
 import org.jabref.gui.actions.ManageCustomImportsAction;
 import org.jabref.gui.actions.ManageJournalsAction;
 import org.jabref.gui.actions.ManageKeywordsAction;
-import org.jabref.gui.actions.ManageProtectedTermsAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewEntryFromPlainTextAction;
@@ -100,6 +99,7 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
+import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
 import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -936,7 +936,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
                 factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
-                factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
+                factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction()),
 
                 new SeparatorMenuItem(),
 
