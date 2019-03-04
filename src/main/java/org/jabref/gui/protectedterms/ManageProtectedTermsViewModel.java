@@ -6,7 +6,6 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -18,7 +17,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +27,14 @@ public class ManageProtectedTermsViewModel {
 
     private final ProtectedTermsLoader termsLoader;
     private final ObservableList<ProtectedTermsList> termsFiles;
-    private DialogService dialogService;
+    private final PreferencesService preferences;
+    private final DialogService dialogService;
 
-    public ManageProtectedTermsViewModel(ProtectedTermsLoader termsLoader, DialogService dialogService) {
+    public ManageProtectedTermsViewModel(ProtectedTermsLoader termsLoader, DialogService dialogService, PreferencesService preferences) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
         this.termsFiles = FXCollections.observableArrayList(termsLoader.getProtectedTermsLists());
+        this.preferences = preferences;
     }
 
     public ObservableList<ProtectedTermsList> getTermsFiles() {
@@ -41,14 +42,15 @@ public class ManageProtectedTermsViewModel {
     }
 
     public void save() {
-        Globals.prefs.setProtectedTermsPreferences(termsLoader);
+        preferences.setProtectedTermsPreferences(termsLoader);
     }
 
     public void addFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(preferences.getWorkingDir())
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> termsLoader.addProtectedTermsListFromFile(file.toAbsolutePath().toString(), true));

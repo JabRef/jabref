@@ -19,6 +19,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -36,6 +37,7 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
 
     @Inject private ProtectedTermsLoader termsLoader;
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
     private ManageProtectedTermsViewModel viewModel;
 
     public ManageProtectedTermsDialog() {
@@ -55,7 +57,7 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageProtectedTermsViewModel(termsLoader, dialogService);
+        viewModel = new ManageProtectedTermsViewModel(termsLoader, dialogService, preferences);
 
         filesTable.setItems(viewModel.getTermsFiles());
         new ViewModelTableRowFactory<ProtectedTermsList>()
