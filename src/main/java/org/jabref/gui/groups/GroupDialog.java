@@ -329,6 +329,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return null;
         });
 
+        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
         nameField.setOnAction(actionHandler);
         descriptionField.setOnAction(actionHandler);
         iconField.setOnAction(actionHandler);
