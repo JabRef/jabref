@@ -15,6 +15,8 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -34,7 +36,6 @@ public class BibtexKeyPatternPanel extends Pane {
 
     // default pattern
     protected final TextField defaultPat = new TextField();
-    private final HelpAction help;
 
     private final int COLUMNS = 2;
 
@@ -45,7 +46,6 @@ public class BibtexKeyPatternPanel extends Pane {
 
     public BibtexKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN);
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         buildGUI();
@@ -93,7 +93,7 @@ public class BibtexKeyPatternPanel extends Pane {
 
             textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
 
-            if (columnIndex == COLUMNS - 1) {
+            if (columnIndex == (COLUMNS - 1)) {
                 columnIndex = 0;
                 rowIndex++;
             } else {
@@ -103,9 +103,10 @@ public class BibtexKeyPatternPanel extends Pane {
 
         rowIndex++;
 
-        Button help1 = new Button("?");
-        help1.setOnAction(e -> new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
-        gridPane.add(help1, 1, rowIndex);
+
+        ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
+        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getCommand());
+        gridPane.add(help, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
         btnDefaultAll1.setOnAction(e -> {
@@ -162,7 +163,7 @@ public class BibtexKeyPatternPanel extends Pane {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }
 
-        if (keyPattern.getDefaultValue() == null || keyPattern.getDefaultValue().isEmpty()) {
+        if ((keyPattern.getDefaultValue() == null) || keyPattern.getDefaultValue().isEmpty()) {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));

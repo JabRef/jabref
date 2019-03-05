@@ -1,13 +1,8 @@
 package org.jabref.gui.preferences;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -15,10 +10,10 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
@@ -28,7 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-class ExternalTab extends JPanel implements PrefsTab {
+class ExternalTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
@@ -135,11 +130,11 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.add(openPdf,  1, 12);
 
         builder.add(pdfOptionPanel, 1, 13);
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -149,10 +144,10 @@ class ExternalTab extends JPanel implements PrefsTab {
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
-        if (index % 2 == 0) {
-            panel.add(button, 1, index / 2 + 1);
+        if ((index % 2) == 0) {
+            panel.add(button, 1, (index / 2) + 1);
         } else {
-            panel.add(button, 2, index / 2 + 1);
+            panel.add(button, 2, (index / 2) + 1);
         }
     }
 
@@ -213,6 +208,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void showConsoleChooser() {
+
         JFileChooser consoleChooser = new JFileChooser();
         int answer = consoleChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
