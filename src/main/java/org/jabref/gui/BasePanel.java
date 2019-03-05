@@ -40,10 +40,8 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.FileUpdatePanel;
-import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -399,11 +397,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
 
-        actions.put(Actions.MANAGE_SELECTORS, () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(frame, BasePanel.this, false, null);
-            csd.setVisible(true);
-        });
-
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
@@ -411,8 +404,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-
-        actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
         actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));

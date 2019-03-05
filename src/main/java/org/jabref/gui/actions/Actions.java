@@ -45,7 +45,6 @@ public enum Actions {
     REDO,
     REMOVE_FROM_GROUP,
     REPLACE_ALL,
-    RESOLVE_DUPLICATE_KEYS,
     SAVE,
     SAVE_AS,
     SAVE_SELECTED_AS_PLAIN,
