@@ -214,7 +214,6 @@ class ExternalTab implements PrefsTab {
 
     private void showAdobeChooser() {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> adobeAcrobatReaderPath.setText(file.toAbsolutePath().toString()));
-
     }
 
     private void showSumatraChooser() {
