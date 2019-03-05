@@ -319,21 +319,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return null;
         });
 
-        ChangeListener<String> caretListener = (ObservableValue<? extends String> ov, String oldValue,
-                                                String newValue) -> updateComponents();
-        ChangeListener<Boolean> itemListener = (ObservableValue<? extends Boolean> ov, Boolean oldBoolean,
-                                                Boolean newBoolean) -> updateComponents();
-
-        nameField.textProperty().addListener(caretListener);
-        descriptionField.textProperty().addListener(caretListener);
-        iconField.textProperty().addListener(caretListener);
-        keywordGroupSearchField.textProperty().addListener(caretListener);
-        keywordGroupSearchTerm.textProperty().addListener(caretListener);
-        keywordGroupCaseSensitive.selectedProperty().addListener(itemListener);
-        keywordGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupSearchExpression.textProperty().addListener(caretListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
+        nameField.setOnAction(actionHandler);
+        descriptionField.setOnAction(actionHandler);
+        iconField.setOnAction(actionHandler);
+        keywordGroupSearchField.setOnAction(actionHandler);
+        keywordGroupSearchTerm.setOnAction(actionHandler);
+        keywordGroupCaseSensitive.setOnAction(actionHandler);
+        keywordGroupRegExp.setOnAction(actionHandler);
+        searchGroupSearchExpression.setOnAction(actionHandler);
+        searchGroupRegExp.setOnAction(actionHandler);
+        searchGroupRegExp.setOnAction(actionHandler);
 
         // configure for current type
         if (editedGroup == null) {
