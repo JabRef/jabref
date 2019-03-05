@@ -8,7 +8,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -23,7 +22,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-class ExternalTab extends Pane implements PrefsTab {
+class ExternalTab implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
