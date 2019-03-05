@@ -103,7 +103,6 @@ public class BibtexKeyPatternPanel extends Pane {
 
         rowIndex++;
 
-
         ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
         Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getCommand());
         gridPane.add(help, 1, rowIndex);
@@ -118,7 +117,6 @@ public class BibtexKeyPatternPanel extends Pane {
         });
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
-
 
     /**
      * fill the given LabelPattern by values generated from the text fields
@@ -141,8 +139,7 @@ public class BibtexKeyPatternPanel extends Pane {
 
     protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
         GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
-                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
+                                                                        JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         fillPatternUsingPanelData(res);
         return res;
     }
