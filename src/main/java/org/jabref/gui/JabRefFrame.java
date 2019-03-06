@@ -1334,10 +1334,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             } catch (Throwable ex) {
                 return false;
             }
-        } else {
-            return !response.isPresent() || !response.get().equals(cancel);
+            // Exit.
+            return true;
         }
-        return false;
+        return !response.isPresent() || !response.get().equals(cancel);
     }
 
     private void closeTab(BasePanel panel) {
