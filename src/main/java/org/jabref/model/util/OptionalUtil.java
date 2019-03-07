@@ -22,7 +22,6 @@ public class OptionalUtil {
     }
 
     public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
-
         if (!left.isPresent()) {
             return !right.isPresent();
         } else {

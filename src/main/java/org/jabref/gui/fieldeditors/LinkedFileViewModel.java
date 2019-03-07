@@ -274,7 +274,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if the suggested filename is same as current filename.
      */
     public boolean isGeneratedNameSameAsOriginal() {
-
         Path file = Paths.get(this.linkedFile.getLink());
         String currentFileName = file.getFileName().toString();
         String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
@@ -287,12 +286,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
-
         Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
 
         Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
 
-        BiPredicate<Path, Path> equality = Files::isSameFile;
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
         return OptionalUtil.equals(newDir, currentDir, equality);
     }
 
