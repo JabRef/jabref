@@ -1007,4 +1007,58 @@ public class BibtexKeyGeneratorTest {
         entry.setField("title", "The Interesting Title");
         assertEquals("theinterestingtitle", BibtexKeyGenerator.generateKey(entry, "title:lower:(_)"));
     }
+
+    @Test
+    public void generateKeyWithTitleCapitalizeModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "the InTeresting title longer than THREE words");
+        assertEquals("TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "title:capitalize"));
+    }
+
+    @Test
+    public void generateKeyWithShortTitleCapitalizeModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "the InTeresting title longer than THREE words");
+        assertEquals("InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "shorttitle:capitalize"));
+    }
+
+    @Test
+    public void generateKeyWithTitleTitleCaseModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "A title WITH some of The key words");
+        assertEquals("ATitlewithSomeoftheKeyWords", BibtexKeyGenerator.generateKey(entry, "title:titlecase"));
+    }
+
+    @Test
+    public void generateKeyWithShortTitleTitleCaseModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "the InTeresting title longer than THREE words");
+        assertEquals("InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "shorttitle:titlecase"));
+    }
+
+    @Test
+    public void generateKeyWithTitleSentenceCaseModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "A title WITH some of The key words");
+        assertEquals("Atitlewithsomeofthekeywords", BibtexKeyGenerator.generateKey(entry, "title:sentencecase"));
+    }
+
+    @Test
+    public void generateKeyWithAuthUpperYearShortTitleCapitalizeModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+        entry.setField("year", "2019");
+        entry.setField("title", "the InTeresting title longer than THREE words");
+        assertEquals("NEWTON2019InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "[auth:upper][year][shorttitle:capitalize]"));
+    }
+
+    @Test
+    public void generateKeyWithYearAuthUpperTitleSentenceCaseModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
+        entry.setField("year", "2019");
+        entry.setField("title", "the InTeresting title longer than THREE words");
+        assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
+    }
+
 }

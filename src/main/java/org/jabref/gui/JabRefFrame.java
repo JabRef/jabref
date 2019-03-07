@@ -500,17 +500,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
         }
 
-        // Wait for save operations to finish
-        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            if (getBasePanelAt(i).isSaving()) {
-                // There is a database still being saved, so we need to wait.
-                WaitForSaveOperation w = new WaitForSaveOperation(this);
-                w.show(); // This method won't return until canceled or the save operation is done.
-                if (w.canceled()) {
-                    return false; // The user clicked cancel.
-                }
-            }
-        }
+        WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
+        waitForSaveFinishedDialog.showAndWait(getBasePanelList());
 
         // Good bye!
         tearDownJabRef(filenames);
