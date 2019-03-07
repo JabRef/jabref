@@ -1317,16 +1317,15 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             // The user wants to save.
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
-                if (!saveAction.save()) {
-                    // The action was either canceled or unsuccessful.
-                    output(Localization.lang("Unable to save library"));
-                    return false;
+                if (saveAction.save()) {
+                    // Saved, now exit.
+                    return true;
                 }
+                // The action was either canceled or unsuccessful.
+                output(Localization.lang("Unable to save library"));
             } catch (Throwable ex) {
-                return false;
+                LOGGER.error("A problem occurred when saving the file", ex);
             }
-            // Exit.
-            return true;
         }
         return !response.isPresent() || !response.get().equals(cancel);
     }
