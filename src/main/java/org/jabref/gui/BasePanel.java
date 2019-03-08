@@ -40,7 +40,6 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -405,8 +404,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
-        actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
-
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
 
@@ -416,7 +413,8 @@ public class BasePanel extends StackPane {
      * @param outputFormat the desired {@link CitationStyleOutputFormat}
      */
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        new CitationStyleToClipboardWorker(this, outputFormat).execute();
+        CitationStyleToClipboardWorker worker = new CitationStyleToClipboardWorker(this, outputFormat, dialogService, Globals.clipboardManager, Globals.prefs.getPreviewPreferences());
+        worker.copyCitationStyleToClipboard(Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -962,7 +960,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-        || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -1392,8 +1390,8 @@ public class BasePanel extends StackPane {
 
                     Optional<LinkedFile> linkedFile = files.stream()
                                                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                                           || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                                           || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
                                                            .findFirst();
 
                     if (linkedFile.isPresent()) {

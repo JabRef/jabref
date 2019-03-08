@@ -87,6 +87,12 @@ public class Formatters {
                 return Optional.of(new LowerCaseFormatter());
             case "upper":
                 return Optional.of(new UpperCaseFormatter());
+            case "capitalize":
+                return Optional.of(new CapitalizeFormatter());
+            case "titlecase":
+                return Optional.of(new TitleCaseFormatter());
+            case "sentencecase":
+                return Optional.of(new SentenceCaseFormatter());
         }
 
         if (modifier.startsWith(RegexFormatter.KEY)) {

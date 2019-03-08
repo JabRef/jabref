@@ -818,14 +818,14 @@
 
 .separator:horizontal .line {
     -fx-border-color: -jr-separator;
-    -fx-border-width: 0;
-    -fx-border-insets: 1 0 0 0;
+    -fx-border-width: 0.3;
+    -fx-border-insets: 1 15 0 20;
 }
 
 .separator:vertical .line {
     -fx-border-color: -jr-separator;
     -fx-border-width: 1;
-    -fx-border-insets: 0 0 0 1;
+    -fx-border-insets: 5 15 5 15;
 }
 
 .mainToolbar {
