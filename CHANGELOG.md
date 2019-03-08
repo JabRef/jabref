@@ -111,6 +111,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
+  - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 
