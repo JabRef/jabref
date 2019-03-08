@@ -13,6 +13,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.testfx.framework.junit5.Start;
 
 import static org.mockito.Mockito.mock;
 
+@GUITest
 @ExtendWith(ApplicationExtension.class)
 public class SourceTabTest {
 
