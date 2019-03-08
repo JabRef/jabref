@@ -12,6 +12,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -53,8 +54,13 @@ public class CitationStyleToClipboardWorker {
         this.dialogService = dialogService;
         dialogService.notify(Localization.lang("Copying..."));
 
-        BackgroundTask.wrap(this::loadCitationStyles).onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
-                      .onSuccess(this::done);
+    }
+
+    public void copyCitationStyleToClipboard(TaskExecutor taskExecutor) {
+        BackgroundTask.wrap(this::loadCitationStyles)
+                      .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
+                      .onSuccess(this::setClipBoardContent)
+                      .executeWith(taskExecutor);
     }
 
     private List<String> loadCitationStyles() throws IOException {
@@ -158,7 +164,7 @@ public class CitationStyleToClipboardWorker {
         return content;
     }
 
-    public void done(List<String> citations) {
+    private void setClipBoardContent(List<String> citations) {
         // if it's not a citation style take care of the preview
         if (!CitationStyle.isCitationStyleFile(style)) {
             clipBoardManager.setHtmlContent(processPreview(citations));
