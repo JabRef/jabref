@@ -228,16 +228,8 @@ public class BracketedPattern {
                     return authNofMth(authString, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
                 } else if (val.matches("auth\\d+")) {
-                    // authN. First N chars of the first author's last
-                    // name.
-
-                    authString = BibtexKeyGenerator.cleanKey(authString, isEnforceLegalKey);
-                    String fa = firstAuthor(authString);
                     int num = Integer.parseInt(val.substring(4));
-                    if (num > fa.length()) {
-                        num = fa.length();
-                    }
-                    return fa.substring(0, num);
+                    return authN(authString, num, isEnforceLegalKey);
                 } else if (val.matches("authors\\d+")) {
                     return nAuthors(authString, Integer.parseInt(val.substring(7)));
                 } else {
@@ -843,6 +835,18 @@ public class BracketedPattern {
         } else {
             return lastName.substring(0, n);
         }
+    }
+
+    /**
+     * First N chars of the first author's last name.
+     */
+    public static String authN(String authString, int num, boolean isEnforceLegalKey) {
+        authString = BibtexKeyGenerator.cleanKey(authString, isEnforceLegalKey);
+        String fa = firstAuthor(authString);
+        if (num > fa.length()) {
+            num = fa.length();
+        }
+        return fa.substring(0, num);
     }
 
     /**
