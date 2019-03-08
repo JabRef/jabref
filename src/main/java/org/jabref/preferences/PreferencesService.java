@@ -12,12 +12,17 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
+    void setProtectedTermsPreferences(ProtectedTermsLoader loader);
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
+
+    Character getKeywordDelimiter();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
@@ -54,6 +59,8 @@ public interface PreferencesService {
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+
+    boolean isKeywordSyncEnabled();
 
     SavePreferences loadForExportFromPreferences();
 

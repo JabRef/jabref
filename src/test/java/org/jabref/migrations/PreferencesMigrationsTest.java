@@ -20,7 +20,7 @@ class PreferencesMigrationsTest {
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
     private final String[] newStylePatterns = new String[]{"[bibtexkey]",
-            "[bibtexkey] - [fulltitle]"};
+                                                            "[bibtexkey] - [title]"};
 
     @BeforeEach
     void setUp() {
