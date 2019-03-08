@@ -113,6 +113,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     }
 
     private void storeSettings() {
+        //FIXME: Move to viewModel until fieldFormatterCleanupsPanel is property implemented
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
         Charset oldEncoding = metaData.getEncoding()
                                       .orElse(preferencesService.getDefaultEncoding());
@@ -171,5 +172,4 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             panel.markNonUndoableBaseChanged();
         }
     }
-
 }
