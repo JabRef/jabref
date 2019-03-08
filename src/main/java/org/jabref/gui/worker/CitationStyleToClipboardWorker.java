@@ -50,20 +50,18 @@ public class CitationStyleToClipboardWorker {
         this.previewStyle = previewPreferences.getPreviewStyle();
         this.outputFormat = outputFormat;
         this.clipBoardManager = clipBoardManager;
-
         this.dialogService = dialogService;
-        dialogService.notify(Localization.lang("Copying..."));
-
     }
 
     public void copyCitationStyleToClipboard(TaskExecutor taskExecutor) {
-        BackgroundTask.wrap(this::loadCitationStyles)
+        dialogService.notify(Localization.lang("Copying..."));
+        BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
                       .onSuccess(this::setClipBoardContent)
                       .executeWith(taskExecutor);
     }
 
-    private List<String> loadCitationStyles() throws IOException {
+    private List<String> generateCitations() throws IOException {
         // This worker stored the style as filename. The CSLAdapter and the CitationStyleCache store the source of the
         // style. Therefore, we extract the style source from the file.
         String styleSource = null;
