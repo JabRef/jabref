@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -340,7 +339,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         keywordGroupCaseSensitive.setOnAction(actionHandler);
         keywordGroupRegExp.setOnAction(actionHandler);
         searchGroupSearchExpression.setOnAction(actionHandler);
-        searchGroupRegExp.setOnAction(actionHandler);
         searchGroupRegExp.setOnAction(actionHandler);
 
         // configure for current type
