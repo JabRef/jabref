@@ -1,56 +1,11 @@
 package org.jabref.gui.customentrytypes;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.jabref.gui.util.BaseDialog;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
 
-import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.strings.StringUtil;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSelectionListener {
-
+    // TODO: Re-implement customize entry types feature (https://github.com/JabRef/jabref/issues/4719)
+    /*
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
     protected JButton delete;
@@ -70,9 +25,6 @@ public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSe
     private boolean biblatexMode;
     private BibDatabaseMode bibDatabaseMode;
 
-    /**
-     * Creates a new instance of EntryTypeCustomizationDialog
-     */
     public EntryTypeCustomizationDialog(JabRefFrame frame) {
         super(Localization.lang("Customize entry types"), false, EntryTypeCustomizationDialog.class);
 
@@ -419,6 +371,7 @@ public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSe
             changed.add(lastSelected);
             typeComp.enable(lastSelected, true);
         }
-
     }
+
+    */
 }

@@ -134,7 +134,7 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.2'
+    compile 'org.fxmisc.richtext:richtextfx:0.9.3'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:8.0.8'
@@ -167,7 +167,7 @@ dependencies {
 
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
-    testCompile 'org.mockito:mockito-core:2.24.5'
+    testCompile 'org.mockito:mockito-core:2.25.0'
     testCompile 'com.github.tomakehurst:wiremock:2.21.0'
     testCompile 'org.assertj:assertj-swing-junit:3.9.2'
     testCompile 'org.reflections:reflections:0.9.11'
