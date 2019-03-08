@@ -197,7 +197,7 @@ public class IconTheme {
         CLOSE(MaterialDesignIcon.CLOSE_CIRCLE),
         PASTE(JabRefMaterialDesignIcon.PASTE),
         CUT(MaterialDesignIcon.CONTENT_CUT),
-        COPY(JabRefMaterialDesignIcon.COPY),
+        COPY(MaterialDesignIcon.CONTENT_COPY),
         COMMENT(MaterialDesignIcon.COMMENT),
         REDO(MaterialDesignIcon.REDO),
         UNDO(MaterialDesignIcon.UNDO),
@@ -239,7 +239,7 @@ public class IconTheme {
         AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND) /*css: file-find */,
         QUALITY_ASSURED(MaterialDesignIcon.CERTIFICATE), /*css: certificate */
         QUALITY(MaterialDesignIcon.CERTIFICATE),/*css: certificate */
-        OPEN(MaterialDesignIcon.FOLDER_OUTLINE) /*css: folder-outline */,
+        OPEN(MaterialDesignIcon.FOLDER_OUTLINE) /*css: folder */,
         ADD_ROW(MaterialDesignIcon.SERVER_PLUS) /* css: server-plus*/,
         REMOVE_ROW(MaterialDesignIcon.SERVER_MINUS) /*css: server-minus */,
         PICTURE(MaterialDesignIcon.FILE_IMAGE) /*css: file-image */,
