@@ -1434,10 +1434,11 @@ public class JabRefPreferences implements PreferencesService {
                                    get(IMPORT_FILEDIRPATTERN));
     }
 
+    @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                                          getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
-                                          get(TIME_STAMP_FORMAT));
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                get(TIME_STAMP_FORMAT));
     }
 
     public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
@@ -1454,10 +1455,11 @@ public class JabRefPreferences implements PreferencesService {
                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-                                           isKeywordSyncEnabled());
+                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+                isKeywordSyncEnabled());
     }
 
     @Override
@@ -2041,5 +2043,15 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setExportWorkingDirectory(String layoutFileDirString) {
         put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
+    }
+
+    @Override
+    public boolean shouldWarnAboutDuplicatesForImport() {
+        return getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION);
+    }
+
+    @Override
+    public void setShouldWarnAboutDuplicatesForImport(boolean value) {
+        putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
     }
 }

@@ -19,10 +19,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -30,6 +32,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
@@ -44,6 +48,9 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
+    @Inject private PreferencesService preferences;
+    @Inject private StateManager stateManager;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
     private BibDatabaseContext database;
 
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<List<BibEntry>> task) {
@@ -67,7 +74,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
 
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
@@ -104,7 +111,10 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
 
                     return container;
                 })
+                .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
+                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
+        entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
     private Node getEntryNode(BibEntry entry) {

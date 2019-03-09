@@ -44,8 +44,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.clipboardManager;
         } else if (clazz == UndoManager.class) {
             return Globals.undoManager;
-        }
-        {
+        } else {
             try {
                 return clazz.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {

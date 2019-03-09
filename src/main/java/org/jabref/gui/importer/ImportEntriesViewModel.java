@@ -10,10 +10,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DuplicateResolverDialog;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
@@ -22,7 +22,8 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 public class ImportEntriesViewModel extends AbstractViewModel {
 
@@ -31,13 +32,19 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final BibDatabaseContext database;
     private final DialogService dialogService;
     private final UndoManager undoManager;
+    private final StateManager stateManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private ObservableList<BibEntry> entries;
+    private PreferencesService preferences;
 
-    public ImportEntriesViewModel(BackgroundTask<List<BibEntry>> task, TaskExecutor taskExecutor, BibDatabaseContext database, DialogService dialogService, UndoManager undoManager) {
+    public ImportEntriesViewModel(BackgroundTask<List<BibEntry>> task, TaskExecutor taskExecutor, BibDatabaseContext database, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
         this.task = task;
         this.database = database;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
+        this.preferences = preferences;
+        this.stateManager = stateManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         this.entries = FXCollections.observableArrayList();
         this.message = new SimpleStringProperty();
         this.message.bind(task.messageProperty());
@@ -67,7 +74,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
-        if (Globals.prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION)) {
+        if (preferences.shouldWarnAboutDuplicatesForImport()) {
             boolean containsDuplicate = entriesToImport.stream()
                                                        .anyMatch(this::hasDuplicate);
 
@@ -77,7 +84,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                         Localization.lang("Continue with import"),
                         Localization.lang("Cancel import"),
                         Localization.lang("Disable this confirmation dialog"),
-                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut));
+                        optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
 
                 if (!continueImport) {
                     dialogService.notify(Localization.lang("Import canceled"));
@@ -90,12 +97,12 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 dialogService,
                 database,
                 ExternalFileTypes.getInstance(),
-                Globals.prefs.getFilePreferences(),
-                Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getUpdateFieldPreferences(),
-                Globals.getFileUpdateMonitor(),
+                preferences.getFilePreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getUpdateFieldPreferences(),
+                fileUpdateMonitor,
                 undoManager,
-                Globals.stateManager);
+                stateManager);
         importHandler.importEntries(entriesToImport);
 
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
