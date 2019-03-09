@@ -35,6 +35,8 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
@@ -113,16 +115,17 @@ class TableColumnsTab extends Pane implements PrefsTab {
         field.setCellFactory(TextFieldTableCell.forTableColumn());
         field.setEditable(true);
         field.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setName(t.getNewValue());
-                    // Since data is an ObservableList, updating it updates the displayed field name.
-                    this.data.set(t.getTablePosition().getRow(), new TableRow(t.getNewValue()));
-                    // Update the User Preference of COLUMN_NAMES
-                    List<String> tempColumnNames = this.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-                    tempColumnNames.set(t.getTablePosition().getRow(), t.getNewValue());
-                    this.prefs.putStringList(JabRefPreferences.COLUMN_NAMES, tempColumnNames);
-                });
+                              (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                                  t.getTableView().getItems().get(
+                                                                  t.getTablePosition().getRow())
+                                   .setName(t.getNewValue());
+                                  // Since data is an ObservableList, updating it updates the displayed field name.
+                                  this.data.set(t.getTablePosition().getRow(), new TableRow(t.getNewValue()));
+                                  // Update the User Preference of COLUMN_NAMES
+                                  List<String> tempColumnNames = this.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+                                  tempColumnNames.set(t.getTablePosition().getRow(), t.getNewValue());
+                                  this.prefs.putStringList(JabRefPreferences.COLUMN_NAMES, tempColumnNames);
+                              });
 
         colSetup.setItems(data);
         colSetup.getColumns().add(field);
@@ -150,7 +153,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         deleteRow = new Button("Delete");
         deleteRow.setPrefSize(80, 20);
         deleteRow.setOnAction(e -> {
-            if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
+            if ((colSetup.getFocusModel() != null) && (colSetup.getFocusModel().getFocusedIndex() != -1)) {
                 tableChanged = true;
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 TableRow tableRow = data.get(row);
@@ -162,7 +165,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         up.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
-                if (row > data.size() || row == 0) {
+                if ((row > data.size()) || (row == 0)) {
                     return;
                 }
                 TableRow tableRow1 = data.get(row);
@@ -178,7 +181,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         down.setOnAction(e -> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
-                if (row + 1 > data.size()) {
+                if ((row + 1) > data.size()) {
                     return;
                 }
                 TableRow tableRow1 = data.get(row);
@@ -224,10 +227,10 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /** begin: special table columns and special fields ***/
 
-        Button helpButton = new Button("?");
-        helpButton.setPrefSize(20, 20);
-        helpButton.setOnAction(e -> new HelpAction(Localization.lang("Help on special fields"),
-                HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
+        ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
+
+        Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on special fields"),
+                                                                                          HelpFile.SPECIAL_FIELDS).getCommand());
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
         qualityColumn = new CheckBox(Localization.lang("Show quality"));
@@ -300,6 +303,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         builder.add(buttonOrder, 1, 7);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -331,7 +335,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
             }
         } else {
-            listOfFileColumns.getSelectionModel().select(new int[]{});
+            listOfFileColumns.getSelectionModel().select(new int[] {});
         }
 
         /*** begin: special fields ***/
@@ -379,8 +383,8 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
     public static class TableRow {
 
-        private SimpleStringProperty name;
-        private SimpleDoubleProperty length;
+        private final SimpleStringProperty name;
+        private final SimpleDoubleProperty length;
 
         public TableRow() {
             name = new SimpleStringProperty("");
@@ -447,19 +451,19 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         boolean restartRequired;
         restartRequired = (oldSpecialFieldsEnabled != newSpecialFieldsEnabled) ||
-                (oldRankingColumn != newRankingColumn) ||
-                (oldQualityColumn != newQualityColumn) ||
-                (oldPriorityColumn != newPriorityColumn) ||
-                (oldRelevanceColumn != newRelevanceColumn) ||
-                (oldPrintedColumn != newPrintedColumn) ||
-                (oldReadStatusColumn != newReadStatusColumn) ||
-                (oldSyncKeyWords != newSyncKeyWords) ||
-                (oldWriteSpecialFields != newWriteSpecialFields);
+                          (oldRankingColumn != newRankingColumn) ||
+                          (oldQualityColumn != newQualityColumn) ||
+                          (oldPriorityColumn != newPriorityColumn) ||
+                          (oldRelevanceColumn != newRelevanceColumn) ||
+                          (oldPrintedColumn != newPrintedColumn) ||
+                          (oldReadStatusColumn != newReadStatusColumn) ||
+                          (oldSyncKeyWords != newSyncKeyWords) ||
+                          (oldWriteSpecialFields != newWriteSpecialFields);
         if (restartRequired) {
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Changed special field settings"),
-                    Localization.lang("You have changed settings for special fields.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
+                                                                                                          Localization.lang("You have changed settings for special fields.")
+                                                                                                                      .concat(" ")
+                                                                                                                      .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
 
         }
 
@@ -479,11 +483,11 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /*** end: special fields ***/
 
-//        if (colSetup.isEditing()) {
-//            int col = colSetup.getEditingColumn();
-//            int row = colSetup.getEditingRow();
-//            colSetup.getCellEditor(row, col).stopCellEditing();
-//        }
+        //        if (colSetup.isEditing()) {
+        //            int col = colSetup.getEditingColumn();
+        //            int row = colSetup.getEditingRow();
+        //            colSetup.getCellEditor(row, col).stopCellEditing();
+        //        }
 
         // Now we need to make sense of the contents the user has made to the
         // table setup table.
