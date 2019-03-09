@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.metadata;
 
 import java.util.Optional;
 
@@ -6,12 +6,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextArea;
 
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-class PreambleEditor extends SimpleCommand {
+public class PreambleEditor extends SimpleCommand {
 
     private final TextArea editor = new TextArea();
 

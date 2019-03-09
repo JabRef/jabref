@@ -14,9 +14,9 @@ public class GroupDescriptions {
     public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
         String header = regExp ? Localization.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
-                field, StringUtil.quoteForHTML(expr)) : Localization.lang(
+                field, expr) : Localization.lang(
                         "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
-                        field, StringUtil.quoteForHTML(expr));
+                        field, expr);
         String caseSensitiveText = caseSensitive ? Localization.lang("case sensitive") : Localization
                 .lang("case insensitive");
         String footer = regExp ? Localization
@@ -30,7 +30,7 @@ public class GroupDescriptions {
                                 + "then using the context menu. "
                                 + "This process removes the term <b>%1</b> from "
                                 + "each entry's <b>%0</b> field.",
-                        field, StringUtil.quoteForHTML(expr));
+                        field, expr);
         return String.format("%s (%s). %s", header, caseSensitiveText, footer);
     }
 

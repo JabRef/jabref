@@ -2,13 +2,16 @@ package org.jabref.gui.groups;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -16,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -26,7 +30,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -104,7 +107,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private final TextField texGroupFilePath = new TextField();
 
     // for all types
-    private final WebView descriptionWebView = new WebView();
+    private final TextFlow descriptionTextFlow = new TextFlow();
     private final StackPane optionsPanel = new StackPane();
 
 
@@ -120,7 +123,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
         explicitRadioButton.setSelected(true);
 
-        descriptionWebView.setPrefWidth(585);
+        descriptionTextFlow.setMinWidth(585);
+        descriptionTextFlow.setPrefWidth(585);
+        descriptionTextFlow.setMinHeight(180);
+        descriptionTextFlow.setPrefHeight(180);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -196,26 +202,31 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         selectPanel.setPadding(new Insets(0, 0, 0, 10));
 
         // Description panel
-        ScrollPane descriptionPane = new ScrollPane(descriptionWebView);
+        ScrollPane descriptionPane = new ScrollPane(descriptionTextFlow);
         descriptionPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
         descriptionPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
         // create layout
-        VBox mainPanel = new VBox(15);
+        HBox mainPanel = new HBox(15);
         getDialogPane().setContent(mainPanel);
         mainPanel.setPadding(new Insets(5, 15, 5, 15));
         mainPanel.getChildren().setAll(
-                generalPanel,
                 new VBox(5,
-                        new Label(Localization.lang("Type")),
-                        selectPanel
+                        generalPanel,
+                        new VBox(5,
+                                new Label(Localization.lang("Type")),
+                                selectPanel
+                        )
                 ),
-                new VBox(
-                        new Label(Localization.lang("Options")),
-                        optionsPanel
-                ),
-                new Label(Localization.lang("Description")),
-                descriptionPane
+                new Separator(Orientation.VERTICAL),
+                new VBox(5,
+                        new VBox(
+                                new Label(Localization.lang("Options")),
+                                optionsPanel
+                        ),
+                        new Label(Localization.lang("Description")),
+                        descriptionPane
+                )
         );
 
         updateComponents();
@@ -319,21 +330,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return null;
         });
 
-        ChangeListener<String> caretListener = (ObservableValue<? extends String> ov, String oldValue,
-                                                String newValue) -> updateComponents();
-        ChangeListener<Boolean> itemListener = (ObservableValue<? extends Boolean> ov, Boolean oldBoolean,
-                                                Boolean newBoolean) -> updateComponents();
-
-        nameField.textProperty().addListener(caretListener);
-        descriptionField.textProperty().addListener(caretListener);
-        iconField.textProperty().addListener(caretListener);
-        keywordGroupSearchField.textProperty().addListener(caretListener);
-        keywordGroupSearchTerm.textProperty().addListener(caretListener);
-        keywordGroupCaseSensitive.selectedProperty().addListener(itemListener);
-        keywordGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupSearchExpression.textProperty().addListener(caretListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
+        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
+        nameField.setOnAction(actionHandler);
+        descriptionField.setOnAction(actionHandler);
+        iconField.setOnAction(actionHandler);
+        keywordGroupSearchField.setOnAction(actionHandler);
+        keywordGroupSearchTerm.setOnAction(actionHandler);
+        keywordGroupCaseSensitive.setOnAction(actionHandler);
+        keywordGroupRegExp.setOnAction(actionHandler);
+        searchGroupSearchExpression.setOnAction(actionHandler);
+        searchGroupRegExp.setOnAction(actionHandler);
 
         // configure for current type
         if (editedGroup == null) {
@@ -393,6 +399,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 texGroupFilePath.setText(group.getFilePath().toString());
             }
         }
+
+        setResizable(false);
+        getDialogPane().getScene().getWindow().sizeToScene();
     }
 
     public GroupDialog() {
@@ -517,7 +526,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         boolean okEnabled = !nameField.getText().trim().isEmpty();
         if (!okEnabled) {
             setDescription(Localization.lang("Please enter a name for the group."));
-            //TODO: okButton.setDisable(true);
+            getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             return;
         }
         String s1;
@@ -532,18 +541,18 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     try {
                         Pattern.compile(s2);
                         setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
-                                                                                  keywordGroupRegExp.isSelected()));
+                                keywordGroupRegExp.isSelected()));
                     } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s2, e));
                     }
                 } else {
                     setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
-                                                                              keywordGroupRegExp.isSelected()));
+                            keywordGroupRegExp.isSelected()));
                 }
             } else {
                 setDescription(Localization.lang(
-                                                 "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
+                        "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             }
             setNameFontItalic(true);
         } else if (searchRadioButton.isSelected()) {
@@ -551,8 +560,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
                 setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
-                                                                                               new SearchQuery(s1, isCaseSensitive(), isRegex()))
-                                                                        .getDescription()));
+                        new SearchQuery(s1, isCaseSensitive(), isRegex()))
+                        .getDescription()));
 
                 if (isRegex()) {
                     try {
@@ -564,17 +573,17 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 }
             } else {
                 setDescription(Localization
-                                           .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
-                                                 + "<tt>smith</tt><p>"
-                                                 + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
-                                                 + "<tt>author=smith and title=electrical</tt>"));
+                        .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
+                                + "<tt>smith</tt><p>"
+                                + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
+                                + "<tt>author=smith and title=electrical</tt>"));
             }
             setNameFontItalic(true);
         } else if (explicitRadioButton.isSelected()) {
             setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
-        //TODO: okButton.setDisable(!okEnabled);
+        getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {
@@ -596,7 +605,45 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     }
 
     private void setDescription(String description) {
-        descriptionWebView.getEngine().loadContent("<html>" + description + "</html>");
+        descriptionTextFlow.getChildren().setAll(createFormattedDescription(description));
+    }
+
+    private ArrayList<Node> createFormattedDescription(String descriptionHTML) {
+        ArrayList<Node> nodes = new ArrayList<>();
+
+        descriptionHTML = descriptionHTML.replaceAll("<p>|<br>", "\n");
+
+        String[] boldSplit = descriptionHTML.split("(?=<b>)|(?<=</b>)|(?=<i>)|(?<=</i>)|(?=<tt>)|(?<=</tt>)|(?=<kbd>)|(?<=</kbd>)");
+
+        for (String bs : boldSplit) {
+
+            if (bs.matches("<b>[^<>]*</b>")) {
+
+                bs = bs.replaceAll("<b>|</b>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-weight: bold");
+                nodes.add(textElement);
+
+            } else if (bs.matches("<i>[^<>]*</i>")) {
+
+                bs = bs.replaceAll("<i>|</i>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-style: italic");
+                nodes.add(textElement);
+
+            } else if (bs.matches("<tt>[^<>]*</tt>|<kbd>[^<>]*</kbd>")) {
+
+                bs = bs.replaceAll("<tt>|</tt>|<kbd>|</kbd>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-family: 'Courier New', Courier, monospace");
+                nodes.add(textElement);
+
+            } else {
+                nodes.add(new Text(bs));
+            }
+        }
+
+        return nodes;
     }
 
     /**

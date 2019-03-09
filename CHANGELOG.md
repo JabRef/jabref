@@ -52,8 +52,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added the ability to add field names from the Preferences Dialog [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added the ability change the column widths directly in the main table. [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added the ability to execute default action in dialog by using with <kbd>Ctrl</kbd> + <kbd>Enter</kbd> combination [#4496](https://github.com/JabRef/jabref/issues/4496)
-
-
+- We grouped and reordered the Main Menu (File, Edit, Library, Quality, Tools, and View tabs & icons). [#4666](https://github.com/JabRef/jabref/issues/4666) [#4667](https://github.com/JabRef/jabref/issues/4667) [#4668](https://github.com/JabRef/jabref/issues/4668) [#4669](https://github.com/JabRef/jabref/issues/4669) [#4670](https://github.com/JabRef/jabref/issues/4670) [#4671](https://github.com/JabRef/jabref/issues/4671) [#4672](https://github.com/JabRef/jabref/issues/4672) [#4673](https://github.com/JabRef/jabref/issues/4673)
+- We added additional modifiers (capitalize, titlecase and sentencecase) to the Bibtex key generator. [#1506](https://github.com/JabRef/jabref/issues/1506)
+- We grouped the toolbar icons and changed the Open Library and Copy icons. [#4584](https://github.com/JabRef/jabref/issues/4584) 
 
 
 ### Fixed
@@ -103,12 +104,14 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
 - We removed the coloring of cells in the maintable according to whether the field is optional/required.
+- We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
   - Print entry preview: available through entry preview
   - All commands related to marking: marking is not yet reimplemented
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
+  - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 
