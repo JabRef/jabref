@@ -185,8 +185,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREAMBLE_POS_X = "preamblePosX";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
     public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
-    public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
-    public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -233,7 +231,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
-    public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
@@ -659,7 +656,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL);
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
-        defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
@@ -685,8 +681,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
-        defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
-        defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
@@ -1435,10 +1429,11 @@ public class JabRefPreferences implements PreferencesService {
                                    get(IMPORT_FILEDIRPATTERN));
     }
 
+    @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                                          getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
-                                          get(TIME_STAMP_FORMAT));
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                get(TIME_STAMP_FORMAT));
     }
 
     public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
@@ -1456,10 +1451,11 @@ public class JabRefPreferences implements PreferencesService {
                 && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-                                           isKeywordSyncEnabled());
+                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+                isKeywordSyncEnabled());
     }
 
     @Override
@@ -2048,5 +2044,15 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setExportWorkingDirectory(String layoutFileDirString) {
         put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
+    }
+
+    @Override
+    public boolean shouldWarnAboutDuplicatesForImport() {
+        return getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION);
+    }
+
+    @Override
+    public void setShouldWarnAboutDuplicatesForImport(boolean value) {
+        putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
     }
 }

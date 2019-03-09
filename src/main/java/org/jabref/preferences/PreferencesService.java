@@ -8,11 +8,13 @@ import java.util.Map;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
@@ -60,6 +62,10 @@ public interface PreferencesService {
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
+    UpdateFieldPreferences getUpdateFieldPreferences();
+
+    ImportFormatPreferences getImportFormatPreferences();
+
     boolean isKeywordSyncEnabled();
 
     SavePreferences loadForExportFromPreferences();
@@ -77,4 +83,8 @@ public interface PreferencesService {
     SaveOrderConfig loadExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
+
+    boolean shouldWarnAboutDuplicatesForImport();
+
+    void setShouldWarnAboutDuplicatesForImport(boolean value);
 }

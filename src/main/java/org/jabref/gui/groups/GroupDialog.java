@@ -7,8 +7,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -329,21 +330,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return null;
         });
 
-        ChangeListener<String> caretListener = (ObservableValue<? extends String> ov, String oldValue,
-                                                String newValue) -> updateComponents();
-        ChangeListener<Boolean> itemListener = (ObservableValue<? extends Boolean> ov, Boolean oldBoolean,
-                                                Boolean newBoolean) -> updateComponents();
-
-        nameField.textProperty().addListener(caretListener);
-        descriptionField.textProperty().addListener(caretListener);
-        iconField.textProperty().addListener(caretListener);
-        keywordGroupSearchField.textProperty().addListener(caretListener);
-        keywordGroupSearchTerm.textProperty().addListener(caretListener);
-        keywordGroupCaseSensitive.selectedProperty().addListener(itemListener);
-        keywordGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupSearchExpression.textProperty().addListener(caretListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
+        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
+        nameField.setOnAction(actionHandler);
+        descriptionField.setOnAction(actionHandler);
+        iconField.setOnAction(actionHandler);
+        keywordGroupSearchField.setOnAction(actionHandler);
+        keywordGroupSearchTerm.setOnAction(actionHandler);
+        keywordGroupCaseSensitive.setOnAction(actionHandler);
+        keywordGroupRegExp.setOnAction(actionHandler);
+        searchGroupSearchExpression.setOnAction(actionHandler);
+        searchGroupRegExp.setOnAction(actionHandler);
 
         // configure for current type
         if (editedGroup == null) {

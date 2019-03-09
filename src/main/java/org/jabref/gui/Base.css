@@ -364,6 +364,11 @@
     -fx-fill: white;
 }
 
+.toggle-button:selected.icon-button:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -jr-selected;
+}
+
 .icon-buttonNoSpaceBottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
 }
@@ -976,6 +981,35 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 0px;
 }
 
+.bibEntry {
+
+}
+
+.bibEntry .type {
+    -fx-font-size: 110%;
+}
+
+.bibEntry .title {
+    -fx-font-size: 110%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .year {
+    -fx-font-size: 101%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .journal {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .authors {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .summary {
+    -fx-padding: 1ex 0ex 0ex 0ex;
+}
 
 .warning-icon {
     -fx-fill: -jr-warn;
