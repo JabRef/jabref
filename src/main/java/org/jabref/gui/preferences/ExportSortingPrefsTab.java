@@ -20,7 +20,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
         exportOrderPanel = new SaveOrderConfigDisplayView(prefs.loadExportSaveOrder());
 
-        builder.add(exportOrderPanel.getJFXPanel(), 1, 8);
+        builder.add(exportOrderPanel, 1, 8);
         builder.add(new Line(), 2, 9);
     }
 
@@ -31,7 +31,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
     @Override
     public void setValues() {
-
+        //empty
     }
 
     @Override

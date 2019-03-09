@@ -3,7 +3,6 @@ package org.jabref.gui;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
@@ -39,7 +38,6 @@ public class SaveOrderConfigDisplayView extends GridPane {
 
         ViewLoader.view(this)
                   .root(this)
-                  .controller(this)
                   .load();
     }
 
@@ -80,7 +78,4 @@ public class SaveOrderConfigDisplayView extends GridPane {
         return viewModel.getSaveOrderConfig();
     }
 
-    public Node getJFXPanel() {
-        return this;
-    }
 }

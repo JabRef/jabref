@@ -16,13 +16,15 @@ public class SaveOrderConfig {
     private static final String SPECIFIED = "specified";
     private final LinkedList<SortCriterion> sortCriteria = new LinkedList<>();
     private boolean saveInOriginalOrder;
+    private boolean saveInSpecifiedOrder;
 
     public SaveOrderConfig() {
         setSaveInOriginalOrder();
     }
 
-    public SaveOrderConfig(boolean saveInOriginalOrder, SortCriterion first, SortCriterion second, SortCriterion third) {
+    public SaveOrderConfig(boolean saveInOriginalOrder, boolean saveInSpecifiedOrder, SortCriterion first, SortCriterion second, SortCriterion third) {
         this.saveInOriginalOrder = saveInOriginalOrder;
+        this.saveInSpecifiedOrder = saveInSpecifiedOrder;
         sortCriteria.add(first);
         sortCriteria.add(second);
         sortCriteria.add(third);
@@ -62,7 +64,7 @@ public class SaveOrderConfig {
     }
 
     public boolean saveInSpecifiedOrder() {
-        return !saveInOriginalOrder;
+        return saveInSpecifiedOrder;
     }
 
     public LinkedList<SortCriterion> getSortCriteria() {
@@ -83,13 +85,14 @@ public class SaveOrderConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saveInOriginalOrder, sortCriteria);
+        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, sortCriteria);
     }
 
     @Override
     public String toString() {
-        return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder +
-               ", sortCriteria=" + sortCriteria +
+        return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder
+               + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
+               + ", sortCriteria=" + sortCriteria +
                '}';
     }
 
@@ -99,6 +102,7 @@ public class SaveOrderConfig {
 
     public void setSaveInSpecifiedOrder() {
         this.saveInOriginalOrder = false;
+        this.saveInSpecifiedOrder = true;
     }
 
     /**
