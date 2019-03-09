@@ -1027,3 +1027,8 @@ We want to have a look that matches our icons in the tool-bar */
 .tooltip-error {
     -fx-background-color: -jr-error;
 }
+
+.sectionHeader {
+    -fx-font-size: 1.5em;
+    -fx-padding: 1em 0em 1em 0em;
+}

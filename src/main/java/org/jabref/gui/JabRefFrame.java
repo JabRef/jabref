@@ -61,9 +61,9 @@ import org.jabref.gui.actions.BibtexKeyPatternAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
 import org.jabref.gui.actions.CustomizeKeyBindingAction;
-import org.jabref.gui.actions.DatabasePropertiesAction;
 import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
+import org.jabref.gui.actions.LibraryPropertiesAction;
 import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageContentSelectorAction;
 import org.jabref.gui.actions.ManageCustomExportsAction;
@@ -818,7 +818,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 edit.getItems().add(new SeparatorMenuItem());
             }
         }
-
+        //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences(), dialogService, Globals.prefs)),
@@ -826,7 +826,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new DatabasePropertiesAction(this)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(this)),
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(this))
@@ -838,7 +838,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 
-        //@formatter:off
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this)),

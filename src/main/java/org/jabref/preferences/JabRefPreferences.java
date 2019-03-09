@@ -913,6 +913,7 @@ public class JabRefPreferences implements PreferencesService {
         return preferredPositions;
     }
 
+    @Override
     public String getUser() {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
@@ -1396,10 +1397,12 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
+    @Override
     public Charset getDefaultEncoding() {
         return Charset.forName(get(DEFAULT_ENCODING));
     }
 
+    @Override
     public void setDefaultEncoding(Charset encoding) {
         put(DEFAULT_ENCODING, encoding.name());
     }
@@ -1692,10 +1695,13 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
+    @Override
     public void storeExportSaveOrder(SaveOrderConfig config) {
         putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
         putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
 
         put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field);
         put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field);
@@ -1714,8 +1720,9 @@ public class JabRefPreferences implements PreferencesService {
         return config;
     }
 
+    @Override
     public SaveOrderConfig loadExportSaveOrder() {
-        return new SaveOrderConfig(true,
+        return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))

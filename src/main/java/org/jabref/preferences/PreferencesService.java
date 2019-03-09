@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.model.metadata.FilePreferences;
+import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
@@ -70,7 +72,17 @@ public interface PreferencesService {
 
     String getExportWorkingDirectory();
 
+    Charset getDefaultEncoding();
+
+    void setDefaultEncoding(Charset encoding);
+
+    String getUser();
+
     void setExportWorkingDirectory(String layoutFileDirString);
+
+    SaveOrderConfig loadExportSaveOrder();
+
+    void storeExportSaveOrder(SaveOrderConfig config);
 
     boolean shouldWarnAboutDuplicatesForImport();
 
