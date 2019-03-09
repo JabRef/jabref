@@ -58,12 +58,12 @@ public class Globals {
 
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
+    public static CountingUndoManager undoManager = new CountingUndoManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
-    public static CountingUndoManager undoManager = new CountingUndoManager();
 
     private Globals() {
     }
