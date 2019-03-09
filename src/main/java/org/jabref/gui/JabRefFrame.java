@@ -93,7 +93,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCommand;
-import org.jabref.gui.importer.ImportInspectionDialog;
+import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -107,6 +107,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -179,7 +180,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private PushToApplications pushApplications;
-    private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
     private SidePane sidePane;
 
@@ -785,7 +785,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             boolean menuItemAdded = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager));
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, Globals.undoManager));
                 menuItemAdded = true;
             }
 
@@ -805,12 +805,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager));
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, Globals.undoManager));
                 menuItemAdded = true;
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager));
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, Globals.undoManager));
                 menuItemAdded = true;
             }
 
@@ -1204,21 +1204,16 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     /**
-     * This method does the job of adding imported entries into the active database, or into a new one. It shows the
-     * ImportInspectionDialog if preferences indicate it should be used. Otherwise it imports directly.
+     * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
      * @param panel   The BasePanel to add to.
      * @param entries The entries to add.
      */
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries) {
-        SwingUtilities.invokeLater(() -> {
-            ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
-                    Localization.lang("Import"), false);
-            diag.addEntries(entries);
-            diag.entryListComplete();
-            diag.setVisible(true);
-            diag.toFront();
-        });
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> entries);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
+        dialog.setTitle(Localization.lang("Import"));
+        dialog.showAndWait();
     }
 
     public FileHistoryMenu getFileHistory() {
@@ -1389,7 +1384,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     public CountingUndoManager getUndoManager() {
-        return undoManager;
+        return Globals.undoManager;
     }
 
     public DialogService getDialogService() {

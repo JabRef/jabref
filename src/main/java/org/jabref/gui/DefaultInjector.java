@@ -2,6 +2,8 @@ package org.jabref.gui;
 
 import java.util.function.Function;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
@@ -43,6 +45,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.protectedTermsLoader;
         } else if (clazz == ClipBoardManager.class) {
             return Globals.clipboardManager;
+        } else if (clazz == UndoManager.class) {
+            return Globals.undoManager;
         } else {
             try {
                 return clazz.newInstance();
