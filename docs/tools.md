@@ -3,7 +3,7 @@ This page lists some software we consider useful.
 ## Browser plugins
 
 * [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* Navigate through source [Sourcegraph for Chrome](https://chrome.google.com/webstore/detail/sourcegraph-for-github/) / [Sourcegraph for Firefox](https://addons.mozilla.org/de/firefox/addon/sourcegraph-addon-for-github/)
+* [Sourcegraph Browser Extension](https://docs.sourcegraph.com/integration/browser_extension): Navigate through source on github
 
 ## git hints
 Here, we collect some helpful git hints
