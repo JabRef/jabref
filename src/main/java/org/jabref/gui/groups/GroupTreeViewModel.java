@@ -57,10 +57,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate
-                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
 
         // Init
+        refresh();
+    }
+
+    private void refresh() {
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
     }
 
@@ -103,7 +106,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the root
      */
     public void addNewGroupToRoot() {
-        addNewSubgroup(rootGroup.get());
+        if (currentDatabase.isPresent()) {
+            addNewSubgroup(rootGroup.get());
+        } else {
+            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
+        }
     }
 
     /**
@@ -121,8 +128,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(newRoot);
             this.selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
-                                .collect(Collectors.toList()));
+                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                            .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor, localDragboard));
         }
@@ -166,13 +173,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     Localization.lang("Change of Grouping Method"),
                     Localization.lang("Assign the original group's entries to this group?"));
             //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+            boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                     && (group instanceof ExplicitGroup);
 
             oldGroup.getGroupNode().setGroup(
                     group,
                     keepPreviousAssignments,
-                    removePreviousAssignents,
+                    removePreviousAssignments,
                     stateManager.getEntriesInCurrentDatabase());
 
             // TODO: Add undo
@@ -194,6 +201,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
+
+            // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+            refresh();
         });
     }
 
@@ -222,7 +232,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
             groupNode.getParent()
-                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));

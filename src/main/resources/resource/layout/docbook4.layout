@@ -1,0 +1,20 @@
+<biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
+   <authorgroup>
+\begin{author}       \format[CreateDocBook4Authors]{\author} \end{author}
+\begin{editor}       \format[CreateDocBook4Editors]{\editor} \end{editor}
+   </authorgroup>
+   <citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
+\begin{journal}   <citetitle pubwork="journal">\format[XMLChars]{\journal}</citetitle>\end{journal}
+\begin{publisher}   <publisher>
+      <publishername>\format[XMLChars]{\publisher}</publishername>
+   </publisher>\end{publisher}
+\begin{volume}   <volumenum>\volume</volumenum> \end{volume}
+\begin{edition}   <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> \end{edition}
+\begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+\begin{year}   <pubdate>\year</pubdate>  \end{year}
+\begin{url}  <bibliomisc><ulink url="\format[XMLChars]{\url}">\format[XMLChars]{\url}</ulink></bibliomisc>\end{url}
+\begin{abstract}   <abstract>
+      <para>\format[XMLChars,RemoveLatexCommands]{\abstract}
+      </para>
+   </abstract>\end{abstract}
+</biblioentry>

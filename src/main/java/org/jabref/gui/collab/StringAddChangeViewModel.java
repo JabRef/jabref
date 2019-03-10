@@ -43,7 +43,7 @@ class StringAddChangeViewModel extends ChangeViewModel {
 
         try {
             panel.getDatabase().addString(string);
-            undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), string));
+            undoEdit.addEdit(new UndoableInsertString(panel.getDatabase(), string));
         } catch (KeyCollisionException ex) {
             LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }

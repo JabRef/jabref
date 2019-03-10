@@ -42,7 +42,7 @@ public class FileUtil {
     /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
-     * @return The extension (without leading dot), trimmed and in lowercase.
+     * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
         int dotPosition = fileName.lastIndexOf('.');
@@ -57,7 +57,7 @@ public class FileUtil {
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
-     * @return The extension, trimmed and in lowercase.
+     * @return the extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(Path file) {
         return getFileExtension(file.getFileName().toString());

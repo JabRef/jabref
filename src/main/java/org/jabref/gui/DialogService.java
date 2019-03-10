@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -139,7 +140,7 @@ public interface DialogService {
      * @return true if the use clicked "YES" otherwise false
      */
     boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String optOutMessage, Consumer<Boolean> optOutAction);
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
      * Create and display a new confirmation dialog.
@@ -151,8 +152,8 @@ public interface DialogService {
      * @return true if the use clicked "YES" otherwise false
      */
     boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-            String okButtonLabel, String cancelButtonLabel,
-            String optOutMessage, Consumer<Boolean> optOutAction);
+                                                    String okButtonLabel, String cancelButtonLabel,
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
      * This will create and display a new dialog of the specified
@@ -162,7 +163,7 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-            ButtonType... buttonTypes);
+                                                       ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
@@ -183,9 +184,11 @@ public interface DialogService {
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
      *
+     * @param title title of the dialog
+     * @param content message to show above the progress bar
      * @param task The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showCanceableProgressDialogAndWait(Task<V> task);
+    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /**
      * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
@@ -245,4 +248,12 @@ public interface DialogService {
      */
     boolean showPrintDialog(PrinterJob job);
 
+    /**
+     * Shows a new dialog that list all files contained in the given archive and which lets the user select one of these
+     * files. The method doesn't return until the displayed open dialog is dismissed. The return value specifies the
+     * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     *
+     * @return the selected file or an empty {@link Optional} if no file has been selected
+     */
+    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 }

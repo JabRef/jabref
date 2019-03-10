@@ -23,8 +23,7 @@ import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.jabref.logic.util.OS.NEWLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +36,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class ManageJournalAbbreviationsViewModelTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
@@ -50,7 +48,7 @@ class ManageJournalAbbreviationsViewModelTest {
     private DialogService dialogService;
 
     @BeforeEach
-    void setUpViewModel(@TempDirectory.TempDir Path tempFolder) throws Exception {
+    void setUpViewModel(@TempDir Path tempFolder) throws Exception {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);

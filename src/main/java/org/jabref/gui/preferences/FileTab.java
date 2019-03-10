@@ -211,7 +211,7 @@ class FileTab extends Pane implements PrefsTab {
         }
 
         String newline;
-        switch (newlineSeparator.getPromptText()) {
+        switch (newlineSeparator.getValue()) {
             case "CR":
                 newline = "\r";
                 break;

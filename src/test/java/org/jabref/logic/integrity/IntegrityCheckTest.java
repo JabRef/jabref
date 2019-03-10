@@ -23,8 +23,7 @@ import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 class IntegrityCheckTest {
 
     @Test
@@ -86,6 +84,7 @@ class IntegrityCheckTest {
                 withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+        assertWrong(createContext("edition", "1"));
     }
 
     @Test
@@ -220,7 +219,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void fileCheckFindsFilesRelativeToBibFile(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
         Path bibFile = testFolder.resolve("lit.bib");
         Files.createFile(bibFile);
         Path pdfFile = testFolder.resolve("file.pdf");

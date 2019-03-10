@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,7 +13,6 @@ class CitationEntryTest {
     @Test
     void testCitationEntryInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        assertFalse(citationEntry.pageInfoChanged());
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Info", citationEntry.getPageInfo().get());
         assertEquals("RefMark", citationEntry.getRefMarkName());
@@ -24,9 +22,8 @@ class CitationEntryTest {
     @Test
     void testCitationEntryOptionalInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
-        assertFalse(citationEntry.pageInfoChanged());
-        assertTrue(citationEntry.getPageInfo().isPresent());
-        assertEquals("Info", citationEntry.getPageInfo().get());
+
+        assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
         assertEquals("RefMark", citationEntry.getRefMarkName());
         assertEquals("Context", citationEntry.getContext());
     }
@@ -34,34 +31,13 @@ class CitationEntryTest {
     @Test
     void testCitationEntryInitalPageInfoChanged() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        citationEntry.setPageInfo("Other info");
-        assertTrue(citationEntry.pageInfoChanged());
-        assertTrue(citationEntry.getPageInfo().isPresent());
-        assertEquals("Other info", citationEntry.getPageInfo().get());
-    }
-
-    @Test
-    void testCitationEntryInitalPageInfoRemoved() {
-        CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
-        citationEntry.setPageInfo(null);
-        assertTrue(citationEntry.pageInfoChanged());
-        assertFalse(citationEntry.getPageInfo().isPresent());
+        assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
     }
 
     @Test
     void testCitationEntryNoInitalPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
-        assertFalse(citationEntry.pageInfoChanged());
-        assertFalse(citationEntry.getPageInfo().isPresent());
-    }
-
-    @Test
-    void testCitationEntryNoInitalPageInfoChanged() {
-        CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
-        citationEntry.setPageInfo("Other info");
-        assertTrue(citationEntry.pageInfoChanged());
-        assertTrue(citationEntry.getPageInfo().isPresent());
-        assertEquals("Other info", citationEntry.getPageInfo().get());
+        assertEquals(Optional.empty(), citationEntry.getPageInfo());
     }
 
     @Test
