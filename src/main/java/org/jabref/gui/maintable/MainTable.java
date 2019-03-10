@@ -77,7 +77,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.prefs.getImportFormatPreferences(),
                 Globals.prefs.getUpdateFieldPreferences(),
                 Globals.getFileUpdateMonitor(),
-                undoManager);
+                undoManager,
+                Globals.stateManager);
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 

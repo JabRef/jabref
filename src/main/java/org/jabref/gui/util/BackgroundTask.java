@@ -223,6 +223,11 @@ public abstract class BackgroundTask<V> {
         message.setValue(newMessage);
     }
 
+    public BackgroundTask<V> withInitialMessage(String message) {
+        updateMessage(message);
+        return this;
+    }
+
     class BackgroundProgress {
 
         private final double workDone;

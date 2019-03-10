@@ -62,9 +62,6 @@ public class BibEntry implements Cloneable {
     private final StringProperty type = new SimpleStringProperty();
 
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
-    // Search and grouping status is stored in boolean fields for quick reference:
-    private boolean searchHit;
-    private boolean groupHit;
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
     /**
@@ -547,22 +544,6 @@ public class BibEntry implements Cloneable {
     @Override
     public String toString() {
         return CanonicalBibtexEntry.getCanonicalRepresentation(this);
-    }
-
-    public boolean isSearchHit() {
-        return searchHit;
-    }
-
-    public void setSearchHit(boolean searchHit) {
-        this.searchHit = searchHit;
-    }
-
-    public boolean isGroupHit() {
-        return groupHit;
-    }
-
-    public void setGroupHit(boolean groupHit) {
-        this.groupHit = groupHit;
     }
 
     /**

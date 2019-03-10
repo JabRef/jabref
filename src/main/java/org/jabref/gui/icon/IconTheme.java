@@ -44,6 +44,7 @@ public class IconTheme {
      */
     public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
+    public static final javafx.scene.paint.Color SELECTED_COLOR = javafx.scene.paint.Color.web("#50618F");
     public static Font FONT;
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
@@ -179,6 +180,7 @@ public class IconTheme {
     public enum JabRefIcons implements JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_CIRCLE_OUTLINE),
+        ADD_FILLED(MaterialDesignIcon.PLUS_CIRCLE),
         ADD_NOBOX(MaterialDesignIcon.PLUS),
         ADD_ENTRY(MaterialDesignIcon.BOOKMARK_PLUS),
         EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
@@ -314,7 +316,9 @@ public class IconTheme {
         NEW_FILE(MaterialDesignIcon.PLUS),
         DOWNLOAD(MaterialDesignIcon.DOWNLOAD),
         OWNER(MaterialDesignIcon.ACCOUNT),
-        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR);
+        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
+        ARTICLE(MaterialDesignIcon.FILE_DOCUMENT),
+        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT);
 
         private final JabRefIcon icon;
 
