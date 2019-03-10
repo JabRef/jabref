@@ -829,6 +829,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)),
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(this))
         );
 
@@ -916,10 +917,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this))
                 // TODO: Reenable customize entry types feature (https://github.com/JabRef/jabref/issues/4719)
                 //factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
         );
 
         help.getItems().addAll(
