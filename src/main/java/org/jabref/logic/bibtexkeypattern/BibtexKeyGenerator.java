@@ -26,8 +26,8 @@ public class BibtexKeyGenerator extends BracketedPattern {
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
-    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
-    private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
+    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"-#~^':`";
+    private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"-";
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
