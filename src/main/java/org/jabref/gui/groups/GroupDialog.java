@@ -449,8 +449,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         VBox texPanel = new VBox();
         texPanel.setVisible(false);
         texPanel.getChildren().add(new Label(Localization.lang("Aux file")));
-        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> openBrowseDialog(jabRefFrame);
-        texGroupBrowseButton.setOnAction(actionHandler);
+        texGroupBrowseButton.setOnAction((ActionEvent e) -> openBrowseDialog(jabRefFrame.getDialogService()));
         texGroupHBox.getChildren().add(texGroupFilePath);
         texGroupHBox.getChildren().add(texGroupBrowseButton);
         texGroupHBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
@@ -598,8 +597,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
     }
 
-    private void openBrowseDialog(JabRefFrame jabRefFrame) {
-        DialogService dialogService = jabRefFrame.getDialogService();
+    private void openBrowseDialog(DialogService dialogService) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
             .addExtensionFilter(StandardFileType.AUX)
             .withDefaultExtension(StandardFileType.AUX)
