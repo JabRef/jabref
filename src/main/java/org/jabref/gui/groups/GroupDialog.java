@@ -13,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -24,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -33,13 +35,16 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
@@ -105,6 +110,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     // for TexGroup
     private final TextField texGroupFilePath = new TextField();
+    private final Button texGroupBrowseButton = new Button("Browse");
+    private final HBox texGroupHBox = new HBox(10);
 
     // for all types
     private final TextFlow descriptionTextFlow = new TextFlow();
@@ -145,7 +152,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         VBox keywordPanel = createOptionsKeywordGroup();
         VBox searchPanel = createOptionsSearchGroup();
         VBox autoPanel = createOptionsAutoGroup();
-        VBox texPanel = createOptionsTexGroup();
+        VBox texPanel = createOptionsTexGroup(jabrefFrame);
         optionsPanel.getChildren().addAll(explicitPanel, keywordPanel, searchPanel, autoPanel, texPanel);
         optionsPanel.setPadding(new Insets(0, 0, 0, 10));
 
@@ -438,11 +445,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         return s;
     }
 
-    private VBox createOptionsTexGroup() {
+    private VBox createOptionsTexGroup(JabRefFrame jabRefFrame) {
         VBox texPanel = new VBox();
         texPanel.setVisible(false);
         texPanel.getChildren().add(new Label(Localization.lang("Aux file")));
-        texPanel.getChildren().add(texGroupFilePath);
+        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> openBrowseDialog(jabRefFrame);
+        texGroupBrowseButton.setOnAction(actionHandler);
+        texGroupHBox.getChildren().add(texGroupFilePath);
+        texGroupHBox.getChildren().add(texGroupBrowseButton);
+        texGroupHBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
+        texPanel.getChildren().add(texGroupHBox);
         return texPanel;
     }
 
@@ -584,6 +596,15 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setNameFontItalic(false);
         }
         getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
+    }
+
+    private void openBrowseDialog(JabRefFrame jabRefFrame) {
+        DialogService dialogService = jabRefFrame.getDialogService();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.AUX)
+            .withDefaultExtension(StandardFileType.AUX)
+            .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(file.toAbsolutePath().toString()));
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {
