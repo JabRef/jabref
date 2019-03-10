@@ -1,6 +1,5 @@
 package org.jabref.gui.help;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +8,6 @@ import java.util.stream.Stream;
 
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
@@ -58,14 +56,6 @@ public class HelpAction extends MnemonicAwareAction {
 
     public HelpAction(HelpFile helpPage) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
-    }
-
-    public JButton getHelpButton() {
-        JButton button = new JButton(this);
-        button.setText(null);
-        button.setPreferredSize(new Dimension(24, 24));
-        button.setToolTipText(getValue(Action.SHORT_DESCRIPTION).toString());
-        return button;
     }
 
     public static void openHelpPage(HelpFile helpPage) {

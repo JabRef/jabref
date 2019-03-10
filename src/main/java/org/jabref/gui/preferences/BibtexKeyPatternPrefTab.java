@@ -48,7 +48,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
      */
     @Override
     public void storeSettings() {
-
         // Set the default value:
         Globals.prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, defaultPat.getText());
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
@@ -98,6 +97,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }

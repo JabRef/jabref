@@ -112,6 +112,7 @@ public class FXDialogService implements DialogService {
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
+        choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         return choiceDialog.showAndWait();
 
