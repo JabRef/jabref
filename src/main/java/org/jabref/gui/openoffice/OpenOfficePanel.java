@@ -397,6 +397,12 @@ public class OpenOfficePanel {
         connectTask.setOnSucceeded(value -> {
             ooBase = connectTask.getValue();
 
+            try {
+                ooBase.selectDocument();
+            } catch (WrappedTargetException | NoSuchElementException | NoDocumentException e) {
+                LOGGER.error("Error getting open writer documents", e);
+            }
+
             if (ooBase.isConnectedToDocument()) {
                 dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
             }
@@ -453,8 +459,7 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
-        WrappedTargetException, BootstrapException, NoDocumentException,
-        NoSuchElementException, CreationException {
+        BootstrapException, CreationException {
         // Connect
         return new OOBibBase(ooPrefs.getExecutablePath(), true, dialogService);
     }

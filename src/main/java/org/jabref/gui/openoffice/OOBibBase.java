@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
@@ -132,8 +131,7 @@ class OOBibBase {
 
     private final DialogService dialogService;
 
-    public OOBibBase(String pathToOO, boolean atEnd, DialogService dialogService) throws IOException, IllegalAccessException,
-                                                                                  InvocationTargetException, BootstrapException, CreationException, WrappedTargetException, IndexOutOfBoundsException, NoSuchElementException, NoDocumentException {
+    public OOBibBase(String pathToOO, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException {
 
         this.dialogService = dialogService;
 
@@ -150,7 +148,7 @@ class OOBibBase {
 
         this.atEnd = atEnd;
         xDesktop = simpleBootstrap(pathToOO);
-        selectDocument();
+
     }
 
     public boolean isConnectedToDocument() {
@@ -160,7 +158,7 @@ class OOBibBase {
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
         //this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
-        Optional<DocumentTitleViewModel> selectedDocument = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel));
+        Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
         return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }
 
@@ -181,8 +179,7 @@ class OOBibBase {
         }
     }
 
-    public void selectDocument() throws WrappedTargetException, IndexOutOfBoundsException,
-        NoSuchElementException, NoDocumentException {
+    public void selectDocument() throws NoDocumentException, NoSuchElementException, WrappedTargetException {
         List<XTextDocument> textDocumentList = getTextDocuments();
         XTextDocument selected;
         if (textDocumentList.isEmpty()) {
