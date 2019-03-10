@@ -72,7 +72,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         }
     }
 
-    public static String filterUnwantedCharacters(String key, boolean enforceLegalKey) {
+    public static String removeUnwantedCharacters(String key, boolean enforceLegalKey) {
         if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
@@ -101,7 +101,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     public static String cleanKey(String key, boolean enforceLegalKey) {
-        return filterUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s","");
+        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s","");
     }
 
     public String generateKey(BibEntry entry) {
