@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.JOptionPane;
-
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -275,7 +273,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     if (explicitRadioButton.isSelected()) {
                         Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
                         if (groupName.contains(Character.toString(keywordDelimiter))) {
-                            JOptionPane.showMessageDialog(null,
+                            dialogService.showWarningDialogAndWait(Localization.lang("Keyword separator in group name"),
                                     Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
                         }
 
@@ -293,8 +291,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                             }
 
                             if (warnAboutSameName) {
-                                JOptionPane.showMessageDialog(null,
-                                        Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                                dialogService.showErrorDialogAndWait(Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
                                 return null;
                             }
                         }
@@ -337,7 +334,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     resultingGroup.setIconName(iconField.getText());
                     return resultingGroup;
                 } catch (IllegalArgumentException | IOException exception) {
-                    JOptionPane.showMessageDialog(null, exception.getLocalizedMessage());
+                    dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
                     return null;
                 }
             }
