@@ -126,7 +126,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:27.0.1-jre'
+    compile 'com.google.guava:guava:27.1-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
