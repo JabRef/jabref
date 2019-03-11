@@ -148,7 +148,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
                 // This check should only be performed once on initial database setup.
                 // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
-                if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
+                if (dbmsProcessor.checkForPare3Dot6Integrity()) {
                     throw new DatabaseNotSupportedException();
                 }
             }
@@ -210,7 +210,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
         }
 
-        for (BibEntry bibEntry : dbmsProcessor.getSharedEntryByIdList(entriesToDrag)) {
+        for (BibEntry bibEntry : dbmsProcessor.getSharedEntries(entriesToDrag)) {
             bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
         }
     }
@@ -324,10 +324,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     *  Checks whether the current SQL connection is valid.
-     *  In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     * Checks whether the current SQL connection is valid.
+     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
      *
-     *  @return <code>true</code> if the connection is valid, else <code>false</code>.
+     * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
     public boolean checkCurrentConnection() {
         try {

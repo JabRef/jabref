@@ -125,7 +125,7 @@ class DBMSProcessorTest {
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
 
-        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntryByIdList(Arrays.asList(1, 2));
+        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(Arrays.asList(1, 2));
 
         assertEquals(firstEntry.getId(), sharedEntriesByIdList.get(0).getId());
         assertEquals(secondEntry.getId(), sharedEntriesByIdList.get(1).getId());

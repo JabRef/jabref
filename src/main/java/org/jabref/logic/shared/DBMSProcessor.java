@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +54,7 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        return checkTableAvailibility("ENTRY", "FIELD", "METADATA");
+        return checkTableAvailability("ENTRY", "FIELD", "METADATA");
     }
 
     /**
@@ -61,8 +62,8 @@ public abstract class DBMSProcessor {
      *
      * @return <code>true</code> if the structure is old, else <code>false</code>.
      */
-    public boolean checkForPre3Dot6Intergrity() throws SQLException {
-        return checkTableAvailibility(
+    public boolean checkForPare3Dot6Integrity() throws SQLException {
+        return checkTableAvailability(
                 "ENTRIES",
                 "ENTRY_GROUP",
                 "ENTRY_TYPES",
@@ -78,7 +79,7 @@ public abstract class DBMSProcessor {
      * @param tableNames Table names to be checked
      * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
      */
-    private boolean checkTableAvailibility(String... tableNames) throws SQLException {
+    private boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
             requiredTables.add(name.toUpperCase(Locale.ENGLISH));
@@ -148,16 +149,15 @@ public abstract class DBMSProcessor {
      * @param bibEntry {@link BibEntry} to be inserted
      */
     protected void insertIntoEntryTable(BibEntry bibEntry) {
-        // Inserting into ENTRY table
-        StringBuilder insertIntoEntryQuery = new StringBuilder()
-                .append("INSERT INTO ")
-                .append(escape("ENTRY"))
-                .append("(")
-                .append(escape("TYPE"))
-                .append(") VALUES(?)");
-
         // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
-        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
+        String insertIntoEntryQuery =
+                "INSERT INTO " +
+                        escape("ENTRY") +
+                        "(" +
+                        escape("TYPE") +
+                        ") VALUES(?)";
+
+        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
                 new String[] {"SHARED_ID"})) {
 
             preparedEntryStatement.setString(1, bibEntry.getType());
@@ -183,14 +183,14 @@ public abstract class DBMSProcessor {
             // Check if already exists
             int sharedID = bibEntry.getSharedBibEntryData().getSharedID();
             if (sharedID != -1) {
-                StringBuilder selectQuery = new StringBuilder()
-                        .append("SELECT * FROM ")
-                        .append(escape("ENTRY"))
-                        .append(" WHERE ")
-                        .append(escape("SHARED_ID"))
-                        .append(" = ?");
+                String selectQuery =
+                        "SELECT * FROM " +
+                                escape("ENTRY") +
+                                " WHERE " +
+                                escape("SHARED_ID") +
+                                " = ?";
 
-                try (PreparedStatement preparedSelectStatement = connection.prepareStatement(selectQuery.toString())) {
+                try (PreparedStatement preparedSelectStatement = connection.prepareStatement(selectQuery)) {
                     preparedSelectStatement.setInt(1, sharedID);
                     try (ResultSet resultSet = preparedSelectStatement.executeQuery()) {
                         if (resultSet.next()) {
@@ -421,41 +421,42 @@ public abstract class DBMSProcessor {
      * @return instance of {@link BibEntry}
      */
     public Optional<BibEntry> getSharedEntry(int sharedID) {
-        List<BibEntry> sharedEntries = getSharedEntryList(sharedID);
+        List<BibEntry> sharedEntries = getSharedEntries(Collections.singletonList(sharedID));
         if (!sharedEntries.isEmpty()) {
             return Optional.of(sharedEntries.get(0));
         }
         return Optional.empty();
     }
 
-    public List<BibEntry> getSharedEntryByIdList(List<Integer> idList) {
+    public List<BibEntry> getSharedEntries(List<Integer> sharedIDs) {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ")
-                .append(escape("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
-                .append(escape("ENTRY")).append(".").append(escape("TYPE")).append(", ")
-                .append(escape("ENTRY")).append(".").append(escape("VERSION")).append(", ")
-                .append("F.").append(escape("ENTRY_SHARED_ID")).append(", ")
-                .append("F.").append(escape("NAME")).append(", ")
-                .append("F.").append(escape("VALUE"))
-                .append(" FROM ")
-                .append(escape("ENTRY"))
-                .append(" inner join ")
-                .append(escape("FIELD"))
-                .append(" F on ")
-                .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
-                .append(" = F.").append(escape("ENTRY_SHARED_ID"))
-                .append(" where ")
-                .append(escape("SHARED_ID")).append(" in (");
+             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
+             .append(escape("ENTRY")).append(".").append(escape("TYPE")).append(", ")
+             .append(escape("ENTRY")).append(".").append(escape("VERSION")).append(", ")
+             .append("F.").append(escape("ENTRY_SHARED_ID")).append(", ")
+             .append("F.").append(escape("NAME")).append(", ")
+             .append("F.").append(escape("VALUE"))
+             .append(" FROM ")
+             .append(escape("ENTRY"))
+             .append(" inner join ")
+             .append(escape("FIELD"))
+             .append(" F on ")
+             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
+             .append(" = F.").append(escape("ENTRY_SHARED_ID"));
 
-        String idListAsString = idList.stream().map(String::valueOf).collect(Collectors.joining(", "));
-
-        query.append(idListAsString)
-                .append(idList.get(idList.size() - 1))
-                .append(") order by ")
-                .append(escape("SHARED_ID"))
-                .append(";");
+        if (!sharedIDs.isEmpty()) {
+            String idListAsString = sharedIDs.stream().map(String::valueOf).collect(Collectors.joining(", "));
+            query.append(" where ")
+                 .append(escape("SHARED_ID")).append(" in (")
+                 .append(idListAsString)
+                 .append(")");
+        }
+        query.append(" order by ")
+             .append(escape("SHARED_ID"))
+             .append(";");
 
         try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(query.toString())) {
             BibEntry bibEntry = null;
@@ -480,61 +481,7 @@ public abstract class DBMSProcessor {
     }
 
     public List<BibEntry> getSharedEntries() {
-        return getSharedEntryList(0);
-    }
-
-    /**
-     * @param sharedID Entry ID. If 0, all entries are going to be fetched.
-     * @return List of {@link BibEntry} instances
-     */
-    private List<BibEntry> getSharedEntryList(int sharedID) {
-        List<BibEntry> sharedEntries = new ArrayList<>();
-
-        StringBuilder selectEntryQuery = new StringBuilder();
-        selectEntryQuery.append("SELECT * FROM ");
-        selectEntryQuery.append(escape("ENTRY"));
-
-        if (sharedID != 0) {
-            selectEntryQuery.append(" WHERE ");
-            selectEntryQuery.append(escape("SHARED_ID"));
-            selectEntryQuery.append(" = ");
-            selectEntryQuery.append(sharedID);
-        }
-
-        selectEntryQuery.append(" ORDER BY ");
-        selectEntryQuery.append(escape("SHARED_ID"));
-
-        try (ResultSet selectEntryResultSet = connection.createStatement().executeQuery(selectEntryQuery.toString())) {
-            while (selectEntryResultSet.next()) {
-                BibEntry bibEntry = new BibEntry();
-                // setting the base attributes once
-                bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
-                bibEntry.setType(selectEntryResultSet.getString("TYPE"));
-                bibEntry.getSharedBibEntryData().setVersion(selectEntryResultSet.getInt("VERSION"));
-
-                StringBuilder selectFieldQuery = new StringBuilder()
-                    .append("SELECT * FROM ")
-                    .append(escape("FIELD"))
-                    .append(" WHERE ")
-                    .append(escape("ENTRY_SHARED_ID"))
-                    .append(" = ?");
-
-                try (PreparedStatement preparedSelectFieldStatement = connection.prepareStatement(selectFieldQuery.toString())) {
-                    preparedSelectFieldStatement.setInt(1, selectEntryResultSet.getInt("SHARED_ID"));
-                    try (ResultSet selectFieldResultSet = preparedSelectFieldStatement.executeQuery()) {
-                        while (selectFieldResultSet.next()) {
-                            bibEntry.setField(selectFieldResultSet.getString("NAME"),
-                                    Optional.ofNullable(selectFieldResultSet.getString("VALUE")), EntryEventSource.SHARED);
-                        }
-                    }
-                }
-                sharedEntries.add(bibEntry);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
-        }
-
-        return sharedEntries;
+        return getSharedEntries(Collections.emptyList());
     }
 
     /**
