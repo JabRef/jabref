@@ -273,8 +273,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     if (explicitRadioButton.isSelected()) {
                         Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
                         if (groupName.contains(Character.toString(keywordDelimiter))) {
-                            dialogService.showWarningDialogAndWait(Localization.lang("Keyword separator in group name"),
-                                    Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                            dialogService.showWarningDialogAndWait(null, Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
                         }
 
                         Optional<GroupTreeNode> rootGroup = basePanel.getBibDatabaseContext().getMetaData().getGroups();
