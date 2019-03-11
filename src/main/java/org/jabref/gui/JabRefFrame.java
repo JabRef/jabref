@@ -1324,8 +1324,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 // The action was either canceled or unsuccessful.
                 output(Localization.lang("Unable to save library"));
             } catch (Throwable ex) {
-                LOGGER.error("A problem occurred when saving the file", ex);
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
+            // Save was cancelled or an error occurred.
+            return false;
         }
         return !response.isPresent() || !response.get().equals(cancel);
     }
