@@ -1,11 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -17,39 +13,26 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Labeled;
 
+import com.google.common.collect.ArrayListMultimap;
+
 class PreferencesSearchHandler {
 
     private final List<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
-    private final Map<LabelWrapper, Set<PrefsTab>> preferenceTabsLabelNames;
-    private final ArrayList<LabelWrapper> highlightedLabels = new ArrayList<>();
+    private final ArrayListMultimap<PrefsTab, LabeledWrapper> preferenceTabsLabelNames;
+    private final ArrayList<LabeledWrapper> highlightedLabels = new ArrayList<>();
     private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
 
     /*
      * Wrapping Labeled
      */
-    private class LabelWrapper {
+    private class LabeledWrapper {
 
         private final Labeled labeled;
 
-        LabelWrapper(Labeled _labeled) {
+        LabeledWrapper(Labeled _labeled) {
             labeled = _labeled;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof LabelWrapper) {
-                LabelWrapper labelObj = (LabelWrapper) obj;
-                return labelObj.getText() == this.getText();
-            }
-
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return labeled.hashCode();
         }
 
         public boolean contains(String query) {
@@ -109,15 +92,18 @@ class PreferencesSearchHandler {
      * Filter by label name
      */
     private void filterByLabelName(String newSearchText) {
-        for (LabelWrapper labelWrapper : preferenceTabsLabelNames.keySet()) {
-            if (labelWrapper.contains(newSearchText)) {
-                Set<PrefsTab> prefsTabs = preferenceTabsLabelNames.get(labelWrapper);
-                for (PrefsTab tab : prefsTabs) {
-                    if (!filteredPreferenceTabs.contains(tab)) {
-                        filteredPreferenceTabs.add(tab);
-                    }
+        for (PrefsTab tab : preferenceTabsLabelNames.keySet()) {
+            // If the current tab contains a matching label
+            boolean tabContainsLabel = false;
+            for (LabeledWrapper labeledWrapper : preferenceTabsLabelNames.get(tab)) {
+                if (labeledWrapper.contains(newSearchText)) {
+                    tabContainsLabel = true;
+                    highlightLabel(labeledWrapper);
                 }
-                highlightLabel(labelWrapper);
+            }
+
+            if (tabContainsLabel) {
+                filteredPreferenceTabs.add(tab);
             }
         }
     }
@@ -125,16 +111,16 @@ class PreferencesSearchHandler {
     /*
      *  Highlight label
      */
-    private void highlightLabel(LabelWrapper labelWrapper) {
-        labelWrapper.setHighlighted(true);
-        highlightedLabels.add(labelWrapper);
+    private void highlightLabel(LabeledWrapper labeledWrapper) {
+        labeledWrapper.setHighlighted(true);
+        highlightedLabels.add(labeledWrapper);
     }
 
     /*
      * Clear all previous highlights
      */
     private void clearHighlights() {
-        highlightedLabels.forEach(labelWrapper -> labelWrapper.setHighlighted(false));
+        highlightedLabels.forEach(labeledWrapper -> labeledWrapper.setHighlighted(false));
     }
 
     private void clearSearch() {
@@ -142,23 +128,20 @@ class PreferencesSearchHandler {
     }
 
     /*
-     * Returns a Mapping from a label name to the corresponding tabs
-     *
-     * [LabelWrapper] -> {PrefsTab1, PrefsTab2, . . . }
+     * Traverse all nodes of a PrefsTab and return a
+     * mapping from PrefsTab to all its Labeled type nodes.
      */
-    private Map<LabelWrapper, Set<PrefsTab>> getPrefsTabLabelMap() {
-        Map<LabelWrapper, Set<PrefsTab>> prefsTabLabelMap = new HashMap<>();
+    private ArrayListMultimap<PrefsTab, LabeledWrapper> getPrefsTabLabelMap() {
+        ArrayListMultimap<PrefsTab, LabeledWrapper> prefsTabLabelMap = ArrayListMultimap.create();
         for (PrefsTab prefsTab : preferenceTabs) {
             Node builder = prefsTab.getBuilder();
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
                 for (Node child : parentBuilder.getChildrenUnmodifiable()) {
                     if (child instanceof Labeled) {
-                        LabelWrapper labelWrapper = new LabelWrapper((Labeled) child);
-                        if (!labelWrapper.getText().isEmpty()) {
-                            Set<PrefsTab> prefsTabsForLabel = prefsTabLabelMap.getOrDefault(labelWrapper, new HashSet<>());
-                            prefsTabsForLabel.add(prefsTab);
-                            prefsTabLabelMap.put(labelWrapper, prefsTabsForLabel);
+                        LabeledWrapper labeledWrapper = new LabeledWrapper((Labeled) child);
+                        if (!labeledWrapper.getText().isEmpty()) {
+                            prefsTabLabelMap.put(prefsTab, labeledWrapper);
                         }
                     }
                 }
