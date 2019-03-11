@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,19 +10,23 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.groups.GroupEntryChanger;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 public class ImportHandler {
 
@@ -32,6 +37,7 @@ public class ImportHandler {
     private final ExternalFilesEntryLinker linker;
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
+    private final StateManager stateManager;
 
     public ImportHandler(DialogService dialogService,
                          BibDatabaseContext database,
@@ -40,12 +46,14 @@ public class ImportHandler {
                          ImportFormatPreferences importFormatPreferences,
                          UpdateFieldPreferences updateFieldPreferences,
                          FileUpdateMonitor fileupdateMonitor,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         StateManager stateManager) {
 
         this.dialogService = dialogService;
         this.database = database;
         this.updateFieldPreferences = updateFieldPreferences;
         this.fileUpdateMonitor = fileupdateMonitor;
+        this.stateManager = stateManager;
 
         this.linker = new ExternalFilesEntryLinker(externalFileTypes, filePreferences, database);
         this.contentImporter = new ExternalFilesContentImporter(importFormatPreferences);
@@ -83,7 +91,7 @@ public class ImportHandler {
                 entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
             }
 
-            insertEntries(entriesToAdd);
+            importEntries(entriesToAdd);
             entriesToAdd.forEach(entry -> ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entry)));
         }
         ce.end();
@@ -99,15 +107,52 @@ public class ImportHandler {
 
     public void importEntriesFromBibFiles(Path bibFile) {
         List<BibEntry> entriesToImport = contentImporter.importFromBibFile(bibFile, fileUpdateMonitor);
-        insertEntries(entriesToImport);
+        importEntries(entriesToImport);
     }
 
-    private void insertEntries(List<BibEntry> entries) {
+    public void importEntries(List<BibEntry> entries) {
+        //TODO: Add undo/redo
+        //ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+
         database.getDatabase().insertEntries(entries);
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
-            // Set owner field to default value
-            UpdateField.setAutomaticFields(entries, true, true, updateFieldPreferences);
+        // Set owner/timestamp
+        UpdateField.setAutomaticFields(entries, updateFieldPreferences);
+
+        // Generate bibtex keys
+        generateKeys(entries);
+
+        // Add to group
+        addToGroups(entries, stateManager.getSelectedGroup(database));
+    }
+
+    private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
+        for (GroupTreeNode node : groups) {
+            if (node.getGroup() instanceof GroupEntryChanger) {
+                GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
+                List<FieldChange> undo = entryChanger.add(entries);
+                // TODO: Add undo
+                //if (!undo.isEmpty()) {
+                //    ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                //            undo));
+                //}
+            }
+        }
+    }
+
+    /**
+     * Generate keys for given entries.
+     *
+     * @param entries entries to generate keys for
+     */
+    private void generateKeys(List<BibEntry> entries) {
+        BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(
+                database.getMetaData().getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                database.getDatabase(),
+                Globals.prefs.getBibtexKeyPatternPreferences());
+
+        for (BibEntry entry : entries) {
+            keyGenerator.generateAndSetKey(entry);
         }
     }
 }

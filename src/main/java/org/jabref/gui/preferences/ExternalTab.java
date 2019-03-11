@@ -12,7 +12,7 @@ import javafx.scene.layout.GridPane;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
+import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
 import org.jabref.gui.push.PushToApplicationSettingsDialog;
@@ -47,7 +47,7 @@ class ExternalTab implements PrefsTab {
         dialogService = frame.getDialogService();
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
         citeCommand = new TextField();
-        editFileTypes.setOnAction(e -> ExternalFileTypeEditor.getAction());
+        editFileTypes.setOnAction(e -> new EditExternalFileTypesAction().execute());
         defaultConsole = new RadioButton(Localization.lang("Use default terminal emulator"));
         executeConsole = new RadioButton(Localization.lang("Execute command") + ":");
         consoleCommand = new TextField();

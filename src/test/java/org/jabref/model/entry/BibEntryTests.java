@@ -397,19 +397,6 @@ public class BibEntryTests {
     }
 
     @Test
-    public void testGroupAndSearchHits() {
-        BibEntry be = new BibEntry();
-        be.setGroupHit(true);
-        assertTrue(be.isGroupHit());
-        be.setGroupHit(false);
-        assertFalse(be.isGroupHit());
-        be.setSearchHit(true);
-        assertTrue(be.isSearchHit());
-        be.setSearchHit(false);
-        assertFalse(be.isSearchHit());
-    }
-
-    @Test
     public void setCiteKey() {
         BibEntry be = new BibEntry();
         assertFalse(be.hasCiteKey());
