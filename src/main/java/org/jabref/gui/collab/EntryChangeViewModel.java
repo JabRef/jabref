@@ -79,7 +79,9 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public Node description() {
         VBox container = new VBox();
-        container.getChildren().add(new Label(name));
+        Label header = new Label(name);
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().add(header);
 
         for (FieldChangeViewModel change : fieldChanges) {
             container.getChildren().add(change.description());
