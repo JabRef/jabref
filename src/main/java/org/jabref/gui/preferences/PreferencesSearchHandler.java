@@ -17,12 +17,12 @@ import com.google.common.collect.ArrayListMultimap;
 
 class PreferencesSearchHandler {
 
+    private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
     private final List<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
     private final ArrayListMultimap<PrefsTab, LabeledWrapper> preferenceTabsLabelNames;
     private final ArrayList<LabeledWrapper> highlightedLabels = new ArrayList<>();
-    private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
 
     /*
      * Wrapping Labeled
