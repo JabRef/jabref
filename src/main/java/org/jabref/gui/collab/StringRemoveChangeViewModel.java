@@ -1,7 +1,8 @@
 package org.jabref.gui.collab;
 
 import javafx.scene.Node;
-import javafx.scene.web.WebView;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveString;
@@ -36,11 +37,15 @@ class StringRemoveChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        WebView webView = new WebView();
-        webView.getEngine().loadContent("<HTML><H2>" + Localization.lang("Removed string") + "</H2><H3>" +
-                Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" +
-                Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
-        return webView;
+        VBox container = new VBox();
+        Label header = new Label(Localization.lang("Removed string"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().addAll(
+                header,
+                new Label(Localization.lang("Label") + ": " + string.getName()),
+                new Label(Localization.lang("Content") + ": " + string.getContent())
+        );
+        return container;
     }
 
 }

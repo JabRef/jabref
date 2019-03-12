@@ -1,7 +1,8 @@
 package org.jabref.gui.collab;
 
 import javafx.scene.Node;
-import javafx.scene.web.WebView;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoablePreambleChange;
@@ -27,21 +28,21 @@ class PreambleChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        StringBuilder text = new StringBuilder(34);
-        text.append("<FONT SIZE=3><H2>").append(Localization.lang("Changed preamble")).append("</H2>");
-
-        if (StringUtil.isNotBlank(change.getNewPreamble())) {
-            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(change.getNewPreamble()).append("</CODE>");
-        } else {
-            text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
-        }
+        VBox container = new VBox();
+        Label header = new Label(Localization.lang("Changed preamble"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().add(header);
 
         if (StringUtil.isNotBlank(change.getOriginalPreamble())) {
-            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(change.getOriginalPreamble()).append("</CODE>");
+            container.getChildren().add(new Label(Localization.lang("Current value") + ": " + change.getOriginalPreamble()));
         }
 
-        WebView webView = new WebView();
-        webView.getEngine().loadContent(text.toString());
-        return webView;
+        if (StringUtil.isNotBlank(change.getNewPreamble())) {
+            container.getChildren().add(new Label(Localization.lang("Value set externally") + ": " + change.getNewPreamble()));
+        } else {
+            container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
+        }
+
+        return container;
     }
 }

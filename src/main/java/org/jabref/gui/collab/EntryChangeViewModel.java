@@ -9,11 +9,9 @@ import java.util.TreeSet;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,12 +28,9 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
-        Optional<String> key = tmpEntry.getCiteKeyOptional();
-        if (key.isPresent()) {
-            name = Localization.lang("Modified entry") + ": '" + key.get() + '\'';
-        } else {
-            name = Localization.lang("Modified entry");
-        }
+        name = tmpEntry.getCiteKeyOptional()
+                       .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
+                       .orElse(Localization.lang("Modified entry"));
 
         // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
         // locally as well, since last tempfile was saved.
@@ -61,14 +56,13 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
             if ((tmp.isPresent()) && (disk.isPresent())) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
-                    DefaultTaskExecutor.runInJavaFXThread(()->fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get())));
+                    fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
                 }
             } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
                     || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
                             && (mem.isPresent()) && !mem.get().isEmpty())) {
                 // Added externally.
-                DefaultTaskExecutor.runInJavaFXThread(() ->fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
-                        disk.orElse(null))));
+                fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null), disk.orElse(null)));
             }
         }
     }
@@ -100,8 +94,8 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         private final BibEntry tmpEntry;
         private final String field;
         private final String inMem;
+        private final String onTmp;
         private final String onDisk;
-        private final WebView tp = new WebView();
 
         public FieldChangeViewModel(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
             super(field);
@@ -109,25 +103,8 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
             this.tmpEntry = tmpEntry;
             this.field = field;
             this.inMem = inMem;
+            this.onTmp = onTmp;
             this.onDisk = onDisk;
-
-            StringBuilder text = new StringBuilder(36);
-            text.append("<FONT SIZE=10><H2>").append(Localization.lang("Modification of field"))
-                    .append(" <I>").append(field).append("</I></H2>");
-
-            if ((onDisk != null) && !onDisk.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3> ").append(onDisk);
-            } else {
-                text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
-            }
-
-            if ((inMem != null) && !inMem.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Current value")).append(":</H3> ").append(inMem);
-            }
-            if ((onTmp != null) && !onTmp.isEmpty()) {
-                text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3> ").append(onTmp);
-            }
-            tp.getEngine().loadContent(text.toString());
         }
 
         @Override
@@ -142,7 +119,23 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
         @Override
         public Node description() {
-            return tp;
+            VBox container = new VBox();
+            container.getChildren().add(new Label(Localization.lang("Modification of field") + " " + field));
+
+            if ((onDisk != null) && !onDisk.isEmpty()) {
+                container.getChildren().add(new Label(Localization.lang("Value set externally") + ": " + onDisk));
+            } else {
+                container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
+            }
+
+            if ((inMem != null) && !inMem.isEmpty()) {
+                container.getChildren().add(new Label(Localization.lang("Current value") + ": " + inMem));
+            }
+            if ((onTmp != null) && !onTmp.isEmpty()) {
+                container.getChildren().add(new Label(Localization.lang("Current tmp value") + ": " + onTmp));
+            }
+
+            return container;
         }
 
     }

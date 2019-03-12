@@ -1,7 +1,8 @@
 package org.jabref.gui.collab;
 
 import javafx.scene.Node;
-import javafx.scene.web.WebView;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertString;
@@ -48,24 +49,22 @@ class StringChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        StringBuilder sb = new StringBuilder(46);
-        sb.append("<HTML><H2>").append(Localization.lang("Modified string")).append("</H2><H3>")
-          .append(Localization.lang("Label")).append(":</H3>").append(label).append("<H3>")
-          .append(Localization.lang("New content")).append(":</H3>").append(disk);
-        if (string == null) {
-            sb.append("<P><I>");
-            sb.append(Localization.lang("Cannot merge this change")).append(": ");
-            sb.append(Localization.lang("The string has been removed locally")).append("</I>");
-        } else {
-            sb.append("<H3>");
-            sb.append(Localization.lang("Current content")).append(":</H3>");
-            sb.append(string.getContent());
-        }
-        sb.append("</HTML>");
+        VBox container = new VBox();
+        Label header = new Label(Localization.lang("Modified string"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().addAll(
+                header,
+                new Label(Localization.lang("Label") + ": " + label),
+                new Label(Localization.lang("Content") + ": " + disk)
+        );
 
-        WebView webView = new WebView();
-        webView.getEngine().loadContent(sb.toString());
-        return webView;
+        if (string == null) {
+            container.getChildren().add(new Label(Localization.lang("Cannot merge this change") + ": " + Localization.lang("The string has been removed locally")));
+        } else {
+            container.getChildren().add(new Label(Localization.lang("Current content") + ": " + string.getContent()));
+        }
+
+        return container;
     }
 
 }
