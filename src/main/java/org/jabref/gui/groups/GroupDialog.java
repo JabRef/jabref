@@ -7,11 +7,13 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -23,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -32,13 +35,16 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
@@ -82,6 +88,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private final RadioButton independentButton = new RadioButton(Localization.lang("Independent group: When selected, view only this group's entries"));
     private final RadioButton intersectionButton = new RadioButton(Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
     private final RadioButton unionButton = new RadioButton(Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
+    private final DialogService dialogService;
+    private final JabRefPreferences prefs;
 
     // for KeywordGroup
     private final TextField keywordGroupSearchTerm = new TextField();
@@ -104,6 +112,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     // for TexGroup
     private final TextField texGroupFilePath = new TextField();
+    private final Button texGroupBrowseButton = new Button("Browse");
+    private final HBox texGroupHBox = new HBox(10);
 
     // for all types
     private final TextFlow descriptionTextFlow = new TextFlow();
@@ -117,8 +127,13 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        this.setTitle(Localization.lang("Edit group"));
+    public GroupDialog(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
+
+        if (editedGroup == null) {
+            this.setTitle(Localization.lang("Add subgroup"));
+        } else {
+            this.setTitle(Localization.lang("Edit group"));
+        }
 
         explicitRadioButton.setSelected(true);
 
@@ -127,8 +142,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         descriptionTextFlow.setMinHeight(180);
         descriptionTextFlow.setPrefHeight(180);
 
+        this.dialogService = dialogService;
+        this.prefs = prefs;
+
         // set default values (overwritten if editedGroup != null)
-        keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
+        keywordGroupSearchField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
 
         // configure elements
         ToggleGroup groupType = new ToggleGroup();
@@ -260,11 +278,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     if (explicitRadioButton.isSelected()) {
                         Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
                         if (groupName.contains(Character.toString(keywordDelimiter))) {
-                            jabrefFrame.showMessage(
-                                    Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                            dialogService.showWarningDialogAndWait(null, Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
                         }
 
-                        Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
+                        Optional<GroupTreeNode> rootGroup = basePanel.getBibDatabaseContext().getMetaData().getGroups();
                         if (rootGroup.isPresent()) {
                             int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
                             boolean warnAboutSameName = false;
@@ -278,8 +295,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                             }
 
                             if (warnAboutSameName) {
-                                jabrefFrame.showMessage(
-                                        Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                                dialogService.showErrorDialogAndWait(Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
                                 return null;
                             }
                         }
@@ -322,28 +338,23 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     resultingGroup.setIconName(iconField.getText());
                     return resultingGroup;
                 } catch (IllegalArgumentException | IOException exception) {
-                    jabrefFrame.showMessage(exception.getLocalizedMessage());
+                    dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
                     return null;
                 }
             }
             return null;
         });
 
-        ChangeListener<String> caretListener = (ObservableValue<? extends String> ov, String oldValue,
-                                                String newValue) -> updateComponents();
-        ChangeListener<Boolean> itemListener = (ObservableValue<? extends Boolean> ov, Boolean oldBoolean,
-                                                Boolean newBoolean) -> updateComponents();
-
-        nameField.textProperty().addListener(caretListener);
-        descriptionField.textProperty().addListener(caretListener);
-        iconField.textProperty().addListener(caretListener);
-        keywordGroupSearchField.textProperty().addListener(caretListener);
-        keywordGroupSearchTerm.textProperty().addListener(caretListener);
-        keywordGroupCaseSensitive.selectedProperty().addListener(itemListener);
-        keywordGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupSearchExpression.textProperty().addListener(caretListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
-        searchGroupRegExp.selectedProperty().addListener(itemListener);
+        EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
+        nameField.setOnAction(actionHandler);
+        descriptionField.setOnAction(actionHandler);
+        iconField.setOnAction(actionHandler);
+        keywordGroupSearchField.setOnAction(actionHandler);
+        keywordGroupSearchTerm.setOnAction(actionHandler);
+        keywordGroupCaseSensitive.setOnAction(actionHandler);
+        keywordGroupRegExp.setOnAction(actionHandler);
+        searchGroupSearchExpression.setOnAction(actionHandler);
+        searchGroupRegExp.setOnAction(actionHandler);
 
         // configure for current type
         if (editedGroup == null) {
@@ -408,12 +419,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
-    public GroupDialog() {
-        this(JabRefGUI.getMainFrame(), null);
+    public GroupDialog(DialogService dialogService) {
+        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, null);
     }
 
-    public GroupDialog(AbstractGroup editedGroup) {
-        this(JabRefGUI.getMainFrame(), editedGroup);
+    public GroupDialog(DialogService dialogService, AbstractGroup editedGroup) {
+        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, editedGroup);
     }
 
     private static String formatRegExException(String regExp, Exception e) {
@@ -446,7 +457,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         VBox texPanel = new VBox();
         texPanel.setVisible(false);
         texPanel.getChildren().add(new Label(Localization.lang("Aux file")));
-        texPanel.getChildren().add(texGroupFilePath);
+        texGroupBrowseButton.setOnAction((ActionEvent e) -> openBrowseDialog());
+        texGroupHBox.getChildren().add(texGroupFilePath);
+        texGroupHBox.getChildren().add(texGroupBrowseButton);
+        texGroupHBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
+        texPanel.getChildren().add(texGroupHBox);
         return texPanel;
     }
 
@@ -588,6 +603,14 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setNameFontItalic(false);
         }
         getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
+    }
+
+    private void openBrowseDialog() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.AUX)
+            .withDefaultExtension(StandardFileType.AUX)
+            .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(file.toAbsolutePath().toString()));
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {

@@ -11,7 +11,9 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.InputMethodRequests;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -77,9 +79,42 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
+    /* Work around for different input methods.
+     * https://github.com/FXMisc/RichTextFX/issues/146
+     */
+    private class InputMethodRequestsObject implements InputMethodRequests {
+
+        @Override
+        public String getSelectedText() {
+            return "";
+        }
+
+        @Override
+        public int getLocationOffset(int x, int y) {
+            return 0;
+        }
+
+        @Override
+        public void cancelLatestCommittedText() {
+            return;
+        }
+
+        @Override
+        public Point2D getTextLocation(int offset) {
+            return new Point2D(0, 0);
+        }
+    }
+
     private CodeArea createSourceEditor() {
         CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
+        codeArea.setInputMethodRequests(new InputMethodRequestsObject());
+        codeArea.setOnInputMethodTextChanged(event -> {
+            String committed = event.getCommitted();
+            if (!committed.isEmpty()) {
+                codeArea.insertText(codeArea.getCaretPosition(), committed);
+            }
+        });
         return codeArea;
     }
 

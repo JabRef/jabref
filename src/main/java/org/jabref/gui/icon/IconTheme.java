@@ -44,6 +44,7 @@ public class IconTheme {
      */
     public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
+    public static final javafx.scene.paint.Color SELECTED_COLOR = javafx.scene.paint.Color.web("#50618F");
     public static Font FONT;
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
@@ -179,6 +180,7 @@ public class IconTheme {
     public enum JabRefIcons implements JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_CIRCLE_OUTLINE),
+        ADD_FILLED(MaterialDesignIcon.PLUS_CIRCLE),
         ADD_NOBOX(MaterialDesignIcon.PLUS),
         ADD_ENTRY(MaterialDesignIcon.BOOKMARK_PLUS),
         EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
@@ -197,7 +199,7 @@ public class IconTheme {
         CLOSE(MaterialDesignIcon.CLOSE_CIRCLE),
         PASTE(JabRefMaterialDesignIcon.PASTE),
         CUT(MaterialDesignIcon.CONTENT_CUT),
-        COPY(JabRefMaterialDesignIcon.COPY),
+        COPY(MaterialDesignIcon.CONTENT_COPY),
         COMMENT(MaterialDesignIcon.COMMENT),
         REDO(MaterialDesignIcon.REDO),
         UNDO(MaterialDesignIcon.UNDO),
@@ -205,6 +207,7 @@ public class IconTheme {
         REFRESH(MaterialDesignIcon.REFRESH),
         DELETE_ENTRY(MaterialDesignIcon.DELETE),
         SEARCH(MaterialDesignIcon.MAGNIFY),
+        FILE_SEARCH(MaterialDesignIcon.FILE_FIND),
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignIcon.MAGNIFY),
         PREFERENCES(MaterialDesignIcon.SETTINGS),
         HELP(MaterialDesignIcon.HELP_CIRCLE),
@@ -238,7 +241,7 @@ public class IconTheme {
         AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND) /*css: file-find */,
         QUALITY_ASSURED(MaterialDesignIcon.CERTIFICATE), /*css: certificate */
         QUALITY(MaterialDesignIcon.CERTIFICATE),/*css: certificate */
-        OPEN(MaterialDesignIcon.FOLDER) /*css: folder */,
+        OPEN(MaterialDesignIcon.FOLDER_OUTLINE) /*css: folder */,
         ADD_ROW(MaterialDesignIcon.SERVER_PLUS) /* css: server-plus*/,
         REMOVE_ROW(MaterialDesignIcon.SERVER_MINUS) /*css: server-minus */,
         PICTURE(MaterialDesignIcon.FILE_IMAGE) /*css: file-image */,
@@ -276,7 +279,7 @@ public class IconTheme {
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
-        PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
+        CONNECT_DB(MaterialDesignIcon.CLOUD_UPLOAD), /*cloud-upload*/
         SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
         WARNING(MaterialDesignIcon.ALERT),
         ERROR(MaterialDesignIcon.ALERT_CIRCLE),
@@ -293,7 +296,8 @@ public class IconTheme {
         DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
-        IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
+        IMPORT(MaterialDesignIcon.CALL_RECEIVED),
+        EXPORT(MaterialDesignIcon.CALL_MADE),
         PREVIOUS_LEFT(MaterialDesignIcon.CHEVRON_LEFT),
         PREVIOUS_UP(MaterialDesignIcon.CHEVRON_UP),
         NEXT_RIGHT(MaterialDesignIcon.CHEVRON_RIGHT),
@@ -312,7 +316,9 @@ public class IconTheme {
         NEW_FILE(MaterialDesignIcon.PLUS),
         DOWNLOAD(MaterialDesignIcon.DOWNLOAD),
         OWNER(MaterialDesignIcon.ACCOUNT),
-        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR);
+        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
+        ARTICLE(MaterialDesignIcon.FILE_DOCUMENT),
+        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT);
 
         private final JabRefIcon icon;
 

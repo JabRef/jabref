@@ -3,8 +3,6 @@ package org.jabref.gui.importer.fetcher;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -14,10 +12,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.importer.ImportInspectionDialog;
-import org.jabref.logic.importer.FetcherException;
+import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
@@ -97,21 +94,12 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                activeFetcher.getName(), false);
 
-        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
+                                                            .withInitialMessage(Localization.lang("Processing %0", getQuery()));
 
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            dialog.setStatus(Localization.lang("Processing %0", getQuery()));
-            try {
-                List<BibEntry> matches = activeFetcher.performSearch(getQuery().trim());
-                dialog.addEntries(matches);
-                dialog.entryListComplete();
-            } catch (FetcherException e) {
-                LOGGER.error("Error while fetching from " + activeFetcher.getName(), e);
-                dialog.showErrorMessage(activeFetcher.getName(), e.getLocalizedMessage());
-            }
-        });
+        ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
+        dialog.setTitle(activeFetcher.getName());
+        dialog.showAndWait();
     }
 }

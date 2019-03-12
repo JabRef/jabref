@@ -237,9 +237,15 @@ public class PreferencesMigrations {
             String[] oldStylePatterns = new String[] {"\\bibtexkey",
                                                       "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
             String[] newStylePatterns = new String[] {"[bibtexkey]",
-                                                      "[bibtexkey] - [fulltitle]"};
+                                                      "[bibtexkey] - [title]"};
+
+            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title",};
+
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
+            }
+            for (int i = 0; i < oldDisplayStylePattern.length; i++) {
+                migrateFileImportPattern(oldDisplayStylePattern[i], newStylePatterns[i], prefs, mainPrefsNode);
             }
         }
         // Directory preferences are not yet migrated, since it is not quote clear how to parse and reinterpret

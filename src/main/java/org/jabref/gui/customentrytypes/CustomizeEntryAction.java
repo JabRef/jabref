@@ -1,9 +1,7 @@
-package org.jabref.gui.actions;
-
-import javax.swing.JDialog;
+package org.jabref.gui.customentrytypes;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.customentrytypes.EntryTypeCustomizationDialog;
+import org.jabref.gui.actions.SimpleCommand;
 
 public class CustomizeEntryAction extends SimpleCommand {
 
@@ -15,7 +13,7 @@ public class CustomizeEntryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        JDialog dialog = new EntryTypeCustomizationDialog(frame);
-        dialog.setVisible(true);
+        EntryTypeCustomizationDialog dialog = new EntryTypeCustomizationDialog();
+        dialog.showAndWait();
     }
 }

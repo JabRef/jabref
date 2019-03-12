@@ -59,4 +59,12 @@ public class OptionalUtil {
             return Optional.empty();
         }
     }
+
+    public static <T> Optional<T> orElse(Optional<T> valueOne, Optional<T> valueTwo) {
+        if (valueOne.isPresent()) {
+            return valueOne;
+        } else {
+            return valueTwo;
+        }
+    }
 }

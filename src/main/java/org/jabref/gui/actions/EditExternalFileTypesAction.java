@@ -1,12 +1,12 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
+import org.jabref.gui.externalfiletype.CustomizeExternalFileTypesDialog;
 
 public class EditExternalFileTypesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        ExternalFileTypeEditor editor = new ExternalFileTypeEditor();
-        editor.show();
+        CustomizeExternalFileTypesDialog editor = new CustomizeExternalFileTypesDialog();
+        editor.showAndWait();
     }
 }
