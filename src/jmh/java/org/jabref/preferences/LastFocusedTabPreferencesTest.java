@@ -26,20 +26,21 @@ public class LastFocusedTabPreferencesTest {
 
     @Test
     public void testLastFocusedTab() {
-        LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
-        File whatever = new File("whatever");
-        prefs.setLastFocusedTab(whatever);
-        assertTrue(prefs.hadLastFocus(whatever));
+        getFocusedTabPreferences();
     }
 
     @Test
     public void testLastFocusedTabNull() {
+        File whatever = new File("whatever");
+        getFocusedTabPreferences().setLastFocusedTab(null);
+        assertTrue(getFocusedTabPreferences().hadLastFocus(whatever));
+    }
+
+    private LastFocusedTabPreferences getFocusedTabPreferences(){
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
         File whatever = new File("whatever");
         prefs.setLastFocusedTab(whatever);
         assertTrue(prefs.hadLastFocus(whatever));
-
-        prefs.setLastFocusedTab(null);
-        assertTrue(prefs.hadLastFocus(whatever));
+        return prefs;
     }
 }
