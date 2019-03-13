@@ -22,8 +22,6 @@ public class StringSimilarity {
 
     public double editDistanceIgnoreCase(String a, String b) {
         // TODO: Locale is dependent on the language of the strings. English is a good denominator.
-        a = a.toLowerCase(Locale.ENGLISH);
-        b = b.toLowerCase(Locale.ENGLISH);
-        return METRIC_DISTANCE.distance(a, b);
+        return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }
