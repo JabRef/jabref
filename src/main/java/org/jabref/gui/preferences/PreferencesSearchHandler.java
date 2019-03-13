@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -36,7 +37,7 @@ class PreferencesSearchHandler {
         }
 
         public boolean contains(String query) {
-            return labeled.getText().toLowerCase().contains(query.toLowerCase());
+            return labeled.getText().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT));
         }
 
         public String getText() {
@@ -83,7 +84,7 @@ class PreferencesSearchHandler {
      */
     private void filterByTabName(String newSearchText) {
         List<PrefsTab> filteredTabs = preferenceTabs.stream()
-                                                    .filter(tab -> tab.getTabName().toLowerCase().contains(newSearchText))
+                                                    .filter(tab -> tab.getTabName().toLowerCase(Locale.ROOT).contains(newSearchText))
                                                     .collect(Collectors.toCollection(ArrayList::new));
         filteredPreferenceTabs.setAll(filteredTabs);
     }
