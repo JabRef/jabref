@@ -24,11 +24,11 @@
                 </HBox>
             </bottom>
             <top>
-            	<HBox>
-					<TextField fx:id="searchField" promptText="Search"/>
-					<HBox HBox.hgrow="ALWAYS"/>
-				</HBox>
-			</top>
+                <HBox>
+                    <TextField fx:id="searchField" promptText="Search"/>
+                    <HBox HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </top>
             <center>
                 <TableView fx:id="table">
                     <columns>
