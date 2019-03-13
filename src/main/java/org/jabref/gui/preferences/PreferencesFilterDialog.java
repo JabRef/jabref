@@ -52,7 +52,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         showOnlyDeviatingPreferenceOptions.setOnAction(event -> updateModel());
-        searchField.textProperty().addListener((observable, previousText, newText) -> filterPreferences(newText.toLowerCase()));
+        searchField.textProperty().addListener((observable, previousText, newText) -> filterPreferences(newText.toLowerCase(Locale.ROOT)));
         columnType.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getType()));
         columnKey.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getKey()));
         columnValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getValue()));
