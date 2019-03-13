@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
         }
 
         List<JabRefPreferencesFilter.PreferenceOption> filteredOptions = auxillaryPreferenceOptions.stream()
-                                                                                                   .filter(p -> p.getKey().toLowerCase().contains(searchText))
+                                                                                                   .filter(p -> p.getKey().toLowerCase(Locale.ROOT).contains(searchText))
                                                                                                    .collect(Collectors.toList());
         preferenceOptions.setAll(filteredOptions);
     }
