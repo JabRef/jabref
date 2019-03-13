@@ -18,11 +18,12 @@ public class MoveFieldCleanupTest {
    private List<FieldChange> testReturn;
    private MoveFieldCleanup sut;
    @BeforeEach
-   void setup(){
+   void setup() {
        sut = new MoveFieldCleanup(mockSource, mockDestination);
    }
+
     @Test
-    public void givenNoArgsConstructorBibEntryWhenCleanupThenRuns(){
+    public void givenNoArgsConstructorBibEntryWhenCleanupThenRuns() {
        testReturn = sut.cleanup(temp);
        assertNotNull(testReturn);
     }

@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,24 +30,24 @@ public class RemoveHyphenatedNewlinesFormatterTest {
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenRemoveHyphenatedLineBreaksIsReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenRemoveHyphenatedLineBreaksIsReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Remove hyphenated line breaks", formatter.getName());
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenRemovesAllMsgIsReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenRemovesAllMsgIsReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Removes all hyphenated line breaks in the field content.", formatter.getDescription());
     }
 
     @Test
-    public void whenGetKeyMethod_thenRemove_Hyphenated_NewlinesReturned(){
+    public void whenGetKeyMethod_thenRemove_Hyphenated_NewlinesReturned() {
         assertEquals("remove_hyphenated_newlines", formatter.getKey());
     }
 
     @Test
-    public void whenGetExampleInputMethod_thenHyphenatedGimmeShelterReturned(){
+    public void whenGetExampleInputMethod_thenHyphenatedGimmeShelterReturned() {
         assertEquals("Gimme shel-\nter", formatter.getExampleInput());
     }
 

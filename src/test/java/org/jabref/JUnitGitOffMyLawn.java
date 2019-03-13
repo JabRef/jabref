@@ -1,9 +1,5 @@
 package org.jabref;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
 /**public class JUnitGitOffMyLawn {
 
     // I DON'T WORK
