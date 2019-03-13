@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="950.0"
@@ -22,6 +23,12 @@
                     <Label fx:id="count"/>
                 </HBox>
             </bottom>
+            <top>
+            	<HBox>
+					<TextField fx:id="searchField" promptText="Search"/>
+					<HBox HBox.hgrow="ALWAYS"/>
+				</HBox>
+			</top>
             <center>
                 <TableView fx:id="table">
                     <columns>
