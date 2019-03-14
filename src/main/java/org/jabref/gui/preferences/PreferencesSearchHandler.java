@@ -25,9 +25,6 @@ class PreferencesSearchHandler {
     private final ArrayListMultimap<PrefsTab, LabeledWrapper> preferenceTabsLabelNames;
     private final ArrayList<LabeledWrapper> highlightedLabels = new ArrayList<>();
 
-    /*
-     * Wrapping Labeled
-     */
     private class LabeledWrapper {
 
         private final Labeled labeled;
@@ -71,17 +68,11 @@ class PreferencesSearchHandler {
         });
     }
 
-    /*
-     * Filter tabs and labels based on search text
-     */
     private void updateSearch(String newSearchText) {
         filterByTabName(newSearchText);
         filterByLabelName(newSearchText);
     }
 
-    /*
-     * Filter  by tab name
-     */
     private void filterByTabName(String newSearchText) {
         List<PrefsTab> filteredTabs = preferenceTabs.stream()
                                                     .filter(tab -> tab.getTabName().toLowerCase(Locale.ROOT).contains(newSearchText))
@@ -89,9 +80,6 @@ class PreferencesSearchHandler {
         filteredPreferenceTabs.setAll(filteredTabs);
     }
 
-    /*
-     * Filter by label name
-     */
     private void filterByLabelName(String newSearchText) {
         for (PrefsTab tab : preferenceTabsLabelNames.keySet()) {
             // If the current tab contains a matching label
@@ -109,17 +97,11 @@ class PreferencesSearchHandler {
         }
     }
 
-    /*
-     *  Highlight label
-     */
     private void highlightLabel(LabeledWrapper labeledWrapper) {
         labeledWrapper.setHighlighted(true);
         highlightedLabels.add(labeledWrapper);
     }
 
-    /*
-     * Clear all previous highlights
-     */
     private void clearHighlights() {
         highlightedLabels.forEach(labeledWrapper -> labeledWrapper.setHighlighted(false));
     }
@@ -154,4 +136,5 @@ class PreferencesSearchHandler {
     protected ListProperty<PrefsTab> getFilteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
+
 }
