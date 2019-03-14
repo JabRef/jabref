@@ -20,7 +20,7 @@
 .numberColumn > .hits {
     -fx-font-size: 85%;
     -fx-background-color: -jr-group-hits-bg;
-    -fx-padding: 0.1em 0.4em 0.1em 0.4em;
+    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.8em;
 }
