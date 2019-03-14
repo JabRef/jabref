@@ -74,6 +74,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
         } else {
             preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }
+        count.setText(String.format("(%d)", preferenceOptions.size()));
     }
 
 }
