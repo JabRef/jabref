@@ -1,14 +1,14 @@
 package org.jabref.gui.preferences;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -26,7 +26,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
 
     private final JabRefPreferencesFilter preferencesFilter;
     private final ObservableList<JabRefPreferencesFilter.PreferenceOption> preferenceOptions;
-    private final List<JabRefPreferencesFilter.PreferenceOption> auxillaryPreferenceOptions;
+    private final FilteredList<JabRefPreferencesFilter.PreferenceOption> filteredOptions;
 
     @FXML private TableView<JabRefPreferencesFilter.PreferenceOption> table;
     @FXML private TableColumn<JabRefPreferencesFilter.PreferenceOption, JabRefPreferencesFilter.PreferenceType> columnType;
@@ -40,7 +40,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter) {
         this.preferencesFilter = Objects.requireNonNull(preferencesFilter);
         this.preferenceOptions = FXCollections.observableArrayList();
-        this.auxillaryPreferenceOptions = preferencesFilter.getPreferenceOptions();
+        this.filteredOptions = new FilteredList<>(this.preferenceOptions);
 
         ViewLoader.view(this)
                   .load()
@@ -52,40 +52,28 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         showOnlyDeviatingPreferenceOptions.setOnAction(event -> updateModel());
-        searchField.textProperty().addListener((observable, previousText, newText) -> filterPreferences(newText.toLowerCase(Locale.ROOT)));
+        filteredOptions.predicateProperty().bind(Bindings.createObjectBinding(() -> {
+            String searchText = searchField.getText();
+            if ((searchText == null) || searchText.isEmpty()) {
+                return null;
+            }
+            String lowerCaseSearchText = searchText.toLowerCase(Locale.ROOT);
+            return (option) -> option.getKey().toLowerCase(Locale.ROOT).contains(lowerCaseSearchText);
+        }, searchField.textProperty()));
         columnType.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getType()));
         columnKey.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getKey()));
         columnValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getValue()));
         columnDefaultValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getDefaultValue().orElse("")));
-        table.setItems(preferenceOptions);
+        table.setItems(filteredOptions);
         updateModel();
     }
 
     private void updateModel() {
-        auxillaryPreferenceOptions.clear();
         if (showOnlyDeviatingPreferenceOptions.isSelected()) {
-            auxillaryPreferenceOptions.addAll(preferencesFilter.getDeviatingPreferences());
+            preferenceOptions.setAll(preferencesFilter.getDeviatingPreferences());
         } else {
-            auxillaryPreferenceOptions.addAll(preferencesFilter.getPreferenceOptions());
+            preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }
-        preferenceOptions.setAll(auxillaryPreferenceOptions);
-        count.setText(String.format("(%d)", preferenceOptions.size()));
-        String searchText = searchField.getText();
-        if (!searchText.isEmpty()) {
-            filterPreferences(searchText);
-        }
-    }
-
-    private void filterPreferences(String searchText) {
-        if (searchText.isEmpty()) {
-            updateModel();
-            return;
-        }
-
-        List<JabRefPreferencesFilter.PreferenceOption> filteredOptions = auxillaryPreferenceOptions.stream()
-                                                                                                   .filter(p -> p.getKey().toLowerCase(Locale.ROOT).contains(searchText))
-                                                                                                   .collect(Collectors.toList());
-        preferenceOptions.setAll(filteredOptions);
     }
 
 }

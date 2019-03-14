@@ -25,7 +25,7 @@
             </bottom>
             <top>
                 <HBox>
-                    <TextField fx:id="searchField" promptText="Search"/>
+                    <TextField fx:id="searchField" promptText="%Search"/>
                     <HBox HBox.hgrow="ALWAYS"/>
                 </HBox>
             </top>
