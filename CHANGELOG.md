@@ -48,6 +48,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We updated updated the Related Articles tab to accept JSON from the new version of the Mr. DLib service
 - We added an option in the preference dialog box that allows user to choose behavior after dragging and dropping files in Entry Editor. [#4356](https://github.com/JabRef/jabref/issues/4356)
 - We added the ability to have an export preference where previously "File"-->"Export"/"Export selected entries" would not save the user's preference[#4495](https://github.com/JabRef/jabref/issues/4495)
+- We optimized the code responsible for connecting to an external database, which should lead to huge improvements in performance.
 - For automatically created groups, added ability to filter groups by entry type. [#4539](https://github.com/JabRef/jabref/issues/4539)
 - We added the ability to add field names from the Preferences Dialog [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added the ability change the column widths directly in the main table. [#4546](https://github.com/JabRef/jabref/issues/4546)
