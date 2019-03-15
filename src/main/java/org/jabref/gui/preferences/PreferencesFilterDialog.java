@@ -65,6 +65,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
         columnValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getValue()));
         columnDefaultValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getDefaultValue().orElse("")));
         table.setItems(filteredOptions);
+        count.textProperty().bind(Bindings.size(table.getItems()).asString("(%d)"));
         updateModel();
     }
 
@@ -74,7 +75,6 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
         } else {
             preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }
-        count.setText(String.format("(%d)", preferenceOptions.size()));
     }
 
 }
