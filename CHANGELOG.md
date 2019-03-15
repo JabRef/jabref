@@ -58,6 +58,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We grouped the toolbar icons and changed the Open Library and Copy icons. [#4584](https://github.com/JabRef/jabref/issues/4584) 
 - We added a browse button next to the path text field for aux-based groups. [#4586](https://github.com/JabRef/jabref/issues/4586)
 - We changed the title of Group Dialog to "Add subgroup" from "Edit group" when we select Add subgroup option.
+- We enable import button only if entries are selected. [#4755](https://github.com/JabRef/jabref/issues/4755)
 - We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
 
 ### Fixed

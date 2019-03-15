@@ -5,6 +5,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -60,6 +62,10 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
+        Button btn = (Button) this.getDialogPane().lookupButton(importButton);
+        btn.disableProperty().bind(booleanBind);
 
         setResultConverter(button -> {
             if (button == importButton) {
