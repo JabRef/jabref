@@ -18,36 +18,46 @@ public class StringSimilarityTest {
     public void givenIdenticalStrings_whenTestingForSimilarity_thenJudgeThatAreSimilar() {
         String a = "Hello";
         String b = "Hello";
-        assertTrue(sut.isSimilar(a, b));
+        boolean similarity = sut.isSimilar(a, b);
+        assertTrue(similarity);
     }
 
     @Test
     public void givenIdenticalStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenLevenshteinDistance() {
         String a = "A";
         String b = "A";
-        assertEquals(0.0, sut.editDistanceIgnoreCase(a, b));
+        double testVal = 0.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
     public void givenSlightlyDifferentStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenReturnCorrectLevenshteinDistance() {
         String a = "Abc";
         String b = "Bbc";
-        assertEquals(1.0, sut.editDistanceIgnoreCase(a,b));
+        double testVal = 1.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
     public void givenVeryDifferentStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenReturnCorrectLevenshteinDistance() {
         String a = "Fish";
         String b = "Bears";
-        assertEquals(5.0, sut.editDistanceIgnoreCase(a,b));
+        double testVal = 5.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
-    public void givenVeryDifferentStrings_whenTestingForSimilarity_thenJudgeThemToBeDissimilar() {
+    public void givenTwoStringsWithLevenshteinGreaterThanFour_whenTestingForSimilarity_thenJudgeThemToBeDissimilar() {
         String a = "Johnson";
         String b = "Daghtsen";
-        System.out.println(sut.editDistanceIgnoreCase(a,b));
-        assertFalse(sut.isSimilar(a,b));
+        double testDistance = 5.0;
+        double distance = sut.editDistanceIgnoreCase(a,b);
+        boolean similarity = sut.isSimilar(a,b);
+        assertEquals(testDistance, distance);
+        assertFalse(similarity);
     }
 
 }
