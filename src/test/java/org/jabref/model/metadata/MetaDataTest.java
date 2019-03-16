@@ -1,11 +1,6 @@
 package org.jabref.model.metadata;
 
-import java.util.ArrayList;
 import java.util.Optional;
-
-
-import org.jabref.model.metadata.ContentSelector;
-import org.jabref.model.metadata.ContentSelectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +33,9 @@ public class MetaDataTest {
         checkAgainst.addContentSelector(first);
         metaData.addContentSelector(second);
         checkAgainst.addContentSelector(second);
-        if (testResult) testResult = metaData.getContentSelectors().equals(checkAgainst);
-        if (testResult) testResult = metaData.getContentSelectorList().get(0).equals(first);
-        if (testResult) testResult = metaData.getContentSelectorList().get(1).equals(second);
+        if (testResult) { testResult = metaData.getContentSelectors().equals(checkAgainst);}
+        if (testResult) { testResult = metaData.getContentSelectorList().get(0).equals(first);}
+        if (testResult) { testResult = metaData.getContentSelectorList().get(1).equals(second);}
         assertTrue(testResult);
     }
 }
