@@ -10,7 +10,7 @@ public class WordTest {
     public ExpectedException ex = ExpectedException.none();
 
     @Test
-    public void givenWord_whenCharNotSameLength_thenThrowIllegalArgumentException() {
+    public void givenShorterProtectedCharBoolArray_whenMakeWord_thenThrowIllegalArgumentException() {
         ex.expect(IllegalArgumentException.class);
         ex.expectMessage("the chars and the protectedChars array must be of same length");
         char[] arr = {'a', 'b', 'c'};
