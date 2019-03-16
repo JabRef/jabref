@@ -15,9 +15,9 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.16'
+    id 'com.gradle.build-scan' version '2.0.2'
     id 'com.install4j.gradle' version '7.0.10'
-    id 'com.github.johnrengelman.shadow' version '4.0.2'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     id 'net.ltgt.errorprone' version '0.7.1'
@@ -194,11 +194,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
-        rules.withModule("com.gradle.build-scan:com.gradle.build-scan.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.*/) {
-                selection.reject("Cannot be upgraded to version 2 until we upgrade to gradle 5")
-            }
-        }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
@@ -320,11 +315,14 @@ task generateSearchGrammarSource(type: JavaExec) {
 compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
+    //ignore annotation processor from log4j2
+    options.compilerArgs += '-proc:none'
 }
 compileJava.dependsOn "generateSource"
 
 compileTestJava {
     options.encoding = 'UTF-8'
+    options.compilerArgs += '-proc:none'
 }
 
 javadoc {
