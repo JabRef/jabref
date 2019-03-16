@@ -16,19 +16,17 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.16'
-    id 'com.install4j.gradle' version '7.0.9'
+    id 'com.install4j.gradle' version '7.0.10'
     id 'com.github.johnrengelman.shadow' version '4.0.2'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    id 'net.ltgt.errorprone' version '0.6.1'
-    id 'com.github.ben-manes.versions' version '0.20.0'
+    id 'net.ltgt.errorprone' version '0.7.1'
+    id 'com.github.ben-manes.versions' version '0.21.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
-buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
-}
+buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
+
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -131,7 +129,7 @@ dependencies {
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.8.0'
-    compile 'de.saxsys:mvvmfx:1.7.0'
+    compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
     compile 'org.fxmisc.richtext:richtextfx:0.9.3'
