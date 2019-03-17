@@ -227,9 +227,10 @@ public class BibtexKeyGeneratorTest {
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}",
                 importFormatPreferences, fileMonitor);
-        assertEquals("AlK",
-                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        new BibDatabase()), true));
+        assertEquals("Al-",
+                     BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
+                                                                                new BibDatabase()),
+                                                 true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}",
                 importFormatPreferences, fileMonitor);
@@ -1071,6 +1072,14 @@ public class BibtexKeyGeneratorTest {
         entry.setField("year", "2019");
         entry.setField("title", "the InTeresting title longer than THREE words");
         assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
+    }
+
+    @Test
+    public void generateKeyWithAuthYearAndHyphenLowerCase() throws Exception{
+        BibEntry entry = new BibEntry();
+        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
+        entry.setField("year", "2019");
+        assertEquals("newt-2019", BibtexKeyGenerator.generateKey(entry, "[auth4:lower]-[year]"));
     }
 
 }
