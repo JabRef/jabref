@@ -3,8 +3,6 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.StringProperty;
@@ -22,29 +20,8 @@ class PreferencesSearchHandler {
     private final List<PrefsTab> preferenceTabs;
     private final StringProperty searchText;
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
-    private final ArrayListMultimap<PrefsTab, LabeledWrapper> preferenceTabsLabelNames;
-    private final ArrayList<LabeledWrapper> highlightedLabels = new ArrayList<>();
-
-    private class LabeledWrapper {
-
-        private final Labeled labeled;
-
-        LabeledWrapper(Labeled _labeled) {
-            labeled = _labeled;
-        }
-
-        public boolean contains(String query) {
-            return labeled.getText().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT));
-        }
-
-        public String getText() {
-            return labeled.getText();
-        }
-
-        public void setHighlighted(boolean highlight) {
-            labeled.pseudoClassStateChanged(labelHighlight, highlight);
-        }
-    }
+    private final ArrayListMultimap<PrefsTab, Labeled> preferenceTabsLabelNames;
+    private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
 
     PreferencesSearchHandler(List<PrefsTab> preferenceTabs, StringProperty searchText) {
         this.preferenceTabs = preferenceTabs;
@@ -63,47 +40,39 @@ class PreferencesSearchHandler {
             if (newSearchText.isEmpty()) {
                 clearSearch();
             } else {
-                updateSearch(newSearchText);
+                filterTabs(newSearchText.toLowerCase(Locale.ROOT));
             }
         });
     }
 
-    private void updateSearch(String newSearchText) {
-        filterByTabName(newSearchText);
-        filterByLabelName(newSearchText);
-    }
-
-    private void filterByTabName(String newSearchText) {
-        List<PrefsTab> filteredTabs = preferenceTabs.stream()
-                                                    .filter(tab -> tab.getTabName().toLowerCase(Locale.ROOT).contains(newSearchText))
-                                                    .collect(Collectors.toCollection(ArrayList::new));
-        filteredPreferenceTabs.setAll(filteredTabs);
-    }
-
-    private void filterByLabelName(String newSearchText) {
+    private void filterTabs(String text) {
+        filteredPreferenceTabs.clear();
         for (PrefsTab tab : preferenceTabsLabelNames.keySet()) {
-            // If the current tab contains a matching label
             boolean tabContainsLabel = false;
-            for (LabeledWrapper labeledWrapper : preferenceTabsLabelNames.get(tab)) {
-                if (labeledWrapper.contains(newSearchText)) {
+            for (Labeled labeled : preferenceTabsLabelNames.get(tab)) {
+                if (labelContainsText(labeled, text)) {
                     tabContainsLabel = true;
-                    highlightLabel(labeledWrapper);
+                    highlightLabel(labeled);
                 }
             }
-
-            if (tabContainsLabel) {
+            boolean tabNameIsMatchedByQuery = tab.getTabName().toLowerCase(Locale.ROOT).contains(text);
+            if (tabContainsLabel || tabNameIsMatchedByQuery) {
                 filteredPreferenceTabs.add(tab);
             }
         }
     }
 
-    private void highlightLabel(LabeledWrapper labeledWrapper) {
-        labeledWrapper.setHighlighted(true);
-        highlightedLabels.add(labeledWrapper);
+    private boolean labelContainsText(Labeled labeled, String text) {
+        return labeled.getText().toLowerCase(Locale.ROOT).contains(text);
+    }
+
+    private void highlightLabel(Labeled labeled) {
+        labeled.pseudoClassStateChanged(labelHighlight, true);
+        highlightedLabels.add(labeled);
     }
 
     private void clearHighlights() {
-        highlightedLabels.forEach(labeledWrapper -> labeledWrapper.setHighlighted(false));
+        highlightedLabels.forEach(labeled -> labeled.pseudoClassStateChanged(labelHighlight, false));
     }
 
     private void clearSearch() {
@@ -114,17 +83,17 @@ class PreferencesSearchHandler {
      * Traverse all nodes of a PrefsTab and return a
      * mapping from PrefsTab to all its Labeled type nodes.
      */
-    private ArrayListMultimap<PrefsTab, LabeledWrapper> getPrefsTabLabelMap() {
-        ArrayListMultimap<PrefsTab, LabeledWrapper> prefsTabLabelMap = ArrayListMultimap.create();
+    private ArrayListMultimap<PrefsTab, Labeled> getPrefsTabLabelMap() {
+        ArrayListMultimap<PrefsTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
         for (PrefsTab prefsTab : preferenceTabs) {
             Node builder = prefsTab.getBuilder();
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
                 for (Node child : parentBuilder.getChildrenUnmodifiable()) {
                     if (child instanceof Labeled) {
-                        LabeledWrapper labeledWrapper = new LabeledWrapper((Labeled) child);
-                        if (!labeledWrapper.getText().isEmpty()) {
-                            prefsTabLabelMap.put(prefsTab, labeledWrapper);
+                        Labeled labeled = (Labeled) child;
+                        if (!labeled.getText().isEmpty()) {
+                            prefsTabLabelMap.put(prefsTab, labeled);
                         }
                     }
                 }
@@ -133,7 +102,7 @@ class PreferencesSearchHandler {
         return prefsTabLabelMap;
     }
 
-    protected ListProperty<PrefsTab> getFilteredPreferenceTabsProperty() {
+    protected ListProperty<PrefsTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
 
