@@ -39,10 +39,12 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
+    private final String releaseDate;
 
     public AboutDialogViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
+        this.releaseDate = buildInfo.getReleaseDate();
         String[] version = buildInfo.getVersion().getFullVersion().split("--");
         heading.set("JabRef " + version[0]);
 
@@ -118,6 +120,8 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return environmentInfo.get();
     }
 
+    public String getReleaseDate(){ return releaseDate; }
+
     public void copyVersionToClipboard() {
         clipBoardManager.setContent(versionInfo);
         dialogService.notify(Localization.lang("Copied version to clipboard"));
@@ -155,5 +159,4 @@ public class AboutDialogViewModel extends AbstractViewModel {
             logger.error("Could not open default browser.", e);
         }
     }
-
 }
