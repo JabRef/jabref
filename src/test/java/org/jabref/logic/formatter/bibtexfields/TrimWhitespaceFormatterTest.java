@@ -3,6 +3,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,24 +61,24 @@ public class TrimWhitespaceFormatterTest {
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenTrimWhitespaceCharactersIsReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenTrimWhitespaceCharactersIsReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Trim whitespace characters", formatter.getName());
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenTrimWhitespaceCharactersIsReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenTrimWhitespaceCharactersIsReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Trim all whitespace characters in the field content.", formatter.getDescription());
     }
 
     @Test
-    public void whenGetKeyMethod_thenTrim_WhitespaceReturned(){
+    public void whenGetKeyMethod_thenTrim_WhitespaceReturned() {
         assertEquals("trim_whitespace", formatter.getKey());
     }
 
     @Test
-    public void whenGetExampleInputMethod_thenInCDMAWithLineReturnsReturned(){
+    public void whenGetExampleInputMethod_thenInCDMAWithLineReturnsReturned() {
         assertEquals("\r\n InCDMA\n\r ", formatter.getExampleInput());
     }
 }

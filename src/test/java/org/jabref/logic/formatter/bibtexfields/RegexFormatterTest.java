@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,9 @@ class RegexFormatterTest {
     private RegexFormatter formatter;
 
     @BeforeEach
-    public void setUp(){formatter = new RegexFormatter("(\" \",\"-\")");}
+    public void setUp() {
+        formatter = new RegexFormatter("(\" \",\"-\")");
+    }
 
     @Test
     void spacesReplacedCorrectly() {
@@ -60,19 +63,19 @@ class RegexFormatterTest {
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenRegularExpressionReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenRegularExpressionReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("regular expression", formatter.getName());
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenAddARegularMsgReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenAddARegularMsgReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Add a regular expression for the key pattern.", formatter.getDescription());
     }
 
     @Test
-    public void whenGetKeyMethod_thenRegexReturned(){
+    public void whenGetKeyMethod_thenRegexReturned() {
         assertEquals("regex", formatter.getKey());
     }
 

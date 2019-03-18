@@ -1,9 +1,11 @@
 package org.jabref.logic.util.strings;
 
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StringSimilarityTest {
 
@@ -15,39 +17,49 @@ public class StringSimilarityTest {
     }
 
     @Test
-    public void givenIdenticalStrings_whenIsSimilarMethod_thenReturnTrue() {
+    public void givenIdenticalStrings_whenTestingForSimilarity_thenJudgeThatAreSimilar() {
         String a = "Hello";
         String b = "Hello";
-        assertTrue(sut.isSimilar(a, b));
+        boolean similarity = sut.isSimilar(a, b);
+        assertTrue(similarity);
     }
 
     @Test
-    public void givenIdenticalStrings_whenEditDistanceIgnoreCaseMethod_thenReturnZero() {
+    public void givenIdenticalStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenLevenshteinDistance() {
         String a = "A";
         String b = "A";
-        assertEquals(0.0, sut.editDistanceIgnoreCase(a, b));
+        double testVal = 0.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
-    public void givenSlightlyDifferentStrings_whenEditDistanceIgnoreCaseMethod_thenReturnLevenshteinDistance() {
+    public void givenSlightlyDifferentStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenReturnCorrectLevenshteinDistance() {
         String a = "Abc";
         String b = "Bbc";
-        assertEquals(1.0, sut.editDistanceIgnoreCase(a,b));
+        double testVal = 1.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
-    public void givenVeryDifferentStrings_whenEditDistanceIgnoreCaseMethod_thenReturnLevenshteinDistance() {
+    public void givenVeryDifferentStrings_whenFindingAmountOfCharChangesNeededToMakeStringsIdentical_thenReturnCorrectLevenshteinDistance() {
         String a = "Fish";
         String b = "Bears";
-        assertEquals(5.0, sut.editDistanceIgnoreCase(a,b));
+        double testVal = 5.0;
+        double distance = sut.editDistanceIgnoreCase(a, b);
+        assertEquals(testVal, distance);
     }
 
     @Test
-    public void givenDissimilarStrings_whenIsSimilarMethod_thenReturnFalse() {
+    public void givenTwoStringsWithLevenshteinGreaterThanFour_whenTestingForSimilarity_thenJudgeThemToBeDissimilar() {
         String a = "Johnson";
         String b = "Daghtsen";
-        System.out.println(sut.editDistanceIgnoreCase(a,b));
-        assertFalse(sut.isSimilar(a,b));
+        double testDistance = 5.0;
+        double distance = sut.editDistanceIgnoreCase(a,b);
+        boolean similarity = sut.isSimilar(a,b);
+        assertEquals(testDistance, distance);
+        assertFalse(similarity);
     }
 
 }

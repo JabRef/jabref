@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -76,24 +77,24 @@ class AddBracesFormatterTest {
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenAddEnclosingBracesReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetNameMethod_thenAddEnclosingBracesReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Add enclosing braces", formatter.getName());
     }
 
     @Test
-    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenAddBracesMsgReturned(){
+    public void givenLocalizationLanguageSetToEnglish_whenGetDescriptionMethod_thenAddBracesMsgReturned() {
         Localization.setLanguage(Language.English);
         assertEquals("Add braces encapsulating the complete field content.", formatter.getDescription());
     }
 
     @Test
-    public void whenGetKeyMethod_thenAdd_BracesReturned(){
+    public void whenGetKeyMethod_thenAdd_BracesReturned() {
         assertEquals("add_braces", formatter.getKey());
     }
 
     @Test
-    public void whenGetExampleInputMethod_thenInCDMAWithSpaceReturned(){
+    public void whenGetExampleInputMethod_thenInCDMAWithSpaceReturned() {
         assertEquals("In CDMA", formatter.getExampleInput());
     }
 
