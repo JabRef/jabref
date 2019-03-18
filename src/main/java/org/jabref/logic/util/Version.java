@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,6 +102,33 @@ public class Version {
                 versions.add(version);
             }
             return versions;
+        }
+    }
+
+    /**
+     * Grabs all the available releases dates from the GitHub repository
+     */
+    public static List<String> getAllAvailableVersionsDate() throws IOException {
+        URLConnection connection = new URL(JABREF_GITHUB_RELEASES).openConnection();
+        connection.setRequestProperty("Accept-Charset", "UTF-8");
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+
+            List<String> release_dates = new ArrayList<>();
+            JSONArray objects = new JSONArray(rd.readLine());
+            for (int i = 0; i < objects.length(); i++) {
+                JSONObject jsonObject = objects.getJSONObject(i);
+                String publication_date = jsonObject.getString("published_at").replaceFirst("v", "");
+                SimpleDateFormat simpleDateFormatInput = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                SimpleDateFormat simpleDateFormatOutput = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = null;
+                try {
+                    date = simpleDateFormatInput.parse(publication_date);
+                } catch (ParseException e) {
+                    date = null;
+                }
+                release_dates.add(simpleDateFormatOutput.format(date));
+            }
+            return release_dates;
         }
     }
 
