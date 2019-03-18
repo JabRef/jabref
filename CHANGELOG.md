@@ -60,6 +60,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the title of Group Dialog to "Add subgroup" from "Edit group" when we select Add subgroup option.
 - We enable import button only if entries are selected. [#4755](https://github.com/JabRef/jabref/issues/4755)
 - We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
+- We added the information of the JabRef latest version and its release date in the About panel. [#4583](https://github.com/JabRef/jabref/issues/4733)
 
 ### Fixed
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
