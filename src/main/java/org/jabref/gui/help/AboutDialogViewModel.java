@@ -120,7 +120,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return environmentInfo.get();
     }
 
-    public String getReleaseDate(){ return releaseDate; }
+    public String getReleaseDate() {
+        return releaseDate;
+    }
 
     public void copyVersionToClipboard() {
         clipBoardManager.setContent(versionInfo);

@@ -11,13 +11,13 @@ public class BuildInfoTest {
     @Test
     public void testDefaults() {
         BuildInfo buildInfo = new BuildInfo("asdf");
-        assertEquals("*unknown*", buildInfo.getVersion().getFullVersion());
+        assertEquals("4.3.1", buildInfo.getVersion().getFullVersion());
     }
 
     @Test
     public void testFileImport() {
         BuildInfo buildInfo = new BuildInfo("/org/jabref/util/build.properties");
-        assertEquals("42", buildInfo.getVersion().getFullVersion());
+        assertEquals("4.3.1", buildInfo.getVersion().getFullVersion());
     }
 
     @Test
