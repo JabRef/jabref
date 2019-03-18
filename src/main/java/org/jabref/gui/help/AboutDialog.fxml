@@ -20,14 +20,24 @@
         <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <HBox alignment="CENTER_LEFT">
                 <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top" HBox.hgrow="NEVER">
-                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
-                        <cursor>
-                            <Cursor fx:constant="HAND" />
-                        </cursor>
-                        <tooltip>
-                            <Tooltip text="%Copy Version" />
-                        </tooltip>
-                    </Label>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <tooltip>
+                                <Tooltip text="%Copy Version" />
+                            </tooltip>
+                        </Label>
+                        <Label text="${controller.viewModel.releaseDate}" textFill="#2c3e50" wrapText="true">
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <tooltip>
+                                <Tooltip text="Release Date" />
+                            </tooltip>
+                        </Label>
+                    </HBox>
                     <Label managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading"
                            text="${controller.viewModel.developmentVersion}"
                            visible="${controller.viewModel.isDevelopmentVersion}"/>
