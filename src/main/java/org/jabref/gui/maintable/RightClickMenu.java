@@ -29,7 +29,7 @@ import org.jabref.preferences.PreviewPreferences;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, KeyBindingRepository keyBindings, DialogService dialogService) {
+    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, DialogService dialogService) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
@@ -79,7 +79,7 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(new ChangeEntryTypeMenu(keyBindings).getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
+        contextMenu.getItems().add(new ChangeEntryTypeMenu().getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, getFetchEntryData(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(panel, dialogService)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, mergeEntries(panel)));

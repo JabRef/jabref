@@ -550,32 +550,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         });
 
         setCenter(splitPane);
-
-        /*
-        GridBagLayout gbl = new GridBagLayout();
-        GridBagConstraints con = new GridBagConstraints();
-        con.fill = GridBagConstraints.BOTH;
-        con.anchor = GridBagConstraints.WEST;
-        JPanel status = new JPanel();
-        status.setLayout(gbl);
-        con.weighty = 0;
-        con.weightx = 0;
-        con.gridwidth = 1;
-        con.insets = new Insets(0, 2, 0, 0);
-        gbl.setConstraints(statusLabel, con);
-        status.add(statusLabel);
-        con.weightx = 1;
-        con.insets = new Insets(0, 4, 0, 0);
-        con.gridwidth = 1;
-        gbl.setConstraints(statusLine, con);
-        status.add(statusLine);
-        con.weightx = 0;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        con.insets = new Insets(2, 4, 2, 2);
-        gbl.setConstraints(progressBar, con);
-        status.add(progressBar);
-        statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
-        */
     }
 
     private void setDividerPosition() {

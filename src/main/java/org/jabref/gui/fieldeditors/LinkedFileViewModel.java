@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +27,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -86,6 +86,60 @@ public class LinkedFileViewModel extends AbstractViewModel {
         xmpPreferences = preferences.getXMPPreferences();
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+    }
+
+    /**
+     * Look for the last '.' in the link, and return the following characters.
+     * This gives the extension for most reasonably named links.
+     *
+     * @param link The link
+     * @return The suffix, excluding the dot (e.g. "pdf")
+     */
+    public static String getSuffix(final String link) {
+        String strippedLink = link;
+        try {
+            // Try to strip the query string, if any, to get the correct suffix:
+            URL url = new URL(link);
+            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
+                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
+            }
+        } catch (MalformedURLException e) {
+            // Don't report this error, since this getting the suffix is a non-critical
+            // operation, and this error will be triggered and reported elsewhere.
+        }
+        // First see if the stripped link gives a reasonable suffix:
+        String suffix;
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
+            suffix = null;
+        } else {
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
+        }
+        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
+            // If the suffix doesn't seem to give any reasonable file type, try
+            // with the non-stripped link:
+            int index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == (link.length() - 1))) {
+                // No occurrence, or at the end
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
+                    return "";
+                } else {
+                    return suffix; // return the first one we found, anyway.
+                }
+            } else {
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (link.substring(index + 1).indexOf('/') >= 1) {
+                    return "";
+                } else {
+                    return link.substring(index + 1);
+                }
+            }
+        } else {
+            return suffix;
+        }
     }
 
     public BooleanProperty canWriteXMPMetadataProperty() {
@@ -439,7 +493,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
-        String extension = DownloadExternalFile.getSuffix(url);
+        String extension = getSuffix(url);
         if (extension != null) {
             return ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
         } else {
