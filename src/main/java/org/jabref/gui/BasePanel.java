@@ -25,7 +25,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
@@ -191,7 +190,7 @@ public class BasePanel extends StackPane {
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
             changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
-            changePane = new DatabaseChangePane(mainTable.getPane(), bibDatabaseContext, changeMonitor.get());
+            changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
             getChildren().add(changePane);
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
@@ -394,7 +393,7 @@ public class BasePanel extends StackPane {
                                                                          .withPreviewPanelEnabled(enabled)
                                                                          .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
-            DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
+            setPreviewActive(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
@@ -776,13 +775,9 @@ public class BasePanel extends StackPane {
         createMainTable();
 
         ScrollPane pane = mainTable.getPane();
-        AnchorPane anchorPane = new AnchorPane(pane);
-        AnchorPane.setBottomAnchor(pane, 0.0);
-        AnchorPane.setTopAnchor(pane, 0.0);
-        AnchorPane.setLeftAnchor(pane, 0.0);
-        AnchorPane.setRightAnchor(pane, 0.0);
-        splitPane.getItems().add(anchorPane);
-        this.getChildren().setAll(splitPane);
+        pane.setFitToHeight(true);
+        pane.setFitToWidth(true);
+        splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
@@ -845,17 +840,13 @@ public class BasePanel extends StackPane {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
-            showBottomPane(BasePanelMode.SHOWING_EDITOR);
-
-            if (entry != getShowing()) {
-                entryEditor.setEntry(entry);
-                showing = entry;
-            }
-            entryEditor.requestFocus();
-
-        });
+        if (entry != getShowing()) {
+            entryEditor.setEntry(entry);
+            showing = entry;
+        }
+        entryEditor.requestFocus();
     }
 
     private void showBottomPane(BasePanelMode newMode) {
@@ -1148,15 +1139,6 @@ public class BasePanel extends StackPane {
 
     public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    /**
-     * Set the preview active state for all BasePanel instances.
-     */
-    private void setPreviewActiveBasePanels(boolean enabled) {
-        for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-            frame.getBasePanelAt(i).setPreviewActive(enabled);
-        }
     }
 
     private void setPreviewActive(boolean enabled) {
