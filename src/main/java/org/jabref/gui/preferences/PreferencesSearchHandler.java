@@ -3,6 +3,7 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.StringProperty;
