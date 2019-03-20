@@ -36,6 +36,8 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private Button browseUserSpefiicFileDir;
+    @FXML private TextField LaTexFileDirectory;
+    @FXML private Button browseLatexFileDir;
     @FXML private CheckBox protect;
     @Inject private PreferencesService preferencesService;
 
@@ -70,6 +72,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        LaTexFileDirectory.textProperty().bindBidirectional(viewModel.LaTexFileDirectoryProperty());
 
         encoding.itemsProperty().bind(viewModel.encodingsProperty());
         encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
@@ -112,6 +115,11 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         viewModel.browseUserDir();
     }
 
+    @FXML
+    void browseLaTexFileDirectory(ActionEvent event) {
+        viewModel.browseLaTexDir();
+    }
+
     private void storeSettings() {
         //FIXME: Move to viewModel until fieldFormatterCleanupsPanel is property implemented
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
@@ -132,6 +140,13 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             metaData.clearUserFileDirectory(preferencesService.getUser());
         } else {
             metaData.setUserFileDirectory(preferencesService.getUser(), text);
+        }
+
+        text = viewModel.LaTexFileDirectoryProperty().getValue();
+        if (text.isEmpty()) {
+            metaData.clearLaTexFileDirectory(preferencesService.getUser());
+        } else {
+            metaData.setLaTexFileDirectory(preferencesService.getUser(), text);
         }
 
         if (viewModel.libraryProtectedProperty().getValue()) {
@@ -165,7 +180,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         boolean changed = saveOrderConfigChanged || encodingChanged
                           || viewModel.generalFileDirChanged() || viewModel.userFileDirChanged()
-                          || viewModel.protectedValueChanged() || saveActionsChanged;
+                          || viewModel.protectedValueChanged() || saveActionsChanged || viewModel.LaTexFileDirChanged();
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed) {

@@ -1,13 +1,20 @@
 package org.jabref.model.groups;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.auxparser.AuxParser;
 import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -22,13 +29,17 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private Set<String> keysUsedInAux = null;
     private final FileUpdateMonitor fileMonitor;
     private AuxParser auxParser;
+    private final MetaData metaData;
+    private final String user;
 
-    public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor) throws IOException {
+    public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         super(name, context);
-        this.filePath = Objects.requireNonNull(filePath);
+        this.metaData = metaData;
+        user = System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName();
+        this.filePath = expandPath(Objects.requireNonNull(filePath));
         this.auxParser = auxParser;
         this.fileMonitor = fileMonitor;
-        fileMonitor.addListenerForFile(filePath, this);
+        fileMonitor.addListenerForFile(this.filePath, this);
     }
 
     @Override
@@ -49,7 +60,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor);
+            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData);
         } catch (IOException ex) {
             // This should never happen because we were able to monitor the file just fine until now
             LOGGER.error("Problem creating copy of group", ex);
@@ -62,7 +73,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         if (!super.equals(o)) {
@@ -75,7 +86,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public String toString() {
         return "TexGroup{" +
-                "filePath=" + filePath +
+               "filePath=" + filePath +
                 ", keysUsedInAux=" + keysUsedInAux +
                 ", auxParser=" + auxParser +
                 ", fileMonitor=" + fileMonitor +
@@ -88,12 +99,45 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     public Path getFilePath() {
-        return filePath;
+        return relativize(filePath);
     }
 
     @Override
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
+    }
+
+    private Path relativize(Path path) {
+        List<Path> fileDirectories = getFileDirectoriesAsPaths();
+        if (!path.isAbsolute()) {
+            return path;
+        }
+
+        for (Path directory : fileDirectories) {
+            if (path.startsWith(directory)) {
+                return directory.relativize(path);
+            }
+        }
+        return path;
+    }
+
+    private Path expandPath(Path path) {
+        List<Path> fileDirectories = getFileDirectoriesAsPaths();
+        Optional<Path> Fpath = FileHelper.expandFilenameAsPath(path.toString(), fileDirectories);
+        if (Fpath.isPresent()) {
+            return Fpath.get();
+        } else {
+            return path;
+        }
+    }
+
+    private List<Path> getFileDirectoriesAsPaths() {
+        List<Path> fileDirs = new ArrayList<>();
+
+        metaData.getLaTexFileDirectory(user)
+                .ifPresent(LaTexFileDirectory -> fileDirs.add(Paths.get(LaTexFileDirectory).toAbsolutePath().normalize()));
+
+        return fileDirs;
     }
 }

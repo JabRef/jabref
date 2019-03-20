@@ -43,6 +43,8 @@ public class MetaDataSerializer {
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
+        metaData.getLaTexFileDirectories().forEach((user, path) -> stringyMetaData
+                .put(MetaData.FILE_DIRECTORY + 'l' + user, Collections.singletonList(path.trim())));
 
         for (ContentSelector selector: metaData.getContentSelectorList()) {
                 stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
@@ -54,7 +56,7 @@ public class MetaDataSerializer {
         // Write groups if present.
         // Skip this if only the root node exists (which is always the AllEntriesGroup).
         metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
-                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
+                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root, metaData)));
 
         // finally add all unknown meta data items to the serialization map
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
@@ -113,7 +115,7 @@ public class MetaDataSerializer {
         return stringyPattern;
     }
 
-    private static String serializeGroups(GroupTreeNode root) {
+    private static String serializeGroups(GroupTreeNode root, MetaData metaData) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(OS.NEWLINE);
 

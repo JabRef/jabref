@@ -1474,10 +1474,12 @@ class BibtexParserTest {
     void integrationTestFileDirectories() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
-                        + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));
+                        + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
+                        + "@Comment{jabref-meta: fileDirectoryldefaultOwner-user:D:\\\\Documents;}"));
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
+        assertEquals("D:\\Documents", result.getMetaData().getLaTexFileDirectory("defaultOwner-user").get());
     }
 
     @Test

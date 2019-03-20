@@ -25,6 +25,7 @@ public class LibraryPropertiesDialogViewModel {
 
     private final StringProperty generalFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty LaTexFileDirectoryProperty = new SimpleStringProperty("");
     private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
     private final ObjectProperty<Charset> selectedEncodingPropety = new SimpleObjectProperty<>(Encodings.getCharsets().get(0));
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
@@ -36,6 +37,7 @@ public class LibraryPropertiesDialogViewModel {
 
     private final String oldUserSpecificFileDir;
     private final String oldGeneralFileDir;
+    private final String oldLaTexFileDir;
     private final boolean oldLibraryProtected;
 
     public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
@@ -59,8 +61,12 @@ public class LibraryPropertiesDialogViewModel {
         Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
         fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
 
+        Optional<String> fileDL = metaData.getLaTexFileDirectory(preferencesService.getUser());
+        fileDL.ifPresent(LaTexFileDirectoryProperty::setValue);
+
         oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
         oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
+        oldLaTexFileDir = LaTexFileDirectoryProperty.getValue();
 
         libraryProtectedProperty.setValue(metaData.isProtected());
         oldLibraryProtected = libraryProtectedProperty.getValue();
@@ -72,6 +78,10 @@ public class LibraryPropertiesDialogViewModel {
 
     public StringProperty userSpecificFileDirectoryProperty() {
         return this.userSpecificFileDirectoryProperty;
+    }
+
+    public StringProperty LaTexFileDirectoryProperty() {
+        return this.LaTexFileDirectoryProperty;
     }
 
     public ListProperty<Charset> encodingsProperty() {
@@ -90,6 +100,10 @@ public class LibraryPropertiesDialogViewModel {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
+    public void browseLaTexDir() {
+        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> LaTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+    }
+
     public BooleanProperty libraryProtectedProperty() {
         return this.libraryProtectedProperty;
     }
@@ -100,6 +114,10 @@ public class LibraryPropertiesDialogViewModel {
 
     public boolean userFileDirChanged() {
         return !oldUserSpecificFileDir.equals(userSpecificFileDirectoryProperty.getValue());
+    }
+
+    public boolean LaTexFileDirChanged() {
+        return !oldLaTexFileDir.equals(LaTexFileDirectoryProperty.getValue());
     }
 
     public boolean protectedValueChanged() {
@@ -113,4 +131,5 @@ public class LibraryPropertiesDialogViewModel {
     public BooleanProperty protectDisableProperty() {
         return protectDisableProperty;
     }
+
 }

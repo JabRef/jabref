@@ -60,12 +60,17 @@ public class MetaDataParser {
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
+            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + 'l')) {
+                // The user name comes directly after "FILE_DIRECTORYl"
+                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
+                metaData.setLaTexFileDirectory(user, getSingleItem(value));
+                continue;
             }
 
             switch (entry.getKey()) {
                 case MetaData.GROUPSTREE:
                 case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor));
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
                     break;
                 case MetaData.SAVE_ACTIONS:
                     metaData.setSaveActions(Cleanups.parse(value));
