@@ -8,13 +8,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
+import static org.jabref.logic.importer.IdBasedParserFetcher.LOGGER;
 import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
@@ -51,6 +55,12 @@ public class Linux implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(Path filePath) throws IOException {
+        if(Objects.isNull(System.getenv("DESKTOP_SESSION"))){
+            LOGGER.error("Unable to open folder, DESKTOP_SESSION not set.");
+            JabRefGUI.getMainFrame().output(Localization.lang("Unable to open folder, DESKTOP_SESSION not set."));
+            return;
+        }
+
         String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase(Locale.ROOT);
 
         String cmd;
