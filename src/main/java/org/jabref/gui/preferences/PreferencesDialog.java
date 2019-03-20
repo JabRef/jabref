@@ -131,8 +131,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
         TextField searchBox = new TextField();
         searchBox.setPromptText(Localization.lang("Search"));
 
-        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs, searchBox.textProperty());
+        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs);
         tabsList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
+        searchHandler.searchTextProperty().bindBidirectional(searchBox.textProperty());
 
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);

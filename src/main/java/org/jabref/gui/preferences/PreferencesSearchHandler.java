@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
@@ -14,19 +15,19 @@ import javafx.scene.Parent;
 import javafx.scene.control.Labeled;
 
 import com.google.common.collect.ArrayListMultimap;
+import org.fxmisc.easybind.EasyBind;
 
 class PreferencesSearchHandler {
 
     private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
     private final List<PrefsTab> preferenceTabs;
-    private final StringProperty searchText;
+    private final StringProperty searchText = new SimpleStringProperty("");
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
     private final ArrayListMultimap<PrefsTab, Labeled> preferenceTabsLabelNames;
     private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
 
-    PreferencesSearchHandler(List<PrefsTab> preferenceTabs, StringProperty searchText) {
+    PreferencesSearchHandler(List<PrefsTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
-        this.searchText = searchText;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
         initializeSearchTextListener();
@@ -36,14 +37,15 @@ class PreferencesSearchHandler {
      * Reacts upon changes in the search text.
      */
     private void initializeSearchTextListener() {
-        searchText.addListener((observable, previousSearchText, newSearchText) -> {
+        EasyBind.subscribe(searchText, text -> {
             clearHighlights();
-            if (newSearchText.isEmpty()) {
+            if (text.isEmpty()) {
                 clearSearch();
             } else {
-                filterTabs(newSearchText.toLowerCase(Locale.ROOT));
+                filterTabs(text.toLowerCase(Locale.ROOT));
             }
         });
+
     }
 
     private void filterTabs(String text) {
@@ -105,6 +107,10 @@ class PreferencesSearchHandler {
 
     protected ListProperty<PrefsTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
+    }
+
+    public StringProperty searchTextProperty() {
+        return this.searchText;
     }
 
 }
