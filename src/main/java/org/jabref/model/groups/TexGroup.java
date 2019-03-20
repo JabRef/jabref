@@ -30,7 +30,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private final FileUpdateMonitor fileMonitor;
     private AuxParser auxParser;
     private final MetaData metaData;
-    private final String user;
+    private String user;
 
     public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         super(name, context);
@@ -110,23 +110,14 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path relativize(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        if (!path.isAbsolute()) {
-            return path;
-        }
-
-        for (Path directory : fileDirectories) {
-            if (path.startsWith(directory)) {
-                return directory.relativize(path);
-            }
-        }
-        return path;
+        return FileHelper.relativize(path, fileDirectories);
     }
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        Optional<Path> Fpath = FileHelper.expandFilenameAsPath(path.toString(), fileDirectories);
-        if (Fpath.isPresent()) {
-            return Fpath.get();
+        Optional<Path> fpath = FileHelper.expandFilenameAsPath(path.toString(), fileDirectories);
+        if (fpath.isPresent()) {
+            return fpath.get();
         } else {
             return path;
         }
@@ -136,7 +127,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         List<Path> fileDirs = new ArrayList<>();
 
         metaData.getLaTexFileDirectory(user)
-                .ifPresent(LaTexFileDirectory -> fileDirs.add(Paths.get(LaTexFileDirectory).toAbsolutePath().normalize()));
+                .ifPresent(laTexFileDirectory -> fileDirs.add(Paths.get(laTexFileDirectory).toAbsolutePath().normalize()));
 
         return fileDirs;
     }

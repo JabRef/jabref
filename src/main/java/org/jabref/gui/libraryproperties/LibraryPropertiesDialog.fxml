@@ -42,7 +42,7 @@
                         <TextField fx:id="userSpecificFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Button fx:id="browseUserSpefiicFileDir" mnemonicParsing="false" onAction="#browseUserSpecificFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                         <Label text="%LaTex file directory" GridPane.rowIndex="4" />
-                        <TextField fx:id="LaTexFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="laTexFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <Button fx:id="browseLatexFileDir" mnemonicParsing="false" onAction="#browseLaTexFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                         <Label alignment="TOP_LEFT" styleClass="sectionHeader" text="%Override default file directories" GridPane.columnSpan="3" GridPane.rowIndex="1" />
                         <Label alignment="TOP_LEFT" styleClass="sectionHeader" text="%Library protection" GridPane.columnSpan="3" GridPane.rowIndex="5" />

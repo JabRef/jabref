@@ -56,7 +56,7 @@ public class MetaDataSerializer {
         // Write groups if present.
         // Skip this if only the root node exists (which is always the AllEntriesGroup).
         metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
-                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root, metaData)));
+                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
 
         // finally add all unknown meta data items to the serialization map
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
@@ -115,7 +115,7 @@ public class MetaDataSerializer {
         return stringyPattern;
     }
 
-    private static String serializeGroups(GroupTreeNode root, MetaData metaData) {
+    private static String serializeGroups(GroupTreeNode root) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(OS.NEWLINE);
 

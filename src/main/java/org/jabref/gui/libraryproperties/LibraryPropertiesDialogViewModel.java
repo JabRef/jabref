@@ -25,7 +25,7 @@ public class LibraryPropertiesDialogViewModel {
 
     private final StringProperty generalFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
-    private final StringProperty LaTexFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
     private final ObjectProperty<Charset> selectedEncodingPropety = new SimpleObjectProperty<>(Encodings.getCharsets().get(0));
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
@@ -62,11 +62,11 @@ public class LibraryPropertiesDialogViewModel {
         fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
 
         Optional<String> fileDL = metaData.getLaTexFileDirectory(preferencesService.getUser());
-        fileDL.ifPresent(LaTexFileDirectoryProperty::setValue);
+        fileDL.ifPresent(laTexFileDirectoryProperty::setValue);
 
         oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
         oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
-        oldLaTexFileDir = LaTexFileDirectoryProperty.getValue();
+        oldLaTexFileDir = laTexFileDirectoryProperty.getValue();
 
         libraryProtectedProperty.setValue(metaData.isProtected());
         oldLibraryProtected = libraryProtectedProperty.getValue();
@@ -81,7 +81,7 @@ public class LibraryPropertiesDialogViewModel {
     }
 
     public StringProperty LaTexFileDirectoryProperty() {
-        return this.LaTexFileDirectoryProperty;
+        return this.laTexFileDirectoryProperty;
     }
 
     public ListProperty<Charset> encodingsProperty() {
@@ -101,7 +101,7 @@ public class LibraryPropertiesDialogViewModel {
     }
 
     public void browseLaTexDir() {
-        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> LaTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
     public BooleanProperty libraryProtectedProperty() {
@@ -117,7 +117,7 @@ public class LibraryPropertiesDialogViewModel {
     }
 
     public boolean LaTexFileDirChanged() {
-        return !oldLaTexFileDir.equals(LaTexFileDirectoryProperty.getValue());
+        return !oldLaTexFileDir.equals(laTexFileDirectoryProperty.getValue());
     }
 
     public boolean protectedValueChanged() {

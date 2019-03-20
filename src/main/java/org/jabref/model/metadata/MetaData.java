@@ -42,7 +42,7 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, String> LaTexFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, String> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
@@ -211,16 +211,16 @@ public class MetaData {
     }
 
     public Optional<String> getLaTexFileDirectory(String user) {
-        return Optional.ofNullable(LaTexFileDirectory.get(user));
+        return Optional.ofNullable(laTexFileDirectory.get(user));
     }
 
     public void setLaTexFileDirectory(String user, String path) {
-        LaTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
         postChange();
     }
 
     public void clearLaTexFileDirectory(String user) {
-        LaTexFileDirectory.remove(user);
+        laTexFileDirectory.remove(user);
         postChange();
     }
 
@@ -301,7 +301,7 @@ public class MetaData {
     }
 
     public Map<String, String> getLaTexFileDirectories() {
-        return Collections.unmodifiableMap(LaTexFileDirectory);
+        return Collections.unmodifiableMap(laTexFileDirectory);
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
@@ -329,7 +329,7 @@ public class MetaData {
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-                && Objects.equals(LaTexFileDirectory, metaData.LaTexFileDirectory)
+               && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)

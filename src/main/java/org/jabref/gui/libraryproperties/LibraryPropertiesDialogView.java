@@ -36,7 +36,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private Button browseUserSpefiicFileDir;
-    @FXML private TextField LaTexFileDirectory;
+    @FXML private TextField laTexFileDirectory;
     @FXML private Button browseLatexFileDir;
     @FXML private CheckBox protect;
     @Inject private PreferencesService preferencesService;
@@ -72,7 +72,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
-        LaTexFileDirectory.textProperty().bindBidirectional(viewModel.LaTexFileDirectoryProperty());
+        laTexFileDirectory.textProperty().bindBidirectional(viewModel.LaTexFileDirectoryProperty());
 
         encoding.itemsProperty().bind(viewModel.encodingsProperty());
         encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
