@@ -128,7 +128,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
-        this.setTitle(Localization.lang("Edit group"));
+
+        if (editedGroup == null) {
+            this.setTitle(Localization.lang("Add subgroup"));
+        } else {
+            this.setTitle(Localization.lang("Edit group"));
+        }
 
         explicitRadioButton.setSelected(true);
 

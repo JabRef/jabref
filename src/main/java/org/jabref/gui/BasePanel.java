@@ -25,7 +25,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
@@ -41,7 +40,7 @@ import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.FileUpdatePanel;
+import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -116,6 +115,7 @@ public class BasePanel extends StackPane {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
+    private final DatabaseChangePane changePane;
 
     private final CitationStyleCache citationStyleCache;
     private final FileAnnotationCache annotationCache;
@@ -189,7 +189,9 @@ public class BasePanel extends StackPane {
         Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
-            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+            changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
+            getChildren().add(changePane);
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
@@ -197,6 +199,7 @@ public class BasePanel extends StackPane {
                 // -> mark as changed
                 this.baseChanged = true;
             }
+            changePane = null;
         }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
@@ -390,7 +393,7 @@ public class BasePanel extends StackPane {
                                                                          .withPreviewPanelEnabled(enabled)
                                                                          .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
-            DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
+            setPreviewActive(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
@@ -772,13 +775,9 @@ public class BasePanel extends StackPane {
         createMainTable();
 
         ScrollPane pane = mainTable.getPane();
-        AnchorPane anchorPane = new AnchorPane(pane);
-        AnchorPane.setBottomAnchor(pane, 0.0);
-        AnchorPane.setTopAnchor(pane, 0.0);
-        AnchorPane.setLeftAnchor(pane, 0.0);
-        AnchorPane.setRightAnchor(pane, 0.0);
-        splitPane.getItems().add(anchorPane);
-        this.getChildren().setAll(splitPane);
+        pane.setFitToHeight(true);
+        pane.setFitToWidth(true);
+        splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
@@ -841,17 +840,13 @@ public class BasePanel extends StackPane {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
-            showBottomPane(BasePanelMode.SHOWING_EDITOR);
-
-            if (entry != getShowing()) {
-                entryEditor.setEntry(entry);
-                showing = entry;
-            }
-            entryEditor.requestFocus();
-
-        });
+        if (entry != getShowing()) {
+            entryEditor.setEntry(entry);
+            showing = entry;
+        }
+        entryEditor.requestFocus();
     }
 
     private void showBottomPane(BasePanelMode newMode) {
@@ -1098,14 +1093,6 @@ public class BasePanel extends StackPane {
      */
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
-        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            if (fup.getPanel() == this) {
-                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            }
-        }
     }
 
     /**
@@ -1120,10 +1107,6 @@ public class BasePanel extends StackPane {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public boolean isUpdatedExternally() {
-        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
@@ -1156,15 +1139,6 @@ public class BasePanel extends StackPane {
 
     public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    /**
-     * Set the preview active state for all BasePanel instances.
-     */
-    private void setPreviewActiveBasePanels(boolean enabled) {
-        for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-            frame.getBasePanelAt(i).setPreviewActive(enabled);
-        }
     }
 
     private void setPreviewActive(boolean enabled) {
@@ -1210,15 +1184,11 @@ public class BasePanel extends StackPane {
 
     public void resetChangeMonitor() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
     }
 
     public void updateTimeStamp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
-    }
-
-    public Path getTempFile() {
-        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     public void copy() {
