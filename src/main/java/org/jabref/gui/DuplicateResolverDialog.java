@@ -39,8 +39,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
     public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
-        init(one, two, type);
         this.database = database;
+        init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
