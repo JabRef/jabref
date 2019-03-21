@@ -606,7 +606,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
-        getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
     }
 
     private void openBrowseDialog() {
