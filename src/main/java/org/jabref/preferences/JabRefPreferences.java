@@ -738,6 +738,7 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
             defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
             defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
+            defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
             defaults.put(CONSOLE_COMMAND, "");
             defaults.put(ADOBE_ACROBAT_COMMAND, "");

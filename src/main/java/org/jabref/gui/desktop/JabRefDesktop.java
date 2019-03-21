@@ -172,7 +172,6 @@ public class JabRefDesktop {
         if (Objects.isNull(fileLink)) {
             return;
         }
-
         boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
 
         if(usingDefault) {
@@ -182,8 +181,8 @@ public class JabRefDesktop {
             String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
-                // replace the placeholder if used
 
+                // replace the placeholder if used
                 command = command.replace("%DIR", absolutePath);
                 String[] subcommands = command.split(" ");
 
@@ -199,7 +198,6 @@ public class JabRefDesktop {
                         Localization.lang("Error occured while executing the command \"%0\".", command),
                         Localization.lang("Open File Browser") + " - " + Localization.lang("Error"),
                         JOptionPane.ERROR_MESSAGE);
-                    JabRefGUI.getMainFrame().output(null);
                 }
             }
         }

@@ -60,6 +60,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the title of Group Dialog to "Add subgroup" from "Edit group" when we select Add subgroup option.
 - We enable import button only if entries are selected. [#4755](https://github.com/JabRef/jabref/issues/4755)
 - We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
+- We add an option in preference settings to set what action to be taken by JabRef when right clicking on any entry in any database and selecting "Open folder". [#4763](https://github.com/JabRef/jabref/issues/4763)
 
 ### Fixed
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
@@ -99,7 +100,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where only one PDF file could be imported [#4422](https://github.com/JabRef/jabref/issues/4422)
 - We fixed an issue where "Move to group" would always move the first entry in the library and not the selected [#4414](https://github.com/JabRef/jabref/issues/4414)
 - We fixed an issue where an older dialog appears when downloading full texts from the quality menu. [#4489](https://github.com/JabRef/jabref/issues/4489)
-
+- We fixed and issue where right clicking on any entry in any database and selecting "Open folder" results in the NullPointer exception. [#4763](https://github.com/JabRef/jabref/issues/4763)
 
 
 

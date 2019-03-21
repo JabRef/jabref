@@ -55,24 +55,18 @@ public class Linux implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(Path filePath) throws IOException {
-        if(Objects.isNull(System.getenv("DESKTOP_SESSION"))){
-            LOGGER.error("Unable to open folder, DESKTOP_SESSION not set.");
-            JabRefGUI.getMainFrame().output(Localization.lang("Unable to open folder, DESKTOP_SESSION not set."));
-            return;
+        String desktopSession = System.getenv("DESKTOP_SESSION");
+
+        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); //default command
+
+        if(Objects.nonNull(desktopSession)){
+            desktopSession = desktopSession.toLowerCase(Locale.ROOT);
+            if (desktopSession.contains("gnome")) {
+                cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("kde")) {
+                cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+            }
         }
-
-        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase(Locale.ROOT);
-
-        String cmd;
-
-        if (desktopSession.contains("gnome")) {
-            cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
-        } else if (desktopSession.contains("kde")) {
-            cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
-        } else {
-            cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString();
-        }
-
         Runtime.getRuntime().exec(cmd);
     }
 
@@ -83,7 +77,6 @@ public class Linux implements NativeDesktop {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
         String emulatorName = reader.readLine();
-
         if (emulatorName != null) {
             emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
