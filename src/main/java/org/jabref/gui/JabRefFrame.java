@@ -1154,6 +1154,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             // add tab
             Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
             tabbedPane.getTabs().add(newTab);
+            newTab.setOnCloseRequest(event -> closeTab((BasePanel) newTab.getContent()));
 
             // update all tab titles
             updateAllTabTitles();
