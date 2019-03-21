@@ -47,6 +47,7 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
@@ -620,16 +621,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     private Path relativize(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        if (!path.isAbsolute()) {
-            return path;
-        }
-
-        for (Path directory : fileDirectories) {
-            if (path.startsWith(directory)) {
-                return directory.relativize(path);
-            }
-        }
-        return path;
+        return FileUtil.relativize(path, fileDirectories);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
