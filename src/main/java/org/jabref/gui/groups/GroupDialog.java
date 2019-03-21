@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -546,8 +547,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         boolean okEnabled = !nameField.getText().trim().isEmpty();
         if (!okEnabled) {
             setDescription(Localization.lang("Please enter a name for the group."));
+            BooleanBinding booleanBind = Bindings.isEmpty(nameField.textProperty());
             Button btn = (Button) getDialogPane().lookupButton(ButtonType.OK);
-            btn.disableProperty().bind(Bindings.isEmpty(nameField.textProperty()));
+            btn.disableProperty().bind(booleanBind);
             return;
         }
         String s1;
