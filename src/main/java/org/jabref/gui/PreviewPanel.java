@@ -84,7 +84,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
-     * @param databaseContext Used for resolving pdf directories for links. Must not be null.
+     * @param databaseContext Used for resolving pdf directories for links. Must not be null, just pass a new empty BibDatabaseContext()
      */
     public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService, ExternalFileTypes externalFileTypes) {
         this.databaseContext = Objects.requireNonNull(databaseContext);

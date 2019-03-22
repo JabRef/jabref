@@ -829,6 +829,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)),
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(this))
         );
 
@@ -916,10 +917,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this))
                 // TODO: Reenable customize entry types feature (https://github.com/JabRef/jabref/issues/4719)
                 //factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
         );
 
         help.getItems().addAll(
@@ -1313,18 +1313,20 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             // The user wants to save.
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
-                if (!saveAction.save()) {
-                    // The action was either canceled or unsuccessful.
-                    output(Localization.lang("Unable to save library"));
-                    return false;
+                if (saveAction.save()) {
+                    // Saved, now exit.
+                    return true;
                 }
+                // The action was either canceled or unsuccessful.
+                output(Localization.lang("Unable to save library"));
             } catch (Throwable ex) {
-                return false;
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
-        } else {
-            return !response.isPresent() || !response.get().equals(cancel);
+            // Save was cancelled or an error occurred.
+            return false;
         }
-        return false;
+        return !response.isPresent() || !response.get().equals(cancel);
     }
 
     private void closeTab(BasePanel panel) {

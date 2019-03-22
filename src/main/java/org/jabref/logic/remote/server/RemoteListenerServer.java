@@ -19,7 +19,7 @@ public class RemoteListenerServer implements Runnable {
 
     private static final int BACKLOG = 1;
 
-    private static final int ONE_SECOND_TIMEOUT = 1000;
+    private static final int TIMEOUT = 1000;
 
     private final MessageHandler messageHandler;
     private final ServerSocket serverSocket;
@@ -35,7 +35,7 @@ public class RemoteListenerServer implements Runnable {
         try {
             while (!Thread.interrupted()) {
                 try (Socket socket = serverSocket.accept()) {
-                    socket.setSoTimeout(ONE_SECOND_TIMEOUT);
+                    socket.setSoTimeout(TIMEOUT);
 
                     try (Protocol protocol = new Protocol(socket)) {
                         Pair<RemoteMessage, Object> input = protocol.receiveMessage();
