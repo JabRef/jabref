@@ -119,6 +119,19 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
+
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateComponents();
+        });
+
+        keywordGroupSearchTerm.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateComponents();
+        });
+
+        searchGroupSearchExpression.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateComponents();
+        });
+
         this.setTitle(Localization.lang("Edit group"));
 
         explicitRadioButton.setSelected(true);
