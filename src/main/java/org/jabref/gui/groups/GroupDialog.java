@@ -557,11 +557,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         String s1;
         String s2;
         if (keywordsRadioButton.isSelected()) {
+            boolean okEnabled = !booleanBind.get();
             s1 = keywordGroupSearchField.getText().trim();
-            boolean okEnabled = !booleanBind.get() && s1.matches("\\w+");
+            okEnabled = okEnabled && s1.matches("\\w+");
             s2 = keywordGroupSearchTerm.getText().trim();
-            BooleanBinding searchTermEmpty = Bindings.isEmpty(keywordGroupSearchTerm.textProperty());
-            okEnabled = okEnabled && !searchTermEmpty.get();
+            okEnabled = okEnabled && !s2.isEmpty();
             if (okEnabled) {
                 if (keywordGroupRegExp.isSelected()) {
                     try {
@@ -583,9 +583,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setNameFontItalic(true);
             okDisabled = new SimpleBooleanProperty(!okEnabled);
         } else if (searchRadioButton.isSelected()) {
+            boolean okEnabled = !booleanBind.get();
             s1 = searchGroupSearchExpression.getText().trim();
-            BooleanBinding searchExpressionEmpty = Bindings.isEmpty(searchGroupSearchExpression.textProperty());
-            boolean okEnabled = !booleanBind.get() && !searchExpressionEmpty.get();
+            okEnabled = okEnabled && !s1.isEmpty();
             if (okEnabled) {
                 setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
                         new SearchQuery(s1, isCaseSensitive(), isRegex()))
