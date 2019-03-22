@@ -9,6 +9,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -544,21 +546,22 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     private void updateComponents() {
         // all groups need a name
-        boolean okEnabled = !nameField.getText().trim().isEmpty();
-        if (!okEnabled) {
+        Button btn = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        BooleanBinding booleanBind = Bindings.isEmpty(nameField.textProperty());
+        if (booleanBind.get()) {
             setDescription(Localization.lang("Please enter a name for the group."));
-            BooleanBinding booleanBind = Bindings.isEmpty(nameField.textProperty());
-            Button btn = (Button) getDialogPane().lookupButton(ButtonType.OK);
             btn.disableProperty().bind(booleanBind);
             return;
         }
+        ObservableBooleanValue okDisabled = new SimpleBooleanProperty(false);
         String s1;
         String s2;
         if (keywordsRadioButton.isSelected()) {
             s1 = keywordGroupSearchField.getText().trim();
-            okEnabled = okEnabled && s1.matches("\\w+");
+            boolean okEnabled = !booleanBind.get() && s1.matches("\\w+");
             s2 = keywordGroupSearchTerm.getText().trim();
-            okEnabled = okEnabled && !s2.isEmpty();
+            BooleanBinding searchTermEmpty = Bindings.isEmpty(keywordGroupSearchTerm.textProperty());
+            okEnabled = okEnabled && !searchTermEmpty.get();
             if (okEnabled) {
                 if (keywordGroupRegExp.isSelected()) {
                     try {
@@ -578,9 +581,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             }
             setNameFontItalic(true);
+            okDisabled = new SimpleBooleanProperty(!okEnabled);
         } else if (searchRadioButton.isSelected()) {
             s1 = searchGroupSearchExpression.getText().trim();
-            okEnabled = okEnabled & !s1.isEmpty();
+            BooleanBinding searchExpressionEmpty = Bindings.isEmpty(searchGroupSearchExpression.textProperty());
+            boolean okEnabled = !booleanBind.get() && !searchExpressionEmpty.get();
             if (okEnabled) {
                 setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
                         new SearchQuery(s1, isCaseSensitive(), isRegex()))
@@ -602,10 +607,13 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                                 + "<tt>author=smith and title=electrical</tt>"));
             }
             setNameFontItalic(true);
+            okDisabled = new SimpleBooleanProperty(!okEnabled);
         } else if (explicitRadioButton.isSelected()) {
             setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
+        booleanBind = Bindings.or(okDisabled, booleanBind);
+        btn.disableProperty().bind(booleanBind);
     }
 
     private void openBrowseDialog() {
