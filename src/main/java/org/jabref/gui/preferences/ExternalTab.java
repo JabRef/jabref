@@ -20,6 +20,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 class ExternalTab implements PrefsTab {
@@ -75,8 +76,8 @@ class ExternalTab implements PrefsTab {
         executeConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         browseButton.setOnAction(e -> showConsoleChooser());
 
-        defaultFileBrowser.setOnAction(e -> updateExecuteFileBrowserButtonAndFieldEnabledState());
-        executeFileBrowser.setOnAction(e -> updateExecuteFileBrowserButtonAndFieldEnabledState());
+        fileBrowserButton.disableProperty().bind(executeFileBrowser.selectedProperty().not());
+        fileBrowserCommand.disableProperty().bind(executeFileBrowser.selectedProperty().not());
         fileBrowserButton.setOnAction(e -> showFileBrowserCommandChooser());
 
         browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
@@ -213,7 +214,6 @@ class ExternalTab implements PrefsTab {
         }
 
         updateExecuteConsoleButtonAndFieldEnabledState();
-        updateExecuteFileBrowserButtonAndFieldEnabledState();
     }
 
     @Override
@@ -224,9 +224,13 @@ class ExternalTab implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
         prefs.put(JabRefPreferences.ADOBE_ACROBAT_COMMAND, adobeAcrobatReaderPath.getText());
-        prefs.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultFileBrowser.isSelected());
-        prefs.put(JabRefPreferences.FILE_BROWSER_COMMAND, fileBrowserCommand.getText());
 
+        prefs.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultFileBrowser.isSelected());
+        if (StringUtil.isNotBlank(fileBrowserCommand.getText())) {
+            prefs.put(JabRefPreferences.FILE_BROWSER_COMMAND, fileBrowserCommand.getText());
+        } else {
+            prefs.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, true); //default if no command specified
+        }
         if (OS.WINDOWS) {
             prefs.put(JabRefPreferences.SUMATRA_PDF_COMMAND, sumatraReaderPath.getText());
         }
@@ -248,11 +252,6 @@ class ExternalTab implements PrefsTab {
         consoleCommand.setDisable(!executeConsole.isSelected());
     }
 
-    private void updateExecuteFileBrowserButtonAndFieldEnabledState() {
-        fileBrowserButton.setDisable(!executeFileBrowser.isSelected());
-        fileBrowserCommand.setDisable(!executeFileBrowser.isSelected());
-    }
-
     private void showConsoleChooser() {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> consoleCommand.setText(file.toAbsolutePath().toString()));
     }
@@ -265,7 +264,7 @@ class ExternalTab implements PrefsTab {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> sumatraReaderPath.setText(file.toAbsolutePath().toString()));
     }
 
-    private void showFileBrowserCommandChooser(){
+    private void showFileBrowserCommandChooser() {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> fileBrowserCommand.setText(file.toAbsolutePath().toString()));
     }
 

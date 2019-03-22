@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -169,14 +168,14 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
-        if (Objects.isNull(fileLink)) {
+        if (fileLink == null) {
             return;
         }
         boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
 
-        if(usingDefault) {
+        if (usingDefault) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
-        }else{
+        } else {
             String absolutePath = fileLink.toAbsolutePath().getParent().toString();
             String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
             if (!command.isEmpty()) {
@@ -186,18 +185,13 @@ public class JabRefDesktop {
                 command = command.replace("%DIR", absolutePath);
                 String[] subcommands = command.split(" ");
 
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", command));
                 LOGGER.info("Executing command \"" + command + "\"...");
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open File Browser", exception);
-
-                    JOptionPane.showMessageDialog(null,
-                        Localization.lang("Error occured while executing the command \"%0\".", command),
-                        Localization.lang("Open File Browser") + " - " + Localization.lang("Error"),
-                        JOptionPane.ERROR_MESSAGE);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
