@@ -99,8 +99,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where only one PDF file could be imported [#4422](https://github.com/JabRef/jabref/issues/4422)
 - We fixed an issue where "Move to group" would always move the first entry in the library and not the selected [#4414](https://github.com/JabRef/jabref/issues/4414)
 - We fixed an issue where an older dialog appears when downloading full texts from the quality menu. [#4489](https://github.com/JabRef/jabref/issues/4489)
-- We fixed an issue where the enabling/disabling OK button in Create/Edit group was not properly validated with the text boxes present in the window - Group creation not possible anymore with default settings [#4783]
-(https://github.com/JabRef/jabref/issues/4783)
 
 
 
