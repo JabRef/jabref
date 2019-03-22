@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -135,19 +136,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         } else {
             this.setTitle(Localization.lang("Edit group"));
         }
-
-        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateComponents();
-        });
-
-        keywordGroupSearchTerm.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateComponents();
-        });
-
-        searchGroupSearchExpression.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateComponents();
-        });
-
 
         explicitRadioButton.setSelected(true);
 
@@ -357,6 +345,32 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 }
             }
             return null;
+        });
+
+        nameField.textProperty().addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> observable,
+                                String oldValue, String newValue) {
+                updateComponents();
+            }
+        });
+
+        keywordGroupSearchTerm.textProperty().addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> observable,
+                                String oldValue, String newValue) {
+                updateComponents();
+            }
+        });
+
+        searchGroupSearchExpression.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable,
+                                String oldValue, String newValue) {
+                updateComponents();
+            }
         });
 
         EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
