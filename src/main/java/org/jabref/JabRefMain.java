@@ -31,11 +31,10 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * JabRef MainClass
- */
+// JabRef MainClass
 public class JabRefMain extends Application {
 
+    // Creating a logger and using it to write messages to log files
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;
@@ -89,7 +88,7 @@ public class JabRefMain extends Application {
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
-     * define a minimum version including the built number and to indicate whether Java 9 can be use (which it currently
+     * define a minimum version including the built number and to indicate whether Java 9 can be used (which it currently
      * can't). It tries to compare this version number to the version of the currently running JVM. The check is
      * optimistic and will rather return true even if we could not exactly determine the version.
      * <p>
@@ -161,7 +160,7 @@ public class JabRefMain extends Application {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
-        /* Build list of Import and Export formats */
+        // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
@@ -171,7 +170,7 @@ public class JabRefMain extends Application {
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
 
-        // override used newline character with the one stored in the preferences
+        // Override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
     }
