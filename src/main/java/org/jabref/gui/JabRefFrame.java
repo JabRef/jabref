@@ -1344,6 +1344,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
                 removeTab(panel);
+            } else {
+                return;
             }
         } else if (context.getLocation() == DatabaseLocation.SHARED) {
             context.convertToLocalDatabase();
