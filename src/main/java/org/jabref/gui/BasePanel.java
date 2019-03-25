@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -776,7 +775,7 @@ public class BasePanel extends StackPane {
                                               .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
-        Optional<File> file = bibDatabaseContext.getDatabaseFile();
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
         if (file.isPresent()) {
             // create changeMonitor and changePane so we get notifications about outside changes to the file.
             resetChangeMonitorAndChangePane();
