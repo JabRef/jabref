@@ -46,7 +46,7 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
+        PreviewPanel previewPanel = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
         previewPanel.setEntry(memEntry);
         return previewPanel;
     }
