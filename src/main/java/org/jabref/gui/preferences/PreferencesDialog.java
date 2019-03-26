@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
@@ -133,7 +134,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs);
         tabsList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
-        searchHandler.searchTextProperty().bindBidirectional(searchBox.textProperty());
+        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
+        });
 
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);

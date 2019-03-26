@@ -6,8 +6,6 @@ import java.util.Locale;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
@@ -15,13 +13,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.Labeled;
 
 import com.google.common.collect.ArrayListMultimap;
-import org.fxmisc.easybind.EasyBind;
 
 class PreferencesSearchHandler {
 
     private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
     private final List<PrefsTab> preferenceTabs;
-    private final StringProperty searchText = new SimpleStringProperty("");
     private final ListProperty<PrefsTab> filteredPreferenceTabs;
     private final ArrayListMultimap<PrefsTab, Labeled> preferenceTabsLabelNames;
     private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
@@ -30,25 +26,15 @@ class PreferencesSearchHandler {
         this.preferenceTabs = preferenceTabs;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
-        initializeSearchTextListener();
     }
 
-    /**
-     * Reacts upon changes in the search text.
-     */
-    private void initializeSearchTextListener() {
-        EasyBind.subscribe(searchText, text -> {
-            clearHighlights();
-            if (text.isEmpty()) {
-                clearSearch();
-            } else {
-                filterTabs(text.toLowerCase(Locale.ROOT));
-            }
-        });
+    public void filterTabs(String text) {
+        clearHighlights();
+        if (text.isEmpty()) {
+            clearSearch();
+            return;
+        }
 
-    }
-
-    private void filterTabs(String text) {
         filteredPreferenceTabs.clear();
         for (PrefsTab tab : preferenceTabsLabelNames.keySet()) {
             boolean tabContainsLabel = false;
@@ -107,10 +93,6 @@ class PreferencesSearchHandler {
 
     protected ListProperty<PrefsTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
-    }
-
-    public StringProperty searchTextProperty() {
-        return this.searchText;
     }
 
 }
