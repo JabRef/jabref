@@ -127,7 +127,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-
     public GroupDialog(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
 
         if (editedGroup == null) {
