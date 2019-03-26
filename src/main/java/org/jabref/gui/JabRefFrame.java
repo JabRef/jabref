@@ -1154,6 +1154,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             // add tab
             Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
             tabbedPane.getTabs().add(newTab);
+            newTab.setOnCloseRequest(event -> {
+                closeTab((BasePanel) newTab.getContent());
+                event.consume();
+            });
 
             // update all tab titles
             updateAllTabTitles();
@@ -1340,6 +1344,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
                 removeTab(panel);
+            } else {
+                return;
             }
         } else if (context.getLocation() == DatabaseLocation.SHARED) {
             context.convertToLocalDatabase();
