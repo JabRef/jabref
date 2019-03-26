@@ -177,6 +177,7 @@ public class BasePanel extends StackPane {
         setupMainPanel();
 
         setupActions();
+        setPreviewOn(true);
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntryRemovedListener());
@@ -702,6 +703,7 @@ public class BasePanel extends StackPane {
                                                          .ifPresent(entry -> {
                                                              preview.setEntry(entry);
                                                              entryEditor.setEntry(entry);
+                                                             setPreviewAction();
                                                          }));
 
         // TODO: Register these actions globally
@@ -1411,4 +1413,24 @@ public class BasePanel extends StackPane {
             preview.print();
         }
     }
+
+    private void setPreviewAction() {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+        boolean enabled = previewPreferences.isPreviewPanelEnabled();
+        PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
+                                                                     .withPreviewPanelEnabled(enabled)
+                                                                     .build();
+        Globals.prefs.storePreviewPreferences(newPreviewPreferences);
+        setPreviewActive(enabled);
+    }
+
+    private void setPreviewOn(Boolean previewOn) {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+        PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
+                                                                     .withPreviewPanelEnabled(previewOn)
+                                                                     .build();
+        Globals.prefs.storePreviewPreferences(newPreviewPreferences);
+
+    }
+
 }
