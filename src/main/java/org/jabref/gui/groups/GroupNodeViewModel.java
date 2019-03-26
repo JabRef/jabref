@@ -85,6 +85,8 @@ public class GroupNodeViewModel {
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
+        // The wrapper created by the FXCollections will set a weak listener on the wrapped list.
+        // This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
 
