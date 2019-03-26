@@ -1073,4 +1073,12 @@ public class BibtexKeyGeneratorTest {
         assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
     }
 
+    @Test
+    public void generateKeyWithMinusInCitationStyleOutsideAField() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+        entry.setField("year", "2019");
+
+        assertEquals("Newton-2019", BibtexKeyGenerator.generateKey(entry, "[auth]-[year]"));
+    }
 }
