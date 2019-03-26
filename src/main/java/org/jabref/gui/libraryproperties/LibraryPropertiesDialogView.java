@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -146,7 +147,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         if (text.isEmpty()) {
             metaData.clearLaTexFileDirectory(preferencesService.getUser());
         } else {
-            metaData.setLaTexFileDirectory(preferencesService.getUser(), text);
+            metaData.setLaTexFileDirectory(preferencesService.getUser(), Paths.get(text));
         }
 
         if (viewModel.libraryProtectedProperty().getValue()) {

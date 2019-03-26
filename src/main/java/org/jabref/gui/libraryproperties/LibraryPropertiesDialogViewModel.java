@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -61,8 +62,9 @@ public class LibraryPropertiesDialogViewModel {
         Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
         fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
 
-        Optional<String> fileDL = metaData.getLaTexFileDirectory(preferencesService.getUser());
-        fileDL.ifPresent(laTexFileDirectoryProperty::setValue);
+        Optional<Path> fileDL = metaData.getLaTexFileDirectory(preferencesService.getUser());
+        Optional<String> laTexFile = Optional.ofNullable(fileDL.toString());
+        laTexFile.ifPresent(laTexFileDirectoryProperty::setValue);
 
         oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
         oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();

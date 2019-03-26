@@ -1,6 +1,5 @@
 package org.jabref.model.groups;
 
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -13,6 +12,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,12 +46,12 @@ public class TexGroupTest {
     }
 
     @Test
-    public void ReturnsTrueIfPathRelative() throws Exception {
+    public void getFilePathReturnsRelativePath() throws Exception {
         Path auxFile = Paths.get(TexGroupTest.class.getResource("paper.aux").toURI());
-        String user = System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName();
-        metaData.setLaTexFileDirectory(user, auxFile.getParent().toString());
-        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
+        String user = "Darwin";
+        metaData.setLaTexFileDirectory(user, auxFile.getParent());
+        TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, user);
 
-        assertTrue("paper.aux".matches(group.getFilePath().toString()));
+        assertEquals("paper.aux", group.getFilePath().toString());
     }
 }

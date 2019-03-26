@@ -628,7 +628,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         List<Path> fileDirs = new ArrayList<>();
         MetaData metaData = basePanel.getBibDatabaseContext().getMetaData();
         metaData.getLaTexFileDirectory(prefs.getFilePreferences().getUser())
-                .ifPresent(LaTexFileDirectory -> fileDirs.add(Paths.get(LaTexFileDirectory).toAbsolutePath().normalize()));
+                .ifPresent(laTexFileDirectory -> fileDirs.add(laTexFileDirectory));
 
         return fileDirs;
     }

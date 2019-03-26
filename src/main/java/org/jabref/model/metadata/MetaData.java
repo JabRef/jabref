@@ -1,6 +1,7 @@
 package org.jabref.model.metadata;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, String> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
@@ -51,8 +52,8 @@ public class MetaData {
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
-    private ContentSelectors contentSelectors = new ContentSelectors();
-    private Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private final ContentSelectors contentSelectors = new ContentSelectors();
+    private final Map<String, List<String>> unkownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
     /**
@@ -210,11 +211,11 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<String> getLaTexFileDirectory(String user) {
+    public Optional<Path> getLaTexFileDirectory(String user) {
         return Optional.ofNullable(laTexFileDirectory.get(user));
     }
 
-    public void setLaTexFileDirectory(String user, String path) {
+    public void setLaTexFileDirectory(String user, Path path) {
         laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
         postChange();
     }
@@ -300,7 +301,7 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, String> getLaTexFileDirectories() {
+    public Map<String, Path> getLaTexFileDirectories() {
         return Collections.unmodifiableMap(laTexFileDirectory);
     }
 

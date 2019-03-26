@@ -3,11 +3,9 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.auxparser.AuxParser;
@@ -31,6 +29,16 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private AuxParser auxParser;
     private final MetaData metaData;
     private String user;
+
+    public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) throws IOException {
+        super(name, context);
+        this.metaData = metaData;
+        this.user = user;
+        this.filePath = expandPath(Objects.requireNonNull(filePath));
+        this.auxParser = auxParser;
+        this.fileMonitor = fileMonitor;
+        fileMonitor.addListenerForFile(this.filePath, this);
+    }
 
     public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         super(name, context);
@@ -115,19 +123,14 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        Optional<Path> fpath = FileHelper.expandFilenameAsPath(path.toString(), fileDirectories);
-        if (fpath.isPresent()) {
-            return fpath.get();
-        } else {
-            return path;
-        }
+        return FileHelper.expandFilenameAsPath(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
 
         metaData.getLaTexFileDirectory(user)
-                .ifPresent(laTexFileDirectory -> fileDirs.add(Paths.get(laTexFileDirectory).toAbsolutePath().normalize()));
+                .ifPresent(laTexFileDirectory -> fileDirs.add(laTexFileDirectory));
 
         return fileDirs;
     }
