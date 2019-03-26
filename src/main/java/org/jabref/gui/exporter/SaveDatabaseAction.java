@@ -211,7 +211,7 @@ public class SaveDatabaseAction {
         save();
 
         // Reinstall AutosaveManager and BackupManager
-        panel.resetChangeMonitor();
+        panel.resetChangeMonitorAndChangePane();
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(panel));

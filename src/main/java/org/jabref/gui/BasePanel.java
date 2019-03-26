@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -115,7 +114,6 @@ public class BasePanel extends StackPane {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
-    private final DatabaseChangePane changePane;
 
     private final CitationStyleCache citationStyleCache;
     private final FileAnnotationCache annotationCache;
@@ -138,6 +136,7 @@ public class BasePanel extends StackPane {
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
+    private DatabaseChangePane changePane;
     private boolean saving;
 
     // AutoCompleter used in the search bar
@@ -185,22 +184,6 @@ public class BasePanel extends StackPane {
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
-
-        Optional<File> file = bibDatabaseContext.getDatabaseFile();
-        if (file.isPresent()) {
-            // Register so we get notifications about outside changes to the file.
-            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
-            changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
-            getChildren().add(changePane);
-        } else {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                this.baseChanged = true;
-            }
-            changePane = null;
-        }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
@@ -790,6 +773,22 @@ public class BasePanel extends StackPane {
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
                                               .flatMap(SplitPane.Divider::positionProperty)
                                               .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+
+        // Add changePane in case a file is present - otherwise just add the splitPane to the panel
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+        if (file.isPresent()) {
+            // create changeMonitor and changePane so we get notifications about outside changes to the file.
+            resetChangeMonitorAndChangePane();
+        } else {
+            if (bibDatabaseContext.getDatabase().hasEntries()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
+            changePane = null;
+            getChildren().add(splitPane);
+        }
     }
 
     /**
@@ -1182,9 +1181,13 @@ public class BasePanel extends StackPane {
         return annotationCache;
     }
 
-    public void resetChangeMonitor() {
+    public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+
+        changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
+
+        this.getChildren().setAll(changePane);
     }
 
     public void updateTimeStamp() {
