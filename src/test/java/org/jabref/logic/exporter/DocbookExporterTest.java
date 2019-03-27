@@ -27,28 +27,19 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(TempDirectory.class)
 public class DocbookExporterTest {
 
-    public BibDatabaseContext databaseContext;
-    public Charset charset;
+    public BibDatabaseContext databaseContext = new BibDatabaseContext();;
+    public Charset charset = StandardCharsets.UTF_8;
 
     private Exporter exportFormat;
 
     @BeforeEach
     public void setUp() {
-        Map<String, TemplateExporter> customFormats = new HashMap<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        ExporterFactory exporterFactory = ExporterFactory.create(new HashMap<>(), layoutPreferences, savePreferences, xmpPreferences);
 
         exportFormat = exporterFactory.getExporterByName("docbook").get();
-
-        databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
-    }
-
-    @AfterEach
-    public void tearDown() {
-        exportFormat = null;
     }
 
     @Test
