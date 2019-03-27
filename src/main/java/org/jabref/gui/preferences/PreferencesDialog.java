@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -127,6 +129,15 @@ public class PreferencesDialog extends BaseDialog<Void> {
                                                 .withText(PrefsTab::getTabName)
                                                 .install(tabsList);
 
+        TextField searchBox = new TextField();
+        searchBox.setPromptText(Localization.lang("Search"));
+
+        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs);
+        tabsList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
+        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
+        });
+
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
         buttonContainer.setSpacing(3.0);
@@ -155,9 +166,11 @@ public class PreferencesDialog extends BaseDialog<Void> {
         VBox.setVgrow(tabsList, Priority.ALWAYS);
         VBox.setVgrow(spacer, Priority.SOMETIMES);
         vBox.getChildren().addAll(
-                                  tabsList,
-                                  spacer,
-                                  buttonContainer);
+                searchBox,
+                tabsList,
+                spacer,
+                buttonContainer
+        );
 
         container.setLeft(vBox);
 
@@ -230,7 +243,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
-        frame.output(Localization.lang("Preferences recorded."));
+        dialogService.notify(Localization.lang("Preferences recorded."));
     }
 
     public void setValues() {
