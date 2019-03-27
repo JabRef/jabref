@@ -7,24 +7,20 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class DocbookExporterTest {
 
     public BibDatabaseContext databaseContext = new BibDatabaseContext();;
@@ -43,7 +39,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void testCorruptedTitleBraces(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void testCorruptedTitleBraces(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
@@ -59,7 +55,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void testCorruptedTitleUnicode(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void testCorruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
