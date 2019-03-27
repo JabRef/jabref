@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PersonNameSuggestionProviderTest {
 
-    private static final Author vassilisKostakos = new Author("Vassilis", "V.", "", "Kostakos", "");
+    private final Author vassilisKostakos = new Author("Vassilis", "V.", "", "Kostakos", "");
     private PersonNameSuggestionProvider autoCompleter;
     private BibEntry entry;
 

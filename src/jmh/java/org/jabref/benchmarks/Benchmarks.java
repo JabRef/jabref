@@ -62,15 +62,20 @@ public class Benchmarks {
             entry.setField("rnd", "2" + randomizer.nextInt());
             database.insertEntry(entry);
         }
-        StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
-        databaseWriter.savePartOfDatabase(
-                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
-        bibtexString = outputWriter.toString();
+
+        bibtexString = getOutputWriter().toString();
 
         latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
 
         htmlConversionString = "<b>&Ouml;sterreich</b> &#8211; &amp; characters &#x2aa2; <i>italic</i>";
+    }
+
+    private StringWriter getOutputWriter() throws IOException {
+        StringWriter outputWriter = new StringWriter();
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
+        databaseWriter.savePartOfDatabase(
+                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
+        return outputWriter;
     }
 
     @Benchmark
@@ -81,10 +86,7 @@ public class Benchmarks {
 
     @Benchmark
     public String write() throws Exception {
-        StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
-        databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
-        return outputWriter.toString();
+        return getOutputWriter().toString();
     }
 
     @Benchmark

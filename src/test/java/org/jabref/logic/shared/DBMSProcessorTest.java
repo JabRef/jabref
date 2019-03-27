@@ -33,10 +33,10 @@ class DBMSProcessorTest {
     private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
         Collection<Object[]> result = new ArrayList<>();
         for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-                result.add(new Object[] {
-                        dbmsType,
-                        TestConnector.getTestDBMSConnection(dbmsType),
-                        DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
+            result.add(new Object[]{
+                    dbmsType,
+                    TestConnector.getTestDBMSConnection(dbmsType),
+                    DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
         }
         return result.stream();
     }
@@ -111,6 +111,24 @@ class DBMSProcessorTest {
                 .getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedEntry, actualEntryOptional.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        BibEntry firstEntry = getBibEntryExample();
+        firstEntry.setId("1");
+        BibEntry secondEntry = getBibEntryExample();
+        secondEntry.setId("2");
+
+        dbmsProcessor.insertEntry(firstEntry);
+        dbmsProcessor.insertEntry(secondEntry);
+
+        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(Arrays.asList(1, 2));
+
+        assertEquals(firstEntry.getId(), sharedEntriesByIdList.get(0).getId());
+        assertEquals(secondEntry.getId(), sharedEntriesByIdList.get(1).getId());
     }
 
     @ParameterizedTest

@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -15,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
-import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
@@ -36,6 +34,7 @@ public class EntryTypeViewModel {
 
     private final JabRefPreferences prefs;
     private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
+    private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
     private final ListProperty<IdBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty idText = new SimpleStringProperty();
@@ -51,6 +50,10 @@ public class EntryTypeViewModel {
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
 
+    }
+
+    public BooleanProperty searchSuccesfulProperty() {
+        return searchSuccesfulProperty;
     }
 
     public BooleanProperty searchingProperty() {
@@ -110,6 +113,7 @@ public class EntryTypeViewModel {
     }
 
     public void runFetcherWorker() {
+        searchSuccesfulProperty.set(false);
         fetcherWorker.run();
         fetcherWorker.setOnFailed(event -> {
             Throwable exception = fetcherWorker.getException();
@@ -124,27 +128,41 @@ public class EntryTypeViewModel {
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
             searchingProperty.set(false);
+
             fetcherWorker = new FetcherWorker();
+
         });
 
         fetcherWorker.setOnSucceeded(evt -> {
             Optional<BibEntry> result = fetcherWorker.getValue();
             if (result.isPresent()) {
-                final BibEntry bibEntry = result.get();
-                if ((DuplicateCheck.containsDuplicate(basePanel.getDatabase(), bibEntry, basePanel.getBibDatabaseContext().getMode()).isPresent())) {
-                    //If there are duplicates starts ImportInspectionDialog
-                    ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), basePanel, Localization.lang("Import"), false);
-                    diag.addEntries(Arrays.asList(bibEntry));
-                    diag.entryListComplete();
-                    diag.setVisible(true);
-                    diag.toFront();
+                final BibEntry entry = result.get();
+                Optional<BibEntry> duplicate = DuplicateCheck.containsDuplicate(basePanel.getDatabase(), entry, basePanel.getBibDatabaseContext().getMode());
+                if ((duplicate.isPresent())) {
+                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext());
+                    switch (dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
+                        case KEEP_LEFT:
+                            basePanel.getDatabase().removeEntry(duplicate.get());
+                            basePanel.getDatabase().insertEntry(entry);
+                            break;
+                        case KEEP_BOTH:
+                            basePanel.getDatabase().insertEntry(entry);
+                            break;
+                        case KEEP_MERGE:
+                            basePanel.getDatabase().removeEntry(duplicate.get());
+                            basePanel.getDatabase().insertEntry(dialog.getMergedEntry());
+                            break;
+                        default:
+                            // Do nothing
+                            break;
+                    }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
-                    basePanel.insertEntry(bibEntry);
+                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                    basePanel.insertEntry(entry);
                 }
+                searchSuccesfulProperty.set(true);
 
-                // close();
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }

@@ -13,7 +13,6 @@ public class FieldContentParserTest {
 
     private FieldContentParser parser;
 
-
     @BeforeEach
     public void setUp() throws Exception {
         FieldContentParserPreferences prefs = new FieldContentParserPreferences(Collections.emptyList());

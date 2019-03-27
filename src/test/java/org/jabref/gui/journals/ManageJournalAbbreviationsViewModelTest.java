@@ -23,8 +23,7 @@ import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.jabref.logic.util.OS.NEWLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +36,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class ManageJournalAbbreviationsViewModelTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
@@ -50,7 +48,7 @@ class ManageJournalAbbreviationsViewModelTest {
     private DialogService dialogService;
 
     @BeforeEach
-    void setUpViewModel(@TempDirectory.TempDir Path tempFolder) throws Exception {
+    void setUpViewModel(@TempDir Path tempFolder) throws Exception {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
@@ -209,7 +207,7 @@ class ManageJournalAbbreviationsViewModelTest {
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
-                        .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
+                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
 
         assertEquals(expected, actualAbbreviations);
     }
@@ -224,7 +222,7 @@ class ManageJournalAbbreviationsViewModelTest {
                 .observableArrayList(JournalAbbreviationLoader.getOfficialIEEEAbbreviations());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
-                        .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
+                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
 
         assertEquals(expected, actualAbbreviations);
     }
@@ -443,7 +441,7 @@ class ManageJournalAbbreviationsViewModelTest {
     void testSaveExternalFilesListToPreferences() throws Exception {
         addFourTestFileToViewModelAndPreferences();
         List<String> expected = Stream.of(testFile1Entries, testFile3Entries, testFile4Entries, testFile5EntriesWithDuplicate)
-                .map(Path::toString).collect(Collectors.toList());
+                                      .map(Path::toString).collect(Collectors.toList());
         verify(abbreviationPreferences).setExternalJournalLists(expected);
     }
 
@@ -478,6 +476,6 @@ class ManageJournalAbbreviationsViewModelTest {
      */
     private void selectLastAbbreviation() {
         viewModel.currentAbbreviationProperty()
-                .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
+                 .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
     }
 }

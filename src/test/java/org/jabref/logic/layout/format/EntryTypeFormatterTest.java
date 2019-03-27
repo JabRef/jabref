@@ -9,7 +9,6 @@ public class EntryTypeFormatterTest {
 
     private EntryTypeFormatter formatter;
 
-
     @BeforeEach
     public void setUp() {
         formatter = new EntryTypeFormatter();
@@ -29,5 +28,4 @@ public class EntryTypeFormatterTest {
     public void testIncorrectTypeAarticle() {
         assertEquals("Aarticle", formatter.format("aarticle"));
     }
-
 }

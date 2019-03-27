@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class UnicodeConverterTest {
 
-    private  UnicodeToLatexFormatter formatter;
+    private UnicodeToLatexFormatter formatter;
 
     @BeforeEach
     public void setUp() {
@@ -38,5 +38,4 @@ public class UnicodeConverterTest {
     public void testUnicodeSingle() {
         assertEquals("a", formatter.format("a"));
     }
-
 }

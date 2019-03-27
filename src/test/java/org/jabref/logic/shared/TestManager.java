@@ -9,8 +9,8 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.model.database.shared.DBMSType;
 
 /**
- * This class provides helping methods for database tests.
- * Furthermore it determines database systems which are ready to be used for tests.
+ * This class provides helping methods for database tests. Furthermore it determines database systems which are ready to
+ * be used for tests.
  */
 public class TestManager {
 
@@ -41,11 +41,11 @@ public class TestManager {
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"METADATA\"");
         } else if (dbmsType == DBMSType.ORACLE) {
             dbmsConnection.getConnection().createStatement()
-                    .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n"
-                        + "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n"
-                        + "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n"
-                        + "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                        + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;");
+                          .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n"
+                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n"
+                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n"
+                                  + "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
+                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;");
         }
     }
 }

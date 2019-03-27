@@ -855,6 +855,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return properties.get(propName);
     }
 
+    /**
+     * Indicate if it is an internal style
+     *
+     * @return True if an internal style
+     */
     public boolean isFromResource() {
         return fromResource;
     }
@@ -875,7 +880,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         if (o instanceof OOBibStyle) {
             OOBibStyle otherStyle = (OOBibStyle) o;
-            return Objects.equals(path, otherStyle.path) && Objects.equals(name, otherStyle.name)
+            return Objects.equals(path, otherStyle.path)
+                    && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
                     && Objects.equals(properties, otherStyle.properties);
         }

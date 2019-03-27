@@ -218,9 +218,9 @@ class BibtexDatabaseWriterTest {
         // @formatter:off
         assertEquals(
                 "% Encoding: US-ASCII" + OS.NEWLINE +
-                OS.NEWLINE
+                        OS.NEWLINE
                         + "@Comment{jabref-meta: grouping:" + OS.NEWLINE
-                + "0 AllEntriesGroup:;" + OS.NEWLINE
+                        + "0 AllEntriesGroup:;" + OS.NEWLINE
                         + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                         + "}" + OS.NEWLINE, stringWriter.toString());
         // @formatter:on
@@ -297,7 +297,7 @@ class BibtexDatabaseWriterTest {
                 new Defaults(BibDatabaseMode.BIBTEX));
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+        try (Scanner scanner = new Scanner(testBibtexFile, encoding.name())) {
             assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
@@ -341,7 +341,7 @@ class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
 
-        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+        try (Scanner scanner = new Scanner(testBibtexFile, encoding.name())) {
             assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
@@ -358,7 +358,7 @@ class BibtexDatabaseWriterTest {
                 new Defaults(BibDatabaseMode.BIBTEX));
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+        try (Scanner scanner = new Scanner(testBibtexFile, encoding.name())) {
             assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
@@ -419,7 +419,6 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
-
     }
 
     @Test
@@ -436,7 +435,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeSaveOrderConfig() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion("author", false),
                 new SaveOrderConfig.SortCriterion("year", true),
                 new SaveOrderConfig.SortCriterion("abstract", false));
         metaData.setSaveOrderConfig(saveOrderConfig);
@@ -496,7 +495,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntriesSorted() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false,
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true,
                 new SaveOrderConfig.SortCriterion("author", false),
                 new SaveOrderConfig.SortCriterion("year", true),
                 new SaveOrderConfig.SortCriterion("abstract", false));
@@ -525,21 +524,21 @@ class BibtexDatabaseWriterTest {
 
         assertEquals(
                 OS.NEWLINE +
-                "@Article{," + OS.NEWLINE +
-                "  author = {A}," + OS.NEWLINE +
+                        "@Article{," + OS.NEWLINE +
+                        "  author = {A}," + OS.NEWLINE +
                         "  year   = {2010}," + OS.NEWLINE +
-                "}"  + OS.NEWLINE + OS.NEWLINE +
-                "@Article{," + OS.NEWLINE +
-                "  author = {A}," + OS.NEWLINE +
+                        "}" + OS.NEWLINE + OS.NEWLINE +
+                        "@Article{," + OS.NEWLINE +
+                        "  author = {A}," + OS.NEWLINE +
                         "  year   = {2000}," + OS.NEWLINE +
-                "}" + OS.NEWLINE + OS.NEWLINE +
-                "@Article{," + OS.NEWLINE +
-                "  author = {B}," + OS.NEWLINE +
-                "  year   = {2000}," + OS.NEWLINE +
-                "}" + OS.NEWLINE + OS.NEWLINE +
-                "@Comment{jabref-meta: databaseType:bibtex;}"
-                 + OS.NEWLINE + OS.NEWLINE +
-                "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
+                        "}" + OS.NEWLINE + OS.NEWLINE +
+                        "@Article{," + OS.NEWLINE +
+                        "  author = {B}," + OS.NEWLINE +
+                        "  year   = {2000}," + OS.NEWLINE +
+                        "}" + OS.NEWLINE + OS.NEWLINE +
+                        "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + OS.NEWLINE + OS.NEWLINE +
+                        "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
                         OS.NEWLINE,
                 stringWriter.toString());
     }

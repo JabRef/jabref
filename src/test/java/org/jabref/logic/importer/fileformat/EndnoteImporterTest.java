@@ -126,7 +126,7 @@ public class EndnoteImporterTest {
     public void testImportEntries1() throws IOException {
         String medlineString = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
         List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(medlineString))).getDatabase()
-                .getEntries();
+                                            .getEntries();
 
         BibEntry entry = bibEntries.get(0);
 

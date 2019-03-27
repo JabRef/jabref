@@ -39,5 +39,4 @@ public class MsBibImporterTestFiles {
     public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new MsBibImporter(), fileName, FILE_ENDING);
     }
-
 }

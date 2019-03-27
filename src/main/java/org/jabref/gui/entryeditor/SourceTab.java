@@ -11,8 +11,11 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.InputMethodRequests;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -53,8 +56,9 @@ public class SourceTab extends EntryEditorTab {
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
+    private final DialogService dialogService;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -63,6 +67,7 @@ public class SourceTab extends EntryEditorTab {
         this.fieldFormatterPreferences = fieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
+        this.dialogService = dialogService;
 
     }
 
@@ -74,9 +79,42 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
+    /* Work around for different input methods.
+     * https://github.com/FXMisc/RichTextFX/issues/146
+     */
+    private class InputMethodRequestsObject implements InputMethodRequests {
+
+        @Override
+        public String getSelectedText() {
+            return "";
+        }
+
+        @Override
+        public int getLocationOffset(int x, int y) {
+            return 0;
+        }
+
+        @Override
+        public void cancelLatestCommittedText() {
+            return;
+        }
+
+        @Override
+        public Point2D getTextLocation(int offset) {
+            return new Point2D(0, 0);
+        }
+    }
+
     private CodeArea createSourceEditor() {
         CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
+        codeArea.setInputMethodRequests(new InputMethodRequestsObject());
+        codeArea.setOnInputMethodTextChanged(event -> {
+            String committed = event.getCommitted();
+            if (!committed.isEmpty()) {
+                codeArea.insertText(codeArea.getCaretPosition(), committed);
+            }
+        });
         return codeArea;
     }
 
@@ -95,14 +133,21 @@ public class SourceTab extends EntryEditorTab {
             if (sourceValidator.getValidationStatus().isValid()) {
                 notificationPane.hide();
             } else {
-                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage()));
+                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> {
+                    notificationPane.show(validationMessage.getMessage());//this seems not working
+                    dialogService.showErrorDialogAndWait(validationMessage.getMessage());
+                });
             }
         });
         this.setContent(codeArea);
 
-        // Store source for every change in the source code
+        // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
-        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
+        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {
+            if (!onFocus) {
+                storeSource(codeArea.textProperty().getValue());
+            }
+        }, fields -> {
             DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
@@ -139,6 +184,12 @@ public class SourceTab extends EntryEditorTab {
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }
+            }
+
+            if (parserResult.hasWarnings()) {
+                // put the warning into as exception text -> it will be displayed to the user
+
+                throw new IllegalStateException(parserResult.getErrorMessage());
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));

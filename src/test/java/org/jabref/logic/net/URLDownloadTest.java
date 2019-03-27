@@ -91,5 +91,4 @@ public class URLDownloadTest {
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
     }
-
 }

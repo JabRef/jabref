@@ -23,7 +23,6 @@ public class LatexFieldFormatter {
     private final FieldContentParser parser;
     private StringBuilder stringBuilder;
 
-
     public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
         this(true, prefs);
     }
@@ -48,26 +47,26 @@ public class LatexFieldFormatter {
             char item = text.charAt(i);
 
             boolean charBeforeIsEscape = false;
-            if (i > 0 && text.charAt(i - 1) == '\\') {
+            if ((i > 0) && (text.charAt(i - 1) == '\\')) {
                 charBeforeIsEscape = true;
             }
 
-            if (!charBeforeIsEscape && item == '{') {
+            if (!charBeforeIsEscape && (item == '{')) {
                 left++;
-            } else if (!charBeforeIsEscape && item == '}') {
+            } else if (!charBeforeIsEscape && (item == '}')) {
                 right++;
             }
         }
 
         // Then we throw an exception if the error criteria are met.
         if (!(right == 0) && (left == 0)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (!(right == 0) && (right < left)) {
-            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (left != right) {
-            throw new InvalidFieldValueException("Braces don't match.");
+            throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
         }
     }
 
@@ -146,9 +145,9 @@ public class LatexFieldFormatter {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
                         throw new InvalidFieldValueException(
-                                "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
-                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                        + "Note that the entry causing the problem has been selected.");
+                                                             "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                                             + "In JabRef, use pairs of # characters to indicate a string.\n"
+                                                             + "Note that the entry causing the problem has been selected. Field value: " + content);
                     }
                 }
             }
@@ -161,7 +160,7 @@ public class LatexFieldFormatter {
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
                 writeStringLabel(content, pos1 + 1, pos2, pos1 == pivot,
-                        (pos2 + 1) == content.length());
+                                 (pos2 + 1) == content.length());
             }
 
             if (pos2 > -1) {
@@ -187,7 +186,7 @@ public class LatexFieldFormatter {
         } else {
             // Default operation - we only resolve strings for standard fields:
             resolveStrings = InternalBibtexFields.isStandardField(fieldName)
-                    || BIBTEX_STRING.equals(fieldName);
+                             || BIBTEX_STRING.equals(fieldName);
         }
         return resolveStrings;
     }
@@ -195,8 +194,7 @@ public class LatexFieldFormatter {
     private String formatWithoutResolvingStrings(String content, String fieldName) throws InvalidFieldValueException {
         checkBraces(content);
 
-        stringBuilder = new StringBuilder(
-                String.valueOf(FIELD_START));
+        stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
 
         stringBuilder.append(parser.format(content, fieldName));
 
@@ -258,7 +256,7 @@ public class LatexFieldFormatter {
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
             if ((c == '&') && !escape && !(inCommand && "url".equals(commandName.toString()))
-                    && (nestedEnvironments == 0)) {
+                && (nestedEnvironments == 0)) {
                 stringBuilder.append("\\&");
             } else {
                 stringBuilder.append(c);
@@ -271,7 +269,7 @@ public class LatexFieldFormatter {
     private void writeStringLabel(String text, int startPos, int endPos,
                                   boolean first, boolean last) {
         putIn((first ? "" : " # ") + text.substring(startPos, endPos)
-                + (last ? "" : " # "));
+              + (last ? "" : " # "));
     }
 
     private void putIn(String s) {

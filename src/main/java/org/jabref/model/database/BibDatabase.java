@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
@@ -66,6 +67,11 @@ public class BibDatabase {
     public BibDatabase() {
         this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
+    }
+
+    public BibDatabase(List<BibEntry> entries) {
+        this();
+        insertEntries(entries);
     }
 
     /**
@@ -131,7 +137,7 @@ public class BibDatabase {
             allFields.addAll(e.getFieldNames());
         }
         return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
-                .collect(Collectors.toSet());
+                        .collect(Collectors.toSet());
     }
 
     /**
@@ -226,7 +232,6 @@ public class BibDatabase {
         entries.addAll(newEntries);
     }
 
-
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
@@ -287,6 +292,17 @@ public class BibDatabase {
         bibtexStrings.put(string.getId(), string);
     }
 
+    public void addStrings(Collection<BibtexString> stringsToAdd) {
+        for (BibtexString str : stringsToAdd) {
+            Optional<BibtexString> bibtexString = getStringByName(str.getName());
+            if (bibtexString.isPresent() && !(bibtexString.get().getContent().equals(str.getContent()))) {
+                bibtexString.get().setContent(str.getContent());
+            } else {
+                addString(str);
+            }
+        }
+    }
+
     /**
      * Removes the string with the given id.
      */
@@ -318,15 +334,10 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the string with the given name.
+     * Returns the string with the given name/label
      */
     public Optional<BibtexString> getStringByName(String name) {
-        for (BibtexString string : getStringValues()) {
-            if (string.getName().equals(name)) {
-                return Optional.of(string);
-            }
-        }
-        return Optional.empty();
+        return getStringValues().stream().filter(string -> string.getName().equals(name)).findFirst();
     }
 
     /**
@@ -356,12 +367,7 @@ public class BibDatabase {
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (BibtexString value : bibtexStrings.values()) {
-            if (value.getName().equals(label)) {
-                return true;
-            }
-        }
-        return false;
+        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /**
@@ -505,7 +511,7 @@ public class BibDatabase {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
-                    newRes.append(res.substring(piv, next));
+                    newRes.append(res, piv, next);
                 }
                 int stringEnd = res.indexOf('#', next + 1);
                 if (stringEnd >= 0) {
@@ -517,7 +523,7 @@ public class BibDatabase {
                     if (resolved == null) {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
-                        newRes.append(res.substring(next, stringEnd + 1));
+                        newRes.append(res, next, stringEnd + 1);
                     } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:
@@ -615,5 +621,4 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
-
 }

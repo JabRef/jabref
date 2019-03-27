@@ -3,9 +3,8 @@ package org.jabref.logic.search;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -14,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-
 
 class SearchQueryHighlightObservableTest {
 

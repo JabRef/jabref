@@ -9,6 +9,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -57,6 +58,7 @@ public class Globals {
 
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
+    public static CountingUndoManager undoManager = new CountingUndoManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
@@ -75,11 +77,11 @@ public class Globals {
     }
 
     // Background tasks
-    public static void startBackgroundTasks() {
+    public static void startBackgroundTasks() throws JabRefException {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        themeLoader = new ThemeLoader(fileUpdateMonitor);
+        themeLoader = new ThemeLoader(fileUpdateMonitor, prefs);
 
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();

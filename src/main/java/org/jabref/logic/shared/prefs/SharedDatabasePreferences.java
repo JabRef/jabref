@@ -32,6 +32,7 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
     private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
+    private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
@@ -70,6 +71,10 @@ public class SharedDatabasePreferences {
 
     public Optional<String> getKeyStoreFile() {
         return getOptionalValue(SHARED_DATABASE_KEYSTORE_FILE);
+    }
+
+    public Optional<String> getServerTimezone() {
+        return getOptionalValue(SHARED_DATABASE_SERVER_TIMEZONE);
     }
 
     public boolean getRememberPassword() {
@@ -116,6 +121,10 @@ public class SharedDatabasePreferences {
         internalPrefs.put(SHARED_DATABASE_KEYSTORE_FILE, keystoreFile);
     }
 
+    public void setServerTimezone(String serverTimezone) {
+        internalPrefs.put(SHARED_DATABASE_SERVER_TIMEZONE, serverTimezone);
+    }
+
     public void clearPassword() {
         internalPrefs.remove(SHARED_DATABASE_PASSWORD);
     }
@@ -142,6 +151,7 @@ public class SharedDatabasePreferences {
         setUser(properties.getUser());
         setUseSSL(properties.isUseSSL());
         setKeystoreFile(properties.getKeyStore());
+        setServerTimezone(properties.getServerTimezone());
 
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());

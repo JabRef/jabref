@@ -5,11 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -19,15 +18,13 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class XmpExporterTest {
 
     private Exporter exporter;
@@ -37,7 +34,7 @@ public class XmpExporterTest {
 
     @BeforeEach
     public void setUp() {
-        Map<String, TemplateExporter> customFormats = new HashMap<>();
+        List<TemplateExporter> customFormats = new ArrayList<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         SavePreferences savePreferences = mock(SavePreferences.class);
         ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
@@ -49,7 +46,7 @@ public class XmpExporterTest {
     }
 
     @Test
-    public void exportSingleEntry(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void exportSingleEntry(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
@@ -59,25 +56,25 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
         String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                          "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                          "      <dc:creator>\n" +
-                          "        <rdf:Seq>\n" +
-                          "          <rdf:li>Alan Turing</rdf:li>\n" +
-                          "        </rdf:Seq>\n" +
-                          "      </dc:creator>\n" +
-                          "      <dc:format>application/pdf</dc:format>\n" +
-                          "      <dc:type>\n" +
-                          "        <rdf:Bag>\n" +
-                          "          <rdf:li>Misc</rdf:li>\n" +
-                          "        </rdf:Bag>\n" +
-                          "      </dc:type>\n" +
-                          "    </rdf:Description>\n" +
-                          "  </rdf:RDF>";
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Alan Turing</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>";
         assertEquals(expected, actual);
     }
 
     @Test
-    public void writeMultipleEntriesInASingleFile(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void writeMultipleEntriesInASingleFile(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
@@ -93,43 +90,43 @@ public class XmpExporterTest {
         String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                          "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                          "      <dc:creator>\n" +
-                          "        <rdf:Seq>\n" +
-                          "          <rdf:li>Alan Turing</rdf:li>\n" +
-                          "        </rdf:Seq>\n" +
-                          "      </dc:creator>\n" +
-                          "      <dc:format>application/pdf</dc:format>\n" +
-                          "      <dc:type>\n" +
-                          "        <rdf:Bag>\n" +
-                          "          <rdf:li>Misc</rdf:li>\n" +
-                          "        </rdf:Bag>\n" +
-                          "      </dc:type>\n" +
-                          "    </rdf:Description>\n" +
-                          "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                          "      <dc:creator>\n" +
-                          "        <rdf:Seq>\n" +
-                          "          <rdf:li>Michael Armbrust</rdf:li>\n" +
-                          "        </rdf:Seq>\n" +
-                          "      </dc:creator>\n" +
-                          "      <dc:relation>\n" +
-                          "        <rdf:Bag>\n" +
-                          "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
-                          "        </rdf:Bag>\n" +
-                          "      </dc:relation>\n" +
-                          "      <dc:format>application/pdf</dc:format>\n" +
-                          "      <dc:type>\n" +
-                          "        <rdf:Bag>\n" +
-                          "          <rdf:li>Misc</rdf:li>\n" +
-                          "        </rdf:Bag>\n" +
-                          "      </dc:type>\n" +
-                          "    </rdf:Description>\n" +
-                          "  </rdf:RDF>";
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Alan Turing</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Michael Armbrust</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:relation>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:relation>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>";
         assertEquals(expected, actual);
     }
 
     @Test
-    public void writeMultipleEntriesInDifferentFiles(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void writeMultipleEntriesInDifferentFiles(@TempDir Path testFolder) throws Exception {
         Path file = testFolder.resolve("split");
         Files.createFile(file);
 
@@ -150,20 +147,20 @@ public class XmpExporterTest {
         String actualTuring = Files.readAllLines(fileTuring).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedTuring = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                                "      <dc:creator>\n" +
-                                "        <rdf:Seq>\n" +
-                                "          <rdf:li>Alan Turing</rdf:li>\n" +
-                                "        </rdf:Seq>\n" +
-                                "      </dc:creator>\n" +
-                                "      <dc:format>application/pdf</dc:format>\n" +
-                                "      <dc:type>\n" +
-                                "        <rdf:Bag>\n" +
-                                "          <rdf:li>Misc</rdf:li>\n" +
-                                "        </rdf:Bag>\n" +
-                                "      </dc:type>\n" +
-                                "    </rdf:Description>\n" +
-                                "  </rdf:RDF>";
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Alan Turing</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>";
 
         assertEquals(expectedTuring, actualTuring);
 
@@ -171,31 +168,31 @@ public class XmpExporterTest {
         String actualArmbrust = Files.readAllLines(fileArmbrust).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedArmbrust = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                                  "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                                  "      <dc:creator>\n" +
-                                  "        <rdf:Seq>\n" +
-                                  "          <rdf:li>Michael Armbrust</rdf:li>\n" +
-                                  "        </rdf:Seq>\n" +
-                                  "      </dc:creator>\n" +
-                                  "      <dc:relation>\n" +
-                                  "        <rdf:Bag>\n" +
-                                  "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
-                                  "        </rdf:Bag>\n" +
-                                  "      </dc:relation>\n" +
-                                  "      <dc:format>application/pdf</dc:format>\n" +
-                                  "      <dc:type>\n" +
-                                  "        <rdf:Bag>\n" +
-                                  "          <rdf:li>Misc</rdf:li>\n" +
-                                  "        </rdf:Bag>\n" +
-                                  "      </dc:type>\n" +
-                                  "    </rdf:Description>\n" +
-                                  "  </rdf:RDF>";
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Michael Armbrust</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:relation>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:relation>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>";
 
         assertEquals(expectedArmbrust, actualArmbrust);
     }
 
     @Test
-    public void exportSingleEntryWithPrivacyFilter(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
         when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author"));
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
 
@@ -208,15 +205,15 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
         String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
-                          "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
-                          "      <dc:format>application/pdf</dc:format>\n" +
-                          "      <dc:type>\n" +
-                          "        <rdf:Bag>\n" +
-                          "          <rdf:li>Misc</rdf:li>\n" +
-                          "        </rdf:Bag>\n" +
-                          "      </dc:type>\n" +
-                          "    </rdf:Description>\n" +
-                          "  </rdf:RDF>";
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Misc</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>";
         assertEquals(expected, actual);
     }
 }

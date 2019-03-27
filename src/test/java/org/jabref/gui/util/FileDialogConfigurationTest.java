@@ -12,16 +12,14 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(TempDirectory.class)
 class FileDialogConfigurationTest {
 
     @Test
-    void testWithValidDirectoryString(@TempDirectory.TempDir Path folder) {
+    void testWithValidDirectoryString(@TempDir Path folder) {
         String tempFolder = folder.toAbsolutePath().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -30,9 +28,8 @@ class FileDialogConfigurationTest {
         assertEquals(Optional.of(Paths.get(tempFolder)), fileDialogConfiguration.getInitialDirectory());
     }
 
-
     @Test
-    void testWithValidDirectoryPath(@TempDirectory.TempDir Path tempFolder) {
+    void testWithValidDirectoryPath(@TempDir Path tempFolder) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 
@@ -74,10 +71,8 @@ class FileDialogConfigurationTest {
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
-
     private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
         return new FileChooser.ExtensionFilter(description,
                 extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
-
 }

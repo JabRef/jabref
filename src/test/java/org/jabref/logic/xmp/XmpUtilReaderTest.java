@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,12 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.io.Resources;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -30,10 +30,7 @@ import static org.mockito.Mockito.when;
 
 class XmpUtilReaderTest {
 
-    private static final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-
     private XmpPreferences xmpPreferences;
-
     private BibtexParser parser;
 
     /**
@@ -49,7 +46,7 @@ class XmpUtilReaderTest {
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
-        parser = new BibtexParser(importFormatPreferences, fileMonitor);
+        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     /**
@@ -74,11 +71,16 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI()), xmpPreferences);
+        Path pathPdf = Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
+        List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
         BibEntry entry = entries.get(0);
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
+        entryFromBibFile.get().setFiles(Arrays.asList(
+                new LinkedFile("", "paper.pdf", "PDF"),
+                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+        );
 
         assertEquals(entryFromBibFile.get(), entry);
     }
@@ -97,12 +99,15 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadPDMetadata() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI()), xmpPreferences);
+        Path pathPdf = Paths.get(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
+        List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
+        entryFromBibFile.get().setFiles(Collections.singletonList(
+                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+        );
 
         assertEquals(entryFromBibFile.get(), entries.get(0));
     }
-
 }

@@ -26,5 +26,4 @@ class JabRefPreferencesTest {
         prefs.setDefaultEncoding(StandardCharsets.UTF_8);
         assertEquals(StandardCharsets.UTF_8, prefs.getDefaultEncoding());
     }
-
 }

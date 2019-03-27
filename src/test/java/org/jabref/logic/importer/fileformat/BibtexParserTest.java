@@ -25,6 +25,7 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryType;
@@ -56,7 +57,7 @@ class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
-    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
@@ -325,8 +326,8 @@ class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
-                .withField("author", "Ed von T@st");
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(BibEntry.KEY_FIELD, "test")
+                                                                  .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
@@ -336,7 +337,7 @@ class BibtexParserTest {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
                 + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
         String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
-        BibEntry expected = new BibEntry("article")
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE)
                 .withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
@@ -938,7 +939,6 @@ class BibtexParserTest {
                         + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
                         + "	Year = 2002" + "}"));
 
-
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1338,8 +1338,8 @@ class BibtexParserTest {
 
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
-                new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
+        assertEquals(new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion("author", false),
+                        new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
                 saveOrderConfig.get());
     }
 
@@ -1441,7 +1441,6 @@ class BibtexParserTest {
 
         assertEquals(Collections.singletonList(expectedEntry), entries);
     }
-
 
     @Test
     void parseRecognizesDatabaseID() throws Exception {

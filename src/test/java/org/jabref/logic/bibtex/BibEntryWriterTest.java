@@ -13,6 +13,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -43,7 +44,7 @@ public class BibEntryWriterTest {
     public void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         //set a required field
         entry.setField("author", "Foo Bar");
         entry.setField("journal", "International Journal of Something");
@@ -405,7 +406,7 @@ public class BibEntryWriterTest {
     public void doNotWriteEmptyFields() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField("author", "  ");
         entry.setField("note", "some note");
 
@@ -424,7 +425,7 @@ public class BibEntryWriterTest {
     public void trimFieldContents() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField("note", "        some note    \t");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
@@ -442,7 +443,7 @@ public class BibEntryWriterTest {
     public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField("note", "some text with unbalanced { braces");
 
         assertThrows(IOException.class, () -> writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX));
@@ -509,5 +510,4 @@ public class BibEntryWriterTest {
 
         assertEquals(expected, actual);
     }
-
 }

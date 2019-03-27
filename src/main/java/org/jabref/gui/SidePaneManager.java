@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jabref.Globals;
-import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
@@ -31,10 +30,9 @@ public class SidePaneManager {
 
         OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
         Stream.of(
-                  new FileUpdatePanel(this),
-                  new GroupSidePane(this, preferences, frame.getDialogService()),
+                new GroupSidePane(this, preferences, frame.getDialogService()),
                 new WebSearchPane(this, preferences, frame),
-                  new OpenOfficeSidePanel(this, openOfficePreferences, frame))
+                new OpenOfficeSidePanel(this, preferences, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {

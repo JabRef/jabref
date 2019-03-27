@@ -93,27 +93,27 @@ class LocalizationConsistencyTest {
 
         assertEquals(Collections.EMPTY_LIST, quotedEntries,
                 "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
-                "Please correct the following entries:\n" +
-                quotedEntries
-                        .stream()
-                        .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
-                        .collect(Collectors.toList()));
+                        "Please correct the following entries:\n" +
+                        quotedEntries
+                                .stream()
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .collect(Collectors.toList()));
     }
 
     @Test
     void findMissingLocalizationKeys() throws IOException {
         List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG)
-                .stream()
-                .sorted()
-                .distinct()
-                .collect(Collectors.toList());
+                                                                .stream()
+                                                                .sorted()
+                                                                .distinct()
+                                                                .collect(Collectors.toList());
 
         assertEquals(Collections.emptyList(), missingKeys,
                 "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
-                missingKeys.parallelStream()
-                        .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
-                        .collect(Collectors.joining("\n")));
+                        "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
+                        missingKeys.parallelStream()
+                                   .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
+                                   .collect(Collectors.joining("\n", "\n", "\n")));
     }
 
     @Test
@@ -122,10 +122,10 @@ class LocalizationConsistencyTest {
 
         assertEquals(Collections.emptySet(), obsoleteKeys,
                 "Obsolete keys found in language properties file: \n" +
-                obsoleteKeys.stream().collect(Collectors.joining("\n")) +
-                "\n" +
-                "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n");
+                        obsoleteKeys.stream().collect(Collectors.joining("\n")) +
+                        "\n" +
+                        "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n");
     }
 
     @Test

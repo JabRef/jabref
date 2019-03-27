@@ -18,10 +18,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
@@ -32,16 +31,14 @@ import org.xmlunit.matchers.CompareMatcher;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class MSBibExportFormatTestFiles {
 
+    private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public Path tempFile;
     public MSBibExporter msBibExportFormat;
     public BibtexImporter testImporter;
-
-    private static Path resourceDir;
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         //we have to point it to one existing file, otherwise it will return the default class path
@@ -54,7 +51,7 @@ public class MSBibExportFormatTestFiles {
     }
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();

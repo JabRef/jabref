@@ -63,5 +63,4 @@ public class TitleFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
         assertEquals(Optional.empty(), fetchedEntry);
     }
-
 }

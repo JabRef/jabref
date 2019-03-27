@@ -38,7 +38,7 @@ public class OpenDatabaseTest {
         bibWrongHeader = Paths.get(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI()).toFile();
         bibHeader = Paths.get(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI()).toFile();
         bibHeaderAndSignature = Paths.get(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI())
-                .toFile();
+                                     .toFile();
         bibEncodingWithoutNewline = Paths
                 .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI()).toFile();
     }
