@@ -11,6 +11,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
@@ -29,7 +30,6 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
@@ -37,7 +37,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
-import com.google.common.eventbus.Subscribe;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
@@ -64,16 +63,16 @@ public class GroupNodeViewModel {
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
-        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayName = formatter.format(groupNode.getName());
+        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
-            children = automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries()).stream()
-                    .map(this::toViewModel)
-                    .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
+                                     .stream()
+                                     .map(this::toViewModel)
+                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -85,7 +84,7 @@ public class GroupNodeViewModel {
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
-        databaseContext.getDatabase().registerListener(this);
+        databaseContext.getDatabase().getEntries().addListener(this::onDatabaseChanged);
 
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
@@ -212,10 +211,9 @@ public class GroupNodeViewModel {
     }
 
     /**
-    * Gets invoked if an entry in the current database changes.
-    */
-    @Subscribe
-    public void listen(@SuppressWarnings("unused") EntryEvent entryEvent) {
+     * Gets invoked if an entry in the current database changes.
+     */
+    private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         calculateNumberOfMatches();
     }
 

@@ -31,7 +31,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.GenerateBibtexKeySingleAction;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
-import org.jabref.gui.externalfiles.NewDroppedFileHandler;
+import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -91,7 +91,7 @@ public class EntryEditor extends BorderPane {
 
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
-    private final NewDroppedFileHandler fileHandler;
+    private final ExternalFilesEntryLinker fileLinker;
     private final TaskExecutor taskExecutor;
 
     public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor) {
@@ -103,11 +103,7 @@ public class EntryEditor extends BorderPane {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
-                Globals.prefs.getFilePreferences(),
-                                                Globals.prefs.getImportFormatPreferences(),
-                                                Globals.prefs.getUpdateFieldPreferences(),
-                Globals.getFileUpdateMonitor());
+        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), databaseContext);
 
         ViewLoader.view(this)
                   .root(this)
@@ -144,19 +140,63 @@ public class EntryEditor extends BorderPane {
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
-                if (event.getTransferMode() == TransferMode.MOVE) {
+                FileDragDropPreferenceType dragDropPreferencesType = Globals.prefs.getEntryEditorFileLinkPreference();
 
-                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE)
+                {
+                    if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    }
                 }
-                if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); //alt on win
-                    fileHandler.addToEntry(entry, files);
 
+                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY)
+                {
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode COPY"); //shift on win or no modifier
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
                 }
-                if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
-                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+
+                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK)
+                {
+                    if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    {
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    {
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    }
+                    else
+                    {
+                        LOGGER.debug("Mode LINK"); //shift on win or no modifier
+                        fileLinker.addFilesToEntry(entry, files);
+                    }
                 }
             }
 
@@ -253,10 +293,10 @@ public class EntryEditor extends BorderPane {
         // Special tabs
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
-        tabs.add(new RelatedArticlesTab(preferences));
+        tabs.add(new RelatedArticlesTab(preferences, dialogService));
 
         // Source tab
-        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);
+        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor, dialogService);
         tabs.add(sourceTab);
         return tabs;
     }

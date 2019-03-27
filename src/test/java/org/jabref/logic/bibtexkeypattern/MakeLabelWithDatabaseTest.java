@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 class MakeLabelWithDatabaseTest {
 
     private BibDatabase database;
@@ -398,7 +397,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
         entry.setField("title", "Please replace the spaces");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Please-Replace-the-Spaces"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("PleaseReplacetheSpaces"), entry.getCiteKeyOptional());
     }
 
     @Test

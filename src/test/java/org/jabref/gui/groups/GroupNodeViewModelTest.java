@@ -154,7 +154,7 @@ public class GroupNodeViewModelTest {
     @Test
     public void entriesAreAddedCorrectly() {
         String groupName = "group";
-        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT,',');
+        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 

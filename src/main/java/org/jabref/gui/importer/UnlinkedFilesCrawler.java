@@ -2,48 +2,48 @@ package org.jabref.gui.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javafx.scene.control.CheckBoxTreeItem;
 
-import org.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
-import org.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
+import org.jabref.gui.externalfiles.FindUnlinkedFilesDialog.FileNodeWrapper;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
-public class UnlinkedFilesCrawler {
-    /**
-     * File filter, that accepts directories only.
-     */
-    private static final FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
+public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNodeWrapper>> {
 
+    private final Path directory;
+    private final FileFilter fileFilter;
+    private int counter;
     private final BibDatabaseContext databaseContext;
 
-
-    public UnlinkedFilesCrawler(BibDatabaseContext databaseContext) {
+    public UnlinkedFilesCrawler(Path directory, FileFilter fileFilter, BibDatabaseContext databaseContext) {
+        this.directory = directory;
+        this.fileFilter = fileFilter;
         this.databaseContext = databaseContext;
     }
 
-    public CheckableTreeNode searchDirectory(File directory, FileFilter filter) {
-        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(filter, databaseContext);
-        return searchDirectory(directory, ff, new AtomicBoolean(true), null);
+    @Override
+    protected CheckBoxTreeItem<FileNodeWrapper> call() {
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext);
+        return searchDirectory(directory.toFile(), unlinkedPDFFileFilter);
     }
 
     /**
      * Searches recursively all files in the specified directory. <br>
      * <br>
-     * All {@link File}s, which match the {@link FileFilter} that comes with the
-     * {@link EntryFromFileCreatorManager}, are taken into the resulting tree. <br>
+     * All files matched by the given {@link UnlinkedPDFFileFilter} are taken into the resulting tree. <br>
      * <br>
      * The result will be a tree structure of nodes of the type
-     * {@link CheckableTreeNode}. <br>
+     * {@link CheckBoxTreeItem}. <br>
      * <br>
      * The user objects that are attached to the nodes is the
      * {@link FileNodeWrapper}, which wraps the {@link File}-Object. <br>
@@ -53,11 +53,7 @@ public class UnlinkedFilesCrawler {
      * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
-    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
-        /* Cancellation of the search from outside! */
-        if ((state == null) || !state.get()) {
-            return null;
-        }
+    private CheckBoxTreeItem<FileNodeWrapper> searchDirectory(File directory, UnlinkedPDFFileFilter ff) {
         // Return null if the directory is not valid.
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
@@ -70,11 +66,11 @@ public class UnlinkedFilesCrawler {
         } else {
             files = Arrays.asList(filesArray);
         }
-        CheckableTreeNode root = new CheckableTreeNode(null);
+        CheckBoxTreeItem<FileNodeWrapper> root = new CheckBoxTreeItem<>(new FileNodeWrapper(directory.toPath(), 0));
 
         int filesCount = 0;
 
-        filesArray = directory.listFiles(DIRECTORY_FILTER);
+        filesArray = directory.listFiles(pathname -> (pathname != null) && pathname.isDirectory());
         List<File> subDirectories;
         if (filesArray == null) {
             subDirectories = Collections.emptyList();
@@ -82,23 +78,30 @@ public class UnlinkedFilesCrawler {
             subDirectories = Arrays.asList(filesArray);
         }
         for (File subDirectory : subDirectories) {
-            CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
-            if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
-                filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
-                root.add(subRoot);
+            if (isCanceled()) {
+                return root;
+            }
+
+            CheckBoxTreeItem<FileNodeWrapper> subRoot = searchDirectory(subDirectory, ff);
+            if ((subRoot != null) && (!subRoot.getChildren().isEmpty())) {
+                filesCount += subRoot.getValue().fileCount;
+                root.getChildren().add(subRoot);
             }
         }
 
-        root.setUserObject(new FileNodeWrapper(directory, files.size() + filesCount));
+        root.setValue(new FileNodeWrapper(directory.toPath(), files.size() + filesCount));
 
         for (File file : files) {
-            root.add(new CheckableTreeNode(new FileNodeWrapper(file)));
-            if (changeListener != null) {
-                changeListener.stateChanged(new ChangeEvent(this));
+            root.getChildren().add(new CheckBoxTreeItem<>(new FileNodeWrapper(file.toPath())));
+
+            counter++;
+            if (counter == 1) {
+                updateMessage(Localization.lang("One file found"));
+            } else {
+                updateMessage(Localization.lang("%0 files found", Integer.toString(counter)));
             }
         }
 
         return root;
     }
-
 }

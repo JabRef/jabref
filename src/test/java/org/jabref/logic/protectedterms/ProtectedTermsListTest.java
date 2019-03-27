@@ -6,23 +6,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(TempDirectory.class)
 public class ProtectedTermsListTest {
 
     private ProtectedTermsList internalList;
     private ProtectedTermsList externalList;
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
+    public void setUp(@TempDir Path temporaryFolder) throws IOException {
         Path path = temporaryFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         String tempFileName = path.toString();
@@ -99,5 +97,4 @@ public class ProtectedTermsListTest {
         externalList.addProtectedTerm("CCC");
         assertTrue(externalList.getTermList().contains("CCC"));
     }
-
 }

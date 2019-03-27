@@ -87,7 +87,6 @@ public class GroupsParserTest {
 
         GroupTreeNode parsedNode = GroupsParser.importGroups(orderedData, ',', fileMonitor);
         assertEquals(rootNode.getChildren(), parsedNode.getChildren());
-
     }
 
     @Test

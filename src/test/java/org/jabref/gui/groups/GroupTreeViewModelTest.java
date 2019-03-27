@@ -44,7 +44,7 @@ public class GroupTreeViewModelTest {
 
     @Test
     public void explicitGroupsAreRemovedFromEntriesOnDelete() {
-        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT,',');
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 

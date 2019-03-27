@@ -41,7 +41,7 @@ public class IntegrityCheck {
         return result;
     }
 
-    private List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
+    public List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {

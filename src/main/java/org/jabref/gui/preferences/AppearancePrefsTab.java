@@ -4,14 +4,18 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 class AppearancePrefsTab extends Pane implements PrefsTab {
@@ -22,6 +26,8 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     private final CheckBox overrideFonts;
     private final VBox container = new VBox();
     private final DialogService dialogService;
+    private final RadioButton lightTheme;
+    private final RadioButton darkTheme;
 
     /**
      * Customization of appearance parameters.
@@ -41,10 +47,23 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         fontSizeContainer.disableProperty().bind(overrideFonts.selectedProperty().not());
         fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
-        container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF);
+        ToggleGroup themeGroup = new ToggleGroup();
+        lightTheme = new RadioButton("Light theme");
+        lightTheme.setToggleGroup(themeGroup);
+        darkTheme = new RadioButton("Dark theme");
+        darkTheme.setToggleGroup(themeGroup);
 
+        String cssFileName = prefs.get(JabRefPreferences.FX_THEME);
+        if (StringUtil.isBlank(cssFileName) || ThemeLoader.MAIN_CSS.equalsIgnoreCase(cssFileName)) {
+            lightTheme.setSelected(true);
+        } else if (ThemeLoader.DARK_CSS.equals(cssFileName)) {
+            darkTheme.setSelected(true);
+        }
+
+        container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
     }
 
+    @Override
     public Node getBuilder() {
         return container;
     }
@@ -68,10 +87,21 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         int newFontSize = Integer.parseInt(fontSize.getText());
         prefs.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
 
+        boolean isThemeChanged = false;
+
+        if (lightTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
+            prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+            isThemeChanged = true;
+        } else if (darkTheme.isSelected() && !prefs.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
+            prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
+            isThemeChanged = true;
+        }
+
         boolean isRestartRequired =
-                oldFxTweakValue != fontTweaksLAF.isSelected()
-                        || oldOverrideDefaultFontSize != overrideFonts.isSelected()
-                        || oldFontSize != newFontSize;
+                (oldFxTweakValue != fontTweaksLAF.isSelected())
+                        || (oldOverrideDefaultFontSize != overrideFonts.isSelected())
+                        || (oldFontSize != newFontSize)
+                        || isThemeChanged;
         if (isRestartRequired) {
             dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
                     Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));

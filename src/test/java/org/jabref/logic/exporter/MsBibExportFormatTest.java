@@ -13,12 +13,10 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(TempDirectory.class)
 public class MsBibExportFormatTest {
 
     public BibDatabaseContext databaseContext;
@@ -33,7 +31,7 @@ public class MsBibExportFormatTest {
     }
 
     @Test
-    public final void testPerformExportWithNoEntry(@TempDirectory.TempDir Path tempFile) throws IOException, SaveException {
+    public final void testPerformExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
         Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         List<BibEntry> entries = Collections.emptyList();

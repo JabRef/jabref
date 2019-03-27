@@ -5,10 +5,14 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 
 import org.fxmisc.easybind.EasyBind;
@@ -26,7 +30,9 @@ public abstract class BackgroundTask<V> {
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
     private Runnable onFinished;
+    private BooleanProperty isCanceled = new SimpleBooleanProperty(false);
     private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
+    private StringProperty message = new SimpleStringProperty("");
     private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
 
     public BackgroundTask() {
@@ -52,6 +58,37 @@ public abstract class BackgroundTask<V> {
         };
     }
 
+    private static <T> Consumer<T> chain(Runnable first, Consumer<T> second) {
+        if (first != null) {
+            if (second != null) {
+                return result -> {
+                    first.run();
+                    second.accept(result);
+                };
+            } else {
+                return result -> first.run();
+            }
+        } else {
+            return second;
+        }
+    }
+
+    public boolean isCanceled() {
+        return isCanceled.get();
+    }
+
+    public void cancel() {
+        this.isCanceled.set(true);
+    }
+
+    public BooleanProperty isCanceledProperty() {
+        return isCanceled;
+    }
+
+    public StringProperty messageProperty() {
+        return message;
+    }
+
     public double getWorkDonePercentage() {
         return workDonePercentage.get();
     }
@@ -66,21 +103,6 @@ public abstract class BackgroundTask<V> {
 
     public ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
-    }
-
-    private static <T> Consumer<T> chain(Runnable first, Consumer<T> second) {
-        if (first != null) {
-            if (second != null) {
-                return result -> {
-                    first.run();
-                    second.accept(result);
-                };
-            } else {
-                return result -> first.run();
-            }
-        } else {
-            return second;
-        }
     }
 
     /**
@@ -195,6 +217,15 @@ public abstract class BackgroundTask<V> {
 
     protected void updateProgress(double workDone, double max) {
         updateProgress(new BackgroundProgress(workDone, max));
+    }
+
+    protected void updateMessage(String newMessage) {
+        message.setValue(newMessage);
+    }
+
+    public BackgroundTask<V> withInitialMessage(String message) {
+        updateMessage(message);
+        return this;
     }
 
     class BackgroundProgress {

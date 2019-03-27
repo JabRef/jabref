@@ -64,7 +64,6 @@ public class HTMLCharsTest {
         assertEquals("<u>hallo</u>", layout.format("\\underline{hallo}"));
         assertEquals("<s>hallo</s>", layout.format("\\sout{hallo}"));
         assertEquals("<tt>hallo</tt>", layout.format("\\texttt{hallo}"));
-
     }
 
     @Test

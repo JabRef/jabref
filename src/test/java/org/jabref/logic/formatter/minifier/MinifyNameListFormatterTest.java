@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.minifier;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

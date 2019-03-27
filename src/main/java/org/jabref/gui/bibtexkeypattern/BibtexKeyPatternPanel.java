@@ -15,6 +15,8 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -34,7 +36,8 @@ public class BibtexKeyPatternPanel extends Pane {
 
     // default pattern
     protected final TextField defaultPat = new TextField();
-    private final HelpAction help;
+
+    private final int COLUMNS = 2;
 
     // one field for each type
     private final Map<String, TextField> textFields = new HashMap<>();
@@ -43,26 +46,12 @@ public class BibtexKeyPatternPanel extends Pane {
 
     public BibtexKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN);
+        gridPane.setHgap(10);
+        gridPane.setVgap(5);
         buildGUI();
     }
 
     private void buildGUI() {
-        // The header - can be removed
-        Label label = new Label(Localization.lang("Entry type"));
-        gridPane.add(label, 1, 1);
-
-        Label keyPattern = new Label(Localization.lang("Key pattern"));
-        gridPane.add(keyPattern, 3, 1);
-
-        Label defaultPattern = new Label(Localization.lang("Default pattern"));
-        gridPane.add(defaultPattern, 1, 2);
-        gridPane.add(defaultPat, 3, 2);
-
-        Button button = new Button("Default");
-        button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
-        gridPane.add(button, 4, 2);
-
         BibDatabaseMode mode;
         // check mode of currently used DB
         if (panel != null) {
@@ -72,37 +61,61 @@ public class BibtexKeyPatternPanel extends Pane {
             mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
 
-        int rowIndex = 3;
+        int rowIndex = 1;
+        int columnIndex = 0;
+        // The header - can be removed
+        for (int i = 0; i < COLUMNS; i++) {
+            Label label = new Label(Localization.lang("Entry type"));
+            Label keyPattern = new Label(Localization.lang("Key pattern"));
+            gridPane.add(label, ++columnIndex, rowIndex);
+            gridPane.add(keyPattern, ++columnIndex, rowIndex);
+            ++columnIndex; //3
+        }
+
+        rowIndex++;
+        Label defaultPattern = new Label(Localization.lang("Default pattern"));
+        Button button = new Button("Default");
+        button.setOnAction(e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        gridPane.add(defaultPattern, 1, rowIndex);
+        gridPane.add(defaultPat, 2, rowIndex);
+        gridPane.add(button, 3, rowIndex);
+
+        columnIndex = 1;
         for (EntryType type : EntryTypes.getAllValues(mode)) {
             Label label1 = new Label(type.getName());
-
             TextField textField = new TextField();
-
             Button button1 = new Button("Default");
             button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
 
-            gridPane.add(label1, 1, rowIndex);
-            gridPane.add(textField, 3, rowIndex);
-            gridPane.add(button1, 4, rowIndex);
+            gridPane.add(label1, 1 + (columnIndex * 3), rowIndex);
+            gridPane.add(textField, 2 + (columnIndex * 3), rowIndex);
+            gridPane.add(button1, 3 + (columnIndex * 3), rowIndex);
 
             textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
 
-            rowIndex++;
+            if (columnIndex == (COLUMNS - 1)) {
+                columnIndex = 0;
+                rowIndex++;
+            } else {
+                columnIndex++;
+            }
         }
 
-        Button help1 = new Button("?");
-        help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
-        gridPane.add(help1, 1, rowIndex);
+        rowIndex++;
+
+        ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
+        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getCommand());
+        gridPane.add(help, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
-        btnDefaultAll1.setOnAction(e-> {
+        btnDefaultAll1.setOnAction(e -> {
             // reset all fields
             for (TextField field : textFields.values()) {
                 field.setText("");
             }
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
-        gridPane.add(btnDefaultAll1, 3, rowIndex);
+        gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
 
     /**
@@ -126,8 +139,7 @@ public class BibtexKeyPatternPanel extends Pane {
 
     protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
         GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
-                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
+                                                                        JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         fillPatternUsingPanelData(res);
         return res;
     }
@@ -148,7 +160,7 @@ public class BibtexKeyPatternPanel extends Pane {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }
 
-        if (keyPattern.getDefaultValue() == null || keyPattern.getDefaultValue().isEmpty()) {
+        if ((keyPattern.getDefaultValue() == null) || keyPattern.getDefaultValue().isEmpty()) {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));

@@ -15,6 +15,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -25,6 +27,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
+
+import static javafx.beans.binding.Bindings.not;
 
 class GeneralTab extends Pane implements PrefsTab {
 
@@ -53,16 +57,16 @@ class GeneralTab extends Pane implements PrefsTab {
     public GeneralTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.dialogService = dialogService;
+
+        ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
+
         biblatexMode = new ComboBox<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        if (!useTimeStamp.isSelected()) {
-            updateTimeStamp.setDisable(true);
-        }
-        useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
+        updateTimeStamp.disableProperty().bind(not(useTimeStamp.selectedProperty()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
@@ -91,10 +95,8 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(defOwnerField, 2, 10);
         builder.add(overwriteOwner, 3, 10);
 
-        Button help = new Button("?");
-        help.setPrefSize(10, 10);
-        help.setOnAction(event -> new HelpAction(HelpFile.OWNER).getHelpButton().doClick());
-        builder.add(help, 4, 10);
+        Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER).getCommand());
+        builder.add(helpOwner, 4, 10);
 
         builder.add(useTimeStamp, 1, 13);
         builder.add(timeStampFormat, 2, 13);
@@ -103,9 +105,8 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(fieldName, 3, 13);
         builder.add(timeStampField, 4, 13);
 
-        Button help1 = new Button("?");
-        help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
-        builder.add(help1, 6, 13);
+        Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP).getCommand());
+        builder.add(helpTimestamp, 6, 13);
 
         builder.add(updateTimeStamp, 1, 14);
         builder.add(new Line(), 1, 15);
@@ -140,7 +141,6 @@ class GeneralTab extends Pane implements PrefsTab {
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
-        updateTimeStamp.setSelected(useTimeStamp.isSelected());
         enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         shouldCollectTelemetry.setSelected(prefs.shouldCollectTelemetry());
         memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
@@ -182,9 +182,9 @@ class GeneralTab extends Pane implements PrefsTab {
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding(encodings.getValue());
-        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue().equals(BibDatabaseMode.BIBLATEX));
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue() == BibDatabaseMode.BIBLATEX);
 
-        if (!languageSelection.getValue().equals(prefs.getLanguage())) {
+        if (languageSelection.getValue() != prefs.getLanguage()) {
             prefs.setLanguage(languageSelection.getValue());
             Localization.setLanguage(languageSelection.getValue());
 

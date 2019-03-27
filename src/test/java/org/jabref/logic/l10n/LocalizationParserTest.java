@@ -50,5 +50,4 @@ public class LocalizationParserTest {
     private void assertLocalizationParameterParsing(String code, String expectedParameter) {
         assertLocalizationParameterParsing(code, Collections.singletonList(expectedParameter));
     }
-
 }

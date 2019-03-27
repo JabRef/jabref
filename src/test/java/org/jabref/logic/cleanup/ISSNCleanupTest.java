@@ -52,5 +52,4 @@ public class ISSNCleanupTest {
         worker.cleanup(preset, entry);
         assertEquals(Optional.of("Banana"), entry.getField("issn"));
     }
-
 }

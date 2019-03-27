@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 class MakeLabelWithoutDatabaseTest {
 
     private BibEntry entry;
@@ -36,5 +35,4 @@ class MakeLabelWithoutDatabaseTest {
         String label = BibtexKeyGenerator.generateKey(localEntry, "auth");
         assertEquals("Doe", label);
     }
-
 }

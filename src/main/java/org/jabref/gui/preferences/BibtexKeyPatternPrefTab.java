@@ -24,7 +24,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     private final CheckBox dontOverwrite = new CheckBox(Localization.lang("Do not overwrite existing keys"));
     private final CheckBox warnBeforeOverwriting = new CheckBox(Localization.lang("Warn before overwriting existing keys"));
     private final CheckBox generateOnSave = new CheckBox(Localization.lang("Generate keys before saving (for entries without a key)"));
-    private final CheckBox autoGenerateOnImport = new CheckBox(Localization.lang("Generate keys for imported entries"));
 
     private final RadioButton letterStartA = new RadioButton(Localization.lang("Ensure unique keys using letters (a, b, ...)"));
     private final RadioButton letterStartB = new RadioButton(Localization.lang("Ensure unique keys using letters (b, c, ...)"));
@@ -49,7 +48,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
      */
     @Override
     public void storeSettings() {
-
         // Set the default value:
         Globals.prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, defaultPat.getText());
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
@@ -57,7 +55,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
         Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegex.getText());
         Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, keyPatternReplacement.getText());
-        Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSave.isSelected());
 
         if (alwaysAddLetter.isSelected()) {
@@ -82,7 +79,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings"));
         keyGeneratorSettings.getStyleClass().add("sectionHeader");
         builder.add(keyGeneratorSettings, 1, 10);
-        builder.add(autoGenerateOnImport, 1, 11);
         builder.add(letterStartA, 2, 11);
         builder.add(warnBeforeOverwriting, 1, 12);
         builder.add(letterStartB, 2, 12);
@@ -101,6 +97,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -116,7 +113,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         defaultPat.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         dontOverwrite.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
         generateOnSave.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
-        autoGenerateOnImport.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY));
 
         boolean prefAlwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);

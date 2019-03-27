@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- *  Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
+ * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
 class CleanupUrlFormatterTest {
 
@@ -32,7 +32,7 @@ class CleanupUrlFormatterTest {
     @Test
     void formatExample() {
         assertEquals("http://www.focus.de/" +
-                "gesundheit/ratgeber/herz/test/lebenserwartung-werden-sie-100-jahre-alt_aid_363828.html",
+                        "gesundheit/ratgeber/herz/test/lebenserwartung-werden-sie-100-jahre-alt_aid_363828.html",
                 formatter.format(formatter.getExampleInput()));
     }
 }

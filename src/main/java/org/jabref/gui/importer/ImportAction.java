@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
+import org.jabref.JabRefException;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -24,6 +23,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -36,10 +36,6 @@ public class ImportAction {
     private final DialogService dialogService;
     private Exception importError;
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
-
-    public ImportAction(JabRefFrame frame, boolean openInNew) {
-        this(frame, openInNew, null);
-    }
 
     public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer) {
         this.importer = Optional.ofNullable(importer);
@@ -54,53 +50,41 @@ public class ImportAction {
      */
     public void automatedImport(List<String> filenames) {
         List<Path> files = filenames.stream().map(Paths::get).collect(Collectors.toList());
-        BackgroundTask.wrap(() -> doImport(files))
-                      .onSuccess(this::reportResult)
-                      .executeWith(taskExecutor);
-    }
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> {
+            List<ImportFormatReader.UnknownFormatImport> imports = doImport(files);
+            // Ok, done. Then try to gather in all we have found. Since we might
+            // have found
+            // one or more bibtex results, it's best to gather them in a
+            // BibDatabase.
+            ParserResult bibtexResult = mergeImportResults(imports);
 
-    private void reportResult(List<ImportFormatReader.UnknownFormatImport> imports) {
-        // Ok, done. Then try to gather in all we have found. Since we might
-        // have found
-        // one or more bibtex results, it's best to gather them in a
-        // BibDatabase.
-        ParserResult bibtexResult = mergeImportResults(imports);
-
-        /* show parserwarnings, if any. */
-        for (ImportFormatReader.UnknownFormatImport p : imports) {
-            if (p != null) {
-                ParserResult pr = p.parserResult;
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
-            }
-        }
-
-        if (bibtexResult == null) {
-            if (importer == null) {
-                frame.output(Localization.lang("Could not find a suitable import format."));
-            } else {
-                // Import in a specific format was specified. Check if we have stored error information:
+            // TODO: show parserwarnings, if any (not here)
+            // for (ImportFormatReader.UnknownFormatImport p : imports) {
+            //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
+            //}
+            if (bibtexResult == null) {
                 if (importError == null) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Import failed"),
-                                                         Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+                    throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                 } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Import failed"), importError);
+                    throw importError;
                 }
             }
-        } else {
-            if (openInNew) {
-                frame.addTab(bibtexResult.getDatabaseContext(), true);
-                frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
-            } else {
-                final BasePanel panel = frame.getCurrentBasePanel();
 
-                SwingUtilities.invokeLater(() -> {
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
-                    diag.addEntries(bibtexResult.getDatabase().getEntries());
-                    diag.entryListComplete();
-                    diag.setVisible(true);
-                    diag.toFront();
-                });
-            }
+            return bibtexResult.getDatabase().getEntries();
+        });
+
+        if (openInNew) {
+            task.onSuccess(entries -> {
+                frame.addTab(new BibDatabaseContext(new BibDatabase(entries)), true);
+                dialogService.notify(Localization.lang("Imported entries") + ": " + entries.size());
+            })
+                .executeWith(taskExecutor);
+        } else {
+            final BasePanel panel = frame.getCurrentBasePanel();
+
+            ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
+            dialog.setTitle(Localization.lang("Import"));
+            dialog.showAndWait();
         }
     }
 
