@@ -44,6 +44,8 @@ import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXSnackbarLayout;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides methods to create default
@@ -57,6 +59,7 @@ import org.controlsfx.dialog.ProgressDialog;
 public class FXDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FXDialogService.class);
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
@@ -67,6 +70,11 @@ public class FXDialogService implements DialogService {
     @Deprecated
     public FXDialogService() {
         this(null, null);
+    }
+
+    public FXDialogService(Window mainWindow) {
+        this.mainWindow = mainWindow;
+        this.statusLine = new JFXSnackbar();
     }
 
     public FXDialogService(Window mainWindow, Pane mainPane) {
@@ -262,6 +270,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
+        LOGGER.info(message);
         DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null)));
     }
 
