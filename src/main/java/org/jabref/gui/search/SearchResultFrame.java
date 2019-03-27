@@ -228,7 +228,7 @@ public class SearchResultFrame {
                     } catch (IOException e1) {
                         LOGGER.error("Error while serializing entries for clipboard", e1);
                     }
-                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
+                    frame.getDialogService().notify(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
                 }

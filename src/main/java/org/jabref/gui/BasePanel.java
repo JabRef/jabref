@@ -251,7 +251,7 @@ public class BasePanel extends StackPane {
     }
 
     public void output(String s) {
-        frame.output(s);
+        frame.getDialogService().notify(s);
     }
 
     private void setupActions() {
@@ -442,7 +442,7 @@ public class BasePanel extends StackPane {
         getUndoManager().addEdit(compound);
 
         markBaseChanged();
-        frame.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
@@ -1326,10 +1326,10 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().undo();
                 markBaseChanged();
-                frame.output(Localization.lang("Undo"));
+                output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 LOGGER.warn("Nothing to undo", ex);
-                frame.output(Localization.lang("Nothing to undo") + '.');
+                output(Localization.lang("Nothing to undo") + '.');
             }
 
             markChangedOrUnChanged();
@@ -1397,9 +1397,9 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().redo();
                 markBaseChanged();
-                frame.output(Localization.lang("Redo"));
+                output(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
-                frame.output(Localization.lang("Nothing to redo") + '.');
+                output(Localization.lang("Nothing to redo") + '.');
             }
 
             markChangedOrUnChanged();

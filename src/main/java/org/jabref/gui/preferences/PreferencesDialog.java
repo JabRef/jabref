@@ -230,7 +230,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
-        frame.output(Localization.lang("Preferences recorded."));
+        frame.getDialogService().notify(Localization.lang("Preferences recorded."));
     }
 
     public void setValues() {

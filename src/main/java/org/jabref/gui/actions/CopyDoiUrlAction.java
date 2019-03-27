@@ -37,9 +37,9 @@ public class CopyDoiUrlAction extends AbstractAction {
         Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {
             Globals.clipboardManager.setContent(urlOptional.get());
-            JabRefGUI.getMainFrame().output(Localization.lang("The link has been copied to the clipboard."));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("The link has been copied to the clipboard."));
         } else {
-            JabRefGUI.getMainFrame().output(Localization.lang("Invalid DOI: '%0'.", identifier));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Invalid DOI: '%0'.", identifier));
         }
     }
 }

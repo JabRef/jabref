@@ -70,7 +70,7 @@ public class SpecialFieldAction implements BaseAction {
                 } else {
                     outText = getTextDone(specialField, value, Integer.toString(bes.size()));
                 }
-                frame.output(outText);
+                frame.getDialogService().notify(outText);
             } else {
                 // if user does not change anything with his action, we do not do anything either
                 // even no output message

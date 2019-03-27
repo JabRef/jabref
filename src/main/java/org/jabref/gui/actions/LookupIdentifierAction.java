@@ -39,7 +39,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
     public void execute() {
         try {
             BackgroundTask.wrap(this::lookupIdentifiers)
-                          .onSuccess(frame::output)
+                          .onSuccess(frame.getDialogService()::notify)
                           .executeWith(Globals.TASK_EXECUTOR);
         } catch (Exception e) {
             LOGGER.error("Problem running ID Worker", e);
@@ -84,7 +84,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         int foundCount = 0;
         for (BibEntry bibEntry : bibEntries) {
             count++;
-            frame.output(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+            frame.getDialogService().notify(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                     fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount)));
             Optional<T> identifier = Optional.empty();
             try {
@@ -97,7 +97,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 if (fieldChange.isPresent()) {
                     namedCompound.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
-                    frame.output(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                    frame.getDialogService().notify(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             Integer.toString(count), totalCount, Integer.toString(foundCount)));
                 }
             }

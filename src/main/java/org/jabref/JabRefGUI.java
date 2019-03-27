@@ -10,8 +10,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
@@ -43,14 +41,14 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
-    private final DialogService dialogService;
+    //private final DialogService dialogService;
 
     private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
-        this.dialogService = new FXDialogService(mainStage);
+        //this.dialogService = new FXDialogService(mainStage);
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
@@ -109,7 +107,7 @@ public class JabRefGUI {
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
-                        dialogService.showErrorDialogAndWait(
+                        JabRefGUI.mainFrame.getDialogService().showErrorDialogAndWait(
                                 Localization.lang("Connection error"),
                                 Localization.lang("A local copy will be opened."),
                                 e);
@@ -168,7 +166,7 @@ public class JabRefGUI {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
                     + pr.getErrorMessage();
 
-            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+            JabRefGUI.mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
         }
 
@@ -219,7 +217,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(JabRefGUI.mainFrame.getDialogService(), dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,

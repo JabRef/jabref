@@ -41,9 +41,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getUndoManager().addEdit(nc);
                             JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
                         }
-                        JabRefGUI.getMainFrame().output(Localization.lang("Finished automatically setting external links."));
+                        JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Finished automatically setting external links."));
                     } else {
-                        JabRefGUI.getMainFrame().output(Localization.lang("Finished automatically setting external links.") + " "
+                        JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Finished automatically setting external links.") + " "
                                 + Localization.lang("No files found."));
                     }
                 } , diag);

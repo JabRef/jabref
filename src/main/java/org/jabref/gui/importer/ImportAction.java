@@ -95,11 +95,11 @@ public class ImportAction {
             try {
                 if (!importer.isPresent()) {
                     // Unknown format:
-                    frame.output(Localization.lang("Importing in unknown format") + "...");
+                    frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     // This import method never throws an IOException:
                     imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
-                    frame.output(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
+                    frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     // Specific importer:
                     ParserResult pr = importer.get().importDatabase(filename, Globals.prefs.getDefaultEncoding());
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));

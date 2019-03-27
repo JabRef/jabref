@@ -24,19 +24,24 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
+import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
+import com.jfoenix.controls.JFXSnackbarLayout;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 
@@ -51,18 +56,22 @@ import org.controlsfx.dialog.ProgressDialog;
  */
 public class FXDialogService implements DialogService {
 
+    private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
+
     private final Window mainWindow;
+    private final JFXSnackbar statusLine;
 
     /**
      * @deprecated try not to initialize a new dialog service but reuse the one constructed in {@link org.jabref.gui.JabRefFrame}.
      */
     @Deprecated
     public FXDialogService() {
-        this(null);
+        this(null, null);
     }
 
-    public FXDialogService(Window mainWindow) {
+    public FXDialogService(Window mainWindow, Pane mainPane) {
         this.mainWindow = mainWindow;
+        this.statusLine = new JFXSnackbar(mainPane);
     }
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
@@ -253,7 +262,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
-        JabRefGUI.getMainFrame().output(message);
+        DefaultTaskExecutor.runInJavaFXThread(() -> statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null)));
     }
 
     @Override
