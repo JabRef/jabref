@@ -168,7 +168,7 @@ public class JabRefGUI {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
                     + pr.getErrorMessage();
 
-            JabRefGUI.mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
         }
 
