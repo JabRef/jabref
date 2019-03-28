@@ -251,7 +251,7 @@ public class BasePanel extends StackPane {
     }
 
     public void output(String s) {
-        frame.getDialogService().notify(s);
+        dialogService.notify(s);
     }
 
     private void setupActions() {
