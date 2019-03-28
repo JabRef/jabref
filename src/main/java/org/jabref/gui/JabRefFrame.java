@@ -113,7 +113,6 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -148,7 +147,7 @@ import osx.macadapter.MacAdapter;
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends BorderPane implements OutputPrinter {
+public class JabRefFrame extends BorderPane {
 
     // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
@@ -1251,17 +1250,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         return false;
     }
 
-    @Override
-    public void showMessage(String message, String title, int msgType) {
-        JOptionPane.showMessageDialog(null, message, title, msgType);
-    }
-
-    @Override
-    public void setStatus(String s) {
-        output(s);
-    }
-
-    @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
@@ -1440,7 +1428,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private void increaseTableFontSize() {
@@ -1448,7 +1436,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private void decreaseTableFontSize() {
@@ -1460,7 +1448,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private class CloseDatabaseAction extends SimpleCommand {
