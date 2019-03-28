@@ -69,7 +69,7 @@ public class FXDialogService implements DialogService {
      */
     @Deprecated
     public FXDialogService() {
-        this(null, null);
+        this(null);
     }
 
     public FXDialogService(Window mainWindow) {
