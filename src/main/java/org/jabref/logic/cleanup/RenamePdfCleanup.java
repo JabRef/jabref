@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
@@ -54,8 +55,8 @@ public class RenamePdfCleanup implements CleanupJob {
         }
 
         if (changed) {
-            Optional<FieldChange> changes = entry.setFiles(files);
-            return OptionalUtil.toList(changes);
+            Optional<FieldChange> fileFieldChanged = DefaultTaskExecutor.runInJavaFXThread(() -> entry.setFiles(files));
+            return OptionalUtil.toList(fileFieldChanged);
         }
 
         return Collections.emptyList();
