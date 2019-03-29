@@ -6,5 +6,5 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.BibtexKeyEditor">
     <EditorTextField fx:id="textField"/>
-    <Button fx:id="generateCiteKeyButton" text="Generate" styleClass="icon-button"/>
+    <Button fx:id="generateCiteKeyButton" text="%Generate" styleClass="icon-button"/>
 </fx:root>
