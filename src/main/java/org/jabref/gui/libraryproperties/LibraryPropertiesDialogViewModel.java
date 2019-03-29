@@ -62,6 +62,8 @@ public class LibraryPropertiesDialogViewModel {
         Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
         fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
 
+        metaData.getLaTexFileDirectory(preferencesService.getUser()).map(Path::toString).ifPresent(laTexFileDirectoryProperty::setValue);
+        
         Optional<Path> fileDL = metaData.getLaTexFileDirectory(preferencesService.getUser());
         Optional<String> laTexFile = Optional.ofNullable(fileDL.toString());
         laTexFile.ifPresent(laTexFileDirectoryProperty::setValue);

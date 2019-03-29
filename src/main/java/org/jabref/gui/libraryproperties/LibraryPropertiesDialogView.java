@@ -38,7 +38,6 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @FXML private TextField userSpecificFileDirectory;
     @FXML private Button browseUserSpefiicFileDir;
     @FXML private TextField laTexFileDirectory;
-    @FXML private Button browseLatexFileDir;
     @FXML private CheckBox protect;
     @Inject private PreferencesService preferencesService;
 

@@ -41,13 +41,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        super(name, context);
-        this.metaData = metaData;
-        user = System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName();
-        this.filePath = expandPath(Objects.requireNonNull(filePath));
-        this.auxParser = auxParser;
-        this.fileMonitor = fileMonitor;
-        fileMonitor.addListenerForFile(this.filePath, this);
+        this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName());
     }
 
     @Override
