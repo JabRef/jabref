@@ -9,9 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.model.strings.StringUtil;
-
-import org.apache.http.client.utils.URIBuilder;
 
 public class URLUtil {
     private static final String URL_EXP = "^(https?|ftp)://.+";
