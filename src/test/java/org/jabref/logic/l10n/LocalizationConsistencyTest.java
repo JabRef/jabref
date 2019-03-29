@@ -112,8 +112,8 @@ class LocalizationConsistencyTest {
                 "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                         "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         missingKeys.parallelStream()
-                                   .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
-                                   .collect(Collectors.joining("\n")));
+                                   .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
+                                   .collect(Collectors.joining("\n", "\n", "\n")));
     }
 
     @Test

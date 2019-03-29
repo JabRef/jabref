@@ -57,7 +57,7 @@ class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
-    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
@@ -1338,7 +1338,7 @@ class BibtexParserTest {
 
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+        assertEquals(new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion("author", false),
                         new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
                 saveOrderConfig.get());
     }

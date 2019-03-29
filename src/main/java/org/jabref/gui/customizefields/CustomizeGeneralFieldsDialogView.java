@@ -36,11 +36,7 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        HelpAction helpCommand = new HelpAction(HelpFile.GENERAL_FIELDS);
-        //HelpAction is written with Swing, not JavaFX, so runCommand() cannot be used normally.  Here I am reaching into
-        //the command and running execute.  When HelpAction is converted to JavaFX,
-        //the following will need to be changed.
-        ControlHelper.setAction(helpButton, getDialogPane(), event -> helpCommand.getCommand().execute());
+        ControlHelper.setAction(helpButton, getDialogPane(), event -> new HelpAction(HelpFile.GENERAL_FIELDS).execute());
         ControlHelper.setAction(resetButton, getDialogPane(), event -> resetFields());
         ControlHelper.setAction(okButton, getDialogPane(), event -> saveFieldsAndCloseDialog());
 

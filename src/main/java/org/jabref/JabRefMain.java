@@ -141,6 +141,8 @@ public class JabRefMain extends Application {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
+                } else {
+                    LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
             } else {
                 // We are alone, so we start the server

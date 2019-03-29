@@ -435,7 +435,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeSaveOrderConfig() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion("author", false),
                 new SaveOrderConfig.SortCriterion("year", true),
                 new SaveOrderConfig.SortCriterion("abstract", false));
         metaData.setSaveOrderConfig(saveOrderConfig);
@@ -495,7 +495,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntriesSorted() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false,
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true,
                 new SaveOrderConfig.SortCriterion("author", false),
                 new SaveOrderConfig.SortCriterion("year", true),
                 new SaveOrderConfig.SortCriterion("abstract", false));

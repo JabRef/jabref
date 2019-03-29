@@ -11,7 +11,9 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.InputMethodRequests;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -77,9 +79,42 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
+    /* Work around for different input methods.
+     * https://github.com/FXMisc/RichTextFX/issues/146
+     */
+    private class InputMethodRequestsObject implements InputMethodRequests {
+
+        @Override
+        public String getSelectedText() {
+            return "";
+        }
+
+        @Override
+        public int getLocationOffset(int x, int y) {
+            return 0;
+        }
+
+        @Override
+        public void cancelLatestCommittedText() {
+            return;
+        }
+
+        @Override
+        public Point2D getTextLocation(int offset) {
+            return new Point2D(0, 0);
+        }
+    }
+
     private CodeArea createSourceEditor() {
         CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
+        codeArea.setInputMethodRequests(new InputMethodRequestsObject());
+        codeArea.setOnInputMethodTextChanged(event -> {
+            String committed = event.getCommitted();
+            if (!committed.isEmpty()) {
+                codeArea.insertText(codeArea.getCaretPosition(), committed);
+            }
+        });
         return codeArea;
     }
 
@@ -110,7 +145,7 @@ public class SourceTab extends EntryEditorTab {
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {
             if (!onFocus) {
-                storeSource(codeArea.textProperty().getValue());
+                storeSource(entry, codeArea.textProperty().getValue());
             }
         }, fields -> {
             DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
@@ -128,8 +163,8 @@ public class SourceTab extends EntryEditorTab {
 
     }
 
-    private void storeSource(String text) {
-        if ((currentEntry == null) || text.isEmpty()) {
+    private void storeSource(BibEntry outOfFocusEntry, String text) {
+        if ((outOfFocusEntry == null) || text.isEmpty()) {
             return;
         }
 
@@ -162,42 +197,42 @@ public class SourceTab extends EntryEditorTab {
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
 
             if (newKey != null) {
-                currentEntry.setCiteKey(newKey);
+                outOfFocusEntry.setCiteKey(newKey);
             } else {
-                currentEntry.clearCiteKey();
+                outOfFocusEntry.clearCiteKey();
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : currentEntry.getFieldMap().entrySet()) {
+            for (Map.Entry<String, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
                     compound.addEdit(
-                            new UndoableFieldChange(currentEntry, fieldName, fieldValue, null));
-                    currentEntry.clearField(fieldName);
+                                     new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                    outOfFocusEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
             for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
-                String oldValue = currentEntry.getField(fieldName).orElse(null);
+                String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(fieldFormatterPreferences)
                             .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));
-                    currentEntry.setField(fieldName, newValue);
+                    compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                    outOfFocusEntry.setField(fieldName, newValue);
                 }
             }
 
             // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), currentEntry.getType())) {
-                compound.addEdit(new UndoableChangeType(currentEntry, currentEntry.getType(), newEntry.getType()));
-                currentEntry.setType(newEntry.getType());
+            if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
+                compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+                outOfFocusEntry.setType(newEntry.getType());
             }
             compound.end();
             undoManager.addEdit(compound);

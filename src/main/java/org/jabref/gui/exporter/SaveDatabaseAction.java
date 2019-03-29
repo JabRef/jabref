@@ -19,7 +19,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -138,15 +137,13 @@ public class SaveDatabaseAction {
                 panel.setBaseChanged(false);
                 panel.markExternalChangesAsResolved();
 
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    // Reset title of tab
-                    frame.setTabTitle(panel, panel.getTabTitle(),
-                            panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                    frame.output(Localization.lang("Saved library") + " '"
-                            + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-                    frame.setWindowTitle();
-                    frame.updateAllTabTitles();
-                });
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                                  panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.output(Localization.lang("Saved library") + " '"
+                             + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
             }
             return success;
         } catch (SaveException ex) {
@@ -214,7 +211,7 @@ public class SaveDatabaseAction {
         save();
 
         // Reinstall AutosaveManager and BackupManager
-        panel.resetChangeMonitor();
+        panel.resetChangeMonitorAndChangePane();
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(panel));

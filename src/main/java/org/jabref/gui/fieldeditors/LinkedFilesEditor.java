@@ -220,15 +220,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
         renameFile.setOnAction(event -> linkedFile.rename());
-        renameFile.setDisable(linkedFile.getFile().isOnlineLink());
+        renameFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedNameSameAsOriginal());
 
         MenuItem moveFile = new MenuItem(Localization.lang("Move file to file directory"));
         moveFile.setOnAction(event -> linkedFile.moveToDefaultDirectory());
-        moveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        moveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
         MenuItem renameAndMoveFile = new MenuItem(Localization.lang("Move file to file directory and rename file"));
         renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
-        renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));

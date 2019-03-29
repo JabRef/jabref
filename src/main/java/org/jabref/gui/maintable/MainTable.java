@@ -77,22 +77,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.prefs.getImportFormatPreferences(),
                 Globals.prefs.getUpdateFieldPreferences(),
                 Globals.getFileUpdateMonitor(),
-                undoManager);
+                undoManager,
+                Globals.stateManager);
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                                                              .withOnMouseClickedEvent((entry, event) -> {
+                .withOnMouseClickedEvent((entry, event) -> {
                                                                   if (event.getClickCount() == 2) {
                                                                       panel.showAndEdit(entry.getEntry());
                                                                   }
                                                               })
-                                                              .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
-                                                              .setOnDragDetected(this::handleOnDragDetected)
-                                                              .setOnDragDropped(this::handleOnDragDropped)
-                                                              .setOnDragOver(this::handleOnDragOver)
-                                                              .setOnMouseDragEntered(this::handleOnDragEntered)
-                                                              .install(this);
+                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService()))
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .setOnMouseDragEntered(this::handleOnDragEntered)
+                .install(this);
 
         /*for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
             Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import javax.xml.transform.TransformerException;
 
@@ -25,7 +26,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -44,6 +44,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -267,6 +268,37 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
+    /**
+     * Gets the filename for the current linked file and compares it to the new suggested filename.
+     * @return true if the suggested filename is same as current filename.
+     */
+    public boolean isGeneratedNameSameAsOriginal() {
+        Path file = Paths.get(this.linkedFile.getLink());
+        String currentFileName = file.getFileName().toString();
+        String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
+
+        return currentFileName.equals(suggestedFileName);
+    }
+
+    /**
+     * Compares suggested filepath of current linkedFile with existing filepath.
+     * @return true if suggested filepath is same as existing filepath.
+     */
+    public boolean isGeneratedPathSameAsOriginal() {
+        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
+        return OptionalUtil.equals(newDir, currentDir, equality);
+    }
+
     public void moveToDefaultDirectoryAndRename() {
         moveToDefaultDirectory();
         rename();
@@ -406,12 +438,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
-        String extension = DownloadExternalFile.getSuffix(url);
-        if (extension != null) {
-            return ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
-        } else {
-            return Optional.empty();
-        }
+        return URLUtil.getSuffix(url)
+                      .flatMap(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension));
     }
 
     public LinkedFile getFile() {

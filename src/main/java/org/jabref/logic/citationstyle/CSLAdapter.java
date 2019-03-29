@@ -31,9 +31,9 @@ import org.jbibtex.Key;
  * same style. Changing the output format is cheap.
  * @implNote The main function {@link #makeBibliography} will enforce
  * synchronized calling. The main CSL engine under the hood is not thread-safe. Since this class is usually called from
- * a SwingWorker, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
+ * a BackgroundTakk, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
  * In the current scheme, {@link #makeBibliography} can be called as usual
- * SwingWorker task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
+ * background task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
  */
 public class CSLAdapter {
 
@@ -63,7 +63,7 @@ public class CSLAdapter {
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        if (cslInstance == null || !Objects.equals(newStyle, style)) {
+        if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), newStyle, "en-US", false);
             style = newStyle;
@@ -81,7 +81,7 @@ public class CSLAdapter {
      */
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
-        private ArrayList<BibEntry> data = new ArrayList<>();
+        private final ArrayList<BibEntry> data = new ArrayList<>();
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.

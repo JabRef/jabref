@@ -92,8 +92,8 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                 Globals.prefs.getImportFormatPreferences(),
                 Globals.prefs.getUpdateFieldPreferences(),
                 Globals.getFileUpdateMonitor(),
-                frame.getUndoManager()
-        );
+                frame.getUndoManager(),
+                Globals.stateManager);
 
         initialize();
     }

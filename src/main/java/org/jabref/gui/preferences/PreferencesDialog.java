@@ -1,16 +1,19 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -37,6 +40,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +65,10 @@ public class PreferencesDialog extends BaseDialog<Void> {
     public PreferencesDialog(JabRefFrame parent, TaskExecutor taskExecutor) {
         setTitle(Localization.lang("JabRef preferences"));
         getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
@@ -93,7 +101,13 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         container = new BorderPane();
         getDialogPane().setContent(container);
+
         construct();
+    }
+
+    @FXML
+    private void initalize() {
+        //FIXME: Model whole dialog as fxml
     }
 
     private void construct() {
@@ -112,8 +126,17 @@ public class PreferencesDialog extends BaseDialog<Void> {
         });
         tabsList.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<PrefsTab>()
-                .withText(PrefsTab::getTabName)
-                .install(tabsList);
+                                                .withText(PrefsTab::getTabName)
+                                                .install(tabsList);
+
+        TextField searchBox = new TextField();
+        searchBox.setPromptText(Localization.lang("Search"));
+
+        PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(preferenceTabs);
+        tabsList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
+        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
+        });
 
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
@@ -133,37 +156,40 @@ public class PreferencesDialog extends BaseDialog<Void> {
         resetPreferences.setOnAction(e -> resetPreferences());
         resetPreferences.setMaxWidth(Double.MAX_VALUE);
         buttonContainer.getChildren().addAll(
-                importPreferences,
-                exportPreferences,
-                showPreferences,
-                resetPreferences);
+                                             importPreferences,
+                                             exportPreferences,
+                                             showPreferences,
+                                             resetPreferences);
 
         VBox spacer = new VBox();
         spacer.setPrefHeight(10.0);
         VBox.setVgrow(tabsList, Priority.ALWAYS);
         VBox.setVgrow(spacer, Priority.SOMETIMES);
         vBox.getChildren().addAll(
+                searchBox,
                 tabsList,
                 spacer,
-                buttonContainer);
+                buttonContainer
+        );
 
         container.setLeft(vBox);
 
         setValues();
+
     }
 
     private void resetPreferences() {
         boolean resetPreferencesConfirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Reset preferences"),
-                Localization.lang("Are you sure you want to reset all settings to default values?"),
-                Localization.lang("Reset preferences"),
-                Localization.lang("Cancel"));
+                                                                                        Localization.lang("Reset preferences"),
+                                                                                        Localization.lang("Are you sure you want to reset all settings to default values?"),
+                                                                                        Localization.lang("Reset preferences"),
+                                                                                        Localization.lang("Cancel"));
         if (resetPreferencesConfirmed) {
             try {
                 prefs.clear();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                        Localization.lang("You must restart JabRef for this to come into effect."));
+                                                       Localization.lang("You must restart JabRef for this to come into effect."));
             } catch (BackingStoreException ex) {
                 LOGGER.error("Error while resetting preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
@@ -174,9 +200,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void importPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.XML)
-                .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
+                                                                                               .addExtensionFilter(StandardFileType.XML)
+                                                                                               .withDefaultExtension(StandardFileType.XML)
+                                                                                               .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
@@ -184,7 +210,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 updateAfterPreferenceChanges();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                        Localization.lang("You must restart JabRef for this to come into effect."));
+                                                       Localization.lang("You must restart JabRef for this to come into effect."));
             } catch (JabRefException ex) {
                 LOGGER.error("Error while importing preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
@@ -217,7 +243,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
-        frame.output(Localization.lang("Preferences recorded."));
+        dialogService.notify(Localization.lang("Preferences recorded."));
     }
 
     public void setValues() {
@@ -229,10 +255,10 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void exportPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.XML)
-                .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.setLastPreferencesExportPath())
-                .build();
+                                                                                               .addExtensionFilter(StandardFileType.XML)
+                                                                                               .withDefaultExtension(StandardFileType.XML)
+                                                                                               .withInitialDirectory(prefs.setLastPreferencesExportPath())
+                                                                                               .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(exportFile -> {
