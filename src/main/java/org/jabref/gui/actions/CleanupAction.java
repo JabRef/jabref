@@ -59,9 +59,8 @@ public class CleanupAction implements BaseAction {
 
             preferences.setCleanupPreset(chosenPreset.get());
 
-            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
-                          .onSuccess(result -> showResults())
-                          .executeWith(Globals.TASK_EXECUTOR);
+            this.cleanup(chosenPreset.get());
+            this.showResults();
         }
     }
 
