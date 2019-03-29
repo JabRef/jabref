@@ -10,7 +10,6 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLUtil;
 import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.easybind.EasyBind;
