@@ -63,7 +63,6 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -1009,39 +1008,6 @@ public class BasePanel extends StackPane {
 
     public BibDatabase getDatabase() {
         return bibDatabaseContext.getDatabase();
-    }
-
-    public void changeTypeOfSelectedEntries(String newType) {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeType(bes, newType);
-    }
-
-    private void changeType(List<BibEntry> entries, String newType) {
-        if ((entries == null) || (entries.isEmpty())) {
-            LOGGER.error("At least one entry must be selected to be able to change the type.");
-            return;
-        }
-
-        if (entries.size() > 1) {
-            boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
-            if (!proceed) {
-                return;
-            }
-        }
-
-        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                entry.setType(newType);
-            });
-        }
-
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
-        compound.end();
-        getUndoManager().addEdit(compound);
-        markBaseChanged();
-        updateEntryEditorIfShowing();
     }
 
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {

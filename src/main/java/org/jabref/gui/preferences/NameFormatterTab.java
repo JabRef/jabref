@@ -151,8 +151,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
             }
         });
 
-        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on Name Formatting"),
-                                                                                    HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getCommand());
+        Button help = factory.createIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER));
         HBox toolbar = new HBox();
         toolbar.getChildren().addAll(addName, addLast, add, delete, help);
         tabPanel.setBottom(toolbar);

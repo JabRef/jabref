@@ -1,14 +1,10 @@
 package org.jabref.gui.preferences;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import javax.swing.AbstractAction;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -50,7 +46,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-    private final TableView colSetup;
+    private final TableView<TableRow> colSetup;
     private final JabRefFrame frame;
 
     private final CheckBox urlColumn;
@@ -229,8 +225,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
 
-        Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on special fields"),
-                                                                                          HelpFile.SPECIAL_FIELDS).getCommand());
+        Button helpButton = factory.createIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS));
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
         qualityColumn = new CheckBox(Localization.lang("Show quality"));
@@ -299,7 +294,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         builder.add(tabPanel, 1, 5);
         Button buttonOrder = new Button("Update to current column order");
         buttonOrder.setPrefSize(300, 30);
-        buttonOrder.setOnAction(e -> new UpdateOrderAction());
+        buttonOrder.setOnAction(e -> updateOrderAction());
         builder.add(buttonOrder, 1, 7);
     }
 
@@ -517,23 +512,16 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
     }
 
-    class UpdateOrderAction extends AbstractAction {
-
-        public UpdateOrderAction() {
-            super(Localization.lang("Update to current column order"));
+    private void updateOrderAction() {
+        BasePanel panel = frame.getCurrentBasePanel();
+        if (panel == null) {
+            return;
         }
+        // idea: sort elements according to value stored in hash, keep
+        // everything not inside hash/mainTable as it was
+        final HashMap<String, Integer> map = new HashMap<>();
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.getCurrentBasePanel();
-            if (panel == null) {
-                return;
-            }
-            // idea: sort elements according to value stored in hash, keep
-            // everything not inside hash/mainTable as it was
-            final HashMap<String, Integer> map = new HashMap<>();
-
-            // first element (#) not inside data
+        // first element (#) not inside data
             /*
             for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
                 String name = column.getText();
@@ -542,19 +530,18 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 }
             }
             */
-            Collections.sort(data, (o1, o2) -> {
-                Integer n1 = map.get(o1.getName());
-                Integer n2 = map.get(o2.getName());
-                if ((n1 == null) || (n2 == null)) {
-                    return 0;
-                }
-                return n1.compareTo(n2);
-            });
+        data.sort((o1, o2) -> {
+            Integer n1 = map.get(o1.getName());
+            Integer n2 = map.get(o2.getName());
+            if ((n1 == null) || (n2 == null)) {
+                return 0;
+            }
+            return n1.compareTo(n2);
+        });
 
-            colSetup.setItems(data);
-            colSetup.refresh();
-            tableChanged = true;
-        }
+        colSetup.setItems(data);
+        colSetup.refresh();
+        tableChanged = true;
     }
 
     @Override

@@ -116,7 +116,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         getDialogPane().setContent(borderPane);
         Button helpButton = (Button) this.getDialogPane().lookupButton(help);
-        helpButton.setOnAction(evt -> helpCommand.getCommand().execute());
+        helpButton.setOnAction(evt -> helpCommand.execute());
     }
 
     public BibEntry getMergedEntry() {

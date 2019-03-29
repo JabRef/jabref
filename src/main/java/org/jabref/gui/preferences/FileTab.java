@@ -143,8 +143,7 @@ class FileTab extends Pane implements PrefsTab {
         matchExactKeyOnly.setToggleGroup(autolinkGroup);
         useRegExpComboBox.setToggleGroup(autolinkGroup);
 
-        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on regular expression search"),
-                                                                                    HelpFile.REGEX_SEARCH).getCommand());
+        Button help = factory.createIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH));
         builder.add(help, 3, 16);
         builder.add(runAutoFileSearch, 1, 17);
         builder.add(allowFileAutoOpenBrowse, 1, 18);
@@ -157,7 +156,7 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(autosave, 1, 20);
         builder.add(localAutoSave, 1, 21);
 
-        Button helpAutosave = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE).getCommand());
+        Button helpAutosave = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE));
         builder.add(helpAutosave, 2, 21);
     }
 

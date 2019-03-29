@@ -6,7 +6,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Optional;
 
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -52,7 +54,7 @@ public class URLUtil {
             for (String pair: pairs) {
                 // "clean" url is decoded value of "url" parameter
                 if (pair.startsWith("url=")) {
-                    String value = pair.substring(pair.indexOf('=') + 1, pair.length());
+                    String value = pair.substring(pair.indexOf('=') + 1);
 
                     String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     // url?
@@ -102,4 +104,57 @@ public class URLUtil {
         return path + "/" + segment;
     }
 
+    /**
+     * Look for the last '.' in the link, and return the following characters.
+     * This gives the extension for most reasonably named links.
+     *
+     * @param link The link
+     * @return The suffix, excluding the dot (e.g. "pdf")
+     */
+    public static Optional<String> getSuffix(final String link) {
+        String strippedLink = link;
+        try {
+            // Try to strip the query string, if any, to get the correct suffix:
+            URL url = new URL(link);
+            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
+                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
+            }
+        } catch (MalformedURLException e) {
+            // Don't report this error, since this getting the suffix is a non-critical
+            // operation, and this error will be triggered and reported elsewhere.
+        }
+        // First see if the stripped link gives a reasonable suffix:
+        String suffix;
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
+            suffix = null;
+        } else {
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
+        }
+        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
+            // If the suffix doesn't seem to give any reasonable file type, try
+            // with the non-stripped link:
+            int index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == (link.length() - 1))) {
+                // No occurrence, or at the end
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(suffix); // return the first one we found, anyway.
+                }
+            } else {
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (link.substring(index + 1).indexOf('/') >= 1) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(link.substring(index + 1));
+                }
+            }
+        } else {
+            return Optional.ofNullable(suffix);
+        }
+    }
 }
