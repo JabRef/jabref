@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
@@ -148,7 +149,16 @@ public class BindingsHelper {
                 updateB);
     }
 
-    public static ObservableValue<? extends Boolean> constantOf(boolean value) {
+    public static <T> ObservableValue<T> constantOf(T value) {
+        return new ObjectBinding<T>() {
+            @Override
+            protected T computeValue() {
+                return value;
+            }
+        };
+    }
+
+    public static ObservableValue<Boolean> constantOf(boolean value) {
         return new BooleanBinding() {
             @Override
             protected boolean computeValue() {

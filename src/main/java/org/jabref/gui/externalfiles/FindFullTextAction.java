@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -9,20 +8,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction implements BaseAction {
+public class FindFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
@@ -39,15 +35,15 @@ public class FindFullTextAction implements BaseAction {
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
-    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
+    public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
-        this.dialogService = dialogService;
+        this.dialogService = basePanel.frame().getDialogService();
     }
 
     @Override
-    public void action() {
+    public void execute() {
         BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
+                      .onSuccess(this::downloadFullTexts)
                       .executeWith(Globals.TASK_EXECUTOR);
     }
 
@@ -101,40 +97,50 @@ public class FindFullTextAction implements BaseAction {
 
                     return;
                 }
-                DownloadExternalFile fileDownload = new DownloadExternalFile(dialogService,
-                        basePanel.getBibDatabaseContext(), entry);
-                try {
-                    fileDownload.download(result.get(), "application/pdf", file -> {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            Optional<FieldChange> fieldChange = entry.addFile(file);
-                            if (fieldChange.isPresent()) {
-                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                                basePanel.getUndoManager().addEdit(edit);
-                                basePanel.markBaseChanged();
-                            }
-                        });
 
-                    });
-                } catch (IOException e) {
-                    LOGGER.warn("Problem downloading file", e);
-                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-                }
-                basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                //Download full text
+                addLinkedFileFromURL(result.get(), entry);
             } else {
-                String title = Localization.lang("No full text document found");
-                String message = Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
-
-                basePanel.output(message);
-                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
+                dialogService.notify(Localization.lang("No full text document found for entry %0.",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
             finishedTasks.add(result);
         }
         for (Optional<URL> result : finishedTasks) {
             downloads.remove(result);
+        }
+    }
+
+    /**
+     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
+     * from the findFullTexts map
+     *
+     * @param url   the url "key"
+     * @param entry the entry "value"
+     */
+    private void addLinkedFileFromURL(URL url, BibEntry entry) {
+
+        LinkedFile newLinkedFile = new LinkedFile(url, "");
+
+        if (!entry.getFiles().contains(newLinkedFile)) {
+
+            LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                    newLinkedFile,
+                    entry,
+                    basePanel.getBibDatabaseContext(),
+                    Globals.TASK_EXECUTOR,
+                    dialogService,
+                    JabRefPreferences.getInstance());
+
+            onlineFile.download();
+
+            entry.addFile(onlineFile.getFile());
+
+            dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+        } else {
+            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
     }
 }

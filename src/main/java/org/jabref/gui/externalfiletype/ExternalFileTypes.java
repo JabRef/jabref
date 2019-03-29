@@ -71,7 +71,8 @@ public class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
-        return externalFileTypes.stream().filter(type -> type.getExtension().equalsIgnoreCase(extension)).findFirst();
+        String extensionCleaned = extension.replace(".", "").replace("*", "");
+        return externalFileTypes.stream().filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();
     }
 
     /**

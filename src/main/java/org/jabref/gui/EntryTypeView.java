@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -143,6 +144,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         }
 
+        Platform.runLater(() -> idTextField.requestFocus());
     }
 
     public EntryType getChoice() {

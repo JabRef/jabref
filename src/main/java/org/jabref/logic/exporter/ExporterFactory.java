@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,8 +27,8 @@ public class ExporterFactory {
         this.exporters = Objects.requireNonNull(exporters);
     }
 
-    public static ExporterFactory create(Map<String, TemplateExporter> customFormats,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
+    public static ExporterFactory create(List<TemplateExporter> customFormats,
+                                         LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -38,7 +37,8 @@ public class ExporterFactory {
         // Initialize build-in exporters
         exporters.add(new TemplateExporter("HTML", "html", "html", null, StandardFileType.HTML, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, StandardFileType.HTML, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("DocBook 4.4", "docbook", "docbook", null, StandardFileType.XML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("DocBook 5.1", "docbook5", "docbook5", null, StandardFileType.XML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("DocBook 4", "docbook4", "docbook4", null, StandardFileType.XML, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter("DIN 1505", "din1505", "din1505winword", "din1505", StandardFileType.RTF, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter("BibO RDF", "bibordf", "bibordf", null, StandardFileType.RDF, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", StandardFileType.HTML, layoutPreferences, savePreferences));
@@ -60,7 +60,7 @@ public class ExporterFactory {
         exporters.add(new XmpPdfExporter(xmpPreferences));
 
         // Now add custom export formats
-        exporters.addAll(customFormats.values());
+        exporters.addAll(customFormats);
 
         return new ExporterFactory(exporters);
     }

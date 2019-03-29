@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.search.rules.describer.GrammarBasedSearchRuleDescriber;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@GUITest
 @ExtendWith(ApplicationExtension.class)
 class GrammarBasedSearchRuleDescriberTest {
 

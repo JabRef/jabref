@@ -16,10 +16,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.net.URLUtil;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -165,10 +165,34 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        URLUtil.addPath(uriBuilder, query);
+        DOAJFetcher.addPath(uriBuilder, query);
         uriBuilder.addParameter("pageSize", "30"); // Number of results
         //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
         return uriBuilder.build().toURL();
+    }
+
+    /**
+     * @implNote slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
+     */
+    public static URIBuilder addPath(URIBuilder base, String subPath) {
+        if (StringUtil.isBlank(subPath) || "/".equals(subPath)) {
+            return base;
+        } else {
+            base.setPath(appendSegmentToPath(base.getPath(), subPath));
+            return base;
+        }
+    }
+
+    private static String appendSegmentToPath(String path, String segment) {
+        if (StringUtil.isBlank(path)) {
+            path = "/";
+        }
+
+        if (path.charAt(path.length() - 1) == '/' || segment.startsWith("/")) {
+            return path + segment;
+        }
+
+        return path + "/" + segment;
     }
 
     @Override

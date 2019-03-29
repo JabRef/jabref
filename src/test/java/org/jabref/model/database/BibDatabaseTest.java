@@ -11,7 +11,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.event.TestEventListener;
 
@@ -117,6 +120,32 @@ public class BibDatabaseTest {
         database.addString(string);
         assertTrue(database.hasStringLabel("DSP"));
         assertFalse(database.hasStringLabel("VLSI"));
+    }
+
+    @Test
+    public void addStringAsCollection() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        List<BibtexString> strings = Arrays.asList(string);
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void addStringAsCollectionWithUpdatedContent() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        List<BibtexString> strings = Arrays.asList(string, new BibtexString("DSP", "ABCD"));
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void addStringAsCollectionWithNewContent() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
+        List<BibtexString> strings = Arrays.asList(string, vlsi);
+        database.addStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+        assertEquals(Optional.of(vlsi), database.getStringByName("VLSI"));
     }
 
     @Test
@@ -250,7 +279,7 @@ public class BibDatabaseTest {
 
     @Test
     public void getUsedStrings() {
-        BibEntry entry = new BibEntry(IdGenerator.next());
+        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(), "required", "optional"));
         entry.setField("author", "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");
@@ -298,9 +327,9 @@ public class BibDatabaseTest {
 
     @Test
     public void getEntriesSortedWithTwoEntries() {
-        BibEntry entryB = new BibEntry("article");
+        BibEntry entryB = new BibEntry(BibtexEntryTypes.ARTICLE);
         entryB.setId("2");
-        BibEntry entryA = new BibEntry("article");
+        BibEntry entryA = new BibEntry(BiblatexEntryTypes.ARTICLE);
         entryB.setId("1");
         database.insertEntries(entryB, entryA);
         assertEquals(Arrays.asList(entryA, entryB), database.getEntriesSorted(Comparator.comparing(BibEntry::getId)));

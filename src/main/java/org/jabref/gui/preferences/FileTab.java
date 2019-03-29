@@ -17,6 +17,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
@@ -52,22 +54,26 @@ class FileTab extends Pane implements PrefsTab {
     private final CheckBox allowFileAutoOpenBrowse;
     private final RadioButton useRegExpComboBox;
     private final RadioButton matchExactKeyOnly = new RadioButton(
-            Localization.lang("Autolink only files that match the BibTeX key"));
+                                                                  Localization.lang("Autolink only files that match the BibTeX key"));
     private final RadioButton matchStartsWithKey = new RadioButton(
-            Localization.lang("Autolink files with names starting with the BibTeX key"));
+                                                                   Localization.lang("Autolink files with names starting with the BibTeX key"));
     private final TextField regExpTextField;
 
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
+
+        ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
+
         fileDir = new TextField();
+
         bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
         bibLocAsPrimaryDir.setAccessibleText(Localization.lang("When downloading files, or moving linked files to the "
-                + "file directory, prefer the BIB file location rather than the file directory set above"));
+                                                               + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new CheckBox(
-                Localization.lang("When opening file link, search for matching file if no link is defined"));
+                                         Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new CheckBox(
-                Localization.lang("Automatically open browse dialog when creating new file link"));
+                                               Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new TextField();
         useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
         useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
@@ -92,13 +98,13 @@ class FileTab extends Pane implements PrefsTab {
         Label general = new Label(Localization.lang("General"));
         general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
-        builder.add(openLast,  1, 2);
+        builder.add(openLast, 1, 2);
         builder.add(backup, 1, 3);
         Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.add(label, 1, 4);
         final ToggleGroup resolveGroup = new ToggleGroup();
         builder.add(nonWrappableFields, 2, 4);
-        builder.add(resolveStringsStandard,  1, 5);
+        builder.add(resolveStringsStandard, 1, 5);
         builder.add(resolveStringsAll, 1, 6);
         builder.add(doNotResolveStringsFor, 2, 6);
         resolveStringsStandard.setToggleGroup(resolveGroup);
@@ -122,25 +128,22 @@ class FileTab extends Pane implements PrefsTab {
         browse.setPrefSize(80, 20);
         browse.setOnAction(e -> {
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                    .withInitialDirectory(Paths.get(fileDir.getText())).build();
+                                                                                                            .withInitialDirectory(Paths.get(fileDir.getText())).build();
             dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
                          .ifPresent(f -> fileDir.setText(f.toString()));
         });
         builder.add(browse, 3, 12);
         builder.add(bibLocAsPrimaryDir, 1, 13);
         final ToggleGroup autolinkGroup = new ToggleGroup();
-        builder.add(matchStartsWithKey,  1, 14);
-        builder.add(matchExactKeyOnly,  1, 15);
+        builder.add(matchStartsWithKey, 1, 14);
+        builder.add(matchExactKeyOnly, 1, 15);
         builder.add(useRegExpComboBox, 1, 16);
         builder.add(regExpTextField, 2, 16);
         matchStartsWithKey.setToggleGroup(autolinkGroup);
         matchExactKeyOnly.setToggleGroup(autolinkGroup);
         useRegExpComboBox.setToggleGroup(autolinkGroup);
 
-        Button help = new Button("?");
-        help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
-                HelpFile.REGEX_SEARCH).getHelpButton().doClick());
-
+        Button help = factory.createIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH));
         builder.add(help, 3, 16);
         builder.add(runAutoFileSearch, 1, 17);
         builder.add(allowFileAutoOpenBrowse, 1, 18);
@@ -151,10 +154,10 @@ class FileTab extends Pane implements PrefsTab {
         Label autosave = new Label(Localization.lang("Autosave"));
         autosave.getStyleClass().add("sectionHeader");
         builder.add(autosave, 1, 20);
-        builder.add(localAutoSave,  1, 21);
-        Button help1 = new Button("?");
-        help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
-        builder.add(help1, 2, 21);
+        builder.add(localAutoSave, 1, 21);
+
+        Button helpAutosave = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE));
+        builder.add(helpAutosave, 2, 21);
     }
 
     @Override
@@ -194,6 +197,7 @@ class FileTab extends Pane implements PrefsTab {
         localAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -211,7 +215,7 @@ class FileTab extends Pane implements PrefsTab {
         }
 
         String newline;
-        switch (newlineSeparator.getPromptText()) {
+        switch (newlineSeparator.getValue()) {
             case "CR":
                 newline = "\r";
                 break;
@@ -247,8 +251,8 @@ class FileTab extends Pane implements PrefsTab {
         boolean valid = Files.exists(path) && Files.isDirectory(path);
         if (!valid) {
             dialogService.showErrorDialogAndWait(
-                    String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
-                            Localization.lang("Main file directory"), Localization.lang("Directory not found"), path));
+                                                 String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                                                               Localization.lang("Main file directory"), Localization.lang("Directory not found"), path));
         }
         return valid;
     }

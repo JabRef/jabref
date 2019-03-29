@@ -2,10 +2,8 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -53,7 +51,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -226,18 +223,16 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(), Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                                                                                                                                                                  .getDatabasePath()
-                                                                                                                                                                  .map(Path::getFileName)
-                                                                                                                                                                  .map(Path::toString)
-                                                                                                                                                                  .orElse(GUIGlobals.UNTITLED_TITLE),
-                                                                                                           this.getSearchQuery().localize()), getSearchQuery(), false);
-        List<BibEntry> entries = currentBasePanel.getDatabase()
-                                                 .getEntries()
-                                                 .stream()
-                                                 .filter(BibEntry::isSearchHit)
-                                                 .collect(Collectors.toList());
-        searchDialog.addEntries(entries, currentBasePanel);
+        SearchResultFrame searchDialog = new SearchResultFrame(
+                currentBasePanel.frame(),
+                Localization.lang("Search results in library %0 for %1",
+                        currentBasePanel.getBibDatabaseContext()
+                                        .getDatabasePath()
+                                        .map(Path::getFileName)
+                                        .map(Path::toString)
+                                        .orElse(GUIGlobals.UNTITLED_TITLE),
+                        this.getSearchQuery().localize()), getSearchQuery(), false);
+        searchDialog.addEntries(currentBasePanel.getDatabase().getEntries(), currentBasePanel);
         searchDialog.selectFirstEntry();
         searchDialog.setVisible(true);
     }

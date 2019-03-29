@@ -6,6 +6,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import javafx.concurrent.Task;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
      * javafx.concurrent.Task.TaskCallable#call()}, but adapted to run sequentially.
      */
     @Override
-    public <V> Future<?> execute(BackgroundTask<V> task) {
+    public <V> Future<V> execute(BackgroundTask<V> task) {
         Runnable onRunning = task.getOnRunning();
         if (onRunning != null) {
             onRunning.run();
@@ -42,8 +44,13 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             } else {
                 LOGGER.error("Unhandled exception", exception);
             }
-            return new FailedFuture(exception);
+            return new FailedFuture<>(exception);
         }
+    }
+
+    @Override
+    public <V> Future<V> execute(Task<V> task) {
+        return task;
     }
 
     @Override

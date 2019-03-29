@@ -29,7 +29,7 @@ class INSPIREFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.MASTERSTHESIS.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.MASTERSTHESIS);
         expected.setCiteKey("Diez:2014ppa");
         expected.setField("author", "Diez, Tobias");
         expected.setField("title", "Slice theorem for Fr\\'echet group actions and covariant symplectic field theory");

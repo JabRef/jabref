@@ -15,6 +15,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -55,6 +57,9 @@ class GeneralTab extends Pane implements PrefsTab {
     public GeneralTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.dialogService = dialogService;
+
+        ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
+
         biblatexMode = new ComboBox<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
@@ -90,10 +95,8 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(defOwnerField, 2, 10);
         builder.add(overwriteOwner, 3, 10);
 
-        Button help = new Button("?");
-        help.setPrefSize(10, 10);
-        help.setOnAction(event -> new HelpAction(HelpFile.OWNER).getHelpButton().doClick());
-        builder.add(help, 4, 10);
+        Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER));
+        builder.add(helpOwner, 4, 10);
 
         builder.add(useTimeStamp, 1, 13);
         builder.add(timeStampFormat, 2, 13);
@@ -102,9 +105,8 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(fieldName, 3, 13);
         builder.add(timeStampField, 4, 13);
 
-        Button help1 = new Button("?");
-        help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
-        builder.add(help1, 6, 13);
+        Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP));
+        builder.add(helpTimestamp, 6, 13);
 
         builder.add(updateTimeStamp, 1, 14);
         builder.add(new Line(), 1, 15);

@@ -55,6 +55,7 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
+    private final ObservableList<BibEntry> entriesList;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -63,16 +64,16 @@ public class GroupNodeViewModel {
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
 
-        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-        displayName = formatter.format(groupNode.getName());
+        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
-            children = automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries()).stream()
-                    .map(this::toViewModel)
-                    .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
+                                     .stream()
+                                     .map(this::toViewModel)
+                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -84,7 +85,9 @@ public class GroupNodeViewModel {
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
-        databaseContext.getDatabase().getEntries().addListener(this::onDatabaseChanged);
+        // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
+        entriesList = databaseContext.getDatabase().getEntries();
+        entriesList.addListener(this::onDatabaseChanged);
 
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);

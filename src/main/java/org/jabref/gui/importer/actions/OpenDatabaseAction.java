@@ -35,7 +35,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -53,13 +52,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Migrations:
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
-            // External file handling system in version 2.3:
-            new FileLinksUpgradeWarning(),
-
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            // Warning about and handling duplicate BibTeX keys:
-            new HandleDuplicateWarnings());
+            new CheckForNewEntryTypesAction()
+    );
 
     private final JabRefFrame frame;
 
