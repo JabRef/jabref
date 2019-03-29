@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

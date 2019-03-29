@@ -1,6 +1,7 @@
 package org.jabref.logic.net;
 
 import org.jabref.gui.fieldeditors.URLUtil;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
