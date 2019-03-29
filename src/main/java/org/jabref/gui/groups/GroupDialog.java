@@ -1,8 +1,10 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -45,6 +47,7 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
@@ -58,6 +61,7 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -90,6 +94,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private final RadioButton unionButton = new RadioButton(Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
+    private final BasePanel basePanel;
 
     // for KeywordGroup
     private final TextField keywordGroupSearchTerm = new TextField();
@@ -144,6 +149,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
         this.dialogService = dialogService;
         this.prefs = prefs;
+        this.basePanel = basePanel;
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -330,7 +336,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         }
                     } else if (texRadioButton.isSelected()) {
                         resultingGroup = new TexGroup(groupName, getContext(),
-                                Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
+                                                      Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor(), basePanel.getBibDatabaseContext().getMetaData());
                     }
 
                     resultingGroup.setColor(colorField.getValue());
@@ -610,7 +616,21 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             .addExtensionFilter(StandardFileType.AUX)
             .withDefaultExtension(StandardFileType.AUX)
             .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(file.toAbsolutePath().toString()));
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(relativize(file.toAbsolutePath()).toString()));
+    }
+
+    private Path relativize(Path path) {
+        List<Path> fileDirectories = getFileDirectoriesAsPaths();
+        return FileUtil.relativize(path, fileDirectories);
+    }
+
+    private List<Path> getFileDirectoriesAsPaths() {
+        List<Path> fileDirs = new ArrayList<>();
+        MetaData metaData = basePanel.getBibDatabaseContext().getMetaData();
+        metaData.getLaTexFileDirectory(prefs.getFilePreferences().getUser())
+                .ifPresent(laTexFileDirectory -> fileDirs.add(laTexFileDirectory));
+
+        return fileDirs;
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {
