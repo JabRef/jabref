@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
