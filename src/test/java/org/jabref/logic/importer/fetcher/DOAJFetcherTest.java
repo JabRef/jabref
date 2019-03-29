@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -72,5 +73,33 @@ class DOAJFetcherTest {
     @Test
     public void searchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+    }
+
+    @Test
+    void appendSingleWord() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        DOAJFetcher.addPath(builder, "/example");
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendSingleWordWithSlash() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        DOAJFetcher.addPath(builder, "/example");
+        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendSlash() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        DOAJFetcher.addPath(builder, "/");
+        assertEquals("http://example.com/test", builder.build().toASCIIString());
+    }
+
+    @Test
+    void appendTwoWords() throws Exception {
+        URIBuilder builder = new URIBuilder("http://example.com/test");
+        DOAJFetcher.addPath(builder, "example two");
+        assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());
     }
 }
