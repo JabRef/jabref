@@ -71,7 +71,6 @@ import org.jabref.gui.actions.ManageCustomImportsAction;
 import org.jabref.gui.actions.ManageJournalsAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
-import org.jabref.gui.actions.NewEntryFromPlainTextAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
@@ -795,7 +794,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences(), dialogService, Globals.prefs)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
