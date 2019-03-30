@@ -20,7 +20,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationAction implements Runnable, BaseAction, Action{
+public class PushToApplicationAction implements Runnable, BaseAction, Action {
 
     private final PushToApplication operation;
     private final JabRefFrame frame;
