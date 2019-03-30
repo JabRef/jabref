@@ -593,7 +593,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
                 factory.createIconButton(new PushToApplicationAction(this), new OldDatabaseCommandWrapper(Actions.PUSH_TO_APPLICATION, this, Globals.stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
