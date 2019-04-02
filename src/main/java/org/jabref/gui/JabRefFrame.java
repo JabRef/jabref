@@ -55,7 +55,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.BibtexKeyPatternAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
@@ -70,7 +69,6 @@ import org.jabref.gui.actions.ManageCustomImportsAction;
 import org.jabref.gui.actions.ManageJournalsAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
-import org.jabref.gui.actions.NewEntryFromPlainTextAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
@@ -87,6 +85,7 @@ import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
@@ -112,7 +111,6 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -144,7 +142,7 @@ import osx.macadapter.MacAdapter;
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends BorderPane implements OutputPrinter {
+public class JabRefFrame extends BorderPane {
 
     // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
@@ -790,7 +788,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences(), dialogService, Globals.prefs)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
@@ -816,7 +813,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction())
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs))
         );
 
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
@@ -1236,17 +1233,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         return false;
     }
 
-    @Override
-    public void showMessage(String message, String title, int msgType) {
-        JOptionPane.showMessageDialog(null, message, title, msgType);
-    }
-
-    @Override
-    public void setStatus(String s) {
-        dialogService.notify(s);
-    }
-
-    @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
@@ -1425,7 +1411,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private void increaseTableFontSize() {
@@ -1433,7 +1419,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private void decreaseTableFontSize() {
@@ -1445,7 +1431,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             basePanel.updateTableFont();
         }
-        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private class CloseDatabaseAction extends SimpleCommand {

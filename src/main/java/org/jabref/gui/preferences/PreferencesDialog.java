@@ -122,6 +122,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 ScrollPane preferencePaneContainer = new ScrollPane(tab.getBuilder());
                 preferencePaneContainer.getStyleClass().add("preferencePaneContainer");
                 container.setCenter(preferencePaneContainer);
+            } else {
+                container.setCenter(null);
             }
         });
         tabsList.getSelectionModel().selectFirst();
@@ -136,6 +138,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
         tabsList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
+            tabsList.getSelectionModel().clearSelection();
+            tabsList.getSelectionModel().selectFirst();
         });
 
         VBox buttonContainer = new VBox();
