@@ -77,11 +77,6 @@ public class GlobalSearchBar extends HBox {
 
     private SearchDisplayMode searchDisplayMode;
 
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
-    private boolean dontSelectSearchBar;
-
     public GlobalSearchBar(JabRefFrame frame) {
         super();
         this.frame = Objects.requireNonNull(frame);
@@ -266,12 +261,6 @@ public class GlobalSearchBar extends HBox {
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
         return searchQueryHighlightObservable;
-    }
-
-    public boolean isStillValidQuery(SearchQuery query) {
-        return query.getQuery().equals(this.searchField.getText())
-                && (query.isRegularExpression() == regularExp.isSelected())
-                && (query.isCaseSensitive() == caseSensitive.isSelected());
     }
 
     private SearchQuery getSearchQuery() {
