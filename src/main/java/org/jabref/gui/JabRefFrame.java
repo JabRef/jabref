@@ -130,7 +130,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
-import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.jfoenix.controls.JFXSnackbar;
@@ -270,16 +269,14 @@ public class JabRefFrame extends BorderPane {
             // Poor-mans binding to global state
             // We need to invoke this in the JavaFX thread as all the listeners sit there
             Platform.runLater(() -> Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext())));
-            if (new SearchPreferences(Globals.prefs).isGlobalSearch()) {
-                globalSearchBar.performSearch();
-            } else {
-                String content = "";
-                Optional<SearchQuery> currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-                if (currentSearchQuery.isPresent()) {
-                    content = currentSearchQuery.get().getQuery();
-                }
-                globalSearchBar.setSearchTerm(content);
+
+            // Update search query
+            String content = "";
+            Optional<SearchQuery> currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
+            if (currentSearchQuery.isPresent()) {
+                content = currentSearchQuery.get().getQuery();
             }
+            globalSearchBar.setSearchTerm(content);
 
             currentBasePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
 
