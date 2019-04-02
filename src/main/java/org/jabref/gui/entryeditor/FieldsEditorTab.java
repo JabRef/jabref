@@ -103,7 +103,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
-        columnExpand.setHgrow(Priority.ALWAYS);
+        columnExpand.setPercentWidth(60);
 
         ColumnConstraints columnDoNotContract = new ColumnConstraints();
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);

@@ -1,7 +1,5 @@
 package org.jabref.gui.bibtexkeypattern;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -15,6 +13,8 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -28,15 +28,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class BibtexKeyPatternPanel extends Pane {
 
-    // used by both BibtexKeyPatternPanel and TabLabelPAttern
-    protected final GridBagLayout gbl = new GridBagLayout();
-    protected final GridBagConstraints con = new GridBagConstraints();
-
     // default pattern
     protected final TextField defaultPat = new TextField();
-    private final HelpAction help;
-
-    private final int COLUMNS = 2;
 
     // one field for each type
     private final Map<String, TextField> textFields = new HashMap<>();
@@ -45,7 +38,6 @@ public class BibtexKeyPatternPanel extends Pane {
 
     public BibtexKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN);
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         buildGUI();
@@ -64,7 +56,8 @@ public class BibtexKeyPatternPanel extends Pane {
         int rowIndex = 1;
         int columnIndex = 0;
         // The header - can be removed
-        for (int i = 0; i < COLUMNS; i++) {
+        int columnsNumber = 2;
+        for (int i = 0; i < columnsNumber; i++) {
             Label label = new Label(Localization.lang("Entry type"));
             Label keyPattern = new Label(Localization.lang("Key pattern"));
             gridPane.add(label, ++columnIndex, rowIndex);
@@ -93,7 +86,7 @@ public class BibtexKeyPatternPanel extends Pane {
 
             textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
 
-            if (columnIndex == COLUMNS - 1) {
+            if (columnIndex == (columnsNumber - 1)) {
                 columnIndex = 0;
                 rowIndex++;
             } else {
@@ -103,9 +96,9 @@ public class BibtexKeyPatternPanel extends Pane {
 
         rowIndex++;
 
-        Button help1 = new Button("?");
-        help1.setOnAction(e -> new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
-        gridPane.add(help1, 1, rowIndex);
+        ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
+        Button help = factory.createIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.BIBTEX_KEY_PATTERN));
+        gridPane.add(help, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
         btnDefaultAll1.setOnAction(e -> {
@@ -117,7 +110,6 @@ public class BibtexKeyPatternPanel extends Pane {
         });
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
-
 
     /**
      * fill the given LabelPattern by values generated from the text fields
@@ -139,9 +131,7 @@ public class BibtexKeyPatternPanel extends Pane {
     }
 
     protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
-        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
-                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
+        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(Globals.prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         fillPatternUsingPanelData(res);
         return res;
     }
@@ -162,7 +152,7 @@ public class BibtexKeyPatternPanel extends Pane {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }
 
-        if (keyPattern.getDefaultValue() == null || keyPattern.getDefaultValue().isEmpty()) {
+        if ((keyPattern.getDefaultValue() == null) || keyPattern.getDefaultValue().isEmpty()) {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));

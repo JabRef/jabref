@@ -65,17 +65,7 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-        // Set antialiasing on everywhere. This only works in JRE >= 1.5.
-        // Or... it doesn't work, period.
-        // TODO test and maybe remove this! I found this commented out with no additional info ( payload@lavabit.com )
-        // Enabled since JabRef 2.11 beta 4
-        System.setProperty("swing.aatext", "true");
-        // Default is "on".
-        // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
-        System.setProperty("awt.useSystemAAFontSettings", "lcd");
-
-        // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
-        setLookAndFeel();
+        applyFontRenderingTweak();
 
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
@@ -242,9 +232,9 @@ public class JabRefGUI {
         return false;
     }
 
-    private void setLookAndFeel() {
-        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
-        // setting. See https://github.com/woky/javafx-hates-linux
+    private void applyFontRenderingTweak() {
+        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering setting.
+        // See https://github.com/woky/javafx-hates-linux
         if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
             System.setProperty("prism.text", "t2k");
             System.setProperty("prism.lcdtext", "true");
@@ -253,10 +243,5 @@ public class JabRefGUI {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
-    }
-
-    // Only used for testing, other than that do NOT set the mainFrame...
-    public static void setMainFrame(JabRefFrame mainFrame) {
-        JabRefGUI.mainFrame = mainFrame;
     }
 }

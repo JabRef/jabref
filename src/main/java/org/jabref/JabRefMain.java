@@ -2,14 +2,13 @@ package org.jabref;
 
 import java.net.Authenticator;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
+import org.jabref.gui.FXDialog;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
@@ -119,9 +118,10 @@ public class JabRefMain extends Application {
                 versionError.append("\n");
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
-            final JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(null, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            frame.dispose();
+
+            FXDialog alert = new FXDialog(Alert.AlertType.ERROR, Localization.lang("Error"), true);
+            alert.setHeaderText(null);
+            alert.setContentText(versionError.toString());
 
             // We exit on Java 9 error since this will definitely not work
             if (java9Fail) {
@@ -141,6 +141,8 @@ public class JabRefMain extends Application {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
+                } else {
+                    LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
             } else {
                 // We are alone, so we start the server

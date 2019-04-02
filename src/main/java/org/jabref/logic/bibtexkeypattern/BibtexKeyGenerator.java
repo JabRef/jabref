@@ -26,8 +26,8 @@ public class BibtexKeyGenerator extends BracketedPattern {
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
-    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
-    private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
+    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"-#~^':`";
+    private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"-";
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -72,7 +72,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         }
     }
 
-    public static String cleanKey(String key, boolean enforceLegalKey) {
+    public static String removeUnwantedCharacters(String key, boolean enforceLegalKey) {
         if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
@@ -80,7 +80,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && (KEY_UNWANTED_CHARACTERS.indexOf(c) == -1)) {
+                if (KEY_UNWANTED_CHARACTERS.indexOf(c) == -1) {
                     newKey.append(c);
                 }
             }
@@ -90,7 +90,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (KEY_ILLEGAL_CHARACTERS.indexOf(c) == -1)) {
+            if (KEY_ILLEGAL_CHARACTERS.indexOf(c) == -1) {
                 newKey.append(c);
             }
         }
@@ -98,6 +98,10 @@ public class BibtexKeyGenerator extends BracketedPattern {
         // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
         return StringUtil.replaceSpecialCharacters(newKey.toString());
+    }
+
+    public static String cleanKey(String key, boolean enforceLegalKey) {
+        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s","");
     }
 
     public String generateKey(BibEntry entry) {
@@ -123,11 +127,14 @@ public class BibtexKeyGenerator extends BracketedPattern {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
-                    String label = expandBrackets(pattern, delimiter, entry, database);
+                    String label = expandBrackets(pattern, delimiter, entry, database, bibtexKeyPatternPreferences.isEnforceLegalKey());
                     // apply modifier if present
                     if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
                     }
+
+                    // Remove all illegal characters from the label.
+                    label = cleanKey(label, bibtexKeyPatternPreferences.isEnforceLegalKey());
 
                     stringBuilder.append(label);
 
@@ -139,8 +146,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             LOGGER.warn("Cannot make label", e);
         }
 
-        // Remove all illegal characters from the key.
-        key = cleanKey(stringBuilder.toString(), bibtexKeyPatternPreferences.isEnforceLegalKey());
+        key = stringBuilder.toString();
 
         // Remove Regular Expressions while generating Keys
         String regex = bibtexKeyPatternPreferences.getKeyPatternRegex();

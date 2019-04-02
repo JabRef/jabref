@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
@@ -40,9 +38,8 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.FileUpdatePanel;
+import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -53,7 +50,6 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.groups.GroupAddRemoveDialog;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -67,7 +63,6 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -140,6 +135,7 @@ public class BasePanel extends StackPane {
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
+    private DatabaseChangePane changePane;
     private boolean saving;
 
     // AutoCompleter used in the search bar
@@ -187,19 +183,6 @@ public class BasePanel extends StackPane {
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
-
-        Optional<File> file = bibDatabaseContext.getDatabaseFile();
-        if (file.isPresent()) {
-            // Register so we get notifications about outside changes to the file.
-            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
-        } else {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                this.baseChanged = true;
-            }
-        }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
@@ -392,7 +375,7 @@ public class BasePanel extends StackPane {
                                                                          .withPreviewPanelEnabled(enabled)
                                                                          .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
-            DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
+            setPreviewActive(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
@@ -406,12 +389,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
-        actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
-
-        actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
-        actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
-        actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
-
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
 
@@ -421,7 +398,8 @@ public class BasePanel extends StackPane {
      * @param outputFormat the desired {@link CitationStyleOutputFormat}
      */
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        new CitationStyleToClipboardWorker(this, outputFormat).execute();
+        CitationStyleToClipboardWorker worker = new CitationStyleToClipboardWorker(this, outputFormat, dialogService, Globals.clipboardManager, Globals.prefs.getPreviewPreferences());
+        worker.copyCitationStyleToClipboard(Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -779,13 +757,9 @@ public class BasePanel extends StackPane {
         createMainTable();
 
         ScrollPane pane = mainTable.getPane();
-        AnchorPane anchorPane = new AnchorPane(pane);
-        AnchorPane.setBottomAnchor(pane, 0.0);
-        AnchorPane.setTopAnchor(pane, 0.0);
-        AnchorPane.setLeftAnchor(pane, 0.0);
-        AnchorPane.setRightAnchor(pane, 0.0);
-        splitPane.getItems().add(anchorPane);
-        this.getChildren().setAll(splitPane);
+        pane.setFitToHeight(true);
+        pane.setFitToWidth(true);
+        splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
@@ -798,6 +772,22 @@ public class BasePanel extends StackPane {
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
                                               .flatMap(SplitPane.Divider::positionProperty)
                                               .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+
+        // Add changePane in case a file is present - otherwise just add the splitPane to the panel
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+        if (file.isPresent()) {
+            // create changeMonitor and changePane so we get notifications about outside changes to the file.
+            resetChangeMonitorAndChangePane();
+        } else {
+            if (bibDatabaseContext.getDatabase().hasEntries()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
+            changePane = null;
+            getChildren().add(splitPane);
+        }
     }
 
     /**
@@ -848,17 +838,13 @@ public class BasePanel extends StackPane {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
-            showBottomPane(BasePanelMode.SHOWING_EDITOR);
-
-            if (entry != getShowing()) {
-                entryEditor.setEntry(entry);
-                showing = entry;
-            }
-            entryEditor.requestFocus();
-
-        });
+        if (entry != getShowing()) {
+            entryEditor.setEntry(entry);
+            showing = entry;
+        }
+        entryEditor.requestFocus();
     }
 
     private void showBottomPane(BasePanelMode newMode) {
@@ -967,7 +953,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-        || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -1024,39 +1010,6 @@ public class BasePanel extends StackPane {
         return bibDatabaseContext.getDatabase();
     }
 
-    public void changeTypeOfSelectedEntries(String newType) {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeType(bes, newType);
-    }
-
-    private void changeType(List<BibEntry> entries, String newType) {
-        if ((entries == null) || (entries.isEmpty())) {
-            LOGGER.error("At least one entry must be selected to be able to change the type.");
-            return;
-        }
-
-        if (entries.size() > 1) {
-            boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
-            if (!proceed) {
-                return;
-            }
-        }
-
-        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                entry.setType(newType);
-            });
-        }
-
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
-        compound.end();
-        getUndoManager().addEdit(compound);
-        markBaseChanged();
-        updateEntryEditorIfShowing();
-    }
-
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String title = Localization.lang("Delete entry");
@@ -1105,14 +1058,6 @@ public class BasePanel extends StackPane {
      */
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
-        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            if (fup.getPanel() == this) {
-                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            }
-        }
     }
 
     /**
@@ -1127,10 +1072,6 @@ public class BasePanel extends StackPane {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public boolean isUpdatedExternally() {
-        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
@@ -1163,15 +1104,6 @@ public class BasePanel extends StackPane {
 
     public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    /**
-     * Set the preview active state for all BasePanel instances.
-     */
-    private void setPreviewActiveBasePanels(boolean enabled) {
-        for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-            frame.getBasePanelAt(i).setPreviewActive(enabled);
-        }
     }
 
     private void setPreviewActive(boolean enabled) {
@@ -1215,17 +1147,17 @@ public class BasePanel extends StackPane {
         return annotationCache;
     }
 
-    public void resetChangeMonitor() {
+    public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+
+        changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
+
+        this.getChildren().setAll(changePane);
     }
 
     public void updateTimeStamp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
-    }
-
-    public Path getTempFile() {
-        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     public void copy() {
@@ -1397,8 +1329,8 @@ public class BasePanel extends StackPane {
 
                     Optional<LinkedFile> linkedFile = files.stream()
                                                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                                           || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                                           || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
                                                            .findFirst();
 
                     if (linkedFile.isPresent()) {

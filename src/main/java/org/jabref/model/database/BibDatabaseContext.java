@@ -185,7 +185,7 @@ public class BibDatabaseContext {
      * metadata can specify a general directory and/or a user-specific directory or the preferences can specify one. <p>
      * The settings are prioritized in the following order and the first defined setting is used:
      * <ol>
-     *     <li>metdata</li>
+     *     <li>metadata</li>
      *     <li>user-specific directory</li>
      *     <li>preferences directory</li>
      *     <li>BIB file directory</li>

@@ -1,9 +1,6 @@
 package org.jabref.gui.actions;
 
-import java.awt.event.ActionEvent;
 import java.util.Optional;
-
-import javax.swing.AbstractAction;
 
 import javafx.scene.control.TextArea;
 
@@ -15,24 +12,17 @@ import org.jabref.model.entry.identifier.DOI;
 /**
  * Copies the doi url to the clipboard
  */
-public class CopyDoiUrlAction extends AbstractAction {
+public class CopyDoiUrlAction extends SimpleCommand {
 
-    private TextArea component = null;
-    private String identifier;
-
-    public CopyDoiUrlAction(String identifier) {
-        super(Localization.lang("Copy DOI url"));
-        this.identifier = identifier;
-    }
+    private TextArea component;
 
     public CopyDoiUrlAction(TextArea component) {
-        this(component.getText());
         this.component = component;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        identifier = component == null ? identifier : component.getText();
+    public void execute() {
+        String identifier = component.getText();
 
         Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {

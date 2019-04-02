@@ -137,6 +137,10 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordChains.contains(o);
     }
 
+    public boolean contains(String keywordString) {
+        return contains(new Keyword(keywordString));
+    }
+
     public boolean remove(Keyword o) {
         return keywordChains.remove(o);
     }

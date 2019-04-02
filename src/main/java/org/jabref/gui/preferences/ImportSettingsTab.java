@@ -9,23 +9,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ImportSettingsTab extends Pane implements PrefsTab {
+public class ImportSettingsTab implements PrefsTab {
 
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
-            "[bibtexkey] - [title]"};
-
-    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
+                                                                          "[bibtexkey] - [title]"};
 
     private final JabRefPreferences prefs;
     private final GridPane builder = new GridPane();
     private final TextField fileNamePattern;
     private final ComboBox<String> selectFileNamePattern;
-
 
     private final TextField fileDirPattern;
 
@@ -35,8 +31,9 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         fileNamePattern = new TextField();
         fileDirPattern = new TextField();
         selectFileNamePattern = new ComboBox<>();
-        selectFileNamePattern.getItems().addAll(FXCollections.observableArrayList(DEFAULT_FILENAMEPATTERNS_DISPLAY));
+        selectFileNamePattern.getItems().addAll(FXCollections.observableArrayList(DEFAULT_FILENAMEPATTERNS));
         selectFileNamePattern.setValue(Localization.lang("Choose pattern"));
+
         selectFileNamePattern.setOnAction(e -> {
             fileNamePattern.setText(selectFileNamePattern.getValue());
         });
@@ -60,6 +57,7 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         builder.add(fileDirPattern, 2, 10);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }

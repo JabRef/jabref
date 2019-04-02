@@ -178,16 +178,6 @@ public class ExternalFileTypeEntryEditor {
         setValues(entry);
     }
 
-    public void setEntry(CustomExternalFileType entry) {
-        this.entry = entry;
-        if (entry.getName().isEmpty()) {
-            diag.setTitle(newFileTitle);
-        } else {
-            diag.setTitle(editFileTitle);
-        }
-        setValues(entry);
-    }
-
     public void setVisible(boolean visible) {
         if (visible) {
             okPressed = false;

@@ -7,21 +7,30 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="950.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.preferences.PreferencesFilterDialog">
 
     <content>
         <BorderPane>
             <bottom>
-                <HBox>
-                    <CheckBox fx:id="showOnlyDeviatingPreferenceOptions"
-                              text="%Show only preferences deviating from their default value"/>
-                    <HBox HBox.hgrow="ALWAYS"/>
+                <HBox alignment="BOTTOM_RIGHT">
                     <Label fx:id="count"/>
                 </HBox>
             </bottom>
+            <top>
+                <HBox spacing="20">
+                    <TextField fx:id="searchField" promptText="%Search"/>
+                    <VBox alignment="CENTER">
+                        <CheckBox fx:id="showOnlyDeviatingPreferenceOptions"
+                            text="%Show only preferences deviating from their default value" alignment="bottom_right"/>
+                    </VBox>
+                    <HBox HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </top>
             <center>
                 <TableView fx:id="table">
                     <columns>

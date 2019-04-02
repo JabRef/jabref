@@ -21,7 +21,6 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -30,7 +29,7 @@ import org.jabref.preferences.PreviewPreferences;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, KeyBindingRepository keyBindings, DialogService dialogService) {
+    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, DialogService dialogService) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
@@ -80,36 +79,12 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(new ChangeEntryTypeMenu(keyBindings).getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
+        contextMenu.getItems().add(new ChangeEntryTypeMenu().getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, getFetchEntryData(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(panel, dialogService)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, mergeEntries(panel)));
 
-        contextMenu.getItems().add(new SeparatorMenuItem());
-
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.ADD_TO_GROUP, addToGroup(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.REMOVE_FROM_GROUP, removeFromGroup(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MOVE_TO_GROUP, moveToGroup(panel)));
-
         return contextMenu;
-    }
-
-    private static OldCommandWrapper moveToGroup(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.MOVE_TO_GROUP, panel);
-        command.setExecutable(areGroupsPresent(panel.getBibDatabaseContext()));
-        return command;
-    }
-
-    private static OldCommandWrapper removeFromGroup(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.REMOVE_FROM_GROUP, panel);
-        command.setExecutable(areGroupsPresent(panel.getBibDatabaseContext()));
-        return command;
-    }
-
-    private static OldCommandWrapper addToGroup(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.ADD_TO_GROUP, panel);
-        command.setExecutable(areGroupsPresent(panel.getBibDatabaseContext()));
-        return command;
     }
 
     private static OldCommandWrapper mergeEntries(BasePanel panel) {
@@ -167,10 +142,6 @@ public class RightClickMenu {
 
         copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(panel, dialogService)));
         return copySpecialMenu;
-    }
-
-    private static boolean areGroupsPresent(BibDatabaseContext database) {
-        return database.getMetaData().getGroups().isPresent();
     }
 
     private static boolean isFieldSetForSelectedEntry(String field, BasePanel panel) {

@@ -44,4 +44,11 @@ public class MsBibAuthorTest {
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Bach", msBibAuthor.getLastName());
     }
+
+    @Test
+    public void testGetVonAndLastName() {
+        Author author = new Author("John", null, "von", "Neumann", null);
+        MsBibAuthor msBibAuthor = new MsBibAuthor(author);
+        assertEquals("von Neumann", msBibAuthor.getLastName());
+    }
 }

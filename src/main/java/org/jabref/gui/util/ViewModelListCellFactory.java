@@ -1,7 +1,11 @@
 package org.jabref.gui.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
+import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -37,6 +41,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
+    private Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -115,6 +120,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> withPseudoClass(PseudoClass pseudoClass, Callback<T, ObservableValue<Boolean>> toCondition) {
+        this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
+        return this;
+    }
+
     public void install(ComboBox<T> comboBox) {
         comboBox.setButtonCell(this.call(null));
         comboBox.setCellFactory(this);
@@ -175,6 +185,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragOver != null) {
                         setOnDragOver(event -> toOnDragOver.accept(viewModel, event));
+                    }
+                    for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
+                        ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
+                        BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
                     }
                 }
                 getListView().refresh();

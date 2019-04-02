@@ -28,6 +28,8 @@ public enum KeyBinding {
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Look up full text documents", Localization.lang("Look up full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
+    EXPORT("Export", Localization.lang("Export"), "ctrl+alt+e", KeyBindingCategory.FILE),
+    EXPORT_SELECTED("Export Selected", Localization.lang("Export selected entries"), "ctrl+shift+e", KeyBindingCategory.FILE),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
     ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "alt+DOWN", KeyBindingCategory.VIEW),
     ENTRY_EDITOR_NEXT_PANEL("Entry editor, next panel", Localization.lang("Entry editor, next panel"), "ctrl+TAB", KeyBindingCategory.VIEW),

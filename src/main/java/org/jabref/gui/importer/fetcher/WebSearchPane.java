@@ -59,8 +59,7 @@ public class WebSearchPane extends SidePaneComponent {
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                HelpAction helpCommand = new HelpAction(fetcher.getHelpPage().get());
-                Button helpButton = factory.createIconButton(StandardActions.HELP, helpCommand.getCommand());
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get()));
                 helpButtonContainer.getChildren().setAll(helpButton);
             } else {
                 helpButtonContainer.getChildren().clear();

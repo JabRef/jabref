@@ -15,6 +15,8 @@ import javafx.scene.shape.Line;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -76,9 +78,11 @@ class AdvancedTab extends Pane implements PrefsTab {
         HBox p = new HBox();
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
-        Button helpButton = new Button("?");
-        helpButton.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
-        p.getChildren().add(helpButton);
+
+        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
+        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE));
+        help.setMaxWidth(Double.MAX_VALUE);
+        p.getChildren().add(help);
 
         builder.add(p, 2, 9);
         builder.add(new Label(""), 1, 10);

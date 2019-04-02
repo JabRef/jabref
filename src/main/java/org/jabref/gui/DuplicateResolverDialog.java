@@ -12,9 +12,12 @@ import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
+
+    private final BibDatabaseContext database;
 
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
@@ -32,12 +35,11 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    private final JabRefFrame frame;
     private MergeEntries me;
 
-    public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        this.frame = frame;
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
+        this.database = database;
         init(one, two, type);
     }
 
@@ -61,14 +63,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                me = new MergeEntries(one, two, database.getMode());
                 break;
             case INSPECTION:
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        Localization.lang("From import"), database.getMode());
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
@@ -77,14 +79,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
                 removeExactVisible = true;
 
-                me = new MergeEntries(one, two, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                me = new MergeEntries(one, two, database.getMode());
                 break;
             default:
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        Localization.lang("From import"), database.getMode());
                 break;
         }
         if (removeExactVisible) {
@@ -114,7 +116,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         getDialogPane().setContent(borderPane);
         Button helpButton = (Button) this.getDialogPane().lookupButton(help);
-        helpButton.setOnAction(evt -> helpCommand.getCommand().execute());
+        helpButton.setOnAction(evt -> helpCommand.execute());
     }
 
     public BibEntry getMergedEntry() {

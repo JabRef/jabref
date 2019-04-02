@@ -1,6 +1,7 @@
 package org.jabref.logic.net;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.jabref.gui.fieldeditors.URLUtil;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,31 +74,4 @@ class URLUtilTest {
         assertFalse(URLUtil.isURL("google.com"));
     }
 
-    @Test
-    void appendSingleWord() throws Exception {
-        URIBuilder builder = new URIBuilder("http://example.com/test");
-        URLUtil.addPath(builder, "/example");
-        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
-    }
-
-    @Test
-    void appendSingleWordWithSlash() throws Exception {
-        URIBuilder builder = new URIBuilder("http://example.com/test");
-        URLUtil.addPath(builder, "/example");
-        assertEquals("http://example.com/test/example", builder.build().toASCIIString());
-    }
-
-    @Test
-    void appendSlash() throws Exception {
-        URIBuilder builder = new URIBuilder("http://example.com/test");
-        URLUtil.addPath(builder, "/");
-        assertEquals("http://example.com/test", builder.build().toASCIIString());
-    }
-
-    @Test
-    void appendTwoWords() throws Exception {
-        URIBuilder builder = new URIBuilder("http://example.com/test");
-        URLUtil.addPath(builder, "example two");
-        assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());
-    }
 }

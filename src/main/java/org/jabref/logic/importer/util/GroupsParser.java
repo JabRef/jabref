@@ -24,6 +24,7 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -35,7 +36,7 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
         try {
             GroupTreeNode cursor = null;
@@ -52,7 +53,7 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor);
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData);
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -84,7 +85,7 @@ public class GroupsParser {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor)
+    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
@@ -108,13 +109,13 @@ public class GroupsParser {
             return automaticKeywordGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
-            return texGroupFromString(s, fileMonitor);
+            return texGroupFromString(s, fileMonitor, metaData);
         }
 
         throw new ParseException("Unknown group: " + s);
     }
 
-    private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor) throws ParseException {
+    private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor, MetaData metaData) throws ParseException {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.TEX_GROUP_ID
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
@@ -122,7 +123,7 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         try {
             Path path = Paths.get(tok.nextToken());
-            TexGroup newGroup = new TexGroup(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor);
+            TexGroup newGroup = new TexGroup(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
             addGroupDetails(tok, newGroup);
             return newGroup;
         } catch (InvalidPathException | IOException ex) {
