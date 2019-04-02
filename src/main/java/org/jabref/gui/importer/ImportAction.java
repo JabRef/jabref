@@ -15,6 +15,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -95,11 +96,11 @@ public class ImportAction {
             try {
                 if (!importer.isPresent()) {
                     // Unknown format:
-                    frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "..."));
                     // This import method never throws an IOException:
                     imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
-                    frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "..."));
                     // Specific importer:
                     ParserResult pr = importer.get().importDatabase(filename, Globals.prefs.getDefaultEncoding());
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));

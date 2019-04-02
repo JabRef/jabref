@@ -12,6 +12,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -84,8 +85,9 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         int foundCount = 0;
         for (BibEntry bibEntry : bibEntries) {
             count++;
-            frame.getDialogService().notify(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                    fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount)));
+            final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                    fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(statusMessage));
             Optional<T> identifier = Optional.empty();
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
@@ -97,8 +99,9 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                 if (fieldChange.isPresent()) {
                     namedCompound.addEdit(new UndoableFieldChange(fieldChange.get()));
                     foundCount++;
-                    frame.getDialogService().notify(Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                            Integer.toString(count), totalCount, Integer.toString(foundCount)));
+                    final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                            fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(nextStatusMessage));
                 }
             }
         }

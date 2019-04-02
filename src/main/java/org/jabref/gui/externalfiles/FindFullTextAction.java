@@ -2,8 +2,6 @@ package org.jabref.gui.externalfiles;
 
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,12 +40,6 @@ public class FindFullTextAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(this::downloadFullTexts)
-                      .executeWith(Globals.TASK_EXECUTOR);
-    }
-
-    private Map<Optional<URL>, BibEntry> findFullTexts() {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
@@ -68,21 +60,24 @@ public class FindFullTextAction extends SimpleCommand {
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
-                return null;
+                return;
             }
         }
+        BackgroundTask.wrap(this::findFullTexts)
+                      .onSuccess(this::downloadFullTexts)
+                      .executeWith(Globals.TASK_EXECUTOR);
+    }
 
+    private Map<Optional<URL>, BibEntry> findFullTexts() {
         Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fetchers.findFullTextPDF(entry), entry);
         }
-
         return downloads;
     }
 
     private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
-        List<Optional<URL>> finishedTasks = new ArrayList<>();
         for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
@@ -94,20 +89,15 @@ public class FindFullTextAction extends SimpleCommand {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"));
-
                     return;
                 }
-
-                //Download full text
+                //Download and link full text
                 addLinkedFileFromURL(result.get(), entry);
+
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
-            finishedTasks.add(result);
-        }
-        for (Optional<URL> result : finishedTasks) {
-            downloads.remove(result);
         }
     }
 
@@ -119,7 +109,6 @@ public class FindFullTextAction extends SimpleCommand {
      * @param entry the entry "value"
      */
     private void addLinkedFileFromURL(URL url, BibEntry entry) {
-
         LinkedFile newLinkedFile = new LinkedFile(url, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {

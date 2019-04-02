@@ -251,7 +251,6 @@ public class JabRefDesktop {
                                                   Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
                                                   Localization.lang("Open console") + " - " + Localization.lang("Error"),
                                                   JOptionPane.ERROR_MESSAGE);
-                    JabRefGUI.getMainFrame().getDialogService().notify(null);
                 }
             }
         }

@@ -569,13 +569,12 @@ public class BasePanel extends StackPane {
     }
 
     private void openExternalFile() {
+        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (selectedEntries.size() != 1) {
+            output(Localization.lang("This operation requires exactly one item to be selected."));
+            return;
+        }
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-            if (selectedEntries.size() != 1) {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
-            }
-
             final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field

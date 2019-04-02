@@ -28,7 +28,7 @@ public class AttachFileAction extends SimpleCommand {
     @Override
     public void execute() {
         if (panel.getSelectedEntries().size() != 1) {
-            panel.output(Localization.lang("This operation requires exactly one item to be selected."));
+            dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);

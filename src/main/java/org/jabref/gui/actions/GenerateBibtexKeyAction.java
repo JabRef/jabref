@@ -33,7 +33,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
                                                    Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
-        basePanel.output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
+        dialogService.notify(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
@@ -87,7 +87,7 @@ public class GenerateBibtexKeyAction implements BaseAction {
         }
 
         basePanel.markBaseChanged();
-        basePanel.output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
+        dialogService.notify(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
     }
 
     private String formatOutputMessage(String start, int count) {

@@ -24,14 +24,13 @@ public class UnabbreviateAction implements BaseAction {
 
     @Override
     public void action() {
+        panel.output(Localization.lang("Unabbreviating..."));
         BackgroundTask.wrap(this::unabbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private String unabbreviate() {
-        panel.output(Localization.lang("Unabbreviating..."));
-
         List<BibEntry> entries = panel.getSelectedEntries(); // never null
 
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationLoader
