@@ -30,19 +30,29 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private final MetaData metaData;
     private String user;
 
-    public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) throws IOException {
+    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
         super(name, context);
         this.metaData = metaData;
         this.user = user;
         this.filePath = expandPath(Objects.requireNonNull(filePath));
         this.auxParser = auxParser;
         this.fileMonitor = fileMonitor;
-        fileMonitor.addListenerForFile(this.filePath, this);
     }
 
-    public TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
+    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName());
     }
+
+    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
+        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+        fileMonitor.addListenerForFile(filePath, group);
+        return group;
+    }
+
+    public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
+        return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    }
+
 
     @Override
     public boolean contains(BibEntry entry) {
@@ -124,7 +134,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         List<Path> fileDirs = new ArrayList<>();
 
         metaData.getLaTexFileDirectory(user)
-                .ifPresent(laTexFileDirectory -> fileDirs.add(laTexFileDirectory));
+                .ifPresent(fileDirs::add);
 
         return fileDirs;
     }

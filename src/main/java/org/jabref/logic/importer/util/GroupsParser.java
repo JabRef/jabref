@@ -28,10 +28,14 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
 public class GroupsParser {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GroupsParser.class);
 
     private GroupsParser() {
     }
@@ -123,9 +127,18 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         try {
             Path path = Paths.get(tok.nextToken());
-            TexGroup newGroup = new TexGroup(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
-            addGroupDetails(tok, newGroup);
-            return newGroup;
+            try {
+                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
+                addGroupDetails(tok, newGroup);
+                return newGroup;
+            } catch (IOException ex) {
+                // Problem accessing file -> create without file monitoring
+                LOGGER.warn("Could not access file " + path + ". The group " + name + " will not reflect changes to the aux file.", ex);
+
+                TexGroup newGroup = TexGroup.createWithoutFileMonitoring(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
+                addGroupDetails(tok, newGroup);
+                return newGroup;
+            }
         } catch (InvalidPathException | IOException ex) {
             throw new ParseException(ex);
         }

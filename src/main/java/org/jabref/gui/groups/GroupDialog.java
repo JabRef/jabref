@@ -335,7 +335,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                                     autoGroupPersonsField.getText().trim());
                         }
                     } else if (texRadioButton.isSelected()) {
-                        resultingGroup = new TexGroup(groupName, getContext(),
+                        resultingGroup = TexGroup.create(groupName, getContext(),
                                                       Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor(), basePanel.getBibDatabaseContext().getMetaData());
                     }
 
@@ -466,7 +466,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         texGroupBrowseButton.setOnAction((ActionEvent e) -> openBrowseDialog());
         texGroupHBox.getChildren().add(texGroupFilePath);
         texGroupHBox.getChildren().add(texGroupBrowseButton);
-        texGroupHBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
+        HBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
         texPanel.getChildren().add(texGroupHBox);
         return texPanel;
     }

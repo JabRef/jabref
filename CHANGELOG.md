@@ -74,6 +74,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where selecting a group messed up the focus of the main table / entry editor. https://github.com/JabRef/jabref/issues/3367
 - We fixed an issue where composite author names were sorted incorrectly. https://github.com/JabRef/jabref/issues/2828
 - We fixed an issue where commands followed by `-` didn't work. [#3805](https://github.com/JabRef/jabref/issues/3805)
+- We fixed an issue where a non-existing aux file in a group made it impossible to open the library. [#4735](https://github.com/JabRef/jabref/issues/4735)
 - We fixed an issue where some journal names were wrongly marked as abbreviated. [#4115](https://github.com/JabRef/jabref/issues/4115)
 - We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
 - We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
