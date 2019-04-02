@@ -71,6 +71,8 @@ public class GroupTreeView {
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
 
+    private DragOverTreeItem previousDragOverTreeItem;
+
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
             row.pseudoClassStateChanged(pseudoClass, false);
@@ -84,6 +86,7 @@ public class GroupTreeView {
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        previousDragOverTreeItem = new DragOverTreeItem();
 
         // Set-up bindings
         Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
@@ -220,7 +223,7 @@ public class GroupTreeView {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
                     //expand node and all children on drag over
-                    row.getTreeItem().setExpanded(true);
+                    row.getTreeItem().setExpanded(previousDragOverTreeItem.expandGroup(row.getTreeItem()));
 
                     removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
                     switch (getDroppingMouseLocation(row, event)) {
@@ -397,6 +400,26 @@ public class GroupTreeView {
             return DroppingMouseLocation.BOTTOM;
         } else {
             return DroppingMouseLocation.CENTER;
+        }
+    }
+
+    private class DragOverTreeItem {
+        private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
+        private TreeItem<GroupNodeViewModel> draggedItem;
+        private long dragStarted;
+
+        public boolean expandGroup(TreeItem<GroupNodeViewModel> treeItem) {
+            if (!treeItem.equals(draggedItem)) {
+                this.draggedItem = treeItem;
+                this.dragStarted = System.currentTimeMillis();
+                return false;
+            }
+
+            if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }
