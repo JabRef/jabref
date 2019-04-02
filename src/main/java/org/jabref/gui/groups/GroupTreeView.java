@@ -412,13 +412,16 @@ public class GroupTreeView {
             if (!treeItem.equals(draggedItem)) {
                 this.draggedItem = treeItem;
                 this.dragStarted = System.currentTimeMillis();
-                return false;
+                return this.draggedItem.isExpanded();
             }
 
             if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
-                return true;
+                // expand or collapse the tree item and reset the time
+                this.dragStarted = System.currentTimeMillis();
+                return !this.draggedItem.isExpanded();
             } else {
-                return false;
+                // leave the expansion state of the tree item as it is
+                return this.draggedItem.isExpanded();
             }
         }
     }
