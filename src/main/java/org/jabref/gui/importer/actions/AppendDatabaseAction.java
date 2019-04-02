@@ -166,7 +166,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (Path file : filesToOpen) {
                 // Run the actual open in a thread to prevent the program locking until the file is loaded.
                 BackgroundTask.wrap(() -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
-                              .onSuccess(fileName -> { dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'");})
+                              .onSuccess(fileName -> dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'"))
                               .onFailure(exception -> {
                                   LOGGER.warn("Could not open database", exception);
                                   dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);})

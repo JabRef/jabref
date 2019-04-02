@@ -247,10 +247,9 @@ public class JabRefDesktop {
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JOptionPane.showMessageDialog(null,
-                                                  Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
-                                                  Localization.lang("Open console") + " - " + Localization.lang("Error"),
-                                                  JOptionPane.ERROR_MESSAGE);
+                    JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(
+                            Localization.lang("Open console") + " - " + Localization.lang("Error",
+                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText)));
                 }
             }
         }
