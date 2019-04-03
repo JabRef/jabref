@@ -74,6 +74,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where selecting a group messed up the focus of the main table / entry editor. https://github.com/JabRef/jabref/issues/3367
 - We fixed an issue where composite author names were sorted incorrectly. https://github.com/JabRef/jabref/issues/2828
 - We fixed an issue where commands followed by `-` didn't work. [#3805](https://github.com/JabRef/jabref/issues/3805)
+- We fixed an issue where a non-existing aux file in a group made it impossible to open the library. [#4735](https://github.com/JabRef/jabref/issues/4735)
 - We fixed an issue where some journal names were wrongly marked as abbreviated. [#4115](https://github.com/JabRef/jabref/issues/4115)
 - We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
 - We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
@@ -109,6 +110,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Removed
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
+- We removed the global search feature.
 - We removed the coloring of cells in the maintable according to whether the field is optional/required.
 - We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
@@ -119,7 +121,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Copy linked files to folder: available through File menu
   - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
-
 
 
 
