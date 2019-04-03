@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
-import org.jabref.gui.DialogService;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -23,7 +23,6 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
     @FXML private ButtonType okButton;
     @FXML private TextArea fieldsTextArea;
 
-    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     private CustomizeGeneralFieldsDialogViewModel viewModel;
 
@@ -44,7 +43,7 @@ public class CustomizeGeneralFieldsDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new CustomizeGeneralFieldsDialogViewModel(dialogService, preferences);
+        viewModel = new CustomizeGeneralFieldsDialogViewModel(JabRefGUI.getMainFrame().getDialogService(), preferences);
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsTextProperty());
 
     }

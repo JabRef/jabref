@@ -14,7 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
-import org.jabref.gui.DialogService;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -45,7 +45,6 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     @FXML private Button addNewJournalFileButton;
     @FXML private Button removeJournalAbbreviationsButton;
     @Inject private PreferencesService preferences;
-    @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationLoader journalAbbreviationLoader;
     private ManageJournalAbbreviationsViewModel viewModel;
@@ -62,7 +61,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, JabRefGUI.getMainFrame().getDialogService(), taskExecutor, journalAbbreviationLoader);
 
         setUpTable();
         setBindings();

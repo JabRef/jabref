@@ -1,7 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
@@ -12,7 +10,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 
-import org.jabref.gui.DialogService;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -33,8 +31,6 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     @FXML private TableView<CitationEntryViewModel> citationsTableView;
     @FXML private TableColumn<CitationEntryViewModel, String> citation;
     @FXML private TableColumn<CitationEntryViewModel, String> extraInfo;
-
-    @Inject private DialogService dialogService;
 
     private ManageCitationsDialogViewModel viewModel;
 
@@ -58,7 +54,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
 
-        viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
+        viewModel = new ManageCitationsDialogViewModel(ooBase, JabRefGUI.getMainFrame().getDialogService());
 
         citation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
         new ValueTableCellFactory<CitationEntryViewModel, String>().withGraphic(this::getText).install(citation);

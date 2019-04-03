@@ -17,8 +17,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
@@ -37,7 +37,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
-    private final DialogService dialogService;
+
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -47,9 +47,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             .compareToIgnoreCase(v2.getName());
     private Optional<BibDatabaseContext> currentDatabase;
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
-        this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
         // Register listener
@@ -109,7 +108,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         if (currentDatabase.isPresent()) {
             addNewSubgroup(rootGroup.get());
         } else {
-            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
+            JabRefGUI.getMainFrame().getDialogService().showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
         }
     }
 
@@ -141,7 +140,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog(dialogService));
+        Optional<AbstractGroup> newGroup = JabRefGUI.getMainFrame().getDialogService().showCustomDialogAndWait(new GroupDialog(JabRefGUI.getMainFrame().getDialogService()));
         newGroup.ifPresent(group -> {
             parent.addSubgroup(group);
 
@@ -152,7 +151,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // TODO: Expand parent to make new group visible
             //parent.expand();
 
-            dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Added group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
         });
     }
@@ -165,11 +164,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(dialogService, oldGroup.getGroupNode().getGroup()));
+        Optional<AbstractGroup> newGroup = JabRefGUI.getMainFrame().getDialogService()
+                .showCustomDialogAndWait(new GroupDialog(JabRefGUI.getMainFrame().getDialogService(), oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
             // TODO: Keep assignments
-            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+            boolean keepPreviousAssignments = JabRefGUI.getMainFrame().getDialogService().showConfirmationDialogAndWait(
                     Localization.lang("Change of Grouping Method"),
                     Localization.lang("Assign the original group's entries to this group?"));
             //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
@@ -199,7 +198,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
             //}
 
-            dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Modified group \"%0\".", group.getName()));
             writeGroupChangesToMetaData();
 
             // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
@@ -208,7 +207,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+        boolean confirmation = JabRefGUI.getMainFrame().getDialogService().showConfirmationDialogAndWait(
                 Localization.lang("Remove subgroups"),
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
@@ -216,13 +215,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
             //panel.getUndoManager().addEdit(undo);
             group.getGroupNode().removeAllChildren();
-            dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
         }
     }
 
     public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+        boolean confirmation = JabRefGUI.getMainFrame().getDialogService().showConfirmationDialogAndWait(
                 Localization.lang("Remove group"),
                 Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
 
@@ -235,7 +234,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
-            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
         }
     }
@@ -244,7 +243,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Removes the specified group and its subgroups (after asking for confirmation).
      */
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
+        boolean confirmed = JabRefGUI.getMainFrame().getDialogService().showConfirmationDialogAndWait(
                 Localization.lang("Remove group and subgroups"),
                 Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
                 Localization.lang("Remove"));
@@ -257,7 +256,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             group.getGroupNode().removeFromParent();
 
-            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
             writeGroupChangesToMetaData();
         }
     }

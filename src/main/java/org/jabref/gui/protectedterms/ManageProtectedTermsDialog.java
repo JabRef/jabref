@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 
-import org.jabref.gui.DialogService;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
@@ -36,7 +36,6 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
     @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableDeleteColumn;
 
     @Inject private ProtectedTermsLoader termsLoader;
-    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     private ManageProtectedTermsViewModel viewModel;
 
@@ -57,7 +56,7 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageProtectedTermsViewModel(termsLoader, dialogService, preferences);
+        viewModel = new ManageProtectedTermsViewModel(termsLoader, JabRefGUI.getMainFrame().getDialogService(), preferences);
 
         filesTable.setItems(viewModel.getTermsFiles());
         new ViewModelTableRowFactory<ProtectedTermsList>()

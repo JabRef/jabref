@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -41,7 +42,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private Button add;
     @FXML private VBox vbox;
     @Inject private PreferencesService preferencesService;
-    @Inject private DialogService dialogService;
     private StyleSelectDialogViewModel viewModel;
     private PreviewPanel previewArticle;
     private PreviewPanel previewBook;
@@ -66,6 +66,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
+
+        DialogService dialogService = JabRefGUI.getMainFrame().getDialogService();
 
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 

@@ -8,7 +8,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import org.jabref.gui.DialogService;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -29,7 +29,6 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<ExporterViewModel, String> layoutColumn;
     @FXML private TableColumn<ExporterViewModel, String> extensionColumn;
 
-    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     @Inject private JournalAbbreviationLoader loader;
     private ExportCustomizationDialogViewModel viewModel;
@@ -52,7 +51,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, loader);
+        viewModel = new ExportCustomizationDialogViewModel(preferences, JabRefGUI.getMainFrame().getDialogService(), loader);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());

@@ -2,7 +2,6 @@ package org.jabref.gui.groups;
 
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class GroupTreeViewModelTest {
     StateManager stateManager;
@@ -33,7 +31,7 @@ public class GroupTreeViewModelTest {
         stateManager = new StateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), taskExecutor, new CustomLocalDragboard());
+        groupTree = new GroupTreeViewModel(stateManager, taskExecutor, new CustomLocalDragboard());
     }
 
     @Test

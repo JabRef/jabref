@@ -6,8 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
@@ -20,7 +20,6 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML private ButtonType copyVersionButton;
     @FXML private TextArea textAreaVersions;
 
-    @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
 
@@ -42,7 +41,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
+        viewModel = new AboutDialogViewModel(JabRefGUI.getMainFrame().getDialogService(), clipBoardManager, buildInfo);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
     }
