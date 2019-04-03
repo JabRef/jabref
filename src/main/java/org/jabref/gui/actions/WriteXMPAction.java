@@ -92,7 +92,7 @@ public class WriteXMPAction extends SimpleCommand {
         }
         optionsDialog.open();
 
-        basePanel.output(Localization.lang("Writing XMP-metadata..."));
+        dialogService.notify(Localization.lang("Writing XMP-metadata..."));
     }
 
     private void writeXMP() {
@@ -162,7 +162,7 @@ public class WriteXMPAction extends SimpleCommand {
             return;
         }
 
-        basePanel.output(Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
+        dialogService.notify(Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
 

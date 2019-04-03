@@ -46,11 +46,11 @@ public class SendAsEMailAction implements BaseAction {
     @Override
     public void action() {
         BackgroundTask.wrap(this::sendEmail)
-                      .onSuccess(frame::output)
+                      .onSuccess(frame.getDialogService()::notify)
                       .onFailure(e -> {
                           String message = Localization.lang("Error creating email");
                           LOGGER.warn(message, e);
-                          frame.output(message);
+                          frame.getDialogService().notify(message);
                       })
                       .executeWith(Globals.TASK_EXECUTOR);
     }

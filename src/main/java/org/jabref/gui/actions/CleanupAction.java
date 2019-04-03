@@ -71,7 +71,7 @@ public class CleanupAction implements BaseAction {
             isCanceled = true;
             return;
         }
-        panel.output(Localization.lang("Doing a cleanup for %0 entries...",
+        dialogService.notify(Localization.lang("Doing a cleanup for %0 entries...",
                 Integer.toString(panel.getSelectedEntries().size())));
     }
 
@@ -115,7 +115,7 @@ public class CleanupAction implements BaseAction {
                 message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
                 break;
         }
-        panel.output(message);
+        dialogService.notify(message);
     }
 
     private void cleanup(CleanupPreset cleanupPreset) {
