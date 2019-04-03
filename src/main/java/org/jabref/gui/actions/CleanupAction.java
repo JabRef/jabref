@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -59,9 +58,8 @@ public class CleanupAction implements BaseAction {
 
             preferences.setCleanupPreset(chosenPreset.get());
 
-            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
-                          .onSuccess(result -> showResults())
-                          .executeWith(Globals.TASK_EXECUTOR);
+            this.cleanup(chosenPreset.get());
+            this.showResults();
         }
     }
 
@@ -73,7 +71,7 @@ public class CleanupAction implements BaseAction {
             isCanceled = true;
             return;
         }
-        panel.output(Localization.lang("Doing a cleanup for %0 entries...",
+        dialogService.notify(Localization.lang("Doing a cleanup for %0 entries...",
                 Integer.toString(panel.getSelectedEntries().size())));
     }
 
@@ -117,7 +115,7 @@ public class CleanupAction implements BaseAction {
                 message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
                 break;
         }
-        panel.output(message);
+        dialogService.notify(message);
     }
 
     private void cleanup(CleanupPreset cleanupPreset) {

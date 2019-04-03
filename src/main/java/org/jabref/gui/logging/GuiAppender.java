@@ -13,6 +13,7 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.impl.MutableLogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
 @Plugin(name = "GuiAppender", category = "Core", elementType = "appender", printObject = true)
@@ -44,6 +45,9 @@ public class GuiAppender extends AbstractAppender {
      */
     @Override
     public void append(LogEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(event));
+        // We need to make a copy as instances of LogEvent are reused by log4j
+        MutableLogEvent copy = new MutableLogEvent();
+        copy.initFrom(event);
+        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(copy));
     }
 }

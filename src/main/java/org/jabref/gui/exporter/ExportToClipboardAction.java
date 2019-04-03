@@ -53,7 +53,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         }
 
         if (panel.getSelectedEntries().isEmpty()) {
-            panel.output(Localization.lang("This operation requires one or more entries to be selected."));
+            dialogService.notify(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
 
@@ -123,7 +123,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         clipboardContent.putRtf(content);
         Globals.clipboardManager.setContent(clipboardContent);
 
-        panel.output(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
+        dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
 
     }
 

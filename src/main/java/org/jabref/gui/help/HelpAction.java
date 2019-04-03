@@ -1,68 +1,39 @@
 package org.jabref.gui.help;
 
-import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.KeyStroke;
-
 import org.jabref.Globals;
-import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
  * Dialog unless it is already visible, and shows the URL in it.
  */
-public class HelpAction extends MnemonicAwareAction {
+public class HelpAction extends SimpleCommand {
 
     /**
      * New languages of the help have to be added here
      */
-    private static final Set<String> AVAIABLE_LANG_FILES = Stream.of("en", "de", "fr", "in", "ja")
-            .collect(Collectors.toCollection(HashSet::new));
+    private static final Set<String> AVAILABLE_LANG_FILES = Stream.of("en", "de", "fr", "in", "ja")
+                                                                  .collect(Collectors.toCollection(HashSet::new));
 
     private HelpFile helpPage;
 
-
-    public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
-        this(title, tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
-        putValue(Action.ACCELERATOR_KEY, key);
-    }
-
-    private HelpAction(String title, String tooltip, HelpFile helpPage, Icon icon) {
-        super(icon);
-        this.helpPage = helpPage;
-        putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
-    }
-
-    public HelpAction(String tooltip, HelpFile helpPage) {
-        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
-    }
-
-    public HelpAction(HelpFile helpPage, Icon icon) {
-        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, icon);
-    }
-
     public HelpAction(HelpFile helpPage) {
-        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
+        this.helpPage = helpPage;
     }
 
     public static void openHelpPage(HelpFile helpPage) {
         String lang = Globals.prefs.get(JabRefPreferences.LANGUAGE);
         StringBuilder sb = new StringBuilder("https://help.jabref.org/");
 
-        if (AVAIABLE_LANG_FILES.contains(lang)) {
+        if (AVAILABLE_LANG_FILES.contains(lang)) {
             sb.append(lang);
             sb.append("/");
         } else {
@@ -70,15 +41,6 @@ public class HelpAction extends MnemonicAwareAction {
         }
         sb.append(helpPage.getPageName());
         JabRefDesktop.openBrowserShowPopup(sb.toString());
-    }
-
-    public void setHelpFile(HelpFile urlPart) {
-        this.helpPage = urlPart;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        openHelpPage(helpPage);
     }
 
     public static SimpleCommand getMainHelpPageCommand() {
@@ -90,12 +52,8 @@ public class HelpAction extends MnemonicAwareAction {
         };
     }
 
-    public SimpleCommand getCommand() {
-        return new SimpleCommand() {
-            @Override
-            public void execute() {
-                openHelpPage(helpPage);
-            }
-        };
+    @Override
+    public void execute() {
+        openHelpPage(helpPage);
     }
 }

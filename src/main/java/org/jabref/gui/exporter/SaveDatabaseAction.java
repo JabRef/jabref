@@ -140,7 +140,7 @@ public class SaveDatabaseAction {
                 // Reset title of tab
                 frame.setTabTitle(panel, panel.getTabTitle(),
                                   panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                frame.output(Localization.lang("Saved library") + " '"
+                frame.getDialogService().notify(Localization.lang("Saved library") + " '"
                              + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
                 frame.setWindowTitle();
                 frame.updateAllTabTitles();
@@ -158,7 +158,7 @@ public class SaveDatabaseAction {
 
     public boolean save() {
         if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            panel.frame().output(Localization.lang("Saving library") + "...");
+            panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
             panel.setSaving(true);
             return doSave();
         } else {
@@ -211,7 +211,7 @@ public class SaveDatabaseAction {
         save();
 
         // Reinstall AutosaveManager and BackupManager
-        panel.resetChangeMonitor();
+        panel.resetChangeMonitorAndChangePane();
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(panel));
@@ -240,7 +240,7 @@ public class SaveDatabaseAction {
             try {
                 saveDatabase(path, true, prefs.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
-                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
+                frame.getDialogService().notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
                 frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);

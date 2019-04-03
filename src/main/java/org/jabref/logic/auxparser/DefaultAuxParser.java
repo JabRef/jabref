@@ -77,7 +77,7 @@ public class DefaultAuxParser implements AuxParser {
                     matchNestedAux(auxFile, result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
-                LOGGER.info("Cannot locate input file", e);
+                LOGGER.warn("Cannot locate input file", e);
             } catch (IOException e) {
                 LOGGER.warn("Problem opening file", e);
             }
