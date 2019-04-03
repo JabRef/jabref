@@ -8,7 +8,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -24,6 +24,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @FXML private TextField description;
     @FXML private ComboBox<ExternalFileType> fileType;
 
+    @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
 
     @Inject private PreferencesService preferences;
@@ -55,7 +56,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @FXML
     private void initialize() {
 
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), JabRefGUI.getMainFrame().getDialogService(), preferences, externalFileTypes);
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences, externalFileTypes);
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());

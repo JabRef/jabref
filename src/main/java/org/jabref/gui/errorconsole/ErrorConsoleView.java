@@ -18,8 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.util.Callback;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -40,6 +40,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     @FXML private ListView<LogEventViewModel> messagesListView;
     @FXML private Label descriptionLabel;
 
+    @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
     @Inject private KeyBindingRepository keyBindingRepository;
@@ -59,7 +60,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ErrorConsoleViewModel(JabRefGUI.getMainFrame().getDialogService(), clipBoardManager, buildInfo);
+        viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);

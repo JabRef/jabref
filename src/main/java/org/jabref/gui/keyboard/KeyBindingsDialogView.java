@@ -10,7 +10,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 
-import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -32,6 +32,7 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
     @FXML private TreeTableColumn<KeyBindingViewModel, String> resetColumn;
 
     @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     private KeyBindingsDialogViewModel viewModel;
 
@@ -49,7 +50,7 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsDialogViewModel(keyBindingRepository, JabRefGUI.getMainFrame().getDialogService(), preferences);
+        viewModel = new KeyBindingsDialogViewModel(keyBindingRepository, dialogService, preferences);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(

@@ -20,7 +20,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
@@ -48,6 +48,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     private final BackgroundTask<List<BibEntry>> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
     @Inject private PreferencesService preferences;
     @Inject private StateManager stateManager;
@@ -70,7 +71,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
             if (button == importButton) {
                 viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems());
             } else {
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Import canceled"));
+                dialogService.notify(Localization.lang("Import canceled"));
             }
 
             return null;
@@ -79,7 +80,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, JabRefGUI.getMainFrame().getDialogService(), undoManager, preferences, stateManager, fileUpdateMonitor);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
 
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());

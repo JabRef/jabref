@@ -34,6 +34,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
@@ -65,6 +66,7 @@ public class GroupTreeView {
     @FXML private CustomTextField searchField;
 
     @Inject private StateManager stateManager;
+    @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
@@ -80,7 +82,7 @@ public class GroupTreeView {
     @FXML
     public void initialize() {
         this.localDragboard = GUIGlobals.localDragboard;
-        viewModel = new GroupTreeViewModel(stateManager, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

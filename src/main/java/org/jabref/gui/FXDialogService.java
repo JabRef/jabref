@@ -63,6 +63,14 @@ public class FXDialogService implements DialogService {
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
+    /**
+     * @deprecated try not to initialize a new dialog service but reuse the one constructed in {@link org.jabref.gui.JabRefFrame}.
+     */
+    @Deprecated
+    public FXDialogService() {
+        this(null);
+    }
+
     public FXDialogService(Window mainWindow) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar();

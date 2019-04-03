@@ -27,7 +27,9 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-         if (clazz == TaskExecutor.class) {
+        if (clazz == DialogService.class) {
+            return new FXDialogService();
+        } else if (clazz == TaskExecutor.class) {
             return Globals.TASK_EXECUTOR;
         } else if (clazz == PreferencesService.class) {
             return Globals.prefs;

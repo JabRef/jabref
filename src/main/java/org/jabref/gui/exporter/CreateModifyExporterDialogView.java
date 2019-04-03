@@ -25,9 +25,9 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     @FXML private TextField fileName;
     @FXML private TextField extension;
     @FXML private ButtonType saveExporter;
+    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     private CreateModifyExporterDialogViewModel viewModel;
-    private DialogService dialogService;
 
     public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
                                           PreferencesService preferences, JournalAbbreviationLoader loader) {

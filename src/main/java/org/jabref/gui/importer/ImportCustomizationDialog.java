@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 
-import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -33,6 +33,7 @@ public class ImportCustomizationDialog extends BaseDialog<Void> {
     @FXML private TableColumn<CustomImporter, String> classColumn;
     @FXML private TableColumn<CustomImporter, String> basePathColumn;
 
+    @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
     @Inject private JournalAbbreviationLoader loader;
     private ImportCustomizationDialogViewModel viewModel;
@@ -57,7 +58,7 @@ public class ImportCustomizationDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportCustomizationDialogViewModel(preferences, JabRefGUI.getMainFrame().getDialogService());
+        viewModel = new ImportCustomizationDialogViewModel(preferences, dialogService);
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());
         EasyBind.listBind(viewModel.selectedImportersProperty(), importerTable.getSelectionModel().getSelectedItems());

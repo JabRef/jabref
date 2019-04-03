@@ -1,5 +1,7 @@
 package org.jabref.gui.shared;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -42,6 +45,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private Button browseKeystore;
     @FXML private TextField serverTimezone;
 
+    @Inject private DialogService dialogService;
+
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -70,7 +75,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel = new SharedDatabaseLoginDialogViewModel(frame, frame.getDialogService());
+        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
