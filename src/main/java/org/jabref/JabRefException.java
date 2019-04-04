@@ -29,7 +29,7 @@ public class JabRefException extends Exception {
     public JabRefException(Throwable cause) {
         super(cause);
     }
-     
+
     @Override
     public String getLocalizedMessage() {
         if (localizedMessage == null) {
