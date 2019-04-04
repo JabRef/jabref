@@ -31,10 +31,11 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// JabRef MainClass
+/**
+ * JabRef MainClass
+ */
 public class JabRefMain extends Application {
 
-    // Creating a logger and using it to write messages to log files
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;
