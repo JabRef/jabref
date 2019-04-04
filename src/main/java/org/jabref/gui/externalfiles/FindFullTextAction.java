@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javafx.concurrent.Task;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -63,18 +64,29 @@ public class FindFullTextAction extends SimpleCommand {
                 return;
             }
         }
-        BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(this::downloadFullTexts)
-                      .executeWith(Globals.TASK_EXECUTOR);
-    }
 
-    private Map<Optional<URL>, BibEntry> findFullTexts() {
-        Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
-        for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fetchers.findFullTextPDF(entry), entry);
-        }
-        return downloads;
+        Task<Map<Optional<URL>, BibEntry>> findFullTextsTask = new Task<Map<Optional<URL>, BibEntry>>() {
+            @Override
+            protected Map<Optional<URL>, BibEntry> call() {
+                Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+                int count = 0;
+                for (BibEntry entry : basePanel.getSelectedEntries()) {
+                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                    downloads.put(fetchers.findFullTextPDF(entry), entry);
+                    updateProgress(++count, basePanel.getSelectedEntries().size());
+                }
+                return downloads;
+            }
+        };
+
+        findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
+
+        dialogService.showProgressDialogAndWait(
+                Localization.lang("Looking for full text document..."),
+                Localization.lang("Looking for full text document..."),
+                findFullTextsTask);
+
+        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
 
     private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
