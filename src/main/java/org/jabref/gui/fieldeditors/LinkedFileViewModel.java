@@ -383,7 +383,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
         }
-
         try {
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
             if (!targetDirectory.isPresent()) {
@@ -392,28 +391,32 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
 
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
-            BackgroundTask<Path> downloadTask = BackgroundTask
-                    .wrap(() -> {
-                        Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                        String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
-                        linkedFile.setFileType(suggestedTypeName);
-
-                        String suggestedName = linkedFileHandler.getSuggestedFileName();
-                        return targetDirectory.get().resolve(suggestedName);
-                    })
-                    .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
-                    .onSuccess(destination -> {
-                        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences));
-                        linkedFile.setLink(newLinkedFile.getLink());
-                        linkedFile.setFileType(newLinkedFile.getFileType());
-                    })
-                    .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
-
+            BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
+            downloadTask.onSuccess(destination -> {
+                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences));
+                linkedFile.setLink(newLinkedFile.getLink());
+                linkedFile.setFileType(newLinkedFile.getFileType());
+            });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }
+    }
+
+    public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        BackgroundTask<Path> downloadTask = BackgroundTask
+                .wrap(() -> {
+                    Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                    String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                    linkedFile.setFileType(suggestedTypeName);
+
+                    String suggestedName = linkedFileHandler.getSuggestedFileName();
+                    return targetDirectory.resolve(suggestedName);
+                })
+                .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
+        return downloadTask;
     }
 
     private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
