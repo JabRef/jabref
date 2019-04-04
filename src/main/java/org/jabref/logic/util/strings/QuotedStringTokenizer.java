@@ -34,6 +34,10 @@ public class QuotedStringTokenizer {
         }
     }
 
+    /**
+     * @return the next token from the content string, ending at the next
+     * unquoted delimiter. Does not unquote the string itself.
+     */
     public String nextToken() {
         char c;
         StringBuilder stringBuilder = new StringBuilder();
