@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefException extends Exception {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefException.class);
     private String localizedMessage;
 
@@ -30,10 +30,8 @@ public class JabRefException extends Exception {
         super(cause);
     }
      
-    // To display localized message on error
     @Override
     public String getLocalizedMessage() {
-
         if (localizedMessage == null) {
             LOGGER.debug("No localized exception message defined. Falling back to getMessage().");
             return getMessage();
