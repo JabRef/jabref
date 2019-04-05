@@ -178,7 +178,6 @@ public class JabRefFrame extends BorderPane {
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.dialogService = new FXDialogService(mainStage, this);
-        init();
     }
 
     /**
@@ -204,7 +203,7 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private void init() {
+    public void init() {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
