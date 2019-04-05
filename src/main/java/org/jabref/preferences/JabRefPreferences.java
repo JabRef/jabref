@@ -690,8 +690,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
-        defaults.put(MAIN_FONT_SIZE, 9);
-        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
+        defaults.put(MAIN_FONT_SIZE, 12);
+        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, true);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
