@@ -57,7 +57,7 @@ public class JabRefGUI {
                                     .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionAsync(false);
     }
 
@@ -107,7 +107,7 @@ public class JabRefGUI {
                     // add them to the list
                     toOpenTab.add(pr);
                 } else {
-                    JabRefGUI.getMainFrame().addParserResult(pr, first);
+                    mainFrame.addParserResult(pr, first);
                     first = false;
                 }
             }
@@ -115,7 +115,7 @@ public class JabRefGUI {
 
         // finally add things to the currently opened tab
         for (ParserResult pr : toOpenTab) {
-            JabRefGUI.getMainFrame().addParserResult(pr, first);
+            mainFrame.addParserResult(pr, first);
             first = false;
         }
 
@@ -162,7 +162,7 @@ public class JabRefGUI {
         // Display warnings, if any
         int tabNumber = 0;
         for (ParserResult pr : bibDatabases) {
-            ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), tabNumber++);
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame, tabNumber++);
         }
 
         // After adding the databases, go through each and see if
@@ -174,9 +174,9 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < bibDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
+        for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
-            BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
+            BasePanel panel = mainFrame.getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 
