@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Within JabRefPreferences.java we updated the MAIN_DEFAULT_SIZE to 12 and updated the OVERRIDE_DEFAULT_FONT_SIZE to true. This was to set the font size in accordance with ISO 9241-303. There are currently some truncating going on but the bounds remain the same.
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
   - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
   - DOI/URL: General -> Optional
