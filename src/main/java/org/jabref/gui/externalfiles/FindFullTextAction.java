@@ -86,7 +86,7 @@ public class FindFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
 
         dialogService.showProgressDialogAndWait(
-                Localization.lang("Looking for full text document..."),
+                Localization.lang("Look up full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
 
@@ -119,10 +119,11 @@ public class FindFullTextAction extends SimpleCommand {
 
     /**
      * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
-     * from the findFullTexts map
+     * from the findFullTexts map and then downloads the file into the given targetDirectory
      *
      * @param url   the url "key"
      * @param entry the entry "value"
+     * @param targetDirectory the target directory for the downloaded file
      */
     private void addLinkedFileFromURL(URL url, BibEntry entry, Path targetDirectory) {
         LinkedFile newLinkedFile = new LinkedFile(url, "");
