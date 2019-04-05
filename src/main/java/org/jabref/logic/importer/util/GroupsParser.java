@@ -169,8 +169,8 @@ public class GroupsParser {
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         String field = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        Character delimiter = tok.nextToken().charAt(0);
-        Character hierarchicalDelimiter = tok.nextToken().charAt(0);
+        Character delimiter = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR).charAt(0);
+        Character hierarchicalDelimiter = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR).charAt(0);
         AutomaticKeywordGroup newGroup = new AutomaticKeywordGroup(name, context, field, delimiter, hierarchicalDelimiter);
         addGroupDetails(tok, newGroup);
         return newGroup;
@@ -212,7 +212,7 @@ public class GroupsParser {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
-        String name = tok.nextToken();
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         try {
             int context = Integer.parseInt(tok.nextToken());
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
@@ -230,7 +230,7 @@ public class GroupsParser {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
-        String name = tok.nextToken();
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         try {
             int context = Integer.parseInt(tok.nextToken());
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
@@ -274,15 +274,15 @@ public class GroupsParser {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.SEARCH_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
-        String name = tok.nextToken();
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         int context = Integer.parseInt(tok.nextToken());
-        String expression = tok.nextToken();
+        String expression = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
-        return new SearchGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                GroupHierarchyType.getByNumberOrDefault(context), StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp
+        return new SearchGroup(name,
+                GroupHierarchyType.getByNumberOrDefault(context), expression, caseSensitive, regExp
         );
     }
 
