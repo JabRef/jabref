@@ -5,20 +5,20 @@ import java.util.Optional;
 
 import javax.swing.SwingUtilities;
 
-import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -48,7 +48,7 @@ public class PushToApplicationAction extends SimpleCommand implements Runnable {
         return pushActions.get(0);
     }
 
-    public Action getActionInformation(){
+    public Action getActionInformation() {
         return new Action() {
             @Override
             public Optional<JabRefIcon> getIcon() {
