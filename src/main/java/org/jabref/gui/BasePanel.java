@@ -390,7 +390,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
-        actions.put(Actions.PUSH_TO_APPLICATION, new PushToApplicationAction(frame));
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
 

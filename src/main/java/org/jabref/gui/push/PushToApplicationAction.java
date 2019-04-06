@@ -5,12 +5,15 @@ import java.util.Optional;
 
 import javax.swing.SwingUtilities;
 
+import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -20,16 +23,17 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationAction implements Runnable, BaseAction, Action {
+public class PushToApplicationAction extends SimpleCommand implements Runnable {
 
-    private final PushToApplication operation;
-    private final JabRefFrame frame;
+    private PushToApplication operation;
+    private JabRefFrame frame;
     private BasePanel panel;
     private List<BibEntry> entries;
 
-    public PushToApplicationAction(JabRefFrame frame) {
+    public PushToApplicationAction(final JabRefFrame frame, final StateManager stateManager) {
         this.frame = frame;
         this.operation = getLastUsedApplication(frame.getPushApplications().getApplications());
+        this.executable.bind(EasyBind.map(stateManager.activeDatabaseProperty(), Optional::isPresent));
     }
 
     private PushToApplication getLastUsedApplication(List<PushToApplication> pushActions) {
@@ -44,28 +48,32 @@ public class PushToApplicationAction implements Runnable, BaseAction, Action {
         return pushActions.get(0);
     }
 
-    @Override
-    public Optional<JabRefIcon> getIcon() {
-        return Optional.of(operation.getIcon());
+    public Action getActionInformation(){
+        return new Action() {
+            @Override
+            public Optional<JabRefIcon> getIcon() {
+                return Optional.of(operation.getIcon());
+            }
+
+            @Override
+            public Optional<KeyBinding> getKeyBinding() {
+                return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
+            }
+
+            @Override
+            public String getText() {
+                return Localization.lang("Push entries to external application (%0)", operation.getApplicationName());
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        };
     }
 
     @Override
-    public Optional<KeyBinding> getKeyBinding() {
-        return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
-    }
-
-    @Override
-    public String getText() {
-        return Localization.lang("Push entries to external application (%0)", operation.getApplicationName());
-    }
-
-    @Override
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
-    public void action() {
+    public void execute() {
         panel = frame.getCurrentBasePanel();
 
         // Check if a BasePanel exists:
