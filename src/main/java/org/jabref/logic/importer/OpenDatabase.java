@@ -6,11 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -64,8 +66,18 @@ public class OpenDatabase {
      */
     public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
         throws IOException {
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
-                importFormatPreferences.getEncoding());
+
+        //pdf integration for getting the bibliography
+        
+        ParserResult result;
+        if(BibDatabaseMode.BIBTEX.equals(fileToOpen)){
+            result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
+                    importFormatPreferences.getEncoding());
+        } else{
+            result = new PdfContentImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
+                    importFormatPreferences.getEncoding());
+        }
+
 
         if (importFormatPreferences.isKeywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
