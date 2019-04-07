@@ -351,6 +351,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             return null;
         });
 
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
+        keywordGroupSearchTerm.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
+        searchGroupSearchExpression.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
+
         EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
         nameField.setOnAction(actionHandler);
         descriptionField.setOnAction(actionHandler);
