@@ -68,7 +68,7 @@ public class OpenDatabase {
         throws IOException {
 
         //pdf integration for getting the bibliography
-        
+
         ParserResult result;
         if(BibDatabaseMode.BIBTEX.equals(fileToOpen)){
             result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
