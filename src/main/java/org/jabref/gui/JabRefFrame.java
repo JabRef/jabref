@@ -118,7 +118,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -136,7 +135,6 @@ import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
@@ -286,18 +284,6 @@ public class JabRefFrame extends BorderPane {
             currentBasePanel.getUndoManager().postUndoRedoEvent();
             currentBasePanel.getMainTable().requestFocus();
         });
-
-        //Note: The registration of Apple event is at the end of initialization, because
-        //if the events happen too early (ie when the window is not initialized yet), the
-        //opened (double-clicked) documents are not displayed.
-        if (OS.OS_X) {
-            try {
-                new MacAdapter().registerMacEvents(this);
-            } catch (Exception e) {
-                LOGGER.error("Could not interface with Mac OS X methods.", e);
-            }
-        }
-
         initShowTrackingNotification();
     }
 
