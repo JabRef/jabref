@@ -133,6 +133,9 @@ public class BibtexKeyGenerator extends BracketedPattern {
                         label = applyModifiers(label, parts, 1);
                     }
 
+                    // Remove all illegal characters from the label.
+                    label = cleanKey(label, bibtexKeyPatternPreferences.isEnforceLegalKey());
+
                     stringBuilder.append(label);
 
                 } else {
@@ -143,8 +146,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             LOGGER.warn("Cannot make label", e);
         }
 
-        // Remove all illegal characters from the key.
-        key = cleanKey(stringBuilder.toString(), bibtexKeyPatternPreferences.isEnforceLegalKey());
+        key = stringBuilder.toString();
 
         // Remove Regular Expressions while generating Keys
         String regex = bibtexKeyPatternPreferences.getKeyPatternRegex();

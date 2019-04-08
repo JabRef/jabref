@@ -95,7 +95,7 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(defOwnerField, 2, 10);
         builder.add(overwriteOwner, 3, 10);
 
-        Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER).getCommand());
+        Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER));
         builder.add(helpOwner, 4, 10);
 
         builder.add(useTimeStamp, 1, 13);
@@ -105,7 +105,7 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(fieldName, 3, 13);
         builder.add(timeStampField, 4, 13);
 
-        Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP).getCommand());
+        Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP));
         builder.add(helpTimestamp, 6, 13);
 
         builder.add(updateTimeStamp, 1, 14);

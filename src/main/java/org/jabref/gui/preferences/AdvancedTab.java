@@ -80,7 +80,7 @@ class AdvancedTab extends Pane implements PrefsTab {
         p.getChildren().add(remoteServerPort);
 
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
-        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE).getCommand());
+        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE));
         help.setMaxWidth(Double.MAX_VALUE);
         p.getChildren().add(help);
 

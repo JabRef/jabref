@@ -3,6 +3,8 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,12 +62,18 @@ public class MetaDataParser {
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
+            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
+                // The user name comes directly after "FILE_DIRECTORYLatex-"
+                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 6);
+                Path path = Paths.get(getSingleItem(value)).normalize();
+                metaData.setLaTexFileDirectory(user, path);
+                continue;
             }
 
             switch (entry.getKey()) {
                 case MetaData.GROUPSTREE:
                 case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor));
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
                     break;
                 case MetaData.SAVE_ACTIONS:
                     metaData.setSaveActions(Cleanups.parse(value));
