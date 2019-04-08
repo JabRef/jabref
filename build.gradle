@@ -163,7 +163,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.1'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.4.1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.4.2'
 
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
