@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A command that is only executable if a database is open.
+ * Deprecated use instead
+ * @see org.jabref.gui.actions.SimpleCommand
  */
+@Deprecated
 public class OldDatabaseCommandWrapper extends CommandBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OldDatabaseCommandWrapper.class);
