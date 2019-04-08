@@ -259,8 +259,8 @@ public class JabRefFrame extends BorderPane {
             }
 
             // Poor-mans binding to global state
-            // We need to invoke this in the JavaFX thread as all the listeners sit there
-            Platform.runLater(() -> Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext())));
+            Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext()));
+            Globals.stateManager.setSelectedEntries(currentBasePanel.getSelectedEntries());
 
             // Update search query
             String content = "";
@@ -728,7 +728,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(this))
+                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(Globals.stateManager))
         );
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
