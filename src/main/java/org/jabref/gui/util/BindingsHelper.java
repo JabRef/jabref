@@ -176,6 +176,14 @@ public class BindingsHelper {
         };
     }
 
+    /**
+     * Returns a wrapper around the given list that posts changes on the JavaFX thread.
+     */
+    public static <T> ObservableList<T> forUI(ObservableList<T> list) {
+        return new UiThreadList<>(list);
+    }
+
+
     private static class BidirectionalBinding<A, B> {
 
         private final ObservableValue<A> propertyA;
