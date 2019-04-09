@@ -293,9 +293,10 @@ public class BibDatabase {
     }
 
     public void addStrings(Collection<BibtexString> stringsToAdd) {
+
         for (BibtexString str : stringsToAdd) {
             Optional<BibtexString> bibtexString = getStringByName(str.getName());
-            if (bibtexString.isPresent() && !(bibtexString.get().getContent().equals(str.getContent()))) {
+            if (bibtexString.isPresent()) {
                 bibtexString.get().setContent(str.getContent());
             } else {
                 addString(str);
@@ -303,6 +304,11 @@ public class BibDatabase {
         }
     }
 
+    public void removeStringByName(BibtexString strToRemove) {
+        Optional<String> bibtexString = getStringByName(strToRemove.getName()).map(BibtexString::getId);
+        bibtexString.ifPresent(this::removeString);
+
+    }
     /**
      * Removes the string with the given id.
      */

@@ -59,7 +59,9 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     }
 
     public void removeString() {
-        allStrings.remove(selectedItemProperty.getValue());
+        BibtexStringViewModel toBeRemoved = selectedItemProperty.getValue();
+        allStrings.remove(toBeRemoved);
+        bibDatabase.removeStringByName(fromBibtexStringViewModel(toBeRemoved));
     }
 
     private BibtexStringViewModel convertFromBibTexString(BibtexString bibtexString) {
