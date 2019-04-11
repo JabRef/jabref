@@ -126,16 +126,17 @@ public class BibDatabaseTest {
     public void addStringAsCollection() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         List<BibtexString> strings = Arrays.asList(string);
-        database.addStrings(strings);
+        database.setStrings(strings);
         assertEquals(Optional.of(string), database.getStringByName("DSP"));
     }
 
     @Test
     public void addStringAsCollectionWithUpdatedContent() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
-        List<BibtexString> strings = Arrays.asList(string, new BibtexString("DSP", "ABCD"));
-        database.addStrings(strings);
-        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+        BibtexString newContent = new BibtexString("DSP", "ABCD");
+        List<BibtexString> strings = Arrays.asList(string, newContent);
+        database.setStrings(strings);
+        assertEquals(Optional.of(newContent), database.getStringByName("DSP"));
     }
 
     @Test
@@ -143,7 +144,7 @@ public class BibDatabaseTest {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
         List<BibtexString> strings = Arrays.asList(string, vlsi);
-        database.addStrings(strings);
+        database.setStrings(strings);
         assertEquals(Optional.of(string), database.getStringByName("DSP"));
         assertEquals(Optional.of(vlsi), database.getStringByName("VLSI"));
     }

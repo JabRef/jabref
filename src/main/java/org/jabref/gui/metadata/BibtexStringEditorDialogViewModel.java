@@ -35,9 +35,7 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         addAllStringsFromDB();
 
         ObservableList<ObservableValue<Boolean>> allValidProperty = EasyBind.map(allStringsProperty(), BibtexStringViewModel::combinedValidationValidProperty);
-
         validProperty.bind(EasyBind.combine(allValidProperty, stream -> stream.allMatch(valid -> valid)));
-
     }
 
     private void addAllStringsFromDB() {
@@ -61,7 +59,6 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     public void removeString() {
         BibtexStringViewModel toBeRemoved = selectedItemProperty.getValue();
         allStrings.remove(toBeRemoved);
-        bibDatabase.removeStringByName(fromBibtexStringViewModel(toBeRemoved));
     }
 
     private BibtexStringViewModel convertFromBibTexString(BibtexString bibtexString) {
@@ -74,14 +71,13 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
 
     public void save() {
         List<BibtexString> stringsToAdd = allStrings.stream().map(this::fromBibtexStringViewModel).collect(Collectors.toList());
-        bibDatabase.addStrings(stringsToAdd);
+        bibDatabase.setStrings(stringsToAdd);
     }
 
     private BibtexString fromBibtexStringViewModel(BibtexStringViewModel viewModel) {
         String label = viewModel.labelProperty().getValue();
         String content = viewModel.contentProperty().getValue();
         return new BibtexString(label, content);
-
     }
 
     public BooleanProperty validProperty() {
