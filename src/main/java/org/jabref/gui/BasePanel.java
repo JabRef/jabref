@@ -63,7 +63,6 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -251,7 +250,7 @@ public class BasePanel extends StackPane {
     }
 
     public void output(String s) {
-        frame.output(s);
+        dialogService.notify(s);
     }
 
     private void setupActions() {
@@ -442,7 +441,7 @@ public class BasePanel extends StackPane {
         getUndoManager().addEdit(compound);
 
         markBaseChanged();
-        frame.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
@@ -570,13 +569,12 @@ public class BasePanel extends StackPane {
     }
 
     private void openExternalFile() {
+        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (selectedEntries.size() != 1) {
+            output(Localization.lang("This operation requires exactly one item to be selected."));
+            return;
+        }
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-            if (selectedEntries.size() != 1) {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
-            }
-
             final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
@@ -1011,39 +1009,6 @@ public class BasePanel extends StackPane {
         return bibDatabaseContext.getDatabase();
     }
 
-    public void changeTypeOfSelectedEntries(String newType) {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeType(bes, newType);
-    }
-
-    private void changeType(List<BibEntry> entries, String newType) {
-        if ((entries == null) || (entries.isEmpty())) {
-            LOGGER.error("At least one entry must be selected to be able to change the type.");
-            return;
-        }
-
-        if (entries.size() > 1) {
-            boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
-            if (!proceed) {
-                return;
-            }
-        }
-
-        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                entry.setType(newType);
-            });
-        }
-
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
-        compound.end();
-        getUndoManager().addEdit(compound);
-        markBaseChanged();
-        updateEntryEditorIfShowing();
-    }
-
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String title = Localization.lang("Delete entry");
@@ -1326,10 +1291,10 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().undo();
                 markBaseChanged();
-                frame.output(Localization.lang("Undo"));
+                output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 LOGGER.warn("Nothing to undo", ex);
-                frame.output(Localization.lang("Nothing to undo") + '.');
+                output(Localization.lang("Nothing to undo") + '.');
             }
 
             markChangedOrUnChanged();
@@ -1397,9 +1362,9 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().redo();
                 markBaseChanged();
-                frame.output(Localization.lang("Redo"));
+                output(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
-                frame.output(Localization.lang("Nothing to redo") + '.');
+                output(Localization.lang("Nothing to redo") + '.');
             }
 
             markChangedOrUnChanged();

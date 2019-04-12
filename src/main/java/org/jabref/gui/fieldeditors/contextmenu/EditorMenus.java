@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -15,7 +12,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 
+import org.jabref.Globals;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.CopyDoiUrlAction;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.formatter.bibtexfields.CleanupURLFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -74,9 +74,8 @@ public class EditorMenus {
      */
     public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea) {
         return () -> {
-            AbstractAction copyDoiUrlAction = new CopyDoiUrlAction(textArea);
-            MenuItem copyDoiUrlMenuItem = new MenuItem((String) copyDoiUrlAction.getValue(Action.NAME));
-            copyDoiUrlMenuItem.setOnAction(event -> copyDoiUrlAction.actionPerformed(null));
+            ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea));
 
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiUrlMenuItem);

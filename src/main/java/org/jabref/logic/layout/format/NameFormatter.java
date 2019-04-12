@@ -124,7 +124,6 @@ public class NameFormatter implements LayoutFormatter {
     }
 
     public String format(String toFormat, String inParameters) {
-
         AuthorList al = AuthorList.parse(toFormat);
         String parameters;
 

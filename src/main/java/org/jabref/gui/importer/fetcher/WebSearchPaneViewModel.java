@@ -84,12 +84,12 @@ public class WebSearchPaneViewModel {
 
     public void search() {
         if (StringUtil.isBlank(getQuery())) {
-            frame.output(Localization.lang("Please enter a search string"));
+            frame.getDialogService().notify(Localization.lang("Please enter a search string"));
             return;
         }
 
         if (frame.getCurrentBasePanel() == null) {
-            frame.output(Localization.lang("Please open or start a new library before searching"));
+            frame.getDialogService().notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
 
