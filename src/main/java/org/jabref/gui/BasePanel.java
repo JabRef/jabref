@@ -48,6 +48,7 @@ import org.jabref.gui.externalfiles.FindFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.icon.JabRefIcon;
@@ -390,7 +391,7 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
 
-        actions.put(Actions.RENAME, this::copyTitle);
+        actions.put(Actions.RENAME, this::renameFile);
     }
 
     /**
@@ -918,6 +919,45 @@ public class BasePanel extends StackPane {
     public void closeBottomPane() {
         mode = BasePanelMode.SHOWING_NOTHING;
         splitPane.getItems().removeAll(entryEditor, preview);
+    }
+
+    /**
+     * This method renames a file after select an entry and click with the right button.
+     */
+    private void renameFile() {
+        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (selectedEntries.size() == 1) {
+            String field = FieldName.DOI;
+            Optional<String> link = selectedEntries.get(0).getField(FieldName.DOI);
+            if (selectedEntries.get(0).hasField(FieldName.URL)) {
+                link = selectedEntries.get(0).getField(FieldName.URL);
+                field = FieldName.URL;
+            }
+            if (link.isPresent()) {
+                try {
+                    JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
+                    output(Localization.lang("External viewer called") + '.');
+                } catch (IOException ex) {
+                    output(Localization.lang("Error") + ": " + ex.getMessage());
+                }
+            } else {
+                // No URL or DOI found in the "url" and "doi" fields.
+                // Look for web links in the "file" field as a fallback:
+
+                List<LinkedFile> files = selectedEntries.get(0).getFiles();
+
+                Optional<LinkedFile> linkedFile = files.stream()
+                        .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
+                                || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                        .findFirst();
+
+                LinkedFileViewModel lfvm = new LinkedFileViewModel(files.get(0), selectedEntries.get(0), this.bibDatabaseContext, new DefaultTaskExecutor(), this.dialogService, Globals.prefs);
+                lfvm.rename();
+            }
+        } else {
+            output(Localization.lang("This operation requires exactly one item to be selected."));
+        }
     }
 
     /**
