@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -51,6 +53,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -451,6 +454,23 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
+    }
+
+    private void renameFile() {
+        List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (selectedEntries.size() != 1) {
+            output(Localization.lang("This operation requires exactly one item to be selected."));
+            return;
+        }
+        List<LinkedFile> files = selectedEntries.get(0).getFiles();
+        String oldFile = files.get(0).getLink();
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(files.get(0));
+
+        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        editedFile.ifPresent(file -> {
+            files.get(0).setLink(file.getLink());
+            FileUtil.renameFile(Paths.get(oldFile), Paths.get(file.getLink()));
+        });
     }
 
     private void copyTitle() {
@@ -919,45 +939,6 @@ public class BasePanel extends StackPane {
     public void closeBottomPane() {
         mode = BasePanelMode.SHOWING_NOTHING;
         splitPane.getItems().removeAll(entryEditor, preview);
-    }
-
-    /**
-     * This method renames a file after select an entry and click with the right button.
-     */
-    private void renameFile() {
-        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-        if (selectedEntries.size() == 1) {
-            String field = FieldName.DOI;
-            Optional<String> link = selectedEntries.get(0).getField(FieldName.DOI);
-            if (selectedEntries.get(0).hasField(FieldName.URL)) {
-                link = selectedEntries.get(0).getField(FieldName.URL);
-                field = FieldName.URL;
-            }
-            if (link.isPresent()) {
-                try {
-                    JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
-                    output(Localization.lang("External viewer called") + '.');
-                } catch (IOException ex) {
-                    output(Localization.lang("Error") + ": " + ex.getMessage());
-                }
-            } else {
-                // No URL or DOI found in the "url" and "doi" fields.
-                // Look for web links in the "file" field as a fallback:
-
-                List<LinkedFile> files = selectedEntries.get(0).getFiles();
-
-                Optional<LinkedFile> linkedFile = files.stream()
-                        .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
-                        .findFirst();
-
-                LinkedFileViewModel lfvm = new LinkedFileViewModel(files.get(0), selectedEntries.get(0), this.bibDatabaseContext, new DefaultTaskExecutor(), this.dialogService, Globals.prefs);
-                lfvm.rename();
-            }
-        } else {
-            output(Localization.lang("This operation requires exactly one item to be selected."));
-        }
     }
 
     /**
