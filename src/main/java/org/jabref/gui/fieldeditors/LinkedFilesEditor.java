@@ -222,6 +222,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         renameFile.setOnAction(event -> linkedFile.rename());
         renameFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedNameSameAsOriginal());
 
+        MenuItem renameFileName = new MenuItem(Localization.lang("Rename to given name"));
+        renameFileName.setOnAction(event -> linkedFile.renameFile());
+
         MenuItem moveFile = new MenuItem(Localization.lang("Move file to file directory"));
         moveFile.setOnAction(event -> linkedFile.moveToDefaultDirectory());
         moveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
@@ -244,7 +247,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (linkedFile.getFile().isOnlineLink()) {
             menu.getItems().add(download);
         }
-        menu.getItems().addAll(renameFile, moveFile, renameAndMoveFile, deleteLink, deleteFile);
+        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, deleteLink, deleteFile);
 
         return menu;
     }

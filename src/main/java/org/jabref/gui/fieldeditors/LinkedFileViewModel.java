@@ -356,6 +356,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
+    public void renameFile() {
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
+        String oldFile = this.linkedFile.getLink();
+        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        editedFile.ifPresent(file -> {
+            this.linkedFile.setLink(file.getLink());
+            FileUtil.renameFile(Paths.get(oldFile), Paths.get(file.getLink()));
+        });
+    }
+
     public void writeXMPMetadata() {
         // Localization.lang("Writing XMP-metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {

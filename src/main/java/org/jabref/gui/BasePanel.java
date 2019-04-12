@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -393,8 +392,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
-
-        actions.put(Actions.RENAME, this::renameFile);
     }
 
     /**
@@ -454,23 +451,6 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    private void renameFile() {
-        List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-        if (selectedEntries.size() != 1) {
-            output(Localization.lang("This operation requires exactly one item to be selected."));
-            return;
-        }
-        List<LinkedFile> files = selectedEntries.get(0).getFiles();
-        String oldFile = files.get(0).getLink();
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(files.get(0));
-
-        Optional<LinkedFile> editedFile = dialog.showAndWait();
-        editedFile.ifPresent(file -> {
-            files.get(0).setLink(file.getLink());
-            FileUtil.renameFile(Paths.get(oldFile), Paths.get(file.getLink()));
-        });
     }
 
     private void copyTitle() {
