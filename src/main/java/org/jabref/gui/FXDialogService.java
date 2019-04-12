@@ -59,7 +59,6 @@ public class FXDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(FXDialogService.class);
-
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
@@ -118,7 +117,6 @@ public class FXDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         return choiceDialog.showAndWait();
-
     }
 
     @Override

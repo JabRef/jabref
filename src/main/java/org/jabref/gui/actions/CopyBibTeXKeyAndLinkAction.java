@@ -11,6 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * This class will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard.
@@ -46,14 +47,14 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
                 sb.append(OS.NEWLINE);
             }
-
-            DefaultTaskExecutor.runInJavaFXThread(() -> clipboardManager.setHtmlContent(sb.toString()));
+            final String keyAndLink = sb.toString();
+            DefaultTaskExecutor.runInJavaFXThread(() -> clipboardManager.setHtmlContent(keyAndLink));
 
             int copied = entriesWithKey.size();
             int toCopy = entries.size();
             if (copied == toCopy) {
                 // All entries had keys.
-                JabRefGUI.getMainFrame().getDialogService().notify((entries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Copied") + " '" + keyAndLink.substring(0, Math.min(keyAndLink.length(), JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT)) + "'.");
             } else {
                 JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                         Long.toString(toCopy - copied), Integer.toString(toCopy)));

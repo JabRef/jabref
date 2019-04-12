@@ -399,6 +399,9 @@ public class JabRefPreferences implements PreferencesService {
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
 
+    // Snackbar dialog maximum size
+    public static final int SNACKBAR_DIALOG_SIZE_LIMIT = 300;
+
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
 

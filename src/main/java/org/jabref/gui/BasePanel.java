@@ -190,7 +190,6 @@ public class BasePanel extends StackPane {
 
         this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService, externalFileTypes);
         frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-
     }
 
     @Subscribe
@@ -464,11 +463,12 @@ public class BasePanel extends StackPane {
                 output(Localization.lang("None of the selected entries have titles."));
                 return;
             }
-            Globals.clipboardManager.setContent(String.join("\n", titles));
+            final String copiedTitles = String.join("\n", titles);
+            Globals.clipboardManager.setContent(copiedTitles);
 
             if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
-                output((selectedBibEntries.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
+                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined title.", Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
             }
@@ -488,15 +488,15 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
                                          .filter(cite -> cite.contains("\\")) // must contain \
                                          .orElse("\\cite");
-            Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
+            final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
+            Globals.clipboardManager.setContent(copiedCiteCommand);
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output(bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key") + '.');
+                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedCiteCommand) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -516,11 +516,12 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            Globals.clipboardManager.setContent(String.join(",", keys));
+            final String copiedKeys = String.join(",", keys);
+            Globals.clipboardManager.setContent(copiedKeys);
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedKeys) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -557,15 +558,23 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            Globals.clipboardManager.setContent(sb.toString());
+            final String copiedKeysAndTitles = sb.toString();
+            Globals.clipboardManager.setContent(copiedKeysAndTitles);
 
             if (copied == bes.size()) {
                 // All entries had keys.
-                output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedKeysAndTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
             }
         }
+    }
+
+    private String shortenDialogMessage(String dialogMessage) {
+        if (dialogMessage.length() < JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT) {
+            return dialogMessage;
+        }
+        return dialogMessage.substring(0, Math.min(dialogMessage.length(), JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT)) + "...";
     }
 
     private void openExternalFile() {
@@ -952,7 +961,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
