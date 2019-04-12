@@ -389,6 +389,8 @@ public class BasePanel extends StackPane {
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
+
+        actions.put(Actions.RENAME, this::copyTitle);
     }
 
     /**

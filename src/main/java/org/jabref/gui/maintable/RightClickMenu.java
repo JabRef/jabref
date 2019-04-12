@@ -38,6 +38,7 @@ public class RightClickMenu {
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new OldCommandWrapper(Actions.CUT, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.RENAME, new OldCommandWrapper(Actions.RENAME, panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
