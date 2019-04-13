@@ -26,7 +26,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -439,12 +438,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
-        String extension = DownloadExternalFile.getSuffix(url);
-        if (extension != null) {
-            return ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
-        } else {
-            return Optional.empty();
-        }
+        return URLUtil.getSuffix(url)
+                      .flatMap(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension));
     }
 
     public LinkedFile getFile() {

@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.impl.MutableLogEvent;
 
 /**
  * This class is used for storing and archiving all message output of JabRef as log events.
@@ -28,10 +27,7 @@ public class LogMessages {
     }
 
     public void add(LogEvent event) {
-        // We need to make a copy as instances of LogEvent are reused by log4j
-        MutableLogEvent copy = new MutableLogEvent();
-        copy.initFrom(event);
-        messages.add(copy);
+        messages.add(event);
     }
 
     public void clear() {

@@ -485,12 +485,13 @@ class BibtexDatabaseWriterTest {
     void writeFileDirectories() throws Exception {
         metaData.setDefaultFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
+        metaData.setLaTexFileDirectory("defaultOwner-user", Paths.get("D:\\Latex"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + OS.NEWLINE +
                 OS.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
-                + OS.NEWLINE, stringWriter.toString());
+                     + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test

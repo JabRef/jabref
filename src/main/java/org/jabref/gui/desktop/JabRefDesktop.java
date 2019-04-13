@@ -10,8 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -227,12 +225,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(null,
-                                          couldNotOpenBrowser + "\n" + openManually + "\n" +
-                                                copiedToClipboard,
-                                          couldNotOpenBrowser,
-                                          JOptionPane.ERROR_MESSAGE);
+            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
+            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -265,11 +259,13 @@ public class JabRefDesktop {
                 String[] subcommands = command.split(" ");
 
                 LOGGER.info("Executing command \"" + command + "\"...");
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", commandLoggingText));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
+
                     JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
