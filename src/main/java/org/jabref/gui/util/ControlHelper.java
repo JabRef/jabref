@@ -3,9 +3,6 @@ package org.jabref.gui.util;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-import javax.swing.JComponent;
-
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.Parent;
@@ -22,13 +19,6 @@ public class ControlHelper {
             consumer.accept(event);
             event.consume();
         }));
-    }
-
-    public static void setSwingContent(DialogPane dialogPane, JComponent content) {
-        SwingNode node = new SwingNode();
-        node.setContent(content);
-        node.setVisible(true);
-        dialogPane.setContent(node);
     }
 
     public static boolean childIsFocused(Parent node) {

@@ -2,14 +2,13 @@ package org.jabref;
 
 import java.net.Authenticator;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
+import org.jabref.gui.FXDialog;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
@@ -89,11 +88,11 @@ public class JabRefMain extends Application {
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
-     * define a minimum version including the built number and to indicate whether Java 9 can be use (which it currently
+     * define a minimum version including the built number and to indicate whether Java 9 can be used (which it currently
      * can't). It tries to compare this version number to the version of the currently running JVM. The check is
      * optimistic and will rather return true even if we could not exactly determine the version.
      * <p>
-     * Note: Users with an very old version like 1.6 will not profit from this since class versions are incompatible and
+     * Note: Users with a very old version like 1.6 will not profit from this since class versions are incompatible and
      * JabRef won't even start. Currently, JabRef won't start with Java 9 either, but the warning that it cannot be used
      * with this version is helpful anyway to prevent users to update from an old 1.8 directly to version 9. Additionally,
      * we soon might have a JabRef that does start with Java 9 but is not perfectly compatible. Therefore, we should leave
@@ -119,9 +118,10 @@ public class JabRefMain extends Application {
                 versionError.append("\n");
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
-            final JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(null, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            frame.dispose();
+
+            FXDialog alert = new FXDialog(Alert.AlertType.ERROR, Localization.lang("Error"), true);
+            alert.setHeaderText(null);
+            alert.setContentText(versionError.toString());
 
             // We exit on Java 9 error since this will definitely not work
             if (java9Fail) {
@@ -163,7 +163,7 @@ public class JabRefMain extends Application {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
-        /* Build list of Import and Export formats */
+        // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
@@ -173,7 +173,7 @@ public class JabRefMain extends Application {
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
 
-        // override used newline character with the one stored in the preferences
+        // Override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
     }

@@ -65,7 +65,7 @@ public class FetchAndMergeEntry {
                                       if (fetchedEntry.isPresent()) {
                                           showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
                                       } else {
-                                          panel.frame().setStatus(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                                       }
                                   })
                                   .onFailure(exception -> {

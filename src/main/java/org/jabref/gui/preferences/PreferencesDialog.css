@@ -12,3 +12,7 @@
 .preferencePaneContainer {
     -fx-padding: 0em 1em 0em 3em;
 }
+
+*:search-highlight {
+	-fx-background-color: -jr-light-red;
+}

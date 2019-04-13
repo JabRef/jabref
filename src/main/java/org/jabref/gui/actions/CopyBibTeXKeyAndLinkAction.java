@@ -36,7 +36,7 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
             List<BibEntry> entriesWithKey = entries.stream().filter(BibEntry::hasCiteKey).collect(Collectors.toList());
 
             if (entriesWithKey.isEmpty()) {
-                JabRefGUI.getMainFrame().output(Localization.lang("None of the selected entries have BibTeX keys."));
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("None of the selected entries have BibTeX keys."));
                 return;
             }
 
@@ -53,9 +53,9 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
             int toCopy = entries.size();
             if (copied == toCopy) {
                 // All entries had keys.
-                JabRefGUI.getMainFrame().output((entries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                JabRefGUI.getMainFrame().getDialogService().notify((entries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
             } else {
-                JabRefGUI.getMainFrame().output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                         Long.toString(toCopy - copied), Integer.toString(toCopy)));
             }
         }
