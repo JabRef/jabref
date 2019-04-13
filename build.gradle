@@ -95,9 +95,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.14'
-    compile 'org.apache.pdfbox:fontbox:2.0.14'
-    compile 'org.apache.pdfbox:xmpbox:2.0.14'
+    compile 'org.apache.pdfbox:pdfbox:2.0.15'
+    compile 'org.apache.pdfbox:fontbox:2.0.15'
+    compile 'org.apache.pdfbox:xmpbox:2.0.15'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
 
@@ -112,7 +112,7 @@ dependencies {
     compile "org.libreoffice:unoil:6.2.2"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
-    compile 'info.debatty:java-string-similarity:1.1.0'
+    compile 'info.debatty:java-string-similarity:1.2.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -167,7 +167,7 @@ dependencies {
 
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
-    testCompile 'org.mockito:mockito-core:2.26.0'
+    testCompile 'org.mockito:mockito-core:2.27.0'
     testCompile 'com.github.tomakehurst:wiremock:2.22.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'

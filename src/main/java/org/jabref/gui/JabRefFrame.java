@@ -100,7 +100,7 @@ import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
 import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
-import org.jabref.gui.push.PushToApplicationButton;
+import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -559,7 +559,8 @@ public class JabRefFrame extends BorderPane {
         leftSide.setMinWidth(100);
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
-        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+
+        PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(this, Globals.stateManager);
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
@@ -570,7 +571,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
                 new Separator(Orientation.VERTICAL),
-                factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
+                factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction),
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
                 new Separator(Orientation.VERTICAL),
@@ -798,7 +799,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs))
         );
 
-        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+        final PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(this, Globals.stateManager);
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
@@ -815,7 +816,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
-                factory.createMenuItem(pushToExternal.getMenuAction(), pushToExternal),
+                factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
                         factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
