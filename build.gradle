@@ -96,7 +96,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
     compile 'org.apache.pdfbox:pdfbox:2.0.15'
-    compile 'org.apache.pdfbox:fontbox:2.0.14'
+    compile 'org.apache.pdfbox:fontbox:2.0.15'
     compile 'org.apache.pdfbox:xmpbox:2.0.15'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
