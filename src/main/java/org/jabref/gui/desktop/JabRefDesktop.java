@@ -166,7 +166,33 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
-        NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        if (fileLink == null) {
+            return;
+        }
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        } else {
+            String absolutePath = fileLink.toAbsolutePath().getParent().toString();
+            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            if (!command.isEmpty()) {
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+
+                // replace the placeholder if used
+                command = command.replace("%DIR", absolutePath);
+                String[] subcommands = command.split(" ");
+
+                LOGGER.info("Executing command \"" + command + "\"...");
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error("Open File Browser", exception);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                }
+            }
+        }
     }
 
     /**
@@ -228,22 +254,19 @@ public class JabRefDesktop {
 
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
+                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
+
                 String[] subcommands = command.split(" ");
 
-                // replace the placeholder if used
-                String commandLoggingText = command.replace("%DIR", absolutePath);
-
+                LOGGER.info("Executing command \"" + command + "\"...");
                 JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", commandLoggingText));
-                LOGGER.info("Executing command \"" + commandLoggingText + "\"...");
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(
-                            Localization.lang("Open console") + " - " + Localization.lang("Error",
-                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText)));
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
