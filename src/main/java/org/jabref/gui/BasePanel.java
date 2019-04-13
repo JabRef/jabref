@@ -255,7 +255,7 @@ public class BasePanel extends StackPane {
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs);
-        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
+        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
