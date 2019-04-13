@@ -259,7 +259,7 @@ public class JabRefDesktop {
                 String[] subcommands = command.split(" ");
 
                 LOGGER.info("Executing command \"" + command + "\"...");
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", commandLoggingText));
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
