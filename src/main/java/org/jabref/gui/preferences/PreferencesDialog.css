@@ -13,7 +13,6 @@
     -fx-padding: 0em 1em 0em 3em;
 }
 
-.sectionHeader {
-    -fx-font-size: 1.5em;
-    -fx-padding: 1em 0em 1em 0em;
+*:search-highlight {
+	-fx-background-color: -jr-light-red;
 }

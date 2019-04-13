@@ -7,33 +7,35 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-
-<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
-   <content>
-      <BorderPane>
-         <top>
-            <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
-              <columns>
-                <TableColumn fx:id="colName" minWidth="100.0" prefWidth="-1.0" text="%Name" />
-                <TableColumn fx:id="colJournals" minWidth="100.0" prefWidth="75.0" text="%Journals" />
-                  <TableColumn fx:id="colFile" minWidth="100.0" prefWidth="-1.0" text="%File" />
-                  <TableColumn fx:id="colDeleteIcon" minWidth="100.0" prefWidth="-1.0" />
-              </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-         </top>
-         <right>
-            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile" text="%Add style file" BorderPane.alignment="CENTER" />
-         </right>
-         <bottom>
-            <VBox fx:id="vbox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER" />
-         </bottom>
-      </BorderPane>
-   </content>
-      <buttonTypes>
-        <ButtonType fx:constant="CANCEL" />
-        <ButtonType fx:constant="OK" />
-      </buttonTypes>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0"
+            prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
+    <content>
+        <BorderPane>
+            <top>
+                <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn fx:id="colName" minWidth="100.0" prefWidth="-1.0" text="%Name"/>
+                        <TableColumn fx:id="colJournals" minWidth="100.0" prefWidth="75.0" text="%Journals"/>
+                        <TableColumn fx:id="colFile" minWidth="100.0" prefWidth="-1.0" text="%File"/>
+                        <TableColumn fx:id="colDeleteIcon" minWidth="100.0" prefWidth="-1.0"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </top>
+            <right>
+                <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile"
+                        text="%Add style file" BorderPane.alignment="CENTER"/>
+            </right>
+            <bottom>
+                <VBox fx:id="vbox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
+            </bottom>
+        </BorderPane>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType fx:constant="OK"/>
+    </buttonTypes>
 </DialogPane>

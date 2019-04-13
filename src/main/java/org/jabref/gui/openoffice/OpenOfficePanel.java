@@ -94,10 +94,10 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private final JabRefFrame frame;
     private OOBibStyle style;
-    private OpenOfficePreferences ooPrefs;
     private final JabRefPreferences jabRefPreferences;
-    private final StyleLoader loader;
     private final TaskExecutor taskExecutor;
+    private final StyleLoader loader;
+    private OpenOfficePreferences ooPrefs;
 
     public OpenOfficePanel(JabRefFrame frame, JabRefPreferences jabRefPreferences, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
@@ -117,9 +117,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        HelpAction helpCommand = new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE);
-
-        help = factory.createIconButton(StandardActions.HELP, helpCommand.getCommand());
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -139,6 +137,23 @@ public class OpenOfficePanel {
         initPanel();
     }
 
+    private static void addURL(List<URL> jarList) throws IOException {
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class<URLClassLoader> sysclass = URLClassLoader.class;
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            for (URL anU : jarList) {
+                method.invoke(sysloader, anU);
+            }
+        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
+                 InvocationTargetException e) {
+            LOGGER.error("Could not add URL to system classloader", e);
+            sysloader.close();
+            throw new IOException("Error, could not add URL to system classloader", e);
+        }
+    }
+
     public Node getContent() {
         return vbox;
     }
@@ -155,7 +170,7 @@ public class OpenOfficePanel {
                 ooBase.selectDocument();
                 dialogService.notify(Localization.lang("Connected to document") + ": "
                                      + ooBase.getCurrentDocumentTitle().orElse(""));
-            } catch (UnknownPropertyException | WrappedTargetException | IndexOutOfBoundsException |
+            } catch (WrappedTargetException | IndexOutOfBoundsException |
                      NoSuchElementException | NoDocumentException ex) {
                 LOGGER.warn("Problem connecting", ex);
                 dialogService.showErrorDialogAndWait(ex);
@@ -211,7 +226,6 @@ public class OpenOfficePanel {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
                                                          Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                                                            unresolvedKeys.get(0)));
-
                 }
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
@@ -223,18 +237,15 @@ public class OpenOfficePanel {
                 LOGGER.warn("Problem with style file", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("No valid style file defined"),
                                                      Localization.lang("You must select either a valid style file, or use one of the default styles."));
-
             } catch (BibEntryNotFoundException ex) {
                 LOGGER.debug("BibEntry not found", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"), Localization.lang(
                                                                                                                                 "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                                                                                                                 ex.getBibtexKey()));
-
             } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
                      CreationException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
             }
-
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
@@ -276,7 +287,7 @@ public class OpenOfficePanel {
 
         HBox hbox = new HBox();
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
-        hbox.getChildren().forEach(btn -> hbox.setHgrow(btn, Priority.ALWAYS));
+        hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
 
         vbox.setFillWidth(true);
         vbox.getChildren().addAll(hbox, setStyleFile, pushEntries, pushEntriesInt, pushEntriesAdvanced, pushEntriesEmpty, merge, manageCitations, exportCitations, settingsB);
@@ -384,6 +395,12 @@ public class OpenOfficePanel {
         connectTask.setOnSucceeded(value -> {
             ooBase = connectTask.getValue();
 
+            try {
+                ooBase.selectDocument();
+            } catch (WrappedTargetException | NoSuchElementException | NoDocumentException e) {
+                LOGGER.error("Error getting open writer documents", e);
+            }
+
             if (ooBase.isConnectedToDocument()) {
                 dialogService.notify(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
             }
@@ -398,7 +415,6 @@ public class OpenOfficePanel {
             merge.setDisable(false);
             manageCitations.setDisable(false);
             exportCitations.setDisable(false);
-
         });
         connectTask.setOnFailed(value -> {
             Throwable ex = connectTask.getException();
@@ -407,7 +423,6 @@ public class OpenOfficePanel {
 
                 dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
                                                                        + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
-
             } else if (ex instanceof IOException) {
                 LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
@@ -442,28 +457,9 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
-        WrappedTargetException, BootstrapException, UnknownPropertyException, NoDocumentException,
-        NoSuchElementException, CreationException {
+        BootstrapException, CreationException {
         // Connect
-        return new OOBibBase(ooPrefs.getExecutablePath(), true);
-    }
-
-    private static void addURL(List<URL> jarList) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<URLClassLoader> sysclass = URLClassLoader.class;
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
-            for (URL anU : jarList) {
-                method.invoke(sysloader, anU);
-            }
-        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
-                 InvocationTargetException e) {
-            LOGGER.error("Could not add URL to system classloader", e);
-            sysloader.close();
-            throw new IOException("Error, could not add URL to system classloader", e);
-
-        }
+        return new OOBibBase(ooPrefs.getExecutablePath(), true, dialogService);
     }
 
     private Optional<Boolean> showManualConnectionDialog() {

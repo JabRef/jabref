@@ -23,5 +23,4 @@ public class ReadStatusFieldComparator implements Comparator<Optional<SpecialFie
             }
         }
     }
-
 }

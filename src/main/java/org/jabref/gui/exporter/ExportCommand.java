@@ -58,8 +58,8 @@ public class ExportCommand extends SimpleCommand {
 
         //Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
-                .sorted(Comparator.comparing(Exporter::getName))
-                .collect(Collectors.toList());
+                                                        .sorted(Comparator.comparing(Exporter::getName))
+                                                        .collect(Collectors.toList());
 
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -113,14 +113,14 @@ public class ExportCommand extends SimpleCommand {
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
-                .onSuccess(x -> frame.output(Localization.lang("%0 export successful", format.getName())))
+                .onSuccess(x -> frame.getDialogService().notify(Localization.lang("%0 export successful", format.getName())))
                 .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private void handleError(Exception ex) {
         LOGGER.warn("Problem exporting", ex);
-        frame.output(Localization.lang("Could not save file."));
+        frame.getDialogService().notify(Localization.lang("Could not save file."));
         // Need to warn the user that saving failed!
         frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
     }

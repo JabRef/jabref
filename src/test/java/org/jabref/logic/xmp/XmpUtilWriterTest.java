@@ -9,20 +9,19 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class XmpUtilWriterTest {
 
     private static BibEntry olly2018;
@@ -31,7 +30,6 @@ class XmpUtilWriterTest {
     private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
-
         olly2018 = new BibEntry();
         olly2018.setType("article");
         olly2018.setCiteKey("Olly2018");
@@ -80,7 +78,6 @@ class XmpUtilWriterTest {
      */
     @BeforeEach
     void setUp() {
-
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
@@ -94,8 +91,7 @@ class XmpUtilWriterTest {
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
     @Test
-    void testWriteXmp(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
-
+    void testWriteXmp(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
         // read a bib entry from the tests before
@@ -103,12 +99,13 @@ class XmpUtilWriterTest {
         entry.setCiteKey("WriteXMPTest");
         entry.setId("ID4711");
 
-        // write the changed bib entry to the create PDF
+        // write the changed bib entry to the PDF
         XmpUtilWriter.writeXmp(pdfFile.toAbsolutePath().toString(), entry, null, xmpPreferences);
 
         // read entry again
         List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
+        entryWritten.clearField(FieldName.FILE);
 
         // compare the two entries
         assertEquals(entry, entryWritten);
@@ -118,8 +115,7 @@ class XmpUtilWriterTest {
      * Test, which writes multiple metadata entries to a PDF and reads them again to test the size.
      */
     @Test
-    void testWriteMultipleBibEntries(@TempDirectory.TempDir Path tempDir) throws IOException, TransformerException {
-
+    void testWriteMultipleBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeMultiple.pdf", tempDir);
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);

@@ -17,8 +17,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +30,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class LinkedFileViewModelTest {
 
     private Path tempFile;
@@ -43,7 +41,7 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path tempFolder) throws Exception {
+    void setUp(@TempDir Path tempFolder) throws Exception {
         entry = new BibEntry();
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);

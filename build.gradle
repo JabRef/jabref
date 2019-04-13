@@ -15,21 +15,19 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.16'
-    id 'com.install4j.gradle' version '7.0.9'
-    id 'com.github.johnrengelman.shadow' version '4.0.2'
+    id 'com.gradle.build-scan' version '2.0.2'
+    id 'com.install4j.gradle' version '7.0.10'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    id 'net.ltgt.errorprone' version '0.6.1'
+    id 'net.ltgt.errorprone' version '0.7.1'
+    id 'com.github.ben-manes.versions' version '0.21.0'
     id 'com.zyxist.chainsaw' version '0.3.1'
-    id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
-buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
-}
+buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
+
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -111,25 +109,24 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.13'
-    compile 'org.apache.pdfbox:fontbox:2.0.13'
-    compile 'org.apache.pdfbox:xmpbox:2.0.13'
+    compile 'org.apache.pdfbox:pdfbox:2.0.15'
+    compile 'org.apache.pdfbox:fontbox:2.0.15'
+    compile 'org.apache.pdfbox:xmpbox:2.0.15'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.60'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.61'
 
     compile 'commons-cli:commons-cli:1.4'
 
-    // TODO: LibreOffice has a split package, temporarily removed
-    libreoffice "org.libreoffice:juh:5.4.2"
-    libreoffice "org.libreoffice:jurt:5.4.2"
-    libreoffice "org.libreoffice:ridl:5.4.2"
-    libreoffice "org.libreoffice:unoil:5.4.2"
+    compile "org.libreoffice:juh:6.2.2"
+    compile "org.libreoffice:jurt:6.2.2"
+    compile "org.libreoffice:ridl:6.2.2"
+    compile "org.libreoffice:unoil:6.2.2"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
-    compile 'info.debatty:java-string-similarity:1.1.0'
+    compile 'info.debatty:java-string-similarity:1.2.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -137,24 +134,24 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.14'
+    compile 'mysql:mysql-connector-java:8.0.15'
 
     compile 'org.postgresql:postgresql:42.2.5'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:27.0.1-jre'
+    compile 'com.google.guava:guava:27.1-jre'
 
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     // JavaFX stuff
+    compile 'de.jensd:fontawesomefx-commons:8.15'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.jensd:fontawesomefx-commons:9.1.2'
-    compile 'de.saxsys:mvvmfx-validation:1.7.0'
-    compile 'de.saxsys:mvvmfx:1.7.0'
+    compile 'de.saxsys:mvvmfx-validation:1.8.0'
+    compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.2'
+    compile 'org.fxmisc.richtext:richtextfx:0.9.3'
    //compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:9.0.8'
@@ -166,44 +163,41 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
-    compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.1'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.11.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.11.1'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta4'
+    compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.2'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.2'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.2'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
     // JAX-B is considered JavaEE API and is no longer part of JavaSE (JDK 9)
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
     errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.0'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.0'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.3.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.2'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.3.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.2'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.4.2'
 
-    testCompile 'org.junit-pioneer:junit-pioneer:0.3.0'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
-    testCompile 'org.mockito:mockito-core:2.23.4'
-    testCompile 'com.github.tomakehurst:wiremock:2.20.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
+    testCompile 'org.mockito:mockito-core:2.27.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.22.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.9.3'
-    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.9.3'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.10.2'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.10.2'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.16'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.19'
 }
 
 jacoco {
@@ -214,20 +208,12 @@ dependencyUpdates {
     outputFormatter = "json"
 }
 
-//We have to use this as long as junit-pioneer has no official release
-dependencyUpdates.revision = 'integration'
-
 // We have some dependencies which cannot be updated due to various reasons.
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
                 selection.reject("Ignore SNAPSHOT releases")
-            }
-        }
-        rules.withModule("com.gradle.build-scan:com.gradle.build-scan.gradle.plugin") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.*/) {
-                selection.reject("Cannot be upgraded to version 2 until we upgrade to gradle 5")
             }
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
@@ -351,11 +337,14 @@ task generateSearchGrammarSource(type: JavaExec) {
 compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
+    //ignore annotation processor from log4j2
+    options.compilerArgs += '-proc:none'
 }
 compileJava.dependsOn "generateSource"
 
 compileTestJava {
     options.encoding = 'UTF-8'
+    options.compilerArgs += '-proc:none'
 }
 
 javadoc {

@@ -62,9 +62,6 @@ public class BibEntry implements Cloneable {
     private final StringProperty type = new SimpleStringProperty();
 
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
-    // Search and grouping status is stored in boolean fields for quick reference:
-    private boolean searchHit;
-    private boolean groupHit;
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
     /**
@@ -100,7 +97,7 @@ public class BibEntry implements Cloneable {
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
     public BibEntry(EntryType type) {
-        this(IdGenerator.next(),type.getName());
+        this(IdGenerator.next(), type.getName());
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -533,7 +530,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(IdGenerator.next(),type.getValue());
+        BibEntry clone = new BibEntry(IdGenerator.next(), type.getValue());
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
@@ -547,22 +544,6 @@ public class BibEntry implements Cloneable {
     @Override
     public String toString() {
         return CanonicalBibtexEntry.getCanonicalRepresentation(this);
-    }
-
-    public boolean isSearchHit() {
-        return searchHit;
-    }
-
-    public void setSearchHit(boolean searchHit) {
-        this.searchHit = searchHit;
-    }
-
-    public boolean isGroupHit() {
-        return groupHit;
-    }
-
-    public void setGroupHit(boolean groupHit) {
-        this.groupHit = groupHit;
     }
 
     /**
@@ -792,7 +773,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<String> getLatexFreeField(String name) {
-        if (!hasField(name)) {
+        if (!hasField(name) && !TYPE_HEADER.equals(name)) {
             return Optional.empty();
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
@@ -801,6 +782,15 @@ public class BibEntry implements Cloneable {
             Optional<String> citeKey = getCiteKeyOptional();
             latexFreeFields.put(name, citeKey.get());
             return citeKey;
+        } else if (TYPE_HEADER.equals(name)) {
+            Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                String entryName = entryType.get().getName();
+                latexFreeFields.put(name, entryName);
+                return Optional.of(entryName);
+            } else {
+                return Optional.of(StringUtil.capitalizeFirst(getType()));
+            }
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);

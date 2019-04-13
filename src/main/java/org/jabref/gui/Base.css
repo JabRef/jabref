@@ -18,7 +18,7 @@
 
     -jr-white: #ffffff;
     -jr-gray-0: #f2f2f2;
-    -jr-gray-1: #e6e6e6;
+    -jr-gray-1: #dddddd;
     -jr-gray-2: #808080;
     -jr-gray-3: #404040;
     -jr-black: #000;
@@ -70,7 +70,7 @@
     -jr-error: -jr-light-red;
 
     /* Color for the small group view indicator for the number of hits */
-    -jr-group-hits-bg: derive(-jr-sidepane-background, -5%);
+    -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
     -jr-group-hits-fg: ladder(
             -jr-group-hits-bg,
             -fx-light-text-color 45%,
@@ -84,8 +84,8 @@
     -jr-tooltip-fg: -jr-black;
 
     /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
-    -jr-sidepane-background: -jr-gray-0;
-    -jr-sidepane-header-background: -jr-gray-0;
+    -jr-sidepane-background: -jr-gray-1;
+    -jr-sidepane-header-background: -jr-gray-1;
     -jr-sidepane-header-color: -jr-theme-text;
 
     /* Specs for the scrollbars */
@@ -116,7 +116,7 @@
      */
     -fx-control-inner-background: derive(-fx-base, 95%);
     /* Version of -fx-control-inner-background for alternative rows */
-    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -2%);
+    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -6%);
 
     /* One of these colors will be chosen based upon a ladder calculation
      * that uses the brightness of a background color.  Instead of using these
@@ -362,6 +362,11 @@
     -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: white;
     -fx-fill: white;
+}
+
+.toggle-button:selected.icon-button:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -jr-selected;
 }
 
 .icon-buttonNoSpaceBottom {
@@ -818,14 +823,14 @@
 
 .separator:horizontal .line {
     -fx-border-color: -jr-separator;
-    -fx-border-width: 0;
-    -fx-border-insets: 1 0 0 0;
+    -fx-border-width: 0.3;
+    -fx-border-insets: 1 15 0 20;
 }
 
 .separator:vertical .line {
     -fx-border-color: -jr-separator;
     -fx-border-width: 1;
-    -fx-border-insets: 0 0 0 1;
+    -fx-border-insets: 5 15 5 15;
 }
 
 .mainToolbar {
@@ -974,4 +979,56 @@ We want to have a look that matches our icons in the tool-bar */
 
 .color-palette-region .button {
     -fx-border-width: 0px;
+}
+
+.bibEntry {
+
+}
+
+.bibEntry .type {
+    -fx-font-size: 110%;
+}
+
+.bibEntry .title {
+    -fx-font-size: 110%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .year {
+    -fx-font-size: 101%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .journal {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .authors {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .summary {
+    -fx-padding: 1ex 0ex 0ex 0ex;
+}
+
+.warning-icon {
+    -fx-fill: -jr-warn;
+}
+
+.error-icon {
+    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-error;
+}
+
+.tooltip-warning {
+    -fx-background-color: -jr-warn;
+}
+
+.tooltip-error {
+    -fx-background-color: -jr-error;
+}
+
+.sectionHeader {
+    -fx-font-size: 1.5em;
+    -fx-padding: 1em 0em 1em 0em;
 }

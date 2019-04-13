@@ -17,8 +17,7 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 class MoveFilesCleanupTest {
 
     private Path defaultFileFolder;
@@ -36,7 +34,7 @@ class MoveFilesCleanupTest {
     private FilePreferences filePreferences;
 
     @BeforeEach
-    void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void setUp(@TempDir Path bibFolder) throws IOException {
         // The folder where the files should be moved to
         defaultFileFolder = bibFolder.resolve("pdf");
         Files.createDirectory(defaultFileFolder);

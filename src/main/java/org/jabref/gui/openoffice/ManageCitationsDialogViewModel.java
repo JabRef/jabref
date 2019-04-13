@@ -40,13 +40,12 @@ public class ManageCitationsDialogViewModel {
         for (String name : names) {
 
             CitationEntry entry = new CitationEntry(name,
-                                                    ooBase.getCitationContext(nameAccess, name, 30, 30, true),
-                                                    ooBase.getCustomProperty(name));
+                    ooBase.getCitationContext(nameAccess, name, 30, 30, true),
+                    ooBase.getCustomProperty(name));
 
             CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);
         }
-
     }
 
     public void storeSettings() {
@@ -59,7 +58,7 @@ public class ManageCitationsDialogViewModel {
                 }
             }
         } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
-                 IllegalArgumentException ex) {
+                IllegalArgumentException ex) {
             LOGGER.warn("Problem modifying citation", ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Problem modifying citation"), ex);
         }
@@ -68,6 +67,5 @@ public class ManageCitationsDialogViewModel {
     public ListProperty<CitationEntryViewModel> citationsProperty() {
         return citations;
     }
-
 }
 

@@ -122,12 +122,12 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentBasePanel().getBibDatabaseContext());
 
         DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
         if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
-            || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
+                || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
             result.remove(second);
             if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                 autoRemoveExactDuplicates.set(true); // Remember choice
@@ -167,7 +167,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
-                             + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+                + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
         compoundEdit.end();
         panel.getUndoManager().addEdit(compoundEdit);
 

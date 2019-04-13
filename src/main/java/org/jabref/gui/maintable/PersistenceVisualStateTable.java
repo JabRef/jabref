@@ -66,7 +66,7 @@ public class PersistenceVisualStateTable {
         }
 
         if (columnNames.size() == columnsWidths.size() &&
-                columnNames.size() == preferences.getStringList(preferences.COLUMN_NAMES).size()) {
+                columnNames.size() == preferences.getStringList(JabRefPreferences.COLUMN_NAMES).size()) {
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
             preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
         }

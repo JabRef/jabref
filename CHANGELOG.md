@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
   - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
   - DOI/URL: General -> Optional
@@ -48,14 +49,24 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We updated updated the Related Articles tab to accept JSON from the new version of the Mr. DLib service
 - We added an option in the preference dialog box that allows user to choose behavior after dragging and dropping files in Entry Editor. [#4356](https://github.com/JabRef/jabref/issues/4356)
 - We added the ability to have an export preference where previously "File"-->"Export"/"Export selected entries" would not save the user's preference[#4495](https://github.com/JabRef/jabref/issues/4495)
+- We optimized the code responsible for connecting to an external database, which should lead to huge improvements in performance.
+- For automatically created groups, added ability to filter groups by entry type. [#4539](https://github.com/JabRef/jabref/issues/4539)
 - We added the ability to add field names from the Preferences Dialog [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added the ability change the column widths directly in the main table. [#4546](https://github.com/JabRef/jabref/issues/4546)
 - We added the ability to execute default action in dialog by using with <kbd>Ctrl</kbd> + <kbd>Enter</kbd> combination [#4496](https://github.com/JabRef/jabref/issues/4496)
-
-
+- We grouped and reordered the Main Menu (File, Edit, Library, Quality, Tools, and View tabs & icons). [#4666](https://github.com/JabRef/jabref/issues/4666) [#4667](https://github.com/JabRef/jabref/issues/4667) [#4668](https://github.com/JabRef/jabref/issues/4668) [#4669](https://github.com/JabRef/jabref/issues/4669) [#4670](https://github.com/JabRef/jabref/issues/4670) [#4671](https://github.com/JabRef/jabref/issues/4671) [#4672](https://github.com/JabRef/jabref/issues/4672) [#4673](https://github.com/JabRef/jabref/issues/4673)
+- We added additional modifiers (capitalize, titlecase and sentencecase) to the Bibtex key generator. [#1506](https://github.com/JabRef/jabref/issues/1506)
+- We grouped the toolbar icons and changed the Open Library and Copy icons. [#4584](https://github.com/JabRef/jabref/issues/4584) 
+- We added a browse button next to the path text field for aux-based groups. [#4586](https://github.com/JabRef/jabref/issues/4586)
+- We changed the title of Group Dialog to "Add subgroup" from "Edit group" when we select Add subgroup option.
+- We enable import button only if entries are selected. [#4755](https://github.com/JabRef/jabref/issues/4755)
+- We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
+- We added an option in the settings to set the default action in JabRef when right clicking on any entry in any database and selecting "Open folder". [#4763](https://github.com/JabRef/jabref/issues/4763)
+- The Medline fetcher now normalizes the author names according to the BibTeX-Standard [#4345](https://github.com/JabRef/jabref/issues/4345)
 
 
 ### Fixed
+- We fixed an issue where JabRef died silently for the user without enough inotify instances [#4874](https://github.com/JabRef/jabref/issues/4847)
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 - Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
@@ -67,6 +78,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where selecting a group messed up the focus of the main table / entry editor. https://github.com/JabRef/jabref/issues/3367
 - We fixed an issue where composite author names were sorted incorrectly. https://github.com/JabRef/jabref/issues/2828
 - We fixed an issue where commands followed by `-` didn't work. [#3805](https://github.com/JabRef/jabref/issues/3805)
+- We fixed an issue where a non-existing aux file in a group made it impossible to open the library. [#4735](https://github.com/JabRef/jabref/issues/4735)
 - We fixed an issue where some journal names were wrongly marked as abbreviated. [#4115](https://github.com/JabRef/jabref/issues/4115)
 - We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
 - We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
@@ -80,6 +92,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the default icon of a group was not colored correctly.
 - We fixed an issue where the first field in entry editor was not focused when adding a new entry. [#4024](https://github.com/JabRef/jabref/issues/4024)
 - We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files https://github.com/JabRef/jabref/issues/2970
+- We fixed an issue where custom name formatters were no longer found correctly. [#3531](https://github.com/JabRef/jabref/issues/3531)
 - We fixed an issue where the month was not shown in the preview https://github.com/JabRef/jabref/issues/3239.
 - Rewritten logic to detect a second jabref instance. [#4023](https://github.com/JabRef/jabref/issues/4023)
 - We fixed an issue where the "Convert to BibTeX-Cleanup" moved the content of the `file` field to the `pdf` field [#4120](https://github.com/JabRef/jabref/issues/4120)
@@ -93,23 +106,28 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where only one PDF file could be imported [#4422](https://github.com/JabRef/jabref/issues/4422)
 - We fixed an issue where "Move to group" would always move the first entry in the library and not the selected [#4414](https://github.com/JabRef/jabref/issues/4414)
 - We fixed an issue where an older dialog appears when downloading full texts from the quality menu. [#4489](https://github.com/JabRef/jabref/issues/4489)
-
-
+- We fixed an issue where right clicking on any entry in any database and selecting "Open folder" results in the NullPointer exception. [#4763](https://github.com/JabRef/jabref/issues/4763)
+- We fixed an issue where option 'open terminal here' with custom command was passing wrong argument. [#4802](https://github.com/JabRef/jabref/issues/4802)
+- We fixed an issue where ranking an entry would generate an IllegalArgumentException. [#4754](https://github.com/JabRef/jabref/issues/4754)
+- We fixed an issue where special characters where removed from non label key generation pattern parts [#4767](https://github.com/JabRef/jabref/issues/4767)
+- We fixed an issue where the RIS import would overwite the article date with the value of the acessed date [#4816](https://github.com/JabRef/jabref/issues/4816)
 
 
 
 ### Removed
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
+- We removed the global search feature.
 - We removed the coloring of cells in the maintable according to whether the field is optional/required.
+- We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
   - Print entry preview: available through entry preview
   - All commands related to marking: marking is not yet reimplemented
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
+  - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
-
 
 
 

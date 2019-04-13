@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.CheckListView?>
+<DialogPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="org.jabref.gui.importer.ImportEntriesDialog"
+            prefHeight="700.0" prefWidth="1000.0">
+    <content>
+        <VBox spacing="10">
+            <Label text="%Select the entries to be imported:"/>
+            <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
+            <HBox>
+                <Button text="%Select all new entries" styleClass="text-button" onAction="#selectAllNewEntries"/>
+                <Button text="%Unselect all" styleClass="text-button" onAction="#unselectAll"/>
+            </HBox>
+        </VBox>
+    </content>
+    <ButtonType fx:id="importButton" text="%Import entries" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

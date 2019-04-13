@@ -183,14 +183,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREAMBLE_SIZE_X = "preambleSizeX";
     public static final String PREAMBLE_POS_Y = "preamblePosY";
     public static final String PREAMBLE_POS_X = "preamblePosX";
-    public static final String TERMS_SIZE_Y = "termsSizeY";
-    public static final String TERMS_SIZE_X = "termsSizeX";
-    public static final String TERMS_POS_Y = "termsPosY";
-    public static final String TERMS_POS_X = "termsPosX";
     public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
     public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
-    public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
-    public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -237,7 +231,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
-    public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
@@ -251,6 +244,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
     public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
     public static final String USE_PDF_READER = "usePDFReader";
+    public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
+    public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -288,8 +284,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
-    public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
-    public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
@@ -565,10 +559,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREAMBLE_POS_Y, 0);
         defaults.put(PREAMBLE_SIZE_X, 600);
         defaults.put(PREAMBLE_SIZE_Y, 400);
-        defaults.put(TERMS_POS_X, 0);
-        defaults.put(TERMS_POS_Y, 0);
-        defaults.put(TERMS_SIZE_X, 500);
-        defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
@@ -652,7 +642,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
         defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
         defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
@@ -669,7 +659,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL);
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
-        defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
@@ -695,8 +684,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
-        defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
-        defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
@@ -730,9 +717,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DROPPEDFILEHANDLER_MOVE, Boolean.FALSE);
         defaults.put(DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
 
-        defaults.put(IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
-
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
         //Default empty String to be backwards compatible
@@ -748,16 +732,19 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
+        defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
             defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
             defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
             defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
+            defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
             defaults.put(CONSOLE_COMMAND, "");
             defaults.put(ADOBE_ACROBAT_COMMAND, "");
             defaults.put(SUMATRA_PDF_COMMAND, "");
             defaults.put(USE_PDF_READER, "");
+            defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
         //versioncheck defaults
@@ -932,6 +919,7 @@ public class JabRefPreferences implements PreferencesService {
         return preferredPositions;
     }
 
+    @Override
     public String getUser() {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
@@ -1415,10 +1403,12 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
+    @Override
     public Charset getDefaultEncoding() {
         return Charset.forName(get(DEFAULT_ENCODING));
     }
 
+    @Override
     public void setDefaultEncoding(Charset encoding) {
         put(DEFAULT_ENCODING, encoding.name());
     }
@@ -1445,10 +1435,11 @@ public class JabRefPreferences implements PreferencesService {
                                    get(IMPORT_FILEDIRPATTERN));
     }
 
+    @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                                          getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
-                                          get(TIME_STAMP_FORMAT));
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                get(TIME_STAMP_FORMAT));
     }
 
     public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
@@ -1460,15 +1451,17 @@ public class JabRefPreferences implements PreferencesService {
         return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS));
     }
 
+    @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-                                           isKeywordSyncEnabled());
+                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+                isKeywordSyncEnabled());
     }
 
     @Override
@@ -1549,14 +1542,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                                         this.get(JabRefPreferences.OO_JARS_PATH),
-                                         this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                                         this.get(JabRefPreferences.OO_PATH),
-                                         this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                                         this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                                         this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                                         this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                                         this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                this.get(JabRefPreferences.OO_JARS_PATH),
+                this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                this.get(JabRefPreferences.OO_PATH),
+                this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
@@ -1636,6 +1629,7 @@ public class JabRefPreferences implements PreferencesService {
                                              getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
+    @Override
     public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
         List<String> enabledExternalList = new ArrayList<>();
         List<String> disabledExternalList = new ArrayList<>();
@@ -1662,7 +1656,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
-
     }
 
     @Override
@@ -1708,10 +1701,13 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
+    @Override
     public void storeExportSaveOrder(SaveOrderConfig config) {
         putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
         putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
 
         put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field);
         put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field);
@@ -1730,14 +1726,16 @@ public class JabRefPreferences implements PreferencesService {
         return config;
     }
 
+    @Override
     public SaveOrderConfig loadExportSaveOrder() {
-        return new SaveOrderConfig(true,
+        return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
                 new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
         );
     }
 
+    @Override
     public Character getKeywordDelimiter() {
         return get(KEYWORD_SEPARATOR).charAt(0);
     }
@@ -2011,7 +2009,7 @@ public class JabRefPreferences implements PreferencesService {
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                                                           layoutPreferences, savePreferences);
+                    layoutPreferences, savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;
@@ -2045,12 +2043,22 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public String getExportWorkingDirectory() {
+        return get(EXPORT_WORKING_DIRECTORY);
+    }
+
+    @Override
     public void setExportWorkingDirectory(String layoutFileDirString) {
         put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
     }
 
     @Override
-    public String getExportWorkingDirectory() {
-        return get(EXPORT_WORKING_DIRECTORY);
+    public boolean shouldWarnAboutDuplicatesForImport() {
+        return getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION);
+    }
+
+    @Override
+    public void setShouldWarnAboutDuplicatesForImport(boolean value) {
+        putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
     }
 }

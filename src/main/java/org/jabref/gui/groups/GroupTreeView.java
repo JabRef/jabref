@@ -71,6 +71,8 @@ public class GroupTreeView {
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
 
+    private DragExpansionHandler dragExpansionHandler;
+
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
             row.pseudoClassStateChanged(pseudoClass, false);
@@ -84,6 +86,7 @@ public class GroupTreeView {
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        dragExpansionHandler = new DragExpansionHandler();
 
         // Set-up bindings
         Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
@@ -220,7 +223,7 @@ public class GroupTreeView {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
                     //expand node and all children on drag over
-                    row.getTreeItem().setExpanded(true);
+                    dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
                     switch (getDroppingMouseLocation(row, event)) {
@@ -398,6 +401,30 @@ public class GroupTreeView {
             return DroppingMouseLocation.BOTTOM;
         } else {
             return DroppingMouseLocation.CENTER;
+        }
+    }
+
+    private class DragExpansionHandler {
+        private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
+        private TreeItem<GroupNodeViewModel> draggedItem;
+        private long dragStarted;
+
+        public void expandGroup(TreeItem<GroupNodeViewModel> treeItem) {
+            if (!treeItem.equals(draggedItem)) {
+                this.draggedItem = treeItem;
+                this.dragStarted = System.currentTimeMillis();
+                this.draggedItem.setExpanded(this.draggedItem.isExpanded());
+                return;
+            }
+
+            if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
+                // expand or collapse the tree item and reset the time
+                this.dragStarted = System.currentTimeMillis();
+                this.draggedItem.setExpanded(!this.draggedItem.isExpanded());
+            } else {
+                // leave the expansion state of the tree item as it is
+                this.draggedItem.setExpanded(this.draggedItem.isExpanded());
+            }
         }
     }
 }

@@ -30,12 +30,13 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.externalfiles.NewDroppedFileHandler;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
@@ -59,7 +60,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final UndoManager undoManager;
 
     private final MainTableDataModel model;
-    private final NewDroppedFileHandler fileHandler;
+    private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
@@ -71,28 +72,29 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
-                                                Globals.prefs.getFilePreferences(),
-                                                Globals.prefs.getImportFormatPreferences(),
-                                                Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor()
-
-        );
+        importHandler = new ImportHandler(
+                frame.getDialogService(), database, externalFileTypes,
+                Globals.prefs.getFilePreferences(),
+                Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getUpdateFieldPreferences(),
+                Globals.getFileUpdateMonitor(),
+                undoManager,
+                Globals.stateManager);
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                                                              .withOnMouseClickedEvent((entry, event) -> {
+                .withOnMouseClickedEvent((entry, event) -> {
                                                                   if (event.getClickCount() == 2) {
                                                                       panel.showAndEdit(entry.getEntry());
                                                                   }
                                                               })
-                                                              .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
-                                                              .setOnDragDetected(this::handleOnDragDetected)
-                                                              .setOnDragDropped(this::handleOnDragDropped)
-                                                              .setOnDragOver(this::handleOnDragOver)
-                                                              .setOnMouseDragEntered(this::handleOnDragEntered)
-                                                              .install(this);
+                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService()))
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .setOnMouseDragEntered(this::handleOnDragEntered)
+                .install(this);
 
         /*for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
             Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
@@ -107,7 +109,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.setItems(model.getEntriesFilteredAndSorted());
+        this.setItems(BindingsHelper.forUI(model.getEntriesFilteredAndSorted()));
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
@@ -279,42 +281,37 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
-
         boolean success = false;
 
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
-
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-
             List<Path> bibFiles = files.stream().filter(FileUtil::isBibFile).collect(Collectors.toList());
 
             if (!bibFiles.isEmpty()) {
+                // Import all bibtex entries contained in the dropped bib files
                 for (Path file : bibFiles) {
-                    fileHandler.importEntriesFromDroppedBibFiles(file);
+                    importHandler.importEntriesFromBibFiles(file);
                 }
                 success = true;
-
             }
             if (event.getGestureTarget() instanceof TableRow) {
-
+                // Depending on the pressed modifier, import as new entries or link to drop target
                 BibEntry entry = originalItem.getEntry();
-
                 if ((event.getTransferMode() == TransferMode.MOVE)) {
-
                     LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-                    fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
+                    importHandler.importAsNewEntries(files);
                     success = true;
                 }
 
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("LINK"); //alt on win
-                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
+                    importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
-
                 }
+
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); //ctrl on win
-                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
+                    importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }
             }
@@ -322,7 +319,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         event.setDropCompleted(success);
         event.consume();
-
     }
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {

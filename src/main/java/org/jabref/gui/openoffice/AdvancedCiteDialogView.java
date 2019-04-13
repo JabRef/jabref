@@ -41,6 +41,5 @@ public class AdvancedCiteDialogView extends BaseDialog<AdvancedCiteDialogViewMod
         inPar.selectedProperty().bindBidirectional(viewModel.citeInParProperty());
         inText.selectedProperty().bindBidirectional(viewModel.citeInTextProperty());
         pageInfo.textProperty().bindBidirectional(viewModel.pageInfoProperty());
-
     }
 }

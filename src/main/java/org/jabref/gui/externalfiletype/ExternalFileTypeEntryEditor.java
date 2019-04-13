@@ -20,8 +20,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -62,7 +62,7 @@ public class ExternalFileTypeEntryEditor {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(Paths.get(appDir)).build();
-        DialogService ds = new FXDialogService();
+        DialogService ds = JabRefGUI.getMainFrame().getDialogService();
 
         Optional<Path> path = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -175,16 +175,6 @@ public class ExternalFileTypeEntryEditor {
 
         browseBut.addActionListener(browsePressed);
 
-        setValues(entry);
-    }
-
-    public void setEntry(CustomExternalFileType entry) {
-        this.entry = entry;
-        if (entry.getName().isEmpty()) {
-            diag.setTitle(newFileTitle);
-        } else {
-            diag.setTitle(editFileTitle);
-        }
         setValues(entry);
     }
 

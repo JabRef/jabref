@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
@@ -40,10 +38,8 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.FileUpdatePanel;
-import org.jabref.gui.contentselector.ContentSelectorDialog;
+import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -54,7 +50,6 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.groups.GroupAddRemoveDialog;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -68,7 +63,6 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -141,6 +135,7 @@ public class BasePanel extends StackPane {
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
+    private DatabaseChangePane changePane;
     private boolean saving;
 
     // AutoCompleter used in the search bar
@@ -150,7 +145,6 @@ public class BasePanel extends StackPane {
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
 
-    private StringDialog stringDialog;
     private SuggestionProviders suggestionProviders;
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
@@ -189,19 +183,6 @@ public class BasePanel extends StackPane {
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
-
-        Optional<File> file = bibDatabaseContext.getDatabaseFile();
-        if (file.isPresent()) {
-            // Register so we get notifications about outside changes to the file.
-            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
-        } else {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                this.baseChanged = true;
-            }
-        }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
@@ -269,12 +250,12 @@ public class BasePanel extends StackPane {
     }
 
     public void output(String s) {
-        frame.output(s);
+        dialogService.notify(s);
     }
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs);
-        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
+        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
@@ -307,17 +288,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.PASTE, this::paste);
 
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
-
-        // The action for opening the string editor
-        actions.put(Actions.EDIT_STRINGS, () -> {
-            if (stringDialog == null) {
-                StringDialog form = new StringDialog(frame, BasePanel.this, bibDatabaseContext.getDatabase());
-                form.setVisible(true);
-                stringDialog = form;
-            } else {
-                stringDialog.setVisible(true);
-            }
-        });
 
         // The action for auto-generating keys.
         actions.put(Actions.MAKE_KEY, new GenerateBibtexKeyAction(this, frame.getDialogService()));
@@ -374,47 +344,42 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
-        actions.put(Actions.REPLACE_ALL, ()-> (new ReplaceStringAction(this)).execute());
+        actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
+                    new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
+                    new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
+                    new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
             actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
+                        new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
             actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
+                        new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
+                        new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, () -> {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
             boolean enabled = !previewPreferences.isPreviewPanelEnabled();
             PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
-                    .withPreviewPanelEnabled(enabled)
-                    .build();
+                                                                         .withPreviewPanelEnabled(enabled)
+                                                                         .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
-            DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
+            setPreviewActive(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
-
-        actions.put(Actions.MANAGE_SELECTORS, () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(frame, BasePanel.this, false, null);
-            csd.setVisible(true);
-        });
 
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -423,12 +388,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-
-        actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
-
-        actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
-        actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
-        actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
     }
@@ -439,7 +398,8 @@ public class BasePanel extends StackPane {
      * @param outputFormat the desired {@link CitationStyleOutputFormat}
      */
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        new CitationStyleToClipboardWorker(this, outputFormat).execute();
+        CitationStyleToClipboardWorker worker = new CitationStyleToClipboardWorker(this, outputFormat, dialogService, Globals.clipboardManager, Globals.prefs.getPreviewPreferences());
+        worker.copyCitationStyleToClipboard(Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -481,7 +441,7 @@ public class BasePanel extends StackPane {
         getUndoManager().addEdit(compound);
 
         markBaseChanged();
-        frame.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
@@ -496,9 +456,9 @@ public class BasePanel extends StackPane {
         if (!selectedBibEntries.isEmpty()) {
             // Collect all non-null titles.
             List<String> titles = selectedBibEntries.stream()
-                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                    .map(bibEntry -> bibEntry.getTitle().get())
-                    .collect(Collectors.toList());
+                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                                                    .map(bibEntry -> bibEntry.getTitle().get())
+                                                    .collect(Collectors.toList());
 
             if (titles.isEmpty()) {
                 output(Localization.lang("None of the selected entries have titles."));
@@ -530,8 +490,8 @@ public class BasePanel extends StackPane {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> cite.contains("\\")) // must contain \
-                    .orElse("\\cite");
+                                         .filter(cite -> cite.contains("\\")) // must contain \
+                                         .orElse("\\cite");
             Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
 
             if (keys.size() == bes.size()) {
@@ -575,7 +535,7 @@ public class BasePanel extends StackPane {
             Layout layout;
             try {
                 layout = new LayoutHelper(sr, Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                        .getLayoutFromText();
+                                                                                                                             .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -609,13 +569,12 @@ public class BasePanel extends StackPane {
     }
 
     private void openExternalFile() {
+        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (selectedEntries.size() != 1) {
+            output(Localization.lang("This operation requires exactly one item to be selected."));
+            return;
+        }
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-            if (selectedEntries.size() != 1) {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
-            }
-
             final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
@@ -719,12 +678,12 @@ public class BasePanel extends StackPane {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                .stream()
-                .findFirst()
-                .ifPresent(entry -> {
-                    preview.setEntry(entry);
-                    entryEditor.setEntry(entry);
-                }));
+                                                         .stream()
+                                                         .findFirst()
+                                                         .ifPresent(entry -> {
+                                                             preview.setEntry(entry);
+                                                             entryEditor.setEntry(entry);
+                                                         }));
 
         // TODO: Register these actions globally
         /*
@@ -797,13 +756,9 @@ public class BasePanel extends StackPane {
         createMainTable();
 
         ScrollPane pane = mainTable.getPane();
-        AnchorPane anchorPane = new AnchorPane(pane);
-        AnchorPane.setBottomAnchor(pane, 0.0);
-        AnchorPane.setTopAnchor(pane, 0.0);
-        AnchorPane.setLeftAnchor(pane, 0.0);
-        AnchorPane.setRightAnchor(pane, 0.0);
-        splitPane.getItems().add(anchorPane);
-        this.getChildren().setAll(splitPane);
+        pane.setFitToHeight(true);
+        pane.setFitToWidth(true);
+        splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
@@ -814,8 +769,24 @@ public class BasePanel extends StackPane {
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                .flatMap(SplitPane.Divider::positionProperty)
-                .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+                                              .flatMap(SplitPane.Divider::positionProperty)
+                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+
+        // Add changePane in case a file is present - otherwise just add the splitPane to the panel
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+        if (file.isPresent()) {
+            // create changeMonitor and changePane so we get notifications about outside changes to the file.
+            resetChangeMonitorAndChangePane();
+        } else {
+            if (bibDatabaseContext.getDatabase().hasEntries()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
+            changePane = null;
+            getChildren().add(splitPane);
+        }
     }
 
     /**
@@ -846,18 +817,6 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void assureStringDialogNotEditing() {
-        if (stringDialog != null) {
-            stringDialog.assureNotEditing();
-        }
-    }
-
-    public void updateStringDialog() {
-        if (stringDialog != null) {
-            stringDialog.refreshTable();
-        }
-    }
-
     private void adjustSplitter() {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             splitPane.setDividerPositions(Globals.prefs.getPreviewPreferences().getPreviewPanelDividerPosition().doubleValue());
@@ -878,17 +837,13 @@ public class BasePanel extends StackPane {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
-            showBottomPane(BasePanelMode.SHOWING_EDITOR);
-
-            if (entry != getShowing()) {
-                entryEditor.setEntry(entry);
-                showing = entry;
-            }
-            entryEditor.requestFocus();
-
-        });
+        if (entry != getShowing()) {
+            entryEditor.setEntry(entry);
+            showing = entry;
+        }
+        entryEditor.requestFocus();
     }
 
     private void showBottomPane(BasePanelMode newMode) {
@@ -945,9 +900,9 @@ public class BasePanel extends StackPane {
 
     private void cyclePreview(int newPosition) {
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
+                                                             .getBuilder()
+                                                             .withPreviewCyclePosition(newPosition)
+                                                             .build();
         Globals.prefs.storePreviewPreferences(previewPreferences);
 
         preview.updateLayout(previewPreferences);
@@ -1054,43 +1009,6 @@ public class BasePanel extends StackPane {
         return bibDatabaseContext.getDatabase();
     }
 
-    public void stringsClosing() {
-        stringDialog = null;
-    }
-
-    public void changeTypeOfSelectedEntries(String newType) {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeType(bes, newType);
-    }
-
-    private void changeType(List<BibEntry> entries, String newType) {
-        if ((entries == null) || (entries.isEmpty())) {
-            LOGGER.error("At least one entry must be selected to be able to change the type.");
-            return;
-        }
-
-        if (entries.size() > 1) {
-            boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
-            if (!proceed) {
-                return;
-            }
-        }
-
-        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                entry.setType(newType);
-            });
-        }
-
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
-        compound.end();
-        getUndoManager().addEdit(compound);
-        markBaseChanged();
-        updateEntryEditorIfShowing();
-    }
-
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String title = Localization.lang("Delete entry");
@@ -1105,11 +1023,11 @@ public class BasePanel extends StackPane {
             }
 
             return dialogService.showConfirmationDialogWithOptOutAndWait(title,
-                    message,
-                    okButton,
-                    cancelButton,
-                    Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
+                                                                         message,
+                                                                         okButton,
+                                                                         cancelButton,
+                                                                         Localization.lang("Disable this confirmation dialog"),
+                                                                         optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
         } else {
             return true;
         }
@@ -1125,29 +1043,20 @@ public class BasePanel extends StackPane {
 
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                    .getBuilder()
-                    .withPreviewPanelDividerPosition(position)
-                    .build();
+                                                                 .getBuilder()
+                                                                 .withPreviewPanelDividerPosition(position)
+                                                                 .build();
             Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }
     }
 
-
     /**
      * Perform necessary cleanup when this BasePanel is closed.
      */
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
-        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            if (fup.getPanel() == this) {
-                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
-            }
-        }
     }
 
     /**
@@ -1162,10 +1071,6 @@ public class BasePanel extends StackPane {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public boolean isUpdatedExternally() {
-        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
@@ -1198,15 +1103,6 @@ public class BasePanel extends StackPane {
 
     public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    /**
-     * Set the preview active state for all BasePanel instances.
-     */
-    private void setPreviewActiveBasePanels(boolean enabled) {
-        for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-            frame.getBasePanelAt(i).setPreviewActive(enabled);
-        }
     }
 
     private void setPreviewActive(boolean enabled) {
@@ -1250,17 +1146,17 @@ public class BasePanel extends StackPane {
         return annotationCache;
     }
 
-    public void resetChangeMonitor() {
+    public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+
+        changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
+
+        this.getChildren().setAll(changePane);
     }
 
     public void updateTimeStamp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
-    }
-
-    public Path getTempFile() {
-        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     public void copy() {
@@ -1395,10 +1291,10 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().undo();
                 markBaseChanged();
-                frame.output(Localization.lang("Undo"));
+                output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 LOGGER.warn("Nothing to undo", ex);
-                frame.output(Localization.lang("Nothing to undo") + '.');
+                output(Localization.lang("Nothing to undo") + '.');
             }
 
             markChangedOrUnChanged();
@@ -1441,8 +1337,8 @@ public class BasePanel extends StackPane {
                         try {
 
                             JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext,
-                                    linkedFile.get().getLink(),
-                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
+                                                                    linkedFile.get().getLink(),
+                                                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
 
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
@@ -1466,9 +1362,9 @@ public class BasePanel extends StackPane {
             try {
                 getUndoManager().redo();
                 markBaseChanged();
-                frame.output(Localization.lang("Redo"));
+                output(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
-                frame.output(Localization.lang("Nothing to redo") + '.');
+                output(Localization.lang("Nothing to redo") + '.');
             }
 
             markChangedOrUnChanged();

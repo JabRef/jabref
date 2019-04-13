@@ -25,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
@@ -213,6 +214,7 @@ public class PdfContentImporter extends Importer {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
+                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
                 return parserResult;
             }
 
@@ -488,6 +490,7 @@ public class PdfContentImporter extends Importer {
             return ParserResult.fromErrorMessage(e.getMessage());
         }
 
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
         return new ParserResult(result);
     }
 

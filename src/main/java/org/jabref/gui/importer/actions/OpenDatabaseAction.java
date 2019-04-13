@@ -35,7 +35,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -53,13 +52,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Migrations:
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
-            // External file handling system in version 2.3:
-            new FileLinksUpgradeWarning(),
-
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            // Warning about and handling duplicate BibTeX keys:
-            new HandleDuplicateWarnings());
+            new CheckForNewEntryTypesAction()
+    );
 
     private final JabRefFrame frame;
 
@@ -179,12 +174,12 @@ public class OpenDatabaseAction extends SimpleCommand {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.",
+            frame.getDialogService().notify(Localization.lang("File '%0' is already open.",
                     toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
             frame.showBasePanel(toRaise);
         }
 
-        frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
+        frame.getDialogService().notify(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
     }
 
     /**
@@ -195,7 +190,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (Files.exists(file)) {
             Path fileToLoad = file.toAbsolutePath();
 
-            frame.output(Localization.lang("Opening") + ": '" + file + "'");
+            frame.getDialogService().notify(Localization.lang("Opening") + ": '" + file + "'");
 
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
 
@@ -244,7 +239,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (Objects.nonNull(file)) {
-            frame.output(Localization.lang("Opened library") + " '" + file.toString() + "' "
+            frame.getDialogService().notify(Localization.lang("Opened library") + " '" + file.toString() + "' "
                     + Localization.lang("with")
                     + " "
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");
