@@ -19,7 +19,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class EditExternalFileTypeDialog extends BaseDialog<Void> {
+public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML private RadioButton defaultApplication;
     @FXML private ToggleGroup applicationToggleGroup;
@@ -38,7 +38,7 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
     private EditExternalFileTypeViewModel viewModel;
     private CustomExternalFileType entry;
 
-    public EditExternalFileTypeDialog(CustomExternalFileType entry, String dialogTitle) {
+    public EditExternalFileTypeEntryDialog(CustomExternalFileType entry, String dialogTitle) {
         this.entry = entry;
 
         this.setTitle(dialogTitle);

@@ -51,7 +51,7 @@ public class CustomizeExternalFileTypesViewModel {
             typeForEdit = new CustomExternalFileType(type);
         }
 
-        EditExternalFileTypeDialog dlg = new EditExternalFileTypeDialog(typeForEdit, dialogTitle);
+        EditExternalFileTypeEntryDialog dlg = new EditExternalFileTypeEntryDialog(typeForEdit, dialogTitle);
         dlg.showAndWait();
     }
 
