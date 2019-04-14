@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -31,6 +30,7 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
+import org.jabref.gui.filelist.LinkedFileRenameDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
@@ -357,7 +357,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void renameFile() {
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
+        LinkedFileRenameDialogView dialog = new LinkedFileRenameDialogView(this.linkedFile);
         String oldFile = this.linkedFile.getLink();
         Optional<LinkedFile> editedFile = dialog.showAndWait();
         editedFile.ifPresent(file -> {
