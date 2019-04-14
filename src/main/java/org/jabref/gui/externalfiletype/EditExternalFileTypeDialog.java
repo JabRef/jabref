@@ -16,7 +16,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -35,16 +34,14 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
 
     private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
-    private final String editFileTitle = Localization.lang("Edit file type");
-    private final String newFileTitle = Localization.lang("Add new file type");
 
     private EditExternalFileTypeViewModel viewModel;
     private CustomExternalFileType entry;
 
-    public EditExternalFileTypeDialog(CustomExternalFileType entry, boolean add) {
+    public EditExternalFileTypeDialog(CustomExternalFileType entry, String dialogTitle) {
         this.entry = entry;
 
-        setTitleToAddOrEdit(add);
+        this.setTitle(dialogTitle);
 
         ViewLoader.view(this)
                   .load()
@@ -79,11 +76,4 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));
     }
 
-    private void setTitleToAddOrEdit(boolean add) {
-        if (add) {
-            this.setTitle(newFileTitle);
-        } else {
-            this.setTitle(editFileTitle);
-        }
-    }
 }
