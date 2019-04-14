@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -29,16 +30,21 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
     @FXML private RadioButton customApplication;
     @FXML private TextField selectedApplication;
     @FXML private Button btnBrowse;
+    @FXML private Label icon;
+    @Inject private DialogService dialogService;
+
     private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
+    private final String editFileTitle = Localization.lang("Edit file type");
+    private final String newFileTitle = Localization.lang("Add new file type");
 
-    @Inject private DialogService dialogService;
     private EditExternalFileTypeViewModel viewModel;
     private CustomExternalFileType entry;
 
-    public EditExternalFileTypeDialog(CustomExternalFileType entry) {
+    public EditExternalFileTypeDialog(CustomExternalFileType entry, boolean add) {
         this.entry = entry;
-        this.setTitle(Localization.lang("Edit external file type"));
+
+        setTitleToAddOrEdit(add);
 
         ViewLoader.view(this)
                   .load()
@@ -56,7 +62,9 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
     public void initialize() {
         viewModel = new EditExternalFileTypeViewModel(entry);
 
-        viewModel.defaultApplicationSelectedProperty().bindBidirectional(defaultApplication.selectedProperty());
+        icon.setGraphic(viewModel.getIcon());
+
+        defaultApplication.selectedProperty().bindBidirectional(viewModel.defaultApplicationSelectedProperty());
         selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
         btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
 
@@ -64,13 +72,18 @@ public class EditExternalFileTypeDialog extends BaseDialog<Void> {
         name.textProperty().bindBidirectional(viewModel.nameProperty());
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());
-
     }
 
     @FXML
     private void openFileChooser(ActionEvent event) {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));
-
     }
 
+    private void setTitleToAddOrEdit(boolean add) {
+        if (add) {
+            this.setTitle(newFileTitle);
+        } else {
+            this.setTitle(editFileTitle);
+        }
+    }
 }

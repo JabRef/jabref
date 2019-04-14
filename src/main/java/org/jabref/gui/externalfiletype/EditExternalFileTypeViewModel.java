@@ -1,12 +1,12 @@
 package org.jabref.gui.externalfiletype;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+
+import org.jabref.logic.util.OS;
 
 public class EditExternalFileTypeViewModel {
 
@@ -15,16 +15,18 @@ public class EditExternalFileTypeViewModel {
     private final StringProperty mimeTypeProperty = new SimpleStringProperty("");
     private final StringProperty selectedApplicationProperty = new SimpleStringProperty("");
     private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);
-    private final ObjectProperty<Node> iconProperty = new SimpleObjectProperty<>();
+    private final Node icon;
+    private final CustomExternalFileType fileType;
 
-    public EditExternalFileTypeViewModel(CustomExternalFileType entry) {
-        extensionProperty.setValue(entry.getExtension());
-        nameProperty.setValue(entry.getFieldName());
-        mimeTypeProperty.setValue(entry.getMimeType());
-        selectedApplicationProperty.setValue(entry.getOpenWithApplication());
-        iconProperty.setValue(entry.getIcon().getGraphicNode());
+    public EditExternalFileTypeViewModel(CustomExternalFileType fileType) {
+        this.fileType = fileType;
+        extensionProperty.setValue(fileType.getExtension());
+        nameProperty.setValue(fileType.getFieldName());
+        mimeTypeProperty.setValue(fileType.getMimeType());
+        selectedApplicationProperty.setValue(fileType.getOpenWithApplication());
+        icon = fileType.getIcon().getGraphicNode();
 
-        if (entry.getOpenWithApplication().isEmpty()) {
+        if (fileType.getOpenWithApplication().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
         }
 
@@ -50,12 +52,36 @@ public class EditExternalFileTypeViewModel {
         return defaultApplicationSelectedProperty;
     }
 
-    public ObjectProperty<Node> iconProperty() {
-        return iconProperty;
+    public Node getIcon() {
+        return icon;
     }
 
     public void storeSettings() {
-        // TODO Auto-generated method stub
+
+        fileType.setName(nameProperty.getValue().trim());
+        fileType.setMimeType(mimeTypeProperty.getValue().trim());
+
+        String ext = extensionProperty.getValue().trim();
+        if (!ext.isEmpty() && (ext.charAt(0) == '.')) {
+            fileType.setExtension(ext.substring(1));
+        } else {
+            fileType.setExtension(ext);
+        }
+
+        String application = selectedApplicationProperty.getValue().trim();
+        if (OS.WINDOWS) {
+            // On Windows, store application as empty if the "Default" option is selected,
+            // or if the application name is empty:
+            if (defaultApplicationSelectedProperty.getValue() || application.isEmpty()) {
+                fileType.setOpenWith("");
+                selectedApplicationProperty.setValue("");
+
+            } else {
+                fileType.setOpenWith(application);
+            }
+        } else {
+            fileType.setOpenWith(application);
+        }
 
     }
 

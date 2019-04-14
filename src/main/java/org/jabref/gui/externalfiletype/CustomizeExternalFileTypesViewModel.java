@@ -10,7 +10,8 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.icon.IconTheme;
 
 public class CustomizeExternalFileTypesViewModel {
-    private ObservableList<ExternalFileType> fileTypes;
+
+    private final ObservableList<ExternalFileType> fileTypes;
 
     public CustomizeExternalFileTypesViewModel() {
         Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
@@ -34,14 +35,14 @@ public class CustomizeExternalFileTypesViewModel {
     public void addNewType() {
         CustomExternalFileType type = new CustomExternalFileType("", "", "", "", "new", IconTheme.JabRefIcons.FILE);
         fileTypes.add(type);
-        edit(type);
+        edit(type, true);
     }
 
     public ObservableList<ExternalFileType> getFileTypes() {
         return fileTypes;
     }
 
-    public void edit(ExternalFileType type) {
+    public void edit(ExternalFileType type, boolean add) {
         CustomExternalFileType typeForEdit;
         if (type instanceof CustomExternalFileType) {
             typeForEdit = (CustomExternalFileType) type;
@@ -49,8 +50,9 @@ public class CustomizeExternalFileTypesViewModel {
             typeForEdit = new CustomExternalFileType(type);
         }
 
-        ExternalFileTypeEntryEditor entryEditor = new ExternalFileTypeEntryEditor(typeForEdit);
-        entryEditor.setVisible(true);
+        EditExternalFileTypeDialog dlg = new EditExternalFileTypeDialog(typeForEdit, add);
+        dlg.showAndWait();
+
     }
 
     public void remove(ExternalFileType type) {
