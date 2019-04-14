@@ -81,7 +81,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
             String newLabelValue = cell.getNewValue();
             if (cell.getTableView().getItems().stream().anyMatch(strs -> strs.labelProperty().get().equals(newLabelValue))) {
 
-                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists", newLabelValue));
+                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", newLabelValue));
                 cell.getRowValue().setLabel("");
             } else {
                 cell.getRowValue().setLabel(cell.getNewValue());

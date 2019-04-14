@@ -302,12 +302,6 @@ public class BibDatabase {
         bibtexStrings = strs;
     }
 
-    public void removeStringByName(BibtexString strToRemove) {
-        Optional<String> bibtexString = getStringByName(strToRemove.getName()).map(BibtexString::getId);
-        bibtexString.ifPresent(this::removeString);
-
-    }
-
     /**
      * Removes the string with the given id.
      */

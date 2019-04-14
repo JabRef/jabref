@@ -123,7 +123,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void addStringAsCollection() {
+    public void setSingleStringAsCollection() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         List<BibtexString> strings = Arrays.asList(string);
         database.setStrings(strings);
@@ -131,7 +131,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void addStringAsCollectionWithUpdatedContent() {
+    public void setStringAsCollectionWithUpdatedContentOverridesString() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString newContent = new BibtexString("DSP", "ABCD");
         List<BibtexString> strings = Arrays.asList(string, newContent);
@@ -140,7 +140,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void addStringAsCollectionWithNewContent() {
+    public void setStringAsCollectionWithNewContent() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
         List<BibtexString> strings = Arrays.asList(string, vlsi);
