@@ -1,5 +1,7 @@
 package org.jabref.gui.metadata;
 
+import javax.inject.Inject;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,6 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.util.converter.DefaultStringConverter;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -33,6 +36,8 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BibtexStringEditorDialogViewModel viewModel;
+
+    @Inject private DialogService dialogService;
 
     public BibtexStringEditorDialogView(BibDatabase database) {
         viewModel = new BibtexStringEditorDialogViewModel(database);
@@ -72,7 +77,15 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringViewModel, String>().withValidation(BibtexStringViewModel::contentValidation, visualizer).install(colContent, new DefaultStringConverter());
 
         colLabel.setOnEditCommit((CellEditEvent<BibtexStringViewModel, String> cell) -> {
-            cell.getRowValue().setLabel(cell.getNewValue());
+
+            String newLabelValue = cell.getNewValue();
+            if (cell.getTableView().getItems().stream().anyMatch(strs -> strs.labelProperty().get().equals(newLabelValue))) {
+
+                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", newLabelValue));
+                cell.getRowValue().setLabel("");
+            } else {
+                cell.getRowValue().setLabel(cell.getNewValue());
+            }
         });
         colContent.setOnEditCommit((CellEditEvent<BibtexStringViewModel, String> cell) -> {
             cell.getRowValue().setContent(cell.getNewValue());
