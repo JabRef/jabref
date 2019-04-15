@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.preferences.JabRefPreferences;
 
 /**
  * This class will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard.
@@ -54,7 +54,7 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
             int toCopy = entries.size();
             if (copied == toCopy) {
                 // All entries had keys.
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Copied") + " '" + keyAndLink.substring(0, Math.min(keyAndLink.length(), JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT)) + "'.");
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(keyAndLink) + "'.");
             } else {
                 JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                         Long.toString(toCopy - copied), Integer.toString(toCopy)));

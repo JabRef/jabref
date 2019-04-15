@@ -175,7 +175,7 @@ public class JabRefFrame extends BorderPane {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new FXDialogService(mainStage, this);
+        this.dialogService = new JabRefDialogService(mainStage, this);
     }
 
     /**

@@ -468,7 +468,7 @@ public class BasePanel extends StackPane {
 
             if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
-                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedTitles) + "'.");
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined title.", Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
             }
@@ -496,7 +496,7 @@ public class BasePanel extends StackPane {
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedCiteCommand) + "'.");
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedCiteCommand) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -521,7 +521,7 @@ public class BasePanel extends StackPane {
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedKeys) + "'.");
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeys) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -563,18 +563,11 @@ public class BasePanel extends StackPane {
 
             if (copied == bes.size()) {
                 // All entries had keys.
-                output(Localization.lang("Copied") + " '" + shortenDialogMessage(copiedKeysAndTitles) + "'.");
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeysAndTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
             }
         }
-    }
-
-    private String shortenDialogMessage(String dialogMessage) {
-        if (dialogMessage.length() < JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT) {
-            return dialogMessage;
-        }
-        return dialogMessage.substring(0, Math.min(dialogMessage.length(), JabRefPreferences.SNACKBAR_DIALOG_SIZE_LIMIT)) + "...";
     }
 
     private void openExternalFile() {
