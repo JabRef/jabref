@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -27,7 +26,6 @@ import org.fxmisc.easybind.monadic.MonadicObservableValue;
 
 public class LinkedFilesRenameDialogViewModel extends AbstractViewModel {
 
-    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty link = new SimpleStringProperty("");
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
     private final MonadicObservableValue<ExternalFileType> monadicSelectedExternalFileType;
@@ -60,12 +58,13 @@ public class LinkedFilesRenameDialogViewModel extends AbstractViewModel {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
             link.set(relativize(path));
+            link.set(path.getFileName().toString());
         });
     }
 
     public void setValues(LinkedFile linkedFile) {
         Path linkPath = Paths.get(linkedFile.getLink());
-        link.set(relativize(linkPath));
+        link.set(linkPath.getFileName().toString());
     }
 
     public StringProperty linkProperty() {

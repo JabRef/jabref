@@ -49,6 +49,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -359,10 +360,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void renameFile() {
         LinkedFileRenameDialogView dialog = new LinkedFileRenameDialogView(this.linkedFile);
         String oldFile = this.linkedFile.getLink();
+        int nameCount = Paths.get(oldFile).getNameCount();
+        Path subPath = Paths.get(oldFile).subpath(0, nameCount - 1);
         Optional<LinkedFile> editedFile = dialog.showAndWait();
         editedFile.ifPresent(file -> {
-            this.linkedFile.setLink(file.getLink());
-            FileUtil.renameFile(Paths.get(oldFile), Paths.get(file.getLink()));
+            String newFile = System.getProperty("file.separator") + subPath.toString() + System.getProperty("file.separator") + file.getLink();
+            this.linkedFile.setLink(newFile);
+            FileUtil.renameFile(Paths.get(oldFile), Paths.get(newFile));
         });
     }
 
