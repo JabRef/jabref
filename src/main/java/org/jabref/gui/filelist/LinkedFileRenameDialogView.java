@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 
@@ -30,28 +31,30 @@ public class LinkedFileRenameDialogView extends BaseDialog<LinkedFile> {
     private final LinkedFile linkedFile;
     private ExternalFileTypes externalFileTypes;
 
+    private Button applyButton;
+    @FXML private ButtonType applyButtonType;
+
     public LinkedFileRenameDialogView(LinkedFile linkedFile) {
+        this.getDialogPane().setPrefSize(375, 475);
         this.linkedFile = linkedFile;
 
         this.externalFileTypes = ExternalFileTypes.getInstance();
+        this.applyButton = (Button) this.getDialogPane().lookupButton(applyButtonType);
+
         ViewLoader.view(this)
                 .load()
-                .setAsContent(this.getDialogPane());
+                .setAsDialogPane(this);
 
-        this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-
-        this.setResultConverter(button -> {
-            if (button == ButtonType.APPLY) {
+        setResultConverter(button -> {
+            if (button == applyButtonType) {
                 return viewModel.getNewLinkedFile();
-            } else {
-                return null;
             }
+            return null;
         });
     }
 
     @FXML
     private void initialize() {
-
         viewModel = new LinkedFilesRenameDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences, externalFileTypes);
         link.textProperty().bindBidirectional(viewModel.linkProperty());
     }
