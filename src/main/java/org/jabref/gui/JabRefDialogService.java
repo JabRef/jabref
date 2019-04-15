@@ -55,15 +55,16 @@ import org.slf4j.LoggerFactory;
  * rather than complex windows. For more complex dialogs it is
  * advised to rather create a new sub class of {@link FXDialog}.
  */
-public class FXDialogService implements DialogService {
+public class JabRefDialogService implements DialogService {
+    // Snackbar dialog maximum size
+    public static final int DIALOG_SIZE_LIMIT = 300;
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
-    private static final Logger LOGGER = LoggerFactory.getLogger(FXDialogService.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
-    public FXDialogService(Window mainWindow, Pane mainPane) {
+    public JabRefDialogService(Window mainWindow, Pane mainPane) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
     }
@@ -109,6 +110,13 @@ public class FXDialogService implements DialogService {
         return alert;
     }
 
+    public static String shortenDialogMessage(String dialogMessage) {
+        if (dialogMessage.length() < JabRefDialogService.DIALOG_SIZE_LIMIT) {
+            return dialogMessage.trim();
+        }
+        return (dialogMessage.substring(0, Math.min(dialogMessage.length(), JabRefDialogService.DIALOG_SIZE_LIMIT)) + "...").trim();
+    }
+
     @Override
     public <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
@@ -118,7 +126,6 @@ public class FXDialogService implements DialogService {
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
         return choiceDialog.showAndWait();
-
     }
 
     @Override

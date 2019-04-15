@@ -358,7 +358,6 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
-
     //File linking Options for entry editor
     public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
 
