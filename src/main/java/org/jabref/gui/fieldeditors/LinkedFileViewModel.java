@@ -49,7 +49,6 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

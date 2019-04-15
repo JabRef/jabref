@@ -57,7 +57,6 @@ public class LinkedFilesRenameDialogViewModel extends AbstractViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
-            link.set(relativize(path));
             link.set(path.getFileName().toString());
         });
     }
