@@ -8,7 +8,8 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<DialogPane minHeight="-Infinity" prefHeight="150.0" prefWidth="536.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.LinkedFileRenameDialogView">
+<?import javafx.scene.control.ButtonType?>
+<DialogPane minHeight="-Infinity" prefHeight="110.0" prefWidth="536.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.LinkedFileRenameDialogView">
     <content>
         <GridPane>
             <columnConstraints>
@@ -32,4 +33,6 @@
             </children>
         </GridPane>
     </content>
+    <ButtonType fx:id="applyButtonType" buttonData="OK_DONE" text="%Apply" />
+    <ButtonType fx:constant="CANCEL" />
 </DialogPane>
