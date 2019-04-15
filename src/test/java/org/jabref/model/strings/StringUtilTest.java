@@ -147,16 +147,9 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-<<<<<<<<< Temporary merge branch 1
         assertEquals("", StringUtil.getPart("", 0, false));
         assertEquals("a", StringUtil.getPart("{a}", 0, false));
         assertEquals("{a}", StringUtil.getPart(" {a}", 0, true));
-=========
-        assertEquals("",StringUtil.getPart("", 0, false));
-        assertEquals("a", StringUtil.getPart("{a}", 0, false));
-        assertEquals("{a}", StringUtil.getPart("   {a}", 0, true));
-        assertEquals("a", StringUtil.getPart(" a ", 0, false));
->>>>>>>>> Temporary merge branch 2
     }
 
     @Test
