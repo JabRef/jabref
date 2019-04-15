@@ -22,7 +22,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Label minWidth="95.0" text="%Link" />
+                <Label minWidth="95.0" text="%New Filename" />
                 <TextField fx:id="link" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                 <Button id="browse" mnemonicParsing="false" onAction="#openBrowseDialog" text="%Browse" GridPane.columnIndex="2">
                     <GridPane.margin>
