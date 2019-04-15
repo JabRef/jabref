@@ -70,11 +70,11 @@ public class OpenDatabase {
         //pdf integration for getting the bibliography
 
         ParserResult result;
-        if(BibDatabaseMode.BIBTEX.equals(fileToOpen)){
-            result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
+        if(fileToOpen.getName().endsWith(".pdf")){
+            result = new PdfContentImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
                     importFormatPreferences.getEncoding());
         } else{
-            result = new PdfContentImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
+            result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
                     importFormatPreferences.getEncoding());
         }
 
