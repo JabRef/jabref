@@ -108,7 +108,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         applyPreferences();
     }
 
-    public void openDatabase() {
+    public Boolean openDatabase() {
 
         DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties();
         connectionProperties.setType(selectedDBMSType.getValue());
@@ -122,7 +122,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setServerTimezone(serverTimezone.getValue());
 
         setupKeyStore();
-        openSharedDatabase(connectionProperties);
+        Boolean connected = openSharedDatabase(connectionProperties);
+        return connected;
     }
 
     private void setupKeyStore() {
@@ -131,12 +132,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         System.setProperty("javax.net.debug", "ssl");
     }
 
-    private void openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+    private Boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                                                    Localization.lang("You are already connected to a database using entered connection details."));
-            return;
+            return true;
         }
 
         if (autosave.get()) {
@@ -149,7 +150,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                            Localization.lang("Overwrite file"),
                                                                                            Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
-                    return;
+                    return true;
                 }
             }
         }
@@ -169,7 +170,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 }
             }
 
-            return;
+            return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
@@ -191,7 +192,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         }
         loading.set(false);
-
+        return false;
     }
 
     private void setPreferences() {
