@@ -8,9 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.l10n.Localization;
 
 public class CustomizeExternalFileTypesViewModel {
-    private ObservableList<ExternalFileType> fileTypes;
+
+    private final ObservableList<ExternalFileType> fileTypes;
 
     public CustomizeExternalFileTypesViewModel() {
         Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
@@ -34,14 +36,14 @@ public class CustomizeExternalFileTypesViewModel {
     public void addNewType() {
         CustomExternalFileType type = new CustomExternalFileType("", "", "", "", "new", IconTheme.JabRefIcons.FILE);
         fileTypes.add(type);
-        edit(type);
+        showEditDialog(type, Localization.lang("Add new file type"));
     }
 
     public ObservableList<ExternalFileType> getFileTypes() {
         return fileTypes;
     }
 
-    public void edit(ExternalFileType type) {
+    private void showEditDialog(ExternalFileType type, String dialogTitle) {
         CustomExternalFileType typeForEdit;
         if (type instanceof CustomExternalFileType) {
             typeForEdit = (CustomExternalFileType) type;
@@ -49,8 +51,12 @@ public class CustomizeExternalFileTypesViewModel {
             typeForEdit = new CustomExternalFileType(type);
         }
 
-        ExternalFileTypeEntryEditor entryEditor = new ExternalFileTypeEntryEditor(typeForEdit);
-        entryEditor.setVisible(true);
+        EditExternalFileTypeEntryDialog dlg = new EditExternalFileTypeEntryDialog(typeForEdit, dialogTitle);
+        dlg.showAndWait();
+    }
+
+    public void edit(ExternalFileType type) {
+        showEditDialog(type, Localization.lang("Edit file type"));
     }
 
     public void remove(ExternalFileType type) {

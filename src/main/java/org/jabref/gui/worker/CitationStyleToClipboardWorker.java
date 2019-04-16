@@ -54,7 +54,6 @@ public class CitationStyleToClipboardWorker {
     }
 
     public void copyCitationStyleToClipboard(TaskExecutor taskExecutor) {
-        dialogService.notify(Localization.lang("Copying..."));
         BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
                       .onSuccess(this::setClipBoardContent)
