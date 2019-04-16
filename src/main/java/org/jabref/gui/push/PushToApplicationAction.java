@@ -3,10 +3,7 @@ package org.jabref.gui.push;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -14,6 +11,7 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -23,10 +21,10 @@ import org.fxmisc.easybind.EasyBind;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationAction extends SimpleCommand implements Runnable {
+public class PushToApplicationAction extends SimpleCommand {
 
-    private PushToApplication operation;
-    private JabRefFrame frame;
+    private final PushToApplication operation;
+    private final JabRefFrame frame;
     private BasePanel panel;
     private List<BibEntry> entries;
 
@@ -50,6 +48,7 @@ public class PushToApplicationAction extends SimpleCommand implements Runnable {
 
     public Action getActionInformation() {
         return new Action() {
+
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.of(operation.getIcon());
@@ -85,7 +84,7 @@ public class PushToApplicationAction extends SimpleCommand implements Runnable {
         entries = panel.getSelectedEntries();
         if (entries.isEmpty()) {
             frame.getDialogService().showErrorDialogAndWait(operation.getApplicationName(),
-                    Localization.lang("This operation requires one or more entries to be selected."));
+                                                            Localization.lang("This operation requires one or more entries to be selected."));
 
             return;
         }
@@ -95,7 +94,7 @@ public class PushToApplicationAction extends SimpleCommand implements Runnable {
             for (BibEntry entry : entries) {
                 if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
                     frame.getDialogService().showErrorDialogAndWait(operation.getApplicationName(),
-                            Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
+                                                                    Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
 
                     return;
                 }
@@ -103,16 +102,15 @@ public class PushToApplicationAction extends SimpleCommand implements Runnable {
         }
 
         // All set, call the operation in a new thread:
-        JabRefExecutorService.INSTANCE.execute(this);
+
+        BackgroundTask.wrap(this::pushentries)
+                      .onSuccess(s -> operation.operationCompleted(panel))
+                      .executeWith(Globals.TASK_EXECUTOR);
+
     }
 
-    @Override
-    public void run() {
-        // Do the operation:
+    private void pushentries() {
         operation.pushEntries(panel.getDatabase(), entries, getKeyString(entries), panel.getBibDatabaseContext().getMetaData());
-
-        // Call the operationCompleted() method on the event dispatch thread:
-        SwingUtilities.invokeLater(() -> operation.operationCompleted(panel));
     }
 
     private static String getKeyString(List<BibEntry> bibentries) {

@@ -177,7 +177,7 @@ class ExternalTab implements PrefsTab {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
-        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
+        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
         if ((index % 2) == 0) {
             panel.add(button, 1, (index / 2) + 1);
         } else {

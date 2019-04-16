@@ -1,8 +1,7 @@
 package org.jabref.gui.push;
 
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
@@ -11,18 +10,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PushToEmacsSettings extends PushToApplicationSettings {
 
-    private final JTextField additionalParams = new JTextField(30);
+    private final TextField additionalParams = new TextField();
 
     @Override
-    public JPanel getSettingsPanel(int n) {
+    public GridPane getJFXSettingPane(int n) {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        return super.getSettingsPanel(n);
-    }
-
-    @Override
-    public GridPane getJFXSettingPane() {
-        additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        return super.getJFXSettingPane();
+        return super.getJFXSettingPane(n);
     }
 
     @Override
@@ -32,11 +25,10 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        builder.appendRows("2dlu, p, 2dlu, p");
-        builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
-        builder.add(additionalParams).xy(3, 3);
-        settings = builder.build();
+    protected void initJFXSettingsPanel() {
+        super.initJFXSettingsPanel();
+        jfxSettings.add(new Label(Localization.lang("Additional parameters") + ":"), 0, 1);
+        jfxSettings.add(additionalParams, 1, 1);
     }
+
 }
