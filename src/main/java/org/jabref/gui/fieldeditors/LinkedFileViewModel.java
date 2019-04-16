@@ -30,7 +30,6 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
-import org.jabref.gui.filelist.LinkedFileRenameDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
@@ -357,11 +356,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void renameFile() {
-        LinkedFileRenameDialogView dialog = new LinkedFileRenameDialogView(this.linkedFile);
         String oldFile = this.linkedFile.getLink();
-        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        Optional<String> editedFile = dialogService.showInputDialogAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"));
         editedFile.ifPresent(file -> {
-            Path newFile = Paths.get(oldFile).resolveSibling(file.getLink());
+            Path newFile = Paths.get(oldFile).resolveSibling(file);
             this.linkedFile.setLink(newFile.toString());
             FileUtil.renameFile(Paths.get(oldFile), newFile);
         });
