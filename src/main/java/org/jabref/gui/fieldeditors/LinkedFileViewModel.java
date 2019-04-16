@@ -359,13 +359,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void renameFile() {
         LinkedFileRenameDialogView dialog = new LinkedFileRenameDialogView(this.linkedFile);
         String oldFile = this.linkedFile.getLink();
-        int nameCount = Paths.get(oldFile).getNameCount();
-        Path subPath = Paths.get(oldFile).subpath(0, nameCount - 1);
         Optional<LinkedFile> editedFile = dialog.showAndWait();
         editedFile.ifPresent(file -> {
-            String newFile = System.getProperty("file.separator") + subPath.toString() + System.getProperty("file.separator") + file.getLink();
-            this.linkedFile.setLink(newFile);
-            FileUtil.renameFile(Paths.get(oldFile), Paths.get(newFile));
+            Path newFile = Paths.get(oldFile).resolveSibling(file.getLink());
+            this.linkedFile.setLink(newFile.toString());
+            FileUtil.renameFile(Paths.get(oldFile), newFile);
         });
     }
 
