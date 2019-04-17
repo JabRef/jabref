@@ -137,6 +137,14 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
+    public Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue) {
+        TextInputDialog inputDialog = new TextInputDialog(defaultValue);
+        inputDialog.setHeaderText(title);
+        inputDialog.setContentText(content);
+        return inputDialog.showAndWait();
+    }
+
+    @Override
     public void showInformationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.INFORMATION, title, content);
         alert.showAndWait();
