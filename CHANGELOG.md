@@ -63,6 +63,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
 - We added an option in the settings to set the default action in JabRef when right clicking on any entry in any database and selecting "Open folder". [#4763](https://github.com/JabRef/jabref/issues/4763)
 - The Medline fetcher now normalizes the author names according to the BibTeX-Standard [#4345](https://github.com/JabRef/jabref/issues/4345)
+- We added an option on the Linked File Viewer to rename the attached file of an entry directly on the JabRef. [#4844](https://github.com/JabRef/jabref/issues/4844)
 
 
 ### Fixed
