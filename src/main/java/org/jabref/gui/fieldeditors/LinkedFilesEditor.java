@@ -218,7 +218,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         MenuItem download = new MenuItem(Localization.lang("Download file"));
         download.setOnAction(event -> linkedFile.download());
 
-        MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
+        MenuItem renameFile = new MenuItem(Localization.lang("Rename file to defined pattern"));
         renameFile.setOnAction(event -> linkedFile.rename());
         renameFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedNameSameAsOriginal());
 
