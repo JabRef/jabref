@@ -108,7 +108,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         applyPreferences();
     }
 
-    public Boolean openDatabase() {
+    public boolean openDatabase() {
 
         DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties();
         connectionProperties.setType(selectedDBMSType.getValue());
@@ -122,7 +122,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setServerTimezone(serverTimezone.getValue());
 
         setupKeyStore();
-        Boolean connected = openSharedDatabase(connectionProperties);
+        boolean connected = openSharedDatabase(connectionProperties);
         return connected;
     }
 
@@ -132,7 +132,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         System.setProperty("javax.net.debug", "ssl");
     }
 
-    private Boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+    private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),

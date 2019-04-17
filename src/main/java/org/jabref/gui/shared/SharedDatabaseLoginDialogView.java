@@ -67,7 +67,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @FXML
     private void openDatabase() {
-        Boolean connected = viewModel.openDatabase();
+        boolean connected = viewModel.openDatabase();
 
         if (connected) {
             this.close();
