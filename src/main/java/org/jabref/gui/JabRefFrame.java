@@ -80,6 +80,7 @@ import org.jabref.gui.actions.ShowDocumentViewerAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
@@ -828,6 +829,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(this)),
+                factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(this)),
 
                 new SeparatorMenuItem(),
 
