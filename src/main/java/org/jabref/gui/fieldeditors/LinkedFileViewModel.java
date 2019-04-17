@@ -357,7 +357,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void renameFile() {
         String oldFile = this.linkedFile.getLink();
-        Optional<String> editedFile = dialogService.showInputDialogAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"));
+        Path oldFilePath = Paths.get(oldFile);
+        Optional<String> editedFile = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
         editedFile.ifPresent(file -> {
             Path newFile = Paths.get(oldFile).resolveSibling(file);
             this.linkedFile.setLink(newFile.toString());
