@@ -502,7 +502,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
             for (TableRow tr : data) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
-                widths.add(String.valueOf(tr.getLength()));
+                widths.add(String.valueOf(Double.valueOf(tr.getLength()).intValue()));
             }
 
             // Finally, we store the new preferences.
@@ -522,14 +522,14 @@ class TableColumnsTab extends Pane implements PrefsTab {
         final HashMap<String, Integer> map = new HashMap<>();
 
         // first element (#) not inside data
-            /*
-            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
-                String name = column.getText();
-                if ((name != null) && !name.isEmpty()) {
-                    map.put(name.toLowerCase(Locale.ROOT), i);
-                }
+        /*
+        for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
+            String name = column.getText();
+            if ((name != null) && !name.isEmpty()) {
+                map.put(name.toLowerCase(Locale.ROOT), i);
             }
-            */
+        }
+        */
         data.sort((o1, o2) -> {
             Integer n1 = map.get(o1.getName());
             Integer n2 = map.get(o2.getName());
