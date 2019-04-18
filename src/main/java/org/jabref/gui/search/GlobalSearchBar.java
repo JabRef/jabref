@@ -219,7 +219,7 @@ public class GlobalSearchBar extends HBox {
 
         // TODO: Remove search worker as this is doing the work twice now
         searchWorker = new SearchWorker(currentBasePanel, searchQuery, searchDisplayMode);
-        searchWorker.execute();
+        Globals.TASK_EXECUTOR.execute(searchWorker);
     }
 
     private void informUserAboutInvalidSearchQuery() {

@@ -5,12 +5,11 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingWorker;
+import javafx.concurrent.Task;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -18,11 +17,10 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Not reusable. Always create a new instance for each search!
  */
-class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
+class SearchWorker extends Task<List<BibEntry>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
 
@@ -41,10 +39,10 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     }
 
     @Override
-    protected List<BibEntry> doInBackground() throws Exception {
+    protected List<BibEntry> call() throws Exception {
         return database.getEntries().parallelStream()
-                .filter(searchQuery::isMatch)
-                .collect(Collectors.toList());
+                       .filter(searchQuery::isMatch)
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -52,7 +50,11 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         if (isCancelled()) {
             return;
         }
+    }
 
+    @Override
+    protected void succeeded() {
+        super.succeeded();
         try {
             updateUIWithSearchResult(get());
         } catch (InterruptedException | ExecutionException e) {
@@ -63,10 +65,9 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
         GlobalSearchBar globalSearchBar = JabRefGUI.getMainFrame().getGlobalSearchBar();
 
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                globalSearchBar.updateResults(matchedEntries.size(),
-                        SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
-                        searchQuery.isGrammarBasedSearch()));
+        globalSearchBar.updateResults(matchedEntries.size(),
+                                      SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                                      searchQuery.isGrammarBasedSearch());
         globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 
