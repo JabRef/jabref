@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -149,19 +148,6 @@ public class IconTheme {
             LOGGER.warn("Unable to read default icon theme.", e);
         }
         return result;
-    }
-
-    public static List<java.awt.Image> getLogoSet() {
-        List<java.awt.Image> jabrefLogos = new ArrayList<>();
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon32")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon40")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon48")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon64")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon128")).getImage());
-
-        return jabrefLogos;
     }
 
     public static List<Image> getLogoSetFX() {
