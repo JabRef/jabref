@@ -15,4 +15,14 @@ public class MainArchitectureTestsWithArchUnit {
                    .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
                    .check(classes);
     }
+
+    @ArchTest
+    public static void doNotUseSwing(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("javax.swing").check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUseJGoodies(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies").check(classes);
+    }
 }
