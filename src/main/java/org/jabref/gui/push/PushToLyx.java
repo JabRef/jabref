@@ -61,7 +61,6 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString, MetaData metaData) {
-
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
