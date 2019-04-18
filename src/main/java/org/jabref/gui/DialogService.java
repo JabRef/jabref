@@ -46,6 +46,11 @@ public interface DialogService {
     Optional<String> showInputDialogAndWait(String title, String content);
 
     /**
+     * This will create and display new {@link TextInputDialog} with a text field with a default value to enter data
+     */
+    Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
+
+    /**
      * This will create and display a new information dialog.
      * It will include a blue information icon on the left and
      * a single OK Button. To create an information dialog with custom

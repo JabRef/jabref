@@ -37,6 +37,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -344,7 +345,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-
         LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
 
         Optional<LinkedFile> editedFile = dialog.showAndWait();
@@ -352,6 +352,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());
             this.linkedFile.setFileType(file.getFileType());
+        });
+    }
+
+    public void renameFile() {
+        String oldFile = this.linkedFile.getLink();
+        Path oldFilePath = Paths.get(oldFile);
+        Optional<String> editedFile = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
+        editedFile.ifPresent(file -> {
+            Path newFile = Paths.get(oldFile).resolveSibling(file);
+            this.linkedFile.setLink(newFile.toString());
+            FileUtil.renameFile(Paths.get(oldFile), newFile);
         });
     }
 
