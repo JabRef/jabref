@@ -4,6 +4,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.l10n.Localization;
 
 public class PushToApplicationSettingsDialog {
 
@@ -12,7 +13,7 @@ public class PushToApplicationSettingsDialog {
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(toApp.getJFXSettingPane(n));
 
-        dialogService.showCustomDialogAndWait("App settings", dialogPane, ButtonType.OK, ButtonType.CANCEL).ifPresent(btn -> {
+        dialogService.showCustomDialogAndWait(Localization.lang("App settings"), dialogPane, ButtonType.OK, ButtonType.CANCEL).ifPresent(btn -> {
             if (btn == ButtonType.OK) {
                 toApp.storeSettings();
             }

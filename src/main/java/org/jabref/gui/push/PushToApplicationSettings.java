@@ -1,9 +1,6 @@
 package org.jabref.gui.push;
 
-import javax.swing.JPanel;
-
 import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -14,17 +11,13 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-
 public class PushToApplicationSettings {
 
-    protected final TextField path1 = new TextField();
-    protected JPanel settings;
+    protected final TextField path = new TextField();
+    protected Label commandLabel = new Label();
     protected GridPane jfxSettings;
-    protected FormBuilder builder;
     protected AbstractPushToApplication application;
-    protected DialogService dialogService;
-    protected DialogPane dialogPane = new DialogPane();
+    private DialogService dialogService;
 
     public GridPane getJFXSettingPane(int n) {
         switch (n) {
@@ -55,7 +48,7 @@ public class PushToApplicationSettings {
         if (jfxSettings == null) {
             initJFXSettingsPanel();
         }
-        path1.setText(commandPath);
+        path.setText(commandPath);
 
         return jfxSettings;
     }
@@ -69,17 +62,17 @@ public class PushToApplicationSettings {
         } else {
             label.append(" (").append(application.getCommandName()).append("):");
         }
-        jfxSettings.add(new Label(label.toString()), 0, 0);
-        jfxSettings.add(path1, 1, 0);
+        commandLabel = new Label(label.toString());
+        jfxSettings.add(commandLabel, 0, 0);
+        jfxSettings.add(path, 1, 0);
         Button browse = new Button(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
-                                             .ifPresent(f -> path1.setText(f.toAbsolutePath().toString())));
+                                             .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         jfxSettings.add(browse, 2, 0);
-        dialogPane.setContent(jfxSettings);
     }
 
     /**
@@ -88,6 +81,6 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Globals.prefs.put(application.commandPathPreferenceKey, path1.getText());
+        Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
     }
 }

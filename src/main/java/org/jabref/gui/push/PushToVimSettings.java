@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
@@ -11,12 +10,6 @@ import org.jabref.preferences.JabRefPreferences;
 public class PushToVimSettings extends PushToApplicationSettings {
 
     private final TextField vimServer = new TextField();
-
-    @Override
-    public GridPane getJFXSettingPane(int n) {
-        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        return super.getJFXSettingPane(n);
-    }
 
     @Override
     public void storeSettings() {
@@ -29,6 +22,6 @@ public class PushToVimSettings extends PushToApplicationSettings {
         super.initJFXSettingsPanel();
         jfxSettings.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
         jfxSettings.add(vimServer, 1, 1);
-
+        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
     }
 }
