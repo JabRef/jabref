@@ -123,8 +123,6 @@ public class CustomExternalFileType implements ExternalFileType {
         this.openWith = openWith;
     }
 
-
-
     /**
      * Get the string associated with this file type's icon.
      *
