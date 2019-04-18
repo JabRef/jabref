@@ -50,16 +50,6 @@ Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
 License: BSD-3-Clause
 
-Id:      com.jgoodies:jgoodies-common
-Project: JGoodies Common
-URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD-3-Clause
-
-Id:      com.jgoodies:jgoodies-forms
-Project: JGoodies Forms
-URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD-3-Clause
-
 Id:      com.mashape.unirest
 Project: Unirest for Java
 URL:     https://github.com/Mashape/unirest-java
