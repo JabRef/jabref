@@ -20,7 +20,6 @@ class LocalizationTest {
     @AfterEach
     void restoreDefaultLocale() {
         Locale.setDefault(locale);
-        javax.swing.JComponent.setDefaultLocale(locale);
         Localization.setLanguage(Language.English);
     }
 

@@ -1,9 +1,5 @@
 package org.jabref.gui.keyboard;
 
-import java.awt.AWTError;
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,8 +9,6 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import javax.swing.KeyStroke;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
@@ -32,7 +26,7 @@ public class KeyBindingRepository {
      * sorted by localization
      */
     private final SortedMap<KeyBinding, String> bindings;
-    private int shortcutMask = -1;
+    private final int shortcutMask = -1;
 
     public KeyBindingRepository() {
         this(Collections.emptyList(), Collections.emptyList());
@@ -145,39 +139,6 @@ public class KeyBindingRepository {
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
         KeyCombination keyCombination = getKeyCombination(binding);
         return checkKeyCombinationEquality(keyCombination, keyEvent);
-    }
-
-    /**
-     * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
-     * users, with the Command key preferred instead of Control.
-     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
-     */
-    private KeyStroke getKeyForMac(KeyStroke ks) {
-        if (ks == null) {
-            return null;
-        }
-        int keyCode = ks.getKeyCode();
-        if ((ks.getModifiers() & InputEvent.CTRL_MASK) == 0) {
-            return ks;
-        } else {
-            int modifiers = 0;
-            if ((ks.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.SHIFT_MASK;
-            }
-            if ((ks.getModifiers() & InputEvent.ALT_MASK) != 0) {
-                modifiers = modifiers | InputEvent.ALT_MASK;
-            }
-
-            if (shortcutMask == -1) {
-                try {
-                    shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-                } catch (AWTError | HeadlessException e) {
-                    LOGGER.warn("Problem geting shortcut mask", e);
-                }
-            }
-
-            return KeyStroke.getKeyStroke(keyCode, shortcutMask + modifiers);
-        }
     }
 
     public List<String> getBindNames() {

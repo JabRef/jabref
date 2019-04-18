@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.Icon;
-import javax.swing.JLabel;
 
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.Actions;
@@ -32,12 +31,6 @@ public class SpecialFieldValueViewModel {
 
     public Optional<JabRefIcon> getIcon() {
         return getAction().getIcon();
-    }
-
-    public JLabel createSpecialFieldValueLabel() {
-        JLabel label = new JLabel(getSpecialFieldValueIcon());
-        label.setToolTipText(getToolTipText());
-        return label;
     }
 
     public String getMenuString() {
