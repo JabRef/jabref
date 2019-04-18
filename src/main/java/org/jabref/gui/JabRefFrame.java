@@ -17,7 +17,6 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -1172,18 +1171,9 @@ public class JabRefFrame extends BorderPane {
     /**
      * Sets the indeterminate status of the progress bar.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
      */
     public void setProgressBarIndeterminate(final boolean value) {
-        // TODO: Reimplement
-        /*
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setIndeterminate(value);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
-        }
-        */
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
     /**
@@ -1214,10 +1204,6 @@ public class JabRefFrame extends BorderPane {
             return (selectedEntry.getField(FieldName.URL).isPresent() || selectedEntry.getField(FieldName.DOI).isPresent());
         }
         return false;
-    }
-
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message);
     }
 
     /**
