@@ -102,4 +102,5 @@ public interface EntryType extends Comparable<EntryType> {
         }
         return optionalFieldsAndAliases;
     }
+
 }
