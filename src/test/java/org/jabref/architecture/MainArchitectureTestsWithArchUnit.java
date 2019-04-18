@@ -25,4 +25,9 @@ public class MainArchitectureTestsWithArchUnit {
     public static void doNotUseJGoodies(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies..").check(classes);
     }
+
+    @ArchTest
+    public static void doNotUseGlazedLists(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
+    }
 }
