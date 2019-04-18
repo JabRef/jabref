@@ -45,12 +45,8 @@ import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
-import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -66,6 +62,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.SendAsEMailAction;
@@ -92,6 +89,7 @@ import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -576,24 +574,27 @@ public class BasePanel extends StackPane {
             output(Localization.lang("This operation requires exactly one item to be selected."));
             return;
         }
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            final BibEntry entry = selectedEntries.get(0);
-            if (!entry.hasField(FieldName.FILE)) {
-                // no bibtex field
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-            FileListTableModel fileListTableModel = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(fileListTableModel::setContent);
-            if (fileListTableModel.getRowCount() == 0) {
-                // content in BibTeX field is not readable
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-            FileListEntry flEntry = fileListTableModel.getEntry(0);
-            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), "", flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).map(JabRefIcon::getSmallIcon).orElse(null), bibDatabaseContext, flEntry.getType());
-            item.doClick();
-        });
+        final BibEntry entry = selectedEntries.get(0);
+        if (!entry.hasField(FieldName.FILE)) {
+            // no bibtex field
+            BackgroundTask.wrap(() -> new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen()).executeWith(Globals.TASK_EXECUTOR);
+            return;
+        }
+
+        List<LinkedFile> files = new ArrayList<>();
+        entry.getField(FieldName.FILE).map(FileFieldParser::parse).ifPresent(files::addAll);
+
+        if (files.isEmpty()) {
+            // content in BibTeX field is not readable
+            BackgroundTask.wrap(() -> new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen()).executeWith(Globals.TASK_EXECUTOR);
+            return;
+        }
+        LinkedFile flEntry = files.get(0);
+        try {
+            JabRefDesktop.openExternalFileAnyFormat(this.getBibDatabaseContext(), flEntry.getLink(), ExternalFileTypes.getInstance().fromLinkedFile(flEntry, true));
+        } catch (IOException ex) {
+            dialogService.showErrorDialogAndWait(ex);
+        }
     }
 
     /**
@@ -954,7 +955,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
