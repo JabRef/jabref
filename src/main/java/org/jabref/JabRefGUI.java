@@ -177,7 +177,7 @@ public class JabRefGUI {
         for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
             BasePanel panel = mainFrame.getBasePanelAt(i);
-            OpenDatabaseAction.performPostOpenActions(panel, pr);
+            OpenDatabaseAction.performPostOpenActions(panel, pr, mainFrame.getDialogService());
         }
 
         LOGGER.debug("Finished adding panels");
