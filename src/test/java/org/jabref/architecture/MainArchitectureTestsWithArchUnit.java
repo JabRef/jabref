@@ -18,11 +18,11 @@ public class MainArchitectureTestsWithArchUnit {
 
     @ArchTest
     public static void doNotUseSwing(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("javax.swing").check(classes);
+        noClasses().should().accessClassesThat().resideInAPackage("javax.swing..").check(classes);
     }
 
     @ArchTest
     public static void doNotUseJGoodies(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies").check(classes);
+        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies..").check(classes);
     }
 }
