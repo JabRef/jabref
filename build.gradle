@@ -102,7 +102,7 @@ dependencies {
     compile 'commons-cli:commons-cli:1.4'
 
     compile "org.libreoffice:juh:6.2.2"
-    compile "org.libreoffice:jurt:6.2.2"
+    compile "org.libreoffice:jurt:6.2.3"
     compile "org.libreoffice:ridl:6.2.2"
     compile "org.libreoffice:unoil:6.2.3"
 
