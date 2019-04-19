@@ -104,7 +104,7 @@ dependencies {
     compile "org.libreoffice:juh:6.2.2"
     compile "org.libreoffice:jurt:6.2.2"
     compile "org.libreoffice:ridl:6.2.2"
-    compile "org.libreoffice:unoil:6.2.2"
+    compile "org.libreoffice:unoil:6.2.3"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.2.1'
