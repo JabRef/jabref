@@ -73,8 +73,6 @@ public class GlobalSearchBar extends HBox {
     private final Button searchModeButton = new Button();
     private final Label currentResults = new Label("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private SearchWorker searchWorker;
-
     private SearchDisplayMode searchDisplayMode;
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -171,7 +169,6 @@ public class GlobalSearchBar extends HBox {
             clearSearch();
             MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
             mainTable.requestFocus();
-            //SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
         }
     }
 
@@ -198,11 +195,6 @@ public class GlobalSearchBar extends HBox {
         if (currentBasePanel == null) {
             return;
         }
-
-        if (searchWorker != null) {
-            searchWorker.cancel(true);
-        }
-
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             clearSearch();
@@ -216,10 +208,6 @@ public class GlobalSearchBar extends HBox {
         }
 
         Globals.stateManager.setSearchQuery(searchQuery);
-
-        // TODO: Remove search worker as this is doing the work twice now
-        searchWorker = new SearchWorker(currentBasePanel, searchQuery, searchDisplayMode);
-        Globals.TASK_EXECUTOR.execute(searchWorker);
     }
 
     private void informUserAboutInvalidSearchQuery() {
