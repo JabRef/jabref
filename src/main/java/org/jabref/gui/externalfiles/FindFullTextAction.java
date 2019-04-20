@@ -1,19 +1,24 @@
 package org.jabref.gui.externalfiles;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javafx.concurrent.Task;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
@@ -63,18 +68,29 @@ public class FindFullTextAction extends SimpleCommand {
                 return;
             }
         }
-        BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(this::downloadFullTexts)
-                      .executeWith(Globals.TASK_EXECUTOR);
-    }
 
-    private Map<Optional<URL>, BibEntry> findFullTexts() {
-        Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
-        for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fetchers.findFullTextPDF(entry), entry);
-        }
-        return downloads;
+        Task<Map<Optional<URL>, BibEntry>> findFullTextsTask = new Task<Map<Optional<URL>, BibEntry>>() {
+            @Override
+            protected Map<Optional<URL>, BibEntry> call() {
+                Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+                int count = 0;
+                for (BibEntry entry : basePanel.getSelectedEntries()) {
+                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                    downloads.put(fetchers.findFullTextPDF(entry), entry);
+                    updateProgress(++count, basePanel.getSelectedEntries().size());
+                }
+                return downloads;
+            }
+        };
+
+        findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
+
+        dialogService.showProgressDialogAndWait(
+                Localization.lang("Look up full text documents"),
+                Localization.lang("Looking for full text document..."),
+                findFullTextsTask);
+
+        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
 
     private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
@@ -92,7 +108,7 @@ public class FindFullTextAction extends SimpleCommand {
                     return;
                 }
                 //Download and link full text
-                addLinkedFileFromURL(result.get(), entry);
+                addLinkedFileFromURL(result.get(), entry, dir.get());
 
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
@@ -103,12 +119,13 @@ public class FindFullTextAction extends SimpleCommand {
 
     /**
      * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
-     * from the findFullTexts map
+     * from the findFullTexts map and then downloads the file into the given targetDirectory
      *
      * @param url   the url "key"
      * @param entry the entry "value"
+     * @param targetDirectory the target directory for the downloaded file
      */
-    private void addLinkedFileFromURL(URL url, BibEntry entry) {
+    private void addLinkedFileFromURL(URL url, BibEntry entry, Path targetDirectory) {
         LinkedFile newLinkedFile = new LinkedFile(url, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
@@ -121,12 +138,21 @@ public class FindFullTextAction extends SimpleCommand {
                     dialogService,
                     JabRefPreferences.getInstance());
 
-            onlineFile.download();
-
-            entry.addFile(onlineFile.getFile());
-
-            dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            try {
+                URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
+                BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
+                downloadTask.onSuccess(destination -> {
+                    LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
+                            destination,
+                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()));
+                    entry.addFile(downloadedFile);
+                    dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                });
+                Globals.TASK_EXECUTOR.execute(downloadTask);
+            } catch (MalformedURLException exception) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+            }
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));

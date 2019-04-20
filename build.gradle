@@ -101,10 +101,10 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
 
-    compile "org.libreoffice:juh:6.2.2"
-    compile "org.libreoffice:jurt:6.2.2"
-    compile "org.libreoffice:ridl:6.2.2"
-    compile "org.libreoffice:unoil:6.2.2"
+    compile "org.libreoffice:juh:6.2.3"
+    compile "org.libreoffice:jurt:6.2.3"
+    compile "org.libreoffice:ridl:6.2.3"
+    compile "org.libreoffice:unoil:6.2.3"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.2.1'
@@ -130,7 +130,7 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.3'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.0'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:8.0.8'

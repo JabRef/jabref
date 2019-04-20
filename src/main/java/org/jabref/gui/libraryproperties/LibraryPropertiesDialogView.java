@@ -72,7 +72,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
-        laTexFileDirectory.textProperty().bindBidirectional(viewModel.LaTexFileDirectoryProperty());
+        laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
         encoding.itemsProperty().bind(viewModel.encodingsProperty());
         encoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
@@ -142,7 +142,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             metaData.setUserFileDirectory(preferencesService.getUser(), text);
         }
 
-        text = viewModel.LaTexFileDirectoryProperty().getValue();
+        text = viewModel.laTexFileDirectoryProperty().getValue();
         if (text.isEmpty()) {
             metaData.clearLaTexFileDirectory(preferencesService.getUser());
         } else {
@@ -180,7 +180,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         boolean changed = saveOrderConfigChanged || encodingChanged
                           || viewModel.generalFileDirChanged() || viewModel.userFileDirChanged()
-                          || viewModel.protectedValueChanged() || saveActionsChanged || viewModel.LaTexFileDirChanged();
+                          || viewModel.protectedValueChanged() || saveActionsChanged || viewModel.laTexFileDirChanged();
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed) {

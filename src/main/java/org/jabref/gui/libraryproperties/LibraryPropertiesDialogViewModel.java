@@ -80,7 +80,7 @@ public class LibraryPropertiesDialogViewModel {
         return this.userSpecificFileDirectoryProperty;
     }
 
-    public StringProperty LaTexFileDirectoryProperty() {
+    public StringProperty laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
     }
 
@@ -116,7 +116,7 @@ public class LibraryPropertiesDialogViewModel {
         return !oldUserSpecificFileDir.equals(userSpecificFileDirectoryProperty.getValue());
     }
 
-    public boolean LaTexFileDirChanged() {
+    public boolean laTexFileDirChanged() {
         return !oldLaTexFileDir.equals(laTexFileDirectoryProperty.getValue());
     }
 
