@@ -70,7 +70,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public static void performPostOpenActions(BasePanel panel, ParserResult result, DialogService dialogService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(panel, result, dialogService);
+                action.performAction(panel, result);
                 panel.frame().showBasePanel(panel);
             }
         }

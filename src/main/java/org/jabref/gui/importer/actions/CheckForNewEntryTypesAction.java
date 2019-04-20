@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.EntryTypes;
@@ -24,7 +23,7 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
     }
 
     @Override
-    public void performAction(BasePanel panel, ParserResult parserResult, DialogService dialogService) {
+    public void performAction(BasePanel panel, ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         ImportCustomEntryTypesDialog dlg = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
