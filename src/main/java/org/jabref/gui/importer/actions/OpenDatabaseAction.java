@@ -67,7 +67,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param result The result of the BIB file parse operation.
      * @param dialogService
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult result, DialogService dialogService) {
+    public static void performPostOpenActions(BasePanel panel, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(panel, result);
@@ -191,7 +191,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             BackgroundTask.wrap(() -> loadDatabase(file))
                           .onSuccess(result -> {
                               BasePanel panel = addNewDatabase(result, file, raisePanel);
-                              OpenDatabaseAction.performPostOpenActions(panel, result, dialogService);
+                              OpenDatabaseAction.performPostOpenActions(panel, result);
                           })
                           .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
                                                                                            ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened.")))
