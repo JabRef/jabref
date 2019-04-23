@@ -316,6 +316,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
         if (extraFileColumns.isSelected()) {
             List<String> desiredColumns = prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getSelectionModel().getSelectedIndex();
+            if (listSize < 0) {
+                listSize = 0;
+            }
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
                 indicesToSelect[i] = listSize + 1;
