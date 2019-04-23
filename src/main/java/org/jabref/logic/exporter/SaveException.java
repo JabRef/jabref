@@ -15,7 +15,7 @@ public class SaveException extends Exception {
     public static final SaveException BACKUP_CREATION = new SaveException("Unable to create backup",
             Localization.lang("Unable to create backup"));
 
-    private final BibEntry entry;
+    private BibEntry entry;
     private int status;
     private String localizedMessage;
 
@@ -46,18 +46,18 @@ public class SaveException extends Exception {
         this.entry = entry;
     }
 
-    public SaveException(String message, String localizedMessage, BibEntry entry) {
-        super(message);
+    public SaveException(String message, String localizedMessage, BibEntry entry, Throwable base) {
+        super(message, base);
         this.localizedMessage = localizedMessage;
         this.entry = entry;
     }
 
     public SaveException(Throwable base) {
-        this(base.getMessage(), base.getLocalizedMessage());
+        super(base.getMessage(), base);
     }
 
     public SaveException(Throwable base, BibEntry entry) {
-        this(base.getMessage(), base.getLocalizedMessage(), entry);
+        this(base.getMessage(), base.getLocalizedMessage(), entry, base);
     }
 
     public int getStatus() {

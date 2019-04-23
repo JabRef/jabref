@@ -38,12 +38,11 @@ public class AppendDatabaseDialog extends BaseDialog<Boolean> {
         getDialogPane().setContent(container);
         container.setHgap(10);
         container.setVgap(10);
-        container.setPadding(new Insets(15, 5, 0, 0));
         container.add(entries, 0, 0);
         container.add(strings, 0, 1);
         container.add(groups, 0, 2);
         container.add(selector, 0, 3);
-        container.setPadding(new Insets(15, 5, 0, 0));
+        container.setPadding(new Insets(15, 5, 0, 5));
         container.setGridLinesVisible(false);
     }
 

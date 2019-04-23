@@ -9,6 +9,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -20,15 +22,17 @@ public class CleanupAction implements BaseAction {
 
     private final BasePanel panel;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
 
-    public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
+    public CleanupAction(BasePanel panel, JabRefPreferences preferences, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.preferences = preferences;
         this.dialogService = panel.frame().getDialogService();
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -58,8 +62,9 @@ public class CleanupAction implements BaseAction {
 
             preferences.setCleanupPreset(chosenPreset.get());
 
-            this.cleanup(chosenPreset.get());
-            this.showResults();
+            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
+                          .onSuccess(result -> showResults())
+                          .executeWith(taskExecutor);
         }
     }
 
