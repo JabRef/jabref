@@ -14,7 +14,7 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.CopyDoiUrlAction;
+import org.jabref.gui.edit.CopyDoiUrlAction;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.formatter.bibtexfields.CleanupURLFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;

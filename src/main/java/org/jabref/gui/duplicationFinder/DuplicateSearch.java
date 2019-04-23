@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.duplicationFinder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +14,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
-import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
@@ -24,8 +28,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class DuplicateSearch extends SimpleCommand {
 
@@ -36,18 +43,22 @@ public class DuplicateSearch extends SimpleCommand {
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
     private final DialogService dialogService;
+    private final StateManager stateManager;
 
-    public DuplicateSearch(JabRefFrame frame, DialogService dialogService) {
+    public DuplicateSearch(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
         this.frame = frame;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        BasePanel panel = frame.getCurrentBasePanel();
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         dialogService.notify(Localization.lang("Searching for duplicates..."));
 
-        List<BibEntry> entries = panel.getDatabase().getEntries();
+        List<BibEntry> entries = database.getEntries();
         duplicates.clear();
         libraryAnalyzed.set(false);
         autoRemoveExactDuplicates.set(false);
@@ -57,7 +68,7 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -153,7 +164,7 @@ public class DuplicateSearch extends SimpleCommand {
         if (!result.getToRemove().isEmpty()) {
             for (BibEntry entry : result.getToRemove()) {
                 panel.getDatabase().removeEntry(entry);
-                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry));
             }
             panel.markBaseChanged();
         }

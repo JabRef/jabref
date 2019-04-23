@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.edit;
 
 import java.util.Optional;
 
@@ -6,6 +6,7 @@ import javafx.scene.control.TextArea;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
 

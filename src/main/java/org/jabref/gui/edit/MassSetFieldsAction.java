@@ -1,11 +1,14 @@
 package org.jabref.gui.edit;
 
-import java.util.List;
+import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabaseContext;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
  * An Action for launching mass field.
@@ -17,21 +20,22 @@ import org.jabref.model.entry.BibEntry;
  */
 public class MassSetFieldsAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
+    private final StateManager stateManager;
+    private DialogService dialogService;
+    private UndoManager undoManager;
 
-    public MassSetFieldsAction(JabRefFrame frame) {
-        this.frame = frame;
+    public MassSetFieldsAction(StateManager stateManager, DialogService dialogService, UndoManager undoManager) {
+        this.stateManager = stateManager;
+        this.dialogService = dialogService;
+        this.undoManager = undoManager;
+
+        this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
     }
 
     @Override
     public void execute() {
-        BasePanel bp = frame.getCurrentBasePanel();
-        if (bp == null) {
-            return;
-        }
-
-        List<BibEntry> entries = bp.getSelectedEntries();
-        MassSetFieldsDialog dialog = new MassSetFieldsDialog(entries, bp);
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        MassSetFieldsDialog dialog = new MassSetFieldsDialog(stateManager.getSelectedEntries(), database, dialogService, undoManager);
         dialog.showAndWait();
     }
 

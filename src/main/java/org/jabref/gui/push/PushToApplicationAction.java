@@ -84,7 +84,6 @@ public class PushToApplicationAction extends SimpleCommand {
 
     @Override
     public void execute() {
-
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {

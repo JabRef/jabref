@@ -12,7 +12,7 @@ import javafx.scene.layout.GridPane;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.EditExternalFileTypesAction;
+import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
 import org.jabref.gui.push.PushToApplicationSettingsDialog;

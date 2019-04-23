@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DuplicateResolverDialog;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;

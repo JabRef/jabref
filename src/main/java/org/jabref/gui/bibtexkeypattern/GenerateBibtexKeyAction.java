@@ -1,10 +1,11 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.bibtexkeypattern;
 
 import java.util.List;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;

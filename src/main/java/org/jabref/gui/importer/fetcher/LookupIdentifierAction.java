@@ -1,17 +1,21 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.importer.fetcher;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
@@ -23,6 +27,9 @@ import org.jabref.model.entry.identifier.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
+
 public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LookupIdentifierAction.class);
@@ -30,16 +37,23 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
     private final JabRefFrame frame;
 
     private final IdFetcher<T> fetcher;
+    private final StateManager stateManager;
+    private UndoManager undoManager;
 
-    public LookupIdentifierAction(JabRefFrame frame, IdFetcher<T> fetcher) {
+    public LookupIdentifierAction(JabRefFrame frame, IdFetcher<T> fetcher, StateManager stateManager, UndoManager undoManager) {
         this.frame = frame;
         this.fetcher = fetcher;
+        this.stateManager = stateManager;
+        this.undoManager = undoManager;
+
+        this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(this.stateManager)));
+        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
     }
 
     @Override
     public void execute() {
         try {
-            BackgroundTask.wrap(this::lookupIdentifiers)
+            BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
                           .onSuccess(frame.getDialogService()::notify)
                           .executeWith(Globals.TASK_EXECUTOR);
         } catch (Exception e) {
@@ -72,13 +86,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         };
     }
 
-    private String lookupIdentifiers() {
-        BasePanel basePanel = Objects.requireNonNull(frame.getCurrentBasePanel());
-        List<BibEntry> bibEntries = basePanel.getSelectedEntries();
-        if (bibEntries.isEmpty()) {
-            return Localization.lang("This operation requires one or more entries to be selected.");
-        }
-
+    private String lookupIdentifiers(List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
         NamedCompound namedCompound = new NamedCompound(Localization.lang("Look up %0", fetcher.getIdentifierName()));
         int count = 0;
@@ -107,8 +115,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         }
         namedCompound.end();
         if (foundCount > 0) {
-            basePanel.getUndoManager().addEdit(namedCompound);
-            basePanel.markBaseChanged();
+            undoManager.addEdit(namedCompound);
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
     }

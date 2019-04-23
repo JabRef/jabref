@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.cleanup;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;

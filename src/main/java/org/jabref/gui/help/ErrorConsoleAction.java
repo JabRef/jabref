@@ -1,5 +1,6 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.help;
 
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.errorconsole.ErrorConsoleView;
 
 /**

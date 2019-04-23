@@ -28,7 +28,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.GenerateBibtexKeySingleAction;
+import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;

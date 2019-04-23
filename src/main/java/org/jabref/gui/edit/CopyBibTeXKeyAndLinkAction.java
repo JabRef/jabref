@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.edit;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
