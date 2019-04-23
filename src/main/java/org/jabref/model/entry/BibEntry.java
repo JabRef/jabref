@@ -408,10 +408,6 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        if (BibEntry.ID_FIELD.equals(fieldName)) {
-            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
-        }
-
         changed = true;
 
         fields.put(fieldName, value.intern());
