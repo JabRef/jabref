@@ -29,11 +29,6 @@ public class BibEntryTest {
     }
 
     @Test
-    public void notOverrideReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.setField(BibEntry.ID_FIELD, "somevalue"));
-    }
-
-    @Test
     public void notClearReservedFields() {
         assertThrows(IllegalArgumentException.class, () -> entry.clearField(BibEntry.ID_FIELD));
     }
