@@ -101,7 +101,6 @@ public class WriteXMPAction extends SimpleCommand {
         }
 
         for (BibEntry entry : entries) {
-
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))

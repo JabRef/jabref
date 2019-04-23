@@ -8,9 +8,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -47,8 +46,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData) {
-
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
