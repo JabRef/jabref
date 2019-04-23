@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
@@ -16,7 +15,6 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -27,29 +25,16 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class PushToApplicationAction extends SimpleCommand {
 
     private final PushToApplication operation;
-    private final JabRefFrame frame;
     private final StateManager stateManager;
-    private BasePanel panel;
+    private final DialogService dialogService;
 
-    public PushToApplicationAction(final JabRefFrame frame, final StateManager stateManager) {
-        this.frame = frame;
-        this.operation = getLastUsedApplication(frame.getPushApplications().getApplications());
+    public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
+        this.operation = pushToApplicationsManager.getLastUsedApplication(Globals.prefs);
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
-    }
-
-    private PushToApplication getLastUsedApplication(List<PushToApplication> pushActions) {
-        String appSelected = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
-        for (PushToApplication application : pushActions) {
-            if (application.getApplicationName().equals(appSelected)) {
-                return application;
-            }
-        }
-
-        // Nothing found, pick first
-        return pushActions.get(0);
     }
 
     public Action getActionInformation() {
@@ -99,14 +84,14 @@ public class PushToApplicationAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        panel = frame.getCurrentBasePanel();
 
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
                 if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
-                    frame.getDialogService().showErrorDialogAndWait(operation.getApplicationName(),
-                                                                    Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
+                    dialogService.showErrorDialogAndWait(
+                            operation.getApplicationName(),
+                            Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
 
                     return;
                 }
@@ -115,7 +100,7 @@ public class PushToApplicationAction extends SimpleCommand {
 
         // All set, call the operation in a new thread:
         BackgroundTask.wrap(this::pushEntries)
-                      .onSuccess(s -> operation.operationCompleted(panel))
+                      .onSuccess(s -> operation.operationCompleted())
                       .executeWith(Globals.TASK_EXECUTOR);
 
     }

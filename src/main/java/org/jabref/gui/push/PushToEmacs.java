@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -103,9 +102,8 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public void operationCompleted(BasePanel panel) {
+    public void operationCompleted() {
         if (couldNotConnect) {
-
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
                             + "Emacs or XEmacs is running, and that the server has been started "
@@ -117,7 +115,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                             + "the emacsclient/gnuclient program installed and available in the PATH."));
 
         } else {
-            super.operationCompleted(panel);
+            super.operationCompleted();
         }
     }
 

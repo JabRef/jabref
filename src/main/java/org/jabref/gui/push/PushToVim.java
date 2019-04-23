@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -86,9 +85,8 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void operationCompleted(BasePanel panel) {
+    public void operationCompleted() {
         if (couldNotConnect) {
-
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                                                  Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
 
@@ -97,7 +95,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                                                  Localization.lang("Could not run the 'vim' program."));
 
         } else {
-            super.operationCompleted(panel);
+            super.operationCompleted();
         }
     }
 

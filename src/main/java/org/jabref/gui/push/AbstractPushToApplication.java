@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -93,18 +92,21 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void operationCompleted(BasePanel panel) {
+    public void operationCompleted() {
         if (notDefined) {
-            panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Error pushing entries"),
+                    Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
         } else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Error pushing entries"),
+                    Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotConnect) {
-            panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not connect to %0", getApplicationName()) + ".");
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Error pushing entries"),
+                    Localization.lang("Could not connect to %0", getApplicationName()) + ".");
         } else {
-            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
+            dialogService.notify(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
         }
     }
 

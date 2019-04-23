@@ -101,7 +101,7 @@ import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
 import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
 import org.jabref.gui.push.PushToApplicationAction;
-import org.jabref.gui.push.PushToApplications;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -169,7 +169,7 @@ public class JabRefFrame extends BorderPane {
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
-    private PushToApplications pushApplications;
+    private PushToApplicationsManager pushApplications;
     private final DialogService dialogService;
     private SidePane sidePane;
 
@@ -489,7 +489,7 @@ public class JabRefFrame extends BorderPane {
     private void initLayout() {
         setProgressBarVisible(false);
 
-        pushApplications = new PushToApplications(this.getDialogService());
+        pushApplications = new PushToApplicationsManager(this.getDialogService());
 
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
@@ -560,7 +560,7 @@ public class JabRefFrame extends BorderPane {
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
-        PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(this, Globals.stateManager);
+        PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(Globals.stateManager, this.getPushApplications(), this.getDialogService());
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
@@ -799,7 +799,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs))
         );
 
-        final PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(this, Globals.stateManager);
+        final PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(Globals.stateManager, this.getPushApplications(), this.getDialogService());
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
@@ -1310,7 +1310,7 @@ public class JabRefFrame extends BorderPane {
         return sidePaneManager;
     }
 
-    public PushToApplications getPushApplications() {
+    public PushToApplicationsManager getPushApplications() {
         return pushApplications;
     }
 

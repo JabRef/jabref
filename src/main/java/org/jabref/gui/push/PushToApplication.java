@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -30,7 +29,7 @@ public interface PushToApplication {
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
      */
-    void operationCompleted(BasePanel panel);
+    void operationCompleted();
 
     /**
      * Check whether this operation requires BibTeX keys to be set for the entries. If true is returned an error message
