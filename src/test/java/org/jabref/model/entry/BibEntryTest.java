@@ -29,11 +29,6 @@ public class BibEntryTest {
     }
 
     @Test
-    public void notClearReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.clearField(BibEntry.ID_FIELD));
-    }
-
-    @Test
     public void getFieldIsCaseInsensitive() throws Exception {
         entry.setField("TeSt", "value");
 
