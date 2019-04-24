@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.importer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,12 +8,16 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class NewEntryAction extends SimpleCommand {
 
@@ -23,22 +27,23 @@ public class NewEntryAction extends SimpleCommand {
     /**
      * The type of the entry to create.
      */
-    private final Optional<EntryType> type;
+    private Optional<EntryType> type;
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    public NewEntryAction(JabRefFrame jabRefFrame, DialogService dialogService, JabRefPreferences preferences) {
+    public NewEntryAction(JabRefFrame jabRefFrame, DialogService dialogService, JabRefPreferences preferences, StateManager stateManager) {
         this.jabRefFrame = jabRefFrame;
-        this.type = Optional.empty();
         this.dialogService = dialogService;
         this.preferences = preferences;
+
+        this.type = Optional.empty();
+
+        this.executable.bind(needsDatabase(stateManager));
     }
 
-    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type, DialogService dialogService, JabRefPreferences preferences) {
-        this.jabRefFrame = jabRefFrame;
+    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type, DialogService dialogService, JabRefPreferences preferences, StateManager stateManager) {
+        this(jabRefFrame, dialogService, preferences, stateManager);
         this.type = Optional.of(type);
-        this.dialogService = dialogService;
-        this.preferences = preferences;
     }
 
     @Override

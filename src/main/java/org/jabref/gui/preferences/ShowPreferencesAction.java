@@ -1,7 +1,7 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.preferences;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.preferences.PreferencesDialog;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
 
 public class ShowPreferencesAction extends SimpleCommand {
