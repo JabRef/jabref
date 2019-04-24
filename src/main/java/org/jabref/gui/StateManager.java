@@ -6,8 +6,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -34,6 +36,7 @@ public class StateManager {
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
+    private final IntegerProperty searchResultSize = new SimpleIntegerProperty();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -79,7 +82,7 @@ public class StateManager {
 
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
-                .collect(Collectors.toList());
+                           .collect(Collectors.toList());
     }
 
     public void clearSearchQuery() {
@@ -88,5 +91,13 @@ public class StateManager {
 
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
+    }
+
+    public IntegerProperty searchResultSizeProperty() {
+        return searchResultSize;
+    }
+
+    public void setSearchResultSize(int size) {
+        searchResultSize.setValue(size);
     }
 }
