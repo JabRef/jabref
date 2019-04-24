@@ -15,6 +15,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -87,7 +88,7 @@ public class PushToApplicationAction extends SimpleCommand {
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
-                if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
+                if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
                     dialogService.showErrorDialogAndWait(
                             operation.getApplicationName(),
                             Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));

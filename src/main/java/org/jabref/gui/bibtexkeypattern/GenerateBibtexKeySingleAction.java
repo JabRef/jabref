@@ -4,7 +4,6 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;

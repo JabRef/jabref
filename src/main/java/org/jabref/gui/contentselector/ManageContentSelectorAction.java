@@ -4,7 +4,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.contentselector.ContentSelectorDialogView;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 

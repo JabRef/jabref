@@ -4,8 +4,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.libraryproperties.LibraryPropertiesDialogView;
-import org.jabref.model.database.BibDatabaseContext;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 

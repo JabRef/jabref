@@ -2,7 +2,6 @@ package org.jabref.gui.shared;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.shared.SharedDatabaseLoginDialogView;
 
 /**
  * Opens a shared database.

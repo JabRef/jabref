@@ -3,7 +3,6 @@ package org.jabref.gui.bibtexkeypattern;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 

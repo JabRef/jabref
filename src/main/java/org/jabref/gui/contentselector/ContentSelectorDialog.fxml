@@ -9,7 +9,6 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.contentselector.ContentSelectorDialogView">
     <content>
         <VBox>

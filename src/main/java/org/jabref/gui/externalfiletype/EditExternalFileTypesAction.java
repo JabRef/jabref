@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiletype;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.CustomizeExternalFileTypesDialog;
 
 public class EditExternalFileTypesAction extends SimpleCommand {
 

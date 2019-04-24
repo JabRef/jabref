@@ -2,7 +2,6 @@ package org.jabref.gui.help;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.VersionPreferences;

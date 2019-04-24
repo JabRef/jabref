@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;

@@ -1,6 +1,5 @@
 package org.jabref.gui.metadata;
 
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;

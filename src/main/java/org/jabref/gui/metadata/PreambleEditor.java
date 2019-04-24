@@ -11,7 +11,6 @@ import javafx.scene.control.TextArea;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
