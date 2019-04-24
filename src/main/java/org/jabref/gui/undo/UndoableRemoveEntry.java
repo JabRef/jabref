@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -22,13 +21,9 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
     private final BibDatabase base;
     private final BibEntry entry;
 
-    private final BasePanel panel;
-
-    public UndoableRemoveEntry(BibDatabase base, BibEntry entry,
-                               BasePanel panel) {
+    public UndoableRemoveEntry(BibDatabase base, BibEntry entry) {
         this.base = base;
         this.entry = entry;
-        this.panel = panel;
     }
 
     @Override
@@ -50,8 +45,6 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
         // Redo the change.
         try {
             base.removeEntry(entry);
-            // If the entry has an editor currently open, we must close it.
-            panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
             LOGGER.warn("Problem to redo `remove entry`", ex);
         }

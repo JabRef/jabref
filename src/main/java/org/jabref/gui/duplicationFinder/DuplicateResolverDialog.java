@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.duplicationFinder;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -6,7 +6,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
-import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.util.BaseDialog;

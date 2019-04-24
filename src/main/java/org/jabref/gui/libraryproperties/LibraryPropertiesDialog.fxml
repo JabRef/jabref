@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-
 <DialogPane minHeight="-Infinity" prefHeight="784.0" prefWidth="921.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.libraryproperties.LibraryPropertiesDialogView">
     <content>
         <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">

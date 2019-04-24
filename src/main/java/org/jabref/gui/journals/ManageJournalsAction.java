@@ -1,6 +1,6 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.journals;
 
-import org.jabref.gui.journals.ManageJournalAbbreviationsView;
+import org.jabref.gui.actions.SimpleCommand;
 
 public class ManageJournalsAction extends SimpleCommand {
 
