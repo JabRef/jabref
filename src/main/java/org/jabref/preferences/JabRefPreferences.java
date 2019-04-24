@@ -88,6 +88,7 @@ import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
@@ -872,11 +873,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
         EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
-                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreset.CleanupStep.MOVE_PDF,
-                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+                                                                        CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                                                                        CleanupPreset.CleanupStep.MOVE_PDF,
+                                                                        CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
@@ -1437,8 +1438,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
-                get(TIME_STAMP_FORMAT));
+                                          getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                                          get(TIME_STAMP_FORMAT));
     }
 
     public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
@@ -1453,14 +1454,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-                isKeywordSyncEnabled());
+                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+                                           isKeywordSyncEnabled());
     }
 
     @Override
@@ -1475,32 +1476,32 @@ public class JabRefPreferences implements PreferencesService {
             }
         }
         return new SavePreferences(
-                saveInOriginalOrder,
-                saveOrder,
-                this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
-                SavePreferences.DatabaseSaveType.ALL,
-                false,
-                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                this.getLatexFieldFormatterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
-                getBibtexKeyPatternPreferences());
+                                   saveInOriginalOrder,
+                                   saveOrder,
+                                   this.getDefaultEncoding(),
+                                   this.getBoolean(JabRefPreferences.BACKUP),
+                                   SavePreferences.DatabaseSaveType.ALL,
+                                   false,
+                                   this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                                   this.getLatexFieldFormatterPreferences(),
+                                   this.getKeyPattern(),
+                                   getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                                   getBibtexKeyPatternPreferences());
     }
 
     public SavePreferences loadForSaveFromPreferences() {
         return new SavePreferences(
-                false,
-                null,
-                this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
-                SavePreferences.DatabaseSaveType.ALL,
-                true,
-                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                this.getLatexFieldFormatterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
-                getBibtexKeyPatternPreferences());
+                                   false,
+                                   null,
+                                   this.getDefaultEncoding(),
+                                   this.getBoolean(JabRefPreferences.BACKUP),
+                                   SavePreferences.DatabaseSaveType.ALL,
+                                   true,
+                                   this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                                   this.getLatexFieldFormatterPreferences(),
+                                   this.getKeyPattern(),
+                                   getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                                   getBibtexKeyPatternPreferences());
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
@@ -1541,14 +1542,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                this.get(JabRefPreferences.OO_JARS_PATH),
-                this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                this.get(JabRefPreferences.OO_PATH),
-                this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                                         this.get(JabRefPreferences.OO_JARS_PATH),
+                                         this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                                         this.get(JabRefPreferences.OO_PATH),
+                                         this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                                         this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                                         this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                                         this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                                         this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
@@ -1728,10 +1729,9 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public SaveOrderConfig loadExportSaveOrder() {
         return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
-        );
+                                   new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                                   new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                                   new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
     }
 
     @Override
@@ -2008,7 +2008,7 @@ public class JabRefPreferences implements PreferencesService {
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                    layoutPreferences, savePreferences);
+                                                           layoutPreferences, savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;
@@ -2059,5 +2059,20 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setShouldWarnAboutDuplicatesForImport(boolean value) {
         putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
+    }
+
+    @Override
+    public void saveCustomEntryTypes() {
+        saveCustomEntryTypes(BibDatabaseMode.BIBTEX);
+        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX);
+    }
+
+    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<CustomEntryType> customBiblatexBibTexTypes = EntryTypes.getAllValues(bibDatabaseMode).stream()
+                                                                    .filter(type -> type instanceof CustomEntryType)
+                                                                    .map(entryType -> (CustomEntryType) entryType).collect(Collectors.toList());
+
+        storeCustomEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+
     }
 }

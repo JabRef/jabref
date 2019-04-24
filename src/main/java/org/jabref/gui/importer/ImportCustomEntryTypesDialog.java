@@ -2,6 +2,8 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -11,6 +13,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryType;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
@@ -20,6 +23,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
     @FXML private CheckListView<EntryType> unknownEntryTypesCheckList;
     @FXML private VBox boxDifferentCustomization;
     @FXML private CheckListView<EntryType> differentCustomizationCheckList;
+    @Inject private PreferencesService preferencesService;
 
     private ImportCustomEntryTypesDialogViewModel viewModel;
 
@@ -47,11 +51,11 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes);
+        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
 
-        boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizationsProperty()));
-        unknownEntryTypesCheckList.itemsProperty().bind(viewModel.newTypesProperty());
-        differentCustomizationCheckList.itemsProperty().bind(viewModel.differentCustomizationsProperty());
+        boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
+        unknownEntryTypesCheckList.setItems(viewModel.newTypes());
+        differentCustomizationCheckList.setItems(viewModel.differentCustomizations());
     }
 
 }
