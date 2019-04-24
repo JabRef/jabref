@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.preferences.JabRefPreferences;
 
-public class PushToApplications {
+public class PushToApplicationsManager {
 
     private final List<PushToApplication> applications;
 
-    public PushToApplications(DialogService dialogService) {
+    public PushToApplicationsManager(DialogService dialogService) {
         // Set up the current available choices:
-
         applications = new ArrayList<>();
         applications.add(new PushToEmacs(dialogService));
         applications.add(new PushToLyx(dialogService));
@@ -35,5 +35,13 @@ public class PushToApplications {
         } else {
             return new PushToApplicationSettings();
         }
+    }
+
+    public PushToApplication getLastUsedApplication(JabRefPreferences preferences) {
+        String appSelected = preferences.get(JabRefPreferences.PUSH_TO_APPLICATION);
+        return applications.stream()
+                           .filter(application -> application.getApplicationName().equals(appSelected))
+                           .findAny()
+                           .orElse(applications.get(0));
     }
 }

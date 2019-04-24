@@ -22,6 +22,7 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
+import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.PreboundBinding;
 
 /**
@@ -185,6 +186,16 @@ public class BindingsHelper {
      */
     public static <T> ObservableList<T> forUI(ObservableList<T> list) {
         return new UiThreadList<>(list);
+    }
+
+    public static <T> ObservableValue<T> ifThenElse(ObservableValue<Boolean> condition, T value, T other) {
+        return EasyBind.map(condition, conditionValue -> {
+            if (conditionValue) {
+                return value;
+            } else {
+                return other;
+            }
+        });
     }
 
     private static class BidirectionalBinding<A, B> {

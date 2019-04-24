@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import javafx.application.Platform;
@@ -18,13 +19,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -37,7 +38,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class MassSetFieldsDialog extends BaseDialog<Void> {
 
     private final List<BibEntry> entries;
-    private final BasePanel bp;
+    private final BibDatabaseContext database;
     private final DialogService dialogService;
 
     private RadioButton clearRadioButton;
@@ -49,11 +50,13 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
     private TextField appendTextField;
     private TextField renameTextField;
     private CheckBox overwriteCheckBox;
+    private UndoManager undoManager;
 
-    MassSetFieldsDialog(List<BibEntry> entries, BasePanel bp) {
+    MassSetFieldsDialog(List<BibEntry> entries, BibDatabaseContext database, DialogService dialogService, UndoManager undoManager) {
         this.entries = entries;
-        this.bp = bp;
-        this.dialogService = bp.frame().getDialogService();
+        this.database = database;
+        this.dialogService = dialogService;
+        this.undoManager = undoManager;
 
         init();
         this.setTitle("Set/clear/append/rename fields");
@@ -76,7 +79,6 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      * @return A CompoundEdit for the entire operation.
      */
     private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
-
         String newValue = "";
 
         if (textToAppend != null) {
@@ -140,7 +142,6 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      */
     private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
                                              boolean overwriteValues) {
-
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {
             Optional<String> oldValue = entry.getField(field);
@@ -164,7 +165,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
     private void init() {
         fieldComboBox = new ComboBox<>();
         fieldComboBox.setEditable(true);
-        fieldComboBox.getItems().addAll(bp.getDatabase().getAllVisibleFields());
+        fieldComboBox.getItems().addAll(database.getDatabase().getAllVisibleFields());
 
         ToggleGroup toggleGroup = new ToggleGroup();
         clearRadioButton = new RadioButton(Localization.lang("Clear fields"));
@@ -236,6 +237,6 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
                     overwriteCheckBox.isSelected()));
         }
         compoundEdit.end();
-        bp.getUndoManager().addEdit(compoundEdit);
+        undoManager.addEdit(compoundEdit);
     }
 }

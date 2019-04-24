@@ -7,7 +7,6 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="340.0" prefWidth="427.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.metadata.BibtexStringEditorDialogView">
    <content>
       <VBox>

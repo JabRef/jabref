@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;

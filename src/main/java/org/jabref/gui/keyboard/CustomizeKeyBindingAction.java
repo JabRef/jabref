@@ -1,6 +1,6 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.keyboard;
 
-import org.jabref.gui.keyboard.KeyBindingsDialogView;
+import org.jabref.gui.actions.SimpleCommand;
 
 public class CustomizeKeyBindingAction extends SimpleCommand {
 

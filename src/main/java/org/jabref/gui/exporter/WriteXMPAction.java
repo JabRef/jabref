@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +24,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -101,7 +102,6 @@ public class WriteXMPAction extends SimpleCommand {
         }
 
         for (BibEntry entry : entries) {
-
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
