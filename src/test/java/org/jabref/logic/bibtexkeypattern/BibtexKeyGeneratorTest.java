@@ -236,6 +236,12 @@ public class BibtexKeyGeneratorTest {
         assertEquals("DAl",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         new BibDatabase()), true));
+
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}",
+                importFormatPreferences, fileMonitor);
+        assertEquals("Arn",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
+                        new BibDatabase()), true));
     }
 
     /**
