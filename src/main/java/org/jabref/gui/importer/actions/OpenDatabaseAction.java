@@ -65,7 +65,6 @@ public class OpenDatabaseAction extends SimpleCommand {
      *
      * @param panel  The BasePanel where the database is shown.
      * @param result The result of the BIB file parse operation.
-     * @param dialogService
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {

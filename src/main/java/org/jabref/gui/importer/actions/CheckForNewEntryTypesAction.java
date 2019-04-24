@@ -26,8 +26,8 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
     public void performAction(BasePanel panel, ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
-        ImportCustomEntryTypesDialog dlg = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
-        dlg.showAndWait();
+        ImportCustomEntryTypesDialog importCustomEntryTypesDialog = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
+        importCustomEntryTypesDialog.showAndWait();
 
     }
 

@@ -2,29 +2,26 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
-import org.jabref.gui.customentrytypes.CustomEntryTypesManager;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
+import org.jabref.preferences.PreferencesService;
 
 public class ImportCustomEntryTypesDialogViewModel {
 
-    private final ListProperty<EntryType> newTypesProperty;
-    private final ListProperty<EntryType> differentCustomizationsProperty;
     private final BibDatabaseMode mode;
+    private final PreferencesService preferencesService;
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<EntryType> customEntryTypes) {
+    private final ObservableList<EntryType> newTypes = FXCollections.observableArrayList();
+    private final ObservableList<EntryType> differentCustomizationTypes = FXCollections.observableArrayList();
+
+    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<EntryType> customEntryTypes, PreferencesService preferencesService) {
         this.mode = mode;
-
-        ObservableList<EntryType> newTypes = FXCollections.observableArrayList();
-        ObservableList<EntryType> differentCustomizationTypes = FXCollections.observableArrayList();
+        this.preferencesService = preferencesService;
 
         for (EntryType customType : customEntryTypes) {
             if (!EntryTypes.getType(customType.getName(), mode).isPresent()) {
@@ -37,27 +34,24 @@ public class ImportCustomEntryTypesDialogViewModel {
             }
         }
 
-        newTypesProperty = new SimpleListProperty<>(newTypes);
-        differentCustomizationsProperty = new SimpleListProperty<>(differentCustomizationTypes);
-
     }
 
-    public ListProperty<EntryType> newTypesProperty() {
-        return this.newTypesProperty;
+    public ObservableList<EntryType> newTypes() {
+        return this.newTypes;
     }
 
-    public ListProperty<EntryType> differentCustomizationsProperty() {
-        return this.differentCustomizationsProperty;
+    public ObservableList<EntryType> differentCustomizations() {
+        return this.differentCustomizationTypes;
     }
 
     public void importCustomEntryTypes(List<EntryType> checkedUnknownEntryTypes, List<EntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> EntryTypes.addOrModifyCustomEntryType((CustomEntryType) type, mode));
-            CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
+            preferencesService.saveCustomEntryTypes();
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> EntryTypes.addOrModifyCustomEntryType((CustomEntryType) type, mode));
-            CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
+            preferencesService.saveCustomEntryTypes();
         }
 
     }
