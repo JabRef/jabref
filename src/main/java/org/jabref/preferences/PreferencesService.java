@@ -87,4 +87,6 @@ public interface PreferencesService {
     boolean shouldWarnAboutDuplicatesForImport();
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
+
+    void saveCustomEntryTypes();
 }

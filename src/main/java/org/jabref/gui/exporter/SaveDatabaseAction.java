@@ -83,7 +83,7 @@ public class SaveDatabaseAction {
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
         } catch (IOException ex) {
-            throw new SaveException(ex);
+            throw new SaveException("Problems saving:", ex);
         }
 
         return true;

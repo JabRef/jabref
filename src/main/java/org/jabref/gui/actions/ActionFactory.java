@@ -1,23 +1,34 @@
 package org.jabref.gui.actions;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.model.strings.StringUtil;
 
+import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
+import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to create and style controls according to an {@link Action}.
  */
 public class ActionFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
 
     private final KeyBindingRepository keyBindingRepository;
 
@@ -33,14 +44,64 @@ public class ActionFactory {
         action.getIcon().ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));
     }
 
+    /*
+     * Returns MenuItemContainer node associated with this menu item
+     * which can contain:
+     *   1. label node of type Label for displaying menu item text,
+     *   2. right node of type Label for displaying accelerator text,
+     *      or an arrow if it's a Menu,
+     *   3. graphic node for displaying menu item icon, and
+     *   4. left node for displaying either radio button or check box.
+     *
+     * This is basically rewritten impl_styleableGetNode() which
+     * should not be used since it's marked as deprecated.
+     */
+    private static Label getAssociatedNode(MenuItem menuItem) {
+        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.impl_styleableGetNode();
+
+        if (container == null) {
+            return null;
+        } else {
+            // We have to use reflection to get the associated label
+            try {
+                Method getLabel = ContextMenuContent.MenuItemContainer.class.getDeclaredMethod("getLabel");
+                getLabel.setAccessible(true);
+                return (Label) getLabel.invoke(container);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                LOGGER.warn("Could not get label of menu item", e);
+            }
+        }
+        return null;
+    }
+
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
-        return ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
+        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
+        setGraphic(menuItem, action);
+
+        // Show tooltips
+        if (command instanceof SimpleCommand) {
+            EasyBind.subscribe(
+                    ((SimpleCommand) command).statusMessageProperty(),
+                    message -> {
+                        Label label = getAssociatedNode(menuItem);
+                        if (label != null) {
+                            label.setMouseTransparent(false);
+                            if (StringUtil.isBlank(message)) {
+                                label.setTooltip(null);
+                            } else {
+                                label.setTooltip(new Tooltip(message));
+                            }
+                        }
+                    }
+            );
+        }
+
+        return menuItem;
     }
 
     public MenuItem createMenuItem(Action action, Command command) {
-        MenuItem menuItem = ActionUtils.createMenuItem(new JabRefAction(action, command, keyBindingRepository));
-        setGraphic(menuItem, action);
-
+        MenuItem menuItem = new MenuItem();
+        configureMenuItem(action, command, menuItem);
         return menuItem;
     }
 

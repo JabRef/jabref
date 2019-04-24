@@ -41,7 +41,7 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(memEntry);
-        undoEdit.addEdit(new UndoableRemoveEntry(database.getDatabase(), memEntry, null));
+        undoEdit.addEdit(new UndoableRemoveEntry(database.getDatabase(), memEntry));
     }
 
     @Override
