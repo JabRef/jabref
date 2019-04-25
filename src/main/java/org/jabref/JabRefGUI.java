@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
@@ -41,7 +44,7 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
-
+    Stage window;
     private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
@@ -70,7 +73,7 @@ public class JabRefGUI {
         }
 
         GUIGlobals.init();
-
+        System.out.println("Yes");
         LOGGER.debug("Initializing frame");
         mainFrame.init();
 
@@ -144,11 +147,15 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            saveWindowState(mainStage);
-            boolean reallyQuit = mainFrame.quit();
-            if (!reallyQuit) {
-                event.consume();
+            event.consume();
+
+            Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to exit?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.YES) {
+                saveWindowState(mainStage);
+                mainStage.close();
             }
+
         });
 
         for (ParserResult pr : failed) {

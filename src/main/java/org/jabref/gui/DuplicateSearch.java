@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javafx.scene.control.Alert;
+
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -45,9 +47,10 @@ public class DuplicateSearch extends SimpleCommand {
     @Override
     public void execute() {
         BasePanel panel = frame.getCurrentBasePanel();
-        dialogService.notify(Localization.lang("Searching for duplicates..."));
-
-        List<BibEntry> entries = panel.getDatabase().getEntries();
+        //dialogService.notify(Localization.lang("Searching for duplicates..."));
+        System.out.println("Okay");
+        try {
+            List<BibEntry> entries = panel.getDatabase().getEntries();
         duplicates.clear();
         libraryAnalyzed.set(false);
         autoRemoveExactDuplicates.set(false);
@@ -61,6 +64,13 @@ public class DuplicateSearch extends SimpleCommand {
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setContentText("Username or Password Invalid");
+
+            alert.show();
+        }
 
     }
 
