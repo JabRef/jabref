@@ -44,7 +44,7 @@ class AdvancedTab extends Pane implements PrefsTab {
         this.dialogService = dialogService;
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
-
+        builder.setVgap(5);
         useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         remoteServerPort = new TextField();
@@ -54,10 +54,9 @@ class AdvancedTab extends Pane implements PrefsTab {
         Label remoteOperation = new Label(Localization.lang("Remote operation"));
         remoteOperation.getStyleClass().add("sectionHeader");
         builder.add(remoteOperation, 2, 1);
-        Text textRemote = new Text(
-                        "This feature lets new files be opened or imported into an already running instance of JabRef " +
-                        "instead of opening a new instance. For instance, this is useful when you open a file in JabRef " +
-                        "from your web browser. Note that this will prevent you from running more than one instance of JabRef at a time.");
+        Text textRemote = new Text(Localization.lang("This feature lets new files be opened or imported into an already running instance of JabRef " +
+                "instead of opening a new instance. For instance, this is useful when you open a file in JabRef " +
+                "from your web browser. Note that this will prevent you from running more than one instance of JabRef at a time."));
         textRemote.setWrappingWidth(600);
         builder.add(textRemote, 2, 4);
 
@@ -70,7 +69,7 @@ class AdvancedTab extends Pane implements PrefsTab {
         help.setMaxWidth(Double.MAX_VALUE);
         p.getChildren().add(help);
 
-        builder.add(p, 2, 10);
+        builder.add(p, 2, 6);
         builder.add(new Separator(), 2, 11);
 
         Label explore = new Label(Localization.lang("Search %0", "IEEEXplore"));
