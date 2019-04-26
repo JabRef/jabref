@@ -115,7 +115,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.15'
+    compile 'mysql:mysql-connector-java:8.0.16'
 
     compile 'org.postgresql:postgresql:42.2.5'
 
