@@ -84,7 +84,6 @@ class GeneralTab extends Pane implements PrefsTab {
         Label general = new Label(Localization.lang("General"));
         general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
-        builder.add(new Separator(), 1, 2);
         builder.add(inspectionWarnDupli, 1, 3);
         builder.add(confirmDelete, 1, 5);
         builder.add(enforceLegalKeys, 1, 7);
@@ -92,7 +91,7 @@ class GeneralTab extends Pane implements PrefsTab {
 
         // Owner name
         HBox ownerBox = new HBox();
-        ownerBox.setAlignment(Pos.CENTER);
+        ownerBox.setAlignment(Pos.CENTER_LEFT);
         ownerBox.setSpacing(7);
         Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER));
         ownerBox.getChildren().addAll(useOwner, defOwnerField, overwriteOwner, helpOwner);
@@ -115,6 +114,7 @@ class GeneralTab extends Pane implements PrefsTab {
         // Language configuration
         HBox languageBox = new HBox();
         languageBox.setSpacing(8);
+        languageBox.setAlignment(Pos.CENTER_LEFT);
         Label languageLabel = new Label(Localization.lang("Language") + ':');
         languageSelection.setItems(FXCollections.observableArrayList(Language.values()));
         new ViewModelListCellFactory<Language>()
@@ -126,6 +126,7 @@ class GeneralTab extends Pane implements PrefsTab {
         // Encoding configuration
         HBox encodingBox = new HBox();
         encodingBox.setSpacing(8);
+        encodingBox.setAlignment(Pos.CENTER_LEFT);
         Label defaultEncoding = new Label(Localization.lang("Default encoding") + ':');
         encodingBox.getChildren().addAll(defaultEncoding, encodings);
         builder.add(encodingBox, 1, 26);
@@ -133,6 +134,7 @@ class GeneralTab extends Pane implements PrefsTab {
         // Bibliography mode configuration
         HBox biblioBox = new HBox();
         biblioBox.setSpacing(8);
+        biblioBox.setAlignment(Pos.CENTER_LEFT);
         Label defaultBibliographyMode = new Label(Localization.lang("Default bibliography mode"));
         biblioBox.getChildren().addAll(defaultBibliographyMode, biblatexMode);
         builder.add(biblioBox, 1, 28);

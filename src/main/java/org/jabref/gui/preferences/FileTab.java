@@ -5,15 +5,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import org.jabref.gui.DialogService;
@@ -62,18 +58,15 @@ class FileTab extends Pane implements PrefsTab {
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
+        builder.setVgap(7);
 
         ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
-
-        fileDir = new TextField();
-
         bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
         bibLocAsPrimaryDir.setAccessibleText(Localization.lang("When downloading files, or moving linked files to the "
                                                                + "file directory, prefer the BIB file location rather than the file directory set above"));
-        runAutoFileSearch = new CheckBox(
-                                         Localization.lang("When opening file link, search for matching file if no link is defined"));
-        allowFileAutoOpenBrowse = new CheckBox(
-                                               Localization.lang("Automatically open browse dialog when creating new file link"));
+
+        runAutoFileSearch = new CheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
+        allowFileAutoOpenBrowse = new CheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new TextField();
         useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
         useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
@@ -100,10 +93,15 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(general, 1, 1);
         builder.add(openLast, 1, 2);
         builder.add(backup, 1, 3);
+
+        HBox notWrapBox = new HBox();
+        notWrapBox.setSpacing(15);
+        notWrapBox.setAlignment(Pos.CENTER_LEFT);
         Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
-        builder.add(label, 1, 4);
+        notWrapBox.getChildren().setAll(label, nonWrappableFields);
+        builder.add(notWrapBox, 1, 4);
+
         final ToggleGroup resolveGroup = new ToggleGroup();
-        builder.add(nonWrappableFields, 2, 4);
         builder.add(resolveStringsStandard, 1, 5);
         builder.add(resolveStringsAll, 1, 6);
         builder.add(doNotResolveStringsFor, 2, 6);
@@ -113,51 +111,55 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(newlineSeparatorLabel, 1, 7);
         builder.add(newlineSeparator, 2, 7);
         builder.add(reformatFileOnSaveAndExport, 1, 8);
-        Label invisible = new Label("");
-        builder.add(invisible, 1, 9);
 
+        builder.add(new Separator(), 1, 13);
         Label externalFileLinks = new Label(Localization.lang("External file links"));
         externalFileLinks.getStyleClass().add("sectionHeader");
-        builder.add(externalFileLinks, 1, 11);
+        builder.add(externalFileLinks, 1, 14);
 
+        // Main File Directory choice
+        HBox mainFileDirectoryBox = new HBox();
+        mainFileDirectoryBox.setSpacing(10);
+        mainFileDirectoryBox.setAlignment(Pos.CENTER_LEFT);
+        fileDir = new TextField();
         label = new Label(Localization.lang("Main file directory") + ':');
-        builder.add(label, 1, 12);
-        builder.add(fileDir, 2, 12);
-
         Button browse = new Button(Localization.lang("Browse"));
         browse.setPrefSize(80, 20);
         browse.setOnAction(e -> {
-            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                                            .withInitialDirectory(Paths.get(fileDir.getText())).build();
+            DirectoryDialogConfiguration dirDialogConfiguration =
+                    new DirectoryDialogConfiguration.Builder().withInitialDirectory(Paths.get(fileDir.getText())).build();
             dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                         .ifPresent(f -> fileDir.setText(f.toString()));
+                    .ifPresent(f -> fileDir.setText(f.toString()));
         });
-        builder.add(browse, 3, 12);
-        builder.add(bibLocAsPrimaryDir, 1, 13);
+        mainFileDirectoryBox.getChildren().setAll(label, fileDir, browse);
+        builder.add(mainFileDirectoryBox, 1, 15);
+
+        builder.add(bibLocAsPrimaryDir, 1, 16);
         final ToggleGroup autolinkGroup = new ToggleGroup();
-        builder.add(matchStartsWithKey, 1, 14);
-        builder.add(matchExactKeyOnly, 1, 15);
-        builder.add(useRegExpComboBox, 1, 16);
-        builder.add(regExpTextField, 2, 16);
+        builder.add(matchStartsWithKey, 1, 17);
+        builder.add(matchExactKeyOnly, 1, 18);
+        builder.add(useRegExpComboBox, 1, 19);
+        builder.add(regExpTextField, 2, 20);
         matchStartsWithKey.setToggleGroup(autolinkGroup);
         matchExactKeyOnly.setToggleGroup(autolinkGroup);
         useRegExpComboBox.setToggleGroup(autolinkGroup);
 
         Button help = factory.createIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH));
         builder.add(help, 3, 16);
-        builder.add(runAutoFileSearch, 1, 17);
-        builder.add(allowFileAutoOpenBrowse, 1, 18);
+        builder.add(runAutoFileSearch, 1, 21);
+        builder.add(allowFileAutoOpenBrowse, 1, 22);
 
-        Label invisible1 = new Label("");
-        builder.add(invisible1, 1, 19);
-
+        builder.add(new Separator(), 1, 25);
         Label autosave = new Label(Localization.lang("Autosave"));
         autosave.getStyleClass().add("sectionHeader");
-        builder.add(autosave, 1, 20);
-        builder.add(localAutoSave, 1, 21);
+        builder.add(autosave, 1, 27);
 
+        HBox saveAutosaveBox = new HBox();
+        saveAutosaveBox.setSpacing(7);
+        saveAutosaveBox.setAlignment(Pos.CENTER_LEFT);
         Button helpAutosave = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE));
-        builder.add(helpAutosave, 2, 21);
+        saveAutosaveBox.getChildren().setAll(localAutoSave, helpAutosave);
+        builder.add(saveAutosaveBox, 1, 28);
     }
 
     @Override

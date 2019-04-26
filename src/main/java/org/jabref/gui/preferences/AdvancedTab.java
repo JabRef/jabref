@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.util.Optional;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -44,7 +45,8 @@ class AdvancedTab extends Pane implements PrefsTab {
         this.dialogService = dialogService;
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
-        builder.setVgap(5);
+        builder.setVgap(7);
+
         useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         remoteServerPort = new TextField();
@@ -61,17 +63,15 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(textRemote, 2, 4);
 
         HBox p = new HBox();
-        p.getChildren().add(useRemoteServer);
-        p.getChildren().add(remoteServerPort);
-
+        p.setSpacing(8);
+        p.setAlignment(Pos.CENTER_LEFT);
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE));
         help.setMaxWidth(Double.MAX_VALUE);
-        p.getChildren().add(help);
-
+        p.getChildren().setAll(useRemoteServer, remoteServerPort, help);
         builder.add(p, 2, 6);
-        builder.add(new Separator(), 2, 11);
 
+        builder.add(new Separator(), 2, 11);
         Label explore = new Label(Localization.lang("Search %0", "IEEEXplore"));
         explore.getStyleClass().add("sectionHeader");
         builder.add(explore, 2, 12);
