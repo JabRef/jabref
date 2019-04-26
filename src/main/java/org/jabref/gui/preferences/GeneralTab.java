@@ -9,7 +9,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -106,9 +105,7 @@ class GeneralTab extends Pane implements PrefsTab {
 
         Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP));
         builder.add(helpTimestamp, 1, 19);
-
         builder.add(updateTimeStamp, 1, 20);
-
         builder.add(shouldCollectTelemetry, 1, 22);
 
         // Language configuration
