@@ -4,15 +4,17 @@ import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Line;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
@@ -57,6 +59,7 @@ class GeneralTab extends Pane implements PrefsTab {
     public GeneralTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.dialogService = dialogService;
+        builder.setVgap(7);
 
         ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
 
@@ -81,52 +84,58 @@ class GeneralTab extends Pane implements PrefsTab {
         Label general = new Label(Localization.lang("General"));
         general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
-        builder.add(new Line(), 1, 2);
+        builder.add(new Separator(), 1, 2);
         builder.add(inspectionWarnDupli, 1, 3);
-        builder.add(new Line(), 1, 4);
         builder.add(confirmDelete, 1, 5);
-        builder.add(new Line(), 1, 6);
         builder.add(enforceLegalKeys, 1, 7);
-        builder.add(new Line(), 1, 8);
         builder.add(memoryStick, 1, 9);
 
-        // Create a new panel with its own FormLayout for the last items:
-        builder.add(useOwner, 1, 10);
-        builder.add(defOwnerField, 2, 10);
-        builder.add(overwriteOwner, 3, 10);
-
+        // Owner name
+        HBox ownerBox = new HBox();
+        ownerBox.setAlignment(Pos.CENTER);
+        ownerBox.setSpacing(7);
         Button helpOwner = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER));
-        builder.add(helpOwner, 4, 10);
+        ownerBox.getChildren().addAll(useOwner, defOwnerField, overwriteOwner, helpOwner);
+        builder.add(ownerBox, 1, 10);
 
-        builder.add(useTimeStamp, 1, 13);
-        builder.add(timeStampFormat, 2, 13);
-        builder.add(overwriteTimeStamp, 2, 14);
+        builder.add(useTimeStamp, 1, 14);
+        builder.add(timeStampFormat, 1, 15);
+        builder.add(overwriteTimeStamp, 1, 16);
         Label fieldName = new Label(Localization.lang("Field name") + ':');
-        builder.add(fieldName, 3, 13);
-        builder.add(timeStampField, 4, 13);
+        builder.add(fieldName, 1, 17);
+        builder.add(timeStampField, 1, 18);
 
         Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP));
-        builder.add(helpTimestamp, 6, 13);
+        builder.add(helpTimestamp, 1, 19);
 
-        builder.add(updateTimeStamp, 1, 14);
-        builder.add(new Line(), 1, 15);
+        builder.add(updateTimeStamp, 1, 20);
 
-        builder.add(shouldCollectTelemetry, 1, 15);
-        builder.add(new Line(), 1, 16);
+        builder.add(shouldCollectTelemetry, 1, 22);
+
+        // Language configuration
+        HBox languageBox = new HBox();
+        languageBox.setSpacing(8);
         Label languageLabel = new Label(Localization.lang("Language") + ':');
-        builder.add(languageLabel, 1, 17);
         languageSelection.setItems(FXCollections.observableArrayList(Language.values()));
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
                 .install(languageSelection);
-        builder.add(languageSelection, 2, 17);
-        builder.add(new Line(), 2, 18);
+        languageBox.getChildren().addAll(languageLabel, languageSelection);
+        builder.add(languageBox, 1, 24);
+
+        // Encoding configuration
+        HBox encodingBox = new HBox();
+        encodingBox.setSpacing(8);
         Label defaultEncoding = new Label(Localization.lang("Default encoding") + ':');
-        builder.add(defaultEncoding, 1, 19);
-        builder.add(encodings, 2, 19);
+        encodingBox.getChildren().addAll(defaultEncoding, encodings);
+        builder.add(encodingBox, 1, 26);
+
+        // Bibliography mode configuration
+        HBox biblioBox = new HBox();
+        biblioBox.setSpacing(8);
         Label defaultBibliographyMode = new Label(Localization.lang("Default bibliography mode"));
-        builder.add(defaultBibliographyMode, 1, 20);
-        builder.add(biblatexMode, 2, 20);
+        biblioBox.getChildren().addAll(defaultBibliographyMode, biblatexMode);
+        builder.add(biblioBox, 1, 28);
     }
 
     @Override
