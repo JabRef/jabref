@@ -82,7 +82,7 @@ public class NetworkTab extends Pane implements PrefsTab {
 
         // Port configuration
         HBox portBox = new HBox();
-        portBox.setSpacing(10);
+        portBox.setSpacing(50);
         portBox.setAlignment(Pos.CENTER_LEFT);
         Label port = new Label(Localization.lang("Port") + ':');
         portBox.getChildren().setAll(port, portTextField, useAuthenticationCheckBox);
@@ -100,12 +100,11 @@ public class NetworkTab extends Pane implements PrefsTab {
 
         // Password configuration
         HBox passwordBox = new HBox();
-        passwordBox.setSpacing(13);
+        passwordBox.setSpacing(15);
         passwordBox.setAlignment(Pos.CENTER_LEFT);
         Label password = new Label(Localization.lang("Password") + ':');
-        passwordBox.getChildren().setAll(password, passwordTextField);
+        passwordBox.getChildren().setAll(password, passwordTextField, passwordWarningLabel);
         builder.add(passwordBox, 1, 16);
-        builder.add(passwordWarningLabel, 1, 17);
     }
 
     @Override

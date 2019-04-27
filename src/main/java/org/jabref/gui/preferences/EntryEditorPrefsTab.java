@@ -85,7 +85,6 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         Label editorOptions = new Label(Localization.lang("Editor options"));
         editorOptions.getStyleClass().add("sectionHeader");
         builder.add(editorOptions, 1, 1);
-        builder.add(new Separator(), 2, 1);
         builder.add(autoOpenForm,  1, 2);
         builder.add(defSource,  1, 3);
         builder.add(emacsMode, 1, 4);

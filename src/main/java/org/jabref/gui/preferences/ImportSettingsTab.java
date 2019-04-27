@@ -41,7 +41,6 @@ public class ImportSettingsTab implements PrefsTab {
         Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
         defaultImportStyle.getStyleClass().add("sectionHeader");
         builder.add(defaultImportStyle, 1, 1);
-        builder.add(new Separator(), 2, 1);
         builder.add(new Label(""), 1, 7);
 
         Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action"));

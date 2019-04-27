@@ -97,20 +97,20 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(ownerBox, 1, 10);
 
         builder.add(useTimeStamp, 1, 14);
-        builder.add(timeStampFormat, 1, 15);
-        builder.add(overwriteTimeStamp, 1, 16);
+        builder.add(timeStampFormat, 1, 16);
+        builder.add(overwriteTimeStamp, 1, 17);
         Label fieldName = new Label(Localization.lang("Field name") + ':');
-        builder.add(fieldName, 1, 17);
-        builder.add(timeStampField, 1, 18);
+        builder.add(fieldName, 1, 19);
+        builder.add(timeStampField, 1, 21);
 
         Button helpTimestamp = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP));
-        builder.add(helpTimestamp, 1, 19);
-        builder.add(updateTimeStamp, 1, 20);
-        builder.add(shouldCollectTelemetry, 1, 22);
+        builder.add(helpTimestamp, 1, 22);
+        builder.add(updateTimeStamp, 1, 23);
+        builder.add(shouldCollectTelemetry, 1, 25);
 
         // Language configuration
         HBox languageBox = new HBox();
-        languageBox.setSpacing(8);
+        languageBox.setSpacing(115);
         languageBox.setAlignment(Pos.CENTER_LEFT);
         Label languageLabel = new Label(Localization.lang("Language") + ':');
         languageSelection.setItems(FXCollections.observableArrayList(Language.values()));
@@ -118,23 +118,23 @@ class GeneralTab extends Pane implements PrefsTab {
                 .withText(Language::getDisplayName)
                 .install(languageSelection);
         languageBox.getChildren().addAll(languageLabel, languageSelection);
-        builder.add(languageBox, 1, 24);
+        builder.add(languageBox, 1, 27);
 
         // Encoding configuration
         HBox encodingBox = new HBox();
-        encodingBox.setSpacing(8);
+        encodingBox.setSpacing(68);
         encodingBox.setAlignment(Pos.CENTER_LEFT);
         Label defaultEncoding = new Label(Localization.lang("Default encoding") + ':');
         encodingBox.getChildren().addAll(defaultEncoding, encodings);
-        builder.add(encodingBox, 1, 26);
+        builder.add(encodingBox, 1, 28);
 
         // Bibliography mode configuration
         HBox biblioBox = new HBox();
-        biblioBox.setSpacing(8);
+        biblioBox.setSpacing(10);
         biblioBox.setAlignment(Pos.CENTER_LEFT);
         Label defaultBibliographyMode = new Label(Localization.lang("Default bibliography mode"));
         biblioBox.getChildren().addAll(defaultBibliographyMode, biblatexMode);
-        builder.add(biblioBox, 1, 28);
+        builder.add(biblioBox, 1, 29);
     }
 
     @Override

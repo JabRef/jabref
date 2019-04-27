@@ -3,11 +3,7 @@ package org.jabref.gui.preferences;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
@@ -30,6 +26,7 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
 
     public GroupsPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
+        builder.setVgap(7);
 
         keywordSeparator.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -41,29 +38,35 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
         multiSelectionModeIntersection.setText(Localization.lang("Display only entries belonging to all selected groups."));
         multiSelectionModeUnion.setText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
 
+        // View title
         Label view = new Label(Localization.lang("View"));
         view.getStyleClass().add("sectionHeader");
         builder.add(view, 1, 1);
-        builder.add(hideNonHits, 2, 2);
-        builder.add(grayOut, 2, 3);
+
+        // View configuration
+        builder.add(hideNonHits, 1, 3);
+        builder.add(grayOut, 1, 4);
         final ToggleGroup selectionModeGroup = new ToggleGroup();
-        builder.add(multiSelectionModeIntersection, 2, 4);
-        builder.add(multiSelectionModeUnion, 2, 5);
+        builder.add(multiSelectionModeIntersection, 1, 5);
+        builder.add(multiSelectionModeUnion, 1, 6);
         multiSelectionModeIntersection.setToggleGroup(selectionModeGroup);
         multiSelectionModeUnion.setToggleGroup(selectionModeGroup);
-        builder.add(autoAssignGroup, 2, 6);
-        builder.add(new Label(""), 1, 7);
+        builder.add(autoAssignGroup, 1, 7);
 
+        builder.add(new Separator(), 1, 11);
+
+        // Dynamic groups title
         Label dynamicGroups = new Label(Localization.lang("Dynamic groups"));
         dynamicGroups.getStyleClass().add("sectionHeader");
-        builder.add(dynamicGroups, 1, 8);
+        builder.add(dynamicGroups, 1, 13);
 
+        // Dynamic groups configuration
         Label defaultGrouping = new Label(Localization.lang("Default grouping field") + ":");
-        builder.add(defaultGrouping, 1, 9);
-        builder.add(groupingField, 2, 9);
+        builder.add(defaultGrouping, 1, 15);
+        builder.add(groupingField, 2, 15);
         Label label = new Label(Localization.lang("When adding/removing keywords, separate them by") + ":");
-        builder.add(label, 1, 10);
-        builder.add(keywordSeparator, 2, 10);
+        builder.add(label, 1, 17);
+        builder.add(keywordSeparator, 2, 17);
     }
 
     public Node getBuilder() {
