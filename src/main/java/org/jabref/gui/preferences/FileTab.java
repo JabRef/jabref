@@ -139,7 +139,7 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(matchStartsWithKey, 1, 17);
         builder.add(matchExactKeyOnly, 1, 18);
         builder.add(useRegExpComboBox, 1, 19);
-        builder.add(regExpTextField, 2, 20);
+        builder.add(regExpTextField, 2, 19);
         matchStartsWithKey.setToggleGroup(autolinkGroup);
         matchExactKeyOnly.setToggleGroup(autolinkGroup);
         useRegExpComboBox.setToggleGroup(autolinkGroup);
