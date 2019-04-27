@@ -100,7 +100,7 @@ public class NetworkTab extends Pane implements PrefsTab {
 
         // Password configuration
         HBox passwordBox = new HBox();
-        passwordBox.setSpacing(12);
+        passwordBox.setSpacing(13);
         passwordBox.setAlignment(Pos.CENTER_LEFT);
         Label password = new Label(Localization.lang("Password") + ':');
         passwordBox.getChildren().setAll(password, passwordTextField);
@@ -108,6 +108,7 @@ public class NetworkTab extends Pane implements PrefsTab {
         builder.add(passwordWarningLabel, 1, 17);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
