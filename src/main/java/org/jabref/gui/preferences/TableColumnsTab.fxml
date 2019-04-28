@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckListView?>
 
 <fx:root minHeight="-Infinity" minWidth="-Infinity" prefHeight="604.0" prefWidth="849.0" type="DialogPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
@@ -25,25 +30,41 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 
           </rowConstraints>
          <children>
             <Label styleClass="sectionHeader" text="%Special table columns" />
-            <CheckListView fx:id="specialColumns" GridPane.rowIndex="4" />
-            <CheckBox mnemonicParsing="false" text="Show URL/DOI  column" GridPane.rowIndex="1" />
-            <RadioButton mnemonicParsing="false" text="Show URL first" GridPane.rowIndex="2">
+            <CheckListView fx:id="specialColumnsList" GridPane.rowIndex="4" />
+            <CheckBox mnemonicParsing="false" text="%Show URL/DOI  column" GridPane.rowIndex="1" />
+            <RadioButton mnemonicParsing="false" text="%Show URL first" GridPane.rowIndex="2">
                <toggleGroup>
                   <ToggleGroup fx:id="toggleDoiUrl" />
                </toggleGroup>
             </RadioButton>
-            <RadioButton mnemonicParsing="false" text="Show DOI first" toggleGroup="$toggleDoiUrl" GridPane.rowIndex="3" />
-            <RadioButton mnemonicParsing="false" text="Synchronize with keywords" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <RadioButton mnemonicParsing="false" text="%Show DOI first" toggleGroup="$toggleDoiUrl" GridPane.rowIndex="3" />
+            <RadioButton mnemonicParsing="false" text="%Synchronize with keywords" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <toggleGroup>
                   <ToggleGroup fx:id="toggleSyncKeywords" />
                </toggleGroup>
             </RadioButton>
-            <RadioButton mnemonicParsing="false" text="Write values of special fields as separate fields to BibTeX" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <RadioButton mnemonicParsing="false" text="%Write values of special fields as separate fields to BibTeX" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="\%Entry table columns" GridPane.rowIndex="5" />
+            <ListView prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="6" />
+            <VBox GridPane.rowIndex="7">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="name" promptText="name" />
+                        <Button fx:id="addButton" mnemonicParsing="false" onAction="#addColumn" text="Add" />
+                        <Button mnemonicParsing="false" onAction="#deleteSelectedColumn" text="Delete" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" text="Button" />
+               </children>
+            </VBox>
+            <CheckListView fx:id="externalFillesTypesist" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Show extra file columns" GridPane.columnIndex="1" GridPane.rowIndex="3" />
           
                </children>
       </GridPane>
