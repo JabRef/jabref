@@ -26,18 +26,14 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
 
-    private final BasePanel basePanel;
     private final BibDatabase database;
 
     private final SearchQuery searchQuery;
-    private final SearchDisplayMode searchDisplayMode;
 
     public SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchDisplayMode searchDisplayMode) {
-        this.basePanel = Objects.requireNonNull(basePanel);
         this.database = Objects.requireNonNull(basePanel.getDatabase());
         this.searchQuery = Objects.requireNonNull(searchQuery);
-        this.searchDisplayMode = Objects.requireNonNull(searchDisplayMode);
-        LOGGER.debug("Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
+        LOGGER.debug("Search (" + searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
     }
 
     @Override

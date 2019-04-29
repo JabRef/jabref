@@ -12,7 +12,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
 
-
 /**
  * Caches the generated Citations for quicker access
  * {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
