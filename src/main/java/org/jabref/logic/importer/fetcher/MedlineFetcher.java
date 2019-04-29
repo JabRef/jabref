@@ -52,7 +52,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     private int numberOfResultsFound;
 
-
     /**
      * Replaces all commas in a given string with " AND "
      *

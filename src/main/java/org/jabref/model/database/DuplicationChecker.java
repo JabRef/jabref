@@ -19,11 +19,10 @@ public class DuplicationChecker {
     /** use a map instead of a set since I need to know how many of each key is in there */
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-
     /**
      * Checks if there is more than one occurrence of this key
      */
-    public boolean isDuplicateCiteKeyExisting(String citeKey) {
+    private boolean isDuplicateCiteKeyExisting(String citeKey) {
         return getNumberOfKeyOccurrences(citeKey) > 1;
     }
 

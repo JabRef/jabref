@@ -144,7 +144,6 @@ public class Version {
         return false;
     }
 
-
     /**
      * Checks if this version should be updated to one of the given ones.
      * Ignoring the other Version if this one is Stable and the other one is not.

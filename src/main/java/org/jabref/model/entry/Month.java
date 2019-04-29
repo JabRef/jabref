@@ -38,7 +38,6 @@ public enum Month {
         this.number = number;
     }
 
-
     /**
      * Find month by one-based number.
      * If the number is not in the valid range, then an empty Optional is returned.
