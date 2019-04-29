@@ -82,6 +82,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where a non-existing aux file in a group made it impossible to open the library. [#4735](https://github.com/JabRef/jabref/issues/4735)
 - We fixed an issue where some journal names were wrongly marked as abbreviated. [#4115](https://github.com/JabRef/jabref/issues/4115)
 - We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
+- We improved the parsing of author names whose infix is abbreviated without a dot. [#4864](https://github.com/JabRef/jabref/issues/4864)
 - We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
 - We fixed an issue where the menu on Mac OS was not displayed in the usual Mac-specific way. https://github.com/JabRef/jabref/issues/3146
 - We improved the integrity check for page numbers. [#4113](https://github.com/JabRef/jabref/issues/4113) and [feature request in the forum](http://discourse.jabref.org/t/pages-field-allow-use-of-en-dash/1199)
