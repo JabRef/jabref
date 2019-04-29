@@ -72,4 +72,9 @@ public enum StandardExternalFileType implements ExternalFileType {
     public JabRefIcon getIcon() {
         return icon;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

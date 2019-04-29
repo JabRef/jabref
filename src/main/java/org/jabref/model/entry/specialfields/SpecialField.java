@@ -76,6 +76,12 @@ public enum SpecialField {
         return fieldName;
     }
 
+    @Override
+    public String toString()
+    {
+        return fieldName;
+    }
+
     public boolean isSingleValueField() {
         return this.values.size() == 1;
     }

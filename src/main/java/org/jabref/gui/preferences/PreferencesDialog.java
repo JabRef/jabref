@@ -85,7 +85,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new GeneralTab(dialogService, prefs));
         preferenceTabs.add(new FileTab(dialogService, prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
-        preferenceTabs.add(new TableColumnsTab(prefs, frame));
+        preferenceTabs.add(new TableColumnsTab_Old(prefs, frame));
         preferenceTabs.add(new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance(), taskExecutor));
         preferenceTabs.add(new ExternalTab(frame, this, prefs));
         preferenceTabs.add(new GroupsPrefsTab(prefs));

@@ -42,7 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
-class TableColumnsTab extends Pane implements PrefsTab {
+class TableColumnsTab_Old extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -90,7 +90,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
      *
      * @param prefs a <code>JabRefPreferences</code> value
      */
-    public TableColumnsTab(JabRefPreferences prefs, JabRefFrame frame) {
+    public TableColumnsTab_Old(JabRefPreferences prefs, JabRefFrame frame) {
         this.prefs = prefs;
         this.frame = frame;
 
