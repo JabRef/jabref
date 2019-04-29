@@ -18,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Not reusable. Always create a new instance for each search!
  */
