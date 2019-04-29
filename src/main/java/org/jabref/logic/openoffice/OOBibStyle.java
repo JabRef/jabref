@@ -730,7 +730,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return "";
     }
 
-
     /**
      * Look up the nth author and return the proper last name for citation markers.
      *
