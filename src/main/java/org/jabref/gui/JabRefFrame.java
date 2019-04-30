@@ -519,8 +519,9 @@ public class JabRefFrame extends BorderPane {
                 leftSpacer
         );
         leftSide.setMinWidth(100);
-        leftSide.prefWidthProperty().bind(sidePane.widthProperty());
-        leftSide.maxWidthProperty().bind(sidePane.widthProperty());
+        // Probably useless bind
+        /*leftSide.prefWidthProperty().bind(sidePane.widthProperty());
+        leftSide.maxWidthProperty().bind(sidePane.widthProperty());*/
 
         PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(stateManager, this.getPushApplications(), this.getDialogService());
         HBox rightSide = new HBox(
