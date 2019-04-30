@@ -2,8 +2,6 @@ import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcTask
 
-import static org.jabref.build.Dependencies.getLibraries
-
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
 
