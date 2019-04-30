@@ -1,20 +1,24 @@
 package org.jabref.gui.metadata;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class BibtexStringEditorAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
+    private final StateManager stateManager;
 
-    public BibtexStringEditorAction(JabRefFrame jabRefFrame) {
-        this.frame = jabRefFrame;
+    public BibtexStringEditorAction(StateManager stateManager) {
+        this.stateManager = stateManager;
+
+        this.executable.bind(needsDatabase(this.stateManager));
     }
 
     @Override
     public void execute() {
-        BibDatabase database = frame.getCurrentBasePanel().getDatabase();
-        new BibtexStringEditorDialogView(database).showAndWait();
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        new BibtexStringEditorDialogView(database.getDatabase()).showAndWait();
     }
 }

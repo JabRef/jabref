@@ -38,10 +38,10 @@ import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
 public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
-    private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
     private final ImportHandler importHandler;
     private final JabRefPreferences preferences = Globals.prefs;
@@ -77,13 +76,12 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
     private VBox panelSearchProgress;
     private BackgroundTask findUnlinkedFilesTask;
 
-    public FindUnlinkedFilesDialog(JabRefFrame frame) {
+    public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, CountingUndoManager undoManager) {
         super();
         this.setTitle(Localization.lang("Find unlinked files"));
-        this.frame = frame;
-        dialogService = frame.getDialogService();
+        this.dialogService = dialogService;
 
-        databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
+        databaseContext = database;
         importHandler = new ImportHandler(
                 dialogService,
                 databaseContext,
@@ -92,7 +90,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                 Globals.prefs.getImportFormatPreferences(),
                 Globals.prefs.getUpdateFieldPreferences(),
                 Globals.getFileUpdateMonitor(),
-                frame.getUndoManager(),
+                undoManager,
                 Globals.stateManager);
 
         initialize();

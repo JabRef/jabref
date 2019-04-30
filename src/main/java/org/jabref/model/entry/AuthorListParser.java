@@ -80,7 +80,6 @@ public class AuthorListParser {
      * @return a parsed list of persons
      */
     public AuthorList parse(String listOfNames) {
-
         Objects.requireNonNull(listOfNames);
 
         // initialization of parser
@@ -103,7 +102,6 @@ public class AuthorListParser {
      * empty.
      */
     private Optional<Author> getAuthor() {
-
         List<Object> tokens = new ArrayList<>(); // initialization
         int vonStart = -1;
         int lastStart = -1;
@@ -154,7 +152,7 @@ public class AuthorListParser {
                         vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
                         break;
                     }
-                } else if ((lastStart < 0) && tokenCase) {
+                } else if (tokenCase) {
                     lastStart = tokens.size() - TOKEN_GROUP_LENGTH;
                     break;
                 }
@@ -255,13 +253,10 @@ public class AuthorListParser {
         }
 
         // Third step: do actual splitting, construct Author object
-        String firstPart = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN,
-                false);
-        String firstAbbr = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd,
-                OFFSET_TOKEN_ABBR, true);
+        String firstPart = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN, false);
+        String firstAbbr = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN_ABBR, true);
         String vonPart = vonPartStart < 0 ? null : concatTokens(tokens, vonPartStart, vonPartEnd, OFFSET_TOKEN, false);
-        String lastPart = lastPartStart < 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN,
-                false);
+        String lastPart = lastPartStart < 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
         if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)

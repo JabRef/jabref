@@ -30,20 +30,20 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.actions.CleanupAction;
-import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
-import org.jabref.gui.actions.GenerateBibtexKeyAction;
-import org.jabref.gui.actions.WriteXMPAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
+import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -292,7 +292,7 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame).execute());
+        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, this::copyKey);
@@ -430,7 +430,7 @@ public class BasePanel extends StackPane {
             compound = new NamedCompound((entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
         }
         for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry, BasePanel.this));
+            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry));
             bibDatabaseContext.getDatabase().removeEntry(entry);
             ensureNotShowingBottomPanel(entry);
         }

@@ -91,7 +91,7 @@ public class SharedDatabaseUIManager {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
         EntryEditor entryEditor = panel.getEntryEditor();
 
-        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
+        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry()));
 
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
 

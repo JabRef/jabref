@@ -53,7 +53,6 @@ public class FileUtil {
         }
     }
 
-
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *

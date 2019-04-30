@@ -129,4 +129,9 @@ public class CustomEntryType implements EntryType {
         builder.append("]");
         return builder.toString();
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

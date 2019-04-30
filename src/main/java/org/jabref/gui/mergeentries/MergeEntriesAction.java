@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
@@ -13,14 +14,18 @@ import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 public class MergeEntriesAction extends SimpleCommand {
 
     private final JabRefFrame jabRefFrame;
     private final DialogService dialogService;
 
-    public MergeEntriesAction(JabRefFrame jabRefFrame) {
+    public MergeEntriesAction(JabRefFrame jabRefFrame, StateManager stateManager) {
         this.jabRefFrame = jabRefFrame;
-        dialogService = jabRefFrame.getDialogService();
+        this.dialogService = jabRefFrame.getDialogService();
+
+        this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
@@ -52,9 +57,9 @@ public class MergeEntriesAction extends SimpleCommand {
             // Remove the other two entries and add them to the undo stack (which is not working...)
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
             ce.addEdit(new UndoableInsertEntry(basePanel.getDatabase(), mergedEntry.get()));
-            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), one, basePanel));
+            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), one));
             basePanel.getDatabase().removeEntry(one);
-            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), two, basePanel));
+            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), two));
             basePanel.getDatabase().removeEntry(two);
             ce.end();
             basePanel.getUndoManager().addEdit(ce);

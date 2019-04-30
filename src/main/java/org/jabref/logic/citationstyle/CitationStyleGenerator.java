@@ -11,7 +11,6 @@ import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Facade to unify the access to the citation style engine. Use these methods if you need rendered BibTeX item(s) in a
  * given journal style. This class uses {@link CSLAdapter} to create output.

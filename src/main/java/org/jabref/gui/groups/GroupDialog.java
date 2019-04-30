@@ -424,8 +424,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 texGroupFilePath.setText(group.getFilePath().toString());
             }
         }
-
-        setResizable(false);
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
