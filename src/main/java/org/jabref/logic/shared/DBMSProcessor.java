@@ -129,7 +129,6 @@ public abstract class DBMSProcessor {
      */
     abstract String escape(String expression);
 
-
     /**
      * Inserts the given bibEntry into shared database.
      *

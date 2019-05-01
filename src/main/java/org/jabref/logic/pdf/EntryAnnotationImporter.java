@@ -12,7 +12,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
 
-
 /**
  * Here all PDF files attached to a BibEntry are scanned for annotations using a PdfAnnotationImporter.
  */

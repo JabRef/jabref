@@ -188,7 +188,6 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
         close();
     }
 
-
     /**
      * This class provides a editable text field that is used as table cell.
      * It handles the editing of the name column.
