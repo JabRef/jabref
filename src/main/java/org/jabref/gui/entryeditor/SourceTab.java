@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -121,6 +120,9 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
                 codeArea.insertText(codeArea.getCaretPosition(), committed);
             }
         });
+        codeArea.setId("bibtexSourceCodeArea");
+        codeArea.getStylesheets().add(SourceTab.class.getResource("BibtexSourceCodeArea.css").toExternalForm());
+
         return codeArea;
     }
 
@@ -215,8 +217,7 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
-                    compound.addEdit(
-                                     new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                    compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                     outOfFocusEntry.clearField(fieldName);
                 }
             }
@@ -228,8 +229,7 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(fieldFormatterPreferences)
-                                                                      .format(newValue, fieldName);
+                    new LatexFieldFormatter(fieldFormatterPreferences).format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);
@@ -257,8 +257,7 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
             Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
             while (matcher.find()) {
                 for (int i = 0; i <= matcher.groupCount(); i++) {
-                    //TODO: Styling doesn't work
-                    codeArea.setStyle(matcher.start(), matcher.end(), Collections.singletonList("-fx-text-fill: red;"));
+                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
                 }
             }
         }
