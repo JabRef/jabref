@@ -87,5 +87,8 @@
 .related-articles-tab {
     -fx-padding: 20 20 20 20;
 }
+.red { 
+    -fx-text-fill: red;
+}
 
 

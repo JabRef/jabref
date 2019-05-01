@@ -297,6 +297,7 @@ public class EntryEditor extends BorderPane {
 
         // Source tab
         sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor, dialogService);
+        addSearchListener(sourceTab);
         tabs.add(sourceTab);
         return tabs;
     }
@@ -403,6 +404,7 @@ public class EntryEditor extends BorderPane {
     void addSearchListener(SearchQueryHighlightListener listener) {
         // TODO: Highlight search text in entry editors
         searchListeners.add(listener);
+
         panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
     }
 

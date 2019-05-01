@@ -3,8 +3,12 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -31,6 +35,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -46,7 +51,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SourceTab extends EntryEditorTab {
+public class SourceTab extends EntryEditorTab implements SearchQueryHighlightListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
@@ -57,6 +62,7 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
+    private CodeArea codeArea;
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.mode = bibDatabaseContext.getMode();
@@ -140,6 +146,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         this.setContent(codeArea);
+        this.codeArea = codeArea;
 
         // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
@@ -155,7 +162,7 @@ public class SourceTab extends EntryEditorTab {
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                     LOGGER.debug("Incorrect entry", ex);
                 }
             });
@@ -222,7 +229,7 @@ public class SourceTab extends EntryEditorTab {
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(fieldFormatterPreferences)
-                            .format(newValue, fieldName);
+                                                                      .format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);
@@ -241,6 +248,19 @@ public class SourceTab extends EntryEditorTab {
         } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
             sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
             LOGGER.debug("Incorrect source", ex);
+        }
+    }
+
+    @Override
+    public void highlightPattern(Optional<Pattern> highlightPattern) {
+        if (highlightPattern.isPresent()) {
+            Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
+            while (matcher.find()) {
+                for (int i = 0; i <= matcher.groupCount(); i++) {
+                    //TODO: Styling doesn't work
+                    codeArea.setStyle(matcher.start(), matcher.end(), Collections.singletonList("-fx-text-fill: red;"));
+                }
+            }
         }
     }
 }
