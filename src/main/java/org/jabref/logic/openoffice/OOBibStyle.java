@@ -717,6 +717,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
+
+            Objects.requireNonNull(entry, "Entry cannnot be null");
+            Objects.requireNonNull(database, "database cannnot be null");
             Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
