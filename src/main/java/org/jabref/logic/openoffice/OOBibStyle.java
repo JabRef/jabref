@@ -714,9 +714,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(database, "database cannot be null");
+
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
+
             Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
