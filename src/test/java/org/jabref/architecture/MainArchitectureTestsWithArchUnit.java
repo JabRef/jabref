@@ -18,7 +18,17 @@ public class MainArchitectureTestsWithArchUnit {
 
     @ArchTest
     public static void doNotUseSwing(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("javax.swing..").check(classes);
+        // This checks for all all Swing packages, but not the UndoManager
+        noClasses().should().accessClassesThat().resideInAnyPackage("javax.swing",
+                "javax.swing.border..",
+                "javax.swing.colorchooser..",
+                "javax.swing.event..",
+                "javax.swing.filechooser..",
+                "javax.swing.plaf..",
+                "javax.swing.table..",
+                "javax.swing.text..",
+                "javax.swing.tree.."
+        ).check(classes);
     }
 
     @ArchTest
