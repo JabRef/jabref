@@ -5,9 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -18,6 +16,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -34,7 +33,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -50,7 +48,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SourceTab extends EntryEditorTab implements SearchQueryHighlightListener {
+public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
@@ -61,7 +59,6 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
-    private CodeArea codeArea;
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.mode = bibDatabaseContext.getMode();
@@ -148,7 +145,17 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
             }
         });
         this.setContent(codeArea);
-        this.codeArea = codeArea;
+
+        JabRefGUI.getMainFrame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(highlightPattern -> {
+            if (highlightPattern.isPresent()) {
+                Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
+                while (matcher.find()) {
+                    for (int i = 0; i <= matcher.groupCount(); i++) {
+                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                    }
+                }
+            }
+        });
 
         // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
@@ -251,15 +258,4 @@ public class SourceTab extends EntryEditorTab implements SearchQueryHighlightLis
         }
     }
 
-    @Override
-    public void highlightPattern(Optional<Pattern> highlightPattern) {
-        if (highlightPattern.isPresent()) {
-            Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
-            while (matcher.find()) {
-                for (int i = 0; i <= matcher.groupCount(); i++) {
-                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
-                }
-            }
-        }
-    }
 }
