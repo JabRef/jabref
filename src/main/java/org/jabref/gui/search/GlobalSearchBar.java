@@ -186,8 +186,7 @@ public class GlobalSearchBar extends HBox {
     private void clearSearch() {
         currentResults.setText("");
         searchField.setText("");
-        searchQueryHighlightObservable.reset();
-
+        Globals.stateManager.resetSearchQueryHighlightObservable();
         Globals.stateManager.clearSearchQuery();
     }
 
@@ -213,7 +212,7 @@ public class GlobalSearchBar extends HBox {
         updateResults(Globals.stateManager.searchResultSizeProperty().get(),
                       SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
                       searchQuery.isGrammarBasedSearch());
-        getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
+        Globals.stateManager.fireSearchQueryHighlightEvent(searchQuery);
 
     }
 
@@ -254,9 +253,6 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
-        return searchQueryHighlightObservable;
-    }
 
     private SearchQuery getSearchQuery() {
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());

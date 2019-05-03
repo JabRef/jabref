@@ -16,7 +16,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
-import org.jabref.JabRefGUI;
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -146,7 +146,7 @@ public class SourceTab extends EntryEditorTab {
         });
         this.setContent(codeArea);
 
-        JabRefGUI.getMainFrame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(highlightPattern -> {
+        Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
             if (highlightPattern.isPresent()) {
                 Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
                 while (matcher.find()) {
