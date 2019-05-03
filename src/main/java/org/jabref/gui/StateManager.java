@@ -108,8 +108,10 @@ public class StateManager {
         return searchQueryHighlightObservable;
     }
 
-    public void fireSearchQueryHighlightEvent(SearchQuery searchQuery) {
-        searchQueryHighlightObservable.fireSearchlistenerEvent(searchQuery);
+    public void fireSearchQueryHighlightEvent() {
+        if (activeSearchQuery.get().isPresent()) {
+            searchQueryHighlightObservable.fireSearchlistenerEvent(activeSearchQuery.getValue().get());
+        }
     }
 
     public void resetSearchQueryHighlightObservable()

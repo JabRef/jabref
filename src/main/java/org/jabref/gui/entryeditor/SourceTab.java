@@ -168,6 +168,8 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
+                    Globals.stateManager.fireSearchQueryHighlightEvent();
+
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
