@@ -253,7 +253,6 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-
     private SearchQuery getSearchQuery() {
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
         this.frame.getCurrentBasePanel().setCurrentSearchQuery(searchQuery);
@@ -357,6 +356,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
+            //empty
         }
     }
 }
