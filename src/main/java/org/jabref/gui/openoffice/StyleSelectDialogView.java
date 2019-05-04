@@ -12,8 +12,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -43,8 +43,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
     private StyleSelectDialogViewModel viewModel;
-    private PreviewPanel previewArticle;
-    private PreviewPanel previewBook;
+    private PreviewViewer previewArticle;
+    private PreviewViewer previewBook;
 
     public StyleSelectDialogView(StyleLoader loader) {
 
@@ -66,14 +66,13 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
-
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewPanel(null, new BibDatabaseContext(), preferencesService.getKeyBindingRepository(), preferencesService.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
@@ -89,12 +88,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                     }
                     return null;
                 })
-                .withOnMouseClickedEvent(item -> {
-                    return evt -> viewModel.deleteStyle();
-                })
-                .withTooltip(item -> {
-                    return Localization.lang("Remove style");
-                })
+                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteStyle())
+                .withTooltip(item -> Localization.lang("Remove style"))
                 .install(colDeleteIcon);
 
         edit.setOnAction(e -> viewModel.editStyle());
@@ -122,8 +117,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             tvStyles.getSelectionModel().select(style);
-            previewArticle.setLayout(style.getStyle().getReferenceFormat("default"));
-            previewBook.setLayout(style.getStyle().getReferenceFormat("default"));
+            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
+            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
         });
     }
 

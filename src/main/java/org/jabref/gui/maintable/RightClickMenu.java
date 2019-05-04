@@ -9,7 +9,9 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
@@ -20,7 +22,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -127,8 +128,8 @@ public class RightClickMenu {
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
-        String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
-        if (CitationStyle.isCitationStyleFile(style)) {
+        PreviewLayout style = previewPreferences.getCurrentPreviewStyle();
+        if (style instanceof CitationStylePreviewLayout) {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
             Menu copyCitationMenu = factory.createMenu(StandardActions.COPY_CITATION_MORE);
             copyCitationMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new OldCommandWrapper(Actions.COPY_CITATION_TEXT, panel)));

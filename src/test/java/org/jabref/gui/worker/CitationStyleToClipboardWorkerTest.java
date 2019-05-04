@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.preview.CitationStyleToClipboardWorker;
 import org.jabref.logic.util.OS;
 
 import org.junit.jupiter.api.Test;

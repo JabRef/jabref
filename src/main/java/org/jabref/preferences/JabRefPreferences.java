@@ -40,7 +40,10 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.gui.SidePaneType;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -1586,7 +1589,13 @@ public class JabRefPreferences implements PreferencesService {
 
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
         putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
-        putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle());
+        putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle().stream().map(layout -> {
+            if (layout instanceof CitationStylePreviewLayout) {
+                return ((CitationStylePreviewLayout) layout).getFilePath();
+            } else {
+                return layout.getName();
+            }
+        }).collect(Collectors.toList()));
         putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
@@ -1601,7 +1610,26 @@ public class JabRefPreferences implements PreferencesService {
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
         boolean enabled = getBoolean(PREVIEW_ENABLED);
-        return new PreviewPreferences(cycle, cyclePos, panelHeight, enabled, style, styleDefault);
+
+        // For backwards compatibility always add at least the default preview to the cycle
+        if (cycle.isEmpty()) {
+            cycle.add("Preview");
+        }
+
+        List<PreviewLayout> layouts = cycle.stream()
+                                           .map(layout -> {
+                                               if (CitationStyle.isCitationStyleFile(layout)) {
+                                                   return CitationStyle.createCitationStyleFromFile(layout)
+                                                                       .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
+                                                                       .orElse(null);
+                                               } else {
+                                                   return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                                               }
+                                           })
+                                           .filter(Objects::nonNull)
+                                           .collect(Collectors.toList());
+
+        return new PreviewPreferences(layouts, cyclePos, panelHeight, enabled, style, styleDefault);
     }
 
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
