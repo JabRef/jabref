@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.beans.value.ObservableValue;
@@ -40,7 +38,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -56,20 +53,17 @@ import org.w3c.dom.NodeList;
 /**
  * Displays an BibEntry using the given layout format.
  */
-public class PreviewPanel extends ScrollPane implements SearchQueryHighlightListener, EntryContainer {
+public class PreviewPanel extends ScrollPane implements EntryContainer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
-    private static String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">"
-                                                  + "function highlight(text) {\r\n" +
-                                                  "  var innerHTML =  document.body.innerHTML; \r\n" +
-                                                  "  var index = innerHTML.indexOf(text);\r\n" +
-                                                  "  if (index >= 0) { \r\n" +
-                                                  "   innerHTML = innerHTML.substring(0,index) + \"<span style='background-color:red'>\" + innerHTML.substring(index,index+text.length) + \"</span>\" + innerHTML.substring(index + text.length);\r\n" +
-                                                  "   document.body.innerHTML = innerHTML;\r\n" +
-                                                  "  }\r\n" +
-                                                  "}"
-                                                  + " </script>";
+    private static String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
+                                                  "        function highlight(text) {\r\n" +
+                                                  "            var innerhtml = document.body.innerHTML;\r\n" +
+                                                  "            var response = innerhtml.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
+                                                  "            document.body.innerHTML = response;\r\n" +
+                                                  "        }\r\n" +
+                                                  "    </script>";
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -332,7 +326,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     private void setPreviewLabel(String text) {
-        String myText = JS_HIGHLIGHT_FUNCTION + text;
+        String myText = JS_HIGHLIGHT_FUNCTION + "<div id=\"content\"" + text + "</div>";
         previewView.getEngine().setJavaScriptEnabled(true);
 
         DefaultTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(myText));
@@ -347,24 +341,16 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
             Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
                 if (highlightPattern.isPresent()) {
-                    Matcher matcher = highlightPattern.get().matcher(myText);
-                    while (matcher.find()) {
-                        for (int i = 0; i <= matcher.groupCount(); i++) {
-                            previewView.getEngine().executeScript("highlight('" + matcher.group(i) + "');");
-                        }
-                    }
+                    String pattern  = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+
+                    previewView.getEngine().executeScript("highlight('" + pattern + "');");
                 }
             });
         });
-    }
-
-    @Override
-    public void highlightPattern(Optional<Pattern> newPattern) {
-        // TODO: Implement that search phrases are highlighted
-
-        update();
 
     }
+
+
 
     /**
      * this fixes the Layout, the user cannot change it anymore. Useful for testing the styles in the settings
