@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,6 +12,14 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -30,7 +39,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
@@ -316,17 +324,55 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         }
     }
 
+    String js = " <script type=\"text/javascript\">"
+                + "function highlight(text) {\r\n" +
+                "  var innerHTML =  document.body.innerHTML; \r\n" +
+                "  var index = innerHTML.indexOf(text);\r\n" +
+                "  if (index >= 0) { \r\n" +
+                "   innerHTML = innerHTML.substring(0,index) + \"<span style='background-color:red'>\" + innerHTML.substring(index,index+text.length) + \"</span>\" + innerHTML.substring(index + text.length);\r\n" +
+                "   document.body.innerHTML = innerHTML;\r\n" +
+                "  }\r\n" +
+                "}"
+                + " </script>";
+
     private void setPreviewLabel(String text) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            previewView.getEngine().loadContent(text);
-            this.setHvalue(0);
+        String myText = js + text;
+        previewView.getEngine().setJavaScriptEnabled(true);
+        previewView.getEngine().loadContent(myText);
+        this.setHvalue(0);
+
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
+                                                                             Worker.State oldValue,
+                                                                             Worker.State newValue) -> {
+            if (newValue != Worker.State.SUCCEEDED) {
+                return;
+            }
+            previewView.getEngine().executeScript("highlight('Abel');");
+            Document doc = previewView.getEngine().getDocument();
+            try {
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+                transformer.transform(new DOMSource(doc),
+                                      new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            // Your logic here
         });
+
     }
 
     @Override
     public void highlightPattern(Optional<Pattern> newPattern) {
         // TODO: Implement that search phrases are highlighted
+
         update();
+
     }
 
     /**
