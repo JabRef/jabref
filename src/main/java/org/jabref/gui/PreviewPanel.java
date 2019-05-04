@@ -59,8 +59,8 @@ public class PreviewPanel extends ScrollPane implements EntryContainer {
 
     private static String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
                                                   "        function highlight(text) {\r\n" +
-                                                  "            var innerhtml = document.body.innerHTML;\r\n" +
-                                                  "            var response = innerhtml.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
+                                                  "            var innertxt = document.body.innerText;\r\n" +
+                                                  "            var response = innertxt.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
                                                   "            document.body.innerHTML = response;\r\n" +
                                                   "        }\r\n" +
                                                   "    </script>";
@@ -161,6 +161,7 @@ public class PreviewPanel extends ScrollPane implements EntryContainer {
         createKeyBindings();
         updateLayout(preferences, true);
 
+
     }
 
     private void createKeyBindings() {
@@ -218,6 +219,7 @@ public class PreviewPanel extends ScrollPane implements EntryContainer {
 
     public void updateLayout(PreviewPreferences previewPreferences) {
         updateLayout(previewPreferences, false);
+        Globals.stateManager.fireSearchQueryHighlightEvent();
     }
 
     private void updateLayout(PreviewPreferences previewPreferences, boolean init) {
@@ -331,26 +333,22 @@ public class PreviewPanel extends ScrollPane implements EntryContainer {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(myText));
         this.setHvalue(0);
-
         previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
                                                                              Worker.State oldValue,
                                                                              Worker.State newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
-
             Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
                 if (highlightPattern.isPresent()) {
-                    String pattern  = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+                    String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
 
                     previewView.getEngine().executeScript("highlight('" + pattern + "');");
+
                 }
             });
         });
-
     }
-
-
 
     /**
      * this fixes the Layout, the user cannot change it anymore. Useful for testing the styles in the settings

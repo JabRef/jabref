@@ -120,6 +120,7 @@ public class StateManager {
     }
 
     public void addSearchQueryHighlightListener(SearchQueryHighlightListener listener) {
+        searchQueryHighlightObservable.removeSearchListener(listener);
         searchQueryHighlightObservable.addSearchListener(listener);
     }
 }
