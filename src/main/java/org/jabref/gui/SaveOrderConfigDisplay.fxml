@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-
 <fx:root prefHeight="200.0" prefWidth="600.0" type="javafx.scene.layout.GridPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.SaveOrderConfigDisplayView">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="100.0" />

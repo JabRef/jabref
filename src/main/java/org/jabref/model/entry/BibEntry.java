@@ -45,7 +45,7 @@ public class BibEntry implements Cloneable {
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
     public static final String KEY_FIELD = "bibtexkey";
     public static final String DEFAULT_TYPE = "misc";
-    protected static final String ID_FIELD = "id";
+    protected static final String INTERNAL_ID_FIELD = "JabRef-internal-id";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
@@ -161,7 +161,7 @@ public class BibEntry implements Cloneable {
 
         String oldId = this.id;
 
-        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id, oldId));
+        eventBus.post(new FieldChangedEvent(this, BibEntry.INTERNAL_ID_FIELD, id, oldId));
         this.id = id;
         changed = true;
     }
@@ -408,10 +408,6 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        if (BibEntry.ID_FIELD.equals(fieldName)) {
-            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
-        }
-
         changed = true;
 
         fields.put(fieldName, value.intern());
@@ -462,10 +458,6 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> clearField(String name, EntryEventSource eventSource) {
         String fieldName = toLowerCase(name);
-
-        if (BibEntry.ID_FIELD.equals(fieldName)) {
-            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
-        }
 
         Optional<String> oldValue = getField(fieldName);
         if (!oldValue.isPresent()) {

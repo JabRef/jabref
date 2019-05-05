@@ -29,7 +29,6 @@ package org.jabref.gui.autocompleter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +54,6 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
     /**
      * Create a default suggestion provider based on the toString() method of the generic objects
      * @param possibleSuggestions All possible suggestions
-     * @return
      */
     public static <T> SuggestionProvider<T> create(Collection<T> possibleSuggestions) {
         return create(null, possibleSuggestions);
@@ -67,7 +65,6 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
      *
      * @param stringConverter A stringConverter which converts generic T into a string
      * @param possibleSuggestions All possible suggestions
-     * @return
      */
     public static <T> SuggestionProvider<T> create(Callback<T, String> stringConverter, Collection<T> possibleSuggestions) {
         SuggestionProviderString<T> suggestionProvider = new SuggestionProviderString<>(stringConverter);
@@ -77,7 +74,6 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
 
     /**
      * Add the given new possible suggestions to this  SuggestionProvider
-     * @param newPossible
      */
     public void addPossibleSuggestions(@SuppressWarnings("unchecked") T... newPossible) {
         addPossibleSuggestions(Arrays.asList(newPossible));
@@ -85,7 +81,6 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
 
     /**
      * Add the given new possible suggestions to this  SuggestionProvider
-     * @param newPossible
      */
     public void addPossibleSuggestions(Collection<T> newPossible) {
         synchronized (possibleSuggestionsLock) {
@@ -113,38 +108,20 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
                     }
                 }
             }
-            Collections.sort(suggestions, getComparator());
+            suggestions.sort(getComparator());
         }
         return suggestions;
     }
 
-
-    /***************************************************************************
-     *                                                                         *
-     * Static methods                                                          *
-     *                                                                         *
-     **************************************************************************/
-
     /**
      * Get the comparator to order the suggestions
-     * @return
      */
     protected abstract Comparator<T> getComparator();
 
     /**
      * Check the given possible suggestion is a match (is a valid suggestion)
-     * @param suggestion
-     * @param request
-     * @return
      */
     protected abstract boolean isMatch(T suggestion, ISuggestionRequest request);
-
-
-    /***************************************************************************
-     *                                                                         *
-     * Default implementations                                                 *
-     *                                                                         *
-     **************************************************************************/
 
     /**
      * This is a simple string based suggestion provider.
@@ -166,18 +143,14 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
 
         /**
          * Create a new SuggestionProviderString
-         * @param stringConverter
          */
         public SuggestionProviderString(Callback<T, String> stringConverter) {
             this.stringConverter = stringConverter;
 
             // In case no stringConverter was provided, use the default strategy
             if (this.stringConverter == null) {
-                this.stringConverter = new Callback<T, String>() {
-                    @Override
-                    public String call(T obj) {
-                        return obj != null ? obj.toString() : ""; //$NON-NLS-1$
-                    }
+                this.stringConverter = obj -> {
+                    return obj != null ? obj.toString() : ""; //$NON-NLS-1$
                 };
             }
         }

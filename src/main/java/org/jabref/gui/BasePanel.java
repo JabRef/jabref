@@ -30,20 +30,20 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.actions.CleanupAction;
-import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
-import org.jabref.gui.actions.GenerateBibtexKeyAction;
-import org.jabref.gui.actions.WriteXMPAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
+import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -58,6 +58,8 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.preview.CitationStyleToClipboardWorker;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -67,7 +69,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -130,6 +131,7 @@ public class BasePanel extends StackPane {
     private final ExternalFileTypes externalFileTypes;
 
     private final EntryEditor entryEditor;
+    private final DialogService dialogService;
     private MainTable mainTable;
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
@@ -137,23 +139,17 @@ public class BasePanel extends StackPane {
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
     private boolean saving;
-
     // AutoCompleter used in the search bar
     private PersonNameSuggestionProvider searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
-
     private SuggestionProviders suggestionProviders;
-
     @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
-
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
-
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
-    private final DialogService dialogService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -188,9 +184,8 @@ public class BasePanel extends StackPane {
 
         this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService, externalFileTypes);
+        this.preview = new PreviewPanel(getBibDatabaseContext(), this, dialogService, externalFileTypes, Globals.getKeyPrefs(), preferences.getPreviewPreferences());
         frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-
     }
 
     @Subscribe
@@ -295,7 +290,7 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame).execute());
+        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, this::copyKey);
@@ -433,7 +428,7 @@ public class BasePanel extends StackPane {
             compound = new NamedCompound((entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
         }
         for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry, BasePanel.this));
+            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry));
             bibDatabaseContext.getDatabase().removeEntry(entry);
             ensureNotShowingBottomPanel(entry);
         }
@@ -464,11 +459,12 @@ public class BasePanel extends StackPane {
                 output(Localization.lang("None of the selected entries have titles."));
                 return;
             }
-            Globals.clipboardManager.setContent(String.join("\n", titles));
+            final String copiedTitles = String.join("\n", titles);
+            Globals.clipboardManager.setContent(copiedTitles);
 
             if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
-                output((selectedBibEntries.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined title.", Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
             }
@@ -488,15 +484,15 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
                                          .filter(cite -> cite.contains("\\")) // must contain \
                                          .orElse("\\cite");
-            Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
+            final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
+            Globals.clipboardManager.setContent(copiedCiteCommand);
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output(bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key") + '.');
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedCiteCommand) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -516,11 +512,12 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            Globals.clipboardManager.setContent(String.join(",", keys));
+            final String copiedKeys = String.join(",", keys);
+            Globals.clipboardManager.setContent(copiedKeys);
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
-                output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeys) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
             }
@@ -557,11 +554,12 @@ public class BasePanel extends StackPane {
                 return;
             }
 
-            Globals.clipboardManager.setContent(sb.toString());
+            final String copiedKeysAndTitles = sb.toString();
+            Globals.clipboardManager.setContent(copiedKeysAndTitles);
 
             if (copied == bes.size()) {
                 // All entries had keys.
-                output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeysAndTitles) + "'.");
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
             }
@@ -952,7 +950,7 @@ public class BasePanel extends StackPane {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+                || ((mode == BasePanelMode.SHOWING_PREVIEW))) {
             closeBottomPane();
         }
     }
@@ -1138,10 +1136,6 @@ public class BasePanel extends StackPane {
         return citationStyleCache;
     }
 
-    public PreviewPanel getPreviewPanel() {
-        return preview;
-    }
-
     public FileAnnotationCache getAnnotationCache() {
         return annotationCache;
     }
@@ -1169,6 +1163,11 @@ public class BasePanel extends StackPane {
 
     public void cut() {
         mainTable.cut();
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent entryChangedEvent) {
+        this.markBaseChanged();
     }
 
     private static class SearchAndOpenFile {
@@ -1277,11 +1276,6 @@ public class BasePanel extends StackPane {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
-    }
-
-    @Subscribe
-    public void listen(EntryChangedEvent entryChangedEvent) {
-        this.markBaseChanged();
     }
 
     private class UndoAction implements BaseAction {

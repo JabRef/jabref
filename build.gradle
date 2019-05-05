@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
@@ -15,12 +16,12 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '2.0.2'
-    id 'com.install4j.gradle' version '7.0.10'
+    id 'com.gradle.build-scan' version '2.2.1'
+    id 'com.install4j.gradle' version '7.0.11'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    id 'net.ltgt.errorprone' version '0.7.1'
+    id 'net.ltgt.errorprone' version '0.8'
     id 'com.github.ben-manes.versions' version '0.21.0'
     id 'com.zyxist.chainsaw' version '0.3.1'
 }
@@ -36,10 +37,11 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
+apply plugin: org.jabref.build.antlr.AntlrPlugin
+apply plugin: org.jabref.build.xjc.XjcPlugin
+apply plugin: org.jabref.build.localization.LocalizationPlugin
 
 apply from: 'eclipse.gradle'
-apply from: 'localization.gradle'
-apply from: 'xjc.gradle'
 
 group = "org.jabref"
 version = "5.0-dev"
@@ -93,8 +95,6 @@ repositories {
 }
 
 configurations {
-    antlr3
-    antlr4
     libreoffice
     
     compile {
@@ -105,9 +105,6 @@ configurations {
 dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
-
-    compile 'com.jgoodies:jgoodies-common:1.8.1'
-    compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
     compile 'org.apache.pdfbox:pdfbox:2.0.15'
     compile 'org.apache.pdfbox:fontbox:2.0.15'
@@ -120,10 +117,10 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
 
-    compile "org.libreoffice:juh:6.2.2"
-    compile "org.libreoffice:jurt:6.2.2"
-    compile "org.libreoffice:ridl:6.2.2"
-    compile "org.libreoffice:unoil:6.2.2"
+    compile "org.libreoffice:juh:6.2.3"
+    compile "org.libreoffice:jurt:6.2.3"
+    compile "org.libreoffice:ridl:6.2.3"
+    compile "org.libreoffice:unoil:6.2.3"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.2.1'
@@ -134,7 +131,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.15'
+    compile 'mysql:mysql-connector-java:8.0.16'
 
     compile 'org.postgresql:postgresql:42.2.5'
 
@@ -151,8 +148,8 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.3'
-   //compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.0'
+    //compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:9.0.8'
 
@@ -188,7 +185,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
     testCompile 'org.mockito:mockito-core:2.27.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.22.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.23.2'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
@@ -197,7 +194,9 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.19'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
+    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+    jython 'org.python:jython-standalone:2.7.1'
 }
 
 jacoco {
@@ -288,63 +287,85 @@ processResources {
 }
 
 
-task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
+task generateSource(dependsOn: ["generateBstGrammarSource",
+                                "generateSearchGrammarSource",
+                                "generateMedlineSource",
+                                "generateBibtexmlSource",
+                                "generateEndnoteSource",
+                                "generateModsSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
 }
 
-task generateBstGrammarSource(type: JavaExec) {
-    group 'JabRef'
-    description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
+task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+    group = "JabRef"
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
-    File antlrSource = file('src/main/antlr3/org/jabref/bst/Bst.g')
-
-    inputs.file antlrSource
-    outputs.file file('src/main/gen/org/jabref/logic/bst/BstLexer.java')
-    outputs.file file('src/main/gen/org/jabref/logic/bst/BstParser.java')
-
-    main = 'org.antlr.Tool'
-    classpath = configurations.antlr3
-    args = ["-o", file('src/main/gen/org/jabref/logic/bst/'), antlrSource]
+    antlr = ANTLR3
+    inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
+    outputDir = 'src/main/gen/org/jabref/logic/bst/'
 }
 
-task generateSearchGrammarSource(type: JavaExec) {
-    String grammarFile = "Search"
+task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+    group = 'JabRef'
+    description = "Generates java files for Search.g antlr4."
 
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr4."
+    antlr = ANTLR4
+    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
+    outputDir = "src/main/gen/org/jabref/search"
+    javaPackage = "org.jabref.search"
+}
 
-    String packagePath = "org/jabref/search"
-    File antlrPath = file("src/main/antlr4")
-    File genPath = file("src/main/gen")
+task generateMedlineSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the medline importer."
 
-    File antlrSource = file("$antlrPath/$packagePath/${grammarFile}.g4")
-    File destinationDir = file("$genPath/$packagePath")
+    schemaFile = "src/main/resources/xjc/medline/medline.xsd"
+    outputDirectory = "src/main/gen/"
+    javaPackage = "org.jabref.logic.importer.fileformat.medline"
+}
 
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/${grammarFile}Parser.java")
-    outputs.file file("$destinationDir/${grammarFile}Lexer.java")
-    outputs.file file("$destinationDir/${grammarFile}Visitor.java")
-    outputs.file file("$destinationDir/${grammarFile}BaseVisitor.java")
-    outputs.file file("$destinationDir/${grammarFile}.tokens")
-    outputs.file file("$destinationDir/${grammarFile}Lexer.tokens")
+task generateBibtexmlSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the bibtexml importer."
 
-    main = 'org.antlr.v4.Tool'
-    classpath = configurations.antlr4
-    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "org.jabref.search", antlrSource]
+    schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
+    outputDirectory = "src/main/gen"
+    javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
+}
+
+task generateEndnoteSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the endnote importer."
+
+    schemaFile = "src/main/resources/xjc/endnote/RSXML.dtd"
+    outputDirectory = "src/main/gen/"
+    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
+    arguments = '-dtd'
+}
+
+task generateModsSource(type: XjcTask) {
+    group = 'JabRef'
+    description = "Generates java files for the mods importer."
+
+    schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
+    bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
+    outputDirectory = "src/main/gen/"
+    javaPackage = "org.jabref.logic.importer.fileformat.mods"
+    arguments = '-npa'
+}
+
+tasks.withType(JavaCompile) {
+    // use UTF-8
+    options.encoding = 'UTF-8'
+
+    // ignore annotation processor from log4j2
+    options.compilerArgs += '-proc:none'
 }
 
 compileJava {
-    options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
-    //ignore annotation processor from log4j2
-    options.compilerArgs += '-proc:none'
-}
-compileJava.dependsOn "generateSource"
-
-compileTestJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += '-proc:none'
+    dependsOn "generateSource"
 }
 
 javadoc {
@@ -354,6 +375,8 @@ javadoc {
         author = true
     }
 }
+
+localization.script = 'scripts/syncLang.py'
 
 // Test tasks
 test {
