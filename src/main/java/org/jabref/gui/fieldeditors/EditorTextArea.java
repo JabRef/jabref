@@ -13,7 +13,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import com.sun.javafx.scene.control.skin.TextAreaSkin;
+import javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 

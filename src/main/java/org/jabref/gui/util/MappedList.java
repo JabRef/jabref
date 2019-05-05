@@ -87,4 +87,9 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
     public int size() {
         return backingList.size();
     }
+
+    @Override
+    public int getViewIndex​(int index) {
+        return ((TransformationList<E, F>) backingList).getViewIndex​(index);
+    }
 }

@@ -16,7 +16,8 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
-import com.sun.javafx.scene.control.skin.ContextMenuContent;
+import javafx.scene.control.skin.ContextMenuContent;
+import javafx.scene.control.skin.ContextMenuSkin
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
 import org.fxmisc.easybind.EasyBind;
@@ -57,7 +58,7 @@ public class ActionFactory {
      * should not be used since it's marked as deprecated.
      */
     private static Label getAssociatedNode(MenuItem menuItem) {
-        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.impl_styleableGetNode();
+        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.getNode();
 
         if (container == null) {
             return null;

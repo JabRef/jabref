@@ -14,7 +14,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
+import javafx.scene.control.skin.TextFieldSkin;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
