@@ -181,8 +181,8 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
+	compile 'javax.xml.bind:jaxb-api:2.2.4'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
-	compile 'java.xml.bind:jaxb-api:2.2.4'
 	
     jython 'org.python:jython-standalone:2.7.1'
 }
