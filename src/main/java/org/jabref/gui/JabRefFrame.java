@@ -232,8 +232,6 @@ public class JabRefFrame extends BorderPane {
             }
             globalSearchBar.setSearchTerm(content);
 
-            currentBasePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
-
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));

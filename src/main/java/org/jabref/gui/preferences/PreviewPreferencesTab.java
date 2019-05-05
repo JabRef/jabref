@@ -3,7 +3,6 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -24,11 +23,14 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,39 +39,36 @@ import org.jabref.preferences.PreviewPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PreviewPrefsTab implements PrefsTab {
+public class PreviewPreferencesTab implements PrefsTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPrefsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPreferencesTab.class);
 
-    private final ObservableList<Object> availableModel = FXCollections.observableArrayList();
-    private final ObservableList<Object> chosenModel = FXCollections.observableArrayList();
+    private final ObservableList<PreviewLayout> availableModel = FXCollections.observableArrayList();
+    private final ObservableList<PreviewLayout> chosenModel = FXCollections.observableArrayList();
 
-    private final ListView<Object> available = new ListView<>(availableModel);
-    private final ListView<Object> chosen = new ListView<>(chosenModel);
+    private final ListView<PreviewLayout> available = new ListView<>(availableModel);
+    private final ListView<PreviewLayout> chosen = new ListView<>(chosenModel);
 
     private final Button btnRight = new Button("»");
     private final Button btnLeft = new Button("«");
     private final Button btnUp = new Button(Localization.lang("Up"));
     private final Button btnDown = new Button(Localization.lang("Down"));
     private final GridPane gridPane = new GridPane();
-    private final TextArea layout = new TextArea();
+    private final TextArea previewTextArea = new TextArea();
     private final Button btnTest = new Button(Localization.lang("Test"));
     private final Button btnDefault = new Button(Localization.lang("Default"));
-    private final ScrollPane scrollPane = new ScrollPane(layout);
+    private final ScrollPane scrollPane = new ScrollPane(previewTextArea);
     private final DialogService dialogService;
-    private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
 
-    public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor) {
+    public PreviewPreferencesTab(DialogService dialogService, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.externalFileTypes = externalFileTypes;
         this.taskExecutor = taskExecutor;
         setupLogic();
         setupGui();
     }
 
     private void setupLogic() {
-
         BooleanBinding nothingSelectedFromChosen = Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems());
 
         btnLeft.disableProperty().bind(nothingSelectedFromChosen);
@@ -78,19 +77,17 @@ public class PreviewPrefsTab implements PrefsTab {
         btnRight.disableProperty().bind(Bindings.isEmpty(available.getSelectionModel().getSelectedItems()));
 
         btnRight.setOnAction(event -> {
-            for (Object object : available.getSelectionModel().getSelectedItems()) {
-                availableModel.remove(object);
-                chosenModel.add(object);
+            for (PreviewLayout layout : available.getSelectionModel().getSelectedItems()) {
+                availableModel.remove(layout);
+                chosenModel.add(layout);
             }
-            storeSettings();
         });
 
         btnLeft.setOnAction(event -> {
-            for (Object object : chosen.getSelectionModel().getSelectedItems()) {
-                availableModel.add(object);
-                chosenModel.remove(object);
+            for (PreviewLayout layout : chosen.getSelectionModel().getSelectedItems()) {
+                availableModel.add(layout);
+                chosenModel.remove(layout);
             }
-            storeSettings();
         });
 
         btnUp.setOnAction(event -> {
@@ -101,7 +98,6 @@ public class PreviewPrefsTab implements PrefsTab {
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 chosen.getSelectionModel().select(newIndex);
             }
-            storeSettings();
         });
 
         btnDown.setOnAction(event -> {
@@ -114,29 +110,19 @@ public class PreviewPrefsTab implements PrefsTab {
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 chosen.getSelectionModel().select(newIndex);
             }
-            storeSettings();
         });
 
-        btnDefault.setOnAction(event -> layout.setText(Globals.prefs.getPreviewPreferences()
-                                                                    .getPreviewStyleDefault()
-                                                                    .replace("__NEWLINE__", "\n")));
+        btnDefault.setOnAction(event -> previewTextArea.setText(Globals.prefs.getPreviewPreferences()
+                                                                             .getDefaultPreviewStyle()
+                                                                             .replace("__NEWLINE__", "\n")));
 
         btnTest.setOnAction(event -> {
             try {
+                PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService);
+                testPane.setEntry(TestEntry.getTestEntry());
 
-                PreviewPanel testPane = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
-                if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
-                    testPane.setFixedLayout(layout.getText());
-                    testPane.setEntry(TestEntry.getTestEntry());
-                } else {
-                    int indexStyle = chosen.getSelectionModel().getSelectedIndex();
-                    PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
-                    preferences = new PreviewPreferences(preferences.getPreviewCycle(), indexStyle, preferences.getPreviewPanelDividerPosition(), preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(), preferences.getPreviewStyleDefault());
-
-                    testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService, externalFileTypes);
-                    testPane.setEntry(TestEntry.getTestEntry());
-                    testPane.updateLayout(preferences);
-                }
+                PreviewLayout layout = chosen.getSelectionModel().getSelectedItem();
+                testPane.setLayout(layout);
 
                 DialogPane pane = new DialogPane();
                 pane.setContent(testPane);
@@ -166,8 +152,13 @@ public class PreviewPrefsTab implements PrefsTab {
         gridPane.add(chosen, 3, 2);
         gridPane.add(btnTest, 2, 6);
         gridPane.add(btnDefault, 3, 6);
-        layout.setPrefSize(600, 300);
+        previewTextArea.setPrefSize(600, 300);
         gridPane.add(scrollPane, 1, 9);
+
+        btnTest.disableProperty().bind(Bindings.isEmpty(chosen.getSelectionModel().getSelectedItems()));
+
+        new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(chosen);
+        new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(available);
     }
 
     @Override
@@ -180,69 +171,50 @@ public class PreviewPrefsTab implements PrefsTab {
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
 
         chosenModel.clear();
-        boolean isPreviewChosen = false;
-        for (String style : previewPreferences.getPreviewCycle()) {
-            // in case the style is not a valid citation style file, an empty Optional is returned
-            Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(style);
-            if (citationStyle.isPresent()) {
-                chosenModel.add(citationStyle.get());
-            } else {
-                if (isPreviewChosen) {
-                    LOGGER.error("Preview is already in the list, something went wrong");
-                    continue;
-                }
-                isPreviewChosen = true;
-                chosenModel.add(Localization.lang("Preview"));
-            }
-        }
+        chosenModel.addAll(previewPreferences.getPreviewCycle());
 
         availableModel.clear();
-        if (!isPreviewChosen) {
-            availableModel.add(Localization.lang("Preview"));
+        if (chosenModel.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
+            availableModel.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        BackgroundTask.wrap(() -> CitationStyle.discoverCitationStyles())
-                      .onSuccess(value -> {
-                          value.stream()
-                               .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
-                               .sorted(Comparator.comparing(CitationStyle::getTitle))
-                               .forEach(availableModel::add);
-                      })
+        BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
+                      .onSuccess(value -> value.stream()
+                                               .map(CitationStylePreviewLayout::new)
+                                               .filter(style -> !chosenModel.contains(style))
+                                               .sorted(Comparator.comparing(PreviewLayout::getName))
+                                               .forEach(availableModel::add))
                       .onFailure(ex -> {
                           LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
-                      }).executeWith(taskExecutor);
+                      })
+                      .executeWith(taskExecutor);
 
-        layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
+        previewTextArea.setText(previewPreferences.getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
 
     @Override
     public void storeSettings() {
-        List<String> styles = new ArrayList<>();
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
 
         if (chosenModel.isEmpty()) {
-            chosenModel.add(Localization.lang("Preview"));
+            chosenModel.add(previewPreferences.getTextBasedPreviewLayout());
         }
-        for (Object obj : chosenModel) {
-            if (obj instanceof CitationStyle) {
-                styles.add(((CitationStyle) obj).getFilePath());
-            } else if (obj instanceof String) {
-                styles.add("Preview");
-            }
-        }
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                             .getBuilder()
-                                                             .withPreviewCycle(styles)
-                                                             .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
-                                                             .build();
-        if (!chosen.getSelectionModel().isEmpty()) {
-            previewPreferences = previewPreferences.getBuilder().withPreviewCyclePosition(chosen.getSelectionModel().getSelectedIndex()).build();
-        }
-        Globals.prefs.storePreviewPreferences(previewPreferences);
 
-        // update preview
+        PreviewPreferences newPreviewPreferences = Globals.prefs.getPreviewPreferences()
+                                                                .getBuilder()
+                                                                .withPreviewCycle(chosenModel)
+                                                                .withPreviewStyle(previewTextArea.getText().replace("\n", "__NEWLINE__"))
+                                                                .build();
+        if (!chosen.getSelectionModel().isEmpty()) {
+            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosen.getSelectionModel().getSelectedIndex()).build();
+        }
+        Globals.prefs.storePreviewPreferences(newPreviewPreferences);
+
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
+            // TODO: Find a better way to update preview
+            basePanel.closeBottomPane();
+            //basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
         }
     }
 
