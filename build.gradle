@@ -182,7 +182,7 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
-	compile "com.sun.xml.bind:jaxb-api:2.2.4"
+	compile "java.xml.bind:jaxb-api:2.2.4"
 	
     jython 'org.python:jython-standalone:2.7.1'
 }
