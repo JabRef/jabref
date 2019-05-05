@@ -23,6 +23,7 @@ plugins {
     id 'me.champeau.gradle.jmh' version '0.4.8'
     id 'net.ltgt.errorprone' version '0.8'
     id 'com.github.ben-manes.versions' version '0.21.0'
+	id "org.openjfx.javafxplugin" version "0.0.7"
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -84,6 +85,12 @@ repositories {
 
 configurations {
     errorprone
+}
+
+
+javafx {
+    version = "11.0.3"
+    modules = [ 'javafx.controls' ]
 }
 
 dependencies {
