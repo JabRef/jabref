@@ -40,6 +40,9 @@ before_install:
 
 install: true
 
+jdk:
+  - openjdk11
+
 before_script:
   - psql -c 'create database jabref;' -U postgres
   - mysql -u root -e 'create database jabref'
