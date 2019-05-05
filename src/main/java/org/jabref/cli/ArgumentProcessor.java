@@ -64,7 +64,7 @@ public class ArgumentProcessor {
     private final Mode startupMode;
     private boolean noGUINeeded;
 
-    public ArgumentProcessor(String[] args, Mode startupMode) {
+    public ArgumentProcessor(String[] args, Mode startupMode) throws org.apache.commons.cli.ParseException {
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
@@ -176,7 +176,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            cli.printUsage();
+            JabRefCLI.printUsage();
             noGUINeeded = true;
             return Collections.emptyList();
         }

@@ -21,19 +21,11 @@ public class JabRefCLI {
     private final CommandLine cl;
     private List<String> leftOver;
 
-    public JabRefCLI(String[] args) {
-
+    public JabRefCLI(String[] args) throws ParseException {
         Options options = getOptions();
 
-        try {
-            this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = cl.getArgList();
-        } catch (ParseException e) {
-            LOGGER.warn("Problem parsing arguments", e);
-
-            this.printUsage();
-            throw new RuntimeException();
-        }
+        this.cl = new DefaultParser().parse(options, args, true);
+        this.leftOver = cl.getArgList();
     }
 
     public static String getExportMatchesSyntax() {
@@ -151,7 +143,7 @@ public class JabRefCLI {
 
     public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks"); }
 
-    private Options getOptions() {
+    private static Options getOptions() {
         Options options = new Options();
 
         // boolean options
@@ -254,7 +246,7 @@ public class JabRefCLI {
         System.out.println(getVersionInfo());
     }
 
-    public void printUsage() {
+    public static void printUsage() {
         String header = "";
 
         String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();

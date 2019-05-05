@@ -21,7 +21,7 @@ open module org.jabref {
 
 	// SQL
 	requires java.sql;
-	requires postgresql;
+    //requires postgresql;
 
 	// JavaFX
 	requires javafx.graphics;
@@ -31,6 +31,7 @@ open module org.jabref {
 	requires javafx.fxml;
 	requires afterburner.fx;
 	requires com.jfoenix;
+    requires de.saxsys.mvvmfx;
 //	requires de.jensd.fx.glyphs.commons;
 //	requires de.jensd.fx.glyphs.materialdesignicons;
 
@@ -56,14 +57,22 @@ open module org.jabref {
     requires applicationinsights.core;
 
     requires glazedlists.java15;
-	requires jgoodies.forms;
+    //requires jgoodies.forms;
 	requires commons.logging;
 	requires com.google.common;
     requires easybind;
+    //requires de.jensd.fx.glyphs.commons;
+    //requires controlsfx;
+    requires org.controlsfx.controls;
+    requires javax.inject;
+    requires pdfbox;
+    requires reactfx;
+    requires commons.cli;
     requires de.jensd.fx.glyphs.commons;
-    requires controlsfx;
-    requires mvvmfx;
+    requires de.jensd.fx.glyphs.materialdesignicons;
+    requires org.jabref.thirdparty.libreoffice;
+    //requires mvvmfx;
 
     // Libre Office
-	requires org.jabref.thirdparty.libreoffice;
+    //requires org.jabref.thirdparty.libreoffice;
 }

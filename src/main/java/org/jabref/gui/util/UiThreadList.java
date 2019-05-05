@@ -21,6 +21,11 @@ class UiThreadList<T> extends TransformationList<T, T> {
     }
 
     @Override
+    public int getViewIndex(int index) {
+        return index;
+    }
+
+    @Override
     public T get(int index) {
         return getSource().get(index);
     }

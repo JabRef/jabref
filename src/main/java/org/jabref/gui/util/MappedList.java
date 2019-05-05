@@ -80,7 +80,7 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
 
     @Override
     public int getViewIndex(int index) {
-        throw new UnsupportedOperationException(); // TODO: method was added in Java 9. Provide implementation?
+        return index;
     }
 
     @Override
