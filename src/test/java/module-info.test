@@ -1,0 +1,3 @@
+// Make junit4 module visible (only required for last remaining parameterized tests)
+--add-modules
+    junit
