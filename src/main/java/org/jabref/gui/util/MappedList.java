@@ -90,6 +90,6 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
 
     @Override
     public int getViewIndex​(int index) {
-        return ((TransformationList<E, F>) backingList).getViewIndex​(index);
+        return ((TransformationList<A, B>) backingList).getViewIndex​(index);
     }
 }

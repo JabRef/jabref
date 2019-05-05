@@ -17,7 +17,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
 import javafx.scene.control.skin.ContextMenuContent;
-import javafx.scene.control.skin.ContextMenuSkin
+import javafx.scene.control.skin.ContextMenuSkin;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
 import org.fxmisc.easybind.EasyBind;
