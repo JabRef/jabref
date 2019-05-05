@@ -12,12 +12,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.StyleLoader;

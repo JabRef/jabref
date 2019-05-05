@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;

@@ -20,15 +20,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.gui.DialogService;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;

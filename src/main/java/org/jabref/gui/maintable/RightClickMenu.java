@@ -9,9 +9,7 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.gui.DialogService;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
@@ -22,6 +20,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
