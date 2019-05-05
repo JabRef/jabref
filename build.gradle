@@ -90,7 +90,7 @@ configurations {
 
 javafx {
     version = "11.0.3"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.base', 'javafx.graphics' ]
 }
 
 dependencies {
