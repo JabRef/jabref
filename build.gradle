@@ -46,13 +46,13 @@ group = "org.jabref"
 version = "5.0-dev"
 project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 mainClassName = "org.jabref.JabRefMain"
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
-ext.allowJava9 = false
+ext.allowJava9 = true
 
 sourceSets {
     main {
