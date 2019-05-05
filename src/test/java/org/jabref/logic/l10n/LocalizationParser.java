@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
-//import com.sun.javafx.application.PlatformImpl;
-
 public class LocalizationParser {
 
     public static SortedSet<LocalizationEntry> find(LocalizationBundleForTest type) throws IOException {
@@ -208,7 +206,6 @@ public class LocalizationParser {
             }
         };
 
-        // TODO: removed access to internal API: Why was it used?
         Platform.startup(() -> {
         });
 
@@ -216,9 +213,6 @@ public class LocalizationParser {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
             loader.setControllerFactory(controllerType -> null);
-            // Don't check if root is null (needed for custom controls, where the root value is normally set in the FXMLLoader)
-            // TODO: removed access to internal API.
-//            loader.impl_setStaticLoad(true);
             loader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);

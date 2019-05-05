@@ -10,21 +10,20 @@ buildscript {
         mavenLocal()
         jcenter()
         maven {
-            url "https://oss.sonatype.org/content/groups/public"
+            url 'https://oss.sonatype.org/content/groups/public'
         }
     }
 }
 
 plugins {
+    id 'application'
     id 'com.gradle.build-scan' version '2.2.1'
     id 'com.install4j.gradle' version '7.0.11'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    //id 'net.ltgt.errorprone' version '0.8'
+    id 'net.ltgt.errorprone' version '0.8'
     id 'com.github.ben-manes.versions' version '0.21.0'
-    //id 'com.zyxist.chainsaw' version '0.3.1'
-    id 'application'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.7'
 }
@@ -54,18 +53,7 @@ sourceCompatibility = 9
 targetCompatibility = 9
 mainClassName = "$moduleName/org.jabref.JabRefMain"
 
-/*
-javaModule {
-    name = "org.jabref"
-    hacks {
-        opens "javafx.swing", "javafx.embed.swing", "org.jabref"
-        opens "java.desktop", "java.awt", "spin"
-        opens "javafx.controls", "javafx.scene.control", "org.jabref"
-        exports "javafx.base", "com.sun.javafx.runtime", "controlsfx"
-    }
-}
-*/
-
+// TODO: Ugly workaround to temporarily ignore latex2unicode
 patchModules.config = [
         "latex2unicode=latex2unicode_2.12-0.2.2.jar",
         "test=fastparse_2.12-0.4.2.jar",
@@ -75,7 +63,7 @@ patchModules.config = [
 
 
 // These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_172"
+ext.minRequiredJavaVersion = "1.8.0_171"
 ext.allowJava9 = true
 
 sourceSets {
@@ -107,8 +95,10 @@ repositories {
 }
 
 configurations {
+    errorprone
     libreoffice
-    
+
+    // TODO: Workaround for "ResolutionException: Modules java.annotation and jsr305 export package javax.annotation to module httpcore.nio"
     compile {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     }
@@ -134,6 +124,8 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
 
+    // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
+    // Use the task bundleLibreOffice to update the bundled jar
     //compile "org.libreoffice:juh:6.2.3"
     //compile "org.libreoffice:jurt:6.2.3"
     //compile "org.libreoffice:ridl:6.2.3"
@@ -166,7 +158,6 @@ dependencies {
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
     compile 'org.fxmisc.richtext:richtextfx:0.10.0'
-    //compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:9.0.8'
     compile 'org.controlsfx:controlsfx:11.0.0'
@@ -174,7 +165,6 @@ dependencies {
     compile 'org.jsoup:jsoup:1.11.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta4'
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
     compile 'org.apache.logging.log4j:log4j-jcl:2.11.2'
@@ -183,15 +173,12 @@ dependencies {
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    // JAX-B is considered JavaEE API and is no longer part of JavaSE (JDK 9)
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile 'com.sun.activation:javax.activation:1.2.0'
-    //compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    //errorprone 'com.google.errorprone:error_prone_core:2.3.2'
+    errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.1'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.1'
@@ -233,11 +220,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
-        rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /0.2.[3,4]/) {
                 // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
@@ -247,26 +229,6 @@ dependencyUpdates.resolutionStrategy = {
         rules.withModule("com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /4.*/) {
                 selection.reject("Version 4.X breaks the release process.")
-            }
-        }
-        rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.*/) {
-                selection.reject("Cannot be upgraded to version 2")
-            }
-        }
-        rules.withModule("com.jfoenix:jfoenix") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
-        rules.withModule("com.google.errorprone:javac") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /1.9.*/ || selection.candidate.version ==~ /9.*/) {
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
-        rules.withModule("com.sun.xml.bind:jaxb-xjc") { ComponentSelection selection ->
-            if (!(selection.candidate.version ==~ /2.2.4.*/) || selection.candidate.version ==~ /2.[3-9].*/) {
-                selection.reject("Cannot be updated to 2.2.5 or higher.")
             }
         }
     }
@@ -386,6 +348,7 @@ compileJava {
     dependsOn "generateSource"
 
     moduleOptions {
+        // TODO: Remove access to internal api
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
@@ -394,6 +357,7 @@ compileJava {
 }
 
 run {
+    // TODO: Remove access to internal api
     jvmArgs '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
             '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
@@ -414,6 +378,8 @@ run {
             "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
             "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls"
 
+    // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
+    // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
@@ -426,7 +392,6 @@ run {
         ]
     }
 }
-
 
 javadoc {
     options {

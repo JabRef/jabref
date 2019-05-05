@@ -7,15 +7,13 @@ import java.util.function.Supplier;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 //import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
-// TODO: java 9 TextFieldSkin not accessible in Java 9
+// TODO: TextFieldSkin changed in Java 9
 public class EditorTextField extends javafx.scene.control.TextField implements Initializable, ContextMenuAddable {
 
     public EditorTextField() {

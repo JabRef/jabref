@@ -127,7 +127,6 @@ public class KeyBindingRepository {
     }
 
     public Optional<KeyBinding> mapToKeyBinding(java.awt.event.KeyEvent keyEvent) {
-        // TODO: removed access to internal API: does this do the same?
         Optional<KeyCode> keyCode = Arrays.stream(KeyCode.values()).filter(k -> k.getCode() == keyEvent.getKeyCode()).findFirst();
         if (keyCode.isPresent()) {
             KeyEvent event = new KeyEvent(keyEvent.getSource(), null, KeyEvent.KEY_PRESSED, "", "", keyCode.get(), keyEvent.isShiftDown(), keyEvent.isControlDown(), keyEvent.isAltDown(), keyEvent.isMetaDown());

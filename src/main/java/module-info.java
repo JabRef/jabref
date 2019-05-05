@@ -12,16 +12,11 @@ open module org.jabref {
     exports org.jabref.logic.citationstyle;
     exports org.jabref.logic.search;
 
-//    opens org.jabref.gui to com.google.common;
-//    opens org.jabref.model.database to com.google.common;
-//    opens org.jabref.logic.citationstyle to com.google.common;
-
     // Swing
 	requires java.desktop;
 
 	// SQL
 	requires java.sql;
-    //requires postgresql;
 
 	// JavaFX
 	requires javafx.graphics;
@@ -32,8 +27,9 @@ open module org.jabref {
 	requires afterburner.fx;
 	requires com.jfoenix;
     requires de.saxsys.mvvmfx;
-//	requires de.jensd.fx.glyphs.commons;
-//	requires de.jensd.fx.glyphs.materialdesignicons;
+    requires de.jensd.fx.glyphs.commons;
+    requires de.jensd.fx.glyphs.materialdesignicons;
+    requires org.controlsfx.controls;
 
     provides com.airhacks.afterburner.views.ResourceLocator
         with org.jabref.gui.util.JabRefResourceLocator;
@@ -47,7 +43,7 @@ open module org.jabref {
 
 	// Preferences and XML
 	requires java.prefs;
-	requires java.xml.bind; // Deprecated!
+    requires java.xml.bind;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
@@ -56,21 +52,15 @@ open module org.jabref {
     // Microsoft application insights
     requires applicationinsights.core;
 
-	requires commons.logging;
-	requires com.google.common;
+    // Libre Office
+    requires org.jabref.thirdparty.libreoffice;
+
+    // Other modules
+    requires commons.logging;
+    requires com.google.common;
     requires easybind;
-    //requires de.jensd.fx.glyphs.commons;
-    //requires controlsfx;
-    requires org.controlsfx.controls;
     requires javax.inject;
     requires pdfbox;
     requires reactfx;
     requires commons.cli;
-    requires de.jensd.fx.glyphs.commons;
-    requires de.jensd.fx.glyphs.materialdesignicons;
-    requires org.jabref.thirdparty.libreoffice;
-    //requires mvvmfx;
-
-    // Libre Office
-    //requires org.jabref.thirdparty.libreoffice;
 }
