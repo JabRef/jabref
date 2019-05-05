@@ -20,6 +20,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
+import org.jabref.JabRefGUI;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BackgroundTask;
@@ -209,10 +211,11 @@ public class PreviewPreferencesTab implements PrefsTab {
         }
         Globals.prefs.storePreviewPreferences(newPreviewPreferences);
 
-        // TODO: update preview
-        //for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-        //    basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
-        //}
+        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+            // TODO: Find a better way to update preview
+            basePanel.closeBottomPane();
+            //basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
+        }
     }
 
     @Override
