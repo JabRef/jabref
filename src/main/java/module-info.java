@@ -55,8 +55,6 @@ open module org.jabref {
     // Microsoft application insights
     requires applicationinsights.core;
 
-    requires glazedlists.java15;
-	requires jgoodies.forms;
 	requires commons.logging;
 	requires com.google.common;
     requires easybind;
