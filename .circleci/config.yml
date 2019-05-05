@@ -26,7 +26,7 @@ jobs:
       - image: circleci/openjdk:11.03-jdk-stretch
     steps:
       - restore_cache:
-          key: dependency-cache
+          key: dependency-cache-new
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
@@ -36,7 +36,7 @@ jobs:
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
-          key: dependency-cache
+          key: dependency-cache-new
           paths:
             - "~/.gradle"
       - store_artifacts:
@@ -49,7 +49,7 @@ jobs:
       - image: circleci/openjdk:11.03-jdk-stretch
     steps:
       - restore_cache:
-          key: dependency-cache
+          key: dependency-cache-new
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
