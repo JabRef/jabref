@@ -152,7 +152,7 @@ dependencies {
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-commons:11.0'
-    compile 'de.jensd:fontawesomefx-materialdesignfont:2.0.26-9'
+    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     compile 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
