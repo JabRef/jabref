@@ -3,7 +3,7 @@ version: 2
 jobs:
   downloadinstall4j:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11.0.3-jdk-stretch
     steps:
       - checkout
       - run: git submodule sync
@@ -23,7 +23,7 @@ jobs:
 
   buildDev:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11.0.3-jdk-stretch
     steps:
       - restore_cache:
           key: dependency-cache
@@ -46,7 +46,7 @@ jobs:
 
   buildRelease:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:11.0.3-jdk-stretch
     steps:
       - restore_cache:
           key: dependency-cache
