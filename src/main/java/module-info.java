@@ -40,6 +40,8 @@ open module org.jabref {
 	// Logging
 	requires org.slf4j;
 	requires org.apache.logging.log4j;
+    requires org.apache.logging.log4j.core;
+    requires applicationinsights.logging.log4j2;
 
 	// Preferences and XML
 	requires java.prefs;
@@ -63,4 +65,5 @@ open module org.jabref {
     requires pdfbox;
     requires reactfx;
     requires commons.cli;
+    requires httpclient;
 }
