@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
@@ -45,6 +47,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     private Optional<BibEntry> entry = Optional.empty();
     private BibDatabaseContext database;
+
+    private static String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
+                                                  "        function highlight(text) {\r\n" +
+                                                  "            var innertxt = document.body.innerText;\r\n" +
+                                                  "            var response = innertxt.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
+                                                  "            document.body.innerHTML = response;\r\n" +
+                                                  "        }\r\n" +
+                                                  "    </script>";
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
@@ -93,18 +103,36 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
-                .onSuccess(this::setPreviewText)
-                .onFailure(exception -> {
-                    LOGGER.error("Error while generating citation style", exception);
-                    setPreviewText(Localization.lang("Error while generating citation style"));
-                })
-                .executeWith(taskExecutor);
+                      .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
+                      .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                      .onSuccess(this::setPreviewText)
+                      .onFailure(exception -> {
+                          LOGGER.error("Error while generating citation style", exception);
+                          setPreviewText(Localization.lang("Error while generating citation style"));
+                      })
+                      .executeWith(taskExecutor);
     }
 
     private void setPreviewText(String text) {
-        previewView.getEngine().loadContent(text);
+        String myText = JS_HIGHLIGHT_FUNCTION + "<div id=\"content\"" + text + "</div>";
+        previewView.getEngine().setJavaScriptEnabled(true);
+        previewView.getEngine().loadContent(myText);
+
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
+                                                                             Worker.State oldValue,
+                                                                             Worker.State newValue) -> {
+            if (newValue != Worker.State.SUCCEEDED) {
+                return;
+            }
+            Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
+                if (highlightPattern.isPresent()) {
+                    String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+
+                    previewView.getEngine().executeScript("highlight('" + pattern + "');");
+
+                }
+            });
+        });
         this.setHvalue(0);
     }
 
@@ -116,13 +144,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         BackgroundTask
-                .wrap(() -> {
-                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
-                    previewView.getEngine().print(job);
-                    job.endJob();
-                })
-                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
-                .executeWith(taskExecutor);
+                      .wrap(() -> {
+                          job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
+                          previewView.getEngine().print(job);
+                          job.endJob();
+                      })
+                      .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
+                      .executeWith(taskExecutor);
     }
 
     public void copyPreviewToClipBoard() {

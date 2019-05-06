@@ -185,7 +185,6 @@ public class BasePanel extends StackPane {
         this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR);
 
         this.preview = new PreviewPanel(getBibDatabaseContext(), this, dialogService, externalFileTypes, Globals.getKeyPrefs(), preferences.getPreviewPreferences());
-        frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
     }
 
     @Subscribe
