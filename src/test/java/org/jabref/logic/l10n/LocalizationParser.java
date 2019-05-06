@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +24,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+
+import org.mockito.Mockito;
 
 public class LocalizationParser {
 
@@ -206,13 +209,13 @@ public class LocalizationParser {
             }
         };
 
-        Platform.startup(() -> {
-        });
 
         try {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
-            loader.setControllerFactory(controllerType -> null);
+            loader.setControllerFactory(Mockito::mock);
+            // We need to load in "static mode" because otherwise fxml files with fx:root doesn't work
+            setStaticLoad(loader);
             loader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
@@ -221,6 +224,17 @@ public class LocalizationParser {
         return result.stream()
                      .map(key -> new LocalizationEntry(path, new LocalizationKey(key).getPropertiesKey(), type))
                      .collect(Collectors.toList());
+    }
+
+    private static void setStaticLoad(FXMLLoader loader) {
+        // Somebody decided to make "setStaticLoad" package-private, so let's use reflection
+        try {
+            Method method = FXMLLoader.class.getDeclaredMethod("setStaticLoad", boolean.class);
+            method.setAccessible(true);
+            method.invoke(loader, true);
+        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static class JavaLocalizationEntryParser {

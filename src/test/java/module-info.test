@@ -1,6 +1,12 @@
-// Make junit4 module visible (only required for last remaining parameterized tests)
 --add-modules
+    // Make junit4 module visible (only required for last remaining parameterized tests)
     junit
 
 --add-opens
      javafx.base/com.sun.javafx.beans=net.bytebuddy
+--add-opens
+    // Needed for GUI tests
+    javafx.graphics/com.sun.javafx.application=org.testfx
+--add-opens
+    // Needed for localization tests
+    javafx.fxml/javafx.fxml=org.jabref
