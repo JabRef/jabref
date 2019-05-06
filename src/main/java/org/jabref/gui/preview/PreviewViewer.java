@@ -36,25 +36,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
+    private static final String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
+                                                        "        function highlight(text) {\r\n" +
+                                                        "            var innertxt = document.body.innerText;\r\n" +
+                                                        "            var response = innertxt.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
+                                                        "            document.body.innerHTML = response;\r\n" +
+                                                        "        }\r\n" +
+                                                        "    </script>";
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
 
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
     private final WebView previewView;
     private PreviewLayout layout;
+
     /**
      * The entry currently shown
      */
     private Optional<BibEntry> entry = Optional.empty();
     private BibDatabaseContext database;
-
-    private static String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
-                                                  "        function highlight(text) {\r\n" +
-                                                  "            var innertxt = document.body.innerText;\r\n" +
-                                                  "            var response = innertxt.replace(new RegExp(text, 'gi'), str => `<span style='background-color:red'>${str}</span>`);\r\n" +
-                                                  "            document.body.innerHTML = response;\r\n" +
-                                                  "        }\r\n" +
-                                                  "    </script>";
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
