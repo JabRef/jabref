@@ -27,7 +27,7 @@ open module org.jabref {
 	requires afterburner.fx;
 	requires com.jfoenix;
     requires de.saxsys.mvvmfx;
-    requires de.jensd.fx.glyphs.commons;
+    requires de.jensd.fx.glyphs;
     requires de.jensd.fx.glyphs.materialdesignicons;
     requires org.controlsfx.controls;
 
