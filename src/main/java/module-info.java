@@ -27,8 +27,8 @@ open module org.jabref {
 	requires afterburner.fx;
 	requires com.jfoenix;
     requires de.saxsys.mvvmfx;
-    requires de.jensd.fx.fontawesomefx.commons
-    requires de.jensd.fx.fontawesomefx.materialdesignicons
+    requires de.jensd.fx.fontawesomefx.commons;
+    requires de.jensd.fx.fontawesomefx.materialdesignicons;
     requires org.controlsfx.controls;
 
     provides com.airhacks.afterburner.views.ResourceLocator
