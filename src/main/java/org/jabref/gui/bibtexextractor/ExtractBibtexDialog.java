@@ -58,7 +58,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     private void startExtraction()
     {
         BibtexExtractor extractor = new BibtexExtractor();
-        BibEntry entity = extractor.Extract(textArea.getText());
+        BibEntry entity = extractor.extract(textArea.getText());
         trackNewEntry(BiblatexEntryTypes.ARTICLE);
         frame.getCurrentBasePanel().insertEntry(entity);
     }
