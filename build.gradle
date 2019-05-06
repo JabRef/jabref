@@ -173,7 +173,8 @@ dependencies {
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
     compile 'com.sun.activation:javax.activation:1.2.0'
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
