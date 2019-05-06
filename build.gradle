@@ -17,7 +17,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '2.2.1'
+    id 'com.gradle.build-scan' version '2.3'
     id 'com.install4j.gradle' version '7.0.11'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
@@ -151,8 +151,8 @@ dependencies {
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     // JavaFX stuff
-    compile 'de.jensd:fontawesomefx-commons:9.00'
-    compile 'de.jensd:fontawesomefx-materialdesignfont:2.0.26-9'
+    compile 'de.jensd:fontawesomefx-commons:11.0'
+    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     compile 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
