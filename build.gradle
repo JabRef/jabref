@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '2.2.1'
+    id 'com.gradle.build-scan' version '2.3'
     id 'com.install4j.gradle' version '7.0.11'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
