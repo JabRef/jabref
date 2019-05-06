@@ -163,7 +163,7 @@ class LocalizationConsistencyTest {
         try {
             Locale locale = Language.convertToSupportedLocale(language).get();
             Locale.setDefault(locale);
-            ResourceBundle messages = ResourceBundle.getBundle(Localization.RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+            ResourceBundle messages = ResourceBundle.getBundle(Localization.RESOURCE_PREFIX, locale);
             assertNotNull(messages);
         } finally {
             Locale.setDefault(oldLocale);

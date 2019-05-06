@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 
 class WebFetchersTest {
 
-    Reflections reflections = new Reflections("org.jabref");
-    ImportFormatPreferences importFormatPreferences;
+    private Reflections reflections = new Reflections("org.jabref");
+    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() throws Exception {
