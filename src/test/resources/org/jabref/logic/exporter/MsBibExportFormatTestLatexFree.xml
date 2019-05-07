@@ -1,43 +1,44 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
-<b:SourceType>ConferenceProceedings</b:SourceType>
-<b:Title>Efficiently Managing Context Information for Large-Scale Scenarios</b:Title>
-<b:Tag>Grossmann_2005</b:Tag>
-<b:Publisher>IEEE</b:Publisher>
-<b:BookTitle>Third IEEE International Conference on Pervasive Computing and Communications</b:BookTitle>
-<b:DOI>10.1109/percom.2005.17</b:DOI>
-<b:Author>
-<b:Author>
-<b:NameList>
-<b:Person>
-<b:Last>Grossmann</b:Last>
-<b:First>M.</b:First>
-</b:Person>
-<b:Person>
-<b:Last>Bauer</b:Last>
-<b:First>M.</b:First>
-</b:Person>
-<b:Person>
-<b:Last>Honle</b:Last>
-<b:First>N.</b:First>
-</b:Person>
-<b:Person>
-<b:Last>Kappeler</b:Last>
-<b:First>U.-P.</b:First>
-</b:Person>
-<b:Person>
-<b:Last>Nicklas</b:Last>
-<b:First>D.</b:First>
-</b:Person>
-<b:Person>
-<b:Last>Schwarz</b:Last>
-<b:First>T.</b:First>
-</b:Person>
-</b:NameList>
-</b:Author>
-</b:Author>
-<b:ConferenceName>Third IEEE International Conference on Pervasive Computing and Communications</b:ConferenceName>
-</b:Source>
+    <b:Source>
+        <b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+        <b:SourceType>ConferenceProceedings</b:SourceType>
+        <b:Title>Efficiently Managing Context Information for Large-Scale Scenarios</b:Title>
+        <b:Tag>Grossmann_2005</b:Tag>
+        <b:Publisher>IEEE</b:Publisher>
+        <b:BookTitle>Third IEEE International Conference on Pervasive Computing and Communications</b:BookTitle>
+        <b:DOI>10.1109/percom.2005.17</b:DOI>
+        <b:Author>
+            <b:Author>
+                <b:NameList>
+                    <b:Person>
+                        <b:Last>Grossmann</b:Last>
+                        <b:First>M.</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Bauer</b:Last>
+                        <b:First>M.</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Honle</b:Last>
+                        <b:First>N.</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Kappeler</b:Last>
+                        <b:First>U.-P.</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Nicklas</b:Last>
+                        <b:First>D.</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Schwarz</b:Last>
+                        <b:First>T.</b:First>
+                    </b:Person>
+                </b:NameList>
+            </b:Author>
+        </b:Author>
+        <b:ConferenceName>Third IEEE International Conference on Pervasive Computing and Communications
+        </b:ConferenceName>
+    </b:Source>
 </b:Sources>

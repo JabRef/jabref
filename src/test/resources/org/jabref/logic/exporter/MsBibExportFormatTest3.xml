@@ -1,28 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:LCID>1033</b:LCID>
-<b:Year>2002</b:Year>
-<b:Volume>44</b:Volume>
-<b:BIBTEX_Entry>manual</b:BIBTEX_Entry>
-<b:SourceType>Report</b:SourceType>
-<b:Title>Agile Entwicklung Web-basierter Systeme</b:Title>
-<b:Tag>raey</b:Tag>
-<b:Publisher>Gabler Verlag</b:Publisher>
-<b:BIBTEX_KeyWords>software development processes; agile software development environments; time-to-market; Extreme Programming; Crystal methods family; Adaptive Software Development</b:BIBTEX_KeyWords>
-<b:URL>http://dx.doi.org/10.1007/BF03250842</b:URL>
-<b:Author>
-<b:Author>
-<b:NameList>
-<b:Person>
-<b:Last>5</b:Last>
-</b:Person>
-</b:NameList>
-</b:Author>
-</b:Author>
-<b:Pages>237-248</b:Pages>
-<b:JournalName>Wirtschaftsinformatik</b:JournalName>
-<b:Number>3</b:Number>
-<b:StandardNumber>LCCN: 0937-6429</b:StandardNumber>
-</b:Source>
+    <b:Source>
+        <b:LCID>1033</b:LCID>
+        <b:Year>2002</b:Year>
+        <b:Volume>44</b:Volume>
+        <b:BIBTEX_Entry>manual</b:BIBTEX_Entry>
+        <b:SourceType>Report</b:SourceType>
+        <b:Title>Agile Entwicklung Web-basierter Systeme</b:Title>
+        <b:Tag>raey</b:Tag>
+        <b:Publisher>Gabler Verlag</b:Publisher>
+        <b:BIBTEX_KeyWords>software development processes; agile software development environments; time-to-market;
+            Extreme Programming; Crystal methods family; Adaptive Software Development
+        </b:BIBTEX_KeyWords>
+        <b:URL>http://dx.doi.org/10.1007/BF03250842</b:URL>
+        <b:Author>
+            <b:Author>
+                <b:NameList>
+                    <b:Person>
+                        <b:Last>5</b:Last>
+                    </b:Person>
+                </b:NameList>
+            </b:Author>
+        </b:Author>
+        <b:Pages>237-248</b:Pages>
+        <b:JournalName>Wirtschaftsinformatik</b:JournalName>
+        <b:Number>3</b:Number>
+        <b:StandardNumber>LCCN: 0937-6429</b:StandardNumber>
+    </b:Source>
 </b:Sources>
