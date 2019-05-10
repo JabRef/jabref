@@ -10,8 +10,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
@@ -43,14 +41,13 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
-    private final DialogService dialogService;
 
     private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
-        this.dialogService = new FXDialogService(mainStage);
+        mainFrame = new JabRefFrame(mainStage);
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
@@ -60,22 +57,12 @@ public class JabRefGUI {
                                     .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), JabRefGUI.getMainFrame().getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionAsync(false);
     }
 
     private void openWindow(Stage mainStage) {
-        // Set antialiasing on everywhere. This only works in JRE >= 1.5.
-        // Or... it doesn't work, period.
-        // TODO test and maybe remove this! I found this commented out with no additional info ( payload@lavabit.com )
-        // Enabled since JabRef 2.11 beta 4
-        System.setProperty("swing.aatext", "true");
-        // Default is "on".
-        // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
-        System.setProperty("awt.useSystemAAFontSettings", "lcd");
-
-        // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
-        setLookAndFeel();
+        applyFontRenderingTweak();
 
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
@@ -85,7 +72,7 @@ public class JabRefGUI {
         GUIGlobals.init();
 
         LOGGER.debug("Initializing frame");
-        JabRefGUI.mainFrame = new JabRefFrame(mainStage);
+        mainFrame.init();
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
@@ -109,7 +96,7 @@ public class JabRefGUI {
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
-                        dialogService.showErrorDialogAndWait(
+                        mainFrame.getDialogService().showErrorDialogAndWait(
                                 Localization.lang("Connection error"),
                                 Localization.lang("A local copy will be opened."),
                                 e);
@@ -120,7 +107,7 @@ public class JabRefGUI {
                     // add them to the list
                     toOpenTab.add(pr);
                 } else {
-                    JabRefGUI.getMainFrame().addParserResult(pr, first);
+                    mainFrame.addParserResult(pr, first);
                     first = false;
                 }
             }
@@ -128,7 +115,7 @@ public class JabRefGUI {
 
         // finally add things to the currently opened tab
         for (ParserResult pr : toOpenTab) {
-            JabRefGUI.getMainFrame().addParserResult(pr, first);
+            mainFrame.addParserResult(pr, first);
             first = false;
         }
 
@@ -150,7 +137,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
+        Globals.getThemeLoader().installCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
@@ -168,14 +155,14 @@ public class JabRefGUI {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
                     + pr.getErrorMessage();
 
-            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+            mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
         }
 
         // Display warnings, if any
         int tabNumber = 0;
         for (ParserResult pr : bibDatabases) {
-            ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), tabNumber++);
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame, tabNumber++);
         }
 
         // After adding the databases, go through each and see if
@@ -187,9 +174,9 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < bibDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
+        for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
-            BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
+            BasePanel panel = mainFrame.getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 
@@ -219,7 +206,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
@@ -242,9 +229,9 @@ public class JabRefGUI {
         return false;
     }
 
-    private void setLookAndFeel() {
-        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
-        // setting. See https://github.com/woky/javafx-hates-linux
+    private void applyFontRenderingTweak() {
+        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering setting.
+        // See https://github.com/woky/javafx-hates-linux
         if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
             System.setProperty("prism.text", "t2k");
             System.setProperty("prism.lcdtext", "true");
@@ -253,10 +240,5 @@ public class JabRefGUI {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
-    }
-
-    // Only used for testing, other than that do NOT set the mainFrame...
-    public static void setMainFrame(JabRefFrame mainFrame) {
-        JabRefGUI.mainFrame = mainFrame;
     }
 }

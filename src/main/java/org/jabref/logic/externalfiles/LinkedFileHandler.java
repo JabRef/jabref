@@ -70,13 +70,16 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToSuggestedName() throws IOException {
+        return renameToName(getSuggestedFileName());
+    }
+
+    public boolean renameToName(String targetFileName) throws IOException {
         Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
         if (!oldFile.isPresent()) {
             // Could not find file
             return false;
         }
 
-        String targetFileName = getSuggestedFileName();
         Path newPath = oldFile.get().resolveSibling(targetFileName);
 
         String expandedOldFilePath = oldFile.get().toString();
@@ -124,8 +127,7 @@ public class LinkedFileHandler {
      * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
      * override the existing file.
      */
-    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry) {
-        String targetFileName = getSuggestedFileName();
+    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
                                      .get().getParent().resolve(targetFileName);

@@ -97,6 +97,7 @@ public class FindFullTextAction extends SimpleCommand {
         for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
             BibEntry entry = download.getKey();
             Optional<URL> result = download.getValue();
+
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 

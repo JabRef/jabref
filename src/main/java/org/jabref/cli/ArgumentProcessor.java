@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.externalfiles.AutoSetLinks;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -459,8 +460,7 @@ public class ArgumentProcessor {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                     Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-            Map<String, TemplateExporter> customExporters = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                    Globals.journalAbbreviationLoader);
+            List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
@@ -498,7 +498,8 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
-            AutoSetLinks.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(parserResult.getDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+            util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
         }
     }
 

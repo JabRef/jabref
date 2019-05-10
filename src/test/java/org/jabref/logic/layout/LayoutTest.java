@@ -6,8 +6,10 @@ import java.io.StringReader;
 import java.util.Collections;
 
 import org.jabref.logic.layout.format.FileLinkPreferences;
+import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +39,7 @@ class LayoutTest {
 
     @Test
     void entryTypeForUnknown() throws IOException {
-        BibEntry entry = new BibEntry("unknown").withField("author", "test");
+        BibEntry entry = new BibEntry(new CustomEntryType("unknown", "required", "optional")).withField("author", "test");
 
         assertEquals("Unknown", layout("\\bibtextype", entry));
     }
@@ -97,8 +99,10 @@ class LayoutTest {
                 layoutText);
     }
 
+    /**
+     * Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
+     */
     @Test
-        // Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
                 new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));
@@ -119,5 +123,16 @@ class LayoutTest {
         String layoutText = layout("\\edition-th ed.-", entry);
 
         assertEquals("2-th ed.-", layoutText);
+    }
+
+    @Test
+    void customNameFormatter() throws IOException {
+        when(layoutFormatterPreferences.getNameFormatterPreferences()).thenReturn(
+                new NameFormatterPreferences(Collections.singletonList("DCA"), Collections.singletonList("1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{l}@@*@*@more")));
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "Joe Doe and Mary Jane");
+
+        String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);
+
+        assertEquals("JoeDoe and MaryJ", layoutText);
     }
 }

@@ -714,9 +714,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(database, "database cannot be null");
+
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
+
             Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
@@ -729,7 +733,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         // No luck? Return an empty string:
         return "";
     }
-
 
     /**
      * Look up the nth author and return the proper last name for citation markers.
@@ -855,6 +858,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return properties.get(propName);
     }
 
+    /**
+     * Indicate if it is an internal style
+     *
+     * @return True if an internal style
+     */
     public boolean isFromResource() {
         return fromResource;
     }
@@ -875,7 +883,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         if (o instanceof OOBibStyle) {
             OOBibStyle otherStyle = (OOBibStyle) o;
-            return Objects.equals(path, otherStyle.path) && Objects.equals(name, otherStyle.name)
+            return Objects.equals(path, otherStyle.path)
+                    && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
                     && Objects.equals(properties, otherStyle.properties);
         }

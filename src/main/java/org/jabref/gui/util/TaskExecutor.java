@@ -18,7 +18,16 @@ public interface TaskExecutor {
      * @param <V>  type of return value of the task
      * @param task the task to run
      */
-    <V> Future<?> execute(BackgroundTask<V> task);
+    <V> Future<V> execute(BackgroundTask<V> task);
+
+    /**
+     * Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
+     * #execute(BackgroundTask)}.
+     *
+     * @param <V>  type of return value of the task
+     * @param task the task to run
+     */
+    <V> Future<V> execute(Task<V> task);
 
     /**
      * Shutdown the task executor.

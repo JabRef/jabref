@@ -18,10 +18,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.xmlunit.builder.Input;
@@ -33,7 +32,6 @@ import org.xmlunit.matchers.CompareMatcher;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class ModsExportFormatTestFiles {
 
     private static Path resourceDir;
@@ -57,7 +55,7 @@ public class ModsExportFormatTestFiles {
     }
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
+    public void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExporter();

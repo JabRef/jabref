@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,6 +22,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -31,24 +34,25 @@ public class NameFormatterTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-    private final TableView table;
+    private final TableView<NameFormatterViewModel> table;
     private final GridPane builder = new GridPane();
-    private final List<TableRow> tableRows = new ArrayList<>(10);
-    private final ObservableList<TableRow> data = FXCollections.observableArrayList();
+    private final List<NameFormatterViewModel> tableRows = new ArrayList<>(10);
+    private final ObservableList<NameFormatterViewModel> data = FXCollections.observableArrayList();
 
-    public static class TableRow {
-        private SimpleStringProperty name;
-        private SimpleStringProperty format;
+    public static class NameFormatterViewModel {
 
-        TableRow() {
+        private final SimpleStringProperty name;
+        private final SimpleStringProperty format;
+
+        NameFormatterViewModel() {
             this("");
         }
 
-        TableRow(String name) {
+        NameFormatterViewModel(String name) {
             this(name, NameFormatter.DEFAULT_FORMAT);
         }
 
-        TableRow(String name, String format) {
+        NameFormatterViewModel(String name, String format) {
             this.name = new SimpleStringProperty(name);
             this.format = new SimpleStringProperty(format);
         }
@@ -77,28 +81,32 @@ public class NameFormatterTab extends Pane implements PrefsTab {
     public NameFormatterTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
 
-        TableColumn<TableRow,String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
-        TableColumn<TableRow,String> lastCol = new TableColumn<>(Localization.lang("Format string"));
-        table = new TableView();
+        ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
+
+        TableColumn<NameFormatterViewModel, String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
+        TableColumn<NameFormatterViewModel, String> lastCol = new TableColumn<>(Localization.lang("Format string"));
+        table = new TableView<>();
         table.setEditable(true);
         firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
         firstCol.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setName(t.getNewValue());
-                });
+                                 (TableColumn.CellEditEvent<NameFormatterViewModel, String> t) -> {
+                                     t.getTableView().getItems().get(
+                                                                     t.getTablePosition().getRow())
+                                      .setName(t.getNewValue());
+                                 });
         lastCol.setCellValueFactory(new PropertyValueFactory<>("format"));
         lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
         lastCol.setOnEditCommit(
-                (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setFormat(t.getNewValue());
-                });
+                                (TableColumn.CellEditEvent<NameFormatterViewModel, String> t) -> {
+                                    t.getTableView().getItems().get(
+                                                                    t.getTablePosition().getRow())
+                                     .setFormat(t.getNewValue());
+                                });
         firstCol.setPrefWidth(140);
         lastCol.setPrefWidth(200);
         table.setItems(data);
-        table.getColumns().addAll(firstCol, lastCol);
+        table.getColumns().addAll(Arrays.asList(firstCol, lastCol));
         final TextField addName = new TextField();
         addName.setPromptText("name");
         addName.setMaxWidth(100);
@@ -116,9 +124,9 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label insertRows = new Label(Localization.lang("Insert rows"));
         insertRows.setVisible(false);
         Button add = new Button("Insert");
-        add.setOnAction(e-> {
+        add.setOnAction(e -> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
-                TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
+                NameFormatterViewModel tableRow = new NameFormatterViewModel(addName.getText(), addLast.getText());
                 addName.clear();
                 addLast.clear();
                 data.add(tableRow);
@@ -131,21 +139,21 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label deleteRows = new Label(Localization.lang("Delete rows"));
         deleteRows.setVisible(false);
         Button delete = new Button("Delete");
-        delete.setOnAction(e-> {
-            if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
+        delete.setOnAction(e -> {
+            if ((table.getFocusModel() != null) && (table.getFocusModel().getFocusedIndex() != -1)) {
                 tableChanged = true;
                 int row = table.getFocusModel().getFocusedIndex();
-                TableRow tableRow = tableRows.get(row);
+                NameFormatterViewModel tableRow = tableRows.get(row);
                 tableRows.remove(tableRow);
                 data.remove(tableRow);
                 table.setItems(data);
                 table.refresh();
-            }});
-        Button help = new Button("?");
-        help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
-                HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
+            }
+        });
+
+        Button help = factory.createIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER));
         HBox toolbar = new HBox();
-        toolbar.getChildren().addAll(addName, addLast,add,delete,help);
+        toolbar.getChildren().addAll(addName, addLast, add, delete, help);
         tabPanel.setBottom(toolbar);
 
         Label specialNameFormatters = new Label(Localization.lang("Special name formatters"));
@@ -154,6 +162,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         builder.add(tabPanel, 1, 2);
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
@@ -166,9 +175,9 @@ public class NameFormatterTab extends Pane implements PrefsTab {
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
-                tableRows.add(new TableRow(names.get(i), formats.get(i)));
+                tableRows.add(new NameFormatterViewModel(names.get(i), formats.get(i)));
             } else {
-                tableRows.add(new TableRow(names.get(i)));
+                tableRows.add(new NameFormatterViewModel(names.get(i)));
             }
         }
     }
@@ -198,7 +207,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
             List<String> names = new ArrayList<>(tableRows.size());
             List<String> formats = new ArrayList<>(tableRows.size());
 
-            for (TableRow tr : tableRows) {
+            for (NameFormatterViewModel tr : tableRows) {
                 names.add(tr.getName());
                 formats.add(tr.getFormat());
             }

@@ -37,6 +37,7 @@ public class AbbreviateAction implements BaseAction {
 
     @Override
     public void action() {
+        panel.output(Localization.lang("Abbreviating..."));
         BackgroundTask.wrap(this::abbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -44,8 +45,6 @@ public class AbbreviateAction implements BaseAction {
     }
 
     private String abbreviate() {
-        panel.output(Localization.lang("Abbreviating..."));
-
         List<BibEntry> entries = panel.getSelectedEntries();
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),

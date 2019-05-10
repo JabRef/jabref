@@ -48,7 +48,7 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(ConnectionLostEvent connectionLostEvent) {
 
-        jabRefFrame.output(Localization.lang("Connection lost."));
+        jabRefFrame.getDialogService().notify(Localization.lang("Connection lost."));
 
         ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
         ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
@@ -69,7 +69,7 @@ public class SharedDatabaseUIManager {
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
                 jabRefFrame.refreshTitleAndTabs();
-                jabRefFrame.output(Localization.lang("Working offline."));
+                jabRefFrame.getDialogService().notify(Localization.lang("Working offline."));
             }
         } else {
             jabRefFrame.closeCurrentTab();
@@ -79,7 +79,7 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(UpdateRefusedEvent updateRefusedEvent) {
 
-        jabRefFrame.output(Localization.lang("Update refused."));
+        jabRefFrame.getDialogService().notify(Localization.lang("Update refused."));
 
         new MergeSharedEntryDialog(jabRefFrame, dbmsSynchronizer, updateRefusedEvent.getLocalBibEntry(),
                                    updateRefusedEvent.getSharedBibEntry(),
@@ -91,7 +91,7 @@ public class SharedDatabaseUIManager {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
         EntryEditor entryEditor = panel.getEntryEditor();
 
-        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
+        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry()));
 
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
 
@@ -107,7 +107,6 @@ public class SharedDatabaseUIManager {
      * Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
      *
      * @param dbmsConnectionProperties Connection data
-     * @param raiseTab If <code>true</code> the new tab gets selected.
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
@@ -121,7 +120,7 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
-        jabRefFrame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+        jabRefFrame.getDialogService().notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
         return jabRefFrame.addTab(bibDatabaseContext, true);
     }
 
@@ -150,6 +149,6 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
         parserResult.setDatabaseContext(bibDatabaseContext);
-        jabRefFrame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+        jabRefFrame.getDialogService().notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
     }
 }

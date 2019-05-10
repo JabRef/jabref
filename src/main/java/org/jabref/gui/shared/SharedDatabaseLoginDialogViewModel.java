@@ -69,6 +69,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty keystore = new SimpleStringProperty("");
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
+    private final StringProperty serverTimezone = new SimpleStringProperty("");
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
@@ -107,7 +108,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         applyPreferences();
     }
 
-    public void openDatabase() {
+    public boolean openDatabase() {
 
         DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties();
         connectionProperties.setType(selectedDBMSType.getValue());
@@ -118,9 +119,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setPassword(password.getValue());
         connectionProperties.setUseSSL(useSSL.getValue());
         connectionProperties.setKeyStore(keystore.getValue());
+        connectionProperties.setServerTimezone(serverTimezone.getValue());
 
         setupKeyStore();
-        openSharedDatabase(connectionProperties);
+        boolean connected = openSharedDatabase(connectionProperties);
+        return connected;
     }
 
     private void setupKeyStore() {
@@ -129,12 +132,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         System.setProperty("javax.net.debug", "ssl");
     }
 
-    private void openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+    private boolean openSharedDatabase(DBMSConnectionProperties connectionProperties) {
         if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                                                    Localization.lang("You are already connected to a database using entered connection details."));
-            return;
+            return true;
         }
 
         if (autosave.get()) {
@@ -147,7 +150,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                            Localization.lang("Overwrite file"),
                                                                                            Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
-                    return;
+                    return true;
                 }
             }
         }
@@ -161,13 +164,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(panel).saveAs(Paths.get(folder.getValue()));
+                    new SaveDatabaseAction(panel, Globals.prefs).saveAs(Paths.get(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
             }
 
-            return;
+            return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
@@ -189,7 +192,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         }
         loading.set(false);
-
+        return false;
     }
 
     private void setPreferences() {
@@ -200,6 +203,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         prefs.setUser(user.getValue());
         prefs.setUseSSL(useSSL.getValue());
         prefs.setKeystoreFile(keystore.getValue());
+        prefs.setServerTimezone(serverTimezone.getValue());
 
         if (rememberPassword.get()) {
             try {
@@ -364,4 +368,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public ValidationStatus formValidation() {
         return formValidator.getValidationStatus();
     }
+
+    public StringProperty serverTimezoneProperty() { return serverTimezone; }
 }

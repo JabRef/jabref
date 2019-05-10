@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,22 +50,29 @@ public class ExternalFilesEntryLinker {
         moveFilesCleanup.cleanup(entry);
     }
 
-    public void addFileToEntry(BibEntry entry, Path file) {
-        addFilesToEntry(entry, Arrays.asList(file));
-    }
-
     public void addFilesToEntry(BibEntry entry, List<Path> files) {
         for (Path file : files) {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
-
                 ExternalFileType type = externalFileTypes.getExternalFileTypeByExt(ext)
                                                          .orElse(new UnknownExternalFileType(ext));
                 Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectoriesAsPaths(filePreferences));
                 LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName());
                 entry.addFile(linkedfile);
             });
-
         }
+    }
 
+    public void moveFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
+        addFilesToEntry(entry, files);
+        moveLinkedFilesToFileDir(entry);
+        renameLinkedFilesToPattern(entry);
+    }
+
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
+        for (Path file : files) {
+            copyFileToFileDir(file)
+                    .ifPresent(copiedFile -> addFilesToEntry(entry, files));
+        }
+        renameLinkedFilesToPattern(entry);
     }
 }

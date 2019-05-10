@@ -71,6 +71,8 @@ public class GroupTreeView {
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
 
+    private DragExpansionHandler dragExpansionHandler;
+
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
             row.pseudoClassStateChanged(pseudoClass, false);
@@ -84,6 +86,7 @@ public class GroupTreeView {
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        dragExpansionHandler = new DragExpansionHandler();
 
         // Set-up bindings
         Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
@@ -114,15 +117,16 @@ public class GroupTreeView {
 
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
-                .withTooltip(GroupNodeViewModel::getDescription));
+                .withTooltip(GroupNodeViewModel::getDescription)
+                .install(mainColumn);
 
         // Number of hits
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
-        numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(group -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
@@ -138,11 +142,12 @@ public class GroupTreeView {
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
-                }));
+                })
+                .install(numberColumn);
 
         // Arrow indicating expanded status
         disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        disclosureNodeColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
                     final StackPane disclosureNode = new StackPane();
                     disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
@@ -156,7 +161,8 @@ public class GroupTreeView {
                 .withOnMouseClickedEvent(group -> event -> {
                     group.toggleExpansion();
                     event.consume();
-                }));
+                })
+                .install(disclosureNodeColumn);
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -195,20 +201,21 @@ public class GroupTreeView {
 
             // Drag and drop support
             row.setOnDragDetected(event -> {
-                TreeItem<GroupNodeViewModel> selectedItem = treeTable.getSelectionModel().getSelectedItem();
-                if ((selectedItem != null) && (selectedItem.getValue() != null)) {
-                    Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
-
-                    // Display the group when dragging
-                    dragboard.setDragView(row.snapshot(null, null));
-
-                    // Put the group node as content
-                    ClipboardContent content = new ClipboardContent();
-                    content.put(DragAndDropDataFormats.GROUP, selectedItem.getValue().getPath());
-                    dragboard.setContent(content);
-
-                    event.consume();
+                List<String> groupsToMove = new ArrayList<>();
+                for (TreeItem<GroupNodeViewModel> selectedItem : treeTable.getSelectionModel().getSelectedItems()) {
+                    if ((selectedItem != null) && (selectedItem.getValue() != null)) {
+                        groupsToMove.add(selectedItem.getValue().getPath());
+                    }
                 }
+
+                // Put the group nodes as content
+                Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
+                // Display the group when dragging
+                dragboard.setDragView(row.snapshot(null, null));
+                ClipboardContent content = new ClipboardContent();
+                content.put(DragAndDropDataFormats.GROUP, groupsToMove);
+                dragboard.setContent(content);
+                event.consume();
             });
             row.setOnDragOver(event -> {
                 Dragboard dragboard = event.getDragboard();
@@ -216,7 +223,7 @@ public class GroupTreeView {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
                     //expand node and all children on drag over
-                    row.getTreeItem().setExpanded(true);
+                    dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
                     switch (getDroppingMouseLocation(row, event)) {
@@ -240,13 +247,16 @@ public class GroupTreeView {
             row.setOnDragDropped(event -> {
                 Dragboard dragboard = event.getDragboard();
                 boolean success = false;
+
                 if (dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
-                    String pathToSource = (String) dragboard.getContent(DragAndDropDataFormats.GROUP);
-                    Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
-                            .getChildByPath(pathToSource);
-                    if (source.isPresent()) {
-                        source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
-                        success = true;
+                    List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+                    for (String pathToSource : pathToSources) {
+                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
+                                .getChildByPath(pathToSource);
+                        if (source.isPresent()) {
+                            source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
+                            success = true;
+                        }
                     }
                 }
 
@@ -312,6 +322,7 @@ public class GroupTreeView {
         editGroup.setOnAction(event -> {
             menu.hide();
             viewModel.editGroup(group);
+            groupTree.refresh();
         });
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
@@ -389,6 +400,30 @@ public class GroupTreeView {
             return DroppingMouseLocation.BOTTOM;
         } else {
             return DroppingMouseLocation.CENTER;
+        }
+    }
+
+    private class DragExpansionHandler {
+        private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
+        private TreeItem<GroupNodeViewModel> draggedItem;
+        private long dragStarted;
+
+        public void expandGroup(TreeItem<GroupNodeViewModel> treeItem) {
+            if (!treeItem.equals(draggedItem)) {
+                this.draggedItem = treeItem;
+                this.dragStarted = System.currentTimeMillis();
+                this.draggedItem.setExpanded(this.draggedItem.isExpanded());
+                return;
+            }
+
+            if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
+                // expand or collapse the tree item and reset the time
+                this.dragStarted = System.currentTimeMillis();
+                this.draggedItem.setExpanded(!this.draggedItem.isExpanded());
+            } else {
+                // leave the expansion state of the tree item as it is
+                this.draggedItem.setExpanded(this.draggedItem.isExpanded());
+            }
         }
     }
 }

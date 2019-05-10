@@ -10,9 +10,6 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Static variables for graphics files and keyboard shortcuts.
  */
@@ -31,11 +28,6 @@ public class GUIGlobals {
     public static final int WIDTH_ICON_COL_RANKING = 5 * 16; // Width of Ranking Icon Column
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
-
-    //	Colors.
-    public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GUIGlobals.class);
 
     private GUIGlobals() {
     }

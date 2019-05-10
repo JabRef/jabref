@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentParser;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -29,6 +30,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
@@ -69,7 +71,7 @@ public class BibtexParser implements Parser {
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
-    private MetaDataParser metaDataParser;
+    private final MetaDataParser metaDataParser;
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -210,7 +212,17 @@ public class BibtexParser implements Parser {
 
         parseRemainingContent();
 
+        checkEpilog();
+
         return parserResult;
+    }
+
+    private void checkEpilog() {
+        // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
+        // regex looks for something like 'identifier = blabla ,'
+        if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
+            parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+        }
     }
 
     private void parseRemainingContent() {
@@ -504,7 +516,8 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(entryType);
+        BibEntry result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();
@@ -690,21 +703,21 @@ public class BibtexParser implements Parser {
                     }
 
                     // Finished, now reverse newKey and remove whitespaces:
-                    parserResult.addWarning(
-                            Localization.lang("Line %0: Found corrupted BibTeX key.", String.valueOf(line)));
                     key = newKey.reverse();
+                    parserResult.addWarning(
+                            Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
                 }
             }
             break;
 
         case ',':
-            parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (contains whitespaces).",
-                    String.valueOf(line)));
+            parserResult.addWarning(
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
             break;
 
         case '\n':
             parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key (comma missing).", String.valueOf(line)));
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
             break;
 
         default:

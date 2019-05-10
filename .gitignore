@@ -10,6 +10,14 @@ status.md
 # Install4J
 install4j6/
 
+# Snap
+parts/
+stage/
+prime/
+*.snap
+jabref_source.tar.bz2
+snap/.snapcraft/
+
 # Gradle
 # generated when `gradlew --gui` is called
 ui/
@@ -22,18 +30,6 @@ ui/
 # UNKNWON
 jabref.xml
 *.sonargraph
-
-# Snapcraft - JabRef places the files into buildres/snapcraft
-snap/
-
-
-
-
-
-
-
-
-
 
 # Created by https://www.gitignore.io/api/gradle,java,jabref,intellij,eclipse,netbeans,windows,linux,macos,node,snapcraft
 
@@ -348,3 +344,6 @@ gradle-app.setting
 
 # do not distribute Oracle's JDBC driver
 lib/ojdbc.jar
+
+# do not ignore the source of the build
+!/buildSrc/src/

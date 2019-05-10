@@ -34,8 +34,10 @@ import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
-import org.jabref.logic.layout.format.CreateDocBookAuthors;
-import org.jabref.logic.layout.format.CreateDocBookEditors;
+import org.jabref.logic.layout.format.CreateDocBook4Authors;
+import org.jabref.logic.layout.format.CreateDocBook4Editors;
+import org.jabref.logic.layout.format.CreateDocBook5Authors;
+import org.jabref.logic.layout.format.CreateDocBook5Editors;
 import org.jabref.logic.layout.format.CurrentDate;
 import org.jabref.logic.layout.format.DOICheck;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -389,8 +391,7 @@ class LayoutEntry {
         }
     }
 
-    private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
-
+    private LayoutFormatter getLayoutFormatterByName(String name) {
         switch (name) {
             case "HTMLToLatexFormatter": // For backward compatibility
             case "HtmlToLatex":
@@ -444,10 +445,14 @@ class LayoutEntry {
                 return new CompositeFormat();
             case "CreateBibORDFAuthors":
                 return new CreateBibORDFAuthors();
-            case "CreateDocBookAuthors":
-                return new CreateDocBookAuthors();
-            case "CreateDocBookEditors":
-                return new CreateDocBookEditors();
+            case "CreateDocBook4Authors":
+                return new CreateDocBook4Authors();
+            case "CreateDocBook4Editors":
+                return new CreateDocBook4Editors();
+            case "CreateDocBook5Authors":
+                return new CreateDocBook5Authors();
+            case "CreateDocBook5Editors":
+                return new CreateDocBook5Editors();
             case "CurrentDate":
                 return new CurrentDate();
             case "DateFormatter":
@@ -475,8 +480,7 @@ class LayoutEntry {
             case "Iso690NamesAuthors":
                 return new Iso690NamesAuthors();
             case "JournalAbbreviator":
-                return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(),
-                        prefs.getJournalAbbreviationPreferences());
+                return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(), prefs.getJournalAbbreviationPreferences());
             case "LastPage":
                 return new LastPage();
             case "FormatChars": // For backward compatibility
@@ -529,7 +533,7 @@ class LayoutEntry {
             case "WrapFileLinks":
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
             default:
-                return new NotFoundFormatter(name);
+                return null;
         }
     }
 
@@ -538,19 +542,13 @@ class LayoutEntry {
      * string (in order of appearance).
      */
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
-
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
-
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
-
         Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
-
         for (List<String> strings : formatterStrings) {
-
             String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-
             Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
             if (contents.isPresent()) {
                 NameFormatter nf = new NameFormatter();
@@ -560,22 +558,18 @@ class LayoutEntry {
             }
 
             // Try to load from formatters in formatter folder
-            try {
-                LayoutFormatter f = getLayoutFormatterByName(nameFormatterName);
-                // If this formatter accepts an argument, check if we have one, and
-                // set it if so:
-                if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
-                    ((ParamLayoutFormatter) f).setArgument(strings.get(1));
+            LayoutFormatter formatter = getLayoutFormatterByName(nameFormatterName);
+            if (formatter != null) {
+                // If this formatter accepts an argument, check if we have one, and set it if so
+                if ((formatter instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
+                    ((ParamLayoutFormatter) formatter).setArgument(strings.get(1));
                 }
-                results.add(f);
+                results.add(formatter);
                 continue;
-            } catch (Exception ex) {
-                LOGGER.info("Problem with formatter", ex);
             }
 
             // Then check whether this is a user defined formatter
             String formatterParameter = userNameFormatter.get(nameFormatterName);
-
             if (formatterParameter != null) {
                 NameFormatter nf = new NameFormatter();
                 nf.setParameter(formatterParameter);

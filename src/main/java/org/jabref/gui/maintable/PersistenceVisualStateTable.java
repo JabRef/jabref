@@ -26,7 +26,9 @@ public class PersistenceVisualStateTable {
         this.preferences = preferences;
 
         mainTable.getColumns().addListener(this::onColumnsChanged);
-        mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(obs -> updateColumnSortType(col.getText(), col.getSortType())));
+        mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(obs ->
+                updateColumnSortType(col.getText(), col.getSortType())));
+        mainTable.getColumns().forEach(col -> col.widthProperty().addListener(obs -> updateColumnPreferences()));
 
     }
 
@@ -59,12 +61,14 @@ public class PersistenceVisualStateTable {
                 NormalTableColumn normalColumn = (NormalTableColumn) column;
 
                 columnNames.add(normalColumn.getColumnName());
-                columnsWidths.add(String.valueOf(normalColumn.getWidth()));
+                columnsWidths.add(String.valueOf(Double.valueOf(normalColumn.getWidth()).intValue()));
             }
         }
 
-        // Finally, we store the new preferences.
-        preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
-        preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        if ((columnNames.size() == columnsWidths.size()) &&
+                (columnNames.size() == preferences.getStringList(JabRefPreferences.COLUMN_NAMES).size())) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
+        }
     }
 }
