@@ -1,28 +1,27 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.SwingUtilities;
+import javafx.concurrent.Task;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction implements BaseAction {
+public class FindFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
@@ -39,19 +38,13 @@ public class FindFullTextAction implements BaseAction {
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
-    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
+    public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
-        this.dialogService = dialogService;
+        this.dialogService = basePanel.frame().getDialogService();
     }
 
     @Override
-    public void action() {
-        BackgroundTask.wrap(this::findFullTexts)
-                      .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
-                      .executeWith(Globals.TASK_EXECUTOR);
-    }
-
-    private Map<Optional<URL>, BibEntry> findFullTexts() {
+    public void execute() {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
@@ -72,24 +65,38 @@ public class FindFullTextAction implements BaseAction {
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
-                return null;
+                return;
             }
         }
 
-        Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
-        for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fetchers.findFullTextPDF(entry), entry);
-        }
+        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+            @Override
+            protected Map<BibEntry, Optional<URL>> call() {
+                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
+                int count = 0;
+                for (BibEntry entry : basePanel.getSelectedEntries()) {
+                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                    downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    updateProgress(++count, basePanel.getSelectedEntries().size());
+                }
+                return downloads;
+            }
+        };
 
-        return downloads;
+        findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
+
+        dialogService.showProgressDialogAndWait(
+                Localization.lang("Look up full text documents"),
+                Localization.lang("Looking for full text document..."),
+                findFullTextsTask);
+
+        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
 
-    private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
-        List<Optional<URL>> finishedTasks = new ArrayList<>();
-        for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
-            BibEntry entry = download.getValue();
-            Optional<URL> result = download.getKey();
+    private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads) {
+        for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
+            BibEntry entry = download.getKey();
+            Optional<URL> result = download.getValue();
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
@@ -98,43 +105,57 @@ public class FindFullTextAction implements BaseAction {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"));
-
                     return;
                 }
-                DownloadExternalFile fileDownload = new DownloadExternalFile(dialogService,
-                        basePanel.getBibDatabaseContext(), entry);
-                try {
-                    fileDownload.download(result.get(), "application/pdf", file -> {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            Optional<FieldChange> fieldChange = entry.addFile(file);
-                            if (fieldChange.isPresent()) {
-                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                                basePanel.getUndoManager().addEdit(edit);
-                                basePanel.markBaseChanged();
-                            }
-                        });
+                //Download and link full text
+                addLinkedFileFromURL(result.get(), entry, dir.get());
 
-                    });
-                } catch (IOException e) {
-                    LOGGER.warn("Problem downloading file", e);
-                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-                }
-                basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
-                String title = Localization.lang("No full text document found");
-                String message = Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
-
-                basePanel.output(message);
-                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
+                dialogService.notify(Localization.lang("No full text document found for entry %0.",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
-            finishedTasks.add(result);
         }
-        for (Optional<URL> result : finishedTasks) {
-            downloads.remove(result);
+    }
+
+    /**
+     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
+     * from the findFullTexts map and then downloads the file into the given targetDirectory
+     *
+     * @param url   the url "key"
+     * @param entry the entry "value"
+     * @param targetDirectory the target directory for the downloaded file
+     */
+    private void addLinkedFileFromURL(URL url, BibEntry entry, Path targetDirectory) {
+        LinkedFile newLinkedFile = new LinkedFile(url, "");
+
+        if (!entry.getFiles().contains(newLinkedFile)) {
+
+            LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                    newLinkedFile,
+                    entry,
+                    basePanel.getBibDatabaseContext(),
+                    Globals.TASK_EXECUTOR,
+                    dialogService,
+                    JabRefPreferences.getInstance());
+
+            try {
+                URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
+                BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
+                downloadTask.onSuccess(destination -> {
+                    LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
+                            destination,
+                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()));
+                    entry.addFile(downloadedFile);
+                    dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                });
+                Globals.TASK_EXECUTOR.execute(downloadTask);
+            } catch (MalformedURLException exception) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+            }
+        } else {
+            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
     }
 }
