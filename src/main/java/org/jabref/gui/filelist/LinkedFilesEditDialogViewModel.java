@@ -91,9 +91,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
-
-        Path linkPath = Paths.get(linkedFile.getLink());
-        link.set(relativize(linkPath));
+        link.setValue(linkedFile.getLink()); //Might be an URL
 
         selectedExternalFileType.setValue(null);
 

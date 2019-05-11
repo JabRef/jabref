@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LinkedFileHandler {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);
 
     private final BibDatabaseContext databaseContext;
@@ -84,7 +85,7 @@ public class LinkedFileHandler {
 
         String expandedOldFilePath = oldFile.get().toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                && !newPath.toString().equals(expandedOldFilePath);
+                                        && !newPath.toString().equals(expandedOldFilePath);
 
         if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
             // We do not overwrite files
@@ -113,9 +114,14 @@ public class LinkedFileHandler {
     public String getSuggestedFileName() {
         String oldFileName = fileEntry.getLink();
 
+        String extension = FileHelper.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+        return getSuggestedFileName(extension);
+    }
+
+    public String getSuggestedFileName(String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim()
-                + '.'
-                + FileHelper.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+                                + '.'
+                                + extension;
 
         // Only create valid file names
         return FileUtil.getValidFileName(targetFileName);

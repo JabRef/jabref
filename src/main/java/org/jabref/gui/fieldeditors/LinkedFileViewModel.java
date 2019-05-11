@@ -420,7 +420,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
                     linkedFile.setFileType(suggestedTypeName);
 
-                    String suggestedName = linkedFileHandler.getSuggestedFileName();
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
