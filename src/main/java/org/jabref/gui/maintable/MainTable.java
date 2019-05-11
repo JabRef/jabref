@@ -109,7 +109,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.setItems(BindingsHelper.forUI(model.getEntriesFilteredAndSorted()));
+        this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
