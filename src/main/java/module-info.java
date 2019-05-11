@@ -66,4 +66,5 @@ open module org.jabref {
     requires reactfx;
     requires commons.cli;
     requires httpclient;
+    requires com.github.tomtung.latex2unicode;
 }

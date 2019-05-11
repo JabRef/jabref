@@ -53,12 +53,12 @@ sourceCompatibility = 9
 targetCompatibility = 9
 mainClassName = "$moduleName/org.jabref.JabRefMain"
 
-// TODO: Ugly workaround to temporarily ignore latex2unicode
+// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
+// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
 patchModules.config = [
-        "latex2unicode=latex2unicode_2.12-0.2.2.jar",
-        "test=fastparse_2.12-0.4.2.jar",
-        "test2=fastparse-utils_2.12-0.4.2.jar",
-        "test3=sourcecode_2.12-0.1.3.jar"
+        "test=fastparse_2.12-1.0.0.jar",
+        "test2=fastparse-utils_2.12-1.0.0.jar",
+        "test3=sourcecode_2.12-0.1.4.jar"
 ]
 
 
@@ -177,7 +177,7 @@ dependencies {
     compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
     compile 'com.sun.activation:javax.activation:1.2.0'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.5'
 
     errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 
