@@ -23,10 +23,10 @@ public class MainTableDataModel {
     private final SortedList<BibEntryTableViewModel> entriesSorted;
 
     public MainTableDataModel(BibDatabaseContext context) {
-        ObservableList<BibEntry> allEntries = context.getDatabase().getEntries();
-
+        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
+        
         ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new);
-
+        
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 Bindings.createObjectBinding(() -> this::isMatched,
