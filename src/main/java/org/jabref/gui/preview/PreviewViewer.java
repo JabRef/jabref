@@ -70,6 +70,23 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView = new WebView();
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
+
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
+                                                                             Worker.State oldValue,
+                                                                             Worker.State newValue) -> {
+            if (newValue != Worker.State.SUCCEEDED) {
+                return;
+            }
+            Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
+                if (highlightPattern.isPresent()) {
+                    String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+
+                    previewView.getEngine().executeScript("highlight('" + pattern + "');");
+
+                }
+            });
+        });
+
     }
 
     public void setLayout(PreviewLayout newLayout) {
@@ -119,21 +136,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
-                                                                             Worker.State oldValue,
-                                                                             Worker.State newValue) -> {
-            if (newValue != Worker.State.SUCCEEDED) {
-                return;
-            }
-            Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
-                if (highlightPattern.isPresent()) {
-                    String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
-
-                    previewView.getEngine().executeScript("highlight('" + pattern + "');");
-
-                }
-            });
-        });
         this.setHvalue(0);
     }
 

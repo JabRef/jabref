@@ -55,10 +55,11 @@ public class SourceTab extends EntryEditorTab {
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
-    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    @SuppressWarnings("unchecked") private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
+    private CodeArea codeArea;
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.mode = bibDatabaseContext.getMode();
@@ -71,6 +72,17 @@ public class SourceTab extends EntryEditorTab {
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
 
+        Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
+            if (highlightPattern.isPresent() && codeArea != null) {
+                codeArea.setStyleClass(0, codeArea.getLength(), "text");
+                Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
+                while (matcher.find()) {
+                    for (int i = 0; i <= matcher.groupCount(); i++) {
+                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                    }
+                }
+            }
+        });
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -145,18 +157,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         this.setContent(codeArea);
-
-        Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
-            if (highlightPattern.isPresent()) {
-                Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
-                while (matcher.find()) {
-                    for (int i = 0; i <= matcher.groupCount(); i++) {
-                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
-                    }
-                }
-            }
-        });
-
+        this.codeArea = codeArea;
         // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {

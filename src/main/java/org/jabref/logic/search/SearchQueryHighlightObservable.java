@@ -25,7 +25,6 @@ public class SearchQueryHighlightObservable {
 
         eventBus.register(newListener);
         newListener.highlightPattern(pattern);
-
     }
 
     public void removeSearchListener(SearchQueryHighlightListener listener) {
