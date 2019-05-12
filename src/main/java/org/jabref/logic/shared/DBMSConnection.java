@@ -1,18 +1,17 @@
 package org.jabref.logic.shared;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.database.shared.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DBMSConnection implements DatabaseConnection {
 
@@ -39,8 +38,8 @@ public class DBMSConnection implements DatabaseConnection {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
             LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
-
-            throw e;
+            StringBuilder formattedErrorMessage = formatErrorMessage(e);
+            throw new SQLException(formattedErrorMessage.toString(), e);
         }
     }
 
@@ -70,5 +69,20 @@ public class DBMSConnection implements DatabaseConnection {
             }
         }
         return dbmsTypes;
+    }
+
+    private StringBuilder formatErrorMessage(SQLException e) {
+        String message = e.getMessage();
+        StringBuilder errorFormatter = new StringBuilder();
+        int wordCounter = 0;
+        for (int i = 0; i < message.length(); i++) {
+            if (message.charAt(i) == ' ' && ++wordCounter % 25 == 0) {
+                errorFormatter.append(" ").append(System.lineSeparator());
+
+                continue;
+            }
+            errorFormatter.append(message.charAt(i));
+        }
+        return errorFormatter;
     }
 }
