@@ -63,7 +63,7 @@ Principles:
 - Errors should only be logged when they are finally caught (i.e., logged only once). See **Logging** for details.
 - If the Exception message is intended to be shown to the User in the UI (see below) provide also a localizedMessage (see `JabRefException`).
 
-*(Rationale and further reading: https://today.java.net/article/2006/04/04/exception-handling-antipatterns)*
+*(Rationale and further reading: https://www.baeldung.com/java-exceptions)*
 
 ### Outputting Errors in the UI
 Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized. The technical reasons (and stack traces) for a failure should only be logged.
@@ -223,10 +223,10 @@ For accessing or putting data into the Clipboard use the `ClipboardManager`.
 You should never directly call them, instead pass them as parameters to the class. 
 ```
 
-## Get Absolute Filename or Path
+## Get Absolute Filename or Path for file in File directory
 
 ```java
-File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPreferences.getInstance().getFileDirectoryPreferences()).get(); 
+ Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
 ```
 `String path` Can be the files name or a relative path to it.
 The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
