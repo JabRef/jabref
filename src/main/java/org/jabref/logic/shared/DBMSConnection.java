@@ -1,5 +1,11 @@
 package org.jabref.logic.shared;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.database.shared.DBMSType;
@@ -7,11 +13,6 @@ import org.jabref.model.database.shared.DatabaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DBMSConnection implements DatabaseConnection {
 
@@ -76,7 +77,7 @@ public class DBMSConnection implements DatabaseConnection {
         StringBuilder errorFormatter = new StringBuilder();
         int wordCounter = 0;
         for (int i = 0; i < message.length(); i++) {
-            if (message.charAt(i) == ' ' && ++wordCounter % 25 == 0) {
+            if (message.charAt(i) == ' ' && ++wordCounter % 15 == 0) {
                 errorFormatter.append(" ").append(System.lineSeparator());
 
                 continue;
