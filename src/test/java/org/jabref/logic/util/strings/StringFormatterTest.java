@@ -6,11 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringFormatterTest {
 
-    private String error = "The server time zone value 'MSK' is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the serverTimezone configuration property) to use a more specifc time zone value if you want to utilize time zone support.";
-
     @Test
     void formatErrorMessage() {
         StringFormatter stringFormatter = new StringFormatter();
+        String error = "The server time zone value 'MSK' is unrecognized or represents more than one time zone. You must configure either the server or JDBC driver (via the serverTimezone configuration property) to use a more specifc time zone value if you want to utilize time zone support.";
         Exception exceptionUnderTest = new Exception(error);
         String errorToBeThrown = stringFormatter.formatErrorMessage(exceptionUnderTest);
         String[] lines = errorToBeThrown.split(System.lineSeparator());
