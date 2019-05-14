@@ -11,8 +11,8 @@ import java.util.Optional;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
