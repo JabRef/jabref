@@ -11,8 +11,7 @@ import java.util.List;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
-
-import org.jsoup.helper.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
