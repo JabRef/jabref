@@ -13,7 +13,6 @@ import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
@@ -27,7 +26,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 import org.jabref.Globals;
@@ -269,7 +267,7 @@ public class GlobalSearchBar extends HBox {
         return searchQuery;
     }
 
-    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
+    public void updateResults(int matched, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -284,11 +282,6 @@ public class GlobalSearchBar extends HBox {
             // TODO: switch Icon color
             //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
-        Tooltip tooltip = new Tooltip();
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setGraphic(description);
-        tooltip.setMaxHeight(10);
-        searchField.setTooltip(tooltip);
     }
 
     public void setSearchTerm(String searchTerm) {
