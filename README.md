@@ -84,7 +84,7 @@ An explanation of donation possibilities and usage of donations is available at 
 
 Want to be part of a free and open-source project that tens of thousands scientist use every day? Check out the ways you can contribute, below:
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
-- You are welcome to contribute new features. To get your code included into JabRef, just [fork] (https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request] (https://help.github.com/en/articles/about-pull-requests).
+- You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
 
 We view pull requests as a collaborative process.
