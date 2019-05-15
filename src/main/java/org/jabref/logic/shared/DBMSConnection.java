@@ -1,5 +1,6 @@
 package org.jabref.logic.shared;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ public class DBMSConnection implements DatabaseConnection {
             // ensure that all SQL drivers are loaded - source: http://stackoverflow.com/a/22384826/873282
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
+            DriverManager.setLogWriter(new PrintWriter(System.out));
             this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
 
         } catch (SQLException e) {
