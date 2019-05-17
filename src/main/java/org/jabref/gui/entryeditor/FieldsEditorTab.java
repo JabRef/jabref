@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -25,10 +26,13 @@ import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,6 +57,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private Collection<String> fields = new ArrayList<>();
     private final DialogService dialogService;
     private GridPane gridPane;
+    private PreviewPanel previewPanel;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         this.isCompressed = compressed;
@@ -103,7 +108,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
-        columnExpand.setPercentWidth(60);
+        columnExpand.setHgrow(Priority.ALWAYS);
 
         ColumnConstraints columnDoNotContract = new ColumnConstraints();
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
@@ -217,6 +222,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         initPanel();
         setupPanel(entry, isCompressed, suggestionProviders, undoManager);
 
+        previewPanel.setEntry(entry);
+
         Platform.runLater(() -> {
             // Restore focus to field (run this async so that editor is already initialized correctly)
             selectedFieldName.ifPresent(this::requestFocus);
@@ -234,6 +241,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
+            previewPanel = new PreviewPanel(databaseContext, null, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -242,7 +251,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(true);
 
-            setContent(scrollPane);
+            SplitPane container = new SplitPane(scrollPane, previewPanel);
+
+            setContent(container);
         }
     }
 }
