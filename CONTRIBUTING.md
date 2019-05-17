@@ -11,6 +11,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
 
 In case you have any questions, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email. We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
+
 ## Formal requirements for a pull request
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
 
