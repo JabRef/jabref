@@ -1,5 +1,8 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.jabref.build.antlr.JabRefAntlrPlugin
+import org.jabref.build.localization.LocalizationPlugin
+import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
@@ -39,9 +42,9 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
-apply plugin: org.jabref.build.antlr.AntlrPlugin
-apply plugin: org.jabref.build.xjc.XjcPlugin
-apply plugin: org.jabref.build.localization.LocalizationPlugin
+apply plugin: JabRefAntlrPlugin
+apply plugin: XjcPlugin
+apply plugin: LocalizationPlugin
 
 apply from: 'eclipse.gradle'
 

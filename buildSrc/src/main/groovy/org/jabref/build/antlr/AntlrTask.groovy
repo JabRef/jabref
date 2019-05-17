@@ -13,7 +13,7 @@ class AntlrTask extends JavaExec {
     private String outputDir = ""
     private String javaPackage = ""
 
-    public AntlrTask() {
+    AntlrTask() {
         project.configurations {
             antlr3
             antlr4
