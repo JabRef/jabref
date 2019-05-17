@@ -47,6 +47,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -284,11 +285,14 @@ public class GlobalSearchBar extends HBox {
             // TODO: switch Icon color
             //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
-        Tooltip tooltip = new Tooltip();
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setGraphic(description);
-        tooltip.setMaxHeight(10);
-        searchField.setTooltip(tooltip);
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_TOOLTIPS)) {
+            Tooltip tooltip = new Tooltip();
+            tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            tooltip.setGraphic(description);
+            tooltip.setMaxHeight(10);
+            searchField.setTooltip(tooltip);
+        }
     }
 
     public void setSearchTerm(String searchTerm) {
