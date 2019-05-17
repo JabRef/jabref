@@ -6,6 +6,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -38,7 +39,7 @@ public class AttachFileAction extends SimpleCommand {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
 
-            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()), ExternalFileTypes.getInstance());
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
