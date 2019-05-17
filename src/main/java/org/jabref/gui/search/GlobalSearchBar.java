@@ -286,7 +286,7 @@ public class GlobalSearchBar extends HBox {
             //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_TOOLTIPS)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS)) {
             Tooltip tooltip = new Tooltip();
             tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             tooltip.setGraphic(description);
