@@ -31,6 +31,12 @@
     -fx-background-color: -jr-icon-background-active;
 }
 
+#typeLabel .context-menu,
+#typeLabel .tooltip {
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+}
+
 .icon-button.narrow {
     -fx-padding: 0.1em;
 }
