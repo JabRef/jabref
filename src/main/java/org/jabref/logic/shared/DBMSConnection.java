@@ -1,19 +1,17 @@
 package org.jabref.logic.shared;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.database.shared.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.util.strings.StringFormatter;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DBMSConnection implements DatabaseConnection {
 
@@ -40,8 +38,7 @@ public class DBMSConnection implements DatabaseConnection {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
             LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
-            String formattedErrorMessage = new StringFormatter().formatErrorMessage(e);
-            throw new SQLException(formattedErrorMessage, e);
+            throw e;
         }
     }
 
