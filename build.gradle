@@ -136,7 +136,7 @@ dependencies {
     compile 'com.jfoenix:jfoenix:8.0.8'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
+    compile 'org.controlsfx:controlsfx:8.40.16-SNAPSHOT'
 
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
