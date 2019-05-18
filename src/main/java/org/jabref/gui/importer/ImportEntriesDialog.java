@@ -1,6 +1,7 @@
 package org.jabref.gui.importer;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
@@ -20,6 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
@@ -108,12 +110,15 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     container.getStyleClass().add("entry-container");
                     BindingsHelper.includePseudoClassWhen(container, entrySelected, addToggle.selectedProperty());
 
-                    if (viewModel.hasDuplicate(entry)) {
-                        Button duplicateButton = IconTheme.JabRefIcons.DUPLICATE.asButton();
-                        duplicateButton.setTooltip(new Tooltip(Localization.lang("Possible duplicate of existing entry. Click to resolve.")));
-                        duplicateButton.setOnAction(event -> viewModel.resolveDuplicate(entry));
-                        container.getChildren().add(1, duplicateButton);
-                    }
+                    Callable<Boolean> hasDuplicateEntryTask = () -> viewModel.hasDuplicate(entry);
+                    BackgroundTask.wrap(hasDuplicateEntryTask).onSuccess(e -> {
+                        if (e) {
+                            Button duplicateButton = IconTheme.JabRefIcons.DUPLICATE.asButton();
+                            duplicateButton.setTooltip(new Tooltip(Localization.lang("Possible duplicate of existing entry. Click to resolve.")));
+                            duplicateButton.setOnAction(event -> viewModel.resolveDuplicate(entry));
+                            container.getChildren().add(1, duplicateButton);
+                        }
+                    }).executeWith(Globals.TASK_EXECUTOR);
 
                     return container;
                 })
