@@ -76,9 +76,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDir)
-                .withInitialFileName(fileName)
-                .build();
+                                                                                               .withInitialDirectory(workingDir)
+                                                                                               .withInitialFileName(fileName)
+                                                                                               .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
@@ -92,8 +92,11 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
 
-        Path linkPath = Paths.get(linkedFile.getLink());
-        link.set(relativize(linkPath));
+        if (linkedFile.isOnlineLink()) {
+            link.setValue(linkedFile.getLink()); //Might be an URL
+        } else {
+            link.setValue(relativize(Paths.get(linkedFile.getLink())));
+        }
 
         selectedExternalFileType.setValue(null);
 

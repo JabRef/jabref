@@ -66,13 +66,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
     private final LinkedFileHandler linkedFileHandler;
+    private final ExternalFileTypes externalFileTypes;
 
     public LinkedFileViewModel(LinkedFile linkedFile,
                                BibEntry entry,
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               JabRefPreferences preferences) {
+                               JabRefPreferences preferences,
+                               ExternalFileTypes externalFileTypes) {
 
         this.linkedFile = linkedFile;
         this.filePreferences = preferences.getFilePreferences();
@@ -81,6 +83,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.entry = entry;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.externalFileTypes = externalFileTypes;
 
         xmpPreferences = preferences.getXMPPreferences();
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
@@ -402,7 +405,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences));
+                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
                 linkedFile.setLink(newLinkedFile.getLink());
                 linkedFile.setFileType(newLinkedFile.getFileType());
             });
@@ -420,7 +423,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
                     linkedFile.setFileType(suggestedTypeName);
 
-                    String suggestedName = linkedFileHandler.getSuggestedFileName();
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
@@ -443,7 +446,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
+            return externalFileTypes.getExternalFileTypeByMimeType(mimeType);
         } else {
             return Optional.empty();
         }
@@ -451,7 +454,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
         return URLUtil.getSuffix(url)
-                      .flatMap(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension));
+                      .flatMap(extension -> externalFileTypes.getExternalFileTypeByExt(extension));
     }
 
     public LinkedFile getFile() {
