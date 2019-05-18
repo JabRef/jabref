@@ -100,10 +100,6 @@ public class StateManager {
         return searchResultSize;
     }
 
-    public void setSearchResultSize(int size) {
-        searchResultSize.setValue(size);
-    }
-
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
         return searchQueryHighlightObservable;
     }

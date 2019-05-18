@@ -15,6 +15,7 @@ import javafx.scene.web.WebView;
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.PreviewLayout;
@@ -60,7 +61,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     /**
      * @param database Used for resolving strings and pdf directories for links.
      */
-    public PreviewViewer(BibDatabaseContext database, DialogService dialogService) {
+    public PreviewViewer(BibDatabaseContext database, DialogService dialogService, StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.clipBoardManager = Globals.clipboardManager;
@@ -77,7 +78,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
-            Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
+            stateManager.addSearchQueryHighlightListener(highlightPattern -> {
                 if (highlightPattern.isPresent()) {
                     String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
 

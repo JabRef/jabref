@@ -16,8 +16,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -59,9 +59,11 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
+    private final StateManager stateManager;
+
     private CodeArea codeArea;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -71,8 +73,9 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
 
-        Globals.stateManager.addSearchQueryHighlightListener(highlightPattern -> {
+        stateManager.addSearchQueryHighlightListener(highlightPattern -> {
             if (highlightPattern.isPresent() && codeArea != null) {
                 codeArea.setStyleClass(0, codeArea.getLength(), "text");
                 Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
@@ -130,8 +133,6 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
-        codeArea.getStylesheets().add(SourceTab.class.getResource("BibtexSourceCodeArea.css").toExternalForm());
-
         return codeArea;
     }
 
@@ -169,7 +170,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
-                    Globals.stateManager.fireSearchQueryHighlightEvent();
+                    stateManager.fireSearchQueryHighlightEvent();
 
                 } catch (IOException ex) {
                     codeArea.setEditable(false);

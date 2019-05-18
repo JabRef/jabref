@@ -27,6 +27,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
@@ -93,8 +94,9 @@ public class EntryEditor extends BorderPane {
     private final DialogService dialogService;
     private final ExternalFilesEntryLinker fileLinker;
     private final TaskExecutor taskExecutor;
+    private final StateManager stateManager;
 
-    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor) {
+    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, StateManager stateManager) {
         this.panel = panel;
         this.databaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
@@ -102,6 +104,7 @@ public class EntryEditor extends BorderPane {
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
 
         fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), databaseContext);
 
@@ -296,7 +299,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new RelatedArticlesTab(preferences, dialogService));
 
         // Source tab
-        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor, dialogService);
+        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager);
         tabs.add(sourceTab);
         return tabs;
     }

@@ -1,7 +1,0 @@
-#bibtexSourceCodeArea .search {
-	-fx-fill: red;
-}
-
-.bibtexSourceCodeArea .text {
-    -fx-fill: -fx-text-background-color;
-}

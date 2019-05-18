@@ -212,7 +212,7 @@ public class GlobalSearchBar extends HBox {
         updateResults(Globals.stateManager.searchResultSizeProperty().get(),
                       SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
                       searchQuery.isGrammarBasedSearch());
-        Globals.stateManager.fireSearchQueryHighlightEvent();
+   
 
     }
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -33,10 +32,7 @@ public class MainTableDataModel {
                         Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty())
 
         );
-        entriesFiltered.addListener((ListChangeListener<BibEntryTableViewModel>) c -> {
-            Globals.stateManager.setSearchResultSize(entriesFiltered.size());
-        });
-
+        Globals.stateManager.searchResultSizeProperty().bind(Bindings.size(entriesFiltered));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
     }
