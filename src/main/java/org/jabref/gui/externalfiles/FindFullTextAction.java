@@ -13,6 +13,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -136,7 +137,7 @@ public class FindFullTextAction extends SimpleCommand {
                     basePanel.getBibDatabaseContext(),
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    JabRefPreferences.getInstance());
+                    JabRefPreferences.getInstance(), ExternalFileTypes.getInstance());
 
             try {
                 URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
@@ -144,7 +145,7 @@ public class FindFullTextAction extends SimpleCommand {
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
-                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()));
+                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
                             entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
