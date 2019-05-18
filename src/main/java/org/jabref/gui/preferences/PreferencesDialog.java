@@ -229,7 +229,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
         XmpPreferences xmpPreferences = prefs.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         prefs.updateEntryEditorTabList();
-        frame.getGlobalSearchBar().updateHintVisibility();
     }
 
     private void storeAllSettings() {
@@ -247,8 +246,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
+        frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));
-        updateAfterPreferenceChanges();
     }
 
     public void setValues() {
