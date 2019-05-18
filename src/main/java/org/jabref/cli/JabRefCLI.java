@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefCLI {
 
+    private static final int WIDTH = 100; // Number of characters per line
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
     private List<String> leftOver;
@@ -255,7 +256,7 @@ public class JabRefCLI {
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(100, "jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
+        formatter.printHelp(WIDTH, "jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
     }
 
     private String getVersionInfo() {
