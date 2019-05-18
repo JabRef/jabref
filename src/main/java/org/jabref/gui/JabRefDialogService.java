@@ -165,6 +165,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void showErrorDialogAndWait(String message, Throwable exception) {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
+        exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
         exceptionDialog.showAndWait();
     }
