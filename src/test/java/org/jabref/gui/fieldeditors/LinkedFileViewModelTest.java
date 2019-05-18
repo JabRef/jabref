@@ -17,7 +17,6 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -25,6 +24,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,7 +52,6 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
     private ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private FilePreferences filePreferences = mock(FilePreferences.class);
-    private LinkedFileHandler linkedFileHandler = mock(LinkedFileHandler.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
@@ -158,23 +157,18 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
-        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFile.getParent()));
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(tempFile.getParent()));
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); //use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(linkedFileHandler.getSuggestedFileName("PDF")).thenReturn("asdf.pdf");
+
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
 
         BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileType);
-
+            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), externalFileType);
+            assertEquals("asdf.PDF", newLinkedFile.getLink());
             assertEquals("PDF", newLinkedFile.getFileType());
-
         });
+        task.onFailure(Assertions::fail);
         new CurrentThreadTaskExecutor().execute(task);
-
-        viewModel.download();
-
     }
 }

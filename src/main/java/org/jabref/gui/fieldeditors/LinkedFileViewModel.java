@@ -74,7 +74,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
                                JabRefPreferences preferences,
-                               ExternalFileTypes externalFileTypes){
+                               ExternalFileTypes externalFileTypes) {
 
         this.linkedFile = linkedFile;
         this.filePreferences = preferences.getFilePreferences();

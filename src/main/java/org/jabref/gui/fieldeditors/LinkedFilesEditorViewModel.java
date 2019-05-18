@@ -56,13 +56,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
                                       JabRefPreferences preferences) {
+        
         super(fieldName, suggestionProvider, fieldCheckers);
 
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
-
 
         BindingsHelper.bindContentBidirectional(
                 files,
