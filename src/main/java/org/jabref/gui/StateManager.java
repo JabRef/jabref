@@ -16,8 +16,6 @@ import javafx.collections.ObservableMap;
 
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.SearchQueryHighlightListener;
-import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -39,7 +37,6 @@ public class StateManager {
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty();
-    private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -98,25 +95,5 @@ public class StateManager {
 
     public IntegerProperty searchResultSizeProperty() {
         return searchResultSize;
-    }
-
-    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
-        return searchQueryHighlightObservable;
-    }
-
-    public void fireSearchQueryHighlightEvent() {
-        if (activeSearchQuery.get().isPresent()) {
-            searchQueryHighlightObservable.fireSearchlistenerEvent(activeSearchQuery.getValue().get());
-        }
-    }
-
-    public void resetSearchQueryHighlightObservable()
-    {
-        searchQueryHighlightObservable.reset();
-    }
-
-    public void addSearchQueryHighlightListener(SearchQueryHighlightListener listener) {
-        searchQueryHighlightObservable.removeSearchListener(listener);
-        searchQueryHighlightObservable.addSearchListener(listener);
     }
 }

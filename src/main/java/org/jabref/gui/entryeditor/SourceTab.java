@@ -5,12 +5,16 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
@@ -33,6 +37,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -61,6 +66,7 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager) {
@@ -75,17 +81,23 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
-        stateManager.addSearchQueryHighlightListener(highlightPattern -> {
-            if (highlightPattern.isPresent() && codeArea != null) {
-                codeArea.setStyleClass(0, codeArea.getLength(), "text");
-                Matcher matcher = highlightPattern.get().matcher(codeArea.getText());
-                while (matcher.find()) {
-                    for (int i = 0; i <= matcher.groupCount(); i++) {
-                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
-                    }
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
+
+    }
+
+    private void highlightSearchPattern() {
+        if (searchHighlightPattern.isPresent() && codeArea != null) {
+            codeArea.setStyleClass(0, codeArea.getLength(), "text");
+            Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
+            while (matcher.find()) {
+                for (int i = 0; i <= matcher.groupCount(); i++) {
+                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
                 }
             }
-        });
+        }
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -170,7 +182,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
-                    stateManager.fireSearchQueryHighlightEvent();
+                    highlightSearchPattern();
 
                 } catch (IOException ex) {
                     codeArea.setEditable(false);

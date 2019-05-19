@@ -46,7 +46,6 @@ import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -74,7 +73,6 @@ public class EntryEditor extends BorderPane {
     private final BibDatabaseContext databaseContext;
     private final CountingUndoManager undoManager;
     private final BasePanel panel;
-    private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
     private Subscription typeSubscription;
     private final List<EntryEditorTab> tabs;
     private final FileUpdateMonitor fileMonitor;
@@ -401,12 +399,6 @@ public class EntryEditor extends BorderPane {
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
         new FetchAndMergeEntry(panel, taskExecutor).fetchAndMerge(entry, fetcher);
-    }
-
-    void addSearchListener(SearchQueryHighlightListener listener) {
-        // TODO: Highlight search text in entry editors
-        searchListeners.add(listener);
-
     }
 
     public void setFocusToField(String fieldName) {

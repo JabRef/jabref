@@ -46,7 +46,6 @@ import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
 import org.jabref.preferences.SearchPreferences;
 
@@ -73,7 +72,6 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton regularExp;
     private final Button searchModeButton = new Button();
     private final Label currentResults = new Label("");
-    private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
     private SearchDisplayMode searchDisplayMode;
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -149,6 +147,16 @@ public class GlobalSearchBar extends HBox {
                                   currentResults);
 
         this.setAlignment(Pos.CENTER_LEFT);
+
+        //TODO Needs fixing, not yet working correctly
+        EasyBind.subscribe(Globals.stateManager.searchResultSizeProperty(), matchedResults -> {
+
+            Globals.stateManager.activeSearchQueryProperty().getValue().ifPresent(searchQuery -> {
+                updateResults(matchedResults.intValue(), SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                              searchQuery.isGrammarBasedSearch());
+            });
+
+        });
     }
 
     private void toggleSearchModeAndSearch() {
@@ -186,7 +194,6 @@ public class GlobalSearchBar extends HBox {
     private void clearSearch() {
         currentResults.setText("");
         searchField.setText("");
-        Globals.stateManager.resetSearchQueryHighlightObservable();
         Globals.stateManager.clearSearchQuery();
     }
 
@@ -209,17 +216,10 @@ public class GlobalSearchBar extends HBox {
 
         Globals.stateManager.setSearchQuery(searchQuery);
 
-        updateResults(Globals.stateManager.searchResultSizeProperty().get(),
-                      SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
-                      searchQuery.isGrammarBasedSearch());
-   
-
     }
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-
-        searchQueryHighlightObservable.reset();
 
         Globals.stateManager.clearSearchQuery();
 

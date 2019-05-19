@@ -2,10 +2,11 @@ package org.jabref.gui.preview;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -21,6 +22,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -57,6 +59,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     private Optional<BibEntry> entry = Optional.empty();
     private BibDatabaseContext database;
+    private boolean registered;
+
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
@@ -72,22 +77,31 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable,
-                                                                             Worker.State oldValue,
-                                                                             Worker.State newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
-            stateManager.addSearchQueryHighlightListener(highlightPattern -> {
-                if (highlightPattern.isPresent()) {
-                    String pattern = highlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
-
-                    previewView.getEngine().executeScript("highlight('" + pattern + "');");
-
-                }
-            });
+            if (!registered) {
+                stateManager.activeSearchQueryProperty().addListener(listener);
+                registered = true;
+            }
+            highlightSearchPattern();
         });
 
+    }
+
+    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        highlightSearchPattern();
+    };
+
+    private void highlightSearchPattern() {
+        if (searchHighlightPattern.isPresent()) {
+            String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+
+            previewView.getEngine().executeScript("highlight('" + pattern + "');");
+        }
     }
 
     public void setLayout(PreviewLayout newLayout) {
@@ -109,8 +123,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         for (Observable observable : newEntry.getObservables()) {
             observable.addListener(this);
         }
-
         update();
+
     }
 
     private void update() {
