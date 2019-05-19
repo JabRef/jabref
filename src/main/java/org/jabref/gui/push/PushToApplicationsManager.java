@@ -27,13 +27,13 @@ public class PushToApplicationsManager {
 
     public static PushToApplicationSettings getSettings(PushToApplication application) {
         if (application instanceof PushToEmacs) {
-            return new PushToEmacsSettings();
+            return new PushToEmacsSettings(application.getDialogService());
         } else if (application instanceof PushToLyx) {
-            return new PushToLyxSettings();
+            return new PushToLyxSettings(application.getDialogService());
         } else if (application instanceof PushToVim) {
-            return new PushToVimSettings();
+            return new PushToVimSettings(application.getDialogService());
         } else {
-            return new PushToApplicationSettings();
+            return new PushToApplicationSettings(application.getDialogService());
         }
     }
 
