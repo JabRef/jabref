@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
