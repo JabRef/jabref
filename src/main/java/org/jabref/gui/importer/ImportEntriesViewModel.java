@@ -1,5 +1,10 @@
 package org.jabref.gui.importer;
 
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -20,10 +25,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-
-import javax.swing.undo.UndoManager;
-import java.util.List;
-import java.util.Optional;
 
 public class ImportEntriesViewModel extends AbstractViewModel {
 
