@@ -19,7 +19,9 @@ public class PushToApplicationSettings {
     protected AbstractPushToApplication application;
     private DialogService dialogService;
 
-    public PushToApplicationSettings(DialogService dialogService) { this.dialogService = dialogService; }
+    public PushToApplicationSettings(DialogService dialogService) {
+        this.dialogService = dialogService;
+    }
 
     public GridPane getJFXSettingPane(int n) {
         switch (n) {

@@ -34,7 +34,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         this.dialogService = dialogService;
     }
 
-    public DialogService getDialogService() { return this.dialogService; }
+    public DialogService getDialogService() {
+        return this.dialogService;
+    }
 
     @Override
     public String getName() {
