@@ -324,7 +324,6 @@ class FieldSetComponent extends JPanel {
         list.setSelectedIndex(newInd);
     }
 
-
     /**
      * FocusListener to select the first entry in the list of fields when they are focused
      */

@@ -2,10 +2,8 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
-import org.jabref.Globals;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.JabRefGUI;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -41,13 +39,13 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(memEntry);
-        undoEdit.addEdit(new UndoableRemoveEntry(database.getDatabase(), memEntry, null));
+        undoEdit.addEdit(new UndoableRemoveEntry(database.getDatabase(), memEntry));
     }
 
     @Override
     public Node description() {
-        PreviewPanel previewPanel = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
-        previewPanel.setEntry(memEntry);
-        return previewPanel;
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService());
+        previewViewer.setEntry(memEntry);
+        return previewViewer;
     }
 }

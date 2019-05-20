@@ -31,7 +31,6 @@ abstract class DatabaseChangeViewModel {
         accepted = a;
     }
 
-
     /**
      * This method returns a JComponent detailing the nature of the change.
      * @return JComponent

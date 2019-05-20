@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
@@ -41,7 +40,6 @@ public class ImportSettingsTab implements PrefsTab {
         Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
         defaultImportStyle.getStyleClass().add("sectionHeader");
         builder.add(defaultImportStyle, 1, 1);
-        builder.add(new Separator(), 2, 1);
         builder.add(new Label(""), 1, 7);
 
         Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action"));

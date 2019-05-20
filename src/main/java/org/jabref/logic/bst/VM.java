@@ -935,8 +935,6 @@ public class VM implements Warn {
      * override any definition you define using this command. If you want to
      * define a string the user can't touch, use the FUNCTION command, which has
      * a compatible syntax.
-     *
-     * @param child
      */
     private void macro(Tree child) {
         String name = child.getChild(0).getText();
@@ -959,8 +957,7 @@ public class VM implements Warn {
         }
     }
 
-
-    /*
+    /**
      * Declares the fields and entry variables. It has three arguments, each a
      * (possibly empty) list of variable names. The three lists are of: fields,
      * integer entry variables, and string entry variables. There is an

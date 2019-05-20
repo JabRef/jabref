@@ -518,7 +518,8 @@ class OOBibBase {
                     } else {
                         LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
-                        cEntries[j] = new UndefinedBibtexEntry(keys[j]);
+                        throw new BibEntryNotFoundException(names.get(i), Localization
+                                                                                      .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
                     }
                 }
 

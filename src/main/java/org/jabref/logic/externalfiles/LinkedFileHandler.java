@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LinkedFileHandler {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);
 
     private final BibDatabaseContext databaseContext;
@@ -70,18 +71,21 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToSuggestedName() throws IOException {
+        return renameToName(getSuggestedFileName());
+    }
+
+    public boolean renameToName(String targetFileName) throws IOException {
         Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
         if (!oldFile.isPresent()) {
             // Could not find file
             return false;
         }
 
-        String targetFileName = getSuggestedFileName();
         Path newPath = oldFile.get().resolveSibling(targetFileName);
 
         String expandedOldFilePath = oldFile.get().toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                && !newPath.toString().equals(expandedOldFilePath);
+                                        && !newPath.toString().equals(expandedOldFilePath);
 
         if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
             // We do not overwrite files
@@ -110,9 +114,14 @@ public class LinkedFileHandler {
     public String getSuggestedFileName() {
         String oldFileName = fileEntry.getLink();
 
+        String extension = FileHelper.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+        return getSuggestedFileName(extension);
+    }
+
+    public String getSuggestedFileName(String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim()
-                + '.'
-                + FileHelper.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+                                + '.'
+                                + extension;
 
         // Only create valid file names
         return FileUtil.getValidFileName(targetFileName);
@@ -124,8 +133,7 @@ public class LinkedFileHandler {
      * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
      * override the existing file.
      */
-    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry) {
-        String targetFileName = getSuggestedFileName();
+    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
                                      .get().getParent().resolve(targetFileName);

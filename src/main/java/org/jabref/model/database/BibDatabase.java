@@ -49,7 +49,7 @@ public class BibDatabase {
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
-    private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+    private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
     /**
      * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
      */
@@ -292,15 +292,14 @@ public class BibDatabase {
         bibtexStrings.put(string.getId(), string);
     }
 
-    public void addStrings(Collection<BibtexString> stringsToAdd) {
-        for (BibtexString str : stringsToAdd) {
-            Optional<BibtexString> bibtexString = getStringByName(str.getName());
-            if (bibtexString.isPresent() && !(bibtexString.get().getContent().equals(str.getContent()))) {
-                bibtexString.get().setContent(str.getContent());
-            } else {
-                addString(str);
-            }
-        }
+    /**
+     * Replaces the existing lists of BibTexString with the given one
+     * No Duplicate checks are performed
+     * @param stringsToAdd The collection of strings to set
+     */
+    public void setStrings(Collection<BibtexString> stringsToAdd) {
+        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
+        bibtexStrings = strs;
     }
 
     /**

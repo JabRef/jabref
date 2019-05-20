@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -50,7 +51,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
     private int numberOfResultsFound;
-
 
     /**
      * Replaces all commas in a given string with " AND "
@@ -153,6 +153,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         new FieldFormatterCleanup("copyright", new ClearFormatter()).cleanup(entry);
 
         new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
     @Override

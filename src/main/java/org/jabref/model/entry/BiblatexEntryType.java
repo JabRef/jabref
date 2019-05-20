@@ -56,4 +56,9 @@ public abstract class BiblatexEntryType implements EntryType {
     public int compareTo(EntryType o) {
         return getName().compareTo(o.getName());
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

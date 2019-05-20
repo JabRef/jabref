@@ -10,8 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -168,7 +166,33 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
-        NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        if (fileLink == null) {
+            return;
+        }
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        } else {
+            String absolutePath = fileLink.toAbsolutePath().getParent().toString();
+            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            if (!command.isEmpty()) {
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+
+                // replace the placeholder if used
+                command = command.replace("%DIR", absolutePath);
+                String[] subcommands = command.split(" ");
+
+                LOGGER.info("Executing command \"" + command + "\"...");
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error("Open File Browser", exception);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                }
+            }
+        }
     }
 
     /**
@@ -201,12 +225,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(null,
-                                          couldNotOpenBrowser + "\n" + openManually + "\n" +
-                                                copiedToClipboard,
-                                          couldNotOpenBrowser,
-                                          JOptionPane.ERROR_MESSAGE);
+            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
+            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -234,24 +254,19 @@ public class JabRefDesktop {
 
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
+                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
+
                 String[] subcommands = command.split(" ");
 
-                // replace the placeholder if used
-                String commandLoggingText = command.replace("%DIR", absolutePath);
-
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText));
-                LOGGER.info("Executing command \"" + commandLoggingText + "\"...");
+                LOGGER.info("Executing command \"" + command + "\"...");
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JOptionPane.showMessageDialog(null,
-                                                  Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
-                                                  Localization.lang("Open console") + " - " + Localization.lang("Error"),
-                                                  JOptionPane.ERROR_MESSAGE);
-                    JabRefGUI.getMainFrame().output(null);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
