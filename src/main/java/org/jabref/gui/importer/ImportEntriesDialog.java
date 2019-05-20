@@ -110,8 +110,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     container.getStyleClass().add("entry-container");
                     BindingsHelper.includePseudoClassWhen(container, entrySelected, addToggle.selectedProperty());
 
-                    Callable<Boolean> hasDuplicateEntryTask = () -> viewModel.hasDuplicate(entry);
-                    BackgroundTask.wrap(hasDuplicateEntryTask).onSuccess(e -> {
+                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(e -> {
                         if (e) {
                             Button duplicateButton = IconTheme.JabRefIcons.DUPLICATE.asButton();
                             duplicateButton.setTooltip(new Tooltip(Localization.lang("Possible duplicate of existing entry. Click to resolve.")));
