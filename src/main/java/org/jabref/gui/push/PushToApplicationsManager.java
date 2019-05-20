@@ -25,15 +25,15 @@ public class PushToApplicationsManager {
         return applications;
     }
 
-    public static PushToApplicationSettings getSettings(PushToApplication application) {
+    public static PushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService) {
         if (application instanceof PushToEmacs) {
-            return new PushToEmacsSettings(application.getDialogService());
+            return new PushToEmacsSettings(dialogService);
         } else if (application instanceof PushToLyx) {
-            return new PushToLyxSettings(application.getDialogService());
+            return new PushToLyxSettings(dialogService);
         } else if (application instanceof PushToVim) {
-            return new PushToVimSettings(application.getDialogService());
+            return new PushToVimSettings(dialogService);
         } else {
-            return new PushToApplicationSettings(application.getDialogService());
+            return new PushToApplicationSettings(dialogService);
         }
     }
 

@@ -20,8 +20,6 @@ public interface PushToApplication {
 
     JabRefIcon getIcon();
 
-    DialogService getDialogService();
-
     /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
      * operations without utilizing invokeLater().

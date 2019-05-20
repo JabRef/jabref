@@ -197,7 +197,7 @@ class ExternalTab implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = PushToApplicationsManager.getSettings(application);
+        PushToApplicationSettings settings = PushToApplicationsManager.getSettings(application, dialogService);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));

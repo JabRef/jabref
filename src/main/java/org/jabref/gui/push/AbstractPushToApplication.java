@@ -34,10 +34,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         this.dialogService = dialogService;
     }
 
-    public DialogService getDialogService() {
-        return this.dialogService;
-    }
-
     @Override
     public String getName() {
         return Localization.lang("Push entries to external application (%0)", getApplicationName());
