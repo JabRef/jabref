@@ -1,14 +1,10 @@
 package org.jabref.gui.importer;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -54,7 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(entriesToImport -> entries.addAll(entriesToImport))
-            .executeWith(taskExecutor);
+                .executeWith(taskExecutor);
     }
 
     public String getMessage() {

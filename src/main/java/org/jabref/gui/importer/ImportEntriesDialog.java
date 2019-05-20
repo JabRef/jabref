@@ -1,7 +1,6 @@
 package org.jabref.gui.importer;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
