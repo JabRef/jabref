@@ -12,15 +12,10 @@ Stay on top of your literature: JabRef helps you to collect and organize sources
 ## Table of Contents
 
 - [Features](#features)
-  * [Collect](#collect)
-  * [Organize](#organize)
-  * [Cite](#cite)
-  * [Share](#share)
 - [Installation](#installation)
 - [Bug Reports, Suggestions, Other Feedback](#bug-reports-suggestions-other-feedback)
 - [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
-- [License](#license)
+- [Acknowledgements](#acknowledgements) / [License](#license)
 
 ## Features
 
