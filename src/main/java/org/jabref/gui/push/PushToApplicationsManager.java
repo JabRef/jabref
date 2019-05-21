@@ -25,7 +25,7 @@ public class PushToApplicationsManager {
         return applications;
     }
 
-    public static PushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService) {
+    public PushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService) {
         if (application instanceof PushToEmacs) {
             return new PushToEmacsSettings(dialogService);
         } else if (application instanceof PushToLyx) {

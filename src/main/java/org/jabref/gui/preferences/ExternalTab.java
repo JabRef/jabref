@@ -28,6 +28,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 class ExternalTab implements PrefsTab {
 
+    private final JabRefFrame frame;
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
     private final TextField citeCommand;
@@ -54,6 +55,7 @@ class ExternalTab implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
+        this.frame = frame;
         dialogService = frame.getDialogService();
         builder.setVgap(7);
 
@@ -197,7 +199,7 @@ class ExternalTab implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = PushToApplicationsManager.getSettings(application, dialogService);
+        PushToApplicationSettings settings = frame.getPushApplications().getSettings(application, dialogService);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
