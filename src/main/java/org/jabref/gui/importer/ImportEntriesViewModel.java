@@ -88,24 +88,24 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
                     if (!continueImport) {
                         dialogService.notify(Localization.lang("Import canceled"));
+                    } else {
+                        ImportHandler importHandler = new ImportHandler(
+                                dialogService,
+                                database,
+                                ExternalFileTypes.getInstance(),
+                                preferences.getFilePreferences(),
+                                preferences.getImportFormatPreferences(),
+                                preferences.getUpdateFieldPreferences(),
+                                fileUpdateMonitor,
+                                undoManager,
+                                stateManager);
+                        importHandler.importEntries(entriesToImport);
+                        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
                     }
                 }
             }).executeWith(Globals.TASK_EXECUTOR);
         }
 
-        ImportHandler importHandler = new ImportHandler(
-                dialogService,
-                database,
-                ExternalFileTypes.getInstance(),
-                preferences.getFilePreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getUpdateFieldPreferences(),
-                fileUpdateMonitor,
-                undoManager,
-                stateManager);
-        importHandler.importEntries(entriesToImport);
-
-        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
 
     /**
