@@ -19,7 +19,6 @@ import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
 import org.jabref.gui.push.PushToApplicationSettingsDialog;
-import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -199,7 +198,7 @@ class ExternalTab implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = frame.getPushApplications().getSettings(application, dialogService);
+        PushToApplicationSettings settings = frame.getPushApplications().getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));

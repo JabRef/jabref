@@ -10,7 +10,10 @@ public class PushToApplicationsManager {
 
     private final List<PushToApplication> applications;
 
+    private final DialogService dialogService;
+
     public PushToApplicationsManager(DialogService dialogService) {
+        this.dialogService = dialogService;
         // Set up the current available choices:
         applications = new ArrayList<>();
         applications.add(new PushToEmacs(dialogService));
@@ -25,7 +28,7 @@ public class PushToApplicationsManager {
         return applications;
     }
 
-    public PushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService) {
+    public PushToApplicationSettings getSettings(PushToApplication application) {
         if (application instanceof PushToEmacs) {
             return new PushToEmacsSettings(dialogService);
         } else if (application instanceof PushToLyx) {
