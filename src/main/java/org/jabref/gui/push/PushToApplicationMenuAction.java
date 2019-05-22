@@ -65,14 +65,10 @@ public class PushToApplicationMenuAction extends SimpleCommand {
 
         if(menuItem != null) {
             factory.configureMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction, menuItem);
-
-            //manager.getMenuItem().textProperty().unbind();
-            //manager.getMenuItem().setText(pushToApplicationAction.getActionInformation().getText());
         }
 
         if(toolBarButton != null) {
             factory.configureIconButton(pushToApplicationAction.getActionInformation(),pushToApplicationAction, toolBarButton);
-            //pushToApplicationAction.getActionInformation().getIcon().ifPresent(icon -> toolBarButton.setGraphic(icon.getGraphicNode()));
         }
     }
 }
