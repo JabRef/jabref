@@ -9,7 +9,6 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -42,7 +41,7 @@ public class PushToApplicationMenuAction extends SimpleCommand {
 
             @Override
             public String getText() {
-                return Localization.lang(application.getApplicationName());
+                return application.getApplicationName();
             }
 
             @Override
