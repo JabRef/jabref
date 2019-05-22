@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationsManager {
@@ -12,7 +13,9 @@ public class PushToApplicationsManager {
 
     private final DialogService dialogService;
 
-    public PushToApplicationsManager(DialogService dialogService) {
+    private final PushToApplicationAction pushToApplicationAction;
+
+    public PushToApplicationsManager(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         // Set up the current available choices:
         applications = new ArrayList<>();
@@ -22,10 +25,16 @@ public class PushToApplicationsManager {
         applications.add(new PushToTeXstudio(dialogService));
         applications.add(new PushToVim(dialogService));
         applications.add(new PushToWinEdt(dialogService));
+
+        this.pushToApplicationAction = new PushToApplicationAction(stateManager, this, dialogService);
     }
 
     public List<PushToApplication> getApplications() {
         return applications;
+    }
+
+    public PushToApplicationAction getPushToApplicationAction() {
+        return pushToApplicationAction;
     }
 
     public PushToApplicationSettings getSettings(PushToApplication application) {
