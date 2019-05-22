@@ -767,7 +767,7 @@ public class JabRefFrame extends BorderPane {
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
 
-        final Menu pushApplicationsMenu = factory.createSubMenu(StandardActions.PUSH_APPLICATION);
+        final Menu pushApplicationsMenu = factory.createSubMenu(StandardActions.SELECT_PUSH_APPLICATION);
         final ToggleGroup pushToToggleGroup = new ToggleGroup();
         RadioMenuItem pushToApplication;
         PushToApplicationMenuAction pushToApplicationMenuAction;
