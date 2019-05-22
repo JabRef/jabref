@@ -25,22 +25,34 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
  */
 public class PushToApplicationAction extends SimpleCommand {
 
-    private final PushToApplication operation;
+    private PushToApplication operation;
     private final StateManager stateManager;
     private final DialogService dialogService;
 
+    private Action action;
+
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.operation = pushToApplicationsManager.getLastUsedApplication(Globals.prefs);
+        this.operation = pushToApplicationsManager.getActiveApplication(Globals.prefs);
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
+
+        updateAction();
+    }
+
+    public void updateApplication (PushToApplication application) {
+        this.operation = application;
+        updateAction();
     }
 
     public Action getActionInformation() {
-        return new Action() {
+        return action;
+    }
 
+    public void updateAction() {
+        action = new Action() {
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.of(operation.getIcon());
