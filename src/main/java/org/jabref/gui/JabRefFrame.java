@@ -765,21 +765,23 @@ public class JabRefFrame extends BorderPane {
         );
 
         final PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(stateManager, this.getPushApplications(), this.getDialogService());
-        MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
 
         final Menu pushApplicationsMenu = factory.createSubMenu(StandardActions.PUSH_APPLICATION);
         final ToggleGroup pushToToggleGroup = new ToggleGroup();
-        RadioMenuItem pushApplication;
+        RadioMenuItem pushToApplication;
         PushToApplicationMenuAction pushToApplicationMenuAction;
+        final String activePushToApplication = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
 
         for (PushToApplication application : JabRefFrame.this.getPushApplications().getApplications()) {
             pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationAction, pushToApplicationMenuItem);
-            pushApplication = factory.createRadioMenuItem(pushToApplicationMenuAction.getActionInformation(),
-                                                                        pushToApplicationMenuAction,
-                                                                        application.getApplicationName().equals(
-                                                                                Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION)));
-            pushApplicationsMenu.getItems().add(pushApplication);
-            pushApplication.setToggleGroup(pushToToggleGroup);
+            pushToApplication = factory.createRadioMenuItem(
+                    pushToApplicationMenuAction.getActionInformation(),
+                    pushToApplicationMenuAction,
+                    application.getApplicationName().equals(activePushToApplication));
+
+            pushApplicationsMenu.getItems().add(pushToApplication);
+            pushToApplication.setToggleGroup(pushToToggleGroup);
         }
 
         tools.getItems().addAll(
