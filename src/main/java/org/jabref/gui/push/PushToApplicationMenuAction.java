@@ -2,10 +2,12 @@ package org.jabref.gui.push;
 
 import java.util.Optional;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.Globals;
 import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -18,12 +20,13 @@ public class PushToApplicationMenuAction extends SimpleCommand {
 
     private final PushToApplication application;
     private final PushToApplicationAction pushToApplicationAction;
-    private MenuItem pushToApplicationMenuItem;
 
-    public PushToApplicationMenuAction(PushToApplication pushToApplication, PushToApplicationAction pushToApplicationAction, MenuItem pushToApplicationMenuItem) {
+    private PushToApplicationsManager manager;
+
+    public PushToApplicationMenuAction(PushToApplication pushToApplication, PushToApplicationAction pushToApplicationAction, PushToApplicationsManager manager) {
         this.application = pushToApplication;
         this.pushToApplicationAction = pushToApplicationAction;
-        this.pushToApplicationMenuItem = pushToApplicationMenuItem;
+        this.manager = manager;
     }
 
     public Action getActionInformation() {
@@ -55,6 +58,21 @@ public class PushToApplicationMenuAction extends SimpleCommand {
     public void execute() {
         Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, application.getApplicationName());
         pushToApplicationAction.updateApplication(application);
-        //pushToApplicationMenuItem.setText(pushToApplicationAction.getActionInformation().getText());
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        MenuItem menuItem = manager.getMenuItem();
+        Button toolBarButton = manager.getToolBarButton();
+
+        if(menuItem != null) {
+            factory.configureMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction, menuItem);
+
+            //manager.getMenuItem().textProperty().unbind();
+            //manager.getMenuItem().setText(pushToApplicationAction.getActionInformation().getText());
+        }
+
+        if(toolBarButton != null) {
+            factory.configureIconButton(pushToApplicationAction.getActionInformation(),pushToApplicationAction, toolBarButton);
+            //pushToApplicationAction.getActionInformation().getIcon().ifPresent(icon -> toolBarButton.setGraphic(icon.getGraphicNode()));
+        }
     }
 }
