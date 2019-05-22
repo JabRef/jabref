@@ -40,7 +40,7 @@ public class PushToApplicationsManager {
         }
     }
 
-    public PushToApplication getLastUsedApplication(JabRefPreferences preferences) {
+    public PushToApplication getActiveApplication(JabRefPreferences preferences) {
         String appSelected = preferences.get(JabRefPreferences.PUSH_TO_APPLICATION);
         return applications.stream()
                            .filter(application -> application.getApplicationName().equals(appSelected))
