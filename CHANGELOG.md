@@ -67,6 +67,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option in the preference dialog box that allows user to enable helpful tooltips.[#3599](https://github.com/JabRef/jabref/issues/3599)
 - We moved the dropdown menu for selecting the push-application from the toolbar into the tools menu.[#674](https://github.com/JabRef/jabref/issues/674)
 
+
 ### Fixed
 - We fixed an issue where JabRef died silently for the user without enough inotify instances [#4874](https://github.com/JabRef/jabref/issues/4847)
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
