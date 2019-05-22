@@ -3,6 +3,9 @@ package org.jabref.gui.push;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.preferences.JabRefPreferences;
@@ -14,6 +17,8 @@ public class PushToApplicationsManager {
     private final DialogService dialogService;
 
     private final PushToApplicationAction pushToApplicationAction;
+    private MenuItem menuItem;
+    private Button toolBarButton;
 
     public PushToApplicationsManager(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -27,6 +32,22 @@ public class PushToApplicationsManager {
         applications.add(new PushToWinEdt(dialogService));
 
         this.pushToApplicationAction = new PushToApplicationAction(stateManager, this, dialogService);
+    }
+
+    public void setMenuItem(MenuItem menuItem) {
+        this.menuItem = menuItem;
+    }
+
+    public MenuItem getMenuItem() {
+        return menuItem;
+    }
+
+    public void setToolBarButton(Button pushToApplicationToolBarButton) {
+        this.toolBarButton = pushToApplicationToolBarButton;
+    }
+
+    public Button getToolBarButton() {
+        return toolBarButton;
     }
 
     public List<PushToApplication> getApplications() {
