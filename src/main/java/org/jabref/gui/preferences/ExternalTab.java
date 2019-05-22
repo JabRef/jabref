@@ -149,7 +149,7 @@ class ExternalTab implements PrefsTab {
 
         GridPane butpan = new GridPane();
         int index = 0;
-        for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()) {
+        for (PushToApplication pushToApplication : frame.getPushToApplicationsManager().getApplications()) {
             addSettingsButton(pushToApplication, butpan, index);
             index++;
         }
@@ -198,7 +198,7 @@ class ExternalTab implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = frame.getPushApplications().getSettings(application);
+        PushToApplicationSettings settings = frame.getPushToApplicationsManager().getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
