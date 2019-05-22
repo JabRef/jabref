@@ -526,6 +526,9 @@ public class JabRefFrame extends BorderPane {
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
+
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
@@ -536,7 +539,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
-                factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction),
+                pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
@@ -766,6 +769,7 @@ public class JabRefFrame extends BorderPane {
 
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        pushToApplicationsManager.setMenuItem(pushToApplicationMenuItem);
 
         final Menu pushApplicationsMenu = factory.createSubMenu(StandardActions.SELECT_PUSH_APPLICATION);
         final ToggleGroup pushToToggleGroup = new ToggleGroup();
@@ -774,7 +778,7 @@ public class JabRefFrame extends BorderPane {
         final String activePushToApplication = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
 
         for (PushToApplication application : pushToApplicationsManager.getApplications()) {
-            pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationAction, pushToApplicationMenuItem);
+            pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationAction, pushToApplicationsManager);
             pushToApplication = factory.createRadioMenuItem(
                     pushToApplicationMenuAction.getActionInformation(),
                     pushToApplicationMenuAction,
