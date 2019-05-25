@@ -159,14 +159,15 @@ public class GlobalSearchBar extends HBox {
         this.setAlignment(Pos.CENTER_LEFT);
 
         //TODO Needs fixing, not yet working correctly
-        EasyBind.subscribe(Globals.stateManager.searchResultSizeProperty(), matchedResults -> {
-
-            Globals.stateManager.activeSearchQueryProperty().getValue().ifPresent(searchQuery -> {
-                updateResults(matchedResults.intValue(), SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
-                              searchQuery.isGrammarBasedSearch());
+        EasyBind.subscribe(Globals.stateManager.activeSearchQueryProperty(), searchQuery -> {
+            searchQuery.ifPresent(query -> {
+                
+                updateResults(Globals.stateManager.searchResultSizeProperty().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                              query.isGrammarBasedSearch());
             });
 
         });
+
     }
 
     private void toggleSearchModeAndSearch() {
@@ -271,6 +272,8 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
+        System.out.println("matched" + matched);
+
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);

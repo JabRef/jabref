@@ -35,6 +35,7 @@ public class MainTableDataModel {
         Globals.stateManager.searchResultSizeProperty().bind(Bindings.size(entriesFiltered));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
+    
     }
 
     private boolean isMatched(BibEntryTableViewModel entry) {
