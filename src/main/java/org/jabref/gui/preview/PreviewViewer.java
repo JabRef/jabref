@@ -37,8 +37,6 @@ import org.w3c.dom.NodeList;
  */
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
-
     private static final String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
                                                         "        function highlight(text) {\r\n" +
                                                         "            var innertxt = document.body.innerText;\r\n" +
@@ -47,6 +45,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                                         "        }\r\n" +
                                                         "    </script>";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
+    
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
 

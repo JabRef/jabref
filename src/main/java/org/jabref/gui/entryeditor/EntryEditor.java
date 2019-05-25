@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +27,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
@@ -111,9 +108,9 @@ public class EntryEditor extends BorderPane {
 
         if (GUIGlobals.currentFont != null) {
             setStyle(
-                    "text-area-background: " + ColorUtil.toHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + ColorUtil.toHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + ColorUtil.toHex(GUIGlobals.activeBackgroundColor) + ";");
+                     "text-area-background: " + ColorUtil.toHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                     + "text-area-foreground: " + ColorUtil.toHex(GUIGlobals.editorTextColor) + ";"
+                     + "text-area-highlight: " + ColorUtil.toHex(GUIGlobals.activeBackgroundColor) + ";");
         }
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
@@ -142,58 +139,46 @@ public class EntryEditor extends BorderPane {
 
                 FileDragDropPreferenceType dragDropPreferencesType = Globals.prefs.getEntryEditorFileLinkPreference();
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE)
-                {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
                     if (event.getTransferMode() == TransferMode.LINK) //alt on win
                     {
                         LOGGER.debug("Mode LINK");
                         fileLinker.addFilesToEntry(entry, files);
-                    }
-                    else if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
+                    } else if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
                     {
                         LOGGER.debug("Mode COPY");
                         fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    }
-                    else
-                    {
+                    } else {
                         LOGGER.debug("Mode MOVE"); //shift on win or no modifier
                         fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                     }
                 }
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY)
-                {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
                     if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
                     {
                         LOGGER.debug("Mode MOVE");
                         fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    }
-                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    } else if (event.getTransferMode() == TransferMode.LINK) //alt on win
                     {
                         LOGGER.debug("Mode LINK");
                         fileLinker.addFilesToEntry(entry, files);
-                    }
-                    else
-                    {
+                    } else {
                         LOGGER.debug("Mode COPY"); //shift on win or no modifier
                         fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                     }
                 }
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK)
-                {
+                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
                     if (event.getTransferMode() == TransferMode.COPY) //ctrl on win, no modifier on Xubuntu
                     {
                         LOGGER.debug("Mode COPY");
                         fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    }
-                    else if (event.getTransferMode() == TransferMode.LINK) //alt on win
+                    } else if (event.getTransferMode() == TransferMode.LINK) //alt on win
                     {
                         LOGGER.debug("Mode MOVE");
                         fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    }
-                    else
-                    {
+                    } else {
                         LOGGER.debug("Mode LINK"); //shift on win or no modifier
                         fileLinker.addFilesToEntry(entry, files);
                     }
