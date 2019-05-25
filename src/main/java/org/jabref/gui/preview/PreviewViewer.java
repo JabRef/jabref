@@ -37,6 +37,8 @@ import org.w3c.dom.NodeList;
  */
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
+
     private static final String JS_HIGHLIGHT_FUNCTION = " <script type=\"text/javascript\">\r\n" +
                                                         "        function highlight(text) {\r\n" +
                                                         "            var innertxt = document.body.innerText;\r\n" +
@@ -45,8 +47,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                                         "        }\r\n" +
                                                         "    </script>";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
-    
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
 
@@ -58,10 +58,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      * The entry currently shown
      */
     private Optional<BibEntry> entry = Optional.empty();
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+
     private BibDatabaseContext database;
     private boolean registered;
 
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        highlightSearchPattern();
+    };
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
@@ -90,11 +95,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
 
     }
-
-    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
-        highlightSearchPattern();
-    };
 
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
