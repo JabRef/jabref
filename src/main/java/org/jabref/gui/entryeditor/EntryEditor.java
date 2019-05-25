@@ -86,7 +86,6 @@ public class EntryEditor extends BorderPane {
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
     @FXML private Label typeLabel;
-    @FXML private Button generateCiteKeyButton;
 
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
@@ -263,6 +262,12 @@ public class EntryEditor extends BorderPane {
     }
 
     @FXML
+    void generateCiteKeyButton() {
+        GenerateBibtexKeySingleAction action = new GenerateBibtexKeySingleAction(getEntry(), databaseContext, dialogService, preferences, undoManager);
+        action.execute();
+    }
+
+    @FXML
     private void navigateToPreviousEntry() {
         panel.selectPreviousEntry();
     }
@@ -388,13 +393,6 @@ public class EntryEditor extends BorderPane {
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
         fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
-
-        // Configure cite key button
-        new ActionFactory(preferences.getKeyBindings())
-                .configureIconButton(
-                        StandardActions.GENERATE_CITE_KEY,
-                        new GenerateBibtexKeySingleAction(getEntry(), databaseContext, dialogService, preferences, undoManager),
-                        generateCiteKeyButton);
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
