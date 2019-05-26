@@ -40,6 +40,7 @@ class GeneralTab extends Pane implements PrefsTab {
     private final CheckBox confirmDelete;
     private final CheckBox memoryStick;
     private final CheckBox inspectionWarnDupli;
+    private final CheckBox showAdvancedHints;
     private final CheckBox useTimeStamp;
     private final CheckBox updateTimeStamp;
     private final CheckBox overwriteTimeStamp;
@@ -77,6 +78,7 @@ class GeneralTab extends Pane implements PrefsTab {
         timeStampFormat = new TextField();
         timeStampField = new TextField();
         inspectionWarnDupli = new CheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
+        showAdvancedHints = new CheckBox(Localization.lang("Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"));
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
 
@@ -135,6 +137,8 @@ class GeneralTab extends Pane implements PrefsTab {
         Label defaultBibliographyMode = new Label(Localization.lang("Default bibliography mode"));
         biblioBox.getChildren().addAll(defaultBibliographyMode, biblatexMode);
         builder.add(biblioBox, 1, 29);
+
+        builder.add(showAdvancedHints,1,30);
     }
 
     @Override
@@ -164,6 +168,7 @@ class GeneralTab extends Pane implements PrefsTab {
         }
         encodings.setValue(prefs.getDefaultEncoding());
         languageSelection.setValue(prefs.getLanguage());
+        showAdvancedHints.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
     }
 
     @Override
@@ -181,6 +186,7 @@ class GeneralTab extends Pane implements PrefsTab {
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS, showAdvancedHints.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
