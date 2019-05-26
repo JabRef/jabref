@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -38,39 +40,31 @@ class IEEETest {
     void findByDOI() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
 
-        assertEquals(
-                Optional.of(
-                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
-                fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+                     fetcher.findFullText(entry));
     }
 
     @Test
     void findByDocumentUrl() throws IOException {
         entry.setField("url", "https://ieeexplore.ieee.org/document/7421926/");
-        assertEquals(
-                Optional.of(
-                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
-                fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+                     fetcher.findFullText(entry));
     }
 
     @Test
     void findByURL() throws IOException {
         entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926&ref=");
 
-        assertEquals(
-                Optional.of(
-                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
-                fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+                     fetcher.findFullText(entry));
     }
 
     @Test
     void findByOldURL() throws IOException {
         entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
 
-        assertEquals(
-                Optional.of(
-                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
-                fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+                     fetcher.findFullText(entry));
     }
 
     @Test
@@ -78,10 +72,8 @@ class IEEETest {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
         entry.setField("url", "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
 
-        assertEquals(
-                Optional.of(
-                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
-                fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
+                     fetcher.findFullText(entry));
     }
 
     @Test
@@ -100,6 +92,28 @@ class IEEETest {
     }
 
     @Test
+    void searchResultHasNoKeywordTerms() throws FetcherException {
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
+
+        expected.setField("author", "Shatakshi Jha and Ikhlaq Hussain and Bhim Singh and Sukumar Mishra");
+        expected.setField("date", "25 2 2019");
+        expected.setField("doi", "10.1049/iet-rpg.2018.5648");
+        expected.setField("file", ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8636659:PDF");
+        expected.setField("issn", "1752-1416");
+        expected.setField("issue", "3");
+        expected.setField("journaltitle", "IET Renewable Power Generation");
+        expected.setField("pages", "418--426");
+        expected.setField("publisher", "IET");
+        expected.setField("title", "Optimal operation of PV-DG-battery based microgrid with power quality conditioner");
+        expected.setField("volume", "13");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch("8636659"); //article number
+        fetchedEntries.stream().forEach(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright);
+        assertEquals(Collections.singletonList(expected), fetchedEntries);
+
+    }
+
+    @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry expected = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
         expected.setField("author", "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa");
@@ -109,7 +123,7 @@ class IEEETest {
         expected.setField("location", "Austin, TX");
         expected.setField("doi", "10.1145/2884781.2884806");
         expected.setField("isbn", "978-1-4503-3900-1");
-        expected.setField("issn","1558-1225");
+        expected.setField("issn", "1558-1225");
         expected.setField("journaltitle", "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)");
         expected.setField("pages", "273--284");
         expected.setField("publisher", "IEEE");

@@ -26,19 +26,15 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebSearchPaneViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebSearchPaneViewModel.class);
 
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final JabRefFrame frame;
-    private final  DialogService dialogService;
-    
+    private final DialogService dialogService;
+
     public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService) {
         // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
         this.frame = frame;
@@ -92,7 +88,7 @@ public class WebSearchPaneViewModel {
         }
 
         if (frame.getCurrentBasePanel() == null) {
-           dialogService.notify(Localization.lang("Please open or start a new library before searching"));
+            dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
 
@@ -100,8 +96,8 @@ public class WebSearchPaneViewModel {
 
         BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
                                                             .withInitialMessage(Localization.lang("Processing %0", getQuery()));
-        
-        task.onFailure(ex->dialogService.showErrorDialogAndWait(ex));
+
+        task.onFailure(ex -> dialogService.showErrorDialogAndWait(ex));
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
         dialog.setTitle(activeFetcher.getName());
