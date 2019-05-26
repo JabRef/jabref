@@ -4,12 +4,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToVimSettings extends PushToApplicationSettings {
 
     private final TextField vimServer = new TextField();
+
+    public PushToVimSettings (DialogService dialogService) { super(dialogService); }
 
     @Override
     public void storeSettings() {

@@ -1,9 +1,10 @@
 .about-heading {
     -fx-font-size: 30;
+    -fx-text-fill: -jr-theme;
 }
 
 .about-heading:pressed {
-	-fx-text-fill: -fx-focus-color;
+    -fx-text-fill: -jr-selected;
 }
 
 .top-padding {
@@ -33,7 +34,7 @@
 }
 
 .info-sections {
-	-fx-padding: 5px;
+    -fx-padding: 5px;
 }
 
 .logo-pane {

@@ -246,6 +246,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
+        frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));
     }
 
