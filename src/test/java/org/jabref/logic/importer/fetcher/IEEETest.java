@@ -120,6 +120,4 @@ class IEEETest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
-
-
 }
