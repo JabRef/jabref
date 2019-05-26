@@ -1,5 +1,7 @@
 package org.jabref.gui.filelist;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.jabref.Globals;
@@ -32,14 +34,21 @@ public class AttachFileAction extends SimpleCommand {
             dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
             return;
         }
+
         BibEntry entry = panel.getSelectedEntries().get(0);
+
+        Path workingDirectory = panel.getBibDatabaseContext()
+                                     .getFirstExistingFileDir(Globals.prefs.getFilePreferences())
+                                     .orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
+
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                               .build();
+                .withInitialDirectory(workingDirectory)
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
-
-            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()), ExternalFileTypes.getInstance());
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile,
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()),
+                    ExternalFileTypes.getInstance());
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
