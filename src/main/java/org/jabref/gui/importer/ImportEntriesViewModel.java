@@ -77,8 +77,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
-                    .anyMatch(this::hasDuplicate)).onSuccess(e -> {
-                if (e) {
+                    .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
+                if (duplicateFound) {
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                             Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                             Localization.lang("Continue with import"),
