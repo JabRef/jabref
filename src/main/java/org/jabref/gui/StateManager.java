@@ -9,7 +9,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -25,9 +24,8 @@ import org.jabref.model.util.OptionalUtil;
  * This class manages the GUI-state of JabRef, including:
  * - currently selected database
  * - currently selected group
- * Coming soon:
- * - open databases
  * - active search
+ * - active number of search results
  */
 public class StateManager {
 
@@ -36,7 +34,7 @@ public class StateManager {
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
-    private final IntegerProperty searchResultSize = new SimpleIntegerProperty();
+    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -48,6 +46,14 @@ public class StateManager {
 
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
+    }
+
+    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
+        searchResultMap.put(database, resultSize);
+    }
+
+    public IntegerProperty getSearchResultSize() {
+        return searchResultMap.get(activeDatabase.getValue().orElse(new BibDatabaseContext()));
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -91,9 +97,5 @@ public class StateManager {
 
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
-    }
-
-    public IntegerProperty searchResultSizeProperty() {
-        return searchResultSize;
     }
 }
