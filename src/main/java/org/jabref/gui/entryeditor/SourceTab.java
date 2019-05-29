@@ -158,6 +158,7 @@ public class SourceTab extends EntryEditorTab {
                 factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL))
         );
 
+        contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
 
         return codeArea;
