@@ -19,7 +19,6 @@ import javafx.scene.input.InputMethodRequests;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
@@ -67,9 +66,9 @@ public class SourceTab extends EntryEditorTab {
 
     private class EditAction extends SimpleCommand {
 
-        private final Actions command;
+        private final StandardActions command;
 
-        public EditAction(Actions command) { this.command = command; }
+        public EditAction(StandardActions command) { this.command = command; }
 
         @Override
         public void execute() {
@@ -150,10 +149,10 @@ public class SourceTab extends EntryEditorTab {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
-                factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(Actions.PASTE)),
-                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(Actions.SELECT_ALL))
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL))
         );
 
         codeArea.setContextMenu(contextMenu);
