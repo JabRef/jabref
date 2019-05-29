@@ -65,7 +65,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The Medline fetcher now normalizes the author names according to the BibTeX-Standard [#4345](https://github.com/JabRef/jabref/issues/4345)
 - We added an option on the Linked File Viewer to rename the attached file of an entry directly on the JabRef. [#4844](https://github.com/JabRef/jabref/issues/4844)
 - We added an option in the preference dialog box that allows user to enable helpful tooltips.[#3599](https://github.com/JabRef/jabref/issues/3599)
-
+- We added a context menu to the bib(la)tex-source-editor to copy'n'paste.[#5007](https://github.com/JabRef/jabref/pull/5007)
 
 ### Fixed
 - We fixed an issue where JabRef died silently for the user without enough inotify instances [#4874](https://github.com/JabRef/jabref/issues/4847)
