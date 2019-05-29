@@ -12,10 +12,16 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -57,6 +63,32 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
+    private final CodeArea codeArea = new CodeArea();
+
+    private class EditAction extends SimpleCommand {
+
+        private final Actions command;
+
+        public EditAction(Actions command) { this.command = command; }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case COPY:
+                    codeArea.copy();
+                    break;
+                case CUT:
+                    codeArea.cut();
+                    break;
+                case PASTE:
+                    codeArea.paste();
+                    break;
+                case SELECT_ALL:
+                    codeArea.selectAll();
+                    break;
+            }
+        }
+    }
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.mode = bibDatabaseContext.getMode();
@@ -106,7 +138,6 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private CodeArea createSourceEditor() {
-        CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
@@ -115,6 +146,18 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.insertText(codeArea.getCaretPosition(), committed);
             }
         });
+
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(Actions.PASTE)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(Actions.SELECT_ALL))
+        );
+
+        codeArea.setContextMenu(contextMenu);
+
         return codeArea;
     }
 
