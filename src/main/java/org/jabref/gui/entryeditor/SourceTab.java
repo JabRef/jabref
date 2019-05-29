@@ -62,7 +62,7 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
-    private final CodeArea codeArea = new CodeArea();
+    private CodeArea codeArea;
 
     private class EditAction extends SimpleCommand {
 
@@ -72,19 +72,21 @@ public class SourceTab extends EntryEditorTab {
 
         @Override
         public void execute() {
-            switch (command) {
-                case COPY:
-                    codeArea.copy();
-                    break;
-                case CUT:
-                    codeArea.cut();
-                    break;
-                case PASTE:
-                    codeArea.paste();
-                    break;
-                case SELECT_ALL:
-                    codeArea.selectAll();
-                    break;
+            if (codeArea != null) {
+                switch (command) {
+                    case COPY:
+                        codeArea.copy();
+                        break;
+                    case CUT:
+                        codeArea.cut();
+                        break;
+                    case PASTE:
+                        codeArea.paste();
+                        break;
+                    case SELECT_ALL:
+                        codeArea.selectAll();
+                        break;
+                }
             }
         }
     }
@@ -137,6 +139,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private CodeArea createSourceEditor() {
+        codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
