@@ -163,7 +163,7 @@ dependencies {
 
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
-    testCompile 'org.mockito:mockito-core:2.27.0'
+    testCompile 'org.mockito:mockito-core:2.28.1'
     testCompile 'com.github.tomakehurst:wiremock:2.23.2'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
