@@ -79,16 +79,15 @@ public class SourceTab extends EntryEditorTab {
                         break;
                     case CUT:
                         codeArea.cut();
-                        codeArea.requestFocus();
                         break;
                     case PASTE:
                         codeArea.paste();
-                        codeArea.requestFocus();
                         break;
                     case SELECT_ALL:
                         codeArea.selectAll();
                         break;
                 }
+                codeArea.requestFocus();
             }
         }
     }
@@ -103,7 +102,6 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
-
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
