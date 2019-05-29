@@ -79,9 +79,11 @@ public class SourceTab extends EntryEditorTab {
                         break;
                     case CUT:
                         codeArea.cut();
+                        codeArea.requestFocus();
                         break;
                     case PASTE:
                         codeArea.paste();
+                        codeArea.requestFocus();
                         break;
                     case SELECT_ALL:
                         codeArea.selectAll();
