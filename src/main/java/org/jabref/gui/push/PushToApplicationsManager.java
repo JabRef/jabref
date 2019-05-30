@@ -16,7 +16,7 @@ public class PushToApplicationsManager {
 
     private final DialogService dialogService;
 
-    private final PushToApplicationAction pushToApplicationAction;
+    private final PushToApplicationAction action;
     private MenuItem menuItem;
     private Button toolBarButton;
 
@@ -31,7 +31,15 @@ public class PushToApplicationsManager {
         applications.add(new PushToVim(dialogService));
         applications.add(new PushToWinEdt(dialogService));
 
-        this.pushToApplicationAction = new PushToApplicationAction(stateManager, this, dialogService);
+        this.action = new PushToApplicationAction(stateManager, this, dialogService);
+    }
+
+    public List<PushToApplication> getApplications() {
+        return applications;
+    }
+
+    public PushToApplicationAction getPushToApplicationAction() {
+        return action;
     }
 
     public void setMenuItem(MenuItem menuItem) {
@@ -42,20 +50,10 @@ public class PushToApplicationsManager {
         return menuItem;
     }
 
-    public void setToolBarButton(Button pushToApplicationToolBarButton) {
-        this.toolBarButton = pushToApplicationToolBarButton;
-    }
+    public void setToolBarButton(Button toolBarButton) { this.toolBarButton = toolBarButton; }
 
     public Button getToolBarButton() {
         return toolBarButton;
-    }
-
-    public List<PushToApplication> getApplications() {
-        return applications;
-    }
-
-    public PushToApplicationAction getPushToApplicationAction() {
-        return pushToApplicationAction;
     }
 
     public PushToApplicationSettings getSettings(PushToApplication application) {

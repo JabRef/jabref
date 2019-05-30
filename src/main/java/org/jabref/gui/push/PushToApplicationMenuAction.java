@@ -19,13 +19,10 @@ import org.jabref.preferences.JabRefPreferences;
 public class PushToApplicationMenuAction extends SimpleCommand {
 
     private final PushToApplication application;
-    private final PushToApplicationAction pushToApplicationAction;
+    private final PushToApplicationsManager manager;
 
-    private PushToApplicationsManager manager;
-
-    public PushToApplicationMenuAction(PushToApplication pushToApplication, PushToApplicationAction pushToApplicationAction, PushToApplicationsManager manager) {
+    public PushToApplicationMenuAction(PushToApplication pushToApplication, PushToApplicationsManager manager) {
         this.application = pushToApplication;
-        this.pushToApplicationAction = pushToApplicationAction;
         this.manager = manager;
     }
 
@@ -56,19 +53,26 @@ public class PushToApplicationMenuAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        final PushToApplicationAction pushToApplicationAction = manager.getPushToApplicationAction();
+        final MenuItem menuItem = manager.getMenuItem();
+        final Button toolBarButton = manager.getToolBarButton();
+
         Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, application.getApplicationName());
         pushToApplicationAction.updateApplication(application);
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
-        MenuItem menuItem = manager.getMenuItem();
-        Button toolBarButton = manager.getToolBarButton();
 
         if (menuItem != null) {
-            factory.configureMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction, menuItem);
+            factory.configureMenuItem(
+                    pushToApplicationAction.getActionInformation(),
+                    pushToApplicationAction,
+                    menuItem);
         }
 
         if (toolBarButton != null) {
-            factory.configureIconButton(pushToApplicationAction.getActionInformation(),pushToApplicationAction, toolBarButton);
+            factory.configureIconButton(
+                    pushToApplicationAction.getActionInformation(),
+                    pushToApplicationAction,
+                    toolBarButton);
         }
     }
 }
