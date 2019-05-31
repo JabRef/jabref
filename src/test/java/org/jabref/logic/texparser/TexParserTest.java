@@ -65,6 +65,10 @@ class TexParserTest {
             assertEquals(2, texResult.getFoundKeysInTex());
             assertEquals(0, texResult.getUnresolvedKeysCount());
             assertEquals(2, texResult.getResolvedKeysCount());
+            assertEquals(0, texResult.getNestedFilesCount());
+            assertEquals(0, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
             assertEquals(2, newDatabase.getEntries().size());
 
             // Check paths
@@ -112,9 +116,7 @@ class TexParserTest {
     void testTwoFiles() throws URISyntaxException, IOException {
         final String DARWIN = "Darwin1888";
         final String EINSTEIN = "Einstein1920";
-        final String EINSTEIN_A = "Einstein1920a";
-        final String EINSTEIN_B = "Einstein1920b";
-        final String EINSTEIN_C = "Einstein1920c";
+        final String NEWTON = "Newton1999";
 
         InputStream originalStream = TexParserTest.class.getResourceAsStream("origin.bib");
         Path texFile = Paths.get(TexParserTest.class.getResource("paper.tex").toURI());
@@ -131,20 +133,24 @@ class TexParserTest {
 
             // Check entries
             assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(2, texResult.getCitationsCountByKey(DARWIN));
-            assertEquals(2, texResult.getCitationsCountByKey(EINSTEIN));
-            assertEquals(5, texResult.getFoundKeysInTex());
+            assertEquals(3, texResult.getCitationsCountByKey(DARWIN));
+            assertEquals(3, texResult.getCitationsCountByKey(EINSTEIN));
+            assertEquals(3, texResult.getFoundKeysInTex());
             assertEquals(0, texResult.getUnresolvedKeysCount());
-            assertEquals(5, texResult.getResolvedKeysCount());
-            assertEquals(5, newDatabase.getEntries().size());
+            assertEquals(3, texResult.getResolvedKeysCount());
+            assertEquals(0, texResult.getNestedFilesCount());
+            assertEquals(0, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
+            assertEquals(3, newDatabase.getEntries().size());
 
             // Check paths
             assertEquals(texFile, texResult.getUniqueKeys().get(DARWIN).get(0).getPath());
             assertEquals(texFile, texResult.getUniqueKeys().get(EINSTEIN).get(0).getPath());
 
-            assertEquals(texFile2, texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getPath());
-            assertEquals(texFile2, texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getPath());
-            assertEquals(texFile2, texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getPath());
+            assertEquals(texFile2, texResult.getUniqueKeys().get(DARWIN).get(2).getPath());
+            assertEquals(texFile2, texResult.getUniqueKeys().get(EINSTEIN).get(2).getPath());
+            assertEquals(texFile2, texResult.getUniqueKeys().get(NEWTON).get(0).getPath());
 
             // Check lines
             assertEquals(4, texResult.getUniqueKeys().get(EINSTEIN).get(0).getLine());
@@ -152,9 +158,9 @@ class TexParserTest {
             assertEquals(6, texResult.getUniqueKeys().get(EINSTEIN).get(1).getLine());
             assertEquals(7, texResult.getUniqueKeys().get(DARWIN).get(1).getLine());
 
-            assertEquals(4, texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getLine());
-            assertEquals(5, texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getLine());
-            assertEquals(6, texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getLine());
+            assertEquals(4, texResult.getUniqueKeys().get(DARWIN).get(2).getLine());
+            assertEquals(5, texResult.getUniqueKeys().get(EINSTEIN).get(2).getLine());
+            assertEquals(6, texResult.getUniqueKeys().get(NEWTON).get(0).getLine());
 
             // Check columns
             assertEquals(0, texResult.getUniqueKeys().get(EINSTEIN).get(0).getColStart());
@@ -169,14 +175,14 @@ class TexParserTest {
             assertEquals(0, texResult.getUniqueKeys().get(DARWIN).get(1).getColStart());
             assertEquals(17, texResult.getUniqueKeys().get(DARWIN).get(1).getColEnd());
 
-            assertEquals(48, texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getColStart());
-            assertEquals(68, texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getColEnd());
+            assertEquals(48, texResult.getUniqueKeys().get(DARWIN).get(2).getColStart());
+            assertEquals(65, texResult.getUniqueKeys().get(DARWIN).get(2).getColEnd());
 
-            assertEquals(48, texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getColStart());
-            assertEquals(68, texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getColEnd());
+            assertEquals(48, texResult.getUniqueKeys().get(EINSTEIN).get(2).getColStart());
+            assertEquals(67, texResult.getUniqueKeys().get(EINSTEIN).get(2).getColEnd());
 
-            assertEquals(48, texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getColStart());
-            assertEquals(68, texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getColEnd());
+            assertEquals(48, texResult.getUniqueKeys().get(NEWTON).get(0).getColStart());
+            assertEquals(65, texResult.getUniqueKeys().get(NEWTON).get(0).getColEnd());
 
             // Check line texts
             assertEquals("\\cite{Einstein1920}", texResult.getUniqueKeys().get(EINSTEIN).get(0).getLineText());
@@ -186,12 +192,12 @@ class TexParserTest {
                     texResult.getUniqueKeys().get(EINSTEIN).get(1).getLineText());
             assertEquals("\\cite{Darwin1888}.", texResult.getUniqueKeys().get(DARWIN).get(1).getLineText());
 
-            assertEquals("This is some content trying to cite a bib file: \\cite{Einstein1920a}",
-                    texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getLineText());
-            assertEquals("This is some content trying to cite a bib file: \\cite{Einstein1920b}",
-                    texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getLineText());
-            assertEquals("This is some content trying to cite a bib file: \\cite{Einstein1920c}",
-                    texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getLineText());
+            assertEquals("This is some content trying to cite a bib file: \\cite{Darwin1888}",
+                    texResult.getUniqueKeys().get(DARWIN).get(2).getLineText());
+            assertEquals("This is some content trying to cite a bib file: \\cite{Einstein1920}",
+                    texResult.getUniqueKeys().get(EINSTEIN).get(2).getLineText());
+            assertEquals("This is some content trying to cite a bib file: \\cite{Newton1999}",
+                    texResult.getUniqueKeys().get(NEWTON).get(0).getLineText());
 
             // Check contexts
             assertEquals("\\cite{Einstein1920}", texResult.getUniqueKeys().get(EINSTEIN).get(0).getContext());
@@ -201,12 +207,12 @@ class TexParserTest {
                     texResult.getUniqueKeys().get(EINSTEIN).get(1).getContext());
             assertEquals("\\cite{Darwin1888}.", texResult.getUniqueKeys().get(DARWIN).get(1).getContext());
 
-            assertEquals("nt trying to cite a bib file: \\cite{Einstein1920a}",
-                    texResult.getUniqueKeys().get(EINSTEIN_A).get(0).getContext());
-            assertEquals("nt trying to cite a bib file: \\cite{Einstein1920b}",
-                    texResult.getUniqueKeys().get(EINSTEIN_B).get(0).getContext());
-            assertEquals("nt trying to cite a bib file: \\cite{Einstein1920c}",
-                    texResult.getUniqueKeys().get(EINSTEIN_C).get(0).getContext());
+            assertEquals("ntent trying to cite a bib file: \\cite{Darwin1888}",
+                    texResult.getUniqueKeys().get(DARWIN).get(2).getContext());
+            assertEquals("ent trying to cite a bib file: \\cite{Einstein1920}",
+                    texResult.getUniqueKeys().get(EINSTEIN).get(2).getContext());
+            assertEquals("ntent trying to cite a bib file: \\cite{Newton1999}",
+                    texResult.getUniqueKeys().get(NEWTON).get(0).getContext());
         }
     }
 
@@ -234,6 +240,10 @@ class TexParserTest {
             assertEquals(2, texResult.getFoundKeysInTex());
             assertEquals(0, texResult.getUnresolvedKeysCount());
             assertEquals(2, texResult.getResolvedKeysCount());
+            assertEquals(0, texResult.getNestedFilesCount());
+            assertEquals(0, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
             assertEquals(2, newDatabase.getEntries().size());
 
             // Check paths
@@ -293,6 +303,10 @@ class TexParserTest {
             assertEquals(3, texResult.getFoundKeysInTex());
             assertEquals(1, texResult.getUnresolvedKeysCount());
             assertEquals(2, texResult.getResolvedKeysCount());
+            assertEquals(0, texResult.getNestedFilesCount());
+            assertEquals(0, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
             assertEquals(2, newDatabase.getEntries().size());
         }
     }
@@ -307,6 +321,10 @@ class TexParserTest {
         assertEquals(0, texResult.getFoundKeysInTex());
         assertEquals(0, texResult.getUnresolvedKeysCount());
         assertEquals(0, texResult.getResolvedKeysCount());
+        assertEquals(0, texResult.getNestedFilesCount());
+        assertEquals(0, texResult.getCrossRefEntriesCount());
+        assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
         assertEquals(0, newDatabase.getEntries().size());
     }
 
@@ -324,6 +342,54 @@ class TexParserTest {
 
             assertEquals(Optional.of("\"Maintained by \" # maintainer"), newDatabase.getPreamble());
             assertEquals(1, newDatabase.getStringCount());
+        }
+    }
+
+    @Test
+    void testNestedFiles() throws URISyntaxException, IOException {
+        InputStream originalStream = TexParserTest.class.getResourceAsStream("origin.bib");
+        Path texFile = Paths.get(TexParserTest.class.getResource("nested.tex").toURI());
+        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
+            ParserResult result = new BibtexParser(importFormatPreferences,
+                    new DummyFileUpdateMonitor()).parse(originalReader);
+
+            TexParser texParser = new DefaultTexParser(result.getDatabase());
+            TexParserResult texResult = texParser.parse(texFile);
+            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
+
+            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
+            assertEquals(2, texResult.getFoundKeysInTex());
+            assertEquals(0, texResult.getUnresolvedKeysCount());
+            assertEquals(2, texResult.getResolvedKeysCount());
+            assertEquals(1, texResult.getNestedFilesCount());
+            assertEquals(0, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
+            assertEquals(2, newDatabase.getEntries().size());
+        }
+    }
+
+    @Test
+    void testCrossRef() throws URISyntaxException, IOException {
+        InputStream originalStream = TexParserTest.class.getResourceAsStream("origin.bib");
+        Path texFile = Paths.get(TexParserTest.class.getResource("crossref.tex").toURI());
+        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
+            ParserResult result = new BibtexParser(importFormatPreferences,
+                    new DummyFileUpdateMonitor()).parse(originalReader);
+
+            TexParser texParser = new DefaultTexParser(result.getDatabase());
+            TexParserResult texResult = texParser.parse(texFile);
+            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
+
+            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
+            assertEquals(4, texResult.getFoundKeysInTex());
+            assertEquals(2, texResult.getUnresolvedKeysCount());
+            assertEquals(3, texResult.getResolvedKeysCount());
+            assertEquals(0, texResult.getNestedFilesCount());
+            assertEquals(1, texResult.getCrossRefEntriesCount());
+            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(),
+                    texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
+            assertEquals(4, newDatabase.getEntries().size());
         }
     }
 }

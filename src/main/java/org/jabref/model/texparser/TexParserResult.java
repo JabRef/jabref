@@ -16,6 +16,8 @@ public class TexParserResult {
     private final List<String> unresolvedKeys = new ArrayList<>();
     private final BibDatabase texDatabase = new BibDatabase();
     private int insertedStrings = 0;
+    private int nestedFilesCount = 0;
+    private int crossRefEntriesCount = 0;
 
     public TexParserResult(BibDatabase masterDatabase) {
         this.masterDatabase = masterDatabase;
@@ -50,7 +52,7 @@ public class TexParserResult {
     }
 
     public int getResolvedKeysCount() {
-        return texDatabase.getEntryCount();
+        return texDatabase.getEntryCount() - crossRefEntriesCount;
     }
 
     public int getInsertedStrings() {
@@ -62,5 +64,21 @@ public class TexParserResult {
             texDatabase.addString(string);
             insertedStrings++;
         }
+    }
+
+    public int getNestedFilesCount() {
+        return nestedFilesCount;
+    }
+
+    public void increaseNestedFilesCounter() {
+        nestedFilesCount++;
+    }
+
+    public int getCrossRefEntriesCount() {
+        return crossRefEntriesCount;
+    }
+
+    public void increaseCrossRefEntriesCounter() {
+        crossRefEntriesCount++;
     }
 }

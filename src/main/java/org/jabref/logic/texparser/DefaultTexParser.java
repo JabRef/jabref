@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
@@ -33,6 +35,10 @@ public class DefaultTexParser implements TexParser {
     private static final String CITE_REGEX = String.format("\\\\(?:%s)\\{([^\\}]*)\\}",
             String.join("|", CITE_COMMANDS));
 
+    private static final String[] INCLUDE_COMMANDS = new String[] {"include", "includeonly", "input"};
+    private static final String INCLUDE_REGEX = String.format("\\\\(?:%s)\\{([^\\}]*)\\}",
+            String.join("|", INCLUDE_COMMANDS));
+
     private final BibDatabase masterDatabase;
 
     public DefaultTexParser(BibDatabase database) {
@@ -41,7 +47,7 @@ public class DefaultTexParser implements TexParser {
 
     @Override
     public TexParserResult parse(Path texFile) {
-        return parseTexFiles(Arrays.asList(texFile));
+        return parseTexFiles(new ArrayList<>(Collections.singletonList(texFile)));
     }
 
     @Override
@@ -64,6 +70,7 @@ public class DefaultTexParser implements TexParser {
                     }
 
                     matchCitation(result, file, lnr.getLineNumber(), line);
+                    matchNestedFile(result, file, texFiles, line);
                 }
             } catch (IOException e) {
                 LOGGER.warn("Error opening the TEX file", e);
@@ -85,6 +92,25 @@ public class DefaultTexParser implements TexParser {
 
             for (String key : keys) {
                 addKey(result, key.trim(), new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+            }
+        }
+    }
+
+    private void matchNestedFile(TexParserResult result, Path file, List<Path> fileList, String line) {
+        Matcher includeMatch = Pattern.compile(INCLUDE_REGEX).matcher(line);
+
+        while (includeMatch.find()) {
+            String[] includes = includeMatch.group(1).split(",");
+
+            for (String include : includes) {
+                Path inputFile = (file.getParent() != null)
+                        ? file.getParent().resolve(include)
+                        : Paths.get(include);
+
+                if (!fileList.contains(inputFile)) {
+                    fileList.add(inputFile);
+                    result.increaseNestedFilesCounter();
+                }
             }
         }
     }
@@ -116,6 +142,7 @@ public class DefaultTexParser implements TexParser {
 
                 if (entry.isPresent()) {
                     insertEntry(result, entry.get());
+                    resolveCrossReferences(result, entry.get());
                 } else {
                     result.getUnresolvedKeys().add(key);
                 }
@@ -127,6 +154,21 @@ public class DefaultTexParser implements TexParser {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
             result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));
         }
+    }
+
+    private void resolveCrossReferences(TexParserResult result, BibEntry entry) {
+        entry.getField(FieldName.CROSSREF).ifPresent(crossRef -> {
+            if (!result.getGeneratedBibDatabase().getEntryByKey(crossRef).isPresent()) {
+                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossRef);
+
+                if (refEntry.isPresent()) {
+                    insertEntry(result, refEntry.get());
+                    result.increaseCrossRefEntriesCounter();
+                } else {
+                    result.getUnresolvedKeys().add(crossRef);
+                }
+            }
+        });
     }
 
     /*
