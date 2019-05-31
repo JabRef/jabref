@@ -20,7 +20,7 @@ public class TestEntry {
         entry.setField(FieldName.TITLE, "Title of the test entry");
         entry.setField(FieldName.NUMBER, "3");
         entry.setField(FieldName.VOLUME, "34");
-        entry.setField(FieldName.ISSUE, "34:3");
+        entry.setField(FieldName.ISSUE, "3");
         entry.setField(FieldName.YEAR, "2016");
         entry.setField(FieldName.PAGES, "45--67");
         entry.setField(FieldName.MONTH, "July");
