@@ -26,6 +26,7 @@ public class TestEntry {
         entry.setField(FieldName.PUBLISHER, "JabRef Publishing");
         entry.setField(FieldName.ADDRESS, "Trondheim");
         entry.setField(FieldName.URL, "https://github.com/JabRef");
+        entry.setField(FieldName.DOI, "10.1001/bla.blubb");
         entry.setField(FieldName.ABSTRACT,
                 "This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.");
         return entry;
