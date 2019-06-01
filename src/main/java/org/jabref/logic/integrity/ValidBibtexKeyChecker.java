@@ -18,7 +18,16 @@ public class ValidBibtexKeyChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
+
+        // Fix #2: BibtexKeyGenerator.cleanKey() does not accept a null value
+        // for the "value" parameter. The 'if' statement below is added to check for
+        // both a null and zero length string and to add the empty key warning.
+        if ((value == null) || (value.length() == 0)) {
+            return Optional.of(Localization.lang("BibTeX key is empty"));
+        }
+
         String cleaned = BibtexKeyGenerator.cleanKey(value, enforceLegalKey);
+
         if (cleaned.equals(value)) {
             return Optional.empty();
         } else {
