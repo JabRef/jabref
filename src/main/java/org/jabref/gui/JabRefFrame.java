@@ -772,12 +772,10 @@ public class JabRefFrame extends BorderPane {
         final String activePushToApplicationName = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
 
         final ToggleGroup pushToToggleGroup = new ToggleGroup();
-        RadioMenuItem pushToApplication;
-        PushToApplicationMenuAction pushToApplicationMenuAction;
 
         for (PushToApplication application : pushToApplicationsManager.getApplications()) {
-            pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationsManager);
-            pushToApplication = factory.createRadioMenuItem(
+            PushToApplicationMenuAction pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationsManager);
+            RadioMenuItem pushToApplication = factory.createRadioMenuItem(
                     pushToApplicationMenuAction.getActionInformation(),
                     pushToApplicationMenuAction,
                     application.getApplicationName().equals(activePushToApplicationName));
