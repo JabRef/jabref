@@ -784,7 +784,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
-
                 pushToApplicationMenuItem,
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,

@@ -10,7 +10,6 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -111,14 +110,6 @@ public class ActionFactory {
         setGraphic(checkMenuItem, action);
 
         return checkMenuItem;
-    }
-
-    public RadioMenuItem createRadioMenuItem(Action action, Command command, boolean selected) {
-        RadioMenuItem radioMenuItem = ActionUtils.createRadioMenuItem(new JabRefAction(action, command, keyBindingRepository));
-        radioMenuItem.setSelected(selected);
-        setGraphic(radioMenuItem, action);
-
-        return radioMenuItem;
     }
 
     public Menu createMenu(Action action) {
