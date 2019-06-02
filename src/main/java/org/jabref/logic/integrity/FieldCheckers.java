@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FilePreferences;
-import org.jabref.model.entry.BibEntry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
