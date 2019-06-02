@@ -30,14 +30,12 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.DataFormat;
@@ -98,9 +96,7 @@ import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
-import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationAction;
-import org.jabref.gui.push.PushToApplicationMenuAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
@@ -767,23 +763,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager))
         );
 
-        // PushToApplication submenu
-        final Menu pushApplicationsMenu = factory.createSubMenu(StandardActions.SELECT_PUSH_APPLICATION);
-        final String activePushToApplicationName = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
-
-        final ToggleGroup pushToToggleGroup = new ToggleGroup();
-
-        for (PushToApplication application : pushToApplicationsManager.getApplications()) {
-            PushToApplicationMenuAction pushToApplicationMenuAction = new PushToApplicationMenuAction(application, pushToApplicationsManager);
-            RadioMenuItem pushToApplication = factory.createRadioMenuItem(
-                    pushToApplicationMenuAction.getActionInformation(),
-                    pushToApplicationMenuAction,
-                    application.getApplicationName().equals(activePushToApplicationName));
-
-            pushApplicationsMenu.getItems().add(pushToApplication);
-            pushToApplication.setToggleGroup(pushToToggleGroup);
-        }
-
         // PushToApplication
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
@@ -806,12 +785,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
 
-                new SeparatorMenuItem(),
-
-                pushApplicationsMenu,
                 pushToApplicationMenuItem,
-
-                new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
                         factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, stateManager)),

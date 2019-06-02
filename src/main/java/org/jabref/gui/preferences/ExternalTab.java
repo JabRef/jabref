@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
@@ -17,8 +18,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationSettings;
-import org.jabref.gui.push.PushToApplicationSettingsDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -30,6 +29,7 @@ class ExternalTab implements PrefsTab {
     private final JabRefFrame frame;
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
+    private final ComboBox<String> pushToApplicationComboBox;
     private final TextField citeCommand;
     private final CheckBox openFoldersOfAttachedFiles;
 
@@ -88,6 +88,28 @@ class ExternalTab implements PrefsTab {
 
         browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
 
+        /*  GridPane butpan = new GridPane();
+        int index = 0;
+        for (PushToApplication pushToApplication : frame.getPushToApplicationsManager().getApplications()) {
+            addSettingsButton(pushToApplication, butpan, index);
+            index++;
+        }
+        //builder.add(butpan, 1, 10);
+        */
+
+        // PushToApplication
+        HBox pushToApplicationsBox = new HBox();
+        pushToApplicationsBox.setSpacing(68);
+        pushToApplicationsBox.setAlignment(Pos.CENTER_LEFT);
+        Label pushToApplicationHeading = new Label(Localization.lang("Application to push entries to") + ':');
+
+        pushToApplicationComboBox = new ComboBox<>();
+        for (PushToApplication application : frame.getPushToApplicationsManager().getApplications()) {
+            pushToApplicationComboBox.getItems().add(application.getApplicationName());
+        }
+
+        pushToApplicationsBox.getChildren().addAll(pushToApplicationHeading, pushToApplicationComboBox);
+
         GridPane consoleOptionPanel = new GridPane();
         final ToggleGroup consoleGroup = new ToggleGroup();
         defaultConsole.setToggleGroup(consoleGroup);
@@ -142,18 +164,11 @@ class ExternalTab implements PrefsTab {
 
         builder.add(new Separator(), 1, 7);
 
-        // External programs title
         Label externalPrograms = new Label(Localization.lang("External programs"));
         externalPrograms.getStyleClass().add("sectionHeader");
         builder.add(externalPrograms, 1, 9);
 
-        GridPane butpan = new GridPane();
-        int index = 0;
-        for (PushToApplication pushToApplication : frame.getPushToApplicationsManager().getApplications()) {
-            addSettingsButton(pushToApplication, butpan, index);
-            index++;
-        }
-        builder.add(butpan, 1, 10);
+        builder.add(pushToApplicationsBox, 1, 11);
 
         // Cite command configuration
         HBox citeCommandBox = new HBox();
@@ -197,24 +212,13 @@ class ExternalTab implements PrefsTab {
         return builder;
     }
 
-    private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = frame.getPushToApplicationsManager().getSettings(application);
-        Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
-        button.setPrefSize(150, 20);
-        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
-        if ((index % 2) == 0) {
-            panel.add(button, 1, (index / 2) + 1);
-        } else {
-            panel.add(button, 2, (index / 2) + 1);
-        }
-    }
-
     @Override
     public void setValues() {
 
         emailSubject.setText(prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
+        pushToApplicationComboBox.setValue(prefs.get(JabRefPreferences.PUSH_TO_APPLICATION));
         citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
         defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
@@ -244,6 +248,10 @@ class ExternalTab implements PrefsTab {
     public void storeSettings() {
         prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
         prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
+        if(!(JabRefPreferences.PUSH_TO_APPLICATION.equals(pushToApplicationComboBox.getValue()))) {
+            prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, pushToApplicationComboBox.getValue());
+            frame.getPushToApplicationsManager().updateApplicationAction();
+        }
         prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
@@ -274,6 +282,18 @@ class ExternalTab implements PrefsTab {
     private void updateExecuteConsoleButtonAndFieldEnabledState() {
         browseButton.setDisable(!executeConsole.isSelected());
         consoleCommand.setDisable(!executeConsole.isSelected());
+    }
+
+    private void showPushToApplicationSettings(final PushToApplication application) {
+        /* PushToApplicationSettings settings = frame.getPushToApplicationsManager().getSettings(application);
+        Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
+        button.setPrefSize(150, 20);
+        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
+        if ((index % 2) == 0) {
+            panel.add(button, 1, (index / 2) + 1);
+        } else {
+            panel.add(button, 2, (index / 2) + 1);
+        } */
     }
 
     private void showConsoleChooser() {

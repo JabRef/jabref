@@ -6,8 +6,10 @@ import java.util.List;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationsManager {
@@ -46,15 +48,7 @@ public class PushToApplicationsManager {
         this.menuItem = menuItem;
     }
 
-    public MenuItem getMenuItem() {
-        return menuItem;
-    }
-
     public void setToolBarButton(Button toolBarButton) { this.toolBarButton = toolBarButton; }
-
-    public Button getToolBarButton() {
-        return toolBarButton;
-    }
 
     public PushToApplicationSettings getSettings(PushToApplication application) {
         if (application instanceof PushToEmacs) {
@@ -68,11 +62,30 @@ public class PushToApplicationsManager {
         }
     }
 
-    public PushToApplication getActiveApplication(JabRefPreferences preferences) {
-        String appSelected = preferences.get(JabRefPreferences.PUSH_TO_APPLICATION);
+    public PushToApplication getApplicationByName(String applicationName) {
         return applications.stream()
-                           .filter(application -> application.getApplicationName().equals(appSelected))
+                           .filter(application -> application.getApplicationName().equals(applicationName))
                            .findAny()
                            .orElse(applications.get(0));
+    }
+
+    public void updateApplicationAction() {
+        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        action.updateApplication(getApplicationByName(Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION)));
+
+        if (menuItem != null) {
+            factory.configureMenuItem(
+                    action.getActionInformation(),
+                    action,
+                    menuItem);
+        }
+
+        if (toolBarButton != null) {
+            factory.configureIconButton(
+                    action.getActionInformation(),
+                    action,
+                    toolBarButton);
+        }
     }
 }
