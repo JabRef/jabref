@@ -23,24 +23,24 @@ public class PushToApplicationSettings {
         this.dialogService = dialogService;
     }
 
-    public GridPane getJFXSettingPane(int n) {
-        switch (n) {
-            case 0:
+    public GridPane getJFXSettingPane(String applicationName) {
+        switch (applicationName) {
+            case "Emacs":
                 application = new PushToEmacs(dialogService);
                 break;
-            case 1:
+            case "LyX/Kile":
                 application = new PushToLyx(dialogService);
                 break;
-            case 2:
+            case "Texmaker":
                 application = new PushToTexmaker(dialogService);
                 break;
-            case 3:
+            case "TeXstudio":
                 application = new PushToTeXstudio(dialogService);
                 break;
-            case 4:
+            case "Vim":
                 application = new PushToVim(dialogService);
                 break;
-            case 5:
+            case "WinEdt":
                 application = new PushToWinEdt(dialogService);
                 break;
             default:
