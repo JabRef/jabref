@@ -39,21 +39,14 @@ public class PushToApplicationAction extends SimpleCommand {
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
-
-        updateAction();
     }
 
     public void updateApplication (PushToApplication application) {
         this.application = application;
-        updateAction();
     }
 
     public Action getActionInformation() {
-        return action;
-    }
-
-    public void updateAction() {
-        action = new Action() {
+        return new Action() {
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.of(application.getIcon());
