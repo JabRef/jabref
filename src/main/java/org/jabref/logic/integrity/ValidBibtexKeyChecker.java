@@ -23,7 +23,7 @@ public class ValidBibtexKeyChecker implements ValueChecker {
         // for the "value" parameter. The 'if' statement below is added to check for
         // both a null and zero length string and to add the empty key warning.
         if ((value == null) || (value.length() == 0)) {
-            return Optional.of(Localization.lang("BibTeX key is empty"));
+            return Optional.of(Localization.lang("empty BibTeX key"));
         }
 
         String cleaned = BibtexKeyGenerator.cleanKey(value, enforceLegalKey);
