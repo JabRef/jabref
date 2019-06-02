@@ -29,7 +29,6 @@ public class PushToApplicationAction extends SimpleCommand {
     private final DialogService dialogService;
 
     private PushToApplication application;
-    private Action action;
 
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
         this.application = pushToApplicationsManager.getActiveApplication(Globals.prefs);
