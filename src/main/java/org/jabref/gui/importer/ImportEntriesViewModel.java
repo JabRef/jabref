@@ -90,7 +90,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                         dialogService.notify(Localization.lang("Import canceled"));
                     } else {
                         buildImportHandlerThenImportEntries(entriesToImport);
-                        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
                     }
                 } else {
                     buildImportHandlerThenImportEntries(entriesToImport);
@@ -114,6 +113,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager);
         importHandler.importEntries(entriesToImport);
+        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
 
     /**
