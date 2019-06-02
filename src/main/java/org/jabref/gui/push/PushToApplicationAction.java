@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -32,7 +33,7 @@ public class PushToApplicationAction extends SimpleCommand {
     private Action action;
 
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.application = pushToApplicationsManager.getActiveApplication(Globals.prefs);
+        this.application = pushToApplicationsManager.getApplicationByName(Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION));
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
