@@ -133,7 +133,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.10.1'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
-    compile 'com.jfoenix:jfoenix:8.0.8'
+    compile 'com.jfoenix:jfoenix:8.0.9'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.16-SNAPSHOT'
