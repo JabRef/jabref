@@ -25,7 +25,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    id 'net.ltgt.errorprone' version '0.8'
+    id 'net.ltgt.errorprone' version '0.8.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.7'
@@ -120,7 +120,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.15'
     compile 'org.apache.pdfbox:xmpbox:2.0.15'
 
-    compile group: 'org.apache.tika', name: 'tika-core', version: '1.20'
+    compile group: 'org.apache.tika', name: 'tika-core', version: '1.21'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.61'
@@ -160,12 +160,12 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.10.0'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.1'
     compile 'javax.inject:javax.inject:1'
     compile 'com.jfoenix:jfoenix:9.0.8'
     compile 'org.controlsfx:controlsfx:11.0.0'
 
-    compile 'org.jsoup:jsoup:1.11.3'
+    compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'org.slf4j:slf4j-api:1.8.0-beta4'
@@ -195,7 +195,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.2'
     testCompile 'net.bytebuddy:byte-buddy-parent:1.9.12'
-    testCompile 'org.mockito:mockito-core:2.27.0'
+    testCompile 'org.mockito:mockito-core:2.28.2'
     //testCompile 'com.github.tomakehurst:wiremock:2.23.2'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.2'
@@ -205,7 +205,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.21'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
     jython 'org.python:jython-standalone:2.7.1'
 }

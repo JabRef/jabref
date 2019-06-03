@@ -10,7 +10,10 @@ public class PushToApplicationsManager {
 
     private final List<PushToApplication> applications;
 
+    private final DialogService dialogService;
+
     public PushToApplicationsManager(DialogService dialogService) {
+        this.dialogService = dialogService;
         // Set up the current available choices:
         applications = new ArrayList<>();
         applications.add(new PushToEmacs(dialogService));
@@ -25,15 +28,15 @@ public class PushToApplicationsManager {
         return applications;
     }
 
-    public static PushToApplicationSettings getSettings(PushToApplication application) {
+    public PushToApplicationSettings getSettings(PushToApplication application) {
         if (application instanceof PushToEmacs) {
-            return new PushToEmacsSettings();
+            return new PushToEmacsSettings(dialogService);
         } else if (application instanceof PushToLyx) {
-            return new PushToLyxSettings();
+            return new PushToLyxSettings(dialogService);
         } else if (application instanceof PushToVim) {
-            return new PushToVimSettings();
+            return new PushToVimSettings(dialogService);
         } else {
-            return new PushToApplicationSettings();
+            return new PushToApplicationSettings(dialogService);
         }
     }
 

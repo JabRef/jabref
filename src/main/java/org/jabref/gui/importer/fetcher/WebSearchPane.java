@@ -35,7 +35,7 @@ public class WebSearchPane extends SidePaneComponent {
     public WebSearchPane(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
         super(sidePaneManager, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
         this.preferences = preferences;
-        this.viewModel = new WebSearchPaneViewModel(preferences.getImportFormatPreferences(), frame, preferences);
+        this.viewModel = new WebSearchPaneViewModel(preferences.getImportFormatPreferences(), frame, preferences, frame.getDialogService());
     }
 
     @Override
