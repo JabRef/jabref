@@ -10,12 +10,15 @@ import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+// TODO: Reenable as soon as https://github.com/ronmamo/reflections/issues/202 is fixed
+@Disabled
 class WebFetchersTest {
 
     private Reflections reflections = new Reflections("org.jabref");
