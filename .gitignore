@@ -347,3 +347,4 @@ lib/ojdbc.jar
 
 # do not ignore the source of the build
 !/buildSrc/src/
+!/buildSrc/src/main/groovy/org/jabref/build
