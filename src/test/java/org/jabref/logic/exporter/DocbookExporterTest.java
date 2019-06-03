@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 
 public class DocbookExporterTest {
 
-    public BibDatabaseContext databaseContext = new BibDatabaseContext();;
+    public BibDatabaseContext databaseContext = new BibDatabaseContext();
     public Charset charset = StandardCharsets.UTF_8;
 
     private Exporter exportFormat;
@@ -44,7 +44,7 @@ public class DocbookExporterTest {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Peptidomics of the larval {\\protect{{D}rosophila melanogaster}} central nervous system.");
+        entry.setField("title", "Peptidomics of the larval {{{D}rosophila melanogaster}} central nervous system.");
 
         List<BibEntry> entries = Arrays.asList(entry);
 

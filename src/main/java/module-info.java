@@ -67,4 +67,6 @@ open module org.jabref {
     requires commons.cli;
     requires httpclient;
     requires com.github.tomtung.latex2unicode;
+    requires jbibtex;
+    requires citeproc.java;
 }

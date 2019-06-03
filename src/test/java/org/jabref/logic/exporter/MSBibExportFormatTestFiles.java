@@ -38,10 +38,12 @@ public class MSBibExportFormatTestFiles {
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         //we have to point it to one existing file, otherwise it will return the default class path
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
-        System.out.println(resourceDir);
         try (Stream<Path> stream = Files.list(resourceDir)) {
-            return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                         .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
+            return stream.map(n -> n.getFileName().toString())
+                         .filter(n -> n.endsWith(".bib"))
+                         .filter(n -> n.startsWith("MsBib"))
+                         .collect(Collectors.toList())
+                         .stream();
         }
     }
 
