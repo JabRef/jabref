@@ -57,7 +57,7 @@ public class MSBibExportFormatTestFiles {
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index} file={0}")
     @MethodSource("fileNames")
     void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
