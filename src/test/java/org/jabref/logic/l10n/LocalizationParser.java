@@ -209,7 +209,6 @@ public class LocalizationParser {
             }
         };
 
-
         try {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
