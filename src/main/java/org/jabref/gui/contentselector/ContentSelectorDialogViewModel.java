@@ -25,11 +25,9 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import static com.google.common.collect.ImmutableList.of;
-
 class ContentSelectorDialogViewModel extends AbstractViewModel {
 
-    private static final List<String> DEFAULT_FIELD_NAMES = of(FieldName.AUTHOR, FieldName.JOURNAL, FieldName.KEYWORDS, FieldName.PUBLISHER);
+    private static final List<String> DEFAULT_FIELD_NAMES = List.of(FieldName.AUTHOR, FieldName.JOURNAL, FieldName.KEYWORDS, FieldName.PUBLISHER);
 
     private final BasePanel basePanel;
     private final MetaData metaData;

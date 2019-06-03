@@ -95,7 +95,7 @@ public class IsiImporter extends Importer {
             if (map.containsKey(aSubsup)) {
 
                 Matcher m = IsiImporter.SUB_SUP_PATTERN.matcher(map.get(aSubsup));
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
 
                 while (m.find()) {
 
