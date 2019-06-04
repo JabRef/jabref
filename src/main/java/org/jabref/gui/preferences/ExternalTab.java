@@ -1,7 +1,7 @@
 package org.jabref.gui.preferences;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.List;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -37,7 +37,6 @@ class ExternalTab implements PrefsTab {
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
     private final ComboBox<PushToApplication> pushToApplicationComboBox;
-    private final ObservableList<PushToApplication> pushToApplicationComboCells;
 
     private final TextField citeCommand;
     private final CheckBox openFoldersOfAttachedFiles;
@@ -68,7 +67,6 @@ class ExternalTab implements PrefsTab {
         builder.setVgap(7);
 
         pushToApplicationComboBox = new ComboBox<>();
-        pushToApplicationComboCells = FXCollections.observableArrayList();
         Button pushToApplicationSettingsButton = new Button(Localization.lang("App settings"));
         pushToApplicationSettingsButton.setOnAction(e -> showPushToApplicationSettings());
 
@@ -170,10 +168,7 @@ class ExternalTab implements PrefsTab {
                 .withText(application -> application.getApplicationName())
                 .withIcon(application -> application.getIcon())
                 .install(pushToApplicationComboBox);
-        for (PushToApplication application : frame.getPushToApplicationsManager().getApplications()) {
-            pushToApplicationComboCells.add(application);
-        }
-        pushToApplicationComboBox.getItems().addAll(pushToApplicationComboCells);
+        pushToApplicationComboBox.getItems().addAll(frame.getPushToApplicationsManager().getApplications());
         pushToApplicationHBox.getChildren().add(pushToApplicationComboBox);
         pushToApplicationHBox.getChildren().add(pushToApplicationSettingsButton);
         builder.add(pushToApplicationHBox, 1, 10);
@@ -227,11 +222,12 @@ class ExternalTab implements PrefsTab {
         openFoldersOfAttachedFiles.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
         String pushToApplicationName = prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
+        List<PushToApplication> pushToApplications = frame.getPushToApplicationsManager().getApplications();
         pushToApplicationComboBox.setValue(
-                pushToApplicationComboCells.stream()
+                pushToApplications.stream()
                             .filter(application -> application.getApplicationName().equals(pushToApplicationName))
                             .findAny()
-                            .orElse(pushToApplicationComboCells.get(0)));
+                            .orElse(pushToApplications.get(0)));
         citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
         defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
