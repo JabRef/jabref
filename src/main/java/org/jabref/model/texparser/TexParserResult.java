@@ -3,8 +3,10 @@ package org.jabref.model.texparser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
@@ -18,6 +20,13 @@ public class TexParserResult {
     private int insertedStrings = 0;
     private int nestedFilesCount = 0;
     private int crossRefEntriesCount = 0;
+
+    public TexParserResult(BibDatabase masterDatabase, int insertedStrings, int nestedFilesCount, int crossRefEntriesCount) {
+        this.masterDatabase = masterDatabase;
+        this.insertedStrings = insertedStrings;
+        this.nestedFilesCount = nestedFilesCount;
+        this.crossRefEntriesCount = crossRefEntriesCount;
+    }
 
     public TexParserResult(BibDatabase masterDatabase) {
         this.masterDatabase = masterDatabase;
@@ -80,5 +89,43 @@ public class TexParserResult {
 
     public void increaseCrossRefEntriesCounter() {
         crossRefEntriesCount++;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%nTexParserResult{%n  masterDatabase=%s,%n  uniqueKeys=%s,%n  unresolvedKeys=%s,%n  texDatabase=%s,%n  insertedStrings=%s,%n  nestedFilesCount=%s,%n  crossRefEntriesCount=%s%n}%n",
+                masterDatabase,
+                uniqueKeys,
+                unresolvedKeys,
+                texDatabase,
+                insertedStrings,
+                nestedFilesCount,
+                crossRefEntriesCount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TexParserResult result = (TexParserResult) o;
+
+        return masterDatabase.equals(result.masterDatabase)
+                && uniqueKeys.equals(result.uniqueKeys)
+                && unresolvedKeys.equals(result.unresolvedKeys)
+                && (new HashSet<>(texDatabase.getEntries())).equals(new HashSet<>(result.texDatabase.getEntries()))
+                && insertedStrings == result.insertedStrings
+                && nestedFilesCount == result.nestedFilesCount
+                && crossRefEntriesCount == result.crossRefEntriesCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(masterDatabase, uniqueKeys, unresolvedKeys, texDatabase, insertedStrings, nestedFilesCount, crossRefEntriesCount);
     }
 }
