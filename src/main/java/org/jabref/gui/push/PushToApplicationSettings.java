@@ -13,13 +13,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationSettings {
 
-    private final AbstractPushToApplication application;
-    private final DialogService dialogService;
-
     protected final Label commandLabel;
     protected final TextField path;
-    private final Button browse;
     protected final GridPane settingsPane;
+    private final AbstractPushToApplication application;
+    private final DialogService dialogService;
+    private final Button browse;
 
     public PushToApplicationSettings(PushToApplication application, DialogService dialogService) {
         this.application = (AbstractPushToApplication) application;
