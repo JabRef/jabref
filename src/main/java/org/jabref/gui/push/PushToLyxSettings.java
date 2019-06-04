@@ -7,11 +7,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PushToLyxSettings extends PushToApplicationSettings {
 
-    public PushToLyxSettings (DialogService dialogService) { super(dialogService); }
-
-    @Override
-    protected void initJFXSettingsPanel() {
-        super.initJFXSettingsPanel();
+    public PushToLyxSettings(PushToApplication application, DialogService dialogService) {
+        super(application, dialogService);
         path.setText(Globals.prefs.get(JabRefPreferences.LYXPIPE));
         commandLabel.setText(Localization.lang("Path to LyX pipe") + ":");
     }

@@ -12,19 +12,16 @@ public class PushToVimSettings extends PushToApplicationSettings {
 
     private final TextField vimServer = new TextField();
 
-    public PushToVimSettings (DialogService dialogService) { super(dialogService); }
+    public PushToVimSettings(PushToApplication application, DialogService dialogService) {
+        super(application, dialogService);
+        settingsPane.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
+        settingsPane.add(vimServer, 1, 1);
+        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
+    }
 
     @Override
     public void storeSettings() {
         super.storeSettings();
         Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
-    }
-
-    @Override
-    protected void initJFXSettingsPanel() {
-        super.initJFXSettingsPanel();
-        jfxSettings.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);
-        jfxSettings.add(vimServer, 1, 1);
-        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
     }
 }
