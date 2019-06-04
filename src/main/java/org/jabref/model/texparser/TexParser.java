@@ -9,7 +9,7 @@ public interface TexParser {
      * For testing purposes.
      *
      * @param citeString String that contains a citation
-     * @return a TexParserResult, where Path is /foo/bar and lineNumber is 1
+     * @return a TexParserResult, where Path is foo/bar and lineNumber is 1
      */
     TexParserResult parse(String citeString);
 
