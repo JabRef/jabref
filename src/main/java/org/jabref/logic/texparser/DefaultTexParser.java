@@ -9,13 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
@@ -43,34 +40,29 @@ public class DefaultTexParser implements TexParser {
 
     private static final String INCLUDE_REGEX = "\\\\(?:include|input)\\{(?<file>[^\\}]*)\\}";
 
-    private final BibDatabase masterDatabase;
+    private final TexParserResult result;
 
-    public DefaultTexParser(BibDatabase database) {
-        masterDatabase = database;
+    public DefaultTexParser(BibDatabase masterDatabase) {
+        this.result = new TexParserResult(masterDatabase);
     }
 
     @Override
     public TexParserResult parse(String citeString) {
-        TexParserResult result = new TexParserResult(masterDatabase);
-        matchCitation(result, Paths.get("foo/bar"), 1, citeString);
-        resolveTags(result);
+        matchCitation(Paths.get("foo/bar"), 1, citeString);
+        CrossReferences.resolveKeys(result);
         return result;
     }
 
     @Override
     public TexParserResult parse(Path texFile) {
-        return parse(new TexParserResult(masterDatabase), Collections.singletonList(texFile));
-    }
-
-    @Override
-    public TexParserResult parse(List<Path> texFiles) {
-        return parse(new TexParserResult(masterDatabase), texFiles);
+        return parse(Collections.singletonList(texFile));
     }
 
     /**
      * Parse a list of TEX files and, recursively, their referenced files.
      */
-    private TexParserResult parse(TexParserResult result, List<Path> texFiles) {
+    @Override
+    public TexParserResult parse(List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
 
         for (int fileIndex = 0; fileIndex < texFiles.size(); fileIndex++) {
@@ -83,8 +75,8 @@ public class DefaultTexParser implements TexParser {
                         continue;
                     }
 
-                    matchCitation(result, file, lnr.getLineNumber(), line);
-                    matchNestedFile(result, file, texFiles, referencedFiles, line);
+                    matchCitation(file, lnr.getLineNumber(), line);
+                    matchNestedFile(file, texFiles, referencedFiles, line);
                 }
             } catch (IOException e) {
                 LOGGER.warn("Error opening the TEX file", e);
@@ -92,24 +84,24 @@ public class DefaultTexParser implements TexParser {
         }
 
         if (!referencedFiles.isEmpty()) {
-            parse(result, referencedFiles);
+            parse(referencedFiles);
         }
 
-        resolveTags(result);
+        CrossReferences.resolveKeys(result);
         return result;
     }
 
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(TexParserResult result, Path file, int lineNumber, String line) {
+    private void matchCitation(Path file, int lineNumber, String line) {
         Matcher citeMatch = Pattern.compile(CITE_REGEX).matcher(line);
 
         while (citeMatch.find()) {
             String[] keys = citeMatch.group("key").split(",");
 
             for (String key : keys) {
-                addKey(result, key.trim(), new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+                addKey(key.trim(), new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line));
             }
         }
     }
@@ -117,7 +109,7 @@ public class DefaultTexParser implements TexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private void matchNestedFile(TexParserResult result, Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
+    private void matchNestedFile(Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
         Matcher includeMatch = Pattern.compile(INCLUDE_REGEX).matcher(line);
 
         while (includeMatch.find()) {
@@ -142,7 +134,7 @@ public class DefaultTexParser implements TexParser {
     /**
      * Add a citation to the uniqueKeys map.
      */
-    private void addKey(TexParserResult result, String key, Citation citation) {
+    private void addKey(String key, Citation citation) {
         Map<String, List<Citation>> uniqueKeys = result.getUniqueKeys();
 
         if (!uniqueKeys.containsKey(key)) {
@@ -152,39 +144,5 @@ public class DefaultTexParser implements TexParser {
         if (!uniqueKeys.get(key).contains(citation)) {
             uniqueKeys.get(key).add(citation);
         }
-    }
-
-    /**
-     * Look for an equivalent BibTeX entry within the reference database for all keys inside of the TEX files.
-     */
-    private void resolveTags(TexParserResult result) {
-        Set<String> keySet = result.getUniqueKeys().keySet();
-
-        for (String key : keySet) {
-            if (!result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
-                Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
-
-                if (entry.isPresent()) {
-                    insertEntry(result, entry.get());
-                    CrossReferences.resolve(masterDatabase, result, entry.get());
-                } else {
-                    result.getUnresolvedKeys().add(key);
-                }
-            }
-        }
-
-        // Copy database definitions
-        if (result.getGeneratedBibDatabase().hasEntries()) {
-            result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
-            result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));
-        }
-    }
-
-    /**
-     * Insert into the database a clone of the given entry. The cloned entry has a new unique ID.
-     */
-    private void insertEntry(TexParserResult result, BibEntry entry) {
-        BibEntry clonedEntry = (BibEntry) entry.clone();
-        result.getGeneratedBibDatabase().insertEntry(clonedEntry);
     }
 }
