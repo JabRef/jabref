@@ -30,6 +30,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.21.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.7'
+    id 'org.beryx.jlink' version '2.10.4'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -587,6 +588,22 @@ task releaseJar(dependsOn: "shadowJar") {
 
 task snapJar(dependsOn: "releaseJar", type: Delete) {
     delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
+}
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'JabRefMain'
+    }
+
+    addOptions("--bind-services")
+
+    forceMerge "javafx"
+    forceMerge "org.controlsfx.controls"
+    forceMerge "org.bouncycastle.provider"
+    forceMerge "java.xml.bind"
+    
+    //forceMerge('log4j-api')
 }
 
 jmh {
