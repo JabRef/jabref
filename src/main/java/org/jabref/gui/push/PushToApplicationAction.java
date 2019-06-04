@@ -40,7 +40,7 @@ public class PushToApplicationAction extends SimpleCommand {
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
     }
 
-    public void updateApplication (PushToApplication application) {
+    public void updateApplication(PushToApplication application) {
         this.application = application;
     }
 
@@ -107,7 +107,6 @@ public class PushToApplicationAction extends SimpleCommand {
         BackgroundTask.wrap(this::pushEntries)
                       .onSuccess(s -> application.operationCompleted())
                       .executeWith(Globals.TASK_EXECUTOR);
-
     }
 
     private void pushEntries() {

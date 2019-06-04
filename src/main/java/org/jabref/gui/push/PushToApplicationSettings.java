@@ -13,70 +13,43 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationSettings {
 
-    protected final TextField path = new TextField();
-    protected Label commandLabel = new Label();
-    protected GridPane jfxSettings;
-    protected AbstractPushToApplication application;
-    private DialogService dialogService;
+    private final AbstractPushToApplication application;
+    private final DialogService dialogService;
 
-    public PushToApplicationSettings(DialogService dialogService) {
+    protected final Label commandLabel;
+    protected final TextField path;
+    private final Button browse;
+    protected final GridPane settingsPane;
+
+    public PushToApplicationSettings(PushToApplication application, DialogService dialogService) {
+        this.application = (AbstractPushToApplication) application;
         this.dialogService = dialogService;
-    }
+        settingsPane = new GridPane();
 
-    public GridPane getJFXSettingPane(String applicationName) {
-        switch (applicationName) {
-            case "Emacs":
-                application = new PushToEmacs(dialogService);
-                break;
-            case "LyX/Kile":
-                application = new PushToLyx(dialogService);
-                break;
-            case "Texmaker":
-                application = new PushToTexmaker(dialogService);
-                break;
-            case "TeXstudio":
-                application = new PushToTeXstudio(dialogService);
-                break;
-            case "Vim":
-                application = new PushToVim(dialogService);
-                break;
-            case "WinEdt":
-                application = new PushToWinEdt(dialogService);
-                break;
-            default:
-                application = null;
-                break;
-        }
-        application.initParameters();
-        String commandPath = Globals.prefs.get(application.commandPathPreferenceKey);
-        if (jfxSettings == null) {
-            initJFXSettingsPanel();
-        }
-        path.setText(commandPath);
+        commandLabel = new Label();
+        path = new TextField();
+        browse = new Button(Localization.lang("Browse"));
 
-        return jfxSettings;
-    }
+        this.application.initParameters();
 
-    protected void initJFXSettingsPanel() {
-        jfxSettings = new GridPane();
-        StringBuilder label = new StringBuilder(Localization.lang("Path to %0", application.getApplicationName()));
         // In case the application name and the actual command is not the same, add the command in brackets
-        if (application.getCommandName() == null) {
-            label.append(':');
+        StringBuilder commandLine = new StringBuilder(Localization.lang("Path to %0", application.getApplicationName()));
+        if (this.application.getCommandName() == null) {
+            commandLine.append(':');
         } else {
-            label.append(" (").append(application.getCommandName()).append("):");
+            commandLine.append(" (").append(this.application.getCommandName()).append("):");
         }
-        commandLabel = new Label(label.toString());
-        jfxSettings.add(commandLabel, 0, 0);
-        jfxSettings.add(path, 1, 0);
-        Button browse = new Button(Localization.lang("Browse"));
+        commandLabel.setText(commandLine.toString());
+        settingsPane.add(commandLabel, 0, 0);
+
+        path.setText(Globals.prefs.get(this.application.commandPathPreferenceKey));
+        settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
-        jfxSettings.add(browse, 2, 0);
+        settingsPane.add(browse, 2, 0);
     }
 
     /**
@@ -86,5 +59,9 @@ public class PushToApplicationSettings {
      */
     public void storeSettings() {
         Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
+    }
+
+    public GridPane getSettingsPane() {
+        return settingsPane;
     }
 }

@@ -10,7 +10,6 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.preferences.JabRefPreferences;
 
 public class PushToApplicationsManager {
 
@@ -48,17 +47,19 @@ public class PushToApplicationsManager {
         this.menuItem = menuItem;
     }
 
-    public void setToolBarButton(Button toolBarButton) { this.toolBarButton = toolBarButton; }
+    public void setToolBarButton(Button toolBarButton) {
+        this.toolBarButton = toolBarButton;
+    }
 
     public PushToApplicationSettings getSettings(PushToApplication application) {
         if (application instanceof PushToEmacs) {
-            return new PushToEmacsSettings(dialogService);
+            return new PushToEmacsSettings(application, dialogService);
         } else if (application instanceof PushToLyx) {
-            return new PushToLyxSettings(dialogService);
+            return new PushToLyxSettings(application, dialogService);
         } else if (application instanceof PushToVim) {
-            return new PushToVimSettings(dialogService);
+            return new PushToVimSettings(application, dialogService);
         } else {
-            return new PushToApplicationSettings(dialogService);
+            return new PushToApplicationSettings(application, dialogService);
         }
     }
 
@@ -75,11 +76,11 @@ public class PushToApplicationsManager {
         action.updateApplication(Globals.prefs.getActivePushToApplication(this));
 
         if (menuItem != null) {
-            factory.configureMenuItem(action.getActionInformation(),action,menuItem);
+            factory.configureMenuItem(action.getActionInformation(), action, menuItem);
         }
 
         if (toolBarButton != null) {
-            factory.configureIconButton(action.getActionInformation(),action,toolBarButton);
+            factory.configureIconButton(action.getActionInformation(), action, toolBarButton);
         }
     }
 }

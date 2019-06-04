@@ -288,9 +288,8 @@ class ExternalTab implements PrefsTab {
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
         PushToApplication selectedApplication = pushToApplicationComboBox.getValue();
         PushToApplicationSettings settings = manager.getSettings(selectedApplication);
-
         DialogPane dialogPane = new DialogPane();
-        dialogPane.setContent(settings.getJFXSettingPane(pushToApplicationComboBox.getValue().getApplicationName()));
+        dialogPane.setContent(settings.getSettingsPane());
 
         dialogService.showCustomDialogAndWait(Localization.lang("Application settings"), dialogPane, ButtonType.OK, ButtonType.CANCEL).ifPresent(btn -> {
             if (btn == ButtonType.OK) {
