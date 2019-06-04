@@ -20,7 +20,7 @@ env:
   global:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
-    - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=check
     - TEST_SUITE=checkstyle
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
