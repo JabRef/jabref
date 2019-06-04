@@ -45,6 +45,8 @@ public class Citation {
     }
 
     /**
+     * Get a fixed-width string that shows the context of a citation.
+     *
      * @return String that contains a cite and the text that surrounds it along the same line.
      */
     public String getContext() {
@@ -61,7 +63,7 @@ public class Citation {
 
     @Override
     public String toString() {
-        return String.format("%s\t%d:%d-%d\t%s", path.toString(), line, colStart, colEnd, getContext());
+        return String.format("%s (%d:%d-%d) \"%s\"", path, line, colStart, colEnd, getContext());
     }
 
     @Override
@@ -76,11 +78,12 @@ public class Citation {
 
         Citation citation = (Citation) o;
 
-        return line == citation.line
+        return path.equals(citation.path)
+                && line == citation.line
                 && colStart == citation.colStart
                 && colEnd == citation.colEnd
-                && Objects.equals(path, citation.path)
-                && Objects.equals(lineText, citation.lineText);
+                && lineText.equals(citation.lineText)
+                && getContext().equals(citation.getContext());
     }
 
     @Override
