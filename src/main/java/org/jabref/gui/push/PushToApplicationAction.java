@@ -32,7 +32,7 @@ public class PushToApplicationAction extends SimpleCommand {
     private PushToApplication application;
 
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.application = pushToApplicationsManager.getApplicationByName(Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION));
+        this.application = Globals.prefs.getActivePushToApplication(pushToApplicationsManager);
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 

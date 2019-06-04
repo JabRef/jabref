@@ -155,7 +155,7 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
-    private PushToApplicationsManager pushToApplicationsManager;
+    private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
     private SidePane sidePane;
 
@@ -163,6 +163,7 @@ public class JabRefFrame extends BorderPane {
         this.mainStage = mainStage;
         this.dialogService = new JabRefDialogService(mainStage, this);
         this.stateManager = Globals.stateManager;
+        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
     }
 
@@ -449,8 +450,6 @@ public class JabRefFrame extends BorderPane {
 
     private void initLayout() {
         setProgressBarVisible(false);
-
-        pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
 
         BorderPane head = new BorderPane();
         head.setTop(createMenu());

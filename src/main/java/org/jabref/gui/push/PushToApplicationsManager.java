@@ -72,20 +72,14 @@ public class PushToApplicationsManager {
     public void updateApplicationAction() {
         final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        action.updateApplication(getApplicationByName(Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION)));
+        action.updateApplication(Globals.prefs.getActivePushToApplication(this));
 
         if (menuItem != null) {
-            factory.configureMenuItem(
-                    action.getActionInformation(),
-                    action,
-                    menuItem);
+            factory.configureMenuItem(action.getActionInformation(),action,menuItem);
         }
 
         if (toolBarButton != null) {
-            factory.configureIconButton(
-                    action.getActionInformation(),
-                    action,
-                    toolBarButton);
+            factory.configureIconButton(action.getActionInformation(),action,toolBarButton);
         }
     }
 }
