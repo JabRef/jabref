@@ -602,41 +602,45 @@ jlink {
     forceMerge "controlsfx", "bcprov", "jaxb", "javax", "istack", "stax", "log4j"
 
     mergedModule {
-        requires 'java.logging';
-        requires 'jdk.xml.dom';
-        requires 'java.sql';
-        requires 'java.rmi';
-        requires 'java.xml';
-        requires 'com.sun.xml.txw2';
-        requires 'java.desktop';
-        requires 'java.security.jgss';
-        requires 'jdk.jsobject';
-        requires 'jdk.unsupported';
-        requires 'java.management';
-        requires 'java.naming';
-        requires 'jdk.unsupported.desktop';
-        requires 'java.security.sasl';
-        requires 'java.scripting';
-        requires 'java.datatransfer';
-        requires 'java.compiler';
-        requires 'java.transaction.xa';
-        requires 'com.sun.xml.fastinfoset';
-        requires 'org.slf4j';
-        uses 'com.airhacks.afterburner.injection.PresenterFactory';
-        uses 'org.controlsfx.glyphfont.GlyphFont';
-        uses 'com.airhacks.afterburner.views.ResourceLocator';
-        provides 'java.sql.Driver' with 'org.postgresql.Driver';
-        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome';
-        provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl';
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider';
-        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor';
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider';
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider';
+        requires 'java.logging'
+        requires 'jdk.xml.dom'
+        requires 'java.sql'
+        requires 'java.rmi'
+        requires 'java.xml'
+        requires 'com.sun.xml.txw2'
+        requires 'java.desktop'
+        requires 'java.security.jgss'
+        requires 'jdk.jsobject'
+        requires 'jdk.unsupported'
+        requires 'java.management'
+        requires 'java.naming'
+        requires 'jdk.unsupported.desktop'
+        requires 'java.security.sasl'
+        requires 'java.scripting'
+        requires 'java.datatransfer'
+        requires 'java.compiler'
+        requires 'java.transaction.xa'
+        requires 'com.sun.xml.fastinfoset'
+        requires 'org.slf4j'
+        uses 'com.airhacks.afterburner.injection.PresenterFactory'
+        uses 'org.controlsfx.glyphfont.GlyphFont'
+        uses 'com.airhacks.afterburner.views.ResourceLocator'
+        provides 'java.sql.Driver' with 'org.postgresql.Driver'
+        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
+        provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl'
+        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
+        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                                    'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider';
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider';
+                                    'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
     }
 
+    jpackage {
+        // Download from https://jdk.java.net/jpackage/ and change path accordingly
+        jpackageHome = 'H:\\Downloading\\openjdk-13-jpackage+49_windows-x64_bin\\jdk-13'
+    }
 }
 
 jmh {
