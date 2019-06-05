@@ -14,10 +14,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
-import org.jabref.model.texparser.TexParser;
+import org.jabref.model.texparser.CrossingKeysResult;
 import org.jabref.model.texparser.TexParserResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -27,16 +26,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class TexParserTest {
-    private ImportFormatPreferences importFormatPreferences;
-
     private final String DARWIN = "Darwin1888";
     private final String EINSTEIN = "Einstein1920";
     private final String UNRESOLVED = "UnresolvedKey";
+    private ImportFormatPreferences importFormatPreferences;
 
     @BeforeEach
     void setUp() {
@@ -48,54 +44,58 @@ class TexParserTest {
         importFormatPreferences = null;
     }
 
-    private void addCite(TexParserResult expectedResult, String key, Path texFile, int line, int colStart, int colEnd, String lineText, int resolved) {
-        if (!expectedResult.getUniqueKeys().containsKey(key)) {
-            expectedResult.getUniqueKeys().put(key, new ArrayList<>());
-        } else {
-            resolved = 0;
+    private void testCite(String key, String citeString, boolean match) {
+        TexParserResult texParserResult = new DefaultTexParser().parse(citeString);
+        TexParserResult expectedResult = new TexParserResult();
+
+        if (match) {
+            expectedResult.getCitations().put(key, new ArrayList<>());
+            expectedResult.getCitations().get(key).add(
+                    new Citation(Paths.get("foo/bar"), 1, 0, citeString.length(), citeString));
         }
 
-        Citation citation = new Citation(texFile, line, colStart, colEnd, lineText);
-        if (!expectedResult.getUniqueKeys().get(key).contains(citation)) {
-            expectedResult.getUniqueKeys().get(key).add(citation);
-        }
-
-        if (resolved > 0) {
-            BibEntry clonedEntry = (BibEntry) expectedResult.getMasterDatabase().getEntryByKey(key).get().clone();
-            expectedResult.getGeneratedBibDatabase().insertEntry(clonedEntry);
-        } else if (resolved < 0) {
-            expectedResult.getUnresolvedKeys().add(key);
-        }
+        assertEquals(expectedResult, texParserResult);
     }
 
-    private void testCite(String citeString) throws IOException {
-        InputStream originalStream = TexParserTest.class.getResourceAsStream("origin.bib");
+    private void testMatchCite(String citeString) {
+        testCite(UNRESOLVED, citeString, true);
+    }
 
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(citeString);
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase());
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
-
-            addCite(expectedResult, UNRESOLVED, Paths.get("foo/bar"), 1, 0, citeString.length(), citeString, -1);
-
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertFalse(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
-        }
+    private void testNonMatchCite(String citeString) {
+        testCite(UNRESOLVED, citeString, false);
     }
 
     @Test
-    void testCiteCommands() throws IOException {
-        testCite("\\cite[pre][post]{UnresolvedKey}");
-        testCite("\\cite*{UnresolvedKey}");
-        testCite("\\parencite[post]{UnresolvedKey}");
-        testCite("\\cite[pre][post]{UnresolvedKey}");
-        testCite("\\citep{UnresolvedKey}");
-        testCite("\\citet{UnresolvedKey}");
+    void testCiteCommands() {
+        testMatchCite("\\cite[pre][post]{UnresolvedKey}");
+        testMatchCite("\\cite*{UnresolvedKey}");
+        testMatchCite("\\parencite[post]{UnresolvedKey}");
+        testMatchCite("\\cite[pre][post]{UnresolvedKey}");
+        testMatchCite("\\citep{UnresolvedKey}");
+
+        testNonMatchCite("\\citet21312{123U123n123resolvedKey}");
+        testNonMatchCite("\\1cite[pr234e][post]{UnresolvedKey}");
+        testNonMatchCite("\\citep55{5}UnresolvedKey}");
+        testNonMatchCite("\\cit2et{UnresolvedKey}");
+    }
+
+    private void addCite(CrossingKeysResult expectedResult, String key, Path texFile, int line, int colStart, int colEnd, String lineText, boolean insert) {
+        Citation citation = new Citation(texFile, line, colStart, colEnd, lineText);
+
+        if (!expectedResult.getParserResult().getCitations().containsKey(key)) {
+            expectedResult.getParserResult().getCitations().put(key, new ArrayList<>());
+        }
+
+        if (!expectedResult.getParserResult().getCitations().get(key).contains(citation)) {
+            expectedResult.getParserResult().getCitations().get(key).add(citation);
+        }
+
+        if (insert) {
+            BibEntry clonedEntry = (BibEntry) expectedResult.getMasterDatabase().getEntryByKey(key).get().clone();
+            expectedResult.getNewDatabase().insertEntry(clonedEntry);
+        } else {
+            expectedResult.getUnresolvedKeys().add(key);
+        }
     }
 
     @Test
@@ -105,22 +105,19 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(texFile);
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase());
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            addCite(expectedResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", 1);
-            addCite(expectedResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", 1);
+            TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().add(texFile);
 
-            addCite(expectedResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", 1);
-            addCite(expectedResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", 1);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase());
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", true);
 
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 
@@ -134,26 +131,22 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(Arrays.asList(texFile, texFile2));
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase());
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            addCite(expectedResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", 1);
-            addCite(expectedResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", 1);
-            addCite(expectedResult, EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}", 1);
+            TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2));
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
 
-            addCite(expectedResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", 1);
-            addCite(expectedResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", 1);
-            addCite(expectedResult, DARWIN, texFile2, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}", 1);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase());
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", true);
+            addCite(expectedCrossingResult, EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", true);
+            addCite(expectedCrossingResult, DARWIN, texFile2, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}", true);
+            addCite(expectedCrossingResult, NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}", true);
 
-            addCite(expectedResult, NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}", 1);
-
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 
@@ -164,22 +157,19 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(Arrays.asList(texFile, texFile));
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase());
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            addCite(expectedResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", 1);
-            addCite(expectedResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", 1);
+            TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile));
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile));
 
-            addCite(expectedResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", 1);
-            addCite(expectedResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", 1);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase());
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", true);
 
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 
@@ -192,36 +182,29 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(texFile);
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase());
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            addCite(expectedResult, EINSTEIN, texFile, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}", 1);
-            addCite(expectedResult, DARWIN, texFile, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}", 1);
-            addCite(expectedResult, UNKNOWN, texFile, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{UnknownKey}", -1);
+            TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().add(texFile);
 
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase());
+            addCite(expectedCrossingResult, EINSTEIN, texFile, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, DARWIN, texFile, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}", true);
+            addCite(expectedCrossingResult, UNKNOWN, texFile, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{UnknownKey}", false);
+
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 
     @Test
     void testFileNotFound() {
-        BibDatabase masterDatabase = new BibDatabase();
-        TexParser texParser = new DefaultTexParser(masterDatabase);
-        TexParserResult texResult = texParser.parse(Paths.get("file_not_found.tex"));
-        TexParserResult expectedResult = new TexParserResult(masterDatabase);
-        BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
+        TexParserResult parserResult = new DefaultTexParser().parse(Paths.get("file_not_found.tex"));
+        TexParserResult expectedParserResult = new TexParserResult();
 
-        assertEquals(masterDatabase, texResult.getMasterDatabase());
-        assertFalse(texResult.getGeneratedBibDatabase().hasEntries());
-        assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-        assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-        assertEquals(expectedResult, texResult);
+        expectedParserResult.getFileList().add(Paths.get("file_not_found.tex"));
+
+        assertEquals(expectedParserResult, parserResult);
     }
 
     @Test
@@ -231,12 +214,12 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(texFile);
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            assertEquals(Optional.of("\"Maintained by \" # maintainer"), newDatabase.getPreamble());
-            assertEquals(1, newDatabase.getStringCount());
+            TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+
+            assertEquals(Optional.of("\"Maintained by \" # maintainer"), crossingResult.getNewDatabase().getPreamble());
+            assertEquals(1, crossingResult.getNewDatabase().getStringCount());
         }
     }
 
@@ -244,25 +227,26 @@ class TexParserTest {
     void testNestedFiles() throws URISyntaxException, IOException {
         InputStream originalStream = TexParserTest.class.getResourceAsStream("origin.bib");
         Path texFile = Paths.get(TexParserTest.class.getResource("nested.tex").toURI());
+        Path texFile2 = Paths.get(TexParserTest.class.getResource("nested2.tex").toURI());
+        Path texFile3 = Paths.get(TexParserTest.class.getResource("paper.tex").toURI());
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(texFile);
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase(), 0, 2, 0);
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            addCite(expectedResult, EINSTEIN, texFile.getParent().resolve("paper.tex"), 4, 0, 19, "\\cite{Einstein1920}", 1);
-            addCite(expectedResult, EINSTEIN, texFile.getParent().resolve("paper.tex"), 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", 1);
+            TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().add(texFile);
+            expectedParserResult.getNestedFiles().addAll(Arrays.asList(texFile2, texFile3));
 
-            addCite(expectedResult, DARWIN, texFile.getParent().resolve("paper.tex"), 5, 0, 17, "\\cite{Darwin1888}.", 1);
-            addCite(expectedResult, DARWIN, texFile.getParent().resolve("paper.tex"), 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", 1);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase());
 
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            addCite(expectedCrossingResult, EINSTEIN, texFile.getParent().resolve("paper.tex"), 4, 0, 19, "\\cite{Einstein1920}", true);
+            addCite(expectedCrossingResult, EINSTEIN, texFile.getParent().resolve("paper.tex"), 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile.getParent().resolve("paper.tex"), 5, 0, 17, "\\cite{Darwin1888}.", true);
+            addCite(expectedCrossingResult, DARWIN, texFile.getParent().resolve("paper.tex"), 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}", true);
+
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 
@@ -278,34 +262,33 @@ class TexParserTest {
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(originalReader);
-            TexParser texParser = new DefaultTexParser(result.getDatabase());
-            TexParserResult texResult = texParser.parse(texFile);
-            TexParserResult expectedResult = new TexParserResult(result.getDatabase(), 0, 0, 1);
-            BibDatabase newDatabase = texResult.getGeneratedBibDatabase();
 
-            expectedResult.getUniqueKeys().put(EINSTEIN_A, new ArrayList<>());
-            expectedResult.getUniqueKeys().get(EINSTEIN_A).add(new Citation(texFile, 4, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920a}"));
-            expectedResult.getGeneratedBibDatabase().insertEntry((BibEntry) expectedResult.getMasterDatabase().getEntryByKey(EINSTEIN_A).get().clone());
-            expectedResult.getGeneratedBibDatabase().insertEntry((BibEntry) expectedResult.getMasterDatabase().getEntryByKey(EINSTEIN).get().clone());
+            TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+            TexParserResult expectedParserResult = new TexParserResult();
+            expectedParserResult.getFileList().add(texFile);
 
-            expectedResult.getUniqueKeys().put(EINSTEIN_B, new ArrayList<>());
-            expectedResult.getUniqueKeys().get(EINSTEIN_B).add(new Citation(texFile, 5, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920b}"));
-            expectedResult.getGeneratedBibDatabase().insertEntry((BibEntry) expectedResult.getMasterDatabase().getEntryByKey(EINSTEIN_B).get().clone());
-            expectedResult.getUnresolvedKeys().add(EINSTEIN21);
+            CrossingKeysResult crossingResult = new CrossingKeys(parserResult, result.getDatabase()).resolveKeys();
+            CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, result.getDatabase(), 0, 1);
 
-            expectedResult.getUniqueKeys().put(EINSTEIN_C, new ArrayList<>());
-            expectedResult.getUniqueKeys().get(EINSTEIN_C).add(new Citation(texFile, 6, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920c}"));
-            expectedResult.getGeneratedBibDatabase().insertEntry((BibEntry) expectedResult.getMasterDatabase().getEntryByKey(EINSTEIN_C).get().clone());
+            expectedParserResult.getCitations().put(EINSTEIN_A, new ArrayList<>());
+            expectedParserResult.getCitations().get(EINSTEIN_A).add(new Citation(texFile, 4, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920a}"));
+            expectedCrossingResult.getNewDatabase().insertEntry((BibEntry) expectedCrossingResult.getMasterDatabase().getEntryByKey(EINSTEIN_A).get().clone());
+            expectedCrossingResult.getNewDatabase().insertEntry((BibEntry) expectedCrossingResult.getMasterDatabase().getEntryByKey(EINSTEIN).get().clone());
 
-            expectedResult.getUniqueKeys().put(UNRESOLVED, new ArrayList<>());
-            expectedResult.getUniqueKeys().get(UNRESOLVED).add(new Citation(texFile, 7, 48, 68, "This is some content trying to cite a bib file: \\cite{UnresolvedKey}"));
-            expectedResult.getUnresolvedKeys().add(UNRESOLVED);
+            expectedParserResult.getCitations().put(EINSTEIN_B, new ArrayList<>());
+            expectedParserResult.getCitations().get(EINSTEIN_B).add(new Citation(texFile, 5, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920b}"));
+            expectedCrossingResult.getNewDatabase().insertEntry((BibEntry) expectedCrossingResult.getMasterDatabase().getEntryByKey(EINSTEIN_B).get().clone());
+            expectedCrossingResult.getUnresolvedKeys().add(EINSTEIN21);
 
-            assertEquals(result.getDatabase(), texResult.getMasterDatabase());
-            assertTrue(texResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(texResult.getFoundKeysInTex() + texResult.getCrossRefEntriesCount(), texResult.getResolvedKeysCount() + texResult.getUnresolvedKeysCount());
-            assertEquals(expectedResult.getResolvedKeysCount() + expectedResult.getCrossRefEntriesCount(), newDatabase.getEntries().size());
-            assertEquals(expectedResult, texResult);
+            expectedParserResult.getCitations().put(EINSTEIN_C, new ArrayList<>());
+            expectedParserResult.getCitations().get(EINSTEIN_C).add(new Citation(texFile, 6, 48, 68, "This is some content trying to cite a bib file: \\cite{Einstein1920c}"));
+            expectedCrossingResult.getNewDatabase().insertEntry((BibEntry) expectedCrossingResult.getMasterDatabase().getEntryByKey(EINSTEIN_C).get().clone());
+
+            expectedParserResult.getCitations().put(UNRESOLVED, new ArrayList<>());
+            expectedParserResult.getCitations().get(UNRESOLVED).add(new Citation(texFile, 7, 48, 68, "This is some content trying to cite a bib file: \\cite{UnresolvedKey}"));
+            expectedCrossingResult.getUnresolvedKeys().add(UNRESOLVED);
+
+            assertEquals(expectedCrossingResult, crossingResult);
         }
     }
 }
