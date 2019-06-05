@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 public class PreferencesDialogViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
