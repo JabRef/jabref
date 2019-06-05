@@ -58,7 +58,7 @@ class ExternalTab implements PrefsTab {
     private final DialogService dialogService;
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
-    public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
+    public ExternalTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.frame = frame;
         dialogService = frame.getDialogService();

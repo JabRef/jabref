@@ -1,10 +1,10 @@
-#sideMenu {
+#preferenceTabList {
     -fx-background-color: -fx-control-inner-background;
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 1;
 }
 
-#sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 8 8 8 8;
     -fx-background: -fx-control-inner-background;
 }
