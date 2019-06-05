@@ -8,11 +8,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
@@ -31,25 +29,25 @@ public class DefaultTexParser implements TexParser {
      *
      * <p>TODO: Add support for multicite commands.
      */
+    private static final String[] CITE_COMMANDS = new String[] {
+            "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
+            "([aA]|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
+            "footcitetext"
+    };
     private static final String CITE_REGEX = String.format("\\\\(?:%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<key>[^\\}]*)\\}",
-            String.join("|", new String[] {
-                    "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
-                    "([aA]|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
-                    "footcitetext"
-            }));
+            String.join("|", CITE_COMMANDS));
 
     private static final String INCLUDE_REGEX = "\\\\(?:include|input)\\{(?<file>[^\\}]*)\\}";
 
     private final TexParserResult result;
 
-    public DefaultTexParser(BibDatabase masterDatabase) {
-        this.result = new TexParserResult(masterDatabase);
+    public DefaultTexParser() {
+        this.result = new TexParserResult();
     }
 
     @Override
     public TexParserResult parse(String citeString) {
         matchCitation(Paths.get("foo/bar"), 1, citeString);
-        CrossReferences.resolveKeys(result);
         return result;
     }
 
@@ -58,20 +56,23 @@ public class DefaultTexParser implements TexParser {
         return parse(Collections.singletonList(texFile));
     }
 
-    /**
-     * Parse a list of TEX files and, recursively, their referenced files.
-     */
     @Override
     public TexParserResult parse(List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
+
+        if (result.getFileList().isEmpty()) {
+            result.getFileList().addAll(texFiles);
+        } else {
+            result.getNestedFiles().addAll(texFiles);
+        }
 
         for (int fileIndex = 0; fileIndex < texFiles.size(); fileIndex++) {
             Path file = texFiles.get(fileIndex);
 
             try (LineNumberReader lnr = new LineNumberReader(Files.newBufferedReader(file))) {
                 for (String line = lnr.readLine(); line != null; line = lnr.readLine()) {
-                    // Skip comment lines.
                     if (line.startsWith("%")) {
+                        // Skip comment lines.
                         continue;
                     }
 
@@ -83,16 +84,16 @@ public class DefaultTexParser implements TexParser {
             }
         }
 
+        // Parse all files referenced by TEX files, recursively.
         if (!referencedFiles.isEmpty()) {
             parse(referencedFiles);
         }
 
-        CrossReferences.resolveKeys(result);
         return result;
     }
 
     /**
-     * Find cites along a specific line and store them.
+     * Find cites along a specific line and add them to a map.
      */
     private void matchCitation(Path file, int lineNumber, String line) {
         Matcher citeMatch = Pattern.compile(CITE_REGEX).matcher(line);
@@ -101,7 +102,15 @@ public class DefaultTexParser implements TexParser {
             String[] keys = citeMatch.group("key").split(",");
 
             for (String key : keys) {
-                addKey(key.trim(), new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+                Citation citation = new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+
+                if (!result.getCitations().containsKey(key)) {
+                    result.getCitations().put(key, new ArrayList<>());
+                }
+
+                if (!result.getCitations().get(key).contains(citation)) {
+                    result.getCitations().get(key).add(citation);
+                }
             }
         }
     }
@@ -126,23 +135,7 @@ public class DefaultTexParser implements TexParser {
 
             if (!texFiles.contains(inputFile)) {
                 referencedFiles.add(inputFile);
-                result.increaseNestedFilesCounter();
             }
-        }
-    }
-
-    /**
-     * Add a citation to the uniqueKeys map.
-     */
-    private void addKey(String key, Citation citation) {
-        Map<String, List<Citation>> uniqueKeys = result.getUniqueKeys();
-
-        if (!uniqueKeys.containsKey(key)) {
-            uniqueKeys.put(key, new ArrayList<>());
-        }
-
-        if (!uniqueKeys.get(key).contains(citation)) {
-            uniqueKeys.get(key).add(citation);
         }
     }
 }

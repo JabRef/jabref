@@ -82,8 +82,7 @@ public class Citation {
                 && line == citation.line
                 && colStart == citation.colStart
                 && colEnd == citation.colEnd
-                && lineText.equals(citation.lineText)
-                && getContext().equals(citation.getContext());
+                && lineText.equals(citation.lineText);
     }
 
     @Override
