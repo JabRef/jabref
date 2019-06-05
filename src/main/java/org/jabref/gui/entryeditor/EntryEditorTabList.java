@@ -3,7 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 import org.jabref.preferences.JabRefPreferences;
 
@@ -17,7 +17,7 @@ public final class EntryEditorTabList {
     }
 
     public static Map<String, List<String>> create(JabRefPreferences preferences) {
-        Map<String, List<String>> tabs = new TreeMap<>();
+        Map<String, List<String>> tabs = new LinkedHashMap<>();
         int i = 0;
         String name;
         if (preferences.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + 0)) {
