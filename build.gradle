@@ -56,7 +56,7 @@ project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 9
 targetCompatibility = 9
-mainClassName = "$moduleName/org.jabref.JabRefMain"
+mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names
@@ -599,11 +599,44 @@ jlink {
     addOptions("--bind-services")
 
     forceMerge "javafx"
-    forceMerge "org.controlsfx.controls"
-    forceMerge "org.bouncycastle.provider"
-    forceMerge "java.xml.bind"
-    
-    //forceMerge('log4j-api')
+    forceMerge "controlsfx", "bcprov", "jaxb", "javax", "istack", "stax", "log4j"
+
+    mergedModule {
+        requires 'java.logging';
+        requires 'jdk.xml.dom';
+        requires 'java.sql';
+        requires 'java.rmi';
+        requires 'java.xml';
+        requires 'com.sun.xml.txw2';
+        requires 'java.desktop';
+        requires 'java.security.jgss';
+        requires 'jdk.jsobject';
+        requires 'jdk.unsupported';
+        requires 'java.management';
+        requires 'java.naming';
+        requires 'jdk.unsupported.desktop';
+        requires 'java.security.sasl';
+        requires 'java.scripting';
+        requires 'java.datatransfer';
+        requires 'java.compiler';
+        requires 'java.transaction.xa';
+        requires 'com.sun.xml.fastinfoset';
+        requires 'org.slf4j';
+        uses 'com.airhacks.afterburner.injection.PresenterFactory';
+        uses 'org.controlsfx.glyphfont.GlyphFont';
+        uses 'com.airhacks.afterburner.views.ResourceLocator';
+        provides 'java.sql.Driver' with 'org.postgresql.Driver';
+        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome';
+        provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl';
+        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider';
+        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor';
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider';
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider';
+        provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
+                                    'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider';
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider';
+    }
+
 }
 
 jmh {
