@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ContextMenu;
@@ -27,7 +26,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreviewPreferences;
@@ -35,7 +33,7 @@ import org.jabref.preferences.PreviewPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PreviewPanel extends VBox implements SearchQueryHighlightListener {
+public class PreviewPanel extends VBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
@@ -52,7 +50,7 @@ public class PreviewPanel extends VBox implements SearchQueryHighlightListener {
         this.dialogService = dialogService;
         fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), database);
 
-        previewView = new PreviewViewer(database, dialogService);
+        previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
         previewView.setLayout(preferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(event -> {
@@ -105,11 +103,6 @@ public class PreviewPanel extends VBox implements SearchQueryHighlightListener {
 
     public void close() {
         basePanel.closeBottomPane();
-    }
-
-    @Override
-    public void highlightPattern(Optional<Pattern> newPattern) {
-        // TODO: Implement that search phrases are highlighted
     }
 
     public void updateLayout(PreviewPreferences previewPreferences) {

@@ -98,4 +98,10 @@
     -fx-padding: 20 20 20 20;
 }
 
+#bibtexSourceCodeArea .search {
+    -fx-fill: red;
+}
 
+.bibtexSourceCodeArea .text {
+    -fx-fill: -fx-text-background-color;
+}

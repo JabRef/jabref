@@ -1,5 +1,8 @@
 package org.jabref.logic.search;
 
+import java.util.Optional;
+import java.util.regex.Pattern;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
@@ -189,7 +192,15 @@ public class SearchQueryTest {
         String query = "progress";
 
         SearchQuery result = new SearchQuery(query, false, false);
-
         assertFalse(result.isGrammarBasedSearch());
+    }
+
+    @Test
+    public void testGetPattern() {
+        String query = "progress";
+        SearchQuery result = new SearchQuery(query, false, false);
+        Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
+        //We can't directly compare the pattern objects
+        assertEquals(Optional.of(pattern.toString()), result.getPatternForWords().map(Pattern::toString));
     }
 }
