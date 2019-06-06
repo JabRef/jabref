@@ -42,23 +42,23 @@
     </rowConstraints>
     <children>
         <Label styleClass="sectionHeader" text="%General" />
-        <Label text="\%Language:" GridPane.rowIndex="1" />
+        <Label text="%Language" GridPane.rowIndex="1" />
         <ComboBox fx:id="language" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="1" />
-        <Label text="\%Default encoding:" GridPane.rowIndex="2" />
+        <Label text="%Default encoding" GridPane.rowIndex="2" />
         <ComboBox fx:id="defaultEncoding" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="2" />
-        <Label text="\%Default bibliography mode:" GridPane.rowIndex="3" />
+        <Label text="%Default bibliography mode" GridPane.rowIndex="3" />
         <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="3" />
-        <CheckBox fx:id="inspectionWarningDuplicate" text="\%Warn about unresolved duplicates when closing inspection window" GridPane.columnSpan="3" GridPane.rowIndex="4" />
-        <CheckBox fx:id="confirmDelete" text="\%Show confirmation dialog when deleting entries" GridPane.columnSpan="3" GridPane.rowIndex="5" />
-        <CheckBox fx:id="enforceLegalKeys" text="\%Enforce legal characters in BibTex keys" GridPane.columnSpan="3" GridPane.rowIndex="6" />
-        <CheckBox fx:id="memoryStickMode" text="\%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)" GridPane.columnSpan="3" GridPane.rowIndex="7" />
-        <CheckBox fx:id="collectTelemetry" text="\%Collect and share telemetry data to help improve JabRef." GridPane.columnSpan="3" GridPane.rowIndex="8" />
-        <CheckBox fx:id="showAdvancedHints" text="\%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)" GridPane.columnSpan="3" GridPane.rowIndex="9" />
+        <CheckBox fx:id="inspectionWarningDuplicate" text="%Warn about unresolved duplicates when closing inspection window" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+        <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+        <CheckBox fx:id="enforceLegalKeys" text="%Enforce legal characters in BibTeX keys" GridPane.columnSpan="3" GridPane.rowIndex="6" />
+        <CheckBox fx:id="memoryStickMode" text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)" GridPane.columnSpan="3" GridPane.rowIndex="7" />
+        <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef." GridPane.columnSpan="3" GridPane.rowIndex="8" />
+        <CheckBox fx:id="showAdvancedHints" text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)" GridPane.columnSpan="3" GridPane.rowIndex="9" />
 
         <Label styleClass="sectionHeader" text="%Entry owner" GridPane.rowIndex="10" />
-        <CheckBox fx:id="markOwner" text="\%Mark new entries with owner name:" GridPane.rowIndex="11" />
+        <CheckBox fx:id="markOwner" text="%Mark new entries with owner name" GridPane.rowIndex="11" />
         <TextField fx:id="markOwnerName" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-        <CheckBox fx:id="markOwnerOverwrite" text="\%Overwrite" GridPane.columnIndex="2" GridPane.rowIndex="11">
+        <CheckBox fx:id="markOwnerOverwrite" text="%Overwrite" GridPane.columnIndex="2" GridPane.rowIndex="11">
             <GridPane.margin>
                 <Insets left="5.0" />
             </GridPane.margin>
@@ -66,17 +66,17 @@
         <Button fx:id="markOwnerHelp" GridPane.columnIndex="3" GridPane.rowIndex="11" />
 
         <Label styleClass="sectionHeader" text="%Time stamp" GridPane.rowIndex="12" />
-        <CheckBox fx:id="markTimestamp" text="\%Mark new entries with addition date" GridPane.columnSpan="3" GridPane.rowIndex="13" />
-        <Label text="\%Date format:" GridPane.halignment="RIGHT" GridPane.rowIndex="14" />
+        <CheckBox fx:id="markTimestamp" text="%Mark new entries with addition date" GridPane.columnSpan="3" GridPane.rowIndex="13" />
+        <Label text="%Date format" GridPane.rowIndex="14" />
         <TextField fx:id="markTimeStampFormat" GridPane.columnIndex="1" GridPane.rowIndex="14" />
-        <CheckBox fx:id="markTimeStampOverwrite" text="\%Overwrite" GridPane.columnIndex="2" GridPane.rowIndex="14">
+        <CheckBox fx:id="markTimeStampOverwrite" text="%Overwrite" GridPane.columnIndex="2" GridPane.rowIndex="14">
             <GridPane.margin>
                 <Insets left="5.0" />
             </GridPane.margin>
         </CheckBox>
-        <Label text="\%Field name:" GridPane.halignment="RIGHT" GridPane.rowIndex="15" />
+        <Label text="%Field name" GridPane.rowIndex="15" />
         <TextField fx:id="markTimeStampFieldName" GridPane.columnIndex="1" GridPane.rowIndex="15" />
         <Button fx:id="markTimeStampHelp" GridPane.columnIndex="3" GridPane.rowIndex="15" />
-        <CheckBox fx:id="updateTimeStamp" text="\%Update timestamp on modification" GridPane.rowIndex="16" />
+        <CheckBox fx:id="updateTimeStamp" text="%Update timestamp on modification" GridPane.rowIndex="16" />
     </children>
 </fx:root>
