@@ -8,10 +8,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -20,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.easybind.EasyBind;
 
 /**
@@ -28,7 +29,7 @@ import org.fxmisc.easybind.EasyBind;
  */
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
-    @FXML private TextField searchBox;
+    @FXML private CustomTextField searchBox;
     @FXML private ListView<PrefsTab> preferenceTabList;
     @FXML private ScrollPane preferencePaneContainer;
     @FXML private ButtonType saveButton;
@@ -69,6 +70,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             preferenceTabList.getSelectionModel().clearSelection();
             preferenceTabList.getSelectionModel().selectFirst();
         });
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab != null) {
