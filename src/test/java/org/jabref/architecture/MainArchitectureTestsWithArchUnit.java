@@ -40,4 +40,9 @@ public class MainArchitectureTestsWithArchUnit {
     public static void doNotUseGlazedLists(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
     }
+    
+    @ArchTest
+    public static void doNotUseJavaAWT(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("java.awt..").check(classes);
+    }
 }
