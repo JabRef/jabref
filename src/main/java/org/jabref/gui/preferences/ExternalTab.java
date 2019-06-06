@@ -3,7 +3,10 @@ package org.jabref.gui.preferences;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
@@ -18,9 +21,9 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
-import org.jabref.gui.push.PushToApplicationSettingsDialog;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.strings.StringUtil;
@@ -28,8 +31,11 @@ import org.jabref.preferences.JabRefPreferences;
 
 class ExternalTab implements PrefsTab {
 
+    private final JabRefFrame frame;
     private final JabRefPreferences prefs;
     private final TextField emailSubject;
+    private final ComboBox<PushToApplication> pushToApplicationComboBox;
+
     private final TextField citeCommand;
     private final CheckBox openFoldersOfAttachedFiles;
 
@@ -54,8 +60,13 @@ class ExternalTab implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
+        this.frame = frame;
         dialogService = frame.getDialogService();
         builder.setVgap(7);
+
+        pushToApplicationComboBox = new ComboBox<>();
+        Button pushToApplicationSettingsButton = new Button(Localization.lang("Application settings"));
+        pushToApplicationSettingsButton.setOnAction(e -> showPushToApplicationSettings());
 
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
         citeCommand = new TextField();
@@ -146,13 +157,19 @@ class ExternalTab implements PrefsTab {
         externalPrograms.getStyleClass().add("sectionHeader");
         builder.add(externalPrograms, 1, 9);
 
-        GridPane butpan = new GridPane();
-        int index = 0;
-        for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()) {
-            addSettingsButton(pushToApplication, butpan, index);
-            index++;
-        }
-        builder.add(butpan, 1, 10);
+        // PushToApplication configuration
+        HBox pushToApplicationHBox = new HBox();
+        pushToApplicationHBox.setAlignment(Pos.CENTER_LEFT);
+        pushToApplicationHBox.setSpacing(10);
+        pushToApplicationHBox.getChildren().add(new Label(Localization.lang("Application to push entries to:")));
+        new ViewModelListCellFactory<PushToApplication>()
+                .withText(application -> application.getApplicationName())
+                .withIcon(application -> application.getIcon())
+                .install(pushToApplicationComboBox);
+        pushToApplicationComboBox.getItems().addAll(frame.getPushToApplicationsManager().getApplications());
+        pushToApplicationHBox.getChildren().add(pushToApplicationComboBox);
+        pushToApplicationHBox.getChildren().add(pushToApplicationSettingsButton);
+        builder.add(pushToApplicationHBox, 1, 10);
 
         // Cite command configuration
         HBox citeCommandBox = new HBox();
@@ -196,24 +213,13 @@ class ExternalTab implements PrefsTab {
         return builder;
     }
 
-    private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
-        PushToApplicationSettings settings = PushToApplicationsManager.getSettings(application);
-        Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
-        button.setPrefSize(150, 20);
-        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(dialogService, settings, index));
-        if ((index % 2) == 0) {
-            panel.add(button, 1, (index / 2) + 1);
-        } else {
-            panel.add(button, 2, (index / 2) + 1);
-        }
-    }
-
     @Override
     public void setValues() {
 
         emailSubject.setText(prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
+        pushToApplicationComboBox.setValue(prefs.getActivePushToApplication(frame.getPushToApplicationsManager()));
         citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
         defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
@@ -243,6 +249,7 @@ class ExternalTab implements PrefsTab {
     public void storeSettings() {
         prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
         prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
+        prefs.setActivePushToApplication(pushToApplicationComboBox.getValue(), frame.getPushToApplicationsManager());
         prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
@@ -273,6 +280,20 @@ class ExternalTab implements PrefsTab {
     private void updateExecuteConsoleButtonAndFieldEnabledState() {
         browseButton.setDisable(!executeConsole.isSelected());
         consoleCommand.setDisable(!executeConsole.isSelected());
+    }
+
+    private void showPushToApplicationSettings() {
+        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
+        PushToApplication selectedApplication = pushToApplicationComboBox.getValue();
+        PushToApplicationSettings settings = manager.getSettings(selectedApplication);
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setContent(settings.getSettingsPane());
+
+        dialogService.showCustomDialogAndWait(Localization.lang("Application settings"), dialogPane, ButtonType.OK, ButtonType.CANCEL).ifPresent(btn -> {
+            if (btn == ButtonType.OK) {
+                settings.storeSettings();
+            }
+        });
     }
 
     private void showConsoleChooser() {

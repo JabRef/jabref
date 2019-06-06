@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
@@ -148,13 +147,9 @@ public class ActionFactory {
         button.getStyleClass().add("icon-button");
 
         // For some reason the graphic is not set correctly, so let's fix this
+        // ToDO: Find a way to reuse JabRefIconView
         button.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> {
-            // ToDO: Find a way to reuse JabRefIconView
-            Node graphicNode = icon.getGraphicNode();
-            graphicNode.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %s;", icon.fontFamily(), "1em"));
-            button.setGraphic(graphicNode);
-        });
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
         return button;
     }

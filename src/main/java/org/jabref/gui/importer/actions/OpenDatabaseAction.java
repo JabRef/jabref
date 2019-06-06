@@ -161,6 +161,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             final List<Path> theFiles = Collections.unmodifiableList(filesToOpen);
 
             for (Path theFile : theFiles) {
+                //This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile, raisePanel);
             }
 

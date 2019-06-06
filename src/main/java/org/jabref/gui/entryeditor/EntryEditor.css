@@ -31,6 +31,16 @@
     -fx-background-color: -jr-icon-background-active;
 }
 
+#typeLabel .context-menu {
+    -fx-font-size: 0.92em;
+    -fx-font-weight: normal;
+}
+
+#typeLabel .tooltip {
+    -fx-font-size: 1em;
+    -fx-font-weight: normal;
+}
+
 .icon-button.narrow {
     -fx-padding: 0.1em;
 }
@@ -88,4 +98,10 @@
     -fx-padding: 20 20 20 20;
 }
 
+#bibtexSourceCodeArea .search {
+    -fx-fill: red;
+}
 
+.bibtexSourceCodeArea .text {
+    -fx-fill: -fx-text-background-color;
+}

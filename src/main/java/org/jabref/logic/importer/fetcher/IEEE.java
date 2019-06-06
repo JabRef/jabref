@@ -85,10 +85,9 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         final List<String> authors = new ArrayList<>();
         JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
         authorsContainer.getJSONArray("authors").forEach(authorPure -> {
-                    JSONObject author = (JSONObject) authorPure;
-                    authors.add(author.optString("full_name"));
-                }
-        );
+            JSONObject author = (JSONObject) authorPure;
+            authors.add(author.optString("full_name"));
+        });
         entry.setField(FieldName.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
         entry.setField(FieldName.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(FieldName.DOI, jsonEntry.optString("doi"));
@@ -96,14 +95,18 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
         if (keywordsContainer != null) {
-            keywordsContainer.getJSONObject("ieee_terms").getJSONArray("terms").forEach(data -> {
-                String keyword = (String) data;
-                entry.addKeyword(keyword, keywordSeparator);
-            });
-            keywordsContainer.getJSONObject("author_terms").getJSONArray("terms").forEach(data -> {
-                String keyword = (String) data;
-                entry.addKeyword(keyword, keywordSeparator);
-            });
+            if (keywordsContainer.has("ieee_terms")) {
+                keywordsContainer.getJSONObject("ieee_terms").getJSONArray("terms").forEach(data -> {
+                    String keyword = (String) data;
+                    entry.addKeyword(keyword, keywordSeparator);
+                });
+            }
+            if (keywordsContainer.has("author_terms")) {
+                keywordsContainer.getJSONObject("author_terms").getJSONArray("terms").forEach(data -> {
+                    String keyword = (String) data;
+                    entry.addKeyword(keyword, keywordSeparator);
+                });
+            }
         }
 
         entry.setField(FieldName.ISBN, jsonEntry.optString("isbn"));

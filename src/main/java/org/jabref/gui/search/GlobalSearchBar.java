@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
@@ -42,11 +44,13 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -72,9 +76,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton regularExp;
     private final Button searchModeButton = new Button();
     private final Label currentResults = new Label("");
-    private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private SearchWorker searchWorker;
-
+    private final Tooltip tooltip = new Tooltip();
     private SearchDisplayMode searchDisplayMode;
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -85,6 +87,11 @@ public class GlobalSearchBar extends HBox {
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
+
+        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        tooltip.setMaxHeight(10);
+        searchField.setTooltip(null);
+        updateHintVisibility();
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -145,11 +152,16 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        this.getChildren().addAll(
-                                  searchField,
-                                  currentResults);
+        this.getChildren().addAll(searchField, currentResults);
 
         this.setAlignment(Pos.CENTER_LEFT);
+
+        EasyBind.subscribe(Globals.stateManager.activeSearchQueryProperty(), searchQuery -> {
+            searchQuery.ifPresent(query -> {
+                updateResults(Globals.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                              query.isGrammarBasedSearch());
+            });
+        });
     }
 
     private void toggleSearchModeAndSearch() {
@@ -171,7 +183,6 @@ public class GlobalSearchBar extends HBox {
             clearSearch();
             MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
             mainTable.requestFocus();
-            //SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
         }
     }
 
@@ -188,8 +199,7 @@ public class GlobalSearchBar extends HBox {
     private void clearSearch() {
         currentResults.setText("");
         searchField.setText("");
-        searchQueryHighlightObservable.reset();
-
+        setHintTooltip(null);
         Globals.stateManager.clearSearchQuery();
     }
 
@@ -198,11 +208,6 @@ public class GlobalSearchBar extends HBox {
         if (currentBasePanel == null) {
             return;
         }
-
-        if (searchWorker != null) {
-            searchWorker.cancel(true);
-        }
-
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             clearSearch();
@@ -217,15 +222,10 @@ public class GlobalSearchBar extends HBox {
 
         Globals.stateManager.setSearchQuery(searchQuery);
 
-        // TODO: Remove search worker as this is doing the work twice now
-        searchWorker = new SearchWorker(currentBasePanel, searchQuery, searchDisplayMode);
-        searchWorker.execute();
     }
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-
-        searchQueryHighlightObservable.reset();
 
         Globals.stateManager.clearSearchQuery();
 
@@ -259,10 +259,6 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
-        return searchQueryHighlightObservable;
-    }
-
     private SearchQuery getSearchQuery() {
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
         this.frame.getCurrentBasePanel().setCurrentSearchQuery(searchQuery);
@@ -284,11 +280,35 @@ public class GlobalSearchBar extends HBox {
             // TODO: switch Icon color
             //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
-        Tooltip tooltip = new Tooltip();
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setGraphic(description);
-        tooltip.setMaxHeight(10);
-        searchField.setTooltip(tooltip);
+
+        setHintTooltip(description);
+    }
+
+    private void setHintTooltip(TextFlow description) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS)) {
+            String genericDescription = Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
+            genericDescription = genericDescription.replace("<p>", "\n");
+            List<Text> genericDescriptionTexts = TooltipTextUtil.formatToTexts(genericDescription, new TooltipTextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
+
+            if (description != null) {
+                description.getChildren().add(new Text("\n\n"));
+                description.getChildren().addAll(genericDescriptionTexts);
+                tooltip.setGraphic(description);
+            } else {
+                TextFlow emptyHintTooltip = new TextFlow();
+                emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
+                tooltip.setGraphic(emptyHintTooltip);
+            }
+        }
+    }
+
+    public void updateHintVisibility() {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS)) {
+            searchField.setTooltip(tooltip);
+        } else {
+            searchField.setTooltip(null);
+        }
+        setHintTooltip(null);
     }
 
     public void setSearchTerm(String searchTerm) {
@@ -366,6 +386,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
+            //empty
         }
     }
 }

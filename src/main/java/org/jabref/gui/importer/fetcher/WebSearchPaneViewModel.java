@@ -12,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
@@ -25,21 +26,19 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebSearchPaneViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebSearchPaneViewModel.class);
 
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final JabRefFrame frame;
+    private final DialogService dialogService;
 
-    public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences) {
+    public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService) {
         // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
         this.frame = frame;
+        this.dialogService = dialogService;
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
         allFetchers.sort(Comparator.comparing(WebFetcher::getName));
@@ -84,12 +83,12 @@ public class WebSearchPaneViewModel {
 
     public void search() {
         if (StringUtil.isBlank(getQuery())) {
-            frame.getDialogService().notify(Localization.lang("Please enter a search string"));
+            dialogService.notify(Localization.lang("Please enter a search string"));
             return;
         }
 
         if (frame.getCurrentBasePanel() == null) {
-            frame.getDialogService().notify(Localization.lang("Please open or start a new library before searching"));
+            dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
 
@@ -97,6 +96,8 @@ public class WebSearchPaneViewModel {
 
         BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
                                                             .withInitialMessage(Localization.lang("Processing %0", getQuery()));
+
+        task.onFailure(ex -> dialogService.showErrorDialogAndWait(ex));
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
         dialog.setTitle(activeFetcher.getName());

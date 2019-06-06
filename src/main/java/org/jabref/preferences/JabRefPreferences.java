@@ -53,11 +53,16 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportSettingsTab;
+import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
@@ -221,6 +226,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
+    public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
     public static final String TOOLBAR_VISIBLE = "toolbarVisible";
@@ -587,6 +593,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
+        defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
         defaults.put(FONT_STYLE, Font.PLAIN);
@@ -1586,7 +1593,13 @@ public class JabRefPreferences implements PreferencesService {
 
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
         putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
-        putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle());
+        putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle().stream().map(layout -> {
+            if (layout instanceof CitationStylePreviewLayout) {
+                return ((CitationStylePreviewLayout) layout).getFilePath();
+            } else {
+                return layout.getName();
+            }
+        }).collect(Collectors.toList()));
         putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
@@ -1601,7 +1614,26 @@ public class JabRefPreferences implements PreferencesService {
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
         boolean enabled = getBoolean(PREVIEW_ENABLED);
-        return new PreviewPreferences(cycle, cyclePos, panelHeight, enabled, style, styleDefault);
+
+        // For backwards compatibility always add at least the default preview to the cycle
+        if (cycle.isEmpty()) {
+            cycle.add("Preview");
+        }
+
+        List<PreviewLayout> layouts = cycle.stream()
+                                           .map(layout -> {
+                                               if (CitationStyle.isCitationStyleFile(layout)) {
+                                                   return CitationStyle.createCitationStyleFromFile(layout)
+                                                                       .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
+                                                                       .orElse(null);
+                                               } else {
+                                                   return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                                               }
+                                           })
+                                           .filter(Objects::nonNull)
+                                           .collect(Collectors.toList());
+
+        return new PreviewPreferences(layouts, cyclePos, panelHeight, enabled, style, styleDefault);
     }
 
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
@@ -2074,5 +2106,16 @@ public class JabRefPreferences implements PreferencesService {
 
         storeCustomEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
 
+    }
+
+    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
+        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
+    }
+
+    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
+        if (application.getApplicationName() != get(PUSH_TO_APPLICATION)) {
+            put(PUSH_TO_APPLICATION, application.getApplicationName());
+            manager.updateApplicationAction();
+        }
     }
 }

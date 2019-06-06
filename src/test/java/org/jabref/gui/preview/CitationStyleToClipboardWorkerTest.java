@@ -1,4 +1,4 @@
-package org.jabref.gui.worker;
+package org.jabref.gui.preview;
 
 import java.util.Arrays;
 

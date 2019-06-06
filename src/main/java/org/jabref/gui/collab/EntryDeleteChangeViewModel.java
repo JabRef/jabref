@@ -4,8 +4,7 @@ import javafx.scene.Node;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -46,8 +45,8 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        PreviewPanel previewPanel = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), JabRefGUI.getMainFrame().getDialogService(), ExternalFileTypes.getInstance());
-        previewPanel.setEntry(memEntry);
-        return previewPanel;
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), Globals.stateManager);
+        previewViewer.setEntry(memEntry);
+        return previewViewer;
     }
 }

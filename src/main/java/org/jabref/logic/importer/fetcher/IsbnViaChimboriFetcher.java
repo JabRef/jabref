@@ -10,11 +10,11 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.jsoup.helper.StringUtil;
 
 /**
  * Fetcher for ISBN using https://bibtex.chimbori.com/, which in turn uses Amazon's API.

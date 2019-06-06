@@ -54,6 +54,8 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.preview.CitationStyleToClipboardWorker;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -64,7 +66,6 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -128,6 +129,7 @@ public class BasePanel extends StackPane {
     private final ExternalFileTypes externalFileTypes;
 
     private final EntryEditor entryEditor;
+    private final DialogService dialogService;
     private MainTable mainTable;
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
@@ -135,23 +137,17 @@ public class BasePanel extends StackPane {
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
     private boolean saving;
-
     // AutoCompleter used in the search bar
     private PersonNameSuggestionProvider searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
-
     private SuggestionProviders suggestionProviders;
-
     @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
-
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
-
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
-    private final DialogService dialogService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -184,10 +180,9 @@ public class BasePanel extends StackPane {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR);
+        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR, Globals.stateManager);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService, externalFileTypes);
-        frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
+        this.preview = new PreviewPanel(getBibDatabaseContext(), this, dialogService, externalFileTypes, Globals.getKeyPrefs(), preferences.getPreviewPreferences());
     }
 
     @Subscribe
@@ -954,8 +949,7 @@ public class BasePanel extends StackPane {
      * Closes the entry editor or preview panel if it is showing the given entry.
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry)) || ((mode == BasePanelMode.SHOWING_PREVIEW))) {
             closeBottomPane();
         }
     }
@@ -1141,10 +1135,6 @@ public class BasePanel extends StackPane {
         return citationStyleCache;
     }
 
-    public PreviewPanel getPreviewPanel() {
-        return preview;
-    }
-
     public FileAnnotationCache getAnnotationCache() {
         return annotationCache;
     }
@@ -1172,6 +1162,11 @@ public class BasePanel extends StackPane {
 
     public void cut() {
         mainTable.cut();
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent entryChangedEvent) {
+        this.markBaseChanged();
     }
 
     private static class SearchAndOpenFile {
@@ -1280,11 +1275,6 @@ public class BasePanel extends StackPane {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
-    }
-
-    @Subscribe
-    public void listen(EntryChangedEvent entryChangedEvent) {
-        this.markBaseChanged();
     }
 
     private class UndoAction implements BaseAction {

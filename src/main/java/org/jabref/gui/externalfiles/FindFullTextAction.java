@@ -13,6 +13,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.util.BackgroundTask;
@@ -69,14 +70,14 @@ public class FindFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<Optional<URL>, BibEntry>> findFullTextsTask = new Task<Map<Optional<URL>, BibEntry>>() {
+        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
             @Override
-            protected Map<Optional<URL>, BibEntry> call() {
-                Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+            protected Map<BibEntry, Optional<URL>> call() {
+                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : basePanel.getSelectedEntries()) {
                     FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-                    downloads.put(fetchers.findFullTextPDF(entry), entry);
+                    downloads.put(entry, fetchers.findFullTextPDF(entry));
                     updateProgress(++count, basePanel.getSelectedEntries().size());
                 }
                 return downloads;
@@ -93,10 +94,10 @@ public class FindFullTextAction extends SimpleCommand {
         Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
 
-    private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
-        for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
-            BibEntry entry = download.getValue();
-            Optional<URL> result = download.getKey();
+    private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads) {
+        for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
+            BibEntry entry = download.getKey();
+            Optional<URL> result = download.getValue();
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFilePreferences());
 
@@ -136,7 +137,7 @@ public class FindFullTextAction extends SimpleCommand {
                     basePanel.getBibDatabaseContext(),
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    JabRefPreferences.getInstance());
+                    JabRefPreferences.getInstance(), ExternalFileTypes.getInstance());
 
             try {
                 URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
@@ -144,7 +145,7 @@ public class FindFullTextAction extends SimpleCommand {
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
-                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()));
+                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
                             entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
