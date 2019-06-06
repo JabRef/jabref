@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
+<?import javafx.scene.control.Tooltip?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1"
          type="GridPane"
          xmlns="http://javafx.com/javafx/8.0.212"
@@ -62,6 +63,7 @@
             <GridPane.margin>
                 <Insets left="5.0" />
             </GridPane.margin>
+            <tooltip><Tooltip text="%If a pasted or imported entry already has the field set, overwrite." /></tooltip>
         </CheckBox>
         <Button fx:id="markOwnerHelp" GridPane.columnIndex="3" GridPane.rowIndex="11" />
 
@@ -73,6 +75,7 @@
             <GridPane.margin>
                 <Insets left="5.0" />
             </GridPane.margin>
+            <tooltip><Tooltip text="%If a pasted or imported entry already has the field set, overwrite." /></tooltip>
         </CheckBox>
         <Label text="%Field name" GridPane.rowIndex="15" />
         <TextField fx:id="markTimeStampFieldName" GridPane.columnIndex="1" GridPane.rowIndex="15" />
