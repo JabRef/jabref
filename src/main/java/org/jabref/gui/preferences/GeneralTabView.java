@@ -56,7 +56,6 @@ public class GeneralTabView extends GridPane implements PrefsTab {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-// ???       Globals.getThemeLoader().installCss(this.getScene(), Globals.prefs);
     }
 
     public void initialize() {
