@@ -91,17 +91,16 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     public void reportIssue() {
         try {
-            String issueTitle = "Automatic Bug Report - " + dateFormat.format(date);
-            // system info
+            // System info
             String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
-            // steps to reproduce
+            // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
-            // log messages
+            // Log messages
             String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
                     + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
             clipBoardManager.setContent(issueDetails);
-            // bug report body
+            // Bug report body
             String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
 
             dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
@@ -114,7 +113,6 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             URIBuilder uriBuilder = new URIBuilder()
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
-                    .setParameter("title", issueTitle)
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
