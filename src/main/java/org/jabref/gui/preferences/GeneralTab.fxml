@@ -17,10 +17,10 @@
          fx:controller="org.jabref.gui.preferences.GeneralTabView">
 
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="230.0" />
-        <ColumnConstraints hgrow="ALWAYS" maxWidth="-Infinity" minWidth="200.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="-Infinity" minWidth="250.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0"/>
+        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"/>
     </columnConstraints>
     <rowConstraints>
         <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />

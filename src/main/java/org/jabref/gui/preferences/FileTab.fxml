@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<fx:root type="GridPane" xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.preferences.FileTabView">
+
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="-Infinity" minWidth="250.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0"/>
+        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints valignment="CENTER" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <Label styleClass="sectionHeader" text="%General"/>
+        <CheckBox text="%Open last edited libraries at startup" GridPane.columnSpan="3" GridPane.rowIndex="1"/>
+        <CheckBox text="%Backup old file when saving" GridPane.columnSpan="3" GridPane.rowIndex="2"/>
+        <Label text="%Do not wrap the following fields when saving" GridPane.rowIndex="3"/>
+        <TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <RadioButton text="%Resolve strings for standard BibTeX fields only" GridPane.rowIndex="4">
+            <toggleGroup>
+                <ToggleGroup fx:id="stringsResolveToggleGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton text="%Resolve strings for all fields except" toggleGroup="$stringsResolveToggleGroup"
+                     GridPane.rowIndex="5"/>
+        <TextField GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <Label text="%Newline separator" GridPane.rowIndex="6"/>
+        <ComboBox prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="6"/>
+        <CheckBox text="%Always reformat BIB file on save and export" GridPane.columnSpan="3" GridPane.rowIndex="7"/>
+
+        <Label styleClass="sectionHeader" text="%External file links" GridPane.rowIndex="8"/>
+        <Label text="%Main file directory" GridPane.rowIndex="9"/>
+        <TextField GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+        <Button maxWidth="1.7976931348623157E308" text="%Browse" GridPane.columnIndex="2" GridPane.hgrow="SOMETIMES"
+                GridPane.rowIndex="9">
+            <GridPane.margin>
+                <Insets left="5.0" right="5.0"/>
+            </GridPane.margin>
+        </Button>
+        <CheckBox text="%Use the BIB file location as primary file directory" GridPane.columnSpan="3"
+                  GridPane.rowIndex="10"/>
+        <Button GridPane.columnIndex="3" GridPane.rowIndex="10"/>
+        <RadioButton text="%Autolink files with names starting with the BibTeX key" GridPane.columnSpan="2147483647"
+                     GridPane.rowIndex="11">
+            <toggleGroup>
+                <ToggleGroup fx:id="autolinkToggleGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton text="%Autolink only files that match the BibTeX key" toggleGroup="$autolinkToggleGroup"
+                     GridPane.columnSpan="2147483647" GridPane.rowIndex="12"/>
+        <RadioButton text="%Use regular expression search" toggleGroup="$autolinkToggleGroup" GridPane.rowIndex="13"/>
+        <TextField GridPane.columnIndex="1" GridPane.rowIndex="13"/>
+        <CheckBox text="%When opening file link, search for matching file if no link is defined" GridPane.columnSpan="3"
+                  GridPane.rowIndex="14"/>
+        <CheckBox text="%Automatically open browse dialog when creating new file link" GridPane.columnSpan="3"
+                  GridPane.rowIndex="15"/>
+        <Label styleClass="sectionHeader" text="%Autosave" GridPane.rowIndex="17"/>
+        <CheckBox text="%Autosave local libraries" GridPane.rowIndex="18"/>
+        <Button GridPane.columnIndex="3" GridPane.rowIndex="18"/>
+    </children>
+</fx:root>

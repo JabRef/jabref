@@ -48,7 +48,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         preferenceTabs = FXCollections.observableArrayList();
         preferenceTabs.add(new GeneralTabView(dialogService, prefs));
-        preferenceTabs.add(new FileTab(dialogService, prefs));
+        preferenceTabs.add(new FileTabView(dialogService, prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
         preferenceTabs.add(new PreviewPreferencesTab(dialogService, taskExecutor));
