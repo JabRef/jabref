@@ -96,7 +96,7 @@ public class SharedDatabaseUIManager {
         message.append("\r\n");
         message.append(Localization.lang("Local version: %0", String.valueOf(localBibEntry.getSharedBibEntryData().getVersion())));
         message.append("\r\n");
-        message.append(Localization.lang("Please merge the shared entry with yours and press \"Merge entries\" to resolve this problem."));
+        message.append(Localization.lang("Press \"Merge entries\" to merge the changes and resolve this problem."));
         message.append("\r\n");
         message.append(Localization.lang("Canceling this operation will leave your changes unsynchronized."));
 
