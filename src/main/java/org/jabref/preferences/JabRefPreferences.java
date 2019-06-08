@@ -1,7 +1,5 @@
 package org.jabref.preferences;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +34,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -596,7 +596,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
-        defaults.put(FONT_STYLE, Font.PLAIN);
+        defaults.put(FONT_STYLE, FontWeight.NORMAL);
         defaults.put(FONT_SIZE, 12);
         // Main table color settings:
         defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
@@ -1123,13 +1123,13 @@ public class JabRefPreferences implements PreferencesService {
     public Color getColor(String key) {
         String value = get(key);
         int[] rgb = getRgb(value);
-        return new Color(rgb[0], rgb[1], rgb[2]);
+        return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
 
     public Color getDefaultColor(String key) {
         String value = (String) defaults.get(key);
         int[] rgb = getRgb(value);
-        return new Color(rgb[0], rgb[1], rgb[2]);
+        return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
 
     /**

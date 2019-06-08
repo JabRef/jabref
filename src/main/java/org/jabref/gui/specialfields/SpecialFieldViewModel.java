@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.Icon;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
@@ -39,10 +38,6 @@ public class SpecialFieldViewModel {
                 // otherwise, another setting does not empty the field
                 field.getValues().size() == 1,
                 getLocalization());
-    }
-
-    public Icon getRepresentingIcon() {
-        return getAction().getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
     }
 
     public JabRefIcon getIcon() {

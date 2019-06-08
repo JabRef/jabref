@@ -1281,7 +1281,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void decreaseTableFontSize() {
-        int currentSize = GUIGlobals.currentFont.getSize();
+        double currentSize = GUIGlobals.currentFont.getSize();
         if (currentSize < 2) {
             return;
         }
