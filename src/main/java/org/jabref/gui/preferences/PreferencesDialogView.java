@@ -57,9 +57,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize () {
-        viewModel = new PreferencesDialogViewModel(dialogService, taskExecutor, frame, this);
-        getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
-        preferencePaneContainer.getStyleClass().add("preferencePaneContainer");
+        viewModel = new PreferencesDialogViewModel(dialogService, taskExecutor, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
@@ -86,7 +84,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 .withText(PrefsTab::getTabName)
                 .install(preferenceTabList);
 
-        setValues();
+        viewModel.setValues(); // ToDo: Remove this after conversion of all tabs
     }
 
     @FXML
@@ -116,20 +114,5 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML
     void resetPreferences() {
         viewModel.resetPreferences();
-    }
-
-    /**
-     * Sets the values in each preference tab according to Globals.prefs.
-     * Currently the PreferenceDialogViewModel uses this method, which,
-     * I believe, is not allowed in the MVVM-model. Fixing this would
-     * probably require refactoring the JabRefPreferences to use
-     * Properties probably (?), which would go way beyond this PR.
-     * So this is just deprecated and awaits refactoring.
-     */
-    @Deprecated
-    public void setValues() {
-        for (PrefsTab prefsTab : viewModel.getPreferenceTabs()) {
-            prefsTab.setValues();
-        }
     }
 }

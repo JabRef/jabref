@@ -36,15 +36,13 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final JabRefPreferences prefs;
     private final ObservableList<PrefsTab> preferenceTabs;
-    private final PreferencesDialogView view;
     private final JabRefFrame frame;
 
-    public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame, PreferencesDialogView view) {
+    public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame) {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.prefs = Globals.prefs;
         this.frame = frame;
-        this.view = view;
 
         preferenceTabs = FXCollections.observableArrayList();
         preferenceTabs.add(new GeneralTabView(dialogService, prefs));
@@ -136,7 +134,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     private void updateAfterPreferenceChanges() {
 
-        view.setValues();
+        setValues();
 
         List<TemplateExporter> customExporters = prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
@@ -163,5 +161,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));
+    }
+
+    public void setValues() {
+        for (PrefsTab prefsTab : preferenceTabs) {
+            prefsTab.setValues();
+        }
     }
 }

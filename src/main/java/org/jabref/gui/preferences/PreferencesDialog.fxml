@@ -42,7 +42,7 @@
                         </VBox>
                     </children>
                 </VBox>
-                <ScrollPane fx:id="preferencePaneContainer" maxHeight="Infinity" maxWidth="Infinity" />
+                <ScrollPane fx:id="preferencePaneContainer" styleClass="preferencePaneContainer" maxHeight="Infinity" maxWidth="Infinity" />
             </items>
         </SplitPane>
     </content>

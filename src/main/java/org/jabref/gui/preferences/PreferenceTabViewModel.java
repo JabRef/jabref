@@ -6,6 +6,5 @@ public interface PreferenceTabViewModel {
 
     void storeSettings();
 
-    boolean validateSettings();
-
+    boolean validateSettings(); // ToDo: Remove this after implementation of MVVMFX Validator
 }

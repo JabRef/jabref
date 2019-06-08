@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -23,7 +23,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GeneralTabView extends GridPane implements PrefsTab {
+public class GeneralTabView extends VBox implements PrefsTab {
 
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
@@ -99,7 +99,7 @@ public class GeneralTabView extends GridPane implements PrefsTab {
 
     @Override
     public void setValues() {
-        // Done by bindings
+        // ToDo: Remove this after conversion of all tabs
     }
 
     @Override
