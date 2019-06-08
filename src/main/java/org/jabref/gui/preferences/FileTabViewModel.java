@@ -2,7 +2,6 @@ package org.jabref.gui.preferences;
 
 import org.jabref.gui.DialogService;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.NewLineSeperator;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
