@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -31,6 +33,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
+import org.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -81,9 +84,40 @@ public class SharedDatabaseUIManager {
 
         jabRefFrame.getDialogService().notify(Localization.lang("Update refused."));
 
-        new MergeSharedEntryDialog(jabRefFrame, dbmsSynchronizer, updateRefusedEvent.getLocalBibEntry(),
-                                   updateRefusedEvent.getSharedBibEntry(),
-                                   updateRefusedEvent.getBibDatabaseContext().getMode()).showMergeDialog();
+        BibEntry localBibEntry = updateRefusedEvent.getLocalBibEntry();
+        BibEntry sharedBibEntry = updateRefusedEvent.getSharedBibEntry();
+
+        StringBuilder message = new StringBuilder();
+        message.append(Localization.lang("Update could not be performed due to existing change conflicts."));
+        message.append("\r\n");
+        message.append(Localization.lang("You are not working on the newest version of BibEntry."));
+        message.append("\r\n");
+        message.append(Localization.lang("Shared version: %0", String.valueOf(sharedBibEntry.getSharedBibEntryData().getVersion())));
+        message.append("\r\n");
+        message.append(Localization.lang("Local version: %0", String.valueOf(localBibEntry.getSharedBibEntryData().getVersion())));
+        message.append("\r\n");
+        message.append(Localization.lang("Please merge the shared entry with yours and press \"Merge entries\" to resolve this problem."));
+        message.append("\r\n");
+        message.append(Localization.lang("Canceling this operation will leave your changes unsynchronized."));
+
+        ButtonType merge = new ButtonType(Localization.lang("Merge entries"), ButtonBar.ButtonData.YES);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
+
+        if (response.isPresent() && response.get().equals(merge)) {
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, updateRefusedEvent.getBibDatabaseContext().getMode());
+            Optional<BibEntry> mergedEntry = dialog.showAndWait();
+
+            mergedEntry.ifPresent(mergedBibEntry -> {
+                mergedBibEntry.getSharedBibEntryData().setSharedID(sharedBibEntry.getSharedBibEntryData().getSharedID());
+                mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
+
+                dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
+                dbmsSynchronizer.synchronizeLocalDatabase();
+            });
+
+        }
+
     }
 
     @Subscribe
