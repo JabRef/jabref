@@ -132,8 +132,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
     }
 
+    /**
+     * Reloads the JabRefPreferences into the UI
+     */
     private void updateAfterPreferenceChanges() {
-
         setValues();
 
         List<TemplateExporter> customExporters = prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
@@ -144,16 +146,24 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         prefs.updateEntryEditorTabList();
     }
 
+    /**
+     * Checks if all tabs are ready to close and stores settings.
+     *
+     * ToDo:
+     * After conversion to MVVM, validation checks will be run by
+     * mvvmfx.utils.validation, so this needs to be removed.
+     */
     public void storeAllSettings() {
-        // First check that all tabs are ready to close:
+        // Run validation checks
         for (PrefsTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return; // If not, break off.
             }
         }
-        // Then store settings and close:
+
+        // Store settings
         for (PrefsTab tab : preferenceTabs) {
-            tab.storeSettings();
+            tab.storeSettings(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().storeSettings();
         }
         prefs.flush();
 
@@ -163,9 +173,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         dialogService.notify(Localization.lang("Preferences recorded."));
     }
 
+    /**
+     * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
+     */
     public void setValues() {
         for (PrefsTab prefsTab : preferenceTabs) {
-            prefsTab.setValues();
+            prefsTab.setValues(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().setValues();
         }
     }
 }

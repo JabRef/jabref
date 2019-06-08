@@ -1,6 +1,6 @@
 package org.jabref.preferences;
 
-public enum NewLineSeperator {
+public enum NewLineSeparator {
     CR,
     LF,
     CRLF;
@@ -10,10 +10,21 @@ public enum NewLineSeperator {
      * Possible are CR ("\n"), LF ("\r") and the windows standard CR/LF.
      */
 
+    public String toString() {
+        switch (this) {
+            case CR:
+                return "CR";
+            case LF:
+                return "LF";
+            default:
+                return "CR/LF";
+        }
+    }
+
     /**
      * @return the name of the current mode as String
      */
-    public String getEscapeSign() {
+    public String getEscapeChars() {
         switch (this) {
             case CR:
                 return "\r";
@@ -25,9 +36,9 @@ public enum NewLineSeperator {
     }
 
     /**
-     * Returns the {@link NewLineSeperator} that equals the given string.
+     * Returns the {@link NewLineSeparator} that equals the given string.
      **/
-    public static NewLineSeperator parse(String data) {
+    public static NewLineSeparator parse(String data) {
         switch (data) {
             case "\r":
                 return CR;

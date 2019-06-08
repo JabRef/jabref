@@ -2118,4 +2118,24 @@ public class JabRefPreferences implements PreferencesService {
             manager.updateApplicationAction();
         }
     }
+
+    public NewLineSeparator getNewLineSeparator() {
+        String newline = get(JabRefPreferences.NEWLINE);
+        if ("\r".equals(newline)) {
+            return NewLineSeparator.CR;
+        } else if ("\n".equals(newline)) {
+            return NewLineSeparator.LF;
+        } else {
+            // fallback: windows standard
+            return NewLineSeparator.CRLF;
+        }
+    }
+
+    public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
+        String escapeChars = newLineSeparator.getEscapeChars();
+        put(JabRefPreferences.NEWLINE, escapeChars);
+
+        // we also have to change Globals variable as globals is not a getter, but a constant
+        OS.NEWLINE = escapeChars;
+    }
 }
