@@ -165,7 +165,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private CodeArea createSourceEditor() {
-        codeArea = new CodeArea();
+        CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
@@ -187,6 +187,7 @@ public class SourceTab extends EntryEditorTab {
 
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
+        this.codeArea = codeArea;
 
         return codeArea;
     }
