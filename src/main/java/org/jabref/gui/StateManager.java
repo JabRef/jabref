@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -23,9 +24,8 @@ import org.jabref.model.util.OptionalUtil;
  * This class manages the GUI-state of JabRef, including:
  * - currently selected database
  * - currently selected group
- * Coming soon:
- * - open databases
  * - active search
+ * - active number of search results
  */
 public class StateManager {
 
@@ -34,6 +34,7 @@ public class StateManager {
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
+    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -45,6 +46,14 @@ public class StateManager {
 
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
+    }
+
+    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
+        searchResultMap.put(database, resultSize);
+    }
+
+    public IntegerProperty getSearchResultSize() {
+        return searchResultMap.get(activeDatabase.getValue().orElse(new BibDatabaseContext()));
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -79,7 +88,7 @@ public class StateManager {
 
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
-                .collect(Collectors.toList());
+                           .collect(Collectors.toList());
     }
 
     public void clearSearchQuery() {

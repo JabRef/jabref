@@ -5,6 +5,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -21,6 +24,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -36,6 +40,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -58,10 +63,12 @@ public class SourceTab extends EntryEditorTab {
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
-    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    @SuppressWarnings("unchecked") private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
+    private final StateManager stateManager;
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
 
     private class EditAction extends SimpleCommand {
@@ -92,7 +99,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -102,6 +109,25 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
+
+    }
+
+    private void highlightSearchPattern() {
+        if (searchHighlightPattern.isPresent() && codeArea != null) {
+            codeArea.setStyleClass(0, codeArea.getLength(), "text");
+            Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
+            while (matcher.find()) {
+                for (int i = 0; i <= matcher.groupCount(); i++) {
+                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                }
+            }
+        }
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -148,6 +174,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.insertText(codeArea.getCaretPosition(), committed);
             }
         });
+        codeArea.setId("bibtexSourceCodeArea");
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         ContextMenu contextMenu = new ContextMenu();
@@ -198,10 +225,11 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
+                    highlightSearchPattern();
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                     LOGGER.debug("Incorrect entry", ex);
                 }
             });
@@ -254,8 +282,7 @@ public class SourceTab extends EntryEditorTab {
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
-                    compound.addEdit(
-                                     new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                    compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                     outOfFocusEntry.clearField(fieldName);
                 }
             }
@@ -267,8 +294,7 @@ public class SourceTab extends EntryEditorTab {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(fieldFormatterPreferences)
-                            .format(newValue, fieldName);
+                    new LatexFieldFormatter(fieldFormatterPreferences).format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);

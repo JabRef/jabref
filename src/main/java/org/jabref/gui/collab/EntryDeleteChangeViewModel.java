@@ -2,6 +2,7 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
+import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
@@ -44,7 +45,7 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService());
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), Globals.stateManager);
         previewViewer.setEntry(memEntry);
         return previewViewer;
     }

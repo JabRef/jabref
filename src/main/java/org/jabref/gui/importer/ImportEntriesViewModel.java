@@ -10,6 +10,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -50,7 +51,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(entriesToImport -> entries.addAll(entriesToImport))
-            .executeWith(taskExecutor);
+                .executeWith(taskExecutor);
     }
 
     public String getMessage() {
@@ -75,24 +76,32 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
-            boolean containsDuplicate = entriesToImport.stream()
-                                                       .anyMatch(this::hasDuplicate);
+            BackgroundTask.wrap(() -> entriesToImport.stream()
+                    .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
+                if (duplicateFound) {
+                    boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                            Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                            Localization.lang("Continue with import"),
+                            Localization.lang("Cancel import"),
+                            Localization.lang("Disable this confirmation dialog"),
+                            optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
 
-            if (containsDuplicate) {
-                boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                        Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                        Localization.lang("Continue with import"),
-                        Localization.lang("Cancel import"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
-
-                if (!continueImport) {
-                    dialogService.notify(Localization.lang("Import canceled"));
-                    return;
+                    if (!continueImport) {
+                        dialogService.notify(Localization.lang("Import canceled"));
+                    } else {
+                        buildImportHandlerThenImportEntries(entriesToImport);
+                    }
+                } else {
+                    buildImportHandlerThenImportEntries(entriesToImport);
                 }
-            }
+            }).executeWith(Globals.TASK_EXECUTOR);
+        } else {
+            buildImportHandlerThenImportEntries(entriesToImport);
         }
 
+    }
+
+    private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
                 dialogService,
                 database,
@@ -104,7 +113,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager);
         importHandler.importEntries(entriesToImport);
-
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
 
