@@ -28,28 +28,28 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
-    private BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
-    private BooleanProperty backupOldFileProperty = new SimpleBooleanProperty();
-    private StringProperty noWrapFilesProperty = new SimpleStringProperty("");
-    private BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
-    private BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
-    private StringProperty resolveStringsExceptProperty = new SimpleStringProperty("");
+    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
+    private final BooleanProperty backupOldFileProperty = new SimpleBooleanProperty();
+    private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
+    private final BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
+    private final StringProperty resolveStringsExceptProperty = new SimpleStringProperty("");
     private final ListProperty<NewLineSeparator> newLineSeparatorListProperty = new SimpleListProperty<>();
     private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
-    private BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
+    private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
 
-    private StringProperty mainFileDirProperty = new SimpleStringProperty("");
-    private BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
-    private BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
-    private BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
-    private BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
-    private StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
-    private BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
-    private BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
+    private final StringProperty mainFileDirProperty = new SimpleStringProperty("");
+    private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
+    private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
+    private final BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
+    private final BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
 
-    private BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
+    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private FunctionBasedValidator mainFileDirValidator;
+    private final FunctionBasedValidator mainFileDirValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
