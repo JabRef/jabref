@@ -61,6 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the title of Group Dialog to "Add subgroup" from "Edit group" when we select Add subgroup option.
 - We enable import button only if entries are selected. [#4755](https://github.com/JabRef/jabref/issues/4755)
 - We made modifications to improve contrast of UI elements. [#4583](https://github.com/JabRef/jabref/issues/4583)
+- We added a warning for empty BibTeX keys in the entry editor. [#4440](https://github.com/JabRef/jabref/issues/4440)
 - We added an option in the settings to set the default action in JabRef when right clicking on any entry in any database and selecting "Open folder". [#4763](https://github.com/JabRef/jabref/issues/4763)
 - The Medline fetcher now normalizes the author names according to the BibTeX-Standard [#4345](https://github.com/JabRef/jabref/issues/4345)
 - We added an option on the Linked File Viewer to rename the attached file of an entry directly on the JabRef. [#4844](https://github.com/JabRef/jabref/issues/4844)
@@ -123,7 +124,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the same menu for changing entry type had two different sizes and weights. [#4977](https://github.com/JabRef/jabref/issues/4977)
 - We fixed an issue where the "Attach file" dialog, in the right-click menu for an entry, started on the working directory instead of the user's main directory. [#4995](https://github.com/JabRef/jabref/issues/4995)
 - We fixed an issue where the JabRef Icon in the macOS launchpad was not displayed correctly [#5003](https://github.com/JabRef/jabref/issues/5003)
-
 
 
 ### Removed
