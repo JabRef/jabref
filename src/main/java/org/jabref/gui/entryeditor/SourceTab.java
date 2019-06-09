@@ -187,7 +187,6 @@ public class SourceTab extends EntryEditorTab {
 
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
-        this.codeArea = codeArea;
 
         return codeArea;
     }
