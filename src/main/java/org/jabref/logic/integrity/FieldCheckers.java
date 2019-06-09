@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FilePreferences;
@@ -15,7 +16,7 @@ import com.google.common.collect.Multimap;
 
 public class FieldCheckers {
 
-    private Multimap<String, ValueChecker> fieldChecker;
+    private final Multimap<String, ValueChecker> fieldChecker;
 
     public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
         fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey);
@@ -49,6 +50,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
         fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
+        fieldCheckers.put(BibEntry.KEY_FIELD, new ValidBibtexKeyChecker(enforceLegalKey));
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(FieldName.DATE, new DateChecker());
