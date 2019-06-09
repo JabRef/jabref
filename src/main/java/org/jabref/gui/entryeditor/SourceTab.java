@@ -214,6 +214,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         this.setContent(codeArea);
+        this.codeArea = codeArea;
 
         // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
