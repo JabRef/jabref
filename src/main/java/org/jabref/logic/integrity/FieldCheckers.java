@@ -50,9 +50,6 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
         fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
-        // Fix #1 imported org.jabref.model.entry.BibEntry and added the BibEtry.KEY_FIELD
-        // Key value pair below. When a FieldEditor object is created, the fieldName it uses
-        // is BibEntry.KEY_FIELD ("bibtexkey") and not FieldName.KEY ("key")
         fieldCheckers.put(BibEntry.KEY_FIELD, new ValidBibtexKeyChecker(enforceLegalKey));
 
         if (databaseContext.isBiblatexMode()) {

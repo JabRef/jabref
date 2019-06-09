@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Makes sure the key is legal
@@ -18,11 +19,7 @@ public class ValidBibtexKeyChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
-
-        // Fix #2: BibtexKeyGenerator.cleanKey() does not accept a null value
-        // for the "value" parameter. The 'if' statement below is added to check for
-        // both a null and zero length string and to add the empty key warning.
-        if ((value == null) || (value.length() == 0)) {
+        if (StringUtil.isNullOrEmpty(value)) {
             return Optional.of(Localization.lang("empty BibTeX key"));
         }
 
