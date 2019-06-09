@@ -48,12 +48,12 @@ public class GUIGlobals {
         GUIGlobals.updateEntryEditorColors();
 
         IconTheme.loadFonts();
-        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+        GUIGlobals.currentFont = new Font(Globals.prefs.getFontFamily(), Globals.prefs.getDouble(JabRefPreferences.FONT_SIZE));
     }
 
     public static void setFont(double size) {
         currentFont = new Font(currentFont.getFamily(), size);
         // update preferences
-        Globals.prefs.putDouble(JabRefPreferences.FONT_SIZE, size);
+        Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, size);
     }
 }
