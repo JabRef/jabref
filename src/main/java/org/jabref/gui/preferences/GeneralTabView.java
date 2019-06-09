@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -22,6 +24,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class GeneralTabView extends VBox implements PrefsTab {
 
@@ -49,6 +52,8 @@ public class GeneralTabView extends VBox implements PrefsTab {
     private final JabRefPreferences preferences;
 
     private GeneralTabViewModel viewModel;
+
+    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTabView(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -91,7 +96,8 @@ public class GeneralTabView extends VBox implements PrefsTab {
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP), markTimeStampHelp);
 
-        PreferencesDialogView.createValidationVisualization(viewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat);
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat));
     }
 
     @Override

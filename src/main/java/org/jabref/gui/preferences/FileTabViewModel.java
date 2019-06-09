@@ -65,12 +65,12 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                     Path path = Paths.get(mainFileDirProperty.getValue());
                     return (Files.exists(path) && Files.isDirectory(path));
                 },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s: %s",
+                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
                         Localization.lang("File"),
                         Localization.lang("External file links"),
                         Localization.lang("Main file directory"),
-                        Localization.lang("Directory not found"),
-                        mainFileDirProperty.getValue())
+                        Localization.lang("Directory not found")
+                        )
                 )
         );
     }

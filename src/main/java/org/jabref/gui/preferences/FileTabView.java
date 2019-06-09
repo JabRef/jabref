@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -14,12 +15,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class FileTabView extends VBox implements PrefsTab {
 
@@ -49,6 +52,8 @@ public class FileTabView extends VBox implements PrefsTab {
     private final JabRefPreferences preferences;
 
     private FileTabViewModel viewModel;
+
+    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public FileTabView(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -86,7 +91,8 @@ public class FileTabView extends VBox implements PrefsTab {
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
 
-        PreferencesDialogView.createValidationVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir);
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
     @Override

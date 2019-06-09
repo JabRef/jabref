@@ -19,14 +19,14 @@ interface PrefsTab {
      * is ILLEGAL to set values only at construction time, because the dialog
      * will be reused and updated.
      */
-    void setValues(); // ToDo: Remove this after conversion of all tabs
+    void setValues(); // ToDo: Remove this after conversion of all tabs, done in ViewModel
 
     /**
      * This method is called when the user presses OK in the
      * Preferences dialog. Implementing classes must make sure all
      * settings presented get stored in JabRefPreferences.
      */
-    void storeSettings(); // ToDo: Call directly in ViewModel after conversion of all tabs
+    void storeSettings(); // ToDo: After conversion of all tabs: viewModel.storeSettings()
 
     /**
      * This method is called before the {@link #storeSettings()} method,
@@ -35,7 +35,7 @@ interface PrefsTab {
      * If the tab is *not* ready, it should display a message to the user
      * informing about the illegal setting.
      */
-    boolean validateSettings(); // ToDo: Call directly in ViewModel after conversion of all tabs
+    boolean validateSettings(); // ToDo: After conversion of all tabs: viewModel.validateSettings()
 
     /**
      * Should return the localized identifier to use for the tab.

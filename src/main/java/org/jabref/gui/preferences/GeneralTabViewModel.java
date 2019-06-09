@@ -69,12 +69,12 @@ public class GeneralTabViewModel extends AbstractViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s: %s",
+                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
                         Localization.lang("General"),
                         Localization.lang("Time stamp"),
                         Localization.lang("Date format"),
-                        Localization.lang("Invalid date format"),
-                        markTimeStampFormatProperty.getValue())
+                        Localization.lang("Invalid date format")
+                        )
                 )
         );
     }
