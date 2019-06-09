@@ -54,8 +54,8 @@ public class FileTabView extends VBox implements PrefsTab {
         this.dialogService = dialogService;
         this.preferences = preferences;
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     public void initialize() {
@@ -85,6 +85,8 @@ public class FileTabView extends VBox implements PrefsTab {
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
+
+        PreferencesDialogView.createValidationVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir);
     }
 
     @Override
@@ -102,7 +104,6 @@ public class FileTabView extends VBox implements PrefsTab {
         viewModel.storeSettings();
     }
 
-    @Deprecated
     @Override
     public boolean validateSettings() {
         return viewModel.validateSettings();

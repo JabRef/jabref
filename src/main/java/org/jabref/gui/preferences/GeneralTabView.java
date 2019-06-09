@@ -50,12 +50,12 @@ public class GeneralTabView extends VBox implements PrefsTab {
 
     private GeneralTabViewModel viewModel;
 
-    public GeneralTabView (DialogService dialogService, JabRefPreferences preferences) {
+    public GeneralTabView(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
     }
 
     public void initialize() {
@@ -88,8 +88,10 @@ public class GeneralTabView extends VBox implements PrefsTab {
         updateTimeStamp.selectedProperty().bindBidirectional(viewModel.updateTimeStampProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER),markOwnerHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP),markTimeStampHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP), markTimeStampHelp);
+
+        PreferencesDialogView.createValidationVisualization(viewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat);
     }
 
     @Override
@@ -107,7 +109,6 @@ public class GeneralTabView extends VBox implements PrefsTab {
         viewModel.storeSettings();
     }
 
-    @Deprecated
     @Override
     public boolean validateSettings() {
         return viewModel.validateSettings();

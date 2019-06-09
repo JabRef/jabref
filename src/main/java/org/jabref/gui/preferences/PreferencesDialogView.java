@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 
@@ -14,12 +15,14 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.easybind.EasyBind;
 
@@ -35,7 +38,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
 
     private JabRefFrame frame;
     private TaskExecutor taskExecutor;
@@ -47,16 +49,21 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         this.setTitle(Localization.lang("JabRef preferences"));
 
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                .load()
+                .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+
+        // ToDo: After conversion of all tabs to mvvm, make validSettings bindable
+        // ControlHelper.getButton(saveButton, getDialogPane()).disableProperty().bind(viewModel.validSettings().not());
     }
 
-    public PreferencesDialogViewModel getViewModel() { return viewModel; }
+    public PreferencesDialogViewModel getViewModel() {
+        return viewModel;
+    }
 
     @FXML
-    private void initialize () {
+    private void initialize() {
         viewModel = new PreferencesDialogViewModel(dialogService, taskExecutor, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
@@ -88,12 +95,16 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     }
 
     @FXML
-    private void closeDialog() { close(); }
+    private void closeDialog() {
+        close();
+    }
 
     @FXML
     private void savePreferencesAndCloseDialog() {
-        viewModel.storeAllSettings();
-        closeDialog();
+        if (viewModel.validSettings()) {
+            viewModel.storeAllSettings();
+            closeDialog();
+        }
     }
 
     @FXML
@@ -114,5 +125,11 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML
     void resetPreferences() {
         viewModel.resetPreferences();
+    }
+
+    public static void createValidationVisualization(final ValidationStatus status, final Control control) {
+        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+        validationVisualizer.initVisualization(status, control);
+        validationVisualizer.setDecoration(new IconValidationDecorator());
     }
 }

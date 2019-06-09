@@ -15,13 +15,16 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class GeneralTabViewModel extends AbstractViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
@@ -46,13 +49,34 @@ public class GeneralTabViewModel extends AbstractViewModel {
     private final StringProperty markTimeStampFieldNameProperty = new SimpleStringProperty("");
     private final BooleanProperty updateTimeStampProperty = new SimpleBooleanProperty();
 
+    private FunctionBasedValidator markTimeStampFormatValidator;
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    public GeneralTabViewModel (DialogService dialogService, JabRefPreferences preferences) {
+    public GeneralTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         setValues();
+
+        markTimeStampFormatValidator = new FunctionBasedValidator(
+                markTimeStampFormatProperty,
+                input -> {
+                    try {
+                        DateTimeFormatter.ofPattern(markTimeStampFormatProperty.getValue());
+                    } catch (IllegalArgumentException exception) {
+                        return false;
+                    }
+                    return true;
+                },
+                ValidationMessage.error(String.format("%s > %s > %s %n %n %s: %s",
+                        Localization.lang("General"),
+                        Localization.lang("Time stamp"),
+                        Localization.lang("Date format"),
+                        Localization.lang("Invalid date format"),
+                        markTimeStampFormatProperty.getValue())
+                )
+        );
     }
 
     private void setValues() {
@@ -94,8 +118,8 @@ public class GeneralTabViewModel extends AbstractViewModel {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
                     Localization.lang("You have changed the language setting.")
-                                .concat(" ")
-                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+                            .concat(" ")
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
         }
         preferences.setDefaultEncoding(selectedEncodingProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, selectedBiblatexModeProperty.getValue() == BibDatabaseMode.BIBLATEX);
@@ -126,13 +150,14 @@ public class GeneralTabViewModel extends AbstractViewModel {
         InternalBibtexFields.updateTimeStampField(preferences.get(JabRefPreferences.TIME_STAMP_FIELD));
     }
 
+    public ValidationStatus markTimeStampFormatValidationStatus() {
+        return markTimeStampFormatValidator.getValidationStatus();
+    }
+
     public boolean validateSettings() {
-        try {
-            // Test if date format is legal:
-            DateTimeFormatter.ofPattern(markTimeStampFormatProperty.getValue());
-        } catch (IllegalArgumentException exception) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Invalid date format"),
-                    Localization.lang("The chosen date format for new entries is not valid")));
+        ValidationStatus status = markTimeStampFormatValidationStatus();
+        if (!status.isValid()) {
+            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
             return false;
         }
         return true;

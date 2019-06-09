@@ -12,7 +12,9 @@
 
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600" xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.PreferencesDialogView">
+<DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600"
+            xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.preferences.PreferencesDialogView">
     <content>
         <SplitPane dividerPositions="0.2">
             <items>
@@ -20,34 +22,39 @@
                     <children>
                         <CustomTextField fx:id="searchBox" promptText="%Search" VBox.vgrow="NEVER">
                             <VBox.margin>
-                                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
                             </VBox.margin>
                         </CustomTextField>
-                        <ListView fx:id="preferenceTabList" VBox.vgrow="ALWAYS" />
-                        <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES" />
+                        <ListView fx:id="preferenceTabList" VBox.vgrow="ALWAYS"/>
+                        <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES"/>
                         <VBox alignment="BOTTOM_LEFT" spacing="3.0">
                             <children>
                                 <Button maxWidth="Infinity" onAction="#importPreferences" text="%Import preferences">
-                                    <tooltip><Tooltip text="%Import preferences from file" /></tooltip>
+                                    <tooltip>
+                                        <Tooltip text="%Import preferences from file"/>
+                                    </tooltip>
                                 </Button>
                                 <Button maxWidth="Infinity" onAction="#exportPreferences" text="%Export preferences">
-                                    <tooltip><Tooltip text="%Export preferences to file" /></tooltip>
+                                    <tooltip>
+                                        <Tooltip text="%Export preferences to file"/>
+                                    </tooltip>
                                 </Button>
-                                <Button maxWidth="Infinity" onAction="#showAllPreferences" text="%Show preferences" />
-                                <Button maxWidth="Infinity" onAction="#resetPreferences" text="%Reset preferences" />
+                                <Button maxWidth="Infinity" onAction="#showAllPreferences" text="%Show preferences"/>
+                                <Button maxWidth="Infinity" onAction="#resetPreferences" text="%Reset preferences"/>
                             </children>
                             <padding>
-                                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
                             </padding>
                         </VBox>
                     </children>
                 </VBox>
-                <ScrollPane fx:id="preferencePaneContainer" styleClass="preferencePaneContainer" maxHeight="Infinity" maxWidth="Infinity" />
+                <ScrollPane fx:id="preferencePaneContainer" styleClass="preferencePaneContainer" maxHeight="Infinity"
+                            maxWidth="Infinity"/>
             </items>
         </SplitPane>
     </content>
     <buttonTypes>
-        <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE" />
-        <ButtonType fx:constant="CANCEL" />
+        <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>
+        <ButtonType fx:constant="CANCEL"/>
     </buttonTypes>
 </DialogPane>

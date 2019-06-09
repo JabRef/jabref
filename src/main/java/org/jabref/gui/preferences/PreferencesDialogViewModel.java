@@ -49,7 +49,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs.add(new FileTabView(dialogService, prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
-        preferenceTabs.add(new PreviewPreferencesTab(dialogService, taskExecutor));
+        preferenceTabs.add(new PreviewPreferencesTab(dialogService, this.taskExecutor));
         preferenceTabs.add(new ExternalTab(frame, prefs));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
         preferenceTabs.add(new EntryEditorPrefsTab(prefs));
@@ -147,18 +147,24 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Checks if all tabs are ready to close and stores settings.
-     *
-     * ToDo:
-     * After conversion to MVVM, validation checks will be run by
-     * mvvmfx.utils.validation, so this needs to be removed.
+     * Checks if all tabs are valid
+     * ToDo: After conversion of all tabs use mvvmfx-validator
+     * ToDo: should be observable for binding of OK-button in View
      */
-    public void storeAllSettings() {
-        // Run validation checks
+
+    public boolean validSettings() {
         for (PrefsTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
-                return; // If not, break off.
+                return false;
             }
+        }
+        return true;
+    }
+
+    public void storeAllSettings() {
+        // Run validation checks
+        if (!validSettings()) {
+            return;
         }
 
         // Store settings
@@ -175,6 +181,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
+     * ToDo: Reword after conversion of all tabs: resetValues()
      */
     public void setValues() {
         for (PrefsTab prefsTab : preferenceTabs) {

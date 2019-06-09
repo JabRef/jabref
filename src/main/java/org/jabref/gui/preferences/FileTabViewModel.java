@@ -22,6 +22,10 @@ import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+
 public class FileTabViewModel implements PreferenceTabViewModel {
 
     private BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
@@ -45,6 +49,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
+    private FunctionBasedValidator mainFileDirValidator;
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
@@ -52,6 +58,21 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         setValues();
+
+        mainFileDirValidator = new FunctionBasedValidator(
+                mainFileDirProperty,
+                input -> {
+                    Path path = Paths.get(mainFileDirProperty.getValue());
+                    return (Files.exists(path) && Files.isDirectory(path));
+                },
+                ValidationMessage.error(String.format("%s > %s > %s %n %n %s: %s",
+                        Localization.lang("File"),
+                        Localization.lang("External file links"),
+                        Localization.lang("Main file directory"),
+                        Localization.lang("Directory not found"),
+                        mainFileDirProperty.getValue())
+                )
+        );
     }
 
     public void setValues() {
@@ -106,22 +127,24 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
     }
 
+    ValidationStatus mainFileDirValidationStatus() {
+        return mainFileDirValidator.getValidationStatus();
+    }
+
     public boolean validateSettings() {
-        Path path = Paths.get(mainFileDirProperty.getValue());
-        boolean valid = Files.exists(path) && Files.isDirectory(path);
-        if (!valid) {
-            dialogService.showErrorDialogAndWait(
-                    String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
-                            Localization.lang("Main file directory"), Localization.lang("Directory not found"), path));
+        ValidationStatus status = mainFileDirValidationStatus();
+        if (!status.isValid()) {
+            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+            return false;
         }
-        return valid;
+        return true;
     }
 
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Paths.get(mainFileDirProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                     .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
+                .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
     }
 
     // General
