@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
 
@@ -29,20 +28,30 @@ public class DefaultTexParser implements TexParser {
      *
      * <p>TODO: Add support for multicite commands.
      */
-    private static final String[] CITE_COMMANDS = new String[] {
+    private static final String[] CITE_COMMANDS = {
             "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
             "([aA]|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
             "footcitetext"
     };
-    private static final String CITE_REGEX = String.format("\\\\(?:%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<key>[^\\}]*)\\}",
-            String.join("|", CITE_COMMANDS));
+    private static final String CITE_GROUP = "key";
+    private static final Pattern CITE_PATTERN = Pattern.compile(
+            String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}",
+                    String.join("|", CITE_COMMANDS), CITE_GROUP));
 
-    private static final String INCLUDE_REGEX = "\\\\(?:include|input)\\{(?<file>[^\\}]*)\\}";
+    private static final String INCLUDE_GROUP = "file";
+    private static final Pattern INCLUDE_PATTERN = Pattern.compile(
+            String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP));
+
+    private static final String TEX_EXT = ".tex";
 
     private final TexParserResult result;
 
     public DefaultTexParser() {
         this.result = new TexParserResult();
+    }
+
+    public TexParserResult getResult() {
+        return result;
     }
 
     @Override
@@ -60,19 +69,13 @@ public class DefaultTexParser implements TexParser {
     public TexParserResult parse(List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
 
-        if (result.getFileList().isEmpty()) {
-            result.getFileList().addAll(texFiles);
-        } else {
-            result.getNestedFiles().addAll(texFiles);
-        }
+        result.addFiles(texFiles);
 
-        for (int fileIndex = 0; fileIndex < texFiles.size(); fileIndex++) {
-            Path file = texFiles.get(fileIndex);
-
+        for (Path file : texFiles) {
             try (LineNumberReader lnr = new LineNumberReader(Files.newBufferedReader(file))) {
                 for (String line = lnr.readLine(); line != null; line = lnr.readLine()) {
-                    if (line.startsWith("%")) {
-                        // Skip comment lines.
+                    if (line.isEmpty() || line.charAt(0) == '%') {
+                        // Skip comments and blank lines.
                         continue;
                     }
 
@@ -93,24 +96,16 @@ public class DefaultTexParser implements TexParser {
     }
 
     /**
-     * Find cites along a specific line and add them to a map.
+     * Find cites along a specific line and store them.
      */
     private void matchCitation(Path file, int lineNumber, String line) {
-        Matcher citeMatch = Pattern.compile(CITE_REGEX).matcher(line);
+        Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            String[] keys = citeMatch.group("key").split(",");
+            String[] keys = citeMatch.group(CITE_GROUP).split(",");
 
             for (String key : keys) {
-                Citation citation = new Citation(file, lineNumber, citeMatch.start(), citeMatch.end(), line);
-
-                if (!result.getCitations().containsKey(key)) {
-                    result.getCitations().put(key, new ArrayList<>());
-                }
-
-                if (!result.getCitations().get(key).contains(citation)) {
-                    result.getCitations().get(key).add(citation);
-                }
+                result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line);
             }
         }
     }
@@ -119,19 +114,20 @@ public class DefaultTexParser implements TexParser {
      * Find inputs and includes along a specific line and store them for parsing later.
      */
     private void matchNestedFile(Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
-        Matcher includeMatch = Pattern.compile(INCLUDE_REGEX).matcher(line);
+        Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
+        StringBuilder include;
 
         while (includeMatch.find()) {
-            String include = includeMatch.group("file");
+            include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
 
-            if (!include.endsWith(".tex")) {
-                include += ".tex";
+            if (!include.toString().endsWith(TEX_EXT)) {
+                include.append(TEX_EXT);
             }
 
             Path folder = file.getParent();
-            Path inputFile = (folder != null)
-                    ? folder.resolve(include)
-                    : Paths.get(include);
+            Path inputFile = (folder == null)
+                    ? Paths.get(include.toString())
+                    : folder.resolve(include.toString());
 
             if (!texFiles.contains(inputFile)) {
                 referencedFiles.add(inputFile);

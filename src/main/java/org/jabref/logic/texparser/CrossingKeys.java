@@ -9,7 +9,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.texparser.CrossingKeysResult;
 import org.jabref.model.texparser.TexParserResult;
 
-class CrossingKeys {
+public class CrossingKeys {
 
     private final CrossingKeysResult result;
 
@@ -17,29 +17,27 @@ class CrossingKeys {
         this.result = new CrossingKeysResult(texParserResult, masterDatabase);
     }
 
+    public CrossingKeysResult getResult() {
+        return result;
+    }
+
     /**
      * Look for an equivalent BibTeX entry within the reference database for all keys inside of the TEX files.
      */
     public CrossingKeysResult resolveKeys() {
-        Set<String> keySet = result.getParserResult().getCitations().keySet();
+        Set<String> keySet = result.getCitationsKeySet();
 
         for (String key : keySet) {
-            if (!result.getNewDatabase().getEntryByKey(key).isPresent()) {
-                Optional<BibEntry> entry = result.getMasterDatabase().getEntryByKey(key);
+            if (!result.checkEntryNewDatabase(key)) {
+                Optional<BibEntry> entry = result.getEntryMasterDatabase(key);
 
                 if (entry.isPresent()) {
-                    insertEntry(entry.get());
+                    result.insertEntry(entry.get());
                     resolveCrossReferences(entry.get());
                 } else {
-                    result.getUnresolvedKeys().add(key);
+                    result.addUnresolvedKey(key);
                 }
             }
-        }
-
-        // Copy database definitions.
-        if (result.getNewDatabase().hasEntries()) {
-            result.getNewDatabase().copyPreamble(result.getMasterDatabase());
-            result.insertStrings(result.getMasterDatabase().getUsedStrings(result.getNewDatabase().getEntries()));
         }
 
         return result;
@@ -50,24 +48,16 @@ class CrossingKeys {
      */
     private void resolveCrossReferences(BibEntry entry) {
         entry.getField(FieldName.CROSSREF).ifPresent(crossRef -> {
-            if (!result.getNewDatabase().getEntryByKey(crossRef).isPresent()) {
-                Optional<BibEntry> refEntry = result.getMasterDatabase().getEntryByKey(crossRef);
+            if (!result.checkEntryNewDatabase(crossRef)) {
+                Optional<BibEntry> refEntry = result.getEntryMasterDatabase(crossRef);
 
                 if (refEntry.isPresent()) {
-                    insertEntry(refEntry.get());
-                    result.increaseCrossRefEntriesCounter();
+                    result.insertEntry(refEntry.get());
+                    result.increaseCrossRefsCount();
                 } else {
-                    result.getUnresolvedKeys().add(crossRef);
+                    result.addUnresolvedKey(crossRef);
                 }
             }
         });
-    }
-
-    /**
-     * Insert into the database a clone of the given entry. The cloned entry has a new unique ID.
-     */
-    private void insertEntry(BibEntry entry) {
-        BibEntry clonedEntry = (BibEntry) entry.clone();
-        result.getNewDatabase().insertEntry(clonedEntry);
     }
 }

@@ -2,6 +2,7 @@ package org.jabref.model.texparser;
 
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 public class Citation {
 
@@ -17,6 +18,18 @@ public class Citation {
     private final String lineText;
 
     public Citation(Path path, int line, int colStart, int colEnd, String lineText) {
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null.");
+        }
+
+        if (line <= 0) {
+            throw new IllegalArgumentException("Line has to be greater than 0.");
+        }
+
+        if (colStart < 0 || colEnd > lineText.length()) {
+            throw new IllegalArgumentException("Citation has to be between 0 and line length.");
+        }
+
         this.path = path;
         this.line = line;
         this.colStart = colStart;
@@ -44,10 +57,12 @@ public class Citation {
         return lineText;
     }
 
+    public int getContextWidth() {
+        return CONTEXT_WIDTH;
+    }
+
     /**
-     * Get a fixed-width string that shows the context of a citation.
-     *
-     * @return String that contains a cite and the text that surrounds it along the same line.
+     * Get a fixed-width string that contains a cite and the text that surrounds it along the same line.
      */
     public String getContext() {
         int center = (colStart + colEnd) / 2;
@@ -63,7 +78,13 @@ public class Citation {
 
     @Override
     public String toString() {
-        return String.format("%s (%d:%d-%d) \"%s\"", path, line, colStart, colEnd, getContext());
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("path = " + path)
+                .add("line = " + line)
+                .add("colStart = " + colStart)
+                .add("colEnd = " + colEnd)
+                .add("lineText = " + lineText)
+                .toString();
     }
 
     @Override
@@ -76,13 +97,13 @@ public class Citation {
             return false;
         }
 
-        Citation citation = (Citation) o;
+        Citation that = (Citation) o;
 
-        return path.equals(citation.path)
-                && line == citation.line
-                && colStart == citation.colStart
-                && colEnd == citation.colEnd
-                && lineText.equals(citation.lineText);
+        return Objects.equals(path, that.path)
+                && Objects.equals(line, that.line)
+                && Objects.equals(colStart, that.colStart)
+                && Objects.equals(colEnd, that.colEnd)
+                && Objects.equals(lineText, that.lineText);
     }
 
     @Override
