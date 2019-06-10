@@ -53,6 +53,19 @@ public class DefaultTexParserTest {
     }
 
     @Test
+    public void testTwoCitationsSameLine() {
+        String citeString = "\\citep{Einstein1920c} and \\citep{Einstein1920a}";
+
+        TexParserResult texParserResult = new DefaultTexParser().parse(citeString);
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.addKey(EINSTEIN_C, Paths.get("foo/bar"), 1, 0, 21, citeString);
+        expectedParserResult.addKey(EINSTEIN_A, Paths.get("foo/bar"), 1, 26, 47, citeString);
+
+        assertEquals(expectedParserResult, texParserResult);
+    }
+
+    @Test
     public void testSingleFile() throws URISyntaxException {
         Path texFile = Paths.get(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
