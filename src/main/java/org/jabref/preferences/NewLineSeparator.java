@@ -13,11 +13,11 @@ public enum NewLineSeparator {
     public String toString() {
         switch (this) {
             case CR:
-                return "CR ( \\r )";
+                return "CR (\"\\r\")";
             case LF:
-                return "LF ( \\n )";
+                return "LF (\"\\n\")";
             default:
-                return "CR/LF ( \\r\\n )";
+                return "CR/LF (\"\\r\\n\")";
         }
     }
 

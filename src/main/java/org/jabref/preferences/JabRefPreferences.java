@@ -2120,15 +2120,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public NewLineSeparator getNewLineSeparator() {
-        String newline = get(JabRefPreferences.NEWLINE);
-        if ("\r".equals(newline)) {
-            return NewLineSeparator.CR;
-        } else if ("\n".equals(newline)) {
-            return NewLineSeparator.LF;
-        } else {
-            // fallback: windows standard
-            return NewLineSeparator.CRLF;
-        }
+        return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
     }
 
     public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
