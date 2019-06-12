@@ -34,6 +34,14 @@ public class TexParserResult {
         return citations;
     }
 
+    public Set<String> getCitationsKeySet() {
+        return citations.keySet();
+    }
+
+    public Set<Citation> getCitationsByKey(String key) {
+        return citations.get(key);
+    }
+
     /**
      * Add a list of files to fileList or nestedFiles, depending on whether this is the first list.
      */

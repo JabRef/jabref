@@ -1,0 +1,18 @@
+.list-view .list-cell {
+    -fx-padding: 10px;
+}
+
+.list-view .list-cell .context {
+    -fx-padding: 15px;
+    -fx-font-family: "monospace";
+    -fx-font-size: 110%;
+    -fx-font-style: italic;
+    -fx-border-width: 2px;
+    -fx-border-color: grey;
+    -fx-border-style: dashed;
+}
+
+.list-view .list-cell .data {
+    -fx-font-size: 110%;
+    -fx-font-weight: bold;
+}
