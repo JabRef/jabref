@@ -23,8 +23,8 @@
         <ToggleGroup fx:id="openFileBrowser"/>
     </fx:define>
     <children>
-        <Label styleClass="sectionHeader" text="%External programs"/>
-        <Label text="%Sending of emails"/>
+        <Label styleClass="titleHeader" text="%External programs"/>
+        <Label styleClass="sectionHeader" text="%Sending of emails"/>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
 
             <children>

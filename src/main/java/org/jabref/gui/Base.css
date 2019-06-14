@@ -1028,9 +1028,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-error;
 }
 
+.titleHeader {
+    -fx-font-size: 150%;
+    -fx-padding: 0em 0em 0.5em 0em;
+}
+
 .sectionHeader {
-    -fx-font-size: 1.5em;
-    -fx-padding: 1em 0em 1em 0em;
+    -fx-font-size: 130%;
+    -fx-padding: 1em 0em 0.2em 0em;
 }
 
 .dialog-pane {
