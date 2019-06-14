@@ -1036,3 +1036,7 @@ We want to have a look that matches our icons in the tool-bar */
 .dialog-pane {
     -fx-background-color: -fx-control-inner-background;
 }
+
+.preference-sidepane {
+    -fx-background-color: -jr-sidepane-background;
+}

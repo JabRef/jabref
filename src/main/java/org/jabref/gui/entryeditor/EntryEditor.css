@@ -41,6 +41,10 @@
     -fx-font-weight: normal;
 }
 
+.code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
 .icon-button.narrow {
     -fx-padding: 0.1em;
 }

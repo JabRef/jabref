@@ -1,12 +1,22 @@
-#sideMenu {
-    -fx-background-color: -fx-control-inner-background;
+#preferenceTabList {
+    -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 1;
 }
 
-#sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 8 8 8 8;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
     -fx-background: -fx-control-inner-background;
+}
+
+.split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
 }
 
 .preferencePaneContainer {

@@ -15,11 +15,16 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -63,9 +68,36 @@ public class SourceTab extends EntryEditorTab {
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
     private final StateManager stateManager;
-
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
+
+    private class EditAction extends SimpleCommand {
+
+        private final StandardActions command;
+
+        public EditAction(StandardActions command) { this.command = command; }
+
+        @Override
+        public void execute() {
+            if (codeArea != null) {
+                switch (command) {
+                    case COPY:
+                        codeArea.copy();
+                        break;
+                    case CUT:
+                        codeArea.cut();
+                        break;
+                    case PASTE:
+                        codeArea.paste();
+                        break;
+                    case SELECT_ALL:
+                        codeArea.selectAll();
+                        break;
+                }
+                codeArea.requestFocus();
+            }
+        }
+    }
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager) {
         this.mode = bibDatabaseContext.getMode();
@@ -143,6 +175,19 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
+
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL))
+        );
+
+        contextMenu.getStyleClass().add("context-menu");
+        codeArea.setContextMenu(contextMenu);
+
         return codeArea;
     }
 
@@ -169,6 +214,7 @@ public class SourceTab extends EntryEditorTab {
         });
         this.setContent(codeArea);
         this.codeArea = codeArea;
+
         // Store source for on focus out event in the source code (within its text area)
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {
@@ -181,7 +227,6 @@ public class SourceTab extends EntryEditorTab {
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
                     highlightSearchPattern();
-
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
@@ -271,5 +316,4 @@ public class SourceTab extends EntryEditorTab {
             LOGGER.debug("Incorrect source", ex);
         }
     }
-
 }
