@@ -42,12 +42,13 @@ public class ExternalTabView extends VBox implements PrefsTab {
     @FXML private TextField useFileBrowserSpecialCommand;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
+    private final JabRefPreferences preferences;
     private final JabRefFrame frame;
 
     private ExternalTabViewModel viewModel;
 
-    public ExternalTabView(JabRefFrame frame) {
+    public ExternalTabView(JabRefPreferences preferences, JabRefFrame frame) {
+        this.preferences = preferences;
         this.frame = frame;
 
         ViewLoader.view(this)
@@ -56,7 +57,7 @@ public class ExternalTabView extends VBox implements PrefsTab {
     }
 
     public void initialize() {
-        viewModel = new ExternalTabViewModel(dialogService, (JabRefPreferences) preferences, frame);
+        viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(application -> application.getApplicationName())

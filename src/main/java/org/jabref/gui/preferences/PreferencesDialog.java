@@ -86,7 +86,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
         preferenceTabs.add(new PreviewPreferencesTab(dialogService, taskExecutor));
-        preferenceTabs.add(new ExternalTabView(frame));
+        preferenceTabs.add(new ExternalTabView(prefs, frame));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
         preferenceTabs.add(new EntryEditorPrefsTab(prefs));
         preferenceTabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
