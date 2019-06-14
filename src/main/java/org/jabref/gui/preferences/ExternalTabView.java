@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -14,6 +16,7 @@ import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -38,15 +41,13 @@ public class ExternalTabView extends VBox implements PrefsTab {
     @FXML private RadioButton useFileBrowserSpecial;
     @FXML private TextField useFileBrowserSpecialCommand;
 
-    private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
     private final JabRefFrame frame;
 
     private ExternalTabViewModel viewModel;
 
-    public ExternalTabView(DialogService dialogService, JabRefPreferences preferences, JabRefFrame frame) {
-        this.dialogService = dialogService;
-        this.preferences = preferences;
+    public ExternalTabView(JabRefFrame frame) {
         this.frame = frame;
 
         ViewLoader.view(this)
@@ -55,7 +56,7 @@ public class ExternalTabView extends VBox implements PrefsTab {
     }
 
     public void initialize() {
-        viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
+        viewModel = new ExternalTabViewModel(dialogService, (JabRefPreferences) preferences, frame);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(application -> application.getApplicationName())
