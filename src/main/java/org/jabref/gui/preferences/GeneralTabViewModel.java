@@ -26,7 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
-public class GeneralTabViewModel extends AbstractViewModel {
+public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
     private final ListProperty<Charset> encodingsListProperty = new SimpleListProperty<>();
@@ -79,7 +79,7 @@ public class GeneralTabViewModel extends AbstractViewModel {
         );
     }
 
-    private void setValues() {
+    public void setValues() {
         languagesListProperty.setValue(FXCollections.observableArrayList(Language.values()));
         selectedLanguageProperty.setValue(preferences.getLanguage());
 
@@ -136,7 +136,7 @@ public class GeneralTabViewModel extends AbstractViewModel {
         preferences.setShouldCollectTelemetry(collectTelemetryProperty.getValue());
         preferences.putBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS, showAdvancedHintsProperty.getValue());
 
-        preferences.putBoolean(JabRefPreferences.USE_OWNER, markOwnerOverwriteProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.USE_OWNER, markOwnerProperty.getValue());
         preferences.put(JabRefPreferences.DEFAULT_OWNER, markOwnerNameProperty.getValue().trim());
         preferences.putBoolean(JabRefPreferences.OVERWRITE_OWNER, markOwnerOverwriteProperty.getValue());
 
