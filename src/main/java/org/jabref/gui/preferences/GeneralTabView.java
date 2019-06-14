@@ -2,6 +2,8 @@ package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -48,15 +50,14 @@ public class GeneralTabView extends VBox implements PrefsTab {
     @FXML private Button markTimeStampHelp;
     @FXML private CheckBox updateTimeStamp;
 
-    private final DialogService dialogService;
+    @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
 
     private GeneralTabViewModel viewModel;
 
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public GeneralTabView(DialogService dialogService, JabRefPreferences preferences) {
-        this.dialogService = dialogService;
+    public GeneralTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
         ViewLoader.view(this)
                 .root(this)

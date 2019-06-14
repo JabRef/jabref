@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -48,15 +50,14 @@ public class FileTabView extends VBox implements PrefsTab {
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    private final DialogService dialogService;
+    @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
 
     private FileTabViewModel viewModel;
 
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public FileTabView(DialogService dialogService, JabRefPreferences preferences) {
-        this.dialogService = dialogService;
+    public FileTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
         ViewLoader.view(this)
                 .root(this)
