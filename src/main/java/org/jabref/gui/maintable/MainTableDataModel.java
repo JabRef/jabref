@@ -24,7 +24,7 @@ public class MainTableDataModel {
     private final SortedList<BibEntryTableViewModel> entriesSorted;
 
     public MainTableDataModel(BibDatabaseContext context) {
-        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
+        ObservableList<BibEntry> allEntries = context.getDatabase().getEntries();
         
         ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new);
         
