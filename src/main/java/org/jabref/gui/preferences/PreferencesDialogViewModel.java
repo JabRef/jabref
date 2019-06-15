@@ -50,7 +50,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs.add(new TablePrefsTab(prefs));
         preferenceTabs.add(new TableColumnsTab(prefs, frame));
         preferenceTabs.add(new PreviewPreferencesTab(dialogService, this.taskExecutor));
-        preferenceTabs.add(new ExternalTab(frame, prefs));
+        preferenceTabs.add(new ExternalTabView(prefs, frame));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
         preferenceTabs.add(new EntryEditorPrefsTab(prefs));
         preferenceTabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
