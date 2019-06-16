@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import org.fxmisc.richtext.CodeArea?>
+
+<?import org.fxmisc.flowless.VirtualizedScrollPane?>
+<fx:root prefWidth="650.0" spacing="4.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.212"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.PreviewTabView">
+    <children>
+        <Label text="%Current Preview" styleClass="titleHeader"/>
+        <HBox prefHeight="100.0" prefWidth="200.0" spacing="4.0">
+            <children>
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="%Available" styleClass="sectionHeader" />
+                        <ListView fx:id="availableListView" maxHeight="250.0" minHeight="250.0"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" spacing="4.0">
+                    <children>
+                        <Label styleClass="sectionHeader" />
+                        <Button fx:id="toRightButton"  prefWidth="60.0" text="&gt;&gt;" onAction="#toRightButtonAction" />
+                        <Button fx:id="toLeftButton" prefWidth="60.0" text="&lt;&lt;" onAction="#toLeftButtonAction" />
+                        <VBox prefHeight="40.0"/>
+                        <Button fx:id="sortUpButton" prefWidth="60.0" text="%Up" onAction="#sortUpButtonAction" />
+                        <Button fx:id="sortDownButton" prefWidth="60.0" text="%Down" onAction="#sortDownButtonAction" />
+                    </children>
+                </VBox>
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="%Selected" styleClass="sectionHeader" />
+                        <ListView fx:id="chosenListView" maxHeight="250.0" minHeight="250.0"/>
+                        <HBox alignment="CENTER" spacing="4.0">
+                            <children>
+                                <Button fx:id="testButton" prefWidth="80" text="%Test" onAction="#testButtonAction"/>
+                                <Button fx:id="defaultButton" prefWidth="80" text="%Default" onAction="#defaultButtonAction" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <Label text="%Selected style source" styleClass="sectionHeader" />
+        <VirtualizedScrollPane>
+            <content>
+                <CodeArea fx:id="previewTextArea" prefHeight="200.0" />
+            </content>
+        </VirtualizedScrollPane>
+    </children>
+</fx:root>
