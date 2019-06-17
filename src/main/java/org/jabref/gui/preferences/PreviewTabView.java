@@ -46,7 +46,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @FXML private Button sortDownButton;
 
     @FXML private Button testButton;
-    @FXML private Button defaultButton;
+    @FXML private Button resetDefaultButton;
 
     @FXML private CodeArea previewTextArea;
 
@@ -110,7 +110,6 @@ public class PreviewTabView extends VBox implements PrefsTab {
         sortUpButton.disableProperty().bind(nothingSelectedFromChosen);
         sortDownButton.disableProperty().bind(nothingSelectedFromChosen);
         testButton.disableProperty().bind(nothingSelectedFromChosen);
-        defaultButton.disableProperty().bind(nothingSelectedFromChosen);
 
         previewTextArea.setParagraphGraphicFactory(LineNumberFactory.get(previewTextArea));
         previewTextArea.textProperty().addListener((obs, oldText, newText) -> {
@@ -135,13 +134,13 @@ public class PreviewTabView extends VBox implements PrefsTab {
     }
 
     /**
-     * This was originally created by Carlos Martins (github: @cemarins )
-     * Can this be used here? (BSD-2clause License)
-     * See here: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/src/main/java/org/fxmisc/richtext/demo/XMLEditorDemo.java
-     * and also here: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#automatic-highlighting-of-java-keywords
+     * XML-Syntax-Highlighting for RichTextFX-Codearea
+     * created by (c) Carlos Martins (github: @cemartins)
+     * distributed under the BSD 2-Clause "Simplified" License
+     * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
+     * and: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
      *
-     * @author: Carlos Martins
-     * @param text to highlight
+     * @param text to parse and highlight
      * @return highlighted span for codeArea
      */
     private StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -246,5 +245,5 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public void testButtonAction() { viewModel.testChosen(); }
 
-    public void defaultButtonAction() { viewModel.setChosenDefault(); }
+    public void resetDefaultButtonAction() { viewModel.resetDefaultStyle(); }
 }

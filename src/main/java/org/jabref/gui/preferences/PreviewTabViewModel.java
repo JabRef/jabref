@@ -86,32 +86,32 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
 
         if (chosenListProperty.isEmpty()) {
             chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        PreviewPreferences newPreviewPreferences = Globals.prefs.getPreviewPreferences()
-                                                                .getBuilder()
-                                                                .withPreviewCycle(chosenListProperty)
-                                                                .withPreviewStyle(previewTextProperty.getValue().replace("\n", "__NEWLINE__"))
-                                                                .build();
+        PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
+                                                              .getBuilder()
+                                                              .withPreviewCycle(chosenListProperty)
+                                                              .withPreviewStyle(previewTextProperty.getValue().replace("\n", "__NEWLINE__"))
+                                                              .build();
         if (!selectedChosenItemsProperty.getValue().isEmpty()) {
             newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(selectedChosenItemsProperty.get(0))).build();
         }
-        Globals.prefs.storePreviewPreferences(newPreviewPreferences);
+        preferences.storePreviewPreferences(newPreviewPreferences);
 
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
             // TODO: Find a better way to update preview
             basePanel.closeBottomPane();
-            //basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
+            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 
     @Override
     public boolean validateSettings() {
-        return true;
+        return !chosenListProperty.getValue().isEmpty();
     }
 
     public void addToChosen() {
@@ -157,7 +157,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
             testPane.setEntry(TestEntry.getTestEntry());
 
-            PreviewLayout layout = chosenListProperty.getValue().get(0);
+            PreviewLayout layout = (selectedChosenItemsProperty.getValue().isEmpty()) ?
+                    chosenListProperty.getValue().get(0) :
+                    selectedChosenItemsProperty.getValue().get(0);
+
             testPane.setLayout(layout);
 
             DialogPane pane = new DialogPane();
@@ -170,10 +173,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public void setChosenDefault() {
-        previewTextProperty.setValue(Globals.prefs.getPreviewPreferences()
-                                                  .getDefaultPreviewStyle()
-                                                  .replace("__NEWLINE__", "\n"));
+    public void resetDefaultStyle() {
+        previewTextProperty.setValue(preferences.getPreviewPreferences()
+                                                .getDefaultPreviewStyle()
+                                                .replace("__NEWLINE__", "\n"));
     }
 
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }

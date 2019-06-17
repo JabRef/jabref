@@ -35,21 +35,21 @@
                     <children>
                         <Label text="%Selected" styleClass="sectionHeader" />
                         <ListView fx:id="chosenListView" maxHeight="250.0" minHeight="250.0"/>
-                        <HBox alignment="CENTER" spacing="4.0">
+                        <HBox alignment="CENTER">
                             <children>
-                                <Button fx:id="testButton" prefWidth="80" text="%Test" onAction="#testButtonAction"/>
-                                <Button fx:id="defaultButton" prefWidth="80" text="%Default" onAction="#defaultButtonAction" />
+                                <Button fx:id="testButton" text="%Test selected style" onAction="#testButtonAction"/>
                             </children>
                         </HBox>
                     </children>
                 </VBox>
             </children>
         </HBox>
-        <Label text="%Selected style source" styleClass="sectionHeader" />
+        <Label text="%Default preview style" styleClass="sectionHeader" />
         <VirtualizedScrollPane>
             <content>
                 <CodeArea fx:id="previewTextArea" prefHeight="200.0" />
             </content>
         </VirtualizedScrollPane>
+        <Button fx:id="resetDefaultButton" text="%Reset default preview style" onAction="#resetDefaultButtonAction" />
     </children>
 </fx:root>
