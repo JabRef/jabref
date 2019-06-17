@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
@@ -98,10 +99,12 @@ public class PreviewTabView extends VBox implements PrefsTab {
         availableListView.itemsProperty().bind(viewModel.availableListProperty());
         viewModel.selectedAvailableItemsProperty().bind(new ReadOnlyListWrapper(availableListView.getSelectionModel().getSelectedItems()));
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(availableListView);
+        availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
 
         chosenListView.itemsProperty().bind(viewModel.chosenListProperty());
         viewModel.selectedChosenItemsProperty().bind(new ReadOnlyListWrapper(chosenListView.getSelectionModel().getSelectedItems()));
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(chosenListView);
+        chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
 
         toRightButton.disableProperty().bind(availableListView.selectionModelProperty().getValue().selectedItemProperty().isNull());
 
@@ -198,6 +201,19 @@ public class PreviewTabView extends VBox implements PrefsTab {
         }
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
+    }
+
+    public void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
+        if (keypressed.getCharacter() == null) {
+            return;
+        }
+
+        for (PreviewLayout item : list.getItems()) {
+            if (item.getName().toLowerCase().startsWith(keypressed.getCharacter().toLowerCase())) {
+                list.scrollTo(item);
+                return;
+            }
+        }
     }
 
     @Override
