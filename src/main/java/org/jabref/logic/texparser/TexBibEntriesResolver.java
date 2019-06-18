@@ -6,34 +6,32 @@ import java.util.Set;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.texparser.CrossingKeysResult;
+import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
 
-public class CrossingKeys {
+public class TexBibEntriesResolver {
 
-    private final CrossingKeysResult result;
+    private final BibDatabase masterDatabase;
 
-    public CrossingKeys(TexParserResult texParserResult, BibDatabase masterDatabase) {
-        this.result = new CrossingKeysResult(texParserResult, masterDatabase);
-    }
-
-    public CrossingKeysResult getResult() {
-        return result;
+    public TexBibEntriesResolver(BibDatabase masterDatabase) {
+        this.masterDatabase = masterDatabase;
     }
 
     /**
-     * Look for an equivalent BibTeX entry within the reference database for all keys inside of the TEX files.
+     * Look for BibTeX entries within the reference database for all keys inside of the TEX files.
+     * Insert these data in the list of new entries.
      */
-    public CrossingKeysResult resolveKeys() {
+    public TexBibEntriesResolverResult resolveKeys(TexParserResult texParserResult) {
+        TexBibEntriesResolverResult result = new TexBibEntriesResolverResult(texParserResult);
         Set<String> keySet = result.getCitationsKeySet();
 
         for (String key : keySet) {
             if (!result.checkEntryNewDatabase(key)) {
-                Optional<BibEntry> entry = result.getEntryMasterDatabase(key);
+                Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
                 if (entry.isPresent()) {
                     result.insertEntry(entry.get());
-                    resolveCrossReferences(entry.get());
+                    resolveCrossReferences(result, entry.get());
                 } else {
                     result.addUnresolvedKey(key);
                 }
@@ -44,12 +42,12 @@ public class CrossingKeys {
     }
 
     /**
-     * Find cross references for inserting into the new database.
+     * Find cross references for inserting into the list of new entries.
      */
-    private void resolveCrossReferences(BibEntry entry) {
+    private void resolveCrossReferences(TexBibEntriesResolverResult result, BibEntry entry) {
         entry.getField(FieldName.CROSSREF).ifPresent(crossRef -> {
             if (!result.checkEntryNewDatabase(crossRef)) {
-                Optional<BibEntry> refEntry = result.getEntryMasterDatabase(crossRef);
+                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossRef);
 
                 if (refEntry.isPresent()) {
                     result.insertEntry(refEntry.get());

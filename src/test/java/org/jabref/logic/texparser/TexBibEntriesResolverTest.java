@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.texparser.CrossingKeysResult;
+import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CrossingKeysTest {
+public class TexBibEntriesResolverTest {
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
     private final static String NEWTON = "Newton1999";
@@ -78,58 +78,58 @@ public class CrossingKeysTest {
 
     @Test
     public void testSingleFile() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("paper.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testTwoFiles() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("paper.tex").toURI());
-        Path texFile2 = Paths.get(CrossingKeysTest.class.getResource("paper2.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Paths.get(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2));
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
-        expectedCrossingResult.insertEntry(NEWTON);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
+        expectedCrossingResult.insertEntry(database, NEWTON);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testDuplicateFiles() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("paper.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testUnknownKey() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("unknown_key.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
         expectedCrossingResult.addUnresolvedKey(UNKNOWN);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -137,30 +137,30 @@ public class CrossingKeysTest {
 
     @Test
     public void testNestedFiles() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("nested.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
 
     @Test
     public void testCrossRef() throws URISyntaxException {
-        Path texFile = Paths.get(CrossingKeysTest.class.getResource("crossref.tex").toURI());
+        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(parserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(EINSTEIN);
-        expectedCrossingResult.insertEntry(EINSTEIN_A);
-        expectedCrossingResult.insertEntry(EINSTEIN_B);
-        expectedCrossingResult.insertEntry(EINSTEIN_C);
+        expectedCrossingResult.insertEntry(database, EINSTEIN_B);
+        expectedCrossingResult.insertEntry(database, EINSTEIN_A);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN_C);
         expectedCrossingResult.addUnresolvedKey(EINSTEIN_21);
         expectedCrossingResult.addUnresolvedKey(UNRESOLVED);
         expectedCrossingResult.increaseCrossRefsCount();

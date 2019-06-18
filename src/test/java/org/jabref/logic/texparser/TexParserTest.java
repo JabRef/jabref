@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.texparser.CrossingKeysResult;
+import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -92,18 +92,18 @@ public class TexParserTest {
         expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
         expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(expectedParserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        CrossingKeysResult crossingResult2 = new CrossingKeys(parserResult, database2).resolveKeys();
-        CrossingKeysResult expectedCrossingResult2 = new CrossingKeysResult(expectedParserResult, database2);
+        TexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult2 = new TexBibEntriesResolverResult(expectedParserResult);
 
-        expectedCrossingResult2.insertEntry(EINSTEIN);
+        expectedCrossingResult2.insertEntry(database2, EINSTEIN);
         expectedCrossingResult2.addUnresolvedKey(DARWIN);
 
         assertEquals(expectedCrossingResult2, crossingResult2);
@@ -126,19 +126,19 @@ public class TexParserTest {
         expectedParserResult.addKey(EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
         expectedParserResult.addKey(NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}");
 
-        CrossingKeysResult crossingResult = new CrossingKeys(parserResult, database).resolveKeys();
-        CrossingKeysResult expectedCrossingResult = new CrossingKeysResult(expectedParserResult, database);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(expectedParserResult);
 
-        expectedCrossingResult.insertEntry(DARWIN);
-        expectedCrossingResult.insertEntry(EINSTEIN);
-        expectedCrossingResult.insertEntry(NEWTON);
+        expectedCrossingResult.insertEntry(database, DARWIN);
+        expectedCrossingResult.insertEntry(database, EINSTEIN);
+        expectedCrossingResult.insertEntry(database, NEWTON);
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        CrossingKeysResult crossingResult2 = new CrossingKeys(parserResult, database2).resolveKeys();
-        CrossingKeysResult expectedCrossingResult2 = new CrossingKeysResult(expectedParserResult, database2);
+        TexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2).resolveKeys(parserResult);
+        TexBibEntriesResolverResult expectedCrossingResult2 = new TexBibEntriesResolverResult(expectedParserResult);
 
-        expectedCrossingResult2.insertEntry(EINSTEIN);
+        expectedCrossingResult2.insertEntry(database2, EINSTEIN);
         expectedCrossingResult2.addUnresolvedKey(DARWIN);
         expectedCrossingResult2.addUnresolvedKey(NEWTON);
 
