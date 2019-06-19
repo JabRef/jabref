@@ -5,9 +5,9 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.CheckTreeView?>
 
 <DialogPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.texparser.ParseTexDialog"
@@ -24,7 +24,7 @@
             </VBox>
             <VBox spacing="5.0">
                 <Label text="%TEX files found:" />
-                <TreeView fx:id="filesTree" prefHeight="500.0" VBox.vgrow="ALWAYS" />
+                <CheckTreeView fx:id="filesTree" prefHeight="500.0" VBox.vgrow="ALWAYS" />
             </VBox>
             <VBox spacing="5.0">
                 <HBox spacing="10.0">

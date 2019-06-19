@@ -14,6 +14,9 @@ import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 
+/*
+ * TODO: Use Path instead of File.
+ */
 public class TexFileCrawler extends BackgroundTask<CheckBoxTreeItem<FileNode>> {
 
     private static final FileFilter TEX_FILTER = FileFilterConverter.toFileFilter(
