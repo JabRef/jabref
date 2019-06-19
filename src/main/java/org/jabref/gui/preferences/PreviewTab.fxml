@@ -9,6 +9,10 @@
 <?import org.fxmisc.richtext.CodeArea?>
 
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.ScrollPane?>
+
 <fx:root prefWidth="650.0" spacing="4.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.212"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.PreviewTabView">
     <children>
@@ -17,39 +21,47 @@
             <children>
                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="%Available" styleClass="sectionHeader" />
+                        <Label text="%Available" styleClass="sectionHeader"/>
                         <ListView fx:id="availableListView" maxHeight="250.0" minHeight="250.0"/>
                     </children>
                 </VBox>
                 <VBox alignment="CENTER" spacing="4.0">
                     <children>
-                        <Label styleClass="sectionHeader" />
-                        <Button fx:id="toRightButton"  prefWidth="60.0" text="&gt;&gt;" onAction="#toRightButtonAction" />
-                        <Button fx:id="toLeftButton" prefWidth="60.0" text="&lt;&lt;" onAction="#toLeftButtonAction" />
+                        <Label styleClass="sectionHeader"/>
+                        <Button fx:id="toRightButton" prefWidth="60.0" text="&gt;&gt;" onAction="#toRightButtonAction"/>
+                        <Button fx:id="toLeftButton" prefWidth="60.0" text="&lt;&lt;" onAction="#toLeftButtonAction"/>
                         <VBox prefHeight="40.0"/>
-                        <Button fx:id="sortUpButton" prefWidth="60.0" text="%Up" onAction="#sortUpButtonAction" />
-                        <Button fx:id="sortDownButton" prefWidth="60.0" text="%Down" onAction="#sortDownButtonAction" />
+                        <Button fx:id="sortUpButton" prefWidth="60.0" text="%Up" onAction="#sortUpButtonAction"/>
+                        <Button fx:id="sortDownButton" prefWidth="60.0" text="%Down" onAction="#sortDownButtonAction"/>
                     </children>
                 </VBox>
                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="%Selected" styleClass="sectionHeader" />
+                        <Label text="%Selected" styleClass="sectionHeader"/>
                         <ListView fx:id="chosenListView" maxHeight="250.0" minHeight="250.0"/>
-                        <HBox alignment="CENTER">
-                            <children>
-                                <Button fx:id="testButton" text="%Test selected style" onAction="#testButtonAction"/>
-                            </children>
-                        </HBox>
                     </children>
                 </VBox>
             </children>
         </HBox>
-        <Label text="%Default preview style" styleClass="sectionHeader" />
-        <VirtualizedScrollPane>
-            <content>
-                <CodeArea fx:id="previewTextArea" prefHeight="200.0" />
-            </content>
-        </VirtualizedScrollPane>
-        <Button fx:id="resetDefaultButton" text="%Reset default preview style" onAction="#resetDefaultButtonAction" />
+        <TabPane prefHeight="250.0" prefWidth="650.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="%Preview">
+                    <content>
+                        <ScrollPane fx:id="previewPreviewArea" />
+                    </content>
+                </Tab>
+                <Tab text="%Edit">
+                    <content>
+                        <VirtualizedScrollPane>
+                            <content>
+                                <CodeArea fx:id="previewTextArea" prefHeight="300.0"/>
+                                <Button fx:id="resetDefaultButton" text="%Reset default preview style"
+                                        onAction="#resetDefaultButtonAction"/>
+                            </content>
+                        </VirtualizedScrollPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
     </children>
 </fx:root>

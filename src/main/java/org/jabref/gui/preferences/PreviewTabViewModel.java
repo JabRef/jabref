@@ -6,12 +6,9 @@ import java.util.List;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
+import javafx.scene.control.ScrollPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -42,29 +39,29 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>();
     private final ListProperty<PreviewLayout> selectedChosenItemsProperty = new SimpleListProperty<>();
 
-    private final StringProperty previewTextProperty = new SimpleStringProperty("");
-
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
+    private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
+
+    private final ObservableList<PreviewLayout> allLayouts;
 
     public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        allLayouts = FXCollections.observableArrayList();
+        previewPreferences = preferences.getPreviewPreferences();
 
         setValues();
     }
 
     public void setValues() {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        ObservableList<PreviewLayout> availableLayouts = FXCollections.observableArrayList();
-
         chosenListProperty.setValue(FXCollections.observableArrayList(previewPreferences.getPreviewCycle()));
 
-        availableLayouts.clear();
+        allLayouts.clear();
         if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
-            availableLayouts.add(previewPreferences.getTextBasedPreviewLayout());
+            allLayouts.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
@@ -72,16 +69,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                .map(CitationStylePreviewLayout::new)
                                                .filter(style -> !chosenListProperty.contains(style))
                                                .sorted(Comparator.comparing(PreviewLayout::getName))
-                                               .forEach(availableLayouts::add))
+                                               .forEach(allLayouts::add))
                       .onFailure(ex -> {
                           LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
                       })
                       .executeWith(taskExecutor);
 
-        availableListProperty.setValue(availableLayouts);
+        availableListProperty.setValue(allLayouts);
+    }
 
-        previewTextProperty.setValue(previewPreferences.getPreviewStyle().replace("__NEWLINE__", "\n"));
+    private PreviewLayout findLayoutByNameOrDefault(String name) {
+        return allLayouts.stream().filter(layout -> layout.getName().equals(name))
+                          .findAny()
+                          .orElse(previewPreferences.getTextBasedPreviewLayout());
     }
 
     @Override
@@ -95,8 +96,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
                                                               .getBuilder()
                                                               .withPreviewCycle(chosenListProperty)
-                                                              .withPreviewStyle(previewTextProperty.getValue().replace("\n", "__NEWLINE__"))
+                                                              .withPreviewStyle(((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")).getLayoutText())
                                                               .build();
+
         if (!selectedChosenItemsProperty.getValue().isEmpty()) {
             newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(selectedChosenItemsProperty.get(0))).build();
         }
@@ -152,31 +154,26 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return newSelectedIndices;
     }
 
-    public void testChosen() {
+    public PreviewViewer getPreviewViewer() {
+        PreviewLayout layout = (selectedChosenItemsProperty.getValue().isEmpty()) ?
+                chosenListProperty.getValue().get(0) :
+                selectedChosenItemsProperty.getValue().get(0);
+
         try {
             PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
             testPane.setEntry(TestEntry.getTestEntry());
-
-            PreviewLayout layout = (selectedChosenItemsProperty.getValue().isEmpty()) ?
-                    chosenListProperty.getValue().get(0) :
-                    selectedChosenItemsProperty.getValue().get(0);
-
             testPane.setLayout(layout);
-
-            DialogPane pane = new DialogPane();
-            pane.setContent(testPane);
-            dialogService.showCustomDialogAndWait(Localization.lang("Preview"), pane, ButtonType.OK);
-
+            return testPane;
         } catch (StringIndexOutOfBoundsException exception) {
             LOGGER.warn("Parsing error.", exception);
             dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
+            return ((PreviewViewer) new ScrollPane());
         }
     }
 
     public void resetDefaultStyle() {
-        previewTextProperty.setValue(preferences.getPreviewPreferences()
-                                                .getDefaultPreviewStyle()
-                                                .replace("__NEWLINE__", "\n"));
+        ((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")) // There are issues with caching the testentries
+                .setLayoutText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
     }
 
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }
@@ -186,6 +183,4 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public ListProperty<PreviewLayout> chosenListProperty() { return chosenListProperty; }
 
     public ListProperty<PreviewLayout> selectedChosenItemsProperty() { return selectedChosenItemsProperty; }
-
-    public StringProperty previewTextProperty() { return previewTextProperty; }
 }

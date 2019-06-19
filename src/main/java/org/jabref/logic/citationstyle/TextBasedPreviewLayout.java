@@ -17,18 +17,27 @@ public class TextBasedPreviewLayout implements PreviewLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
 
     private Layout layout;
+    private String layoutText;
+    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     public TextBasedPreviewLayout(String layoutText, LayoutFormatterPreferences layoutFormatterPreferences) {
+        this.layoutFormatterPreferences = layoutFormatterPreferences;
+        setLayoutText(layoutText);
+    }
+
+    public TextBasedPreviewLayout(Layout layout) {
+        this.layout = layout;
+        this.layoutText = layout.toString();
+    }
+
+    public void setLayoutText(String layoutText) {
+        this.layoutText = layoutText;
         StringReader sr = new StringReader(layoutText.replace("__NEWLINE__", "\n"));
         try {
             layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.error("Could not generate layout", e);
         }
-    }
-
-    public TextBasedPreviewLayout(Layout layout) {
-        this.layout = layout;
     }
 
     @Override
@@ -38,6 +47,10 @@ public class TextBasedPreviewLayout implements PreviewLayout {
         } else {
             return "";
         }
+    }
+
+    public String getLayoutText() {
+        return layoutText;
     }
 
     @Override

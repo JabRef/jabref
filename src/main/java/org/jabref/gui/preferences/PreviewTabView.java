@@ -10,11 +10,13 @@ import javax.inject.Inject;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
@@ -27,6 +29,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -46,9 +49,9 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @FXML private Button sortUpButton;
     @FXML private Button sortDownButton;
 
-    @FXML private Button testButton;
     @FXML private Button resetDefaultButton;
 
+    @FXML private ScrollPane previewPreviewArea;
     @FXML private CodeArea previewTextArea;
 
     @Inject private TaskExecutor taskExecutor;
@@ -112,16 +115,42 @@ public class PreviewTabView extends VBox implements PrefsTab {
         toLeftButton.disableProperty().bind(nothingSelectedFromChosen);
         sortUpButton.disableProperty().bind(nothingSelectedFromChosen);
         sortDownButton.disableProperty().bind(nothingSelectedFromChosen);
-        testButton.disableProperty().bind(nothingSelectedFromChosen);
 
         previewTextArea.setParagraphGraphicFactory(LineNumberFactory.get(previewTextArea));
         previewTextArea.textProperty().addListener((obs, oldText, newText) -> {
             previewTextArea.setStyleSpans(0, computeHighlighting(newText));
         });
 
-        BindingsHelper.bindBidirectional(previewTextArea.textProperty(), viewModel.previewTextProperty(),
-                text -> previewTextArea.replaceText(viewModel.previewTextProperty().getValue()),
-                text -> viewModel.previewTextProperty().setValue(previewTextArea.getText()));
+        BindingsHelper.bindBidirectional(previewTextArea.textProperty(), viewModel.selectedChosenItemsProperty(),
+                layoutList -> {
+                    if (layoutList.isEmpty()) {
+                        previewTextArea.clear();
+                    } else {
+                        if (layoutList.get(0) instanceof TextBasedPreviewLayout) {
+                            String previewText = ((TextBasedPreviewLayout)layoutList.get(0)).getLayoutText().replace("__NEWLINE__", "\n");
+                            previewTextArea.replaceText(previewText);
+                            previewTextArea.setStyleSpans(0, computeHighlighting(previewText));
+                            previewTextArea.disableProperty().setValue(false);
+                        } else {
+                            previewTextArea.replaceText(Localization.lang("CitationStyleLayout cannot be edited."));
+                            previewTextArea.disableProperty().setValue(true);
+                        }
+                    }
+                },
+                text -> {
+                    if (!viewModel.selectedChosenItemsProperty().getValue().isEmpty()) {
+                        PreviewLayout item = viewModel.selectedChosenItemsProperty().get(0);
+                        if (item instanceof TextBasedPreviewLayout) {
+                            ((TextBasedPreviewLayout)item).setLayoutText(previewTextArea.getText().replace("\n", "__NEWLINE__"));
+                        }
+                    }
+                }
+        );
+
+        //previewPreviewArea.contentProperty().bind(viewModel.previewPaneProperty());
+        chosenListView.getSelectionModel().getSelectedItems()
+                      .addListener((ListChangeListener<? super PreviewLayout>) c ->
+                              previewPreviewArea.setContent(viewModel.getPreviewViewer()));
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         ContextMenu contextMenu = new ContextMenu();
@@ -131,7 +160,6 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 factory.createMenuItem(StandardActions.PASTE, new PreviewTabView.EditAction(StandardActions.PASTE)),
                 factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
         );
-
         contextMenu.getStyleClass().add("context-menu");
         previewTextArea.setContextMenu(contextMenu);
     }
@@ -259,7 +287,10 @@ public class PreviewTabView extends VBox implements PrefsTab {
         }
     }
 
-    public void testButtonAction() { viewModel.testChosen(); }
-
-    public void resetDefaultButtonAction() { viewModel.resetDefaultStyle(); }
+    public void resetDefaultButtonAction() {
+        viewModel.resetDefaultStyle();
+        if (!chosenListView.getSelectionModel().isEmpty()) {
+// not yet working
+        }
+    }
 }
