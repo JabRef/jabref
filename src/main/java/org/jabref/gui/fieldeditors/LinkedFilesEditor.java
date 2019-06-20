@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,7 +30,9 @@ import javafx.scene.text.Text;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -48,10 +52,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
+    @Inject private StateManager stateManager;
+    private final DialogService dialogService;
+
     public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              JabRefPreferences preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
+        this.dialogService = dialogService;
 
         ViewLoader.view(this)
                   .root(this)
@@ -234,6 +242,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
         renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
+        MenuItem copyLinkedFiles = new MenuItem(Localization.lang("Copy linked files to folder..."));
+        copyLinkedFiles.setOnAction(event->new CopyFilesAction(stateManager, dialogService).execute());
+        copyLinkedFiles.setDisable(linkedFile.getFile().isOnlineLink());
+
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
         deleteFile.setDisable(linkedFile.getFile().isOnlineLink());
@@ -248,7 +260,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (linkedFile.getFile().isOnlineLink()) {
             menu.getItems().add(download);
         }
-        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, deleteLink, deleteFile);
+        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, copyLinkedFiles, deleteLink, deleteFile);
 
         return menu;
     }
