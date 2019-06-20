@@ -1,81 +1,68 @@
 package org.jabref.gui.texparser;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.CheckBoxTreeItem;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.FileFilterConverter;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 
-/*
- * TODO: Use Path instead of File.
- */
 public class TexFileCrawler extends BackgroundTask<CheckBoxTreeItem<FileNode>> {
 
-    private static final FileFilter TEX_FILTER = FileFilterConverter.toFileFilter(
-            FileFilterConverter.toExtensionFilter(StandardFileType.TEX));
+    private static final String TEX_EXT = ".tex";
 
     private final Path directory;
-    private int counter;
+    private int count;
 
     public TexFileCrawler(Path directory) {
         this.directory = directory;
-        this.counter = 0;
+        this.count = 0;
     }
 
     @Override
-    protected CheckBoxTreeItem<FileNode> call() {
-        return searchDirectory(directory.toFile());
+    protected CheckBoxTreeItem<FileNode> call() throws IOException {
+        return searchDirectory(directory);
     }
 
-    private CheckBoxTreeItem<FileNode> searchDirectory(File directory) {
-        if (directory == null || !directory.exists() || !directory.isDirectory()) {
+    private CheckBoxTreeItem<FileNode> searchDirectory(Path directory) throws IOException {
+        if (directory == null || !Files.exists(directory) || !Files.isDirectory(directory)) {
             return null;
         }
 
-        File[] fileArray = directory.listFiles(TEX_FILTER);
-
-        List<File> files = (fileArray == null) ? Collections.emptyList() : Arrays.asList(fileArray);
-
-        CheckBoxTreeItem<FileNode> root = new CheckBoxTreeItem<>(new FileNode(directory.toPath(), 0));
-
+        CheckBoxTreeItem<FileNode> parent = new CheckBoxTreeItem<>(new FileNode(directory));
         int fileCount = 0;
 
-        fileArray = directory.listFiles(pathname -> pathname != null && pathname.isDirectory());
+        List<Path> files = Files.list(directory)
+                                .filter(path -> !Files.isDirectory(path) && path.toString().endsWith(TEX_EXT))
+                                .collect(Collectors.toList());
 
-        List<File> subDirectories = (fileArray == null) ? Collections.emptyList() : Arrays.asList(fileArray);
+        List<Path> subDirectories = Files.list(directory)
+                                         .filter(path -> Files.isDirectory(path))
+                                         .collect(Collectors.toList());
 
-        for (File subDirectory : subDirectories) {
+        for (Path subDirectory : subDirectories) {
             if (isCanceled()) {
-                return root;
+                return parent;
             }
 
             CheckBoxTreeItem<FileNode> subRoot = searchDirectory(subDirectory);
 
             if (subRoot != null && !subRoot.getChildren().isEmpty()) {
                 fileCount += subRoot.getValue().getFileCount();
-                root.getChildren().add(subRoot);
+                parent.getChildren().add(subRoot);
             }
         }
 
-        root.setValue(new FileNode(directory.toPath(), files.size() + fileCount));
+        parent.setValue(new FileNode(directory, files.size() + fileCount));
 
-        for (File file : files) {
-            root.getChildren().add(new CheckBoxTreeItem<>(new FileNode(file.toPath())));
-            counter++;
-
-            updateMessage(String.format("%s %s %s.", counter,
-                    counter == 1 ? Localization.lang("file") : Localization.lang("files"),
-                    Localization.lang("found")));
+        for (Path file : files) {
+            parent.getChildren().add(new CheckBoxTreeItem<>(new FileNode(file)));
+            count++;
         }
 
-        return root;
+        return parent;
     }
 }
