@@ -1,8 +1,8 @@
 package org.jabref.gui.texparser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,21 +14,18 @@ public class ReferenceWrapper {
     private final int count;
     private final ObservableList<Citation> citationList;
 
-    public ReferenceWrapper(String entry, Set<Citation> citationSet) {
-        this(entry, new ArrayList<>(citationSet));
-    }
-
-    public ReferenceWrapper(String entry, List<Citation> citationList) {
+    public ReferenceWrapper(String entry, Collection<Citation> citationColl) {
         this.entry = entry;
-        this.count = citationList.size();
-        this.citationList = FXCollections.observableList(citationList);
+        this.count = citationColl.size();
+        this.citationList = FXCollections.observableList(
+                citationColl instanceof List ? (List) citationColl : new ArrayList(citationColl));
     }
 
-    public final String getEntry() {
+    public String getEntry() {
         return entry;
     }
 
-    public final int getCount() {
+    public int getCount() {
         return count;
     }
 

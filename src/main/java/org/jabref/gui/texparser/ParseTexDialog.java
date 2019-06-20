@@ -14,7 +14,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TextField;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
@@ -122,15 +121,12 @@ public class ParseTexDialog extends BaseDialog<Void> {
         Path directory = Paths.get(texDirectoryField.getText());
 
         if (Files.notExists(directory)) {
-            directory =  databaseContext.getFirstExistingFileDir(Globals.prefs.getFilePreferences())
-                                        .orElse(preferencesService.getWorkingDir());
-
+            directory = initialPath;
             texDirectoryField.setText(directory.toAbsolutePath().toString());
         }
 
         if (!Files.isDirectory(directory)) {
             directory = directory.getParent();
-
             texDirectoryField.setText(directory.toAbsolutePath().toString());
         }
 
