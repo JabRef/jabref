@@ -44,45 +44,44 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
 
-    private final ObservableList<PreviewLayout> allLayouts;
-
     public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        allLayouts = FXCollections.observableArrayList();
         previewPreferences = preferences.getPreviewPreferences();
 
         setValues();
     }
 
     public void setValues() {
-        chosenListProperty.setValue(FXCollections.observableArrayList(previewPreferences.getPreviewCycle()));
+        final ObservableList<PreviewLayout> availableLayouts = FXCollections.observableArrayList();
 
-        allLayouts.clear();
+        chosenListProperty.setValue(FXCollections.observableArrayList(previewPreferences.getPreviewCycle()));
         if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
-            allLayouts.add(previewPreferences.getTextBasedPreviewLayout());
+            chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
-                      .onSuccess(value -> value.stream()
-                                               .map(CitationStylePreviewLayout::new)
-                                               .filter(style -> !chosenListProperty.contains(style))
-                                               .sorted(Comparator.comparing(PreviewLayout::getName))
-                                               .forEach(allLayouts::add))
-                      .onFailure(ex -> {
-                          LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ", ex);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
-                      })
-                      .executeWith(taskExecutor);
+                .onSuccess(value -> value.stream()
+                        .map(CitationStylePreviewLayout::new)
+                        .sorted(Comparator.comparing(PreviewLayout::getName))
+                        .filter(style -> !chosenListProperty.contains(style))
+                        .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
+                .onFailure(ex -> {
+                    LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
+                })
+                .executeWith(taskExecutor);
 
-        availableListProperty.setValue(allLayouts);
+        availableListProperty.setValue(availableLayouts);
     }
 
     private PreviewLayout findLayoutByNameOrDefault(String name) {
-        return allLayouts.stream().filter(layout -> layout.getName().equals(name))
-                          .findAny()
-                          .orElse(previewPreferences.getTextBasedPreviewLayout());
+        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                .findAny()
+                .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                        .findAny()
+                        .orElse(previewPreferences.getTextBasedPreviewLayout()));
     }
 
     @Override

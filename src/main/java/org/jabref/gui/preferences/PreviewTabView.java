@@ -25,6 +25,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -38,8 +39,12 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreviewTabView extends VBox implements PrefsTab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabView.class);
 
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;
@@ -51,8 +56,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     @FXML private Button resetDefaultButton;
 
-    @FXML private ScrollPane previewPreviewArea;
-    @FXML private CodeArea previewTextArea;
+    @FXML private ScrollPane previewPane;
+    @FXML private CodeArea editArea;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -68,22 +73,22 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
         @Override
         public void execute() {
-            if (previewTextArea != null) {
+            if (editArea != null) {
                 switch (command) {
                     case COPY:
-                        previewTextArea.copy();
+                        editArea.copy();
                         break;
                     case CUT:
-                        previewTextArea.cut();
+                        editArea.cut();
                         break;
                     case PASTE:
-                        previewTextArea.paste();
+                        editArea.paste();
                         break;
                     case SELECT_ALL:
-                        previewTextArea.selectAll();
+                        editArea.selectAll();
                         break;
                 }
-                previewTextArea.requestFocus();
+                editArea.requestFocus();
             }
         }
     }
@@ -116,24 +121,24 @@ public class PreviewTabView extends VBox implements PrefsTab {
         sortUpButton.disableProperty().bind(nothingSelectedFromChosen);
         sortDownButton.disableProperty().bind(nothingSelectedFromChosen);
 
-        previewTextArea.setParagraphGraphicFactory(LineNumberFactory.get(previewTextArea));
-        previewTextArea.textProperty().addListener((obs, oldText, newText) -> {
-            previewTextArea.setStyleSpans(0, computeHighlighting(newText));
+        editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
+        editArea.textProperty().addListener((obs, oldText, newText) -> {
+            editArea.setStyleSpans(0, computeHighlighting(newText));
         });
 
-        BindingsHelper.bindBidirectional(previewTextArea.textProperty(), viewModel.selectedChosenItemsProperty(),
+        BindingsHelper.bindBidirectional(editArea.textProperty(), viewModel.selectedChosenItemsProperty(),
                 layoutList -> {
                     if (layoutList.isEmpty()) {
-                        previewTextArea.clear();
+                        editArea.clear();
                     } else {
                         if (layoutList.get(0) instanceof TextBasedPreviewLayout) {
                             String previewText = ((TextBasedPreviewLayout)layoutList.get(0)).getLayoutText().replace("__NEWLINE__", "\n");
-                            previewTextArea.replaceText(previewText);
-                            previewTextArea.setStyleSpans(0, computeHighlighting(previewText));
-                            previewTextArea.disableProperty().setValue(false);
+                            editArea.replaceText(previewText);
+                            editArea.setStyleSpans(0, computeHighlighting(previewText));
+                            editArea.disableProperty().setValue(false);
                         } else {
-                            previewTextArea.replaceText(Localization.lang("CitationStyleLayout cannot be edited."));
-                            previewTextArea.disableProperty().setValue(true);
+                            editArea.replaceText(Localization.lang("CitationStyleLayout cannot be edited."));
+                            editArea.disableProperty().setValue(true);
                         }
                     }
                 },
@@ -141,16 +146,16 @@ public class PreviewTabView extends VBox implements PrefsTab {
                     if (!viewModel.selectedChosenItemsProperty().getValue().isEmpty()) {
                         PreviewLayout item = viewModel.selectedChosenItemsProperty().get(0);
                         if (item instanceof TextBasedPreviewLayout) {
-                            ((TextBasedPreviewLayout)item).setLayoutText(previewTextArea.getText().replace("\n", "__NEWLINE__"));
+                            ((TextBasedPreviewLayout)item).setLayoutText(editArea.getText().replace("\n", "__NEWLINE__"));
+                            ((PreviewViewer) previewPane.getContent()).setLayout(item);
                         }
                     }
                 }
         );
 
-        //previewPreviewArea.contentProperty().bind(viewModel.previewPaneProperty());
         chosenListView.getSelectionModel().getSelectedItems()
                       .addListener((ListChangeListener<? super PreviewLayout>) c ->
-                              previewPreviewArea.setContent(viewModel.getPreviewViewer()));
+                              previewPane.setContent(viewModel.getPreviewViewer()));
 
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         ContextMenu contextMenu = new ContextMenu();
@@ -161,13 +166,13 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
         );
         contextMenu.getStyleClass().add("context-menu");
-        previewTextArea.setContextMenu(contextMenu);
+        editArea.setContextMenu(contextMenu);
     }
 
     /**
      * XML-Syntax-Highlighting for RichTextFX-Codearea
      * created by (c) Carlos Martins (github: @cemartins)
-     * distributed under the BSD 2-Clause "Simplified" License
+     * License: BSD-2-Clause
      * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
      * and: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
      *
