@@ -63,6 +63,9 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
 
+    private long lastKeyPressTime;
+    private String listSearchTerm;
+
     private PreviewTabViewModel viewModel;
 
     private class EditAction extends SimpleCommand {
@@ -103,6 +106,9 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public void initialize() {
         viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
+
+        lastKeyPressTime = System.currentTimeMillis();
+        listSearchTerm = "";
 
         availableListView.itemsProperty().bind(viewModel.availableListProperty());
         viewModel.selectedAvailableItemsProperty().bind(new ReadOnlyListWrapper(availableListView.getSelectionModel().getSelectedItems()));
@@ -241,12 +247,16 @@ public class PreviewTabView extends VBox implements PrefsTab {
             return;
         }
 
-        for (PreviewLayout item : list.getItems()) {
-            if (item.getName().toLowerCase().startsWith(keypressed.getCharacter().toLowerCase())) {
-                list.scrollTo(item);
-                return;
-            }
+        if (System.currentTimeMillis() - lastKeyPressTime < 1000) {
+            listSearchTerm += keypressed.getCharacter().toLowerCase();
+        } else {
+            listSearchTerm = keypressed.getCharacter().toLowerCase();
         }
+
+        lastKeyPressTime = System.currentTimeMillis();
+
+        list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
+                .findFirst().ifPresent(item -> list.scrollTo(item));
     }
 
     @Override
