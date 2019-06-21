@@ -8,13 +8,10 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ScrollPane;
 
-import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -22,8 +19,6 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.TestEntry;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -95,7 +90,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
                                                               .getBuilder()
                                                               .withPreviewCycle(chosenListProperty)
-                                                              .withPreviewStyle(((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")).getLayoutText())
+                                                              .withPreviewStyle(((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")).getText())
                                                               .build();
 
         if (!selectedChosenItemsProperty.getValue().isEmpty()) {
@@ -153,26 +148,21 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return newSelectedIndices;
     }
 
-    public PreviewViewer getPreviewViewer() {
-        PreviewLayout layout = (selectedChosenItemsProperty.getValue().isEmpty()) ?
-                chosenListProperty.getValue().get(0) :
-                selectedChosenItemsProperty.getValue().get(0);
-
-        try {
-            PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
-            testPane.setEntry(TestEntry.getTestEntry());
-            testPane.setLayout(layout);
-            return testPane;
-        } catch (StringIndexOutOfBoundsException exception) {
-            LOGGER.warn("Parsing error.", exception);
-            dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
-            return ((PreviewViewer) new ScrollPane());
+    public PreviewLayout getTestLayout() {
+        if (!selectedChosenItemsProperty.getValue().isEmpty()) {
+            return selectedAvailableItemsProperty.getValue().get(0);
         }
+
+        if (!chosenListProperty.getValue().isEmpty()) {
+            return chosenListProperty.getValue().get(0);
+        }
+
+        return findLayoutByNameOrDefault("Preview");
     }
 
     public void resetDefaultStyle() {
-        ((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")) // There are issues with caching the testentries
-                .setLayoutText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
+        ((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview"))
+                .setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
     }
 
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }

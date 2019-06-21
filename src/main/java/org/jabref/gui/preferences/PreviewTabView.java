@@ -10,11 +10,12 @@ import javax.inject.Inject;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
@@ -29,9 +30,12 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -54,10 +58,13 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @FXML private Button sortUpButton;
     @FXML private Button sortDownButton;
 
+    @FXML private Label readOnlyLabel;
     @FXML private Button resetDefaultButton;
 
     @FXML private ScrollPane previewPane;
     @FXML private CodeArea editArea;
+
+    private final ContextMenu contextMenu;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -98,7 +105,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public PreviewTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
-
+        contextMenu = new ContextMenu();
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -107,16 +114,26 @@ public class PreviewTabView extends VBox implements PrefsTab {
     public void initialize() {
         viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
 
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CUT, new PreviewTabView.EditAction(StandardActions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new PreviewTabView.EditAction(StandardActions.COPY)),
+                factory.createMenuItem(StandardActions.PASTE, new PreviewTabView.EditAction(StandardActions.PASTE)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
+        );
+        contextMenu.getStyleClass().add("context-menu");
+        editArea.setContextMenu(contextMenu);
+
         lastKeyPressTime = System.currentTimeMillis();
         listSearchTerm = "";
 
         availableListView.itemsProperty().bind(viewModel.availableListProperty());
-        viewModel.selectedAvailableItemsProperty().bind(new ReadOnlyListWrapper(availableListView.getSelectionModel().getSelectedItems()));
+        viewModel.selectedAvailableItemsProperty().bind(new ReadOnlyListWrapper<>(availableListView.getSelectionModel().getSelectedItems()));
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(availableListView);
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
 
         chosenListView.itemsProperty().bind(viewModel.chosenListProperty());
-        viewModel.selectedChosenItemsProperty().bind(new ReadOnlyListWrapper(chosenListView.getSelectionModel().getSelectedItems()));
+        viewModel.selectedChosenItemsProperty().bind(new ReadOnlyListWrapper<>(chosenListView.getSelectionModel().getSelectedItems()));
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(chosenListView);
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
 
@@ -126,53 +143,71 @@ public class PreviewTabView extends VBox implements PrefsTab {
         toLeftButton.disableProperty().bind(nothingSelectedFromChosen);
         sortUpButton.disableProperty().bind(nothingSelectedFromChosen);
         sortDownButton.disableProperty().bind(nothingSelectedFromChosen);
+        contextMenu.getItems().get(0).disableProperty().bind(nothingSelectedFromChosen); // ToDo: should not if readonly
+        contextMenu.getItems().get(2).disableProperty().bind(nothingSelectedFromChosen);
+
+        previewPane.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
+        ((PreviewViewer) previewPane.getContent()).setEntry(TestEntry.getTestEntry());
+        ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getTestLayout());
 
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
-        editArea.textProperty().addListener((obs, oldText, newText) -> {
-            editArea.setStyleSpans(0, computeHighlighting(newText));
-        });
+        editArea.textProperty().addListener((obs, oldText, newText) ->
+                editArea.setStyleSpans(0, computeHighlighting(newText)));
 
-        BindingsHelper.bindBidirectional(editArea.textProperty(), viewModel.selectedChosenItemsProperty(),
-                layoutList -> {
-                    if (layoutList.isEmpty()) {
-                        editArea.clear();
-                    } else {
-                        if (layoutList.get(0) instanceof TextBasedPreviewLayout) {
-                            String previewText = ((TextBasedPreviewLayout)layoutList.get(0)).getLayoutText().replace("__NEWLINE__", "\n");
-                            editArea.replaceText(previewText);
-                            editArea.setStyleSpans(0, computeHighlighting(previewText));
-                            editArea.disableProperty().setValue(false);
-                        } else {
-                            editArea.replaceText(Localization.lang("CitationStyleLayout cannot be edited."));
-                            editArea.disableProperty().setValue(true);
-                        }
-                    }
-                },
-                text -> {
-                    if (!viewModel.selectedChosenItemsProperty().getValue().isEmpty()) {
-                        PreviewLayout item = viewModel.selectedChosenItemsProperty().get(0);
-                        if (item instanceof TextBasedPreviewLayout) {
-                            ((TextBasedPreviewLayout)item).setLayoutText(editArea.getText().replace("\n", "__NEWLINE__"));
-                            ((PreviewViewer) previewPane.getContent()).setLayout(item);
-                        }
-                    }
-                }
-        );
+        BindingsHelper.bindBidirectional(editArea.textProperty(), new ReadOnlyListWrapper<>(chosenListView.selectionModelProperty().getValue().getSelectedItems()),
+                layoutList -> update(),
+                            text -> {
+                                if (!viewModel.selectedChosenItemsProperty().getValue().isEmpty()) {
+                                    PreviewLayout item = viewModel.selectedChosenItemsProperty().get(0);
+                                    if (item instanceof TextBasedPreviewLayout) {
+                                        ((TextBasedPreviewLayout)item).setText(editArea.getText().replace("\n", "__NEWLINE__"));
+                                    }
+                                }
+                                update();
+                            }
+                );
 
-        chosenListView.getSelectionModel().getSelectedItems()
-                      .addListener((ListChangeListener<? super PreviewLayout>) c ->
-                              previewPane.setContent(viewModel.getPreviewViewer()));
+        update();
+    }
 
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.CUT, new PreviewTabView.EditAction(StandardActions.CUT)),
-                factory.createMenuItem(StandardActions.COPY, new PreviewTabView.EditAction(StandardActions.COPY)),
-                factory.createMenuItem(StandardActions.PASTE, new PreviewTabView.EditAction(StandardActions.PASTE)),
-                factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
-        );
-        contextMenu.getStyleClass().add("context-menu");
-        editArea.setContextMenu(contextMenu);
+    private void update() { // ToDo: convert to bindings
+        ObservableList<PreviewLayout> layoutList = chosenListView.getSelectionModel().getSelectedItems();
+        if (layoutList.isEmpty()) {
+            ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getTestLayout());
+            previewPane.visibleProperty().setValue(false);
+
+            editArea.clear();
+           // editArea.editableProperty().setValue(false);
+            readOnlyLabel.visibleProperty().setValue(false);
+            resetDefaultButton.disableProperty().setValue(true);
+        } else {
+            String previewText;
+            PreviewLayout item = layoutList.get(0);
+
+            try {
+                ((PreviewViewer) previewPane.getContent()).setLayout(item);
+            } catch (StringIndexOutOfBoundsException exception) {
+                LOGGER.warn("Parsing error.", exception);
+                dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
+            }
+            previewPane.visibleProperty().setValue(true);
+
+            if (item instanceof TextBasedPreviewLayout) {
+                previewText = ((TextBasedPreviewLayout) item).getText().replace("__NEWLINE__", "\n");
+                //editArea.editableProperty().setValue(false);
+                readOnlyLabel.visibleProperty().setValue(false);
+                resetDefaultButton.disableProperty().setValue(false);
+            } else {
+                previewText = ((CitationStylePreviewLayout) item).getSource();
+                //editArea.editableProperty().setValue(true); // ToDo: Cursor caret disappears
+                readOnlyLabel.visibleProperty().setValue(true);
+                resetDefaultButton.disableProperty().setValue(true);
+            }
+
+            editArea.replaceText(previewText);
+            editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea)); // ToDo: throws NPE on CitationStylePreviewLayout
+            editArea.setStyleSpans(0, computeHighlighting(previewText));
+        }
     }
 
     /**
@@ -288,11 +323,12 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public void toLeftButtonAction() { viewModel.removeFromChosen(); }
 
-    public void sortUpButtonAction() {
+    public void sortUpButtonAction() { // ToDo: previewPane loads first in chosenList if Preview is moved
         List<Integer> newIndices = viewModel.selectedInChosenUp(chosenListView.getSelectionModel().getSelectedIndices());
         for (int index : newIndices) {
             chosenListView.getSelectionModel().select(index);
         }
+        update();
     }
 
     public void sortDownButtonAction() {
@@ -300,12 +336,11 @@ public class PreviewTabView extends VBox implements PrefsTab {
         for (int index : newIndices) {
             chosenListView.getSelectionModel().select(index);
         }
+        update();
     }
 
-    public void resetDefaultButtonAction() {
+    public void resetDefaultButtonAction() { // not yet working
         viewModel.resetDefaultStyle();
-        if (!chosenListView.getSelectionModel().isEmpty()) {
-// not yet working
-        }
+        update();
     }
 }

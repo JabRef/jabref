@@ -34,7 +34,7 @@
     -fx-border-color: -fx-outer-border;
 }
 
-.code-area .tagmark .{
+.code-area .tagmark {
     -fx-fill: gray;
 }
 
@@ -65,5 +65,8 @@
 
 .code-area .context-menu {
     -fx-font-family: sans-serif;
-    -fx-padding: 0;
+}
+
+.code-area .context-menu .menu-item {
+    -fx-padding: 2;
 }
