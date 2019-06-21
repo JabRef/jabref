@@ -117,7 +117,7 @@ dependencies {
 
     compile 'mysql:mysql-connector-java:8.0.16'
 
-    compile 'org.postgresql:postgresql:42.2.5'
+    compile 'org.postgresql:postgresql:42.2.6'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
