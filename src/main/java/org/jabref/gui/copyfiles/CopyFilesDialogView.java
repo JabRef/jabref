@@ -24,7 +24,7 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
     private final CopyFilesDialogViewModel viewModel;
 
-    public CopyFilesDialogView(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency results) {
+    public CopyFilesDialogView(CopyFilesResultListDependency results) {
         this.setTitle(Localization.lang("Result"));
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK);

@@ -265,7 +265,7 @@ class MainTableColumnFactory {
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                             if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
                                 // Only one linked file -> open directly
-                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs, externalFileTypes);
+                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
                                 linkedFileViewModel.open();
                             }
                         })
@@ -288,7 +288,7 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs, externalFileTypes);
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
