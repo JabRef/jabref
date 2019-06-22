@@ -45,7 +45,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
