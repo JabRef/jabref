@@ -1,14 +1,9 @@
 package org.jabref.gui.preferences;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,6 +13,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
@@ -41,8 +37,6 @@ import org.jabref.preferences.JabRefPreferences;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +108,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
     public void initialize() {
         viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
 
+        lastKeyPressTime = System.currentTimeMillis();
+
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new PreviewTabView.EditAction(StandardActions.CUT)),
@@ -122,43 +118,43 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
         );
         contextMenu.getStyleClass().add("context-menu");
-        editArea.setContextMenu(contextMenu);
-
-        lastKeyPressTime = System.currentTimeMillis();
-        listSearchTerm = "";
 
         availableListView.itemsProperty().bind(viewModel.availableListProperty());
-        viewModel.selectedAvailableItemsProperty().bind(new ReadOnlyListWrapper<>(availableListView.getSelectionModel().getSelectedItems()));
+        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(availableListView);
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
+        availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         chosenListView.itemsProperty().bind(viewModel.chosenListProperty());
-        viewModel.selectedChosenItemsProperty().bind(new ReadOnlyListWrapper<>(chosenListView.getSelectionModel().getSelectedItems()));
+        viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(chosenListView);
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
+        chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        toRightButton.disableProperty().bind(availableListView.selectionModelProperty().getValue().selectedItemProperty().isNull());
+        toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        BooleanBinding nothingSelectedFromChosen = chosenListView.selectionModelProperty().getValue().selectedItemProperty().isNull();
-        toLeftButton.disableProperty().bind(nothingSelectedFromChosen);
-        sortUpButton.disableProperty().bind(nothingSelectedFromChosen);
-        sortDownButton.disableProperty().bind(nothingSelectedFromChosen);
-        contextMenu.getItems().get(0).disableProperty().bind(nothingSelectedFromChosen); // ToDo: should not if readonly
-        contextMenu.getItems().get(2).disableProperty().bind(nothingSelectedFromChosen);
+        toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
         previewPane.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
+        // previewPane.setMaxWidth(650); // FixMe: PreviewViewer is too large
+        // previewPane.getContent().maxWidth(650);
         ((PreviewViewer) previewPane.getContent()).setEntry(TestEntry.getTestEntry());
-        ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getTestLayout());
+        ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getCurrentLayout());
+        previewPane.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
-        editArea.textProperty().addListener((obs, oldText, newText) ->
-                editArea.setStyleSpans(0, computeHighlighting(newText)));
+        editArea.textProperty().addListener((obs, oldText, newText) -> editArea.setStyleSpans(0, viewModel.computeHighlighting(newText)));
+        editArea.setContextMenu(contextMenu);
+        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
+        // ToDo: Convert to bindings
         BindingsHelper.bindBidirectional(editArea.textProperty(), new ReadOnlyListWrapper<>(chosenListView.selectionModelProperty().getValue().getSelectedItems()),
                 layoutList -> update(),
                             text -> {
-                                if (!viewModel.selectedChosenItemsProperty().getValue().isEmpty()) {
-                                    PreviewLayout item = viewModel.selectedChosenItemsProperty().get(0);
+                                if (!viewModel.chosenSelectionModelProperty().getValue().getSelectedItems().isEmpty()) {
+                                    PreviewLayout item = viewModel.chosenSelectionModelProperty().getValue().getSelectedItems().get(0);
                                     if (item instanceof TextBasedPreviewLayout) {
                                         ((TextBasedPreviewLayout)item).setText(editArea.getText().replace("\n", "__NEWLINE__"));
                                     }
@@ -167,19 +163,22 @@ public class PreviewTabView extends VBox implements PrefsTab {
                             }
                 );
 
+        // ToDo: Implement selectedIsEditableProperty-Logic in ViewModel
+        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
+        resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
+        contextMenu.getItems().get(0).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
+        contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
+
+        //editArea.editableProperty().bind(true); // FixMe: Cursor caret disappears
+
         update();
     }
 
     private void update() { // ToDo: convert to bindings
         ObservableList<PreviewLayout> layoutList = chosenListView.getSelectionModel().getSelectedItems();
         if (layoutList.isEmpty()) {
-            ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getTestLayout());
-            previewPane.visibleProperty().setValue(false);
-
+            ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getCurrentLayout());
             editArea.clear();
-           // editArea.editableProperty().setValue(false);
-            readOnlyLabel.visibleProperty().setValue(false);
-            resetDefaultButton.disableProperty().setValue(true);
         } else {
             String previewText;
             PreviewLayout item = layoutList.get(0);
@@ -190,91 +189,15 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 LOGGER.warn("Parsing error.", exception);
                 dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
             }
-            previewPane.visibleProperty().setValue(true);
 
             if (item instanceof TextBasedPreviewLayout) {
                 previewText = ((TextBasedPreviewLayout) item).getText().replace("__NEWLINE__", "\n");
-                //editArea.editableProperty().setValue(false);
-                readOnlyLabel.visibleProperty().setValue(false);
-                resetDefaultButton.disableProperty().setValue(false);
             } else {
                 previewText = ((CitationStylePreviewLayout) item).getSource();
-                //editArea.editableProperty().setValue(true); // ToDo: Cursor caret disappears
-                readOnlyLabel.visibleProperty().setValue(true);
-                resetDefaultButton.disableProperty().setValue(true);
             }
 
             editArea.replaceText(previewText);
-            editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea)); // ToDo: throws NPE on CitationStylePreviewLayout
-            editArea.setStyleSpans(0, computeHighlighting(previewText));
         }
-    }
-
-    /**
-     * XML-Syntax-Highlighting for RichTextFX-Codearea
-     * created by (c) Carlos Martins (github: @cemartins)
-     * License: BSD-2-Clause
-     * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
-     * and: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
-     *
-     * @param text to parse and highlight
-     * @return highlighted span for codeArea
-     */
-    private StyleSpans<Collection<String>> computeHighlighting(String text) {
-
-        final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
-                + "|(?<COMMENT><!--[^<>]+-->)");
-        final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
-
-        final int GROUP_OPEN_BRACKET = 2;
-        final int GROUP_ELEMENT_NAME = 3;
-        final int GROUP_ATTRIBUTES_SECTION = 4;
-        final int GROUP_CLOSE_BRACKET = 5;
-        final int GROUP_ATTRIBUTE_NAME = 1;
-        final int GROUP_EQUAL_SYMBOL = 2;
-        final int GROUP_ATTRIBUTE_VALUE = 3;
-
-        Matcher matcher = XML_TAG.matcher(text);
-        int lastKwEnd = 0;
-        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-        while (matcher.find()) {
-
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-            if (matcher.group("COMMENT") != null) {
-                spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
-            } else {
-                if (matcher.group("ELEMENT") != null) {
-                    String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
-
-                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
-                    spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
-
-                    if (!attributesText.isEmpty()) {
-
-                        lastKwEnd = 0;
-
-                        Matcher amatcher = ATTRIBUTES.matcher(attributesText);
-                        while (amatcher.find()) {
-                            spansBuilder.add(Collections.emptyList(), amatcher.start() - lastKwEnd);
-                            spansBuilder.add(Collections.singleton("attribute"), amatcher.end(GROUP_ATTRIBUTE_NAME) - amatcher.start(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("tagmark"), amatcher.end(GROUP_EQUAL_SYMBOL) - amatcher.end(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("avalue"), amatcher.end(GROUP_ATTRIBUTE_VALUE) - amatcher.end(GROUP_EQUAL_SYMBOL));
-                            lastKwEnd = amatcher.end();
-                        }
-                        if (attributesText.length() > lastKwEnd) {
-                            spansBuilder.add(Collections.emptyList(), attributesText.length() - lastKwEnd);
-                        }
-                    }
-
-                    lastKwEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
-
-                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKwEnd);
-                }
-            }
-            lastKwEnd = matcher.end();
-        }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-        return spansBuilder.create();
     }
 
     public void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
@@ -323,7 +246,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public void toLeftButtonAction() { viewModel.removeFromChosen(); }
 
-    public void sortUpButtonAction() { // ToDo: previewPane loads first in chosenList if Preview is moved
+    // ToDo: Move selectionstuff to ViewModel
+    public void sortUpButtonAction() { // FixMe: previewPane loads first in chosenList if Preview is moved
         List<Integer> newIndices = viewModel.selectedInChosenUp(chosenListView.getSelectionModel().getSelectedIndices());
         for (int index : newIndices) {
             chosenListView.getSelectionModel().select(index);

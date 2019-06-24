@@ -1,13 +1,22 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.MultipleSelectionModel;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
@@ -22,6 +31,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +41,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>();
-    private final ListProperty<PreviewLayout> selectedAvailableItemsProperty = new SimpleListProperty<>();
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>();
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>();
-    private final ListProperty<PreviewLayout> selectedChosenItemsProperty = new SimpleListProperty<>();
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>();
+
+    private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -71,12 +84,80 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         availableListProperty.setValue(availableLayouts);
     }
 
+    // ToDo: Does this really work as intended? Test!
     private PreviewLayout findLayoutByNameOrDefault(String name) {
         return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                 .findAny()
                 .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                         .findAny()
                         .orElse(previewPreferences.getTextBasedPreviewLayout()));
+    }
+
+    /**
+     * XML-Syntax-Highlighting for RichTextFX-Codearea
+     * created by (c) Carlos Martins (github: @cemartins)
+     * License: BSD-2-Clause
+     * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
+     * and: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
+     *
+     * @param text to parse and highlight
+     * @return highlighted span for codeArea
+     */
+    public StyleSpans<Collection<String>> computeHighlighting(String text) {
+
+        final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
+                + "|(?<COMMENT><!--[^<>]+-->)");
+        final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
+
+        final int GROUP_OPEN_BRACKET = 2;
+        final int GROUP_ELEMENT_NAME = 3;
+        final int GROUP_ATTRIBUTES_SECTION = 4;
+        final int GROUP_CLOSE_BRACKET = 5;
+        final int GROUP_ATTRIBUTE_NAME = 1;
+        final int GROUP_EQUAL_SYMBOL = 2;
+        final int GROUP_ATTRIBUTE_VALUE = 3;
+
+        Matcher matcher = XML_TAG.matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        while (matcher.find()) {
+
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            if (matcher.group("COMMENT") != null) {
+                spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
+            } else {
+                if (matcher.group("ELEMENT") != null) {
+                    String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
+
+                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
+                    spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
+
+                    if (!attributesText.isEmpty()) {
+
+                        lastKwEnd = 0;
+
+                        Matcher amatcher = ATTRIBUTES.matcher(attributesText);
+                        while (amatcher.find()) {
+                            spansBuilder.add(Collections.emptyList(), amatcher.start() - lastKwEnd);
+                            spansBuilder.add(Collections.singleton("attribute"), amatcher.end(GROUP_ATTRIBUTE_NAME) - amatcher.start(GROUP_ATTRIBUTE_NAME));
+                            spansBuilder.add(Collections.singleton("tagmark"), amatcher.end(GROUP_EQUAL_SYMBOL) - amatcher.end(GROUP_ATTRIBUTE_NAME));
+                            spansBuilder.add(Collections.singleton("avalue"), amatcher.end(GROUP_ATTRIBUTE_VALUE) - amatcher.end(GROUP_EQUAL_SYMBOL));
+                            lastKwEnd = amatcher.end();
+                        }
+                        if (attributesText.length() > lastKwEnd) {
+                            spansBuilder.add(Collections.emptyList(), attributesText.length() - lastKwEnd);
+                        }
+                    }
+
+                    lastKwEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
+
+                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKwEnd);
+                }
+            }
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        return spansBuilder.create();
     }
 
     @Override
@@ -93,8 +174,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .withPreviewStyle(((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")).getText())
                                                               .build();
 
-        if (!selectedChosenItemsProperty.getValue().isEmpty()) {
-            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(selectedChosenItemsProperty.get(0))).build();
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
         }
         preferences.storePreviewPreferences(newPreviewPreferences);
 
@@ -111,18 +192,18 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        for (PreviewLayout layout : selectedAvailableItemsProperty.getValue()) {
+        for (PreviewLayout layout : availableSelectionModelProperty.getValue().getSelectedItems()) {
             availableListProperty.remove(layout);
             chosenListProperty.add(layout);
         }
     }
 
     public void removeFromChosen() {
-        for (PreviewLayout layout : selectedChosenItemsProperty.getValue()) {
+        for (PreviewLayout layout : chosenSelectionModelProperty.getValue().getSelectedItems()) {
             availableListProperty.add(layout);
-            availableListProperty.sort((a,b) -> { return a.getName().compareToIgnoreCase(b.getName()); } );
             chosenListProperty.remove(layout);
         }
+        availableListProperty.sort((a,b) -> a.getName().compareToIgnoreCase(b.getName()));
     }
 
     public List<Integer> selectedInChosenUp(List<Integer> oldindices) {
@@ -148,9 +229,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return newSelectedIndices;
     }
 
-    public PreviewLayout getTestLayout() {
-        if (!selectedChosenItemsProperty.getValue().isEmpty()) {
-            return selectedAvailableItemsProperty.getValue().get(0);
+    public PreviewLayout getCurrentLayout() {
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
         }
 
         if (!chosenListProperty.getValue().isEmpty()) {
@@ -167,9 +248,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }
 
-    public ListProperty<PreviewLayout> selectedAvailableItemsProperty() { return selectedAvailableItemsProperty; }
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() { return availableSelectionModelProperty; }
 
     public ListProperty<PreviewLayout> chosenListProperty() { return chosenListProperty; }
 
-    public ListProperty<PreviewLayout> selectedChosenItemsProperty() { return selectedChosenItemsProperty; }
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty() { return chosenSelectionModelProperty; }
+
+    public BooleanProperty selectedIsEditableProperty() { return selectedIsEditableProperty; }
 }
