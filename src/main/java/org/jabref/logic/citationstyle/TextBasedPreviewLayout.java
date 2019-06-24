@@ -27,7 +27,7 @@ public class TextBasedPreviewLayout implements PreviewLayout {
 
     public TextBasedPreviewLayout(Layout layout) {
         this.layout = layout;
-        this.text = layout.toString();
+        this.text = layout.getText();
     }
 
     public void setText(String text) {
