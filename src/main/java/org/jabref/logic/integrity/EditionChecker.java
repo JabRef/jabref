@@ -5,11 +5,15 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
+import org.jabref.preferences.JabRefPreferences;
+
 public class EditionChecker implements ValueChecker {
+
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
     private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9].+)$")
@@ -18,8 +22,11 @@ public class EditionChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
+    private final JabRefPreferences prefs;
+
 
     public EditionChecker(BibDatabaseContext bibDatabaseContext) {
+        this.prefs = Globals.prefs;
         this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
     }
 
@@ -49,8 +56,16 @@ public class EditionChecker implements ValueChecker {
         }
 
         //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-            return Optional.of(Localization.lang("should have the first letter capitalized"));
+        if (!bibDatabaseContextEdition.isBiblatexMode()) {
+            if(ONLY_NUMERALS_OR_LITERALS.test(value.trim())){
+                if(!prefs.getBoolean(JabRefPreferences.ALLOW_EDITION_INTEGER)){
+                    return Optional.of(Localization.lang("should be a String but received a Integer"));
+                }
+            }else{
+                if(!FIRST_LETTER_CAPITALIZED.test(value.trim())){
+                    return Optional.of(Localization.lang("should have the first letter capitalized"));
+                }
+            }
         }
 
         return Optional.empty();

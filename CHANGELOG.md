@@ -69,6 +69,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We moved the dropdown menu for selecting the push-application from the toolbar into the external application preferences. [#674](https://github.com/JabRef/jabref/issues/674)
 - We removed the alphabetical ordering of the custom tabs and updated the error message when trying to create a general field with a name containing an illegal character. [#5019](https://github.com/JabRef/jabref/issues/5019)
 - We added a context menu to the bib(la)tex-source-editor to copy'n'paste. [#5007](https://github.com/JabRef/jabref/pull/5007)
+- We added a option to allow integer field in edition during check integrity even in Bibtex Mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
 
 
 ### Fixed

@@ -44,6 +44,7 @@ class GeneralTab extends Pane implements PrefsTab {
     private final CheckBox useTimeStamp;
     private final CheckBox updateTimeStamp;
     private final CheckBox overwriteTimeStamp;
+    private final CheckBox allowEditionInteger;
     private final TextField defOwnerField;
     private final GridPane builder = new GridPane();
 
@@ -80,6 +81,7 @@ class GeneralTab extends Pane implements PrefsTab {
         inspectionWarnDupli = new CheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
         showAdvancedHints = new CheckBox(Localization.lang("Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"));
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
+        allowEditionInteger = new CheckBox(Localization.lang("Allow edition field Integer when in Bibtex mode"));
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
 
         Label general = new Label(Localization.lang("General"));
@@ -139,6 +141,7 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(biblioBox, 1, 29);
 
         builder.add(showAdvancedHints,1,30);
+        builder.add(allowEditionInteger,1,31);
     }
 
     @Override
@@ -169,6 +172,7 @@ class GeneralTab extends Pane implements PrefsTab {
         encodings.setValue(prefs.getDefaultEncoding());
         languageSelection.setValue(prefs.getLanguage());
         showAdvancedHints.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
+        allowEditionInteger.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_EDITION_INTEGER));
     }
 
     @Override
@@ -187,6 +191,7 @@ class GeneralTab extends Pane implements PrefsTab {
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS, showAdvancedHints.isSelected());
+        prefs.putBoolean(JabRefPreferences.ALLOW_EDITION_INTEGER, allowEditionInteger.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
