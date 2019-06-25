@@ -51,9 +51,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
         // ToDo: After conversion of all tabs to mvvm, rework interface and make validSettings bindable
-        // Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
-        // btnSave.disableProperty().bind(viewModel.validSettings().validProperty().not());
-    }
+                    }
 
     public PreferencesDialogViewModel getViewModel() {
         return viewModel;
@@ -124,3 +122,4 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel.resetPreferences();
     }
 }
+
