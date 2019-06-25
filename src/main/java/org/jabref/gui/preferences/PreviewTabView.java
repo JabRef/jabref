@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -14,11 +12,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -63,6 +67,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
+
+    private ListView<PreviewLayout> dragSourceList = null;
 
     private long lastKeyPressTime;
     private String listSearchTerm;
@@ -121,13 +127,23 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
         availableListView.itemsProperty().bind(viewModel.availableListProperty());
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
-        new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(availableListView);
+        new ViewModelListCellFactory<PreviewLayout>()
+                .withText(PreviewLayout::getName)
+                .setOnDragOver(this::dragOverAvailable)
+                .install(availableListView);
+        availableListView.setOnDragDetected(event -> dragDetected(availableListView, event));
+        availableListView.setOnDragDropped(event -> dragDropped(availableListView, event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         chosenListView.itemsProperty().bind(viewModel.chosenListProperty());
         viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
-        new ViewModelListCellFactory<PreviewLayout>().withText(PreviewLayout::getName).install(chosenListView);
+        new ViewModelListCellFactory<PreviewLayout>()
+                .withText(PreviewLayout::getName)
+                .install(chosenListView);
+        chosenListView.setOnDragOver(this::dragOverChosen);
+        chosenListView.setOnDragDetected(event -> dragDetected(chosenListView, event));
+        chosenListView.setOnDragDropped(event -> dragDropped(chosenListView, event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -144,58 +160,52 @@ public class PreviewTabView extends VBox implements PrefsTab {
         ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getCurrentLayout());
         previewPane.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
+        editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
-        editArea.textProperty().addListener((obs, oldText, newText) -> editArea.setStyleSpans(0, viewModel.computeHighlighting(newText)));
+        editArea.textProperty().addListener((observable, oldText, newText) -> editArea.setStyleSpans(0, viewModel.computeHighlighting(newText)));
         editArea.setContextMenu(contextMenu);
         editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
-        // ToDo: Convert to bindings
-        BindingsHelper.bindBidirectional(editArea.textProperty(), new ReadOnlyListWrapper<>(chosenListView.selectionModelProperty().getValue().getSelectedItems()),
-                layoutList -> update(),
-                            text -> {
-                                if (!viewModel.chosenSelectionModelProperty().getValue().getSelectedItems().isEmpty()) {
-                                    PreviewLayout item = viewModel.chosenSelectionModelProperty().getValue().getSelectedItems().get(0);
-                                    if (item instanceof TextBasedPreviewLayout) {
-                                        ((TextBasedPreviewLayout)item).setText(editArea.getText().replace("\n", "__NEWLINE__"));
-                                    }
-                                }
-                                update();
-                            }
-                );
+        BindingsHelper.bindBidirectional(
+                editArea.textProperty(),
+                viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty(),
+                selectedItem -> update(),
+                text -> {
+                    PreviewLayout selectedItem = viewModel.chosenSelectionModelProperty().getValue().getSelectedItem();
+                    if (selectedItem instanceof TextBasedPreviewLayout) {
+                        ((TextBasedPreviewLayout) selectedItem).setText(editArea.getText().replace("\n", "__NEWLINE__"));
+                    }
+                    update();
+                }
+        );
 
-        // ToDo: Implement selectedIsEditableProperty-Logic in ViewModel
+       // ToDo: Implement selectedIsEditableProperty-Logic in ViewModel
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(0).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
 
-        //editArea.editableProperty().bind(true); // FixMe: Cursor caret disappears
+        // editArea.editableProperty().bind(true); // FixMe: Cursor caret disappears
 
         update();
     }
 
-    private void update() { // ToDo: convert to bindings
-        ObservableList<PreviewLayout> layoutList = chosenListView.getSelectionModel().getSelectedItems();
-        if (layoutList.isEmpty()) {
-            ((PreviewViewer) previewPane.getContent()).setLayout(viewModel.getCurrentLayout());
-            editArea.clear();
-        } else {
+    private void update() {
+        PreviewLayout selectedLayout = viewModel.chosenSelectionModelProperty().getValue().getSelectedItem();
+        if (selectedLayout != null) {
             String previewText;
-            PreviewLayout item = layoutList.get(0);
-
             try {
-                ((PreviewViewer) previewPane.getContent()).setLayout(item);
+                ((PreviewViewer) previewPane.getContent()).setLayout(selectedLayout);
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
                 dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
             }
 
-            if (item instanceof TextBasedPreviewLayout) {
-                previewText = ((TextBasedPreviewLayout) item).getText().replace("__NEWLINE__", "\n");
+            if (selectedLayout instanceof TextBasedPreviewLayout) {
+                previewText = ((TextBasedPreviewLayout) selectedLayout).getText().replace("__NEWLINE__", "\n");
             } else {
-                previewText = ((CitationStylePreviewLayout) item).getSource();
+                previewText = ((CitationStylePreviewLayout) selectedLayout).getSource();
             }
-
             editArea.replaceText(previewText);
         }
     }
@@ -214,7 +224,56 @@ public class PreviewTabView extends VBox implements PrefsTab {
         lastKeyPressTime = System.currentTimeMillis();
 
         list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
-                .findFirst().ifPresent(item -> list.scrollTo(item));
+                .findFirst().ifPresent(list::scrollTo);
+    }
+
+    public void dragOverAvailable(@SuppressWarnings("unused") PreviewLayout layout, DragEvent event) {
+        if ((event.getGestureSource() != layout) && event.getDragboard().hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    public void dragOverChosen(DragEvent event) {
+        if (event.getDragboard().hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    public void dragDetected(ListView<PreviewLayout> sourceListView, MouseEvent event) {
+        PreviewLayout layout = sourceListView.getSelectionModel().getSelectedItem();
+        if (layout != null) {
+            ClipboardContent content = new ClipboardContent();
+            Dragboard dragboard = sourceListView.startDragAndDrop(TransferMode.MOVE);
+            content.put(DragAndDropDataFormats.PREVIEWLAYOUT, layout.getName());
+            dragboard.setContent(content);
+            dragSourceList = sourceListView;
+        }
+        event.consume();
+    }
+
+    public void dragDropped(ListView<PreviewLayout> targetListView, DragEvent event) {
+        Dragboard dragboard = event.getDragboard();
+        boolean success = false;
+
+        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
+            PreviewLayout draggedLayout = viewModel.findLayoutByNameOrNull((String) dragboard.getContent(DragAndDropDataFormats.PREVIEWLAYOUT));
+            if (draggedLayout != null) {
+                if (dragSourceList != null) {
+                    dragSourceList.getItems().remove(draggedLayout);
+                }
+
+                targetListView.getItems().add(draggedLayout);
+
+                success = true;
+
+                if (targetListView == availableListView) {
+                    targetListView.getItems().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                }
+            }
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
     }
 
     @Override
@@ -246,7 +305,6 @@ public class PreviewTabView extends VBox implements PrefsTab {
 
     public void toLeftButtonAction() { viewModel.removeFromChosen(); }
 
-    // ToDo: Move selectionstuff to ViewModel
     public void sortUpButtonAction() { // FixMe: previewPane loads first in chosenList if Preview is moved
         List<Integer> newIndices = viewModel.selectedInChosenUp(chosenListView.getSelectionModel().getSelectedIndices());
         for (int index : newIndices) {
@@ -263,7 +321,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
         update();
     }
 
-    public void resetDefaultButtonAction() { // not yet working
+    public void resetDefaultButtonAction() {
         viewModel.resetDefaultStyle();
         update();
     }

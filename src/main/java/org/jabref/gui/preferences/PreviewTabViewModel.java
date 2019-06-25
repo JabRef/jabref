@@ -84,13 +84,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         availableListProperty.setValue(availableLayouts);
     }
 
-    // ToDo: Does this really work as intended? Test!
     private PreviewLayout findLayoutByNameOrDefault(String name) {
         return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                 .findAny()
                 .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                         .findAny()
                         .orElse(previewPreferences.getTextBasedPreviewLayout()));
+    }
+
+    public PreviewLayout findLayoutByNameOrNull(String name) {
+        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                .findAny()
+                .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                        .findAny()
+                        .orElse(null));
     }
 
     /**
@@ -192,23 +199,26 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        for (PreviewLayout layout : availableSelectionModelProperty.getValue().getSelectedItems()) {
-            availableListProperty.remove(layout);
-            chosenListProperty.add(layout);
-        }
+        List<PreviewLayout> selected = new ArrayList<>();
+        selected.addAll(availableSelectionModelProperty.getValue().getSelectedItems());
+        availableListProperty.removeAll(selected);
+        chosenListProperty.addAll(selected);
     }
 
     public void removeFromChosen() {
-        for (PreviewLayout layout : chosenSelectionModelProperty.getValue().getSelectedItems()) {
-            availableListProperty.add(layout);
-            chosenListProperty.remove(layout);
-        }
+        List<PreviewLayout> selected = new ArrayList<>();
+        selected.addAll(chosenSelectionModelProperty.getValue().getSelectedItems());
+        chosenListProperty.removeAll(selected);
+        availableListProperty.addAll(selected);
         availableListProperty.sort((a,b) -> a.getName().compareToIgnoreCase(b.getName()));
     }
 
-    public List<Integer> selectedInChosenUp(List<Integer> oldindices) {
+    public List<Integer> selectedInChosenUp(List<Integer> oldIndices) {
+        List<Integer> selected = new ArrayList<>();
         List<Integer> newIndices = new ArrayList<>();
-        for (int oldIndex : oldindices) {
+        selected.addAll(oldIndices); // oldIndices needs to be copied, because remove(oldIndex) alters oldIndices
+
+        for (int oldIndex : selected) {
             boolean alreadyTaken = newIndices.contains(oldIndex - 1);
             int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
@@ -218,15 +228,18 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public List<Integer> selectedInChosenDown(List<Integer> oldIndices) {
-        List<Integer> newSelectedIndices = new ArrayList<>();
-        for (int i = oldIndices.size() - 1; i >= 0; i--) {
-            int oldIndex = oldIndices.get(i);
-            boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
+        List<Integer> selected = new ArrayList<>();
+        List<Integer> newIndices = new ArrayList<>();
+        selected.addAll(oldIndices);
+
+        for (int i = selected.size() - 1; i >= 0; i--) {
+            int oldIndex = selected.get(i);
+            boolean alreadyTaken = newIndices.contains(oldIndex + 1);
             int newIndex = ((oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
-            newSelectedIndices.add(newIndex);
+            newIndices.add(newIndex);
         }
-        return newSelectedIndices;
+        return newIndices;
     }
 
     public PreviewLayout getCurrentLayout() {
