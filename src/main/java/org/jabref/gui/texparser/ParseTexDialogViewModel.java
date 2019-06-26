@@ -32,11 +32,11 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final ObservableList<Path> searchPathList = FXCollections.observableArrayList();
     private final ObservableList<Path> selectedFileList = FXCollections.observableArrayList();
     private final StringProperty texDirectory = new SimpleStringProperty("");
-    private final BooleanProperty browseButton = new SimpleBooleanProperty(false);
-    private final BooleanProperty searchButton = new SimpleBooleanProperty(false);
-    private final BooleanProperty selectAllButton = new SimpleBooleanProperty(true);
-    private final BooleanProperty unselectAllButton = new SimpleBooleanProperty(true);
-    private final BooleanProperty parseButton = new SimpleBooleanProperty(true);
+    private final BooleanProperty browseDisable = new SimpleBooleanProperty(false);
+    private final BooleanProperty searchDisable = new SimpleBooleanProperty(false);
+    private final BooleanProperty selectAllDisable = new SimpleBooleanProperty(true);
+    private final BooleanProperty unselectAllDisable = new SimpleBooleanProperty(true);
+    private final BooleanProperty parseDisable = new SimpleBooleanProperty(true);
 
     public ParseTexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
                                    TaskExecutor taskExecutor, PreferencesService preferencesService) {
@@ -49,36 +49,36 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.texDirectory.set(initialPath.toAbsolutePath().toString());
     }
 
-    protected StringProperty texDirectoryProperty() {
-        return texDirectory;
-    }
-
-    protected BooleanProperty browseButtonProperty() {
-        return browseButton;
-    }
-
-    protected BooleanProperty searchButtonProperty() {
-        return searchButton;
-    }
-
-    protected ObservableList<Path> getSearchPathList() {
+    public ObservableList<Path> getSearchPathList() {
         return searchPathList;
     }
 
-    protected ObservableList<Path> getSelectedFileList() {
+    public ObservableList<Path> getSelectedFileList() {
         return selectedFileList;
     }
 
-    protected BooleanProperty selectAllButtonProperty() {
-        return selectAllButton;
+    public StringProperty texDirectoryProperty() {
+        return texDirectory;
     }
 
-    protected BooleanProperty unselectAllButtonProperty() {
-        return unselectAllButton;
+    public BooleanProperty browseDisableProperty() {
+        return browseDisable;
     }
 
-    protected BooleanProperty parseButtonProperty() {
-        return parseButton;
+    public BooleanProperty searchDisableProperty() {
+        return searchDisable;
+    }
+
+    public BooleanProperty selectAllDisableProperty() {
+        return selectAllDisable;
+    }
+
+    public BooleanProperty unselectAllDisableProperty() {
+        return unselectAllDisable;
+    }
+
+    public BooleanProperty parseDisableProperty() {
+        return parseDisable;
     }
 
     protected void browseButtonClicked() {
@@ -92,26 +92,26 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     protected void searchButtonClicked() {
-        BackgroundTask walkFileTreeTask = new WalkFileTreeView(getSearchDirectory())
-                .onRunning(() -> {
-                    browseButton.set(true);
-                    searchButton.set(true);
-                    selectAllButton.set(true);
-                    unselectAllButton.set(true);
-                    parseButton.set(true);
-                })
-                .onFinished(() -> {
-                    browseButton.set(false);
-                    searchButton.set(false);
-                })
-                .onSuccess(paths -> {
-                    searchPathList.setAll(paths);
-                    selectAllButton.set(false);
-                    unselectAllButton.set(false);
-                    parseButton.set(false);
-                });
-
-        walkFileTreeTask.executeWith(taskExecutor);
+        BackgroundTask.wrap(new WalkFileTreeTask(getSearchDirectory())::call)
+                      .onRunning(() -> {
+                          browseDisable.set(true);
+                          searchDisable.set(true);
+                          selectAllDisable.set(true);
+                          unselectAllDisable.set(true);
+                          parseDisable.set(true);
+                      })
+                      .onFinished(() -> {
+                          browseDisable.set(false);
+                          searchDisable.set(false);
+                      })
+                      .onSuccess(paths -> {
+                          searchPathList.setAll(paths);
+                          selectAllDisable.set(false);
+                          unselectAllDisable.set(false);
+                          parseDisable.set(false);
+                      })
+                      .onFailure(dialogService::showErrorDialogAndWait)
+                      .executeWith(taskExecutor);
     }
 
     protected Path getSearchDirectory() {

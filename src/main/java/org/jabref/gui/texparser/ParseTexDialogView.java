@@ -58,7 +58,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
         viewModel.getSearchPathList().addListener((ListChangeListener<Path>) c -> showTreeView());
 
         parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
-        parseButton.disableProperty().bindBidirectional(viewModel.parseButtonProperty());
+        parseButton.disableProperty().bindBidirectional(viewModel.parseDisableProperty());
 
         setResultConverter(button -> {
             if (button == parseButtonType) {
@@ -74,15 +74,15 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
         texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
 
-        browseButton.disableProperty().bindBidirectional(viewModel.browseButtonProperty());
-        searchButton.disableProperty().bindBidirectional(viewModel.searchButtonProperty());
+        browseButton.disableProperty().bindBidirectional(viewModel.browseDisableProperty());
+        searchButton.disableProperty().bindBidirectional(viewModel.searchDisableProperty());
 
         new ViewModelTreeCellFactory<FileNode>()
                 .withText(node -> node.toString())
                 .install(fileTreeView);
 
-        selectAllButton.disableProperty().bindBidirectional(viewModel.selectAllButtonProperty());
-        unselectAllButton.disableProperty().bindBidirectional(viewModel.unselectAllButtonProperty());
+        selectAllButton.disableProperty().bindBidirectional(viewModel.selectAllDisableProperty());
+        unselectAllButton.disableProperty().bindBidirectional(viewModel.unselectAllDisableProperty());
     }
 
     private void showTreeView() {
