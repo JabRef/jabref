@@ -8,23 +8,19 @@ import org.jabref.logic.l10n.Localization;
 public class FileNode {
 
     private final Path path;
-    private final int fileCount;
+    private int fileCount;
 
     public FileNode(Path path) {
-        this(path, 0);
-    }
-
-    public FileNode(Path path, int fileCount) {
         this.path = path;
-        this.fileCount = fileCount;
+        this.fileCount = 0;
     }
 
     public Path getPath() {
         return path;
     }
 
-    public int getFileCount() {
-        return fileCount;
+    public void incFileCount() {
+        this.fileCount++;
     }
 
     @Override

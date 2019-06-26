@@ -28,11 +28,10 @@ public class ParseTexResultView extends BaseDialog<Void> {
         this.texParserResult = texParserResult;
 
         this.setTitle(Localization.lang("Bibliographic entries search"));
-        ViewLoader.view(this).load().setAsDialogPane(this);
-    }
 
-    public ParseTexResultViewModel getViewModel() {
-        return viewModel;
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
     }
 
     @FXML
@@ -40,10 +39,9 @@ public class ParseTexResultView extends BaseDialog<Void> {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.itemsProperty().setValue(viewModel.getReferenceList());
-        referenceListView.getSelectionModel().selectedItemProperty().addListener((observable, _oldValue, _newValue) -> {
+        referenceListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (observable != null && observable.getValue() != null) {
-                viewModel.getCitationList().clear();
-                viewModel.getCitationList().addAll(observable.getValue().citationListProperty());
+                viewModel.getCitationList().setAll(observable.getValue().citationListProperty());
             }
         });
         referenceListView.getSelectionModel().selectFirst();
