@@ -1,5 +1,6 @@
 package org.jabref.gui.texparser;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -7,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.texparser.jump.JumpToTeXstudio;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
@@ -40,8 +42,12 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
-    // TODO: Implement this feature.
-    public void jumpToFile(Path path, int line, int start) {
-        throw new UnsupportedOperationException("TODO");
+    // TODO: Add an applications manager for choosing the text editor
+    public void jumpToFile(Path file, int line, int column) {
+        try {
+            new JumpToTeXstudio().run(file, line, column);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
