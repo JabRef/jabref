@@ -3,6 +3,7 @@ package org.jabref.gui.texparser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,8 +34,16 @@ public class ReferenceWrapper {
         return citationList;
     }
 
+    public String getDisplayText() {
+        return String.format("%s (%s)", entry, count);
+    }
+
     @Override
     public String toString() {
-        return String.format("%s (%s)", entry, count);
+        return new StringJoiner(", ", ReferenceWrapper.class.getSimpleName() + "[", "]")
+                .add("entry='" + entry + "'")
+                .add("count=" + count)
+                .add("citationList=" + citationList)
+                .toString();
     }
 }

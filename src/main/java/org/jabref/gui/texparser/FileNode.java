@@ -2,6 +2,7 @@ package org.jabref.gui.texparser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.StringJoiner;
 
 import org.jabref.logic.l10n.Localization;
 
@@ -19,17 +20,24 @@ public class FileNode {
         return path;
     }
 
-    public void incFileCount() {
+    public void increaseFileCount() {
         this.fileCount++;
     }
 
-    @Override
-    public String toString() {
+    public String getDisplayText() {
         if (Files.isDirectory(path)) {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,
                     fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
         }
 
         return path.getFileName().toString();
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FileNode.class.getSimpleName() + "[", "]")
+                .add("path=" + path)
+                .add("fileCount=" + fileCount)
+                .toString();
     }
 }

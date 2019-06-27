@@ -46,7 +46,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
         });
         referenceListView.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<ReferenceWrapper>()
-                .withText(ref -> ref.toString())
+                .withText(ref -> ref.getDisplayText())
                 .install(referenceListView);
 
         citationListView.setItems(viewModel.getCitationList());

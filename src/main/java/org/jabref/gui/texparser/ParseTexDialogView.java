@@ -78,7 +78,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
         searchButton.disableProperty().bindBidirectional(viewModel.searchDisableProperty());
 
         new ViewModelTreeCellFactory<FileNode>()
-                .withText(node -> node.toString())
+                .withText(node -> node.getDisplayText())
                 .install(fileTreeView);
 
         selectAllButton.disableProperty().bindBidirectional(viewModel.selectAllDisableProperty());
@@ -103,7 +103,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                       .findFirst()
                       .ifPresent(parent -> {
                           parent.getChildren().add(nodeItem);
-                          parent.getValue().incFileCount();
+                          parent.getValue().increaseFileCount();
                       });
 
             if (Files.isDirectory(currentPath)) {
