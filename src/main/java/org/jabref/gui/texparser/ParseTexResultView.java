@@ -15,6 +15,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.easybind.EasyBind;
 
 public class ParseTexResultView extends BaseDialog<Void> {
 
@@ -39,9 +40,9 @@ public class ParseTexResultView extends BaseDialog<Void> {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.itemsProperty().setValue(viewModel.getReferenceList());
-        referenceListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (observable != null && observable.getValue() != null) {
-                viewModel.getCitationList().setAll(observable.getValue().citationListProperty());
+        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), selected -> {
+            if (selected != null) {
+                viewModel.getCitationList().setAll(selected.citationListProperty());
             }
         });
         referenceListView.getSelectionModel().selectFirst();

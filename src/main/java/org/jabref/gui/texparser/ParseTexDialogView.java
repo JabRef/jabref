@@ -5,17 +5,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
@@ -74,15 +73,15 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
         texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
 
-        browseButton.disableProperty().bindBidirectional(viewModel.browseDisableProperty());
-        searchButton.disableProperty().bindBidirectional(viewModel.searchDisableProperty());
+        browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressDisableProperty());
+        searchButton.disableProperty().bindBidirectional(viewModel.searchInProgressDisableProperty());
 
         new ViewModelTreeCellFactory<FileNode>()
                 .withText(node -> node.getDisplayText())
                 .install(fileTreeView);
 
-        selectAllButton.disableProperty().bindBidirectional(viewModel.selectAllDisableProperty());
-        unselectAllButton.disableProperty().bindBidirectional(viewModel.unselectAllDisableProperty());
+        selectAllButton.disableProperty().bindBidirectional(viewModel.filesFoundDisableProperty());
+        unselectAllButton.disableProperty().bindBidirectional(viewModel.filesFoundDisableProperty());
     }
 
     private void showTreeView() {
@@ -113,16 +112,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
         fileTreeView.setRoot(rootItem);
 
-        fileTreeView.getCheckModel()
-                    .getCheckedItems()
-                    .addListener((ListChangeListener<TreeItem<FileNode>>) c ->
-                            viewModel.getSelectedFileList()
-                                     .setAll(fileTreeView.getCheckModel()
-                                                         .getCheckedItems()
-                                                         .stream()
-                                                         .map(item -> item.getValue().getPath())
-                                                         .filter(path -> Files.isRegularFile(path))
-                                                         .collect(Collectors.toList())));
+        Bindings.bindContent(viewModel.getSelectedFileList(), fileTreeView.getCheckModel().getCheckedItems());
 
         rootItem.setSelected(true);
         rootItem.setExpanded(true);

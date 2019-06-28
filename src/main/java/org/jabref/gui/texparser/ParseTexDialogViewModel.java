@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -30,12 +31,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final PreferencesService preferencesService;
     private final Path initialPath;
     private final ObservableList<Path> searchPathList = FXCollections.observableArrayList();
-    private final ObservableList<Path> selectedFileList = FXCollections.observableArrayList();
+    private final ObservableList<TreeItem<FileNode>> selectedFileList = FXCollections.observableArrayList();
     private final StringProperty texDirectory = new SimpleStringProperty("");
-    private final BooleanProperty browseDisable = new SimpleBooleanProperty(false);
-    private final BooleanProperty searchDisable = new SimpleBooleanProperty(false);
-    private final BooleanProperty selectAllDisable = new SimpleBooleanProperty(true);
-    private final BooleanProperty unselectAllDisable = new SimpleBooleanProperty(true);
+    private final BooleanProperty searchInProgress = new SimpleBooleanProperty(false);
+    private final BooleanProperty filesFound = new SimpleBooleanProperty(true);
     private final BooleanProperty parseDisable = new SimpleBooleanProperty(true);
 
     public ParseTexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
@@ -53,7 +52,11 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return searchPathList;
     }
 
-    public ObservableList<Path> getSelectedFileList() {
+    public ObservableList<TreeItem<FileNode>> getSelectedFileList() {
+        selectedFileList.setAll(selectedFileList.stream()
+                                                .filter(item -> Files.isRegularFile(item.getValue().getPath()))
+                                                .collect(Collectors.toList()));
+
         return selectedFileList;
     }
 
@@ -61,20 +64,12 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return texDirectory;
     }
 
-    public BooleanProperty browseDisableProperty() {
-        return browseDisable;
+    public BooleanProperty searchInProgressDisableProperty() {
+        return searchInProgress;
     }
 
-    public BooleanProperty searchDisableProperty() {
-        return searchDisable;
-    }
-
-    public BooleanProperty selectAllDisableProperty() {
-        return selectAllDisable;
-    }
-
-    public BooleanProperty unselectAllDisableProperty() {
-        return unselectAllDisable;
+    public BooleanProperty filesFoundDisableProperty() {
+        return filesFound;
     }
 
     public BooleanProperty parseDisableProperty() {
@@ -94,20 +89,16 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     protected void searchButtonClicked() {
         BackgroundTask.wrap(new WalkFileTreeTask(getSearchDirectory())::call)
                       .onRunning(() -> {
-                          browseDisable.set(true);
-                          searchDisable.set(true);
-                          selectAllDisable.set(true);
-                          unselectAllDisable.set(true);
+                          searchInProgress.set(true);
+                          filesFound.set(true);
                           parseDisable.set(true);
                       })
                       .onFinished(() -> {
-                          browseDisable.set(false);
-                          searchDisable.set(false);
+                          searchInProgress.set(false);
                       })
                       .onSuccess(paths -> {
                           searchPathList.setAll(paths);
-                          selectAllDisable.set(false);
-                          unselectAllDisable.set(false);
+                          filesFound.set(false);
                           parseDisable.set(false);
                       })
                       .onFailure(dialogService::showErrorDialogAndWait)
@@ -136,7 +127,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         }
 
         List<Path> fileList = selectedFileList.stream()
-                                              .map(path -> path.toAbsolutePath())
+                                              .map(item -> item.getValue().getPath().toAbsolutePath())
                                               .filter(path -> path != null && Files.isRegularFile(path))
                                               .collect(Collectors.toList());
 
