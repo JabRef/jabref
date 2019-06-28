@@ -132,13 +132,18 @@ public class BibEntry implements Cloneable {
             return getCiteKeyOptional();
         }
 
-        Optional<String> result = getFieldOrAlias(field);
-
-        // If this field is not set, and the entry has a crossref, try to look up the
-        // field in the referred entry: Do not do this for the bibtex key.
-        if (!result.isPresent() && (database != null)) {
+        Optional<String> result = Optional.empty();
+        // If the entry has a crossref, try to look up the field in the
+        // referred entry: Do not do this for the bibtex key.
+        if (database != null) {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
             result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
+        }
+
+        // If this field is not set yet, try to look up the field in the
+        // main entry.
+        if (!result.isPresent()) {
+            result = getFieldOrAlias(field);
         }
         return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
