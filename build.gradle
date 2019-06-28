@@ -90,7 +90,7 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.15'
+    compile 'org.apache.pdfbox:pdfbox:2.0.16'
     compile 'org.apache.pdfbox:fontbox:2.0.15'
     compile 'org.apache.pdfbox:xmpbox:2.0.16'
 
