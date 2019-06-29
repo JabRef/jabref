@@ -3,7 +3,8 @@ package org.jabref.model.database;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,17 +25,17 @@ public class KeyChangeListenerTest {
 
         entry1 = new BibEntry();
         entry1.setCiteKey("Entry1");
-        entry1.setField(FieldName.CROSSREF, "Entry4");
+        entry1.setField(StandardField.CROSSREF, "Entry4");
         db.insertEntry(entry1);
 
         entry2 = new BibEntry();
         entry2.setCiteKey("Entry2");
-        entry2.setField(FieldName.RELATED, "Entry1,Entry3");
+        entry2.setField(StandardField.RELATED, "Entry1,Entry3");
         db.insertEntry(entry2);
 
         entry3 = new BibEntry();
         entry3.setCiteKey("Entry3");
-        entry3.setField(FieldName.RELATED, "Entry1,Entry2,Entry3");
+        entry3.setField(StandardField.RELATED, "Entry1,Entry2,Entry3");
         db.insertEntry(entry3);
 
         entry4 = new BibEntry();
@@ -65,7 +66,7 @@ public class KeyChangeListenerTest {
 
     @Test
     public void testCrossrefRemoved() {
-        entry4.clearField(BibEntry.KEY_FIELD);
+        entry4.clearField(InternalField.KEY_FIELD);
         assertEquals(Optional.empty(), entry1.getField("crossref"));
     }
 

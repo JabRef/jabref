@@ -46,6 +46,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -278,8 +279,8 @@ public class SourceTab extends EntryEditorTab {
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
+            for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
@@ -289,8 +290,8 @@ public class SourceTab extends EntryEditorTab {
             }
 
             // Then set all fields that have been set by the user.
-            for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
+            for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
                 String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {

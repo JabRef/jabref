@@ -37,6 +37,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -50,14 +51,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final JabRefPreferences preferences;
     private final ExternalFileTypes externalFileTypes = ExternalFileTypes.getInstance();
 
-    public LinkedFilesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider,
+    public LinkedFilesEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
                                       JabRefPreferences preferences) {
-        
-        super(fieldName, suggestionProvider, fieldCheckers);
+
+        super(field, suggestionProvider, fieldCheckers);
 
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;

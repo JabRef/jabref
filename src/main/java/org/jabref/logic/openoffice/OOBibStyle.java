@@ -30,7 +30,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -171,8 +172,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
-        citProperties.put(YEAR_FIELD, FieldName.YEAR);
+        citProperties.put(AUTHOR_FIELD, FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR));
+        citProperties.put(YEAR_FIELD, StandardField.YEAR);
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
         citProperties.put(AUTHOR_SEPARATOR, ", ");
@@ -710,7 +711,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param entry    The entry.
      * @param database The database the entry belongs to.
      * @param field    The field, or succession of fields, to look up. If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup, specify FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR).
+     *                 field names by /. E.g. to use "author" with "editor" as backup, specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
@@ -718,7 +719,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         Objects.requireNonNull(database, "database cannot be null");
 
         String authorField = getStringCitProperty(AUTHOR_FIELD);
-        String[] fields = field.split(FieldName.FIELD_SEPARATOR);
+        String[] fields = field.split(FieldFactory.FIELD_SEPARATOR);
         for (String s : fields) {
 
             Optional<String> content = entry.getResolvedFieldOrAlias(s, database);

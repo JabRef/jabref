@@ -10,7 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -108,7 +108,7 @@ class IEEETest {
         expected.setField("volume", "13");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("8636659"); //article number
-        fetchedEntries.stream().forEach(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright);
+        fetchedEntries.stream().forEach(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright);
         assertEquals(Collections.singletonList(expected), fetchedEntries);
 
     }

@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +98,7 @@ public class BibEntryTests {
         e.setCiteKey("key");
         assertTrue(e.hasCiteKey());
 
-        e.clearField(BibEntry.KEY_FIELD);
+        e.clearField(InternalField.KEY_FIELD);
         assertFalse(e.hasCiteKey());
     }
 
@@ -362,7 +364,7 @@ public class BibEntryTests {
     @Test
     public void getKeywordsReturnsParsedKeywordListFromKeywordsField() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.KEYWORDS, "w1, w2a w2b, w3");
+        entry.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(new KeywordList("w1", "w2a w2b", "w3"), entry.getKeywords(','));
     }
 

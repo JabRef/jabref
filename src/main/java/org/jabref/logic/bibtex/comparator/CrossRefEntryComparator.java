@@ -3,7 +3,7 @@ package org.jabref.logic.bibtex.comparator;
 import java.util.Comparator;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Compares Bibtex entries based on their 'crossref' fields. Entries including
@@ -15,8 +15,8 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-        boolean crEntry1 = e1.hasField(FieldName.CROSSREF);
-        boolean crEntry2 = e2.hasField(FieldName.CROSSREF);
+        boolean crEntry1 = e1.hasField(StandardField.CROSSREF);
+        boolean crEntry2 = e2.hasField(StandardField.CROSSREF);
 
         if ((crEntry1 && crEntry2) || (!crEntry1 && !crEntry2)) {
             return 0;

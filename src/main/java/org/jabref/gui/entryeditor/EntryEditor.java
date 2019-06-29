@@ -45,6 +45,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -384,13 +385,13 @@ public class EntryEditor extends BorderPane {
         new FetchAndMergeEntry(panel, taskExecutor).fetchAndMerge(entry, fetcher);
     }
 
-    public void setFocusToField(String fieldName) {
+    public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(fieldName)) {
+                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(field)) {
                     FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
                     tabbed.getSelectionModel().select(tab);
-                    fieldsEditorTab.requestFocus(fieldName);
+                    fieldsEditorTab.requestFocus(field);
                 }
             }
         });

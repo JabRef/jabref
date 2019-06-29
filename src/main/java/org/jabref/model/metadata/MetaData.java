@@ -15,7 +15,8 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -32,7 +33,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = FieldName.FILE + FilePreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = StandardField.FILE + FilePreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -174,8 +175,8 @@ public class MetaData {
         postChange();
     }
 
-    public List<String> getContentSelectorValuesForField(String fieldName) {
-        return contentSelectors.getSelectorValuesForField(fieldName);
+    public List<String> getContentSelectorValuesForField(Field field) {
+        return contentSelectors.getSelectorValuesForField(field);
     }
 
     public Optional<String> getDefaultFileDirectory() {

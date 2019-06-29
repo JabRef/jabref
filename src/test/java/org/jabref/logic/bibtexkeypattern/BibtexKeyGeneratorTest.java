@@ -7,7 +7,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -64,10 +64,10 @@ public class BibtexKeyGeneratorTest {
     public void testCrossrefAndInAuthorNames() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "Simon Holland");
+        entry2.setField(StandardField.AUTHOR, "Simon Holland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -89,10 +89,10 @@ public class BibtexKeyGeneratorTest {
     public void testCrossrefAndAuthorNames() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
+        entry2.setField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -337,10 +337,10 @@ public class BibtexKeyGeneratorTest {
     public void testcrossrefUniversity() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University}}");
+        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -363,10 +363,10 @@ public class BibtexKeyGeneratorTest {
     public void testcrossrefDepartment() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -389,10 +389,10 @@ public class BibtexKeyGeneratorTest {
     public void testcrossrefSchool() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -414,10 +414,10 @@ public class BibtexKeyGeneratorTest {
     public void testcrossrefInstituteOfTechnology() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("entry2");
-        entry2.setField(FieldName.AUTHOR, "{Massachusetts Institute of Technology}");
+        entry2.setField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -895,7 +895,7 @@ public class BibtexKeyGeneratorTest {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
@@ -929,7 +929,7 @@ public class BibtexKeyGeneratorTest {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
@@ -974,7 +974,7 @@ public class BibtexKeyGeneratorTest {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
@@ -989,7 +989,7 @@ public class BibtexKeyGeneratorTest {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
-        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry1.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);

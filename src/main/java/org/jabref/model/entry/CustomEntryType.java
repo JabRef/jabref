@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -83,7 +84,7 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public Set<String> getOptionalFields() {
+    public Set<Field> getOptionalFields() {
         return Collections.unmodifiableSet(optional);
     }
 
@@ -93,12 +94,12 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public Set<String> getPrimaryOptionalFields() {
+    public Set<Field> getPrimaryOptionalFields() {
         return Collections.unmodifiableSet(primaryOptional);
     }
 
     @Override
-    public Set<String> getSecondaryOptionalFields() {
+    public Set<Field> getSecondaryOptionalFields() {
         Set<String> result = new LinkedHashSet<>(optional);
         result.removeAll(primaryOptional);
         return Collections.unmodifiableSet(result);

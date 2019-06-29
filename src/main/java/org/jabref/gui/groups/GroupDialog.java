@@ -49,8 +49,8 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -508,7 +508,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
-        autoGroupPersonsField.setText(FieldName.AUTHOR);
+        autoGroupPersonsField.setText(StandardField.AUTHOR);
         return autoPanel;
     }
 

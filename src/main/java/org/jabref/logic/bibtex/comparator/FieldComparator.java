@@ -10,10 +10,12 @@ import java.util.Optional;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
@@ -44,7 +46,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     public FieldComparator(String field, boolean descending) {
         this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(FieldName.FIELD_SEPARATOR);
+        this.field = fieldName.split(FieldFactory.FIELD_SEPARATOR);
         fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
         multiplier = descending ? -1 : 1;
@@ -60,13 +62,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (BibEntry.TYPE_HEADER.equals(this.field[0])) {
+        if (InternalField.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
         } else if (InternalBibtexFields.getFieldProperties(this.field[0]).contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (FieldName.YEAR.equals(this.field[0])) {
+        } else if (StandardField.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
-        } else if (FieldName.MONTH.equals(this.field[0])) {
+        } else if (StandardField.MONTH.equals(this.field[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;

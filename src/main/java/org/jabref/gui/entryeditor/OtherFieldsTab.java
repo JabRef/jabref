@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -15,12 +16,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
-    private final List<String> customTabFieldNames;
+    private final List<Field> customTabFieldNames;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<String> customTabFieldNames, DialogService dialogService) {
+    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<Field> customTabFieldNames, DialogService dialogService) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService);
 
         setText(Localization.lang("Other fields"));
@@ -30,15 +33,13 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        List<String> allKnownFields = entryType.getAllFields().stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
-                .filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+        Set<Field> allKnownFields = entryType.getAllFields();
+        List<Field> otherFields = entry.getFieldNames().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
 
         otherFields.removeAll(entryType.getDeprecatedFields());
         otherFields.removeAll(entryType.getOptionalFields());
-        otherFields.remove(BibEntry.KEY_FIELD);
+        otherFields.remove(InternalField.KEY_FIELD);
         otherFields.removeAll(customTabFieldNames);
         return otherFields;
     }

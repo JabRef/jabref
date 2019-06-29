@@ -28,7 +28,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,8 +124,8 @@ public class FreeCiteImporter extends Importer {
                     while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
                             && "citation".equals(parser.getLocalName()))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                            String ln = parser.getLocalName();
-                            if ("authors".equals(ln)) {
+                            Field field = FieldFactory.parseField(parser.getLocalName());
+                            if (new UnknownField("authors").equals(field)) {
                                 StringBuilder sb = new StringBuilder();
                                 parser.nextTag();
 
@@ -144,38 +147,38 @@ public class FreeCiteImporter extends Importer {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField(FieldName.AUTHOR, sb.toString());
-                            } else if (FieldName.JOURNAL.equals(ln)) {
+                                e.setField(StandardField.AUTHOR, sb.toString());
+                            } else if (StandardField.JOURNAL.equals(field)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
                                 // the drawback is that ctx:context-objects is NOT nested in citation, but a separate element
                                 // we would have to change the whole parser to parse that format.
                                 type = BibtexEntryTypes.ARTICLE;
-                                e.setField(ln, parser.getElementText());
-                            } else if ("tech".equals(ln)) {
+                                e.setField(field, parser.getElementText());
+                            } else if (new UnknownField("tech").equals(field)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
-                                e.setField(FieldName.NUMBER, parser.getElementText());
-                            } else if (FieldName.DOI.equals(ln) || FieldName.INSTITUTION.equals(ln)
-                                    || FieldName.LOCATION.equals(ln) || FieldName.NUMBER.equals(ln)
-                                    || FieldName.NOTE.equals(ln) || FieldName.TITLE.equals(ln)
-                                    || FieldName.PAGES.equals(ln) || FieldName.PUBLISHER.equals(ln)
-                                    || FieldName.VOLUME.equals(ln) || FieldName.YEAR.equals(ln)) {
-                                e.setField(ln, parser.getElementText());
-                            } else if (FieldName.BOOKTITLE.equals(ln)) {
+                                e.setField(StandardField.NUMBER, parser.getElementText());
+                            } else if (StandardField.DOI.equals(field) || StandardField.INSTITUTION.equals(field)
+                                    || StandardField.LOCATION.equals(field) || StandardField.NUMBER.equals(field)
+                                    || StandardField.NOTE.equals(field) || StandardField.TITLE.equals(field)
+                                    || StandardField.PAGES.equals(field) || StandardField.PUBLISHER.equals(field)
+                                    || StandardField.VOLUME.equals(field) || StandardField.YEAR.equals(field)) {
+                                e.setField(field, parser.getElementText());
+                            } else if (StandardField.BOOKTITLE.equals(field)) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
                                     // "In proceedings of..." references
                                     booktitle = booktitle.substring(3);
                                 }
-                                e.setField(FieldName.BOOKTITLE, booktitle);
-                            } else if ("raw_string".equals(ln)) {
+                                e.setField(StandardField.BOOKTITLE, booktitle);
+                            } else if (new UnknownField("raw_string").equals(field)) {
                                 // raw input string is ignored
                             } else {
                                 // all other tags are stored as note
-                                noteSB.append(ln);
+                                noteSB.append(field);
                                 noteSB.append(':');
                                 noteSB.append(parser.getElementText());
                                 noteSB.append(OS.NEWLINE);
@@ -186,14 +189,14 @@ public class FreeCiteImporter extends Importer {
 
                     if (noteSB.length() > 0) {
                         String note;
-                        if (e.hasField(FieldName.NOTE)) {
+                        if (e.hasField(StandardField.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = e.getField(FieldName.NOTE).get().concat(OS.NEWLINE)
+                            note = e.getField(StandardField.NOTE).get().concat(OS.NEWLINE)
                                     .concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();
                         }
-                        e.setField(FieldName.NOTE, note);
+                        e.setField(StandardField.NOTE, note);
                     }
 
                     // type has been derived from "genre"

@@ -18,8 +18,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -89,7 +89,7 @@ public class IsiImporter extends Importer {
 
     public static void processSubSup(Map<String, String> map) {
 
-        String[] subsup = {FieldName.TITLE, FieldName.ABSTRACT, FieldName.REVIEW, "notes"};
+        String[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.REVIEW, "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -120,7 +120,7 @@ public class IsiImporter extends Importer {
 
     private static void processCapitalization(Map<String, String> map) {
 
-        String[] subsup = {FieldName.TITLE, FieldName.JOURNAL, FieldName.PUBLISHER};
+        String[] subsup = {StandardField.TITLE, StandardField.JOURNAL, StandardField.PUBLISHER};
 
         for (String aSubsup : subsup) {
 
@@ -214,33 +214,33 @@ public class IsiImporter extends Importer {
                         Type = "inproceedings";
                     }
                 } else if ("JO".equals(beg)) {
-                    hm.put(FieldName.BOOKTITLE, value);
+                    hm.put(StandardField.BOOKTITLE, value);
                 } else if ("AU".equals(beg)) {
                     String author = IsiImporter.isiAuthorsConvert(EOL_PATTERN.matcher(value).replaceAll(" and "));
 
                     // if there is already someone there then append with "and"
-                    if (hm.get(FieldName.AUTHOR) != null) {
-                        author = hm.get(FieldName.AUTHOR) + " and " + author;
+                    if (hm.get(StandardField.AUTHOR) != null) {
+                        author = hm.get(StandardField.AUTHOR) + " and " + author;
                     }
 
-                    hm.put(FieldName.AUTHOR, author);
+                    hm.put(StandardField.AUTHOR, author);
                 } else if ("TI".equals(beg)) {
-                    hm.put(FieldName.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    hm.put(StandardField.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put(FieldName.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    hm.put(StandardField.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
                     value = EOL_PATTERN.matcher(value).replaceAll(" ");
-                    String existingKeywords = hm.get(FieldName.KEYWORDS);
+                    String existingKeywords = hm.get(StandardField.KEYWORDS);
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
                     } else {
                         existingKeywords += ", " + value;
                     }
-                    hm.put(FieldName.KEYWORDS, existingKeywords);
+                    hm.put(StandardField.KEYWORDS, existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put(FieldName.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
+                    hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -257,20 +257,20 @@ public class IsiImporter extends Importer {
                 } else if ("AR".equals(beg)) {
                     pages = value;
                 } else if ("IS".equals(beg)) {
-                    hm.put(FieldName.NUMBER, value);
+                    hm.put(StandardField.NUMBER, value);
                 } else if ("PY".equals(beg)) {
-                    hm.put(FieldName.YEAR, value);
+                    hm.put(StandardField.YEAR, value);
                 } else if ("VL".equals(beg)) {
-                    hm.put(FieldName.VOLUME, value);
+                    hm.put(StandardField.VOLUME, value);
                 } else if ("PU".equals(beg)) {
-                    hm.put(FieldName.PUBLISHER, value);
+                    hm.put(StandardField.PUBLISHER, value);
                 } else if ("DI".equals(beg)) {
-                    hm.put(FieldName.DOI, value);
+                    hm.put(StandardField.DOI, value);
                 } else if ("PD".equals(beg)) {
 
                     String month = IsiImporter.parseMonth(value);
                     if (month != null) {
-                        hm.put(FieldName.MONTH, month);
+                        hm.put(StandardField.MONTH, month);
                     }
 
                 } else if ("DT".equals(beg)) {
@@ -294,7 +294,7 @@ public class IsiImporter extends Importer {
             }
 
             if (!"".equals(pages)) {
-                hm.put(FieldName.PAGES, pages);
+                hm.put(StandardField.PAGES, pages);
             }
 
             // Skip empty entries

@@ -6,9 +6,9 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -29,13 +29,13 @@ public class SpecialFieldUpdateListener {
         }
 
         final BibEntry entry = fieldChangedEvent.getBibEntry();
-        final String fieldName = fieldChangedEvent.getFieldName();
+        final String fieldName = fieldChangedEvent.getField();
         // Source editor cycles through all entries
         // if we immediately updated the fields, the entry editor would detect a subsequent change as a user change
         // and re-fire this event
         // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed.
         SwingUtilities.invokeLater(() -> {
-            if (FieldName.KEYWORDS.equals(fieldName)) {
+            if (StandardField.KEYWORDS.equals(fieldName)) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
             } else if (SpecialField.isSpecialField(fieldName)) {
                 SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, Globals.prefs.getKeywordDelimiter());

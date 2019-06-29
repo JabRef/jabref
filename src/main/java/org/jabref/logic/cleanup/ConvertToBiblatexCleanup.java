@@ -8,7 +8,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryConverter;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -32,11 +32,11 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         }
         // Dates: create date out of year and month, save it and delete old fields
         // If there already exists a non blank/empty value for the field date, it is not overwritten
-        if (StringUtil.isBlank(entry.getField(FieldName.DATE))) {
-            entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                entry.setField(FieldName.DATE, newDate).ifPresent(changes::add);
-                entry.clearField(FieldName.YEAR).ifPresent(changes::add);
-                entry.clearField(FieldName.MONTH).ifPresent(changes::add);
+        if (StringUtil.isBlank(entry.getField(StandardField.DATE))) {
+            entry.getFieldOrAlias(StandardField.DATE).ifPresent(newDate -> {
+                entry.setField(StandardField.DATE, newDate).ifPresent(changes::add);
+                entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                entry.clearField(StandardField.MONTH).ifPresent(changes::add);
             });
         }
         return changes;

@@ -14,6 +14,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
@@ -85,7 +86,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
             try {
                 String formatted = new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
                         .format(bibtexString.getContent(),
-                                LatexFieldFormatter.BIBTEX_STRING);
+                                InternalField.BIBTEX_STRING);
                 writer.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);

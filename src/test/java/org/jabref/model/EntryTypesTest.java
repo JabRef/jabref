@@ -12,8 +12,8 @@ import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.IEEETranEntryTypes;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,7 +127,7 @@ class EntryTypesTest {
     @MethodSource("mode")
     void overwriteCustomEntryTypeFields(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
-        CustomEntryType newCustomEntryTypeAuthorRequired = new CustomEntryType("customType", FieldName.AUTHOR, "optional");
+        CustomEntryType newCustomEntryTypeAuthorRequired = new CustomEntryType("customType", StandardField.AUTHOR, "optional");
         EntryTypes.addOrModifyCustomEntryType(newCustomEntryTypeAuthorRequired, mode);
         assertEquals(Optional.of(newCustomEntryTypeAuthorRequired), EntryTypes.getType("customType", mode));
     }

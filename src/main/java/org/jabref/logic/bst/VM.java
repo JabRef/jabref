@@ -16,7 +16,9 @@ import java.util.regex.Pattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -909,19 +911,18 @@ public class VM implements Warn {
      * We use null for the missing entry designator.
      */
     private void read() {
-
         for (BstEntry e : entries) {
-
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey()).orElse(null);
+                Field field = FieldFactory.parseField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(field).orElse(null);
 
                 mEntry.setValue(fieldValue);
             }
         }
 
         for (BstEntry e : entries) {
-            if (!e.getFields().containsKey(FieldName.CROSSREF)) {
-                e.getFields().put(FieldName.CROSSREF, null);
+            if (!e.getFields().containsKey(StandardField.CROSSREF.getName())) {
+                e.getFields().put(StandardField.CROSSREF.getName(), null);
             }
         }
     }

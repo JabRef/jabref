@@ -1,13 +1,14 @@
-package org.jabref.model.entry.specialfields;
+package org.jabref.model.entry.field;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.entry.KeywordList;
 
-public enum SpecialField {
+public enum SpecialField implements Field<SpecialField> {
 
     PRINTED("printed",
         SpecialFieldValue.PRINTED
@@ -68,35 +69,10 @@ public enum SpecialField {
         return this.keywords;
     }
 
-    public Optional<SpecialFieldValue> parse(String value) {
-        return Optional.ofNullable(map.get(value));
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public boolean isSingleValueField() {
-        return this.values.size() == 1;
-    }
-
-    public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
-        switch (fieldName) {
-            case "priority":
-                return Optional.of(SpecialField.PRIORITY);
-            case "qualityassured":
-                return Optional.of(SpecialField.QUALITY);
-            case "ranking":
-                return Optional.of(SpecialField.RANKING);
-            case "readstatus":
-                return Optional.of(SpecialField.READ_STATUS);
-            case "relevance":
-                return Optional.of(SpecialField.RELEVANCE);
-            case "printed":
-                return Optional.of(SpecialField.PRINTED);
-            default:
-                return Optional.empty();
-        }
+    public static Optional<SpecialField> fromName(String name) {
+        return Arrays.stream(SpecialField.values())
+                     .filter(field -> field.getName().equalsIgnoreCase(name))
+                     .findAny();
     }
 
     /**
@@ -104,7 +80,20 @@ public enum SpecialField {
      * @return true if given field is a special field, false otherwise
      */
     public static boolean isSpecialField(String fieldName) {
-        return SpecialField.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
+        return SpecialField.fromName(fieldName).isPresent();
+    }
+
+    public boolean isSingleValueField() {
+        return this.values.size() == 1;
+    }
+
+    public Optional<SpecialFieldValue> parseValue(String value) {
+        return Optional.ofNullable(map.get(value));
+    }
+
+    @Override
+    public String getName() {
+        return fieldName;
     }
 
 }

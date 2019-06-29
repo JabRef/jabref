@@ -8,6 +8,9 @@ import java.util.SortedSet;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
+
 public class CanonicalBibtexEntry {
 
     private CanonicalBibtexEntry() {
@@ -33,12 +36,12 @@ public class CanonicalBibtexEntry {
 
         // determine sorted fields -- all fields lower case
         SortedSet<String> sortedFields = new TreeSet<>();
-        for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
-            String fieldName = field.getKey();
+        for (Entry<Field, String> field : entry.getFieldMap().entrySet()) {
+            Field fieldName = field.getKey();
             String fieldValue = field.getValue();
             // JabRef stores the key in the field KEY_FIELD, which must not be serialized
-            if (!fieldName.equals(BibEntry.KEY_FIELD)) {
-                String lowerCaseFieldName = fieldName.toLowerCase(Locale.US);
+            if (!fieldName.equals(InternalField.KEY_FIELD)) {
+                String lowerCaseFieldName = fieldName.getName().toLowerCase(Locale.US);
                 sortedFields.add(lowerCaseFieldName);
                 mapFieldToValue.put(lowerCaseFieldName, fieldValue);
             }

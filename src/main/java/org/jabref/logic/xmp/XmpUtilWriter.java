@@ -20,7 +20,7 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -244,9 +244,9 @@ public class XmpUtilWriter {
         // remove the <?xpacket *> tags to enable the usage of the CTAN package xmpincl
         Predicate<String> isBeginOrEndTag = s -> s.contains(XMP_BEGIN_END_TAG);
         String updatedXmpContent = Arrays.stream(xmpContent.split(System.lineSeparator()))
-                .filter(isBeginOrEndTag.negate())
-                .map(line -> line.toString())
-                .collect(Collectors.joining(System.lineSeparator()));
+                                         .filter(isBeginOrEndTag.negate())
+                                         .map(line -> line)
+                                         .collect(Collectors.joining(System.lineSeparator()));
 
         return updatedXmpContent;
     }
@@ -283,13 +283,13 @@ public class XmpUtilWriter {
 
             if (useXmpPrivacyFilter && filters.contains(fieldName)) {
                 // erase field instead of adding it
-                if (FieldName.AUTHOR.equals(fieldName)) {
+                if (StandardField.AUTHOR.equals(fieldName)) {
                     di.setAuthor(null);
-                } else if (FieldName.TITLE.equals(fieldName)) {
+                } else if (StandardField.TITLE.equals(fieldName)) {
                     di.setTitle(null);
-                } else if (FieldName.KEYWORDS.equals(fieldName)) {
+                } else if (StandardField.KEYWORDS.equals(fieldName)) {
                     di.setKeywords(null);
-                } else if (FieldName.ABSTRACT.equals(fieldName)) {
+                } else if (StandardField.ABSTRACT.equals(fieldName)) {
                     di.setSubject(null);
                 } else {
                     di.setCustomMetadataValue("bibtex/" + fieldName, null);
@@ -297,13 +297,13 @@ public class XmpUtilWriter {
                 continue;
             }
 
-            if (FieldName.AUTHOR.equals(fieldName)) {
+            if (StandardField.AUTHOR.equals(fieldName)) {
                 di.setAuthor(fieldContent);
-            } else if (FieldName.TITLE.equals(fieldName)) {
+            } else if (StandardField.TITLE.equals(fieldName)) {
                 di.setTitle(fieldContent);
-            } else if (FieldName.KEYWORDS.equals(fieldName)) {
+            } else if (StandardField.KEYWORDS.equals(fieldName)) {
                 di.setKeywords(fieldContent);
-            } else if (FieldName.ABSTRACT.equals(fieldName)) {
+            } else if (StandardField.ABSTRACT.equals(fieldName)) {
                 di.setSubject(fieldContent);
             } else {
                 di.setCustomMetadataValue("bibtex/" + fieldName, fieldContent);

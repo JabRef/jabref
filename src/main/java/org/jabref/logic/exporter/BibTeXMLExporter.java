@@ -40,6 +40,8 @@ import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,11 +148,11 @@ public class BibTeXMLExporter extends Exporter {
      * a JAXBElement for every field and then add it to the content list.
      */
     private void parseInbook(Inbook inbook, BibEntry bibEntry, Entry entry) {
-        Map<String, String> fieldMap = bibEntry.getFieldMap();
-        for (Map.Entry<String, String> entryField : fieldMap.entrySet()) {
+        Map<Field, String> fieldMap = bibEntry.getFieldMap();
+        for (Map.Entry<Field, String> entryField : fieldMap.entrySet()) {
             String value = entryField.getValue();
-            String key = entryField.getKey();
-            if ("year".equals(key)) {
+            Field key = entryField.getKey();
+            if (StandardField.YEAR.equals(key)) {
                 XMLGregorianCalendar calendar;
                 try {
                     calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
@@ -161,12 +163,12 @@ public class BibTeXMLExporter extends Exporter {
                 } catch (DatatypeConfigurationException e) {
                     LOGGER.error("A configuration error occured");
                 }
-            } else if ("number".equals(key)) {
+            } else if (StandardField.NUMBER.equals(key)) {
                 JAXBElement<BigInteger> number = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, "number"),
                         BigInteger.class, new BigInteger(value));
                 inbook.getContent().add(number);
             } else {
-                JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key), String.class,
+                JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key.getName()), String.class,
                         value);
                 inbook.getContent().add(element);
             }
@@ -192,17 +194,17 @@ public class BibTeXMLExporter extends Exporter {
      */
     private <T> void parse(T entryType, BibEntry bibEntry, Entry entry) {
         List<Method> declaredSetMethods = getListOfSetMethods(entryType);
-        for (Map.Entry<String, String> entryField : bibEntry.getFieldMap().entrySet()) {
-            String key = entryField.getKey();
+        for (Map.Entry<Field, String> entryField : bibEntry.getFieldMap().entrySet()) {
+            Field key = entryField.getKey();
             String value = entryField.getValue();
             for (Method method : declaredSetMethods) {
                 String methodNameWithoutSet = method.getName().replace("set", "").toLowerCase(ENGLISH);
-                if (!methodNameWithoutSet.equals(key)) {
+                if (!methodNameWithoutSet.equals(key.getName())) {
                     continue;
                 }
 
                 try {
-                    if ("year".equals(key)) {
+                    if (StandardField.YEAR.equals(key)) {
                         try {
                             XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
                             method.invoke(entryType, calendar);
@@ -210,7 +212,7 @@ public class BibTeXMLExporter extends Exporter {
                             LOGGER.error("A configuration error occured");
                         }
                         break;
-                    } else if ("number".equals(key)) {
+                    } else if (StandardField.NUMBER.equals(key)) {
                         try {
                             method.invoke(entryType, new BigInteger(value));
                         } catch (NumberFormatException exception) {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,7 +80,7 @@ public class BibEntryTest {
     public void testGetEmptyResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry);
@@ -93,7 +94,7 @@ public class BibEntryTest {
     public void testGetSingleResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         entry2.addKeyword("kw", ',');
         database.insertEntry(entry2);
@@ -108,7 +109,7 @@ public class BibEntryTest {
     public void testGetResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         entry2.addKeyword("kw", ',');
         entry2.addKeyword("kw2", ',');

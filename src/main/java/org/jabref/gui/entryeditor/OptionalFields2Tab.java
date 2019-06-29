@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.Field;
 
 public class OptionalFields2Tab extends FieldsEditorTab {
     public OptionalFields2Tab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
@@ -24,7 +25,7 @@ public class OptionalFields2Tab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         return entryType.getSecondaryOptionalNotDeprecatedFields();
     }
 }

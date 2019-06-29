@@ -9,8 +9,8 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -105,7 +105,7 @@ class XmpUtilWriterTest {
         // read entry again
         List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.toAbsolutePath().toString(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
-        entryWritten.clearField(FieldName.FILE);
+        entryWritten.clearField(StandardField.FILE);
 
         // compare the two entries
         assertEquals(entry, entryWritten);

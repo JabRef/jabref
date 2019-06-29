@@ -16,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -152,11 +152,11 @@ public class MrDLibImporter extends Importer {
         Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;
 
         // Populate bib entry with relevant data
-        current.setField(FieldName.AUTHOR, authors);
-        current.setField(FieldName.TITLE, title);
-        current.setField(FieldName.YEAR, year);
-        current.setField(FieldName.JOURNAL, journal);
-        current.setField(FieldName.URL, url);
+        current.setField(StandardField.AUTHOR, authors);
+        current.setField(StandardField.TITLE, title);
+        current.setField(StandardField.YEAR, year);
+        current.setField(StandardField.JOURNAL, journal);
+        current.setField(StandardField.URL, url);
 
         return new RankedBibEntry(current, rank);
     }

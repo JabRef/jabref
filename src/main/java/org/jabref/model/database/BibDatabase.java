@@ -25,12 +25,13 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
@@ -131,8 +132,8 @@ public class BibDatabase {
      *
      * @return set of fieldnames, that are visible
      */
-    public Set<String> getAllVisibleFields() {
-        Set<String> allFields = new TreeSet<>();
+    public Set<Field> getAllVisibleFields() {
+        Set<Field> allFields = new TreeSet<>();
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
@@ -447,7 +448,7 @@ public class BibDatabase {
             resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (Map.Entry<String, String> field : resultingEntry.getFieldMap().entrySet()) {
+        for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {
             resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));
         }
         return resultingEntry;
@@ -588,7 +589,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
-        return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByKey);
     }
 
     public Optional<String> getSharedDatabaseID() {

@@ -34,6 +34,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
@@ -86,7 +87,7 @@ public abstract class BibDatabaseWriter {
                                                               .map(FieldComparator::new)
                                                               .collect(Collectors.toList());
             comparators.addAll(fieldComparators);
-            comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
+            comparators.add(new FieldComparator(InternalField.KEY_FIELD));
         }
 
         return comparators;

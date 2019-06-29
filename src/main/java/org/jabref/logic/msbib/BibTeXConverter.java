@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.StandardField;
 
 public class BibTeXConverter {
 
@@ -43,15 +43,15 @@ public class BibTeXConverter {
         }
 
         // Value must be converted
-        if (fieldValues.containsKey(FieldName.LANGUAGE)) {
-            int lcid = Integer.valueOf(fieldValues.get(FieldName.LANGUAGE));
-            fieldValues.put(FieldName.LANGUAGE, MSBibMapping.getLanguage(lcid));
+        if (fieldValues.containsKey(StandardField.LANGUAGE)) {
+            int lcid = Integer.valueOf(fieldValues.get(StandardField.LANGUAGE));
+            fieldValues.put(StandardField.LANGUAGE, MSBibMapping.getLanguage(lcid));
         }
 
-        addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
-        addAuthor(fieldValues, FieldName.BOOKAUTHOR, entry.bookAuthors);
-        addAuthor(fieldValues, FieldName.EDITOR, entry.editors);
-        addAuthor(fieldValues, FieldName.TRANSLATOR, entry.translators);
+        addAuthor(fieldValues, StandardField.AUTHOR, entry.authors);
+        addAuthor(fieldValues, StandardField.BOOKAUTHOR, entry.bookAuthors);
+        addAuthor(fieldValues, StandardField.EDITOR, entry.editors);
+        addAuthor(fieldValues, StandardField.TRANSLATOR, entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
         addAuthor(fieldValues, MSBIB_PREFIX + "conductor", entry.conductors);
@@ -65,17 +65,17 @@ public class BibTeXConverter {
         addAuthor(fieldValues, MSBIB_PREFIX + "counsel", entry.counsels);
 
         if (entry.pages != null) {
-            fieldValues.put(FieldName.PAGES, entry.pages.toString("--"));
+            fieldValues.put(StandardField.PAGES, entry.pages.toString("--"));
         }
 
         parseStandardNumber(entry.standardNumber, fieldValues);
 
         if (entry.address != null) {
-            fieldValues.put(FieldName.LOCATION, entry.address);
+            fieldValues.put(StandardField.LOCATION, entry.address);
         }
         // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
         if (entry.conferenceName != null) {
-            fieldValues.put(FieldName.ORGANIZATION, entry.conferenceName);
+            fieldValues.put(StandardField.ORGANIZATION, entry.conferenceName);
         }
 
         if (entry.dateAccessed != null) {
@@ -83,14 +83,14 @@ public class BibTeXConverter {
         }
 
         if (entry.journalName != null) {
-            fieldValues.put(FieldName.JOURNAL, entry.journalName);
+            fieldValues.put(StandardField.JOURNAL, entry.journalName);
         }
         if (entry.month != null) {
             Optional<Month> month = Month.parse(entry.month);
             month.ifPresent(parsedMonth ->  result.setMonth(parsedMonth));
         }
         if (entry.number != null) {
-            fieldValues.put(FieldName.NUMBER, entry.number);
+            fieldValues.put(StandardField.NUMBER, entry.number);
         }
 
         // set all fields
@@ -121,10 +121,10 @@ public class BibTeXConverter {
         if (standardNum == null) {
             return;
         }
-        parseSingleStandardNumber("ISBN", FieldName.ISBN, standardNum, map);
-        parseSingleStandardNumber("ISSN", FieldName.ISSN, standardNum, map);
+        parseSingleStandardNumber("ISBN", StandardField.ISBN, standardNum, map);
+        parseSingleStandardNumber("ISSN", StandardField.ISSN, standardNum, map);
         parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
         parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
-        parseSingleStandardNumber("DOI", FieldName.DOI, standardNum, map);
+        parseSingleStandardNumber("DOI", StandardField.DOI, standardNum, map);
     }
 }

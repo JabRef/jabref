@@ -23,7 +23,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -86,9 +86,9 @@ public class RelatedArticlesTab extends EntryEditorTab {
             hBox.setSpacing(5.0);
 
             String title = entry.getTitle().orElse("");
-            String journal = entry.getField(FieldName.JOURNAL).orElse("");
-            String authors = entry.getField(FieldName.AUTHOR).orElse("");
-            String year = entry.getField(FieldName.YEAR).orElse("");
+            String journal = entry.getField(StandardField.JOURNAL).orElse("");
+            String authors = entry.getField(StandardField.AUTHOR).orElse("");
+            String year = entry.getField(StandardField.YEAR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
             Text journalText = new Text(journal);
@@ -96,11 +96,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
             Text authorsText = new Text(authors);
             Text yearText = new Text("(" + year + ")");
             titleLink.setOnAction(event -> {
-                if (entry.getField(FieldName.URL).isPresent()) {
+                if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
+                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get());
                     } catch (IOException e) {
-                        LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
+                        LOGGER.error("Error opening the browser to: " + entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
                     }
                 }

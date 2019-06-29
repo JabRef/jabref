@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -134,35 +134,35 @@ public class MedlineFetcherTest {
     @Test
     public void testSearchByIDWijedasa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
-        fetchedEntry.get().clearField(FieldName.ABSTRACT); //Remove abstract due to copyright
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
         assertEquals(Optional.of(entryWijedasa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDEndharti() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
-        fetchedEntry.get().clearField(FieldName.ABSTRACT); //Remove abstract due to copyright
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
         assertEquals(Optional.of(entryEndharti), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDIchikawa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
-        fetchedEntry.get().clearField(FieldName.ABSTRACT); //Remove abstract due to copyright
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
         assertEquals(Optional.of(bibEntryIchikawa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDSari() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
-        fetchedEntry.get().clearField(FieldName.ABSTRACT); //Remove abstract due to copyright
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
         assertEquals(Optional.of(bibEntrySari), fetchedEntry);
     }
 
     @Test
     public void testMultipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
-        entryList.forEach(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright);
+        entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright);
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
         assertTrue(entryList.contains(bibEntrySari));

@@ -23,6 +23,8 @@ import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +214,7 @@ public abstract class DBMSProcessor {
     private void insertIntoFieldTable(BibEntry bibEntry) {
         try {
             // Inserting into FIELD table
-            for (String fieldName : bibEntry.getFieldNames()) {
+            for (Field field : bibEntry.getFieldNames()) {
                 StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
                     .append(escape("FIELD"))
@@ -227,8 +229,8 @@ public abstract class DBMSProcessor {
                 try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                     // columnIndex starts with 1
                     preparedFieldStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
-                    preparedFieldStatement.setString(2, fieldName);
-                    preparedFieldStatement.setString(3, bibEntry.getField(fieldName).get());
+                    preparedFieldStatement.setString(2, field.getName());
+                    preparedFieldStatement.setString(3, bibEntry.getField(field).get());
                     preparedFieldStatement.executeUpdate();
                 }
             }
@@ -301,9 +303,9 @@ public abstract class DBMSProcessor {
      * Helping method. Removes shared fields which do not exist locally
      */
     private void removeSharedFieldsByDifference(BibEntry localBibEntry, BibEntry sharedBibEntry) throws SQLException {
-        Set<String> nullFields = new HashSet<>(sharedBibEntry.getFieldNames());
+        Set<Field> nullFields = new HashSet<>(sharedBibEntry.getFieldNames());
         nullFields.removeAll(localBibEntry.getFieldNames());
-        for (String nullField : nullFields) {
+        for (Field nullField : nullFields) {
             StringBuilder deleteFieldQuery = new StringBuilder()
                 .append("DELETE FROM ")
                 .append(escape("FIELD"))
@@ -315,7 +317,7 @@ public abstract class DBMSProcessor {
 
             try (PreparedStatement preparedDeleteFieldStatement = connection
                     .prepareStatement(deleteFieldQuery.toString())) {
-                preparedDeleteFieldStatement.setString(1, nullField);
+                preparedDeleteFieldStatement.setString(1, nullField.getName());
                 preparedDeleteFieldStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
                 preparedDeleteFieldStatement.executeUpdate();
             }
@@ -326,9 +328,9 @@ public abstract class DBMSProcessor {
      * Helping method. Inserts a key-value pair into FIELD table for every field if not existing. Otherwise only an update is performed.
      */
     private void insertOrUpdateFields(BibEntry localBibEntry) throws SQLException {
-        for (String fieldName : localBibEntry.getFieldNames()) {
+        for (Field field : localBibEntry.getFieldNames()) {
             // avoiding to use deprecated BibEntry.getField() method. null values are accepted by PreparedStatement!
-            Optional<String> valueOptional = localBibEntry.getField(fieldName);
+            Optional<String> valueOptional = localBibEntry.getField(field);
             String value = null;
             if (valueOptional.isPresent()) {
                 value = valueOptional.get();
@@ -345,7 +347,7 @@ public abstract class DBMSProcessor {
 
             try (PreparedStatement preparedSelectFieldStatement = connection
                     .prepareStatement(selectFieldQuery.toString())) {
-                preparedSelectFieldStatement.setString(1, fieldName);
+                preparedSelectFieldStatement.setString(1, field.getName());
                 preparedSelectFieldStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
 
                 try (ResultSet selectFieldResultSet = preparedSelectFieldStatement.executeQuery()) {
@@ -364,7 +366,7 @@ public abstract class DBMSProcessor {
                         try (PreparedStatement preparedUpdateFieldStatement = connection
                                 .prepareStatement(updateFieldQuery.toString())) {
                             preparedUpdateFieldStatement.setString(1, value);
-                            preparedUpdateFieldStatement.setString(2, fieldName);
+                            preparedUpdateFieldStatement.setString(2, field.getName());
                             preparedUpdateFieldStatement.setInt(3, localBibEntry.getSharedBibEntryData().getSharedID());
                             preparedUpdateFieldStatement.executeUpdate();
                         }
@@ -383,7 +385,7 @@ public abstract class DBMSProcessor {
                         try (PreparedStatement preparedFieldStatement = connection
                                 .prepareStatement(insertFieldQuery.toString())) {
                             preparedFieldStatement.setInt(1, localBibEntry.getSharedBibEntryData().getSharedID());
-                            preparedFieldStatement.setString(2, fieldName);
+                            preparedFieldStatement.setString(2, field.getName());
                             preparedFieldStatement.setString(3, value);
                             preparedFieldStatement.executeUpdate();
                         }
@@ -470,7 +472,7 @@ public abstract class DBMSProcessor {
                     lastId = selectEntryResultSet.getInt("SHARED_ID");
                 }
 
-                bibEntry.setField(selectEntryResultSet.getString("NAME"), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntryEventSource.SHARED);
+                bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntryEventSource.SHARED);
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);

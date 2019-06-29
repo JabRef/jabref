@@ -6,11 +6,12 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.model.entry.field.Field;
 
 public abstract class OptionEditorViewModel<T> extends AbstractEditorViewModel {
 
-    public OptionEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public OptionEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
     }
 
     public abstract StringConverter<T> getStringConverter();

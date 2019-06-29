@@ -17,7 +17,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -146,21 +147,21 @@ public class MedlinePlainImporter extends Importer {
 
                 //store the fields in a map
                 Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("PG", FieldName.PAGES);
-                hashMap.put("PL", FieldName.ADDRESS);
+                hashMap.put("PG", StandardField.PAGES);
+                hashMap.put("PL", StandardField.ADDRESS);
                 hashMap.put("PHST", "history");
                 hashMap.put("PST", "publication-status");
-                hashMap.put("VI", FieldName.VOLUME);
-                hashMap.put("LA", FieldName.LANGUAGE);
+                hashMap.put("VI", StandardField.VOLUME);
+                hashMap.put("LA", StandardField.LANGUAGE);
                 hashMap.put("PUBM", "model");
                 hashMap.put("RN", "registry-number");
                 hashMap.put("NM", "substance-name");
                 hashMap.put("OCI", "copyright-owner");
                 hashMap.put("CN", "corporate");
-                hashMap.put("IP", FieldName.ISSUE);
-                hashMap.put("EN", FieldName.EDITION);
+                hashMap.put("IP", StandardField.ISSUE);
+                hashMap.put("EN", StandardField.EDITION);
                 hashMap.put("GS", "gene-symbol");
-                hashMap.put("GN", FieldName.NOTE);
+                hashMap.put("GN", StandardField.NOTE);
                 hashMap.put("GR", "grantno");
                 hashMap.put("SO", "source");
                 hashMap.put("NR", "number-of-references");
@@ -168,7 +169,7 @@ public class MedlinePlainImporter extends Importer {
                 hashMap.put("STAT", "status");
                 hashMap.put("SB", "subset");
                 hashMap.put("OTO", "termowner");
-                hashMap.put("OWN", FieldName.OWNER);
+                hashMap.put("OWN", InternalField.OWNER);
 
                 //add the fields to hm
                 for (Map.Entry<String, String> mapEntry : hashMap.entrySet()) {
@@ -187,11 +188,11 @@ public class MedlinePlainImporter extends Importer {
                         fields.put("investigator", oldInvestigator + ", " + value);
                     }
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fields.containsKey(FieldName.KEYWORDS)) {
-                        fields.put(FieldName.KEYWORDS, value);
+                    if (!fields.containsKey(StandardField.KEYWORDS)) {
+                        fields.put(StandardField.KEYWORDS, value);
                     } else {
-                        String kw = fields.get(FieldName.KEYWORDS);
-                        fields.put(FieldName.KEYWORDS, kw + ", " + value);
+                        String kw = fields.get(StandardField.KEYWORDS);
+                        fields.put(StandardField.KEYWORDS, kw + ", " + value);
                     }
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
@@ -203,10 +204,10 @@ public class MedlinePlainImporter extends Importer {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, FieldName.AUTHOR);
-            fixAuthors(fields, editor, FieldName.EDITOR);
+            fixAuthors(fields, author, StandardField.AUTHOR);
+            fixAuthors(fields, editor, StandardField.EDITOR);
             if (!comment.isEmpty()) {
-                fields.put(FieldName.COMMENT, comment);
+                fields.put(StandardField.COMMENT, comment);
             }
 
             BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
@@ -267,7 +268,7 @@ public class MedlinePlainImporter extends Importer {
 
     private void addStandardNumber(Map<String, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = FieldName.ISSN;
+            String key = StandardField.ISSN;
             //it is possible to have two issn, one for electronic and for print
             //if there are two then it comes at the end in brackets (electronic) or (print)
             //so search for the brackets
@@ -281,7 +282,7 @@ public class MedlinePlainImporter extends Importer {
                 hm.put(key, value);
             }
         } else if ("ISBN".equals(lab)) {
-            hm.put(FieldName.ISBN, value);
+            hm.put(StandardField.ISBN, value);
         }
     }
 
@@ -298,7 +299,7 @@ public class MedlinePlainImporter extends Importer {
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
-                key = FieldName.DOI;
+                key = StandardField.DOI;
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');
@@ -322,23 +323,23 @@ public class MedlinePlainImporter extends Importer {
 
     private void addTitles(Map<String, String> hm, String lab, String val, String type) {
         if ("TI".equals(lab)) {
-            String oldVal = hm.get(FieldName.TITLE);
+            String oldVal = hm.get(StandardField.TITLE);
             if (oldVal == null) {
-                hm.put(FieldName.TITLE, val);
+                hm.put(StandardField.TITLE, val);
             } else {
                 if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                    hm.put(FieldName.TITLE, oldVal + " " + val);
+                    hm.put(StandardField.TITLE, oldVal + " " + val);
                 } else {
-                    hm.put(FieldName.TITLE, oldVal + ": " + val);
+                    hm.put(StandardField.TITLE, oldVal + ": " + val);
                 }
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
-            hm.put(FieldName.BOOKTITLE, val);
+            hm.put(StandardField.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
             if ("inproceedings".equals(type)) {
-                hm.put(FieldName.BOOKTITLE, val);
+                hm.put(StandardField.BOOKTITLE, val);
             } else {
-                hm.put(FieldName.JOURNAL, val);
+                hm.put(StandardField.JOURNAL, val);
             }
         } else if ("CTI".equals(lab)) {
             hm.put("collection-title", val);
@@ -364,11 +365,11 @@ public class MedlinePlainImporter extends Importer {
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get(FieldName.ABSTRACT);
+            String oldAb = hm.get(StandardField.ABSTRACT);
             if (oldAb == null) {
-                hm.put(FieldName.ABSTRACT, abstractValue);
+                hm.put(StandardField.ABSTRACT, abstractValue);
             } else {
-                hm.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
+                hm.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put("other-abstract", value);
@@ -388,9 +389,9 @@ public class MedlinePlainImporter extends Importer {
             hm.put("revised", val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
-            hm.put(FieldName.YEAR, parts[0]);
+            hm.put(StandardField.YEAR, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
-                hm.put(FieldName.MONTH, parts[1]);
+                hm.put(StandardField.MONTH, parts[1]);
             }
         } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
             hm.put("publication", val);

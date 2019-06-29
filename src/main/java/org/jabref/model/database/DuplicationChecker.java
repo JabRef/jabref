@@ -8,6 +8,7 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -84,7 +85,7 @@ public class DuplicationChecker {
 
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
-        if (fieldChangedEvent.getFieldName().equals(BibEntry.KEY_FIELD)) {
+        if (fieldChangedEvent.getField().equals(InternalField.KEY_FIELD)) {
             removeKeyFromSet(fieldChangedEvent.getOldValue());
             addKeyToSet(fieldChangedEvent.getNewValue());
         }

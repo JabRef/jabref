@@ -13,7 +13,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.IEEEField;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Handling of bibtex fields.
@@ -29,68 +33,68 @@ import org.jabref.model.entry.specialfields.SpecialField;
  */
 public class InternalBibtexFields {
     private static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(
-            FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.GROUPS, FieldName.OWNER, FieldName.TIMESTAMP
+            StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP
     );
 
     // Lists of fields with special properties
     private static final List<String> INTEGER_FIELDS = Arrays.asList(
-            FieldName.CTLMAX_NAMES_FORCED_ETAL, FieldName.CTLNAMES_SHOW_ETAL, FieldName.CTLALT_STRETCH_FACTOR, FieldName.VOLUMES, FieldName.PMID
+            IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL, IEEEField.CTLALT_STRETCH_FACTOR, StandardField.VOLUMES, StandardField.PMID
     );
 
     private static final List<String> YES_NO_FIELDS = Arrays.asList(
-            FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_URL, FieldName.CTLUSE_FORCED_ETAL, FieldName.CTLUSE_ALT_SPACING, FieldName.CTLDASH_REPEATED_NAMES
+            IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_URL, IEEEField.CTLUSE_FORCED_ETAL, IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLDASH_REPEATED_NAMES
     );
 
     private static final List<String> DATE_FIELDS = Arrays.asList(
-            FieldName.DATE, FieldName.EVENTDATE, FieldName.ORIGDATE, FieldName.URLDATE
+            StandardField.DATE, StandardField.EVENTDATE, StandardField.ORIGDATE, StandardField.URLDATE
     );
 
     private static final List<String> PERSON_NAME_FIELDS = Arrays.asList(
-            FieldName.AUTHOR, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR, FieldName.ANNOTATOR,
-            FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD, FieldName.AFTERWORD,
-            FieldName.BOOKAUTHOR, FieldName.HOLDER, FieldName.SHORTAUTHOR, FieldName.SHORTEDITOR, FieldName.SORTNAME,
-            FieldName.NAMEADDON, FieldName.ASSIGNEE
+            StandardField.AUTHOR, StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC, StandardField.TRANSLATOR, StandardField.ANNOTATOR,
+            StandardField.COMMENTATOR, StandardField.INTRODUCTION, StandardField.FOREWORD, StandardField.AFTERWORD,
+            StandardField.BOOKAUTHOR, StandardField.HOLDER, StandardField.SHORTAUTHOR, StandardField.SHORTEDITOR, StandardField.SORTNAME,
+            StandardField.NAMEADDON, StandardField.ASSIGNEE
     );
 
     private static final List<String> EDITOR_TYPE_FIELDS = Arrays.asList(
-            FieldName.EDITORTYPE, FieldName.EDITORATYPE, FieldName.EDITORBTYPE, FieldName.EDITORCTYPE
+            StandardField.EDITORTYPE, StandardField.EDITORATYPE, StandardField.EDITORBTYPE, StandardField.EDITORCTYPE
     );
 
     private static final List<String> PAGINATION_FIELDS = Arrays.asList(
-            FieldName.PAGINATION, FieldName.BOOKPAGINATION
+            StandardField.PAGINATION, StandardField.BOOKPAGINATION
     );
 
     private static final List<String> JOURNAL_NAME_FIELDS = Arrays.asList(
-            FieldName.JOURNAL, FieldName.JOURNALTITLE, FieldName.JOURNALSUBTITLE
+            StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.JOURNALSUBTITLE
     );
 
     private static final List<String> BOOK_NAME_FIELDS = Arrays.asList(
-            FieldName.BOOKTITLE, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON
+            StandardField.BOOKTITLE, StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE, StandardField.BOOKTITLEADDON
     );
 
     private static final List<String> LANGUAGE_FIELDS = Arrays.asList(
-            FieldName.LANGUAGE, FieldName.ORIGLANGUAGE
+            StandardField.LANGUAGE, StandardField.ORIGLANGUAGE
     );
 
     private static final List<String> MULTI_KEY_FIELDS = Arrays.asList(
-            FieldName.RELATED, FieldName.ENTRYSET
+            StandardField.RELATED, StandardField.ENTRYSET
     );
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(
-            FieldName.URL, FieldName.FILE, FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX
+            StandardField.URL, StandardField.FILE, IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX
     );
 
     private static final List<String> SPECIAL_FIELDS = Arrays.asList(
-            SpecialField.PRINTED.getFieldName(),
-            SpecialField.PRIORITY.getFieldName(),
-            SpecialField.QUALITY.getFieldName(),
-            SpecialField.RANKING.getFieldName(),
-            SpecialField.READ_STATUS.getFieldName(),
-            SpecialField.RELEVANCE.getFieldName()
+            SpecialField.PRINTED.getName(),
+            SpecialField.PRIORITY.getName(),
+            SpecialField.QUALITY.getName(),
+            SpecialField.RANKING.getName(),
+            SpecialField.READ_STATUS.getName(),
+            SpecialField.RELEVANCE.getName()
     );
 
     private static final Set<String> MULTILINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
-            Arrays.asList(FieldName.NOTE, FieldName.ABSTRACT, FieldName.COMMENT)
+            Arrays.asList(StandardField.NOTE, StandardField.ABSTRACT, StandardField.COMMENT)
     ));
 
     // singleton instance
@@ -107,39 +111,39 @@ public class InternalBibtexFields {
 
         // FIRST: all standard fields
         // These are the fields that BibTeX might want to treat, so these must conform to BibTeX rules.
-        add(new BibtexSingleField(FieldName.ADDRESS));
+        add(new BibtexSingleField(StandardField.ADDRESS));
         // An annotation. It is not used by the standard bibliography styles,
         // but may be used by others that produce an annotated bibliography.
         // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/bibtex.html
-        add(new BibtexSingleField(FieldName.ANNOTE));
-        add(new BibtexSingleField(FieldName.AUTHOR, true, 280));
-        add(new BibtexSingleField(FieldName.BOOKTITLE, true, 175));
-        add(new BibtexSingleField(FieldName.CHAPTER));
-        add(new BibtexSingleField(FieldName.CROSSREF).withProperties(FieldProperty.SINGLE_ENTRY_LINK));
-        add(new BibtexSingleField(FieldName.EDITION));
-        add(new BibtexSingleField(FieldName.EDITOR, true, 280));
-        add(new BibtexSingleField(FieldName.EPRINT).withProperties(FieldProperty.EPRINT));
-        add(new BibtexSingleField(FieldName.HOWPUBLISHED));
-        add(new BibtexSingleField(FieldName.INSTITUTION));
-        add(new BibtexSingleField(FieldName.ISBN).withProperties(FieldProperty.ISBN));
-        add(new BibtexSingleField(FieldName.ISSN));
-        add(new BibtexSingleField(FieldName.JOURNAL).withProperties(FieldProperty.JOURNAL_NAME));
-        add(new BibtexSingleField(FieldName.JOURNALTITLE).withProperties(FieldProperty.JOURNAL_NAME));
-        add(new BibtexSingleField(FieldName.KEY));
-        add(new BibtexSingleField(FieldName.MONTH).withProperties(FieldProperty.MONTH));
-        add(new BibtexSingleField(FieldName.MONTHFILED).withProperties(FieldProperty.MONTH));
-        add(new BibtexSingleField(FieldName.NOTE));
-        add(new BibtexSingleField(FieldName.NUMBER, true, 60).setNumeric());
-        add(new BibtexSingleField(FieldName.ORGANIZATION));
-        add(new BibtexSingleField(FieldName.PAGES));
-        add(new BibtexSingleField(FieldName.PUBLISHER));
-        add(new BibtexSingleField(FieldName.SCHOOL));
-        add(new BibtexSingleField(FieldName.SERIES));
-        add(new BibtexSingleField(FieldName.TITLE, true, 400));
-        add(new BibtexSingleField(FieldName.TYPE).withProperties(FieldProperty.TYPE));
-        add(new BibtexSingleField(FieldName.LANGUAGE));
-        add(new BibtexSingleField(FieldName.VOLUME, true, 60).setNumeric());
-        add(new BibtexSingleField(FieldName.YEAR, true, 60).setNumeric());
+        add(new BibtexSingleField(StandardField.ANNOTE));
+        add(new BibtexSingleField(StandardField.AUTHOR, true, 280));
+        add(new BibtexSingleField(StandardField.BOOKTITLE, true, 175));
+        add(new BibtexSingleField(StandardField.CHAPTER));
+        add(new BibtexSingleField(StandardField.CROSSREF).withProperties(FieldProperty.SINGLE_ENTRY_LINK));
+        add(new BibtexSingleField(StandardField.EDITION));
+        add(new BibtexSingleField(StandardField.EDITOR, true, 280));
+        add(new BibtexSingleField(StandardField.EPRINT).withProperties(FieldProperty.EPRINT));
+        add(new BibtexSingleField(StandardField.HOWPUBLISHED));
+        add(new BibtexSingleField(StandardField.INSTITUTION));
+        add(new BibtexSingleField(StandardField.ISBN).withProperties(FieldProperty.ISBN));
+        add(new BibtexSingleField(StandardField.ISSN));
+        add(new BibtexSingleField(StandardField.JOURNAL).withProperties(FieldProperty.JOURNAL_NAME));
+        add(new BibtexSingleField(StandardField.JOURNALTITLE).withProperties(FieldProperty.JOURNAL_NAME));
+        add(new BibtexSingleField(StandardField.KEY));
+        add(new BibtexSingleField(StandardField.MONTH).withProperties(FieldProperty.MONTH));
+        add(new BibtexSingleField(StandardField.MONTHFILED).withProperties(FieldProperty.MONTH));
+        add(new BibtexSingleField(StandardField.NOTE));
+        add(new BibtexSingleField(StandardField.NUMBER, true, 60).setNumeric());
+        add(new BibtexSingleField(StandardField.ORGANIZATION));
+        add(new BibtexSingleField(StandardField.PAGES));
+        add(new BibtexSingleField(StandardField.PUBLISHER));
+        add(new BibtexSingleField(StandardField.SCHOOL));
+        add(new BibtexSingleField(StandardField.SERIES));
+        add(new BibtexSingleField(StandardField.TITLE, true, 400));
+        add(new BibtexSingleField(StandardField.TYPE).withProperties(FieldProperty.TYPE));
+        add(new BibtexSingleField(StandardField.LANGUAGE));
+        add(new BibtexSingleField(StandardField.VOLUME, true, 60).setNumeric());
+        add(new BibtexSingleField(StandardField.YEAR, true, 60).setNumeric());
 
         // custom fields not displayed at editor, but as columns in the UI
         for (String fieldName : SPECIAL_FIELDS) {
@@ -152,55 +156,55 @@ public class InternalBibtexFields {
         }
 
         // some semi-standard fields
-        BibtexSingleField tempField = new BibtexSingleField(BibEntry.KEY_FIELD).withProperties(FieldProperty.KEY);
+        BibtexSingleField tempField = new BibtexSingleField(InternalField.KEY_FIELD).withProperties(FieldProperty.KEY);
         tempField.setPrivate();
         add(tempField);
 
-        add(new BibtexSingleField(FieldName.DOI).withProperties(FieldProperty.DOI));
-        add(new BibtexSingleField(FieldName.EID));
-        add(new BibtexSingleField(FieldName.DATE).withProperties(FieldProperty.DATE));
-        add(new BibtexSingleField(FieldName.PMID, false, 60).setNumeric());
+        add(new BibtexSingleField(StandardField.DOI).withProperties(FieldProperty.DOI));
+        add(new BibtexSingleField(StandardField.EID));
+        add(new BibtexSingleField(StandardField.DATE).withProperties(FieldProperty.DATE));
+        add(new BibtexSingleField(StandardField.PMID, false, 60).setNumeric());
 
         // additional fields
-        add(new BibtexSingleField(FieldName.LOCATION, false));
-        add(new BibtexSingleField(FieldName.ABSTRACT, false, 400).withProperties(FieldProperty.MULTILINE_TEXT));
-        add(new BibtexSingleField(FieldName.URL, false).withProperties(FieldProperty.EXTERNAL, FieldProperty.VERBATIM));
-        add(new BibtexSingleField(FieldName.COMMENT, false));
-        add(new BibtexSingleField(FieldName.KEYWORDS, false));
-        add(new BibtexSingleField(FieldName.FILE, false).withProperties(FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM));
-        add(new BibtexSingleField(FieldName.RELATED, false).withProperties(FieldProperty.MULTIPLE_ENTRY_LINK));
+        add(new BibtexSingleField(StandardField.LOCATION, false));
+        add(new BibtexSingleField(StandardField.ABSTRACT, false, 400).withProperties(FieldProperty.MULTILINE_TEXT));
+        add(new BibtexSingleField(StandardField.URL, false).withProperties(FieldProperty.EXTERNAL, FieldProperty.VERBATIM));
+        add(new BibtexSingleField(StandardField.COMMENT, false));
+        add(new BibtexSingleField(StandardField.KEYWORDS, false));
+        add(new BibtexSingleField(StandardField.FILE, false).withProperties(FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM));
+        add(new BibtexSingleField(StandardField.RELATED, false).withProperties(FieldProperty.MULTIPLE_ENTRY_LINK));
 
         // some biblatex fields
-        add(new BibtexSingleField(FieldName.GENDER).withProperties(FieldProperty.GENDER));
-        add(new BibtexSingleField(FieldName.PUBSTATE).withProperties(FieldProperty.PUBLICATION_STATE));
+        add(new BibtexSingleField(StandardField.GENDER).withProperties(FieldProperty.GENDER));
+        add(new BibtexSingleField(StandardField.PUBSTATE).withProperties(FieldProperty.PUBLICATION_STATE));
 
         // some internal fields
-        tempField = new BibtexSingleField(FieldName.OWNER, false).withProperties(FieldProperty.OWNER);
+        tempField = new BibtexSingleField(InternalField.OWNER, false).withProperties(FieldProperty.OWNER);
         tempField.setPrivate();
         add(tempField);
 
-        timeStampField = FieldName.TIMESTAMP;
-        tempField = new BibtexSingleField(FieldName.TIMESTAMP, false).withProperties(FieldProperty.DATE);
+        timeStampField = InternalField.TIMESTAMP;
+        tempField = new BibtexSingleField(InternalField.TIMESTAMP, false).withProperties(FieldProperty.DATE);
         tempField.setPrivate();
         add(tempField);
 
-        tempField = new BibtexSingleField(BibEntry.TYPE_HEADER, false, 75);
+        tempField = new BibtexSingleField(InternalField.TYPE_HEADER, false, 75);
         tempField.setPrivate();
         add(tempField);
 
-        tempField = new BibtexSingleField(FieldName.SEARCH_INTERNAL, false);
-        tempField.setPrivate();
-        tempField.setWriteable(false);
-        tempField.setDisplayable(false);
-        add(tempField);
-
-        tempField = new BibtexSingleField(FieldName.GROUPSEARCH_INTERNAL, false);
+        tempField = new BibtexSingleField(InternalField.SEARCH_INTERNAL, false);
         tempField.setPrivate();
         tempField.setWriteable(false);
         tempField.setDisplayable(false);
         add(tempField);
 
-        tempField = new BibtexSingleField(FieldName.MARKED_INTERNAL, false);
+        tempField = new BibtexSingleField(InternalField.GROUPSEARCH_INTERNAL, false);
+        tempField.setPrivate();
+        tempField.setWriteable(false);
+        tempField.setDisplayable(false);
+        add(tempField);
+
+        tempField = new BibtexSingleField(InternalField.MARKED_INTERNAL, false);
         tempField.setPrivate();
         tempField.setWriteable(true); // This field must be written to file!
         tempField.setDisplayable(false);
@@ -363,7 +367,7 @@ public class InternalBibtexFields {
         }
     }
 
-    public static Set<FieldProperty> getFieldProperties(String name) {
+    public static Set<FieldProperty> getFieldProperties(Field name) {
         return getField(name)
                 .map(BibtexSingleField::getProperties)
                 .orElse(EnumSet.noneOf(FieldProperty.class));
@@ -385,7 +389,7 @@ public class InternalBibtexFields {
     /**
      * Returns a sorted list with all field names
      */
-    public static List<String> getAllPublicFieldNames() {
+    public static List<Field> getAllPublicFieldNames() {
         List<String> publicFields = new ArrayList<>();
         for (BibtexSingleField field : InternalBibtexFields.RUNTIME.fieldSet.values()) {
             if (!field.isPrivate()) {
@@ -403,7 +407,7 @@ public class InternalBibtexFields {
         return !sField.isPresent() || sField.get().isWriteable();
     }
 
-    public static boolean isDisplayableField(String field) {
+    public static boolean isDisplayableField(Field field) {
         Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
         return !sField.isPresent() || sField.get().isDisplayable();
     }
@@ -414,7 +418,7 @@ public class InternalBibtexFields {
      * @param field a <code>String</code> value
      * @return a <code>boolean</code> value
      */
-    public static boolean isStandardField(String field) {
+    public static boolean isStandardField(Field field) {
         Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
         return sField.isPresent() && sField.get().isStandard();
     }
@@ -424,23 +428,23 @@ public class InternalBibtexFields {
         return sField.isPresent() && sField.get().isNumeric();
     }
 
-    public static boolean isInternalField(String field) {
-        return field.startsWith("__");
+    public static boolean isInternalField(Field field) {
+        return field.getName().startsWith("__");
     }
 
-    public static List<String> getJournalNameFields() {
+    public static List<Field> getJournalNameFields() {
         return getFieldsWithProperty(FieldProperty.JOURNAL_NAME);
     }
 
     /**
      * Returns a sorted List with all field names including internal field names
      */
-    public static List<String> getAllPublicAndInternalFieldNames() {
+    public static List<Field> getAllPublicAndInternalFieldNames() {
         //add the internal field names to public fields
         List<String> publicAndInternalFields = new ArrayList<>();
         publicAndInternalFields.addAll(InternalBibtexFields.getAllPublicFieldNames());
-        publicAndInternalFields.add(FieldName.INTERNAL_ALL_FIELD);
-        publicAndInternalFields.add(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+        publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
+        publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
 
         // sort the entries
         Collections.sort(publicAndInternalFields);
@@ -448,11 +452,11 @@ public class InternalBibtexFields {
         return publicAndInternalFields;
     }
 
-    public static List<String> getBookNameFields() {
+    public static List<Field> getBookNameFields() {
         return getFieldsWithProperty(FieldProperty.BOOK_NAME);
     }
 
-    public static List<String> getPersonNameFields() {
+    public static List<Field> getPersonNameFields() {
         return getFieldsWithProperty(FieldProperty.PERSON_NAMES);
     }
 
@@ -488,7 +492,7 @@ public class InternalBibtexFields {
         fieldSet.put(field.getName(), field);
     }
 
-    public static boolean isSingleLineField(final String fieldName) {
+    public static boolean isSingleLineField(final Field fieldName) {
         return !MULTILINE_FIELDS.contains(fieldName.toLowerCase());
     }
 }

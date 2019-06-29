@@ -3,7 +3,7 @@ package org.jabref.model.groups;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,38 +87,38 @@ public class WordKeywordGroupTest {
     public void addChangesFieldIfEmptyBefore() throws Exception {
         testGroup.add(entry);
 
-        assertEquals(Optional.of("test"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("test"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
     public void addChangesFieldIfNotEmptyBefore() throws Exception {
-        entry.setField(FieldName.KEYWORDS, "bla, blubb");
+        entry.setField(StandardField.KEYWORDS, "bla, blubb");
         testGroup.add(entry);
 
-        assertEquals(Optional.of("bla, blubb, test"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("bla, blubb, test"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
     public void addDoesNotAddDuplicate() throws Exception {
-        entry.setField(FieldName.KEYWORDS, "test, blubb");
+        entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.add(entry);
 
-        assertEquals(Optional.of("test, blubb"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("test, blubb"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
     public void removeDoesNothingIfEntryNotMatched() throws Exception {
-        entry.setField(FieldName.KEYWORDS, "something");
+        entry.setField(StandardField.KEYWORDS, "something");
         testGroup.remove(entry);
 
-        assertEquals(Optional.of("something"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("something"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
     public void removeRemovesNameFromField() throws Exception {
-        entry.setField(FieldName.KEYWORDS, "test, blubb");
+        entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.remove(entry);
 
-        assertEquals(Optional.of("blubb"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("blubb"), entry.getField(StandardField.KEYWORDS));
     }
 }

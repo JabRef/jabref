@@ -56,7 +56,7 @@ import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.base.Joiner;
 import org.slf4j.Logger;
@@ -163,13 +163,13 @@ public class ModsImporter extends Importer implements Parser {
 
             //Now parse the information if the element is present
             abstractDefinition
-                    .ifPresent(abstractDef -> putIfValueNotNull(fields, FieldName.ABSTRACT, abstractDef.getValue()));
+                    .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
 
             genreDefinition.ifPresent(genre -> entry.setType(genre.getValue()));
 
             languageDefinition.ifPresent(
                     languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
-                            .forEach(language -> putIfValueNotNull(fields, FieldName.LANGUAGE, language)));
+                                              .forEach(language -> putIfValueNotNull(fields, StandardField.LANGUAGE, language)));
 
             locationDefinition.ifPresent(location -> parseLocationAndUrl(fields, location));
 
@@ -195,10 +195,10 @@ public class ModsImporter extends Importer implements Parser {
         }
 
         //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
-        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, this.keywordSeparator);
+        putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);
         //same goes for authors and notes
-        putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
-        putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");
+        putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
+        putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
 
     }
 
@@ -209,7 +209,7 @@ public class ModsImporter extends Importer implements Parser {
                 JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
                 if ("title".equals(element.getName().getLocalPart())) {
                     StringPlusLanguage title = element.getValue();
-                    fields.put(FieldName.TITLE, title.getValue());
+                    fields.put(StandardField.TITLE, title.getValue());
                 }
             }
         }
@@ -275,11 +275,11 @@ public class ModsImporter extends Importer implements Parser {
     private void parseLocationAndUrl(Map<String, String> fields, LocationDefinition locationDefinition) {
         List<String> locations = locationDefinition.getPhysicalLocation().stream()
                 .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
-        putIfListIsNotEmpty(fields, locations, FieldName.LOCATION, ", ");
+        putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
 
         List<String> urls = locationDefinition.getUrl().stream().map(UrlDefinition::getValue)
                 .collect(Collectors.toList());
-        putIfListIsNotEmpty(fields, urls, FieldName.URL, ", ");
+        putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
     }
 
     private void parseRecordInfo(Map<String, String> fields, RecordInfoDefinition recordInfo) {
@@ -294,7 +294,7 @@ public class ModsImporter extends Importer implements Parser {
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
                 List<String> languages = languageTerms.stream().map(LanguageTermDefinition::getValue)
                         .collect(Collectors.toList());
-                putIfListIsNotEmpty(fields, languages, FieldName.LANGUAGE, ", ");
+                putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
             }
         }
     }
@@ -335,7 +335,7 @@ public class ModsImporter extends Importer implements Parser {
                         JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
                         if ("title".equals(element.getName().getLocalPart())) {
                             StringPlusLanguage journal = element.getValue();
-                            fields.put(FieldName.JOURNAL, journal.getValue());
+                            fields.put(StandardField.JOURNAL, journal.getValue());
                         }
                     }
                 }
@@ -345,15 +345,15 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putPageInformation(ExtentDefinition extentDefinition, Map<String, String> fields) {
         if (extentDefinition.getTotal() != null) {
-            putIfValueNotNull(fields, FieldName.PAGES, String.valueOf(extentDefinition.getTotal()));
+            putIfValueNotNull(fields, StandardField.PAGES, String.valueOf(extentDefinition.getTotal()));
         } else if (extentDefinition.getStart() != null) {
-            putIfValueNotNull(fields, FieldName.PAGES, extentDefinition.getStart().getValue());
+            putIfValueNotNull(fields, StandardField.PAGES, extentDefinition.getStart().getValue());
             if (extentDefinition.getEnd() != null) {
                 String endPage = extentDefinition.getEnd().getValue();
                 //if end appears, then there has to be a start page appeared, so get it and put it together with
                 //the end page
-                String startPage = fields.get(FieldName.PAGES);
-                fields.put(FieldName.PAGES, startPage + "-" + endPage);
+                String startPage = fields.get(StandardField.PAGES);
+                fields.put(StandardField.PAGES, startPage + "-" + endPage);
             }
         }
     }
@@ -371,7 +371,7 @@ public class ModsImporter extends Importer implements Parser {
         placeDefinition
                 .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
-        putIfListIsNotEmpty(fields, places, FieldName.ADDRESS, ", ");
+        putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
 
@@ -381,9 +381,9 @@ public class ModsImporter extends Importer implements Parser {
     private void putPublisherOrEdition(Map<String, String> fields, String elementName,
                                        StringPlusLanguagePlusSupplied pubOrEd) {
         if ("publisher".equals(elementName)) {
-            putIfValueNotNull(fields, FieldName.PUBLISHER, pubOrEd.getValue());
+            putIfValueNotNull(fields, StandardField.PUBLISHER, pubOrEd.getValue());
         } else if ("edition".equals(elementName)) {
-            putIfValueNotNull(fields, FieldName.EDITION, pubOrEd.getValue());
+            putIfValueNotNull(fields, StandardField.EDITION, pubOrEd.getValue());
         }
     }
 
@@ -393,12 +393,12 @@ public class ModsImporter extends Importer implements Parser {
 
                 case "dateIssued":
                     //The first 4 digits of dateIssued should be the year
-                    fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
+                    fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
                     break;
                 case "dateCreated":
                     //If there was no year in date issued, then take the year from date created
-                    if (fields.get(FieldName.YEAR) == null) {
-                        fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
+                    if (fields.get(StandardField.YEAR) == null) {
+                        fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
                     }
                     fields.put("created", date.getValue());
                     break;

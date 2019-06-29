@@ -15,20 +15,20 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.entry.FieldName.AUTHOR;
-import static org.jabref.model.entry.FieldName.CHAPTER;
-import static org.jabref.model.entry.FieldName.EDITION;
-import static org.jabref.model.entry.FieldName.EDITOR;
-import static org.jabref.model.entry.FieldName.JOURNAL;
-import static org.jabref.model.entry.FieldName.PAGES;
-import static org.jabref.model.entry.FieldName.TITLE;
+import static org.jabref.model.entry.field.StandardField.AUTHOR;
+import static org.jabref.model.entry.field.StandardField.CHAPTER;
+import static org.jabref.model.entry.field.StandardField.EDITION;
+import static org.jabref.model.entry.field.StandardField.EDITOR;
+import static org.jabref.model.entry.field.StandardField.JOURNAL;
+import static org.jabref.model.entry.field.StandardField.PAGES;
+import static org.jabref.model.entry.field.StandardField.TITLE;
 
 /**
  * This class contains utility method for duplicate checking of entries.
@@ -96,7 +96,7 @@ public class DuplicateCheck {
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
-        for (final String name : FieldName.getIdentifierFieldNames()) {
+        for (final String name : FieldFactory.getIdentifierFieldNames()) {
             if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
                 return true;
             }

@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.IEEEField;
+import org.jabref.model.entry.field.StandardField;
+
 /**
  * This class defines entry types for biblatex support.
  * @see <a href="http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf">biblatex documentation</a>
@@ -16,19 +20,19 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType ARTICLE = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.EDITOR, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER,
-                FieldName.EID, FieldName.ISSUE, FieldName.PAGES, FieldName.NOTE, FieldName.ISSN, FieldName.DOI,
-                FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
+                StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
+                StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, FieldName.DATE);
-            addAllOptional(FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.SUBTITLE,
-                    FieldName.TITLEADDON, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
-                    FieldName.JOURNALSUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE,
-                    FieldName.ORIGLANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID,
-                    FieldName.ISSUE, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE,
-                    FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNALTITLE, StandardField.DATE);
+            addAllOptional(StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.SUBTITLE,
+                    StandardField.TITLEADDON, StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+                    StandardField.JOURNALSUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE,
+                    StandardField.ORIGLANGUAGE, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER, StandardField.EID,
+                    StandardField.ISSUE, StandardField.PAGES, StandardField.VERSION, StandardField.NOTE,
+                    StandardField.ISSN, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -44,23 +48,23 @@ public class BiblatexEntryTypes {
 
     public static final BiblatexEntryType BOOK = new BiblatexEntryType() {
 
-        private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.EDITOR,
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                FieldName.MAINTITLEADDON, FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN,
-                FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+        private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.EDITOR,
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+                StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN,
+                StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
-                    FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
-                    FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                    FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.LANGUAGE,
-                    FieldName.ORIGLANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES,
-                    FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION,
-                    FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM,
-                    FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
-                    FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+                    StandardField.FOREWORD, StandardField.AFTERWORD, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                    StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.LANGUAGE,
+                    StandardField.ORIGLANGUAGE, StandardField.VOLUME, StandardField.PART, StandardField.EDITION, StandardField.VOLUMES,
+                    StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION,
+                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM,
+                    StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE,
+                    StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -77,19 +81,19 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MVBOOK = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(
-                Arrays.asList(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EDITION,
-                        FieldName.PUBLISHER, FieldName.ISBN, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                Arrays.asList(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION,
+                        StandardField.PUBLISHER, StandardField.ISBN, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
-                    FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
-                    FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                    FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES,
-                    FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
-                    FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+                    StandardField.FOREWORD, StandardField.AFTERWORD, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                    StandardField.LANGUAGE, StandardField.ORIGLANGUAGE, StandardField.EDITION, StandardField.VOLUMES, StandardField.SERIES,
+                    StandardField.NUMBER, StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN,
+                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -106,23 +110,23 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType INBOOK = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(
-                Arrays.asList(FieldName.BOOKAUTHOR, FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                        FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE,
-                        FieldName.BOOKTITLEADDON, FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER,
-                        FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                Arrays.asList(StandardField.BOOKAUTHOR, StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                        StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+                        StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
+                        StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
-            addAllOptional(FieldName.BOOKAUTHOR, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB,
-                    FieldName.EDITORC, FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR,
-                    FieldName.INTRODUCTION, FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE,
-                    FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON,
-                    FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
-                    FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES,
-                    FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
-                    FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
-                    FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE);
+            addAllOptional(StandardField.BOOKAUTHOR, StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB,
+                    StandardField.EDITORC, StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
+                    StandardField.INTRODUCTION, StandardField.FOREWORD, StandardField.AFTERWORD, StandardField.SUBTITLE,
+                    StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON,
+                    StandardField.BOOKSUBTITLE, StandardField.BOOKTITLEADDON, StandardField.LANGUAGE, StandardField.ORIGLANGUAGE,
+                    StandardField.VOLUME, StandardField.PART, StandardField.EDITION, StandardField.VOLUMES, StandardField.SERIES,
+                    StandardField.NUMBER, StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN,
+                    StandardField.CHAPTER, StandardField.PAGES, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI,
+                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -187,16 +191,16 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType BOOKLET = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED,
-                        FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
-                        FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
+                        StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+                        StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
-                    FieldName.TYPE, FieldName.NOTE, FieldName.LOCATION, FieldName.CHAPTER, FieldName.PAGES,
-                    FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
+                    StandardField.TYPE, StandardField.NOTE, StandardField.LOCATION, StandardField.CHAPTER, StandardField.PAGES,
+                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -213,22 +217,22 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType COLLECTION = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
-                FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.VOLUME, FieldName.EDITION,
-                FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI,
-                FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+                StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION,
+                StandardField.PUBLISHER, StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI,
+                StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR,
-                    FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD,
-                    FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
-                    FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
-                    FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES,
-                    FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
-                    FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE,
-                    FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
-                    FieldName.URLDATE);
+            addAllRequired(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC, StandardField.TRANSLATOR,
+                    StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION, StandardField.FOREWORD,
+                    StandardField.AFTERWORD, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+                    StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.LANGUAGE, StandardField.ORIGLANGUAGE,
+                    StandardField.VOLUME, StandardField.PART, StandardField.EDITION, StandardField.VOLUMES, StandardField.SERIES,
+                    StandardField.NUMBER, StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN,
+                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE,
+                    StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL,
+                    StandardField.URLDATE);
         }
 
         @Override
@@ -245,19 +249,19 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MVCOLLECTION = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                        FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                        StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR,
-                    FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD,
-                    FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE,
-                    FieldName.ORIGLANGUAGE, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER,
-                    FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
-                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
-                    FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC, StandardField.TRANSLATOR,
+                    StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION, StandardField.FOREWORD,
+                    StandardField.AFTERWORD, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE,
+                    StandardField.ORIGLANGUAGE, StandardField.EDITION, StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER,
+                    StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN, StandardField.PAGETOTAL,
+                    StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -274,23 +278,23 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType INCOLLECTION = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                        FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE,
-                        FieldName.BOOKTITLEADDON, FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER,
-                        FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                        StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+                        StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
+                        StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,
-                    FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.INTRODUCTION,
-                    FieldName.FOREWORD, FieldName.AFTERWORD, FieldName.SUBTITLE, FieldName.TITLEADDON,
-                    FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE,
-                    FieldName.BOOKTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.VOLUME,
-                    FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER,
-                    FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
+                    StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
+                    StandardField.FOREWORD, StandardField.AFTERWORD, StandardField.SUBTITLE, StandardField.TITLEADDON,
+                    StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+                    StandardField.BOOKTITLEADDON, StandardField.LANGUAGE, StandardField.ORIGLANGUAGE, StandardField.VOLUME,
+                    StandardField.PART, StandardField.EDITION, StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER,
+                    StandardField.NOTE, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN, StandardField.CHAPTER,
+                    StandardField.PAGES, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -331,17 +335,17 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MANUAL = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(
-                new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EDITION, FieldName.PUBLISHER,
-                        FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION, StandardField.PUBLISHER,
+                        StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.EDITION,
-                    FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE,
-                    FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
-                    FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.EDITION,
+                    StandardField.TYPE, StandardField.SERIES, StandardField.NUMBER, StandardField.VERSION, StandardField.NOTE,
+                    StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN, StandardField.CHAPTER,
+                    StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI,
+                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -358,15 +362,15 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MISC = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED, FieldName.LOCATION, FieldName.DOI,
-                FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
+                StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
-                    FieldName.TYPE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.LOCATION,
-                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
+                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.LOCATION,
+                    StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -383,13 +387,13 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType ONLINE = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.DATE, FieldName.URL);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.VERSION,
-                    FieldName.NOTE, FieldName.ORGANIZATION, FieldName.ADDENDUM, FieldName.PUBSTATE,
-                    FieldName.URLDATE);
+            addAllRequired(FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE, StandardField.URL);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.VERSION,
+                    StandardField.NOTE, StandardField.ORGANIZATION, StandardField.ADDENDUM, StandardField.PUBSTATE,
+                    StandardField.URLDATE);
         }
 
         @Override
@@ -405,16 +409,16 @@ public class BiblatexEntryTypes {
 
     public static final BiblatexEntryType PATENT = new BiblatexEntryType() {
 
-        private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.HOLDER,
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
-                FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+        private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.HOLDER,
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+                StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, FieldName.DATE);
-            addAllOptional(FieldName.HOLDER, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
-                    FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.ADDENDUM,
-                    FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
-                    FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.NUMBER, StandardField.DATE);
+            addAllOptional(StandardField.HOLDER, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,
+                    StandardField.VERSION, StandardField.LOCATION, StandardField.NOTE, StandardField.ADDENDUM,
+                    StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE,
+                    StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -431,16 +435,16 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType PERIODICAL = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.ISSN, FieldName.DOI,
-                FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.ISSN, StandardField.DOI,
+                StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.SUBTITLE,
-                    FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE, FieldName.SERIES,
-                    FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.NOTE,
-                    FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.EDITOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC, StandardField.SUBTITLE,
+                    StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.LANGUAGE, StandardField.SERIES,
+                    StandardField.VOLUME, StandardField.NUMBER, StandardField.ISSUE, StandardField.NOTE,
+                    StandardField.ISSN, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -481,21 +485,21 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType PROCEEDINGS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN,
-                FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+                StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
+                StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
-                    FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.EVENTTITLEADDON,
-                    FieldName.EVENTDATE, FieldName.VENUE, FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART,
-                    FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
-                    FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE,
-                    FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
-                    FieldName.URLDATE);
+            addAllRequired(StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+                    StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.EVENTTITLEADDON,
+                    StandardField.EVENTDATE, StandardField.VENUE, StandardField.LANGUAGE, StandardField.VOLUME, StandardField.PART,
+                    StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION,
+                    StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN,
+                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE,
+                    StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL,
+                    StandardField.URLDATE);
         }
 
         @Override
@@ -512,20 +516,20 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MVPROCEEDINGS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN,
-                FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
+                StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
+                StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EVENTTITLE,
-                    FieldName.EVENTTITLEADDON, FieldName.EVENTDATE, FieldName.VENUE, FieldName.LANGUAGE,
-                    FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
-                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
-                    FieldName.EPRINTTYPE, FieldName.URL,
-                    FieldName.URLDATE);
+            addAllRequired(StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EVENTTITLE,
+                    StandardField.EVENTTITLEADDON, StandardField.EVENTDATE, StandardField.VENUE, StandardField.LANGUAGE,
+                    StandardField.VOLUMES, StandardField.SERIES, StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION,
+                    StandardField.PUBLISHER, StandardField.LOCATION, StandardField.ISBN, StandardField.PAGETOTAL,
+                    StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+                    StandardField.EPRINTTYPE, StandardField.URL,
+                    StandardField.URLDATE);
         }
 
         @Override
@@ -542,22 +546,22 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType INPROCEEDINGS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
-                        FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE,
-                        FieldName.BOOKTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER,
-                        FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+                        StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
+                        StandardField.BOOKTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER,
+                        StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.DATE);
-            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
-                    FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON,
-                    FieldName.EVENTTITLE, FieldName.EVENTTITLEADDON, FieldName.EVENTDATE, FieldName.VENUE,
-                    FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.VOLUMES, FieldName.SERIES,
-                    FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION,
-                    FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM,
-                    FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
-                    FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.DATE);
+            addAllOptional(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
+                    StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE, StandardField.BOOKTITLEADDON,
+                    StandardField.EVENTTITLE, StandardField.EVENTTITLEADDON, StandardField.EVENTDATE, StandardField.VENUE,
+                    StandardField.LANGUAGE, StandardField.VOLUME, StandardField.PART, StandardField.VOLUMES, StandardField.SERIES,
+                    StandardField.NUMBER, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.LOCATION,
+                    StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.ADDENDUM,
+                    StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE,
+                    StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -646,17 +650,17 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType REPORT = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(
-                Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.NUMBER, FieldName.ISRN,
-                        FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NUMBER, StandardField.ISRN,
+                        StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NUMBER,
-                    FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.ISRN,
-                    FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE,
-                    FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
-                    FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.TYPE, StandardField.INSTITUTION, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.NUMBER,
+                    StandardField.VERSION, StandardField.NOTE, StandardField.LOCATION, StandardField.ISRN,
+                    StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE,
+                    StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL,
+                    StandardField.URLDATE);
         }
 
         @Override
@@ -673,7 +677,7 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType SET = new BiblatexEntryType() {
 
         {
-            addAllRequired(FieldName.ENTRYSET, FieldName.CROSSREF);
+            addAllRequired(StandardField.ENTRYSET, StandardField.CROSSREF);
         }
 
         @Override
@@ -685,16 +689,16 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType THESIS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.CHAPTER,
-                        FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
-                        FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.CHAPTER,
+                        StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
+                        StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
-                    FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.TYPE, StandardField.INSTITUTION, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.NOTE,
+                    StandardField.LOCATION, StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES,
+                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -711,14 +715,14 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType UNPUBLISHED = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED,
-                        FieldName.PUBSTATE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
+                        StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.DATE);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED,
-                    FieldName.NOTE, FieldName.LOCATION, FieldName.ADDENDUM, FieldName.PUBSTATE,
-                    FieldName.URL, FieldName.URLDATE);
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE);
+            addAllOptional(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
+                    StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.PUBSTATE,
+                    StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -785,17 +789,17 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType MASTERSTHESIS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
-                        FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,
+                        StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
-            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
-                    FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            // Treated as alias of "THESIS", except StandardField.TYPE field is optional
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE);
+            addAllOptional(StandardField.TYPE, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.NOTE,
+                    StandardField.LOCATION, StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES,
+                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -812,17 +816,17 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType PHDTHESIS = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections
-                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
-                        FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                        FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                .unmodifiableSet(new LinkedHashSet<>(Arrays.asList(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,
+                        StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                        StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
-            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE,
-                    FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
-                    FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
-                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
+            // Treated as alias of "THESIS", except StandardField.TYPE field is optional
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE);
+            addAllOptional(StandardField.TYPE, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.NOTE,
+                    StandardField.LOCATION, StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES,
+                    StandardField.PAGETOTAL, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -839,18 +843,18 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType TECHREPORT = new BiblatexEntryType() {
 
         private final Set<String> primaryOptionalFields = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
-                FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE, FieldName.NUMBER, FieldName.ISRN,
-                FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT,
-                FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE)));
+                StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE, StandardField.NUMBER, StandardField.ISRN,
+                StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
+                StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)));
 
         {
-            // Treated as alias of "REPORT", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.DATE);
-            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE,
-                    FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION,
-                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM,
-                    FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
-                    FieldName.URL, FieldName.URLDATE);
+            // Treated as alias of "REPORT", except StandardField.TYPE field is optional
+            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.DATE);
+            addAllOptional(StandardField.TYPE, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE,
+                    StandardField.NUMBER, StandardField.VERSION, StandardField.NOTE, StandardField.LOCATION,
+                    StandardField.ISRN, StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.ADDENDUM,
+                    StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE,
+                    StandardField.URL, StandardField.URLDATE);
         }
 
         @Override
@@ -895,10 +899,10 @@ public class BiblatexEntryTypes {
     public static final BiblatexEntryType IEEETRANBSTCTL = new BiblatexEntryType() {
 
         {
-            addAllOptional(FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_FORCED_ETAL,
-                    FieldName.CTLUSE_URL, FieldName.CTLMAX_NAMES_FORCED_ETAL, FieldName.CTLNAMES_SHOW_ETAL,
-                    FieldName.CTLUSE_ALT_SPACING, FieldName.CTLALT_STRETCH_FACTOR, FieldName.CTLDASH_REPEATED_NAMES,
-                    FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
+            addAllOptional(IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_FORCED_ETAL,
+                    IEEEField.CTLUSE_URL, IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL,
+                    IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLALT_STRETCH_FACTOR, IEEEField.CTLDASH_REPEATED_NAMES,
+                    IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX);
         }
 
         @Override

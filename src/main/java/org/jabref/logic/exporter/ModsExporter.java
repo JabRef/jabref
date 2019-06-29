@@ -46,7 +46,9 @@ import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 /**
  * TemplateExporter for exporting in MODS XML format.
@@ -76,77 +78,55 @@ class ModsExporter extends Exporter {
             ModsCollectionDefinition modsCollection = new ModsCollectionDefinition();
             for (BibEntry bibEntry : entries) {
                 ModsDefinition mods = new ModsDefinition();
-                bibEntry.getCiteKeyOptional().ifPresent(citeKey -> addIdentifier("citekey", citeKey, mods));
+                bibEntry.getCiteKeyOptional().ifPresent(citeKey -> addIdentifier(new UnknownField("citekey"), citeKey, mods));
 
-                Map<String, String> fieldMap = bibEntry.getFieldMap();
+                Map<Field, String> fieldMap = bibEntry.getFieldMap();
                 addGenre(bibEntry, mods);
 
                 OriginInfoDefinition originInfo = new OriginInfoDefinition();
                 PartDefinition partDefinition = new PartDefinition();
                 RelatedItemDefinition relatedItem = new RelatedItemDefinition();
 
-                for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
-                    String key = entry.getKey();
+                for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                    Field key = entry.getKey();
                     String value = entry.getValue();
 
-                    switch (key) {
-
-                        case FieldName.AUTHOR:
-                            handleAuthors(mods, value);
-                            break;
-                        case "affiliation":
-                            addAffiliation(mods, value);
-                            break;
-                        case FieldName.ABSTRACT:
-                            addAbstract(mods, value);
-                            break;
-                        case FieldName.TITLE:
-                            addTitle(mods, value);
-                            break;
-                        case FieldName.LANGUAGE:
-                            addLanguage(mods, value);
-                            break;
-                        case FieldName.LOCATION:
-                            addLocation(mods, value);
-                            break;
-                        case FieldName.URL:
-                            addUrl(mods, value);
-                            break;
-                        case FieldName.NOTE:
-                            addNote(mods, value);
-                            break;
-                        case FieldName.KEYWORDS:
-                            addKeyWords(mods, value);
-                            break;
-                        case FieldName.VOLUME:
-                            addDetail(FieldName.VOLUME, value, partDefinition);
-                            break;
-                        case FieldName.ISSUE:
-                            addDetail(FieldName.ISSUE, value, partDefinition);
-                            break;
-                        case FieldName.PAGES:
-                            addPages(partDefinition, value);
-                            break;
-                        case FieldName.URI:
-                            addIdentifier(FieldName.URI, value, mods);
-                            break;
-                        case FieldName.ISBN:
-                            addIdentifier(FieldName.ISBN, value, mods);
-                            break;
-                        case FieldName.ISSN:
-                            addIdentifier(FieldName.ISSN, value, mods);
-                            break;
-                        case FieldName.DOI:
-                            addIdentifier(FieldName.DOI, value, mods);
-                            break;
-                        case FieldName.PMID:
-                            addIdentifier(FieldName.PMID, value, mods);
-                            break;
-                        case FieldName.JOURNAL:
-                            addJournal(value, relatedItem);
-                            break;
-                        default:
-                            break;
+                    if (StandardField.AUTHOR.equals(key)) {
+                        handleAuthors(mods, value);
+                    } else if (new UnknownField("affiliation").equals(key)) {
+                        addAffiliation(mods, value);
+                    } else if (StandardField.ABSTRACT.equals(key)) {
+                        addAbstract(mods, value);
+                    } else if (StandardField.TITLE.equals(key)) {
+                        addTitle(mods, value);
+                    } else if (StandardField.LANGUAGE.equals(key)) {
+                        addLanguage(mods, value);
+                    } else if (StandardField.LOCATION.equals(key)) {
+                        addLocation(mods, value);
+                    } else if (StandardField.URL.equals(key)) {
+                        addUrl(mods, value);
+                    } else if (StandardField.NOTE.equals(key)) {
+                        addNote(mods, value);
+                    } else if (StandardField.KEYWORDS.equals(key)) {
+                        addKeyWords(mods, value);
+                    } else if (StandardField.VOLUME.equals(key)) {
+                        addDetail(StandardField.VOLUME, value, partDefinition);
+                    } else if (StandardField.ISSUE.equals(key)) {
+                        addDetail(StandardField.ISSUE, value, partDefinition);
+                    } else if (StandardField.PAGES.equals(key)) {
+                        addPages(partDefinition, value);
+                    } else if (StandardField.URI.equals(key)) {
+                        addIdentifier(StandardField.URI, value, mods);
+                    } else if (StandardField.ISBN.equals(key)) {
+                        addIdentifier(StandardField.ISBN, value, mods);
+                    } else if (StandardField.ISSN.equals(key)) {
+                        addIdentifier(StandardField.ISSN, value, mods);
+                    } else if (StandardField.DOI.equals(key)) {
+                        addIdentifier(StandardField.DOI, value, mods);
+                    } else if (StandardField.PMID.equals(key)) {
+                        addIdentifier(StandardField.PMID, value, mods);
+                    } else if (StandardField.JOURNAL.equals(key)) {
+                        addJournal(value, relatedItem);
                     }
 
                     addOriginInformation(key, value, originInfo);
@@ -344,12 +324,12 @@ class ModsExporter extends Exporter {
         }
     }
 
-    private void addIdentifier(String key, String value, ModsDefinition mods) {
-        if ("citekey".equals(key)) {
+    private void addIdentifier(Field field, String value, ModsDefinition mods) {
+        if (new UnknownField("citekey").equals(field)) {
             mods.setID(value);
         }
         IdentifierDefinition identifier = new IdentifierDefinition();
-        identifier.setType(key);
+        identifier.setType(field.getName());
         identifier.setValue(value);
         mods.getModsGroup().add(identifier);
     }
@@ -375,38 +355,38 @@ class ModsExporter extends Exporter {
         partDefinition.getDetailOrExtentOrDate().add(extent);
     }
 
-    private void addDetail(String detailName, String value, PartDefinition partDefinition) {
+    private void addDetail(Field field, String value, PartDefinition partDefinition) {
         DetailDefinition detail = new DetailDefinition();
         StringPlusLanguage detailType = new StringPlusLanguage();
         detailType.setValue(value);
-        detail.setType(detailName);
+        detail.setType(field.getName());
         JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "number"),
                 StringPlusLanguage.class, detailType);
         detail.getNumberOrCaptionOrTitle().add(element);
         partDefinition.getDetailOrExtentOrDate().add(detail);
     }
 
-    private void addOriginInformation(String key, String value, OriginInfoDefinition originInfo) {
-        if (FieldName.YEAR.equals(key)) {
+    private void addOriginInformation(Field field, String value, OriginInfoDefinition originInfo) {
+        if (StandardField.YEAR.equals(field)) {
             addDate("dateIssued", value, originInfo);
-        } else if ("created".equals(key)) {
+        } else if ("created".equals(field)) {
             addDate("dateCreated", value, originInfo);
-        } else if ("modified".equals(key)) {
+        } else if ("modified".equals(field)) {
             addDate("dateModified", value, originInfo);
-        } else if ("captured".equals(key)) {
+        } else if ("captured".equals(field)) {
             addDate("dateCaptured", value, originInfo);
-        } else if (FieldName.PUBLISHER.equals(key)) {
+        } else if (StandardField.PUBLISHER.equals(field)) {
             StringPlusLanguagePlusSupplied publisher = new StringPlusLanguagePlusSupplied();
             publisher.setValue(value);
             JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
                     new QName(MODS_NAMESPACE_URI, "publisher"), StringPlusLanguagePlusSupplied.class, publisher);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
-        } else if ("issuance".equals(key)) {
+        } else if ("issuance".equals(field)) {
             IssuanceDefinition issuance = IssuanceDefinition.fromValue(value);
             JAXBElement<IssuanceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "issuance"),
                     IssuanceDefinition.class, issuance);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
-        } else if ("address".equals(key)) {
+        } else if ("address".equals(field)) {
             PlaceDefinition placeDefinition = new PlaceDefinition();
             //There can be more than one place, so we split to get all places and add them
             String[] places = value.split(", ");
@@ -421,7 +401,7 @@ class ModsExporter extends Exporter {
             JAXBElement<PlaceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "place"),
                     PlaceDefinition.class, placeDefinition);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
-        } else if ("edition".equals(key)) {
+        } else if ("edition".equals(field)) {
             StringPlusLanguagePlusSupplied edition = new StringPlusLanguagePlusSupplied();
             edition.setValue(value);
             JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(

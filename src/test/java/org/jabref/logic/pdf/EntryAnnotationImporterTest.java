@@ -9,7 +9,7 @@ import java.util.Map;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
 
@@ -34,7 +34,7 @@ public class EntryAnnotationImporterTest {
     @Test
     public void readEntryExampleThesis() {
         //given
-        entry.setField(FieldName.FILE, ":thesis-example.pdf:PDF");
+        entry.setField(StandardField.FILE, ":thesis-example.pdf:PDF");
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
         //when

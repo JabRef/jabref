@@ -8,7 +8,7 @@ import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class FieldFormatterCleanupTest {
 
     @Test
     public void testInternalAllField() throws Exception {
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(FieldName.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
         assertEquals(fieldMap.get("title").toUpperCase(), entry.getField("title").get());
@@ -52,7 +52,7 @@ public class FieldFormatterCleanupTest {
 
     @Test
     public void testInternalAllTextFieldsField() throws Exception {
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
         assertEquals(fieldMap.get("title").toUpperCase(), entry.getField("title").get());
@@ -66,28 +66,28 @@ public class FieldFormatterCleanupTest {
 
     @Test
     public void testCleanupAllFieldsIgnoresKeyField() throws Exception {
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(FieldName.INTERNAL_ALL_FIELD, new UnicodeToLatexFormatter());
-        entry.setField(BibEntry.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UnicodeToLatexFormatter());
+        entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals("François-Marie Arouet", entry.getField(BibEntry.KEY_FIELD).get());
+        assertEquals("François-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 
     @Test
     public void testCleanupAllTextFieldsIgnoresKeyField() throws Exception {
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter());
-        entry.setField(BibEntry.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter());
+        entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals("François-Marie Arouet", entry.getField(BibEntry.KEY_FIELD).get());
+        assertEquals("François-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 
     @Test
     public void testCleanupKeyFieldCleansUpKeyField() throws Exception {
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(BibEntry.KEY_FIELD, new UnicodeToLatexFormatter());
-        entry.setField(BibEntry.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.KEY_FIELD, new UnicodeToLatexFormatter());
+        entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
 
-        assertEquals("Fran{\\c{c}}ois-Marie Arouet", entry.getField(BibEntry.KEY_FIELD).get());
+        assertEquals("Fran{\\c{c}}ois-Marie Arouet", entry.getField(InternalField.KEY_FIELD).get());
     }
 }

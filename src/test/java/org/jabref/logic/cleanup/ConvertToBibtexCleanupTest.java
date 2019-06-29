@@ -3,7 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,9 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.empty(), entry.getField(FieldName.DATE));
-        assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
-        assertEquals(Optional.of("#jan#"), entry.getField(FieldName.MONTH));
+        assertEquals(Optional.empty(), entry.getField(StandardField.DATE));
+        assertEquals(Optional.of("2011"), entry.getField(StandardField.YEAR));
+        assertEquals(Optional.of("#jan#"), entry.getField(StandardField.MONTH));
     }
 
     @Test
@@ -38,8 +38,8 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
-        assertEquals(Optional.of("2012"), entry.getField(FieldName.DATE));
+        assertEquals(Optional.of("2011"), entry.getField(StandardField.YEAR));
+        assertEquals(Optional.of("2012"), entry.getField(StandardField.DATE));
     }
 
     @Test
@@ -48,17 +48,17 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.empty(), entry.getField(FieldName.JOURNALTITLE));
-        assertEquals(Optional.of("Best of JabRef"), entry.getField(FieldName.JOURNAL));
+        assertEquals(Optional.empty(), entry.getField(StandardField.JOURNALTITLE));
+        assertEquals(Optional.of("Best of JabRef"), entry.getField(StandardField.JOURNAL));
     }
 
     @Test
     public void cleanUpDoesntMoveFileField() {
         String fileField = ":Ambriola2006 - On the Systematic Analysis of Natural Language Requirements with CIRCE.pdf:PDF";
-        BibEntry entry = new BibEntry().withField(FieldName.FILE, fileField);
+        BibEntry entry = new BibEntry().withField(StandardField.FILE, fileField);
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.of(fileField), entry.getField(FieldName.FILE));
+        assertEquals(Optional.of(fileField), entry.getField(StandardField.FILE));
     }
 }

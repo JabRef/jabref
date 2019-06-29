@@ -34,23 +34,24 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
 
-    private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
+    private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
 
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
-    private Collection<String> fields = new ArrayList<>();
+    private Collection<Field> fields = new ArrayList<>();
     private final DialogService dialogService;
     private GridPane gridPane;
 
@@ -87,19 +88,19 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         List<Label> labels = new ArrayList<>();
         boolean isFirstField = true;
-        for (String fieldName : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, dialogService,
+        for (Field field : fields) {
+            FieldEditorFX fieldEditor = FieldEditors.getForField(field, Globals.TASK_EXECUTOR, dialogService,
                     Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
                     Globals.prefs, databaseContext, entry.getType(), suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
-            editors.put(fieldName, fieldEditor);
+            editors.put(field, fieldEditor);
             if (isFirstField) {
                 activeField = fieldEditor;
                 isFirstField = false;
             }
 
-            labels.add(new FieldNameLabel(fieldName));
+            labels.add(new FieldNameLabel(field));
         }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
@@ -136,7 +137,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                                    .sum();
 
         List<RowConstraints> constraints = new ArrayList<>();
-        for (String field : fields) {
+        for (Field field : fields) {
             RowConstraints rowExpand = new RowConstraints();
             rowExpand.setVgrow(Priority.ALWAYS);
             rowExpand.setValignment(VPos.TOP);
@@ -160,8 +161,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    private String getPrompt(String field) {
-
+    private String getPrompt(Field field) {
         Set<FieldProperty> fieldProperties = InternalBibtexFields.getFieldProperties(field);
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
@@ -171,13 +171,12 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             return "YYYY-MM-DD";
         }
 
-        switch (field) {
-            case FieldName.YEAR:
-                return "YYYY";
-            case FieldName.MONTH:
-                return "MM or #mmm#";
-            case FieldName.URL:
-                return "https://";
+        if (StandardField.YEAR.equals(field)) {
+            return "YYYY";
+        } else if (StandardField.MONTH.equals(field)) {
+            return "MM or #mmm#";
+        } else if (StandardField.URL.equals(field)) {
+            return "https://";
         }
 
         return "";
@@ -186,7 +185,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     /**
      * Focuses the given field.
      */
-    public void requestFocus(String fieldName) {
+    public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
             activeField.focus();
@@ -208,11 +207,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Optional<String> selectedFieldName = editors.entrySet()
-                                                    .stream()
-                                                    .filter(editor -> editor.getValue().childIsFocused())
-                                                    .map(Map.Entry::getKey)
-                                                    .findFirst();
+        Optional<Field> selectedFieldName = editors.entrySet()
+                                                   .stream()
+                                                   .filter(editor -> editor.getValue().childIsFocused())
+                                                   .map(Map.Entry::getKey)
+                                                   .findFirst();
 
         initPanel();
         setupPanel(entry, isCompressed, suggestionProviders, undoManager);
@@ -223,9 +222,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         });
     }
 
-    protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType);
 
-    public Collection<String> getShownFields() {
+    public Collection<Field> getShownFields() {
         return fields;
     }
 

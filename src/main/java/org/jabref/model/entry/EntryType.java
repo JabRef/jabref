@@ -8,6 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+
 /**
  * Interface for all EntryTypes.
  */
@@ -24,7 +28,7 @@ public interface EntryType extends Comparable<EntryType> {
      *
      * @return a List of optional field name Strings
      */
-    Set<String> getOptionalFields();
+    Set<Field> getOptionalFields();
 
     /**
      * Returns all required field names.
@@ -43,9 +47,9 @@ public interface EntryType extends Comparable<EntryType> {
      */
     default Set<String> getRequiredFieldsFlat() {
         List<String> requiredFlat = getRequiredFields().stream()
-                .map(field -> field.split(FieldName.FIELD_SEPARATOR))
-                .flatMap(Arrays::stream)
-                .collect(Collectors.toList());
+                                                       .map(field -> field.split(FieldFactory.FIELD_SEPARATOR))
+                                                       .flatMap(Arrays::stream)
+                                                       .collect(Collectors.toList());
 
         return Collections.unmodifiableSet(new LinkedHashSet<>(requiredFlat));
     }
@@ -56,8 +60,8 @@ public interface EntryType extends Comparable<EntryType> {
      *
      * @return a List of all defined field name Strings
      */
-    default Set<String> getAllFields() {
-        List<String> allFields = Stream.concat(getRequiredFieldsFlat().stream(), getOptionalFields().stream())
+    default Set<Field> getAllFields() {
+        List<Field> allFields = Stream.concat(getRequiredFieldsFlat().stream(), getOptionalFields().stream())
                 .collect(Collectors.toList());
 
         return Collections.unmodifiableSet(new LinkedHashSet<>(allFields));
@@ -66,25 +70,25 @@ public interface EntryType extends Comparable<EntryType> {
     /**
      * TODO: move inside GUI
      */
-    Set<String> getPrimaryOptionalFields();
+    Set<Field> getPrimaryOptionalFields();
 
     /**
      * TODO: move inside GUI
      */
-    Set<String> getSecondaryOptionalFields();
+    Set<Field> getSecondaryOptionalFields();
 
-    default Set<String> getDeprecatedFields() {
-        Set<String> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-        deprecatedFields.add(FieldName.YEAR);
-        deprecatedFields.add(FieldName.MONTH);
+    default Set<Field> getDeprecatedFields() {
+        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+        deprecatedFields.add(StandardField.YEAR);
+        deprecatedFields.add(StandardField.MONTH);
 
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
 
         return deprecatedFields;
     }
 
-    default Set<String> getSecondaryOptionalNotDeprecatedFields() {
-        Set<String> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
+    default Set<Field> getSecondaryOptionalNotDeprecatedFields() {
+        Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
         return optionalFieldsNotPrimaryOrDeprecated;
     }

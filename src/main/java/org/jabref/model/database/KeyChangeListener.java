@@ -9,6 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -34,7 +35,7 @@ public class KeyChangeListener {
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (event.getFieldName().equals(BibEntry.KEY_FIELD)) {
+        if (event.getField().equals(InternalField.KEY_FIELD)) {
             String newKey = event.getNewValue();
             String oldKey = event.getOldValue();
             updateEntryLinks(newKey, oldKey);

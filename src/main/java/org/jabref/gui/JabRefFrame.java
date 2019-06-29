@@ -121,8 +121,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
@@ -1085,7 +1085,7 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistFile(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return selectedEntry.getField(FieldName.FILE).isPresent();
+            return selectedEntry.getField(StandardField.FILE).isPresent();
         }
         return false;
     }
@@ -1100,7 +1100,7 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return (selectedEntry.getField(FieldName.URL).isPresent() || selectedEntry.getField(FieldName.DOI).isPresent());
+            return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
         }
         return false;
     }

@@ -24,7 +24,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -89,17 +89,17 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
         String entryUrl = DESCRIPTION_URL_PREFIX + identifier;
         String descriptiveHtml = getHtml(entryUrl);
-        entry.setField(FieldName.ABSTRACT, getAbstract(descriptiveHtml));
+        entry.setField(StandardField.ABSTRACT, getAbstract(descriptiveHtml));
         String dateStringAsInHtml = getRequiredValueBetween("<b>Date: </b>", "<p />", descriptiveHtml);
-        entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
+        entry.setField(StandardField.DATE, getLatestDate(dateStringAsInHtml));
 
         if (isFromOrAfterYear2000(entry)) {
             String version = getVersion(identifier, descriptiveHtml);
-            entry.setField(FieldName.VERSION, version);
-            entry.setField(FieldName.URL, entryUrl + "/" + version);
+            entry.setField(StandardField.VERSION, version);
+            entry.setField(StandardField.URL, entryUrl + "/" + version);
         } else {
             // No version information for entries before year 2000
-            entry.setField(FieldName.URL, entryUrl);
+            entry.setField(StandardField.URL, entryUrl);
         }
     }
 
@@ -190,7 +190,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {
-        Optional<String> yearField = entry.getField(FieldName.YEAR);
+        Optional<String> yearField = entry.getField(StandardField.YEAR);
         if (yearField.isPresent()) {
             return Integer.parseInt(yearField.get()) > 2000;
         }

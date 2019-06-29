@@ -9,7 +9,8 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -52,7 +53,7 @@ public class GroupTreeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
-        assertEquals(Optional.empty(), entry.getField(FieldName.GROUPS));
+        assertEquals(Optional.empty(), entry.getField(InternalField.GROUPS));
     }
 
     @Test
@@ -66,6 +67,6 @@ public class GroupTreeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
-        assertEquals(groupName, entry.getField(FieldName.KEYWORDS).get());
+        assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get());
     }
 }

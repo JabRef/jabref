@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -40,7 +40,7 @@ public class ScienceDirect implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isPresent()) {
             // Available in catalog?

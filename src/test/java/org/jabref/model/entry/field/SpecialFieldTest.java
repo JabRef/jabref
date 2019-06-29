@@ -1,4 +1,4 @@
-package org.jabref.model.entry.specialfields;
+package org.jabref.model.entry.field;
 
 import java.util.Optional;
 
@@ -13,12 +13,12 @@ public class SpecialFieldTest {
     @Test
     public void getSpecialFieldInstanceFromFieldNameValid() {
         assertEquals(Optional.of(SpecialField.RANKING),
-                SpecialField.getSpecialFieldInstanceFromFieldName("ranking"));
+                SpecialField.fromName("ranking"));
     }
 
     @Test
     public void getSpecialFieldInstanceFromFieldNameEmptyForInvalidField() {
-        assertEquals(Optional.empty(), SpecialField.getSpecialFieldInstanceFromFieldName("title"));
+        assertEquals(Optional.empty(), SpecialField.fromName("title"));
     }
 
     @Test

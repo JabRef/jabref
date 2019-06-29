@@ -9,13 +9,14 @@ import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class JournalInAbbreviationListChecker implements Checker {
 
-    private final String field;
+    private final Field field;
     private final JournalAbbreviationRepository abbreviationRepository;
 
-    public JournalInAbbreviationListChecker(String field, JournalAbbreviationRepository abbreviationRepository) {
+    public JournalInAbbreviationListChecker(Field field, JournalAbbreviationRepository abbreviationRepository) {
         this.field = Objects.requireNonNull(field);
         this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
     }

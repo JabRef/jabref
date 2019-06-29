@@ -9,8 +9,9 @@ import java.util.Locale;
 import javax.swing.JOptionPane;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.KeywordGroup;
 
@@ -35,7 +36,7 @@ public class WarnAssignmentSideEffects {
             if (group instanceof KeywordGroup) {
                 KeywordGroup keywordGroup = (KeywordGroup) group;
                 String field = keywordGroup.getSearchField().toLowerCase(Locale.ROOT);
-                if (FieldName.KEYWORDS.equals(field) || FieldName.GROUPS.equals(field)) {
+                if (StandardField.KEYWORDS.equals(field) || InternalField.GROUPS.equals(field)) {
                     continue; // this is not undesired
                 }
                 for (String fieldName : InternalBibtexFields.getAllPublicFieldNames()) {

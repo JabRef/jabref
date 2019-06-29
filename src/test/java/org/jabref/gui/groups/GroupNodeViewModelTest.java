@@ -11,7 +11,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -162,7 +162,7 @@ public class GroupNodeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
-        assertEquals(groupName, entry.getField(FieldName.GROUPS).get());
+        assertEquals(groupName, entry.getField(InternalField.GROUPS).get());
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {

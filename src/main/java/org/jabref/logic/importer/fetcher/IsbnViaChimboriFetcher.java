@@ -85,7 +85,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
     public void doPostCleanup(BibEntry entry) {
         // We MUST NOT clean the URL. this is the deal with @manastungare - see https://github.com/JabRef/jabref/issues/684#issuecomment-266541507
         // DO NOT add following code:
-        // new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+        // new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
 
 }

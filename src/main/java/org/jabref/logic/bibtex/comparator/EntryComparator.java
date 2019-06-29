@@ -8,6 +8,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.InternalField;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
@@ -71,8 +72,7 @@ public class EntryComparator implements Comparator<BibEntry> {
             if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase(Locale.ROOT);
             }
-
-        } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
+        } else if (sortField.equals(InternalField.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType();
             f2 = e2.getType();

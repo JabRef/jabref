@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -144,7 +145,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibEntry entry) {
             // special case for searching for entrytype=phdthesis
-            if (fieldPattern.matcher(BibEntry.TYPE_HEADER).matches()) {
+            if (fieldPattern.matcher(InternalField.TYPE_HEADER).matches()) {
                 return matchFieldValue(entry.getType());
             }
 

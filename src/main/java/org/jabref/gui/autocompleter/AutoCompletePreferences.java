@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.entry.field.Field;
 
 public class AutoCompletePreferences {
 
@@ -13,10 +14,10 @@ public class AutoCompletePreferences {
     private AutoCompleteFirstNameMode firstNameMode;
     private boolean onlyCompleteLastFirst;
     private boolean onlyCompleteFirstLast;
-    private List<String> completeFields;
+    private List<Field> completeFields;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
         this.onlyCompleteLastFirst = onlyCompleteLastFirst;
@@ -64,11 +65,11 @@ public class AutoCompletePreferences {
      * Returns the list of fields for which autocomplete is enabled
      * @return List of field names
      */
-    public List<String> getCompleteFields() {
+    public List<Field> getCompleteFields() {
         return completeFields;
     }
 
-    public void setCompleteFields(List<String> completeFields) {
+    public void setCompleteFields(List<Field> completeFields) {
         this.completeFields = completeFields;
     }
 

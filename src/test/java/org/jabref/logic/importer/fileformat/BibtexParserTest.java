@@ -29,7 +29,8 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -326,7 +327,7 @@ class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(InternalField.KEY_FIELD, "test")
                                                                   .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
@@ -338,7 +339,7 @@ class BibtexParserTest {
                 + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
         String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
         BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE)
-                .withField(BibEntry.KEY_FIELD, "test")
+                .withField(InternalField.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
 
@@ -1119,7 +1120,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("ups  \tsala"), parsedEntry.getField(FieldName.ABSTRACT));
+        assertEquals(Optional.of("ups  \tsala"), parsedEntry.getField(StandardField.ABSTRACT));
     }
 
     @Test
@@ -1129,7 +1130,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), parsedEntry.getField(FieldName.ABSTRACT));
+        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), parsedEntry.getField(StandardField.ABSTRACT));
     }
 
     @Test

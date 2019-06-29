@@ -15,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.InternalField;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
     public RequiredFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
@@ -31,7 +32,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
         fields.addAll(entryType.getRequiredFieldsFlat());
 
         // Add the edit field for Bibtex-key.
-        fields.add(BibEntry.KEY_FIELD);
+        fields.add(InternalField.KEY_FIELD);
 
         return fields;
     }

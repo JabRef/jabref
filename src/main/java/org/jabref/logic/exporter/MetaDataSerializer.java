@@ -47,7 +47,7 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
 
         for (ContentSelector selector: metaData.getContentSelectorList()) {
-                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
+            stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField(), selector.getValues());
 
         }
 

@@ -9,7 +9,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
@@ -22,10 +22,10 @@ public class NoBibtexFieldChecker implements Checker {
                                      .flatMap(type -> type.getAllFields().stream())
                                      .filter(fieldName -> !allBibtexFields.contains(fieldName))
                                      // these fields are displayed by JabRef as default
-                                     .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
-                                     .filter(fieldName -> !fieldName.equals(FieldName.COMMENT))
-                                     .filter(fieldName -> !fieldName.equals(FieldName.DOI))
-                                     .filter(fieldName -> !fieldName.equals(FieldName.URL))
+                                     .filter(fieldName -> !fieldName.equals(StandardField.ABSTRACT))
+                                     .filter(fieldName -> !fieldName.equals(StandardField.COMMENT))
+                                     .filter(fieldName -> !fieldName.equals(StandardField.DOI))
+                                     .filter(fieldName -> !fieldName.equals(StandardField.URL))
                                      .sorted()
                                      .collect(Collectors.toList());
     }

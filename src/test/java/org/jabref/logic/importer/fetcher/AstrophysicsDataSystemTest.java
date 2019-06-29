@@ -9,7 +9,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -164,7 +164,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT));//Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT));//Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
@@ -182,7 +182,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 

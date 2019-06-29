@@ -15,8 +15,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.xmpbox.DateConverter;
@@ -45,7 +45,7 @@ public class DublinCoreExtractor {
     private void extractEditor() {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
-            bibEntry.setField(FieldName.EDITOR, String.join(" and ", contributors));
+            bibEntry.setField(StandardField.EDITOR, String.join(" and ", contributors));
         }
     }
 
@@ -58,7 +58,7 @@ public class DublinCoreExtractor {
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", creators));
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
         }
     }
 
@@ -86,12 +86,12 @@ public class DublinCoreExtractor {
                 // Ignored
             }
             if (calender != null) {
-                bibEntry.setField(FieldName.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
+                bibEntry.setField(StandardField.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
                 // not the 1st of January
                 if (!((calender.get(Calendar.MONTH) == 0) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
                     Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
                     if (month.isPresent()) {
-                        bibEntry.setField(FieldName.MONTH, month.get().getShortName());
+                        bibEntry.setField(StandardField.MONTH, month.get().getShortName());
                     }
                 }
             }
@@ -107,7 +107,7 @@ public class DublinCoreExtractor {
     private void extractAbstract() {
         String description = dcSchema.getDescription();
         if (!StringUtil.isNullOrEmpty(description)) {
-            bibEntry.setField(FieldName.ABSTRACT, description);
+            bibEntry.setField(StandardField.ABSTRACT, description);
         }
     }
 
@@ -120,7 +120,7 @@ public class DublinCoreExtractor {
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
         if (!StringUtil.isNullOrEmpty(identifier)) {
-            bibEntry.setField(FieldName.DOI, identifier);
+            bibEntry.setField(StandardField.DOI, identifier);
         }
     }
 
@@ -133,7 +133,7 @@ public class DublinCoreExtractor {
     private void extractPublisher() {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
-            bibEntry.setField(FieldName.PUBLISHER, String.join(" and ", publishers));
+            bibEntry.setField(StandardField.PUBLISHER, String.join(" and ", publishers));
         }
     }
 
@@ -227,7 +227,7 @@ public class DublinCoreExtractor {
     private void extractTitle() {
         String title = dcSchema.getTitle();
         if (!StringUtil.isNullOrEmpty(title)) {
-            bibEntry.setField(FieldName.TITLE, title);
+            bibEntry.setField(StandardField.TITLE, title);
         }
     }
 
@@ -311,7 +311,7 @@ public class DublinCoreExtractor {
      * Bibtex-Fields used: year, month, Field: 'dc:date'
      */
     private void fillDate() {
-        bibEntry.getFieldOrAlias(FieldName.DATE)
+        bibEntry.getFieldOrAlias(StandardField.DATE)
                 .ifPresent(publicationDate -> dcSchema.addUnqualifiedSequenceValue("date", publicationDate));
     }
 
@@ -386,21 +386,21 @@ public class DublinCoreExtractor {
                 continue;
             }
 
-            if (FieldName.EDITOR.equals(field.getKey())) {
+            if (StandardField.EDITOR.equals(field.getKey())) {
                 this.fillContributor(field.getValue());
-            } else if (FieldName.AUTHOR.equals(field.getKey())) {
+            } else if (StandardField.AUTHOR.equals(field.getKey())) {
                 this.fillCreator(field.getValue());
-            } else if (FieldName.YEAR.equals(field.getKey())) {
+            } else if (StandardField.YEAR.equals(field.getKey())) {
                 this.fillDate();
-            } else if (FieldName.ABSTRACT.equals(field.getKey())) {
+            } else if (StandardField.ABSTRACT.equals(field.getKey())) {
                 this.fillDescription(field.getValue());
-            } else if (FieldName.DOI.equals(field.getKey())) {
+            } else if (StandardField.DOI.equals(field.getKey())) {
                 this.fillIdentifier(field.getValue());
-            } else if (FieldName.PUBLISHER.equals(field.getKey())) {
+            } else if (StandardField.PUBLISHER.equals(field.getKey())) {
                 this.fillPublisher(field.getValue());
-            } else if (FieldName.KEYWORDS.equals(field.getKey())) {
+            } else if (StandardField.KEYWORDS.equals(field.getKey())) {
                 this.fillKeywords(field.getValue());
-            } else if (FieldName.TITLE.equals(field.getKey())) {
+            } else if (StandardField.TITLE.equals(field.getKey())) {
                 this.fillTitle(field.getValue());
             } else {
                 this.fillCustomField(field.getKey(), field.getValue());

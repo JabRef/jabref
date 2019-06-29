@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +46,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearchFullEntryLastCharMissing() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, "systematic revie");
+        entry.setField(StandardField.TITLE, "systematic revie");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
         assertFalse(searchQuery.isMatch(entry));
     }
@@ -54,7 +54,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearchFullEntry() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, "systematic review");
+        entry.setField(StandardField.TITLE, "systematic review");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
@@ -62,7 +62,7 @@ public class SearchQueryTest {
     @Test
     public void testSearchingForOpenBraketInBooktitle() {
         BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
-        e.setField(FieldName.BOOKTITLE, "Super Conference (SC)");
+        e.setField(StandardField.BOOKTITLE, "Super Conference (SC)");
 
         SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
         assertTrue(searchQuery.isMatch(e));

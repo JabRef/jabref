@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
 
 public class UpdateField {
 
@@ -92,7 +92,7 @@ public class UpdateField {
         String defaultOwner = prefs.getDefaultOwner();
         String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
         String timeStampField = prefs.getTimeStampField();
-        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
+        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(InternalField.OWNER)));
         boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -108,7 +108,7 @@ public class UpdateField {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(FieldName.OWNER, owner);
+            entry.setField(InternalField.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -139,7 +139,7 @@ public class UpdateField {
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(FieldName.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalField.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }

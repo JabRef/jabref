@@ -4,7 +4,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -26,28 +27,28 @@ public class DocumentInformationExtractor {
     private void extractAuthor() {
         String s = documentInformation.getAuthor();
         if (s != null) {
-            bibEntry.setField(FieldName.AUTHOR, s);
+            bibEntry.setField(StandardField.AUTHOR, s);
         }
     }
 
     private void extractTitle() {
         String s = documentInformation.getTitle();
         if (s != null) {
-            bibEntry.setField(FieldName.TITLE, s);
+            bibEntry.setField(StandardField.TITLE, s);
         }
     }
 
     private void extractKeywords() {
         String s = documentInformation.getKeywords();
         if (s != null) {
-            bibEntry.setField(FieldName.KEYWORDS, s);
+            bibEntry.setField(StandardField.KEYWORDS, s);
         }
     }
 
     private void extractSubject() {
         String s = documentInformation.getSubject();
         if (s != null) {
-            bibEntry.setField(FieldName.ABSTRACT, s);
+            bibEntry.setField(StandardField.ABSTRACT, s);
         }
     }
 
@@ -58,7 +59,7 @@ public class DocumentInformationExtractor {
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
-                if (BibEntry.TYPE_HEADER.equals(key)) {
+                if (InternalField.TYPE_HEADER.equals(key)) {
                     bibEntry.setType(value);
                 } else {
                     bibEntry.setField(key, value);

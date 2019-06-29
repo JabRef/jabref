@@ -14,7 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,8 +234,8 @@ public class RepecNepImporter extends Importer {
      */
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
-        this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
-        be.setField(FieldName.TITLE, readMultipleLines(in));
+        this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1);
+        be.setField(StandardField.TITLE, readMultipleLines(in));
     }
 
     /**
@@ -264,7 +264,7 @@ public class RepecNepImporter extends Importer {
                                         .indexOf(')') : this.lastLine.length())
                                 .trim());
             } else {
-                author = this.lastLine.substring(0, this.lastLine.length()).trim();
+                author = this.lastLine.trim();
                 institutionDone = true;
             }
 
@@ -285,10 +285,10 @@ public class RepecNepImporter extends Importer {
         }
 
         if (!authors.isEmpty()) {
-            be.setField(FieldName.AUTHOR, String.join(" and ", authors));
+            be.setField(StandardField.AUTHOR, String.join(" and ", authors));
         }
         if (institutions.length() > 0) {
-            be.setField(FieldName.INSTITUTION, institutions.toString());
+            be.setField(StandardField.INSTITUTION, institutions.toString());
         }
     }
 
@@ -302,7 +302,7 @@ public class RepecNepImporter extends Importer {
         String theabstract = readMultipleLines(in);
 
         if (!"".equals(theabstract)) {
-            be.setField(FieldName.ABSTRACT, theabstract);
+            be.setField(StandardField.ABSTRACT, theabstract);
         }
     }
 
@@ -326,7 +326,7 @@ public class RepecNepImporter extends Importer {
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = "".equals(this.lastLine) ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
             // skip keyword
-            this.lastLine = "".equals(this.lastLine) ? "" : this.lastLine.substring(this.lastLine.indexOf(':') + 1, this.lastLine.length()).trim();
+            this.lastLine = "".equals(this.lastLine) ? "" : this.lastLine.substring(this.lastLine.indexOf(':') + 1).trim();
 
             // parse keywords field
             if ("Keywords".equals(keyword)) {
@@ -351,7 +351,7 @@ public class RepecNepImporter extends Importer {
                     content = this.lastLine;
                     readLine(in);
                 }
-                be.setField(FieldName.URL, content);
+                be.setField(StandardField.URL, content);
 
                 // authors field
             } else if (keyword.startsWith("By")) {

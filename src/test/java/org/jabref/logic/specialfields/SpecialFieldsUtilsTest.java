@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
@@ -83,8 +83,8 @@ public class SpecialFieldsUtilsTest {
         SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
         // Remove it
         List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
-        assertEquals(Arrays.asList(new FieldChange(entry, specialField.getFieldName(), specialFieldKeyword.get(), null),
-                new FieldChange(entry, FieldName.KEYWORDS, specialFieldKeyword.get(), null)), changes);
+        assertEquals(Arrays.asList(new FieldChange(entry, specialField.getName(), specialFieldKeyword.get(), null),
+                new FieldChange(entry, StandardField.KEYWORDS, specialFieldKeyword.get(), null)), changes);
         KeywordList remainingKeywords = entry.getKeywords(',');
         assertFalse(remainingKeywords.contains(specialFieldKeyword));
     }

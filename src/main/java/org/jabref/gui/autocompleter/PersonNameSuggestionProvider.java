@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
@@ -16,14 +17,14 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
  */
 public class PersonNameSuggestionProvider extends SuggestionProvider<Author> implements AutoCompleteSuggestionProvider<Author> {
 
-    private final List<String> fieldNames;
+    private final List<Field> fieldNames;
     private final Comparator<Author> authorComparator = Comparator.comparing(Author::getNameForAlphabetization);
 
-    PersonNameSuggestionProvider(String fieldName) {
+    PersonNameSuggestionProvider(Field fieldName) {
         this(Collections.singletonList(Objects.requireNonNull(fieldName)));
     }
 
-    public PersonNameSuggestionProvider(List<String> fieldNames) {
+    public PersonNameSuggestionProvider(List<Field> fieldNames) {
         super();
 
         this.fieldNames = Objects.requireNonNull(fieldNames);
@@ -36,7 +37,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> imp
             return;
         }
 
-        for (String fieldName : fieldNames) {
+        for (Field fieldName : fieldNames) {
             entry.getField(fieldName).ifPresent(fieldValue ->  {
                 AuthorList authorList = AuthorList.parse(fieldValue);
                 for (Author author : authorList.getAuthors()) {

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 /**
@@ -13,10 +14,10 @@ import org.jabref.model.util.OptionalUtil;
  */
 public class MoveFieldCleanup implements CleanupJob {
 
-    private String sourceField;
-    private String targetField;
+    private Field sourceField;
+    private Field targetField;
 
-    public MoveFieldCleanup(String sourceField, String targetField) {
+    public MoveFieldCleanup(Field sourceField, Field targetField) {
         this.sourceField = sourceField;
         this.targetField = targetField;
     }

@@ -23,7 +23,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
 
@@ -51,9 +51,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        entry.getLatexFreeField(FieldName.TITLE).ifPresent(title -> uriBuilder.addParameter("query.title", title));
-        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
-        entry.getLatexFreeField(FieldName.YEAR).ifPresent(year ->
+        entry.getLatexFreeField(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.title", title));
+        entry.getLatexFreeField(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
+        entry.getLatexFreeField(StandardField.YEAR).ifPresent(year ->
                 uriBuilder.addParameter("filter", "from-pub-date:" + year)
         );
         uriBuilder.addParameter("rows", "20"); // = API default
@@ -101,8 +101,8 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public void doPostCleanup(BibEntry entry) {
         // Sometimes the fetched entry returns the title also in the subtitle field; in this case only keep the title field
-        if (entry.getField(FieldName.TITLE).equals(entry.getField(FieldName.SUBTITLE))) {
-            new FieldFormatterCleanup(FieldName.SUBTITLE, new ClearFormatter()).cleanup(entry);
+        if (entry.getField(StandardField.TITLE).equals(entry.getField(StandardField.SUBTITLE))) {
+            new FieldFormatterCleanup(StandardField.SUBTITLE, new ClearFormatter()).cleanup(entry);
         }
     }
 
@@ -110,24 +110,24 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         try {
             BibEntry entry = new BibEntry();
             entry.setType(convertType(item.getString("type")));
-            entry.setField(FieldName.TITLE,
+            entry.setField(StandardField.TITLE,
                     Optional.ofNullable(item.optJSONArray("title"))
                             .map(array -> array.optString(0)).orElse(""));
-            entry.setField(FieldName.SUBTITLE,
+            entry.setField(StandardField.SUBTITLE,
                     Optional.ofNullable(item.optJSONArray("subtitle"))
                             .map(array -> array.optString(0)).orElse(""));
-            entry.setField(FieldName.AUTHOR, toAuthors(item.optJSONArray("author")));
-            entry.setField(FieldName.YEAR,
+            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
+            entry.setField(StandardField.YEAR,
                     Optional.ofNullable(item.optJSONObject("published-print"))
                             .map(array -> array.optJSONArray("date-parts"))
                             .map(array -> array.optJSONArray(0))
                             .map(array -> array.optInt(0))
                             .map(year -> Integer.toString(year)).orElse("")
             );
-            entry.setField(FieldName.DOI, item.getString("DOI"));
-            entry.setField(FieldName.PAGES, item.optString("page"));
-            entry.setField(FieldName.VOLUME, item.optString("volume"));
-            entry.setField(FieldName.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
+            entry.setField(StandardField.DOI, item.getString("DOI"));
+            entry.setField(StandardField.PAGES, item.optString("page"));
+            entry.setField(StandardField.VOLUME, item.optString("volume"));
+            entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("CrossRef API JSON format has changed", exception);
@@ -165,13 +165,13 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException {
 
-        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getLatexFreeField(FieldName.TITLE).orElse(""));
+        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getLatexFreeField(StandardField.TITLE).orElse(""));
         final StringSimilarity stringSimilarity = new StringSimilarity();
 
         for (BibEntry fetchedEntry : fetchedEntries) {
             // currently only title-based comparison
             // title
-            Optional<String> dataTitle = fetchedEntry.getField(FieldName.TITLE);
+            Optional<String> dataTitle = fetchedEntry.getField(StandardField.TITLE);
 
             if (OptionalUtil.isPresentAnd(dataTitle, title -> stringSimilarity.isSimilar(entryTitle, title))) {
                 return fetchedEntry.getDOI();
@@ -179,7 +179,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
             // subtitle
             // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
-            Optional<String> dataSubtitle = fetchedEntry.getField(FieldName.SUBTITLE);
+            Optional<String> dataSubtitle = fetchedEntry.getField(StandardField.SUBTITLE);
             Optional<String> dataWithSubTitle = OptionalUtil.combine(dataTitle, dataSubtitle, (title, subtitle) -> title + " " + subtitle);
             if (OptionalUtil.isPresentAnd(dataWithSubTitle, titleWithSubtitle -> stringSimilarity.isSimilar(entryTitle, titleWithSubtitle))) {
                 return fetchedEntry.getDOI();

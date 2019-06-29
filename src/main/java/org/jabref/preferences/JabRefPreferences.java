@@ -97,12 +97,14 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
@@ -522,11 +524,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
 
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
-        defaults.put(EXPORT_PRIMARY_SORT_FIELD, BibEntry.KEY_FIELD);
+        defaults.put(EXPORT_PRIMARY_SORT_FIELD, InternalField.KEY_FIELD);
         defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR);
+        defaults.put(EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR);
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_TERTIARY_SORT_FIELD, FieldName.TITLE);
+        defaults.put(EXPORT_TERTIARY_SORT_FIELD, StandardField.TITLE);
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
         defaults.put(NEWLINE, System.lineSeparator());
@@ -585,7 +587,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
+        defaults.put(GROUPS_DEFAULT_FIELD, StandardField.KEYWORDS);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
@@ -663,7 +665,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
-        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL);
+        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL);
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
@@ -673,7 +675,7 @@ public class JabRefPreferences implements PreferencesService {
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
-        defaults.put(TIME_STAMP_FIELD, FieldName.TIMESTAMP);
+        defaults.put(TIME_STAMP_FIELD, InternalField.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
@@ -970,8 +972,8 @@ public class JabRefPreferences implements PreferencesService {
         prefs.put(CUSTOM_TAB_FIELDS + defNumber, fields);
     }
 
-    public List<String> getCustomTabFieldNames() {
-        List<String> customFields = new ArrayList<>();
+    private List<Field> getCustomTabFieldNames() {
+        List<Field> customFields = new ArrayList<>();
 
         int defNumber = 0;
         while (true) {
@@ -982,7 +984,7 @@ public class JabRefPreferences implements PreferencesService {
                 break;
             }
 
-            customFields.addAll(Arrays.asList(fields.split(";")));
+            customFields.addAll(Arrays.stream(fields.split(";")).map(FieldFactory::parseField).collect(Collectors.toList()));
             defNumber++;
         }
         return customFields;
@@ -995,11 +997,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
 
         // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT);
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", StandardField.ABSTRACT);
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Comments Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.COMMENT);
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", StandardField.COMMENT);
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
@@ -1432,8 +1434,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        Map<String, String> fieldDirectories = Stream.of(FieldName.FILE, FieldName.PDF, FieldName.PS)
-                                                     .collect(Collectors.toMap(field -> field, field -> get(field + FilePreferences.DIR_SUFFIX, "")));
+        Map<Field, String> fieldDirectories = Stream.of(StandardField.FILE, StandardField.PDF, StandardField.PS)
+                                                    .collect(Collectors.toMap(field -> field, field -> get(field.getName() + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
                                    getUser(),
                                    fieldDirectories,
@@ -1450,12 +1452,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
-        return new LatexFieldFormatterPreferences(getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
-                                                  getStringList(DO_NOT_RESOLVE_STRINGS_FOR), getFieldContentParserPreferences());
+        return new LatexFieldFormatterPreferences(
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getFieldContentParserPreferences());
     }
 
     public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS));
+        return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
 
     @Override
@@ -1577,7 +1581,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                                       Collections.singletonList(get(FieldName.FILE + FilePreferences.DIR_SUFFIX)),
+                Collections.singletonList(get(StandardField.FILE + FilePreferences.DIR_SUFFIX)),
                                        fileDirForDatabase);
     }
 
@@ -1741,9 +1745,9 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
         putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
 
-        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field);
-        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field);
-        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field);
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field.getName());
     }
 
     private SaveOrderConfig loadTableSaveOrder() {
@@ -1752,7 +1756,7 @@ public class JabRefPreferences implements PreferencesService {
         List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING).collect(Collectors.toList());
 
         for (int i = 0; i < columns.size(); i++) {
-            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(columns.get(i), sortTypes.get(i)));
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(FieldFactory.parseField(columns.get(i)), sortTypes.get(i)));
         }
 
         return config;
@@ -1761,9 +1765,9 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public SaveOrderConfig loadExportSaveOrder() {
         return new SaveOrderConfig(getBoolean(EXPORT_IN_ORIGINAL_ORDER), getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                                   new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                                   new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                                   new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
     }
 
     @Override
@@ -1829,7 +1833,7 @@ public class JabRefPreferences implements PreferencesService {
                                            AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
                                            getBoolean(AUTOCOMPLETER_LAST_FIRST),
                                            getBoolean(AUTOCOMPLETER_FIRST_LAST),
-                                           getStringList(AUTOCOMPLETER_COMPLETE_FIELDS),
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                                            getJournalAbbreviationPreferences());
     }
 
@@ -1838,7 +1842,7 @@ public class JabRefPreferences implements PreferencesService {
         put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
         putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
         putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
     }
 
     public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {

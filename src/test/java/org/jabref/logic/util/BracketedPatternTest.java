@@ -5,7 +5,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ public class BracketedPatternTest {
     public void pureauthReturnsAuthorIfEditorIsPresent() {
         BibDatabase emptyDatabase = new BibDatabase();
         BracketedPattern pattern = new BracketedPattern("[pureauth]");
-        bibentry.setField(FieldName.EDITOR, "Editorlastname, Editorfirstname");
+        bibentry.setField(StandardField.EDITOR, "Editorlastname, Editorfirstname");
         assertEquals("Kitsune", pattern.expand(bibentry, emptyDatabase));
     }
 
@@ -78,7 +78,7 @@ public class BracketedPatternTest {
     public void pureauthReturnsEmptyStringIfAuthorIsAbsent() {
         BibDatabase emptyDatabase = new BibDatabase();
         BracketedPattern pattern = new BracketedPattern("[pureauth]");
-        bibentry.clearField(FieldName.AUTHOR);
+        bibentry.clearField(StandardField.AUTHOR);
         assertEquals("", pattern.expand(bibentry, emptyDatabase));
     }
 
@@ -86,8 +86,8 @@ public class BracketedPatternTest {
     public void pureauthReturnsEmptyStringIfAuthorIsAbsentAndEditorIsPresent() {
         BibDatabase emptyDatabase = new BibDatabase();
         BracketedPattern pattern = new BracketedPattern("[pureauth]");
-        bibentry.clearField(FieldName.AUTHOR);
-        bibentry.setField(FieldName.EDITOR, "Editorlastname, Editorfirstname");
+        bibentry.clearField(StandardField.AUTHOR);
+        bibentry.setField(StandardField.EDITOR, "Editorlastname, Editorfirstname");
         assertEquals("", pattern.expand(bibentry, emptyDatabase));
     }
 
@@ -209,7 +209,7 @@ public class BracketedPatternTest {
     @Test
     public void testResolvedFieldAndFormat() {
         BibEntry child = new BibEntry();
-        child.setField(FieldName.CROSSREF, "HipKro03");
+        child.setField(StandardField.CROSSREF, "HipKro03");
         database.insertEntry(child);
 
         Character separator = ';';
@@ -234,7 +234,7 @@ public class BracketedPatternTest {
     @Test
     public void testResolvedParentNotInDatabase() {
         BibEntry child = new BibEntry();
-        child.setField(FieldName.CROSSREF, "HipKro03");
+        child.setField(StandardField.CROSSREF, "HipKro03");
         database.removeEntry(dbentry);
         database.insertEntry(child);
 

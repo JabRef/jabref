@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.IEEEField;
+import org.jabref.model.entry.field.StandardField;
+
 /**
  * This class represents all supported IEEETran entry types.
  *
@@ -21,8 +25,8 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, FieldName.LANGUAGE,
-                    FieldName.HOWPUBLISHED, FieldName.ORGANIZATION, FieldName.ADDRESS, FieldName.NOTE, FieldName.URL);
+            addAllOptional(StandardField.AUTHOR, StandardField.MONTH, StandardField.YEAR, StandardField.TITLE, StandardField.LANGUAGE,
+                    StandardField.HOWPUBLISHED, StandardField.ORGANIZATION, StandardField.ADDRESS, StandardField.NOTE, StandardField.URL);
         }
 
         @Override
@@ -37,10 +41,10 @@ public class IEEETranEntryTypes {
     public static final EntryType IEEETRANBSTCTL = new BibtexEntryType() {
 
         {
-            addAllOptional(FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_FORCED_ETAL,
-                    FieldName.CTLUSE_URL, FieldName.CTLMAX_NAMES_FORCED_ETAL, FieldName.CTLNAMES_SHOW_ETAL,
-                    FieldName.CTLUSE_ALT_SPACING, FieldName.CTLALT_STRETCH_FACTOR, FieldName.CTLDASH_REPEATED_NAMES,
-                    FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
+            addAllOptional(IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_FORCED_ETAL,
+                    IEEEField.CTLUSE_URL, IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL,
+                    IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLALT_STRETCH_FACTOR, IEEEField.CTLDASH_REPEATED_NAMES,
+                    IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX);
         }
 
         @Override
@@ -59,9 +63,9 @@ public class IEEETranEntryTypes {
     public static final EntryType PERIODICAL = new BibtexEntryType() {
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, FieldName.LANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER,
-                    FieldName.ORGANIZATION, FieldName.MONTH, FieldName.NOTE, FieldName.URL);
+            addAllRequired(StandardField.TITLE, StandardField.YEAR);
+            addAllOptional(StandardField.EDITOR, StandardField.LANGUAGE, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
+                    StandardField.ORGANIZATION, StandardField.MONTH, StandardField.NOTE, StandardField.URL);
         }
 
         @Override
@@ -79,11 +83,11 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired(FieldName.NATIONALITY, FieldName.NUMBER,
-                    FieldName.orFields(FieldName.YEAR, FieldName.YEARFILED));
-            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, FieldName.ASSIGNEE, FieldName.ADDRESS,
-                    FieldName.TYPE, FieldName.NUMBER, FieldName.DAY, FieldName.DAYFILED, FieldName.MONTH,
-                    FieldName.MONTHFILED, FieldName.NOTE, FieldName.URL);
+            addAllRequired(StandardField.NATIONALITY, StandardField.NUMBER,
+                    FieldFactory.orFields(StandardField.YEAR, StandardField.YEARFILED));
+            addAllOptional(StandardField.AUTHOR, StandardField.TITLE, StandardField.LANGUAGE, StandardField.ASSIGNEE, StandardField.ADDRESS,
+                    StandardField.TYPE, StandardField.NUMBER, StandardField.DAY, StandardField.DAYFILED, StandardField.MONTH,
+                    StandardField.MONTHFILED, StandardField.NOTE, StandardField.URL);
         }
 
         @Override
@@ -101,10 +105,10 @@ public class IEEETranEntryTypes {
     public static final EntryType STANDARD = new BibtexEntryType() {
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.ORGANIZATION, FieldName.INSTITUTION));
-            addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE,
-                    FieldName.NUMBER, FieldName.REVISION, FieldName.ADDRESS, FieldName.MONTH, FieldName.YEAR,
-                    FieldName.NOTE, FieldName.URL);
+            addAllRequired(StandardField.TITLE, FieldFactory.orFields(StandardField.ORGANIZATION, StandardField.INSTITUTION));
+            addAllOptional(StandardField.AUTHOR, StandardField.LANGUAGE, StandardField.HOWPUBLISHED, StandardField.TYPE,
+                    StandardField.NUMBER, StandardField.REVISION, StandardField.ADDRESS, StandardField.MONTH, StandardField.YEAR,
+                    StandardField.NOTE, StandardField.URL);
         }
 
         @Override

@@ -32,7 +32,7 @@ import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -152,8 +152,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         new FieldFormatterCleanup("status", new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup("copyright", new ClearFormatter()).cleanup(entry);
 
-        new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
     @Override

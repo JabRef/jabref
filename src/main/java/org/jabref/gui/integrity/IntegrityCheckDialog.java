@@ -41,7 +41,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
         if (change.next()) {
             change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    basePanel.editEntryAndFocusField(message.getEntry(), message.getFieldName()));
+                    basePanel.editEntryAndFocusField(message.getEntry(), message.getField()));
         }
     }
 
@@ -56,7 +56,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getEntry().getCiteKeyOptional().orElse("")));
-        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getFieldName()));
+        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName()));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
 
         TableFilter.forTableView(messagesTable)

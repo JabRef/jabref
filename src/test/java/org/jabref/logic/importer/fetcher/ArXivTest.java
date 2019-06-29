@@ -9,7 +9,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -60,8 +60,8 @@ public class ArXivTest {
 
     @Test
     public void findFullTextByDOI() throws IOException {
-        entry.setField(FieldName.DOI, "10.1529/biophysj.104.047340");
-        entry.setField(FieldName.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
+        entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
+        entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
     }
@@ -115,8 +115,8 @@ public class ArXivTest {
 
     @Test
     public void findFullTextByDOINotAvailableInCatalog() throws IOException {
-        entry.setField(FieldName.DOI, "10.1016/0370-2693(77)90015-6");
-        entry.setField(FieldName.TITLE, "Superspace formulation of supergravity");
+        entry.setField(StandardField.DOI, "10.1016/0370-2693(77)90015-6");
+        entry.setField(StandardField.TITLE, "Superspace formulation of supergravity");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
@@ -186,7 +186,7 @@ public class ArXivTest {
 
     @Test
     public void searchIdentifierForSlicePaper() throws Exception {
-        sliceTheoremPaper.clearField(FieldName.EPRINT);
+        sliceTheoremPaper.clearField(StandardField.EPRINT);
 
         assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
     }

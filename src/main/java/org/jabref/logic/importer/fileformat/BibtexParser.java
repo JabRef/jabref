@@ -34,9 +34,9 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -574,7 +574,7 @@ public class BibtexParser implements Parser {
                 // for users if JabRef did not accept it.
                 if (InternalBibtexFields.getFieldProperties(key).contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(key, entry.getField(key).get() + " and " + content);
-                } else if (FieldName.KEYWORDS.equals(key)) {
+                } else if (StandardField.KEYWORDS.equals(key)) {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }

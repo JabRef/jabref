@@ -11,7 +11,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -61,11 +61,11 @@ class GoogleScholarTest {
     void findSingleEntry() throws FetcherException {
         entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
         entry.setCiteKey("geiger2013detecting");
-        entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
-        entry.setField(FieldName.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
-        entry.setField(FieldName.BOOKTITLE, "ZEUS");
-        entry.setField(FieldName.YEAR, "2013");
-        entry.setField(FieldName.PAGES, "41--44");
+        entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
+        entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
+        entry.setField(StandardField.BOOKTITLE, "ZEUS");
+        entry.setField(StandardField.YEAR, "2013");
+        entry.setField(StandardField.PAGES, "41--44");
 
         List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models");
 

@@ -16,9 +16,10 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 
 public class NormalTableColumn extends MainTableColumn<String> {
 
@@ -52,7 +53,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             return null;
         }
 
-        StringJoiner joiner = new StringJoiner(FieldName.FIELD_SEPARATOR);
+        StringJoiner joiner = new StringJoiner(FieldFactory.FIELD_SEPARATOR);
         for (String field : bibtexFields) {
             joiner.add(field);
         }
@@ -99,7 +100,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
-        if ((result != null) && !bibtexFields.contains(BibEntry.KEY_FIELD)) {
+        if ((result != null) && !bibtexFields.contains(InternalField.KEY_FIELD)) {
             result = toUnicode.format(result).trim();
         }
         return result;
@@ -133,8 +134,8 @@ public class NormalTableColumn extends MainTableColumn<String> {
         Optional<String> plainFieldContent = Optional.empty();
         for (String field : bibtexFields) {
             // entry type or bibtex key will never be resolved
-            if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)
-                    || BibEntry.KEY_FIELD.equals(field)) {
+            if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)
+                    || InternalField.KEY_FIELD.equals(field)) {
                 return false;
             } else {
                 plainFieldContent = entry.getField(field);

@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
@@ -100,7 +101,7 @@ public class BibEntryWriter {
         writeKeyField(entry, out);
 
         Set<String> written = new HashSet<>();
-        written.add(BibEntry.KEY_FIELD);
+        written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), bibDatabaseMode);
@@ -170,7 +171,7 @@ public class BibEntryWriter {
     }
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<String> isNotBibtexKey = field -> !BibEntry.KEY_FIELD.equals(field);
+        Predicate<String> isNotBibtexKey = field -> !InternalField.KEY_FIELD.equals(field);
         return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(String::length).max().orElse(0);
     }
 

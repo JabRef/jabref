@@ -28,7 +28,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public class BibTeXMLImporter extends Importer {
                     bibEntry.setType(BibtexEntryTypes.INCOLLECTION);
                     Incollection incollection = entry.getIncollection();
                     if (incollection.getChapter() != null) {
-                        fields.put(FieldName.CHAPTER, String.valueOf(incollection.getChapter()));
+                        fields.put(StandardField.CHAPTER, String.valueOf(incollection.getChapter()));
                     }
                     parse(incollection, fields);
                 } else if (entry.getInproceedings() != null) {
@@ -209,14 +209,14 @@ public class BibTeXMLImporter extends Importer {
                 putIfValueNotNull(fields, localName, value);
             } else if (elementValue instanceof BigInteger) {
                 BigInteger value = (BigInteger) elementValue;
-                if (FieldName.NUMBER.equals(localName)) {
-                    fields.put(FieldName.NUMBER, String.valueOf(value));
-                } else if (FieldName.CHAPTER.equals(localName)) {
-                    fields.put(FieldName.CHAPTER, String.valueOf(value));
+                if (StandardField.NUMBER.equals(localName)) {
+                    fields.put(StandardField.NUMBER, String.valueOf(value));
+                } else if (StandardField.CHAPTER.equals(localName)) {
+                    fields.put(StandardField.CHAPTER, String.valueOf(value));
                 }
             } else if (elementValue instanceof XMLGregorianCalendar) {
                 XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;
-                if (FieldName.YEAR.equals(localName)) {
+                if (StandardField.YEAR.equals(localName)) {
                     putYear(fields, value);
                 } else {
                     LOGGER.info("Unexpected field was found");
@@ -229,13 +229,13 @@ public class BibTeXMLImporter extends Importer {
 
     private void putYear(Map<String, String> fields, XMLGregorianCalendar year) {
         if (year != null) {
-            fields.put(FieldName.YEAR, String.valueOf(year));
+            fields.put(StandardField.YEAR, String.valueOf(year));
         }
     }
 
     private void putNumber(Map<String, String> fields, BigInteger number) {
         if (number != null) {
-            fields.put(FieldName.NUMBER, String.valueOf(number));
+            fields.put(StandardField.NUMBER, String.valueOf(number));
         }
     }
 

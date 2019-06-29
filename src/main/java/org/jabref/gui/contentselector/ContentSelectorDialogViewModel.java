@@ -21,7 +21,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
@@ -29,7 +29,7 @@ import static com.google.common.collect.ImmutableList.of;
 
 class ContentSelectorDialogViewModel extends AbstractViewModel {
 
-    private static final List<String> DEFAULT_FIELD_NAMES = of(FieldName.AUTHOR, FieldName.JOURNAL, FieldName.KEYWORDS, FieldName.PUBLISHER);
+    private static final List<String> DEFAULT_FIELD_NAMES = of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
     private final BasePanel basePanel;
     private final MetaData metaData;
@@ -61,7 +61,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private void populateFieldNameKeywordsMapWithExistingValues() {
         metaData.getContentSelectors().getContentSelectors().forEach(
-                existingContentSelector -> fieldNameKeywordsMap.put(existingContentSelector.getFieldName(), new ArrayList<>(existingContentSelector.getValues()))
+                existingContentSelector -> fieldNameKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
         );
     }
 
@@ -169,7 +169,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
     }
 
     void saveChanges() {
-        List<String> metaDataFieldNames = metaData.getContentSelectors().getFieldNamesWithSelectors();
+        List<String> metaDataFieldNames = metaData.getContentSelectors().getFieldsWithSelectors();
         fieldNameKeywordsMap.forEach((fieldName, keywords) -> updateMetaDataContentSelector(metaDataFieldNames, fieldName, keywords));
 
         List<String> fieldNamesToRemove = filterFieldNamesToRemove();
@@ -181,9 +181,9 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private List<String> filterFieldNamesToRemove() {
         Set<String> newlyAddedKeywords = fieldNameKeywordsMap.keySet();
-        return metaData.getContentSelectors().getFieldNamesWithSelectors().stream()
-                .filter(fieldName -> !newlyAddedKeywords.contains(fieldName))
-                .collect(Collectors.toList());
+        return metaData.getContentSelectors().getFieldsWithSelectors().stream()
+                       .filter(fieldName -> !newlyAddedKeywords.contains(fieldName))
+                       .collect(Collectors.toList());
     }
 
     private void updateMetaDataContentSelector(List<String> existingFieldNames, String fieldName, List<String> keywords) {
