@@ -11,13 +11,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.CheckBoxTreeItem;
 import javafx.util.Callback;
 
 /**
  * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
  */
-public class RecursiveTreeItem<T> extends TreeItem<T> {
+public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
 
     private final Callback<T, BooleanProperty> expandedProperty;
     private Callback<T, ObservableList<T>> childrenFactory;

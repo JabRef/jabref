@@ -1,59 +1,78 @@
 package org.jabref.gui.texparser;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-
-public class WalkFileTreeTask extends BackgroundTask<List<Path>> {
+public class WalkFileTreeTask extends BackgroundTask<FileNodeViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkFileTreeTask.class);
     private static final String TEX_EXT = ".tex";
 
     private final Path directory;
+    private int count;
 
     public WalkFileTreeTask(Path directory) {
         this.directory = directory;
+        this.count = 0;
     }
 
     @Override
-    protected List<Path> call() {
-        List<Path> searchPathList = new ArrayList<>();
+    protected FileNodeViewModel call() {
+        return searchDirectory(directory);
+    }
 
-        try {
-            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                    searchPathList.add(dir);
-                    return CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    if (attrs.isRegularFile() && file.toString().endsWith(TEX_EXT)) {
-                        searchPathList.add(file);
-                    }
-                    return CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            LOGGER.error("Problem finding files", e);
+    private FileNodeViewModel searchDirectory(Path directory) {
+        if (directory == null || !Files.exists(directory) || !Files.isDirectory(directory)) {
+            return null;
         }
 
-        Collections.sort(searchPathList);
+        FileNodeViewModel parent = new FileNodeViewModel(directory);
+        int fileCount = 0;
 
-        return searchPathList;
+        List<Path> files = null;
+        List<Path> subDirectories = null;
+
+        try {
+            files = Files.list(directory)
+                         .filter(path -> !Files.isDirectory(path) && path.toString().endsWith(TEX_EXT))
+                         .collect(Collectors.toList());
+
+            subDirectories = Files.list(directory)
+                                  .filter(path -> Files.isDirectory(path))
+                                  .collect(Collectors.toList());
+        } catch (IOException e) {
+            LOGGER.error("Problem scanning files and directories.", e);
+        }
+
+        for (Path subDirectory : subDirectories) {
+            if (isCanceled()) {
+                return parent;
+            }
+
+            FileNodeViewModel subRoot = searchDirectory(subDirectory);
+
+            if (subRoot != null && !subRoot.getChildren().isEmpty()) {
+                fileCount += subRoot.getFileCount();
+                parent.getChildren().add(subRoot);
+            }
+        }
+
+        parent.setPath(directory);
+        parent.setFileCount(files.size() + fileCount);
+
+        for (Path file : files) {
+            parent.getChildren().add(new FileNodeViewModel(file));
+            count++;
+        }
+
+        return parent;
     }
 }

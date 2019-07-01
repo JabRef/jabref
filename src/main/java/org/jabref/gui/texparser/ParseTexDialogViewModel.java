@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -30,12 +32,12 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final Path initialPath;
-    private final ObservableList<Path> searchPathList = FXCollections.observableArrayList();
-    private final ObservableList<TreeItem<FileNode>> selectedFileList = FXCollections.observableArrayList();
-    private final StringProperty texDirectory = new SimpleStringProperty("");
-    private final BooleanProperty searchInProgress = new SimpleBooleanProperty(false);
-    private final BooleanProperty filesFound = new SimpleBooleanProperty(true);
-    private final BooleanProperty parseDisable = new SimpleBooleanProperty(true);
+    private final ObjectProperty<FileNodeViewModel> root;
+    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
+    private final StringProperty texDirectory;
+    private final BooleanProperty noFilesFound;
+    private final BooleanProperty searchInProgress;
+    private final BooleanProperty successfulSearch;
 
     public ParseTexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
                                    TaskExecutor taskExecutor, PreferencesService preferencesService) {
@@ -45,35 +47,42 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.initialPath = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                           .orElse(preferencesService.getWorkingDir());
 
-        this.texDirectory.set(initialPath.toAbsolutePath().toString());
+        this.root = new SimpleObjectProperty<>();
+        this.checkedFileList = FXCollections.observableArrayList();
+        this.texDirectory = new SimpleStringProperty("");
+        this.noFilesFound = new SimpleBooleanProperty(true);
+        this.searchInProgress = new SimpleBooleanProperty(false);
+        this.successfulSearch = new SimpleBooleanProperty(false);
+
+        texDirectory.set(initialPath.toAbsolutePath().toString());
     }
 
-    public ObservableList<Path> getSearchPathList() {
-        return searchPathList;
+    public ObjectProperty<FileNodeViewModel> rootProperty() {
+        return root;
     }
 
-    public ObservableList<TreeItem<FileNode>> getSelectedFileList() {
-        selectedFileList.setAll(selectedFileList.stream()
-                                                .filter(item -> Files.isRegularFile(item.getValue().getPath()))
-                                                .collect(Collectors.toList()));
+    private void setRootProperty(FileNodeViewModel fileNode) {
+        root.set(fileNode);
+    }
 
-        return selectedFileList;
+    public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
+        return checkedFileList;
     }
 
     public StringProperty texDirectoryProperty() {
         return texDirectory;
     }
 
-    public BooleanProperty searchInProgressDisableProperty() {
+    public BooleanProperty noFilesFoundProperty() {
+        return noFilesFound;
+    }
+
+    public BooleanProperty searchInProgressProperty() {
         return searchInProgress;
     }
 
-    public BooleanProperty filesFoundDisableProperty() {
-        return filesFound;
-    }
-
-    public BooleanProperty parseDisableProperty() {
-        return parseDisable;
+    public BooleanProperty successfulSearchProperty() {
+        return successfulSearch;
     }
 
     protected void browseButtonClicked() {
@@ -89,23 +98,21 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     protected void searchButtonClicked() {
         BackgroundTask.wrap(new WalkFileTreeTask(getSearchDirectory())::call)
                       .onRunning(() -> {
+                          noFilesFound.set(true);
                           searchInProgress.set(true);
-                          filesFound.set(true);
-                          parseDisable.set(true);
+                          successfulSearch.set(false);
                       })
-                      .onFinished(() -> {
-                          searchInProgress.set(false);
-                      })
-                      .onSuccess(paths -> {
-                          searchPathList.setAll(paths);
-                          filesFound.set(false);
-                          parseDisable.set(false);
+                      .onFinished(() -> searchInProgress.set(false))
+                      .onSuccess(root -> {
+                          setRootProperty(root);
+                          noFilesFound.set(false);
+                          successfulSearch.set(true);
                       })
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }
 
-    protected Path getSearchDirectory() {
+    private Path getSearchDirectory() {
         Path directory = Paths.get(texDirectory.get());
 
         if (Files.notExists(directory)) {
@@ -122,15 +129,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     protected void parse() {
-        if (selectedFileList == null) {
-            return;
-        }
-
-        List<Path> fileList = selectedFileList.stream()
-                                              .map(item -> item.getValue().getPath().toAbsolutePath())
-                                              .filter(path -> path != null && Files.isRegularFile(path))
-                                              .collect(Collectors.toList());
-
+        List<Path> fileList = checkedFileList.stream()
+                                             .map(item -> item.getValue().getPath().toAbsolutePath())
+                                             .filter(path -> path != null && Files.isRegularFile(path))
+                                             .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             return;
         }

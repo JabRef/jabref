@@ -1,23 +1,17 @@
 package org.jabref.gui.texparser;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
-import javafx.beans.binding.Bindings;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -26,23 +20,21 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckTreeView;
+import org.fxmisc.easybind.EasyBind;
 
 public class ParseTexDialogView extends BaseDialog<Void> {
 
+    private final BibDatabaseContext databaseContext;
     @FXML private TextField texDirectoryField;
     @FXML private Button browseButton;
     @FXML private Button searchButton;
-    @FXML private CheckTreeView<FileNode> fileTreeView;
+    @FXML private CheckTreeView<FileNodeViewModel> fileTreeView;
     @FXML private Button selectAllButton;
     @FXML private Button unselectAllButton;
     @FXML private ButtonType parseButtonType;
-
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
-
-    private BibDatabaseContext databaseContext;
-    private Button parseButton;
     private ParseTexDialogViewModel viewModel;
 
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
@@ -54,10 +46,8 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        viewModel.getSearchPathList().addListener((ListChangeListener<Path>) c -> showTreeView());
-
-        parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
-        parseButton.disableProperty().bindBidirectional(viewModel.parseDisableProperty());
+        Button parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
+        parseButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
 
         setResultConverter(button -> {
             if (button == parseButtonType) {
@@ -71,51 +61,28 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new ParseTexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService);
 
-        texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
+        fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());
+        fileTreeView.rootProperty().bind(EasyBind.map(viewModel.rootProperty(), fileNode ->
+                new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
-        browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressDisableProperty());
-        searchButton.disableProperty().bindBidirectional(viewModel.searchInProgressDisableProperty());
+        EasyBind.subscribe(fileTreeView.rootProperty(), root -> {
+            if (root != null) {
+                ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
+                root.setExpanded(true);
+                EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
+            }
+        });
 
-        new ViewModelTreeCellFactory<FileNode>()
-                .withText(node -> node.getDisplayText())
+        new ViewModelTreeCellFactory<FileNodeViewModel>()
+                .withText(FileNodeViewModel::getDisplayText)
                 .install(fileTreeView);
 
-        selectAllButton.disableProperty().bindBidirectional(viewModel.filesFoundDisableProperty());
-        unselectAllButton.disableProperty().bindBidirectional(viewModel.filesFoundDisableProperty());
-    }
-
-    private void showTreeView() {
-        if (viewModel.getSearchPathList().isEmpty()) {
-            fileTreeView.setRoot(null);
-            return;
-        }
-
-        List<CheckBoxTreeItem<FileNode>> checkItems = new ArrayList<>();
-        CheckBoxTreeItem<FileNode> rootItem = new CheckBoxTreeItem<>(new FileNode(Paths.get(texDirectoryField.getText())));
-        checkItems.add(rootItem);
-
-        for (Path currentPath : viewModel.getSearchPathList()) {
-            CheckBoxTreeItem<FileNode> nodeItem = new CheckBoxTreeItem<>(new FileNode(currentPath));
-
-            checkItems.stream()
-                      .filter(item -> item.getValue().getPath().equals(currentPath.getParent()))
-                      .findFirst()
-                      .ifPresent(parent -> {
-                          parent.getChildren().add(nodeItem);
-                          parent.getValue().increaseFileCount();
-                      });
-
-            if (Files.isDirectory(currentPath)) {
-                checkItems.add(nodeItem);
-            }
-        }
-
-        fileTreeView.setRoot(rootItem);
-
-        Bindings.bindContent(viewModel.getSelectedFileList(), fileTreeView.getCheckModel().getCheckedItems());
-
-        rootItem.setSelected(true);
-        rootItem.setExpanded(true);
+        texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
+        browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
+        searchButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
+        selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
+        unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
     }
 
     @FXML

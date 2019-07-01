@@ -17,7 +17,7 @@ public class ParseTexAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException());
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(NullPointerException::new);
         ParseTexDialogView dialog = new ParseTexDialogView(database);
 
         dialog.showAndWait();

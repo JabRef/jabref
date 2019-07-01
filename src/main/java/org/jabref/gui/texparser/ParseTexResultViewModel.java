@@ -12,26 +12,22 @@ import org.jabref.gui.texparser.jump.JumpToTeXstudio;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ParseTexResultViewModel extends AbstractViewModel {
 
-    private final TexParserResult texParserResult;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseTexResultViewModel.class);
+
     private final ObservableList<ReferenceWrapper> referenceList;
     private final ObservableList<Citation> citationList;
 
     public ParseTexResultViewModel(TexParserResult texParserResult) {
-        this.texParserResult = texParserResult;
-        this.referenceList = setupReferenceList();
+        this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
-    }
 
-    private ObservableList<ReferenceWrapper> setupReferenceList() {
-        ObservableList<ReferenceWrapper> referenceList = FXCollections.observableArrayList();
-
-        for (String key : texParserResult.getCitationsKeySet()) {
-            referenceList.add(new ReferenceWrapper(key, texParserResult.getCitationsByKey(key)));
-        }
-
-        return referenceList.sorted();
+        texParserResult.getCitationsKeySet().forEach(k -> referenceList.add(
+                new ReferenceWrapper(k, texParserResult.getCitationsByKey(k))));
     }
 
     public ObservableList<ReferenceWrapper> getReferenceList() {
@@ -42,12 +38,12 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
-    // TODO: Add an applications manager for choosing the text editor
+    // TODO: Choose the user editor for pushing entries.
     public void jumpToFile(Path file, int line, int column) {
         try {
             new JumpToTeXstudio().run(file, line, column);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Problem opening the file for jumping.", e);
         }
     }
 }

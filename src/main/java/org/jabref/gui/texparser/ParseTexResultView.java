@@ -19,10 +19,9 @@ import org.fxmisc.easybind.EasyBind;
 
 public class ParseTexResultView extends BaseDialog<Void> {
 
+    private final TexParserResult texParserResult;
     @FXML private ListView<ReferenceWrapper> referenceListView;
     @FXML private ListView<Citation> citationListView;
-
-    private TexParserResult texParserResult;
     private ParseTexResultViewModel viewModel;
 
     public ParseTexResultView(TexParserResult texParserResult) {
@@ -40,14 +39,14 @@ public class ParseTexResultView extends BaseDialog<Void> {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.itemsProperty().setValue(viewModel.getReferenceList());
-        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), selected -> {
-            if (selected != null) {
-                viewModel.getCitationList().setAll(selected.citationListProperty());
+        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), reference -> {
+            if (reference != null) {
+                viewModel.getCitationList().setAll(reference.citationListProperty());
             }
         });
         referenceListView.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<ReferenceWrapper>()
-                .withText(ref -> ref.getDisplayText())
+                .withText(ReferenceWrapper::getDisplayText)
                 .install(referenceListView);
 
         citationListView.setItems(viewModel.getCitationList());

@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import org.jabref.model.texparser.Citation;
 
 public class ReferenceWrapper {
+
     private final String entry;
     private final int count;
     private final ObservableList<Citation> citationList;
