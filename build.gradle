@@ -144,7 +144,7 @@ dependencies {
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.2'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.12.0'
     compile 'org.apache.logging.log4j:log4j-api:2.11.2'
     compile 'org.apache.logging.log4j:log4j-core:2.11.2'
 
