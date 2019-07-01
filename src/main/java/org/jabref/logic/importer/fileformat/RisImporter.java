@@ -27,6 +27,8 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+    //stores all the date tags from highest to lowest priority
+    private final String[] dateTags = {"Y1", "PY", "DA", "Y2"};
 
     @Override
     public String getName() {
@@ -61,7 +63,9 @@ public class RisImporter extends Importer {
 
         for (String entry1 : entries) {
 
-            boolean foundDate = false;
+            String dateTag = "";
+            String dateValue = "";
+            int datePriority = dateTags.length;
 
             String type = "";
             String author = "";
@@ -193,25 +197,20 @@ public class RisImporter extends Importer {
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(FieldName.URL, value);
-                    } else if (!foundDate && (("Y1".equals(tag) || "Y2".equals(tag) || "PY".equals(tag) || "DA".equals(tag)) && (value.length() >= 4))) {
-                        String year = value.substring(0, 4);
+                    } else if (isDateTag(tag) && value.length() >= 4) {
+                        int tagPriority = getDatePriority(tag);
 
-                        try {
-                            Year.parse(year, formatter);
-                            //if the year is parsebale we have found our date
-                            fields.put(FieldName.YEAR, value.substring(0, 4));
-                            foundDate = true;
-                        } catch (DateTimeParseException ex) {
-                            //We can't parse the year, we ignore it
-                        }
+                        if (tagPriority < datePriority) {
+                            String year = value.substring(0, 4);
 
-                        String[] parts = value.split("/");
-                        if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
-                                int monthNumber = Integer.parseInt(parts[1]);
-                                month = Month.getMonthByNumber(monthNumber);
-                            } catch (NumberFormatException ex) {
-                                // The month part is unparseable, so we ignore it.
+                                    Year.parse(year, formatter);
+                                    //if the year is parsebale we have found a higher priority date
+                                    dateTag = tag;
+                                    dateValue = value;
+                                    datePriority = tagPriority;
+                            } catch (DateTimeParseException ex) {
+                                //We can't parse the year, we ignore it
                             }
                         }
                     } else if ("KW".equals(tag)) {
@@ -277,6 +276,21 @@ public class RisImporter extends Importer {
                 fields.put(FieldName.PAGES, startPage + endPage);
             }
 
+            // if we found a date
+            if (dateTag.length() > 0) {
+                fields.put(FieldName.YEAR, dateValue.substring(0, 4));
+
+                String[] parts = dateValue.split("/");
+                if ((parts.length > 1) && !parts[1].isEmpty()) {
+                    try {
+                        int monthNumber = Integer.parseInt(parts[1]);
+                        month = Month.getMonthByNumber(monthNumber);
+                    } catch (NumberFormatException ex) {
+                        // The month part is unparseable, so we ignore it.
+                    }
+                }
+            }
+
             // Remove empty fields:
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
 
@@ -299,5 +313,24 @@ public class RisImporter extends Importer {
             doi = doi.replaceAll("(?i)doi:", "").trim();
             hm.put(FieldName.DOI, doi);
         }
+    }
+
+    private boolean isDateTag(String s) {
+        for (String dateTag : dateTags) {
+            if (dateTag.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getDatePriority(String date) {
+        int i;
+        for (i = 0; i < dateTags.length; i++) {
+            if (dateTags[i].equals(date)) {
+                break;
+            }
+        }
+        return i;
     }
 }
