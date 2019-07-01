@@ -146,7 +146,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.12.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.12.0'
     compile 'org.apache.logging.log4j:log4j-api:2.11.2'
-    compile 'org.apache.logging.log4j:log4j-core:2.11.2'
+    compile 'org.apache.logging.log4j:log4j-core:2.12.0'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
@@ -161,7 +161,7 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.4.2'
 
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.12.0'
     testCompile 'org.mockito:mockito-core:2.28.2'
     testCompile 'com.github.tomakehurst:wiremock:2.23.2'
