@@ -157,7 +157,7 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.3.1'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.3.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.4.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.4.2'
 
