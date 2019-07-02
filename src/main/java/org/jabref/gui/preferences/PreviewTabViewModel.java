@@ -42,9 +42,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
-    private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>();
+    private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>();
-    private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>();
+    private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>();
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
@@ -73,26 +73,27 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        final ObservableList<PreviewLayout> availableLayouts = FXCollections.observableArrayList();
+        ObservableList<PreviewLayout> availableLayouts = availableListProperty.getValue();
 
-        chosenListProperty.setValue(FXCollections.observableArrayList(previewPreferences.getPreviewCycle()));
+        chosenListProperty().getValue().clear();
+        chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
+
+        availableLayouts.clear();
         if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
-            chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
+            availableListProperty.getValue().add(previewPreferences.getTextBasedPreviewLayout());
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(value -> value.stream()
                                                .map(CitationStylePreviewLayout::new)
+                                               .filter(style -> !chosenListProperty.getValue().contains(style))
                                                .sorted(Comparator.comparing(PreviewLayout::getName))
-                                               .filter(style -> !chosenListProperty.contains(style))
                                                .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
                       .onFailure(ex -> {
                           LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
                       })
                       .executeWith(taskExecutor);
-
-        availableListProperty.setValue(availableLayouts);
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
