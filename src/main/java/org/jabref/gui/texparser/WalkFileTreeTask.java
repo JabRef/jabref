@@ -17,11 +17,9 @@ public class WalkFileTreeTask extends BackgroundTask<FileNodeViewModel> {
     private static final String TEX_EXT = ".tex";
 
     private final Path directory;
-    private int count;
 
     public WalkFileTreeTask(Path directory) {
         this.directory = directory;
-        this.count = 0;
     }
 
     @Override
@@ -50,6 +48,7 @@ public class WalkFileTreeTask extends BackgroundTask<FileNodeViewModel> {
                                   .collect(Collectors.toList());
         } catch (IOException e) {
             LOGGER.error("Problem scanning files and directories.", e);
+            return null;
         }
 
         for (Path subDirectory : subDirectories) {
@@ -60,18 +59,14 @@ public class WalkFileTreeTask extends BackgroundTask<FileNodeViewModel> {
             FileNodeViewModel subRoot = searchDirectory(subDirectory);
 
             if (subRoot != null && !subRoot.getChildren().isEmpty()) {
-                fileCount += subRoot.getFileCount();
+                fileCount += subRoot.getFileNode().getFileCount();
                 parent.getChildren().add(subRoot);
             }
         }
 
-        parent.setPath(directory);
-        parent.setFileCount(files.size() + fileCount);
+        parent.getFileNode().setFileCount(files.size() + fileCount);
 
-        for (Path file : files) {
-            parent.getChildren().add(new FileNodeViewModel(file));
-            count++;
-        }
+        files.forEach(file -> parent.getChildren().add(new FileNodeViewModel(file)));
 
         return parent;
     }

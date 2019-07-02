@@ -130,7 +130,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     protected void parse() {
         List<Path> fileList = checkedFileList.stream()
-                                             .map(item -> item.getValue().getPath().toAbsolutePath())
+                                             .map(item -> item.getValue().getFileNode().getPath().toAbsolutePath())
                                              .filter(path -> path != null && Files.isRegularFile(path))
                                              .collect(Collectors.toList());
         if (fileList.isEmpty()) {

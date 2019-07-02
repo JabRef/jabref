@@ -26,8 +26,8 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
 
-        texParserResult.getCitationsKeySet().forEach(k -> referenceList.add(
-                new ReferenceWrapper(k, texParserResult.getCitationsByKey(k))));
+        texParserResult.getCitationsKeySet().forEach(key -> referenceList.add(
+                new ReferenceWrapper(key, texParserResult.getCitationsByKey(key))));
     }
 
     public ObservableList<ReferenceWrapper> getReferenceList() {
