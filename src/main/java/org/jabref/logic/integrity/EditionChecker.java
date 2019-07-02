@@ -1,16 +1,15 @@
 package org.jabref.logic.integrity;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.jabref.Globals;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
-
-import org.jabref.preferences.JabRefPreferences;
 
 public class EditionChecker implements ValueChecker {
 
@@ -22,11 +21,10 @@ public class EditionChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
-    private final JabRefPreferences prefs;
+    private final JabRefPreferences prefs = JabRefPreferences.getInstance();
 
 
     public EditionChecker(BibDatabaseContext bibDatabaseContext) {
-        this.prefs = Globals.prefs;
         this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
     }
 
