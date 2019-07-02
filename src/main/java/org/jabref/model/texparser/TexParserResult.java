@@ -2,6 +2,7 @@ package org.jabref.model.texparser;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -34,19 +35,18 @@ public class TexParserResult {
         return citations;
     }
 
-    public Set<String> getCitationsKeySet() {
-        return citations.keySet();
-    }
-
-    public Set<Citation> getCitationsByKey(String key) {
-        return citations.get(key);
-    }
-
     /**
      * Return a set of strings with the keys of the citations multimap.
      */
     public Set<String> getCitationsKeySet() {
         return citations.keySet();
+    }
+
+    /**
+     * Return a collection of citations using a string as key reference.
+     */
+    public Collection<Citation> getCitationsByKey(String key) {
+        return citations.get(key);
     }
 
     /**

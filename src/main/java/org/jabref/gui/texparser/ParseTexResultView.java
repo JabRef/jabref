@@ -41,7 +41,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
         referenceListView.itemsProperty().setValue(viewModel.getReferenceList());
         EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), reference -> {
             if (reference != null) {
-                viewModel.getCitationList().setAll(reference.citationListProperty());
+                viewModel.getCitationList().setAll(reference.getCitationList());
             }
         });
         referenceListView.getSelectionModel().selectFirst();

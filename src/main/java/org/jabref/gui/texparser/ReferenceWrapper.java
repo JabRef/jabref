@@ -13,12 +13,10 @@ import org.jabref.model.texparser.Citation;
 public class ReferenceWrapper {
 
     private final String entry;
-    private final int count;
     private final ObservableList<Citation> citationList;
 
     public ReferenceWrapper(String entry, Collection<Citation> citationColl) {
         this.entry = entry;
-        this.count = citationColl.size();
         this.citationList = FXCollections.observableList(
                 citationColl instanceof List ? (List) citationColl : new ArrayList(citationColl));
     }
@@ -27,23 +25,18 @@ public class ReferenceWrapper {
         return entry;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-    public ObservableList<Citation> citationListProperty() {
+    public ObservableList<Citation> getCitationList() {
         return citationList;
     }
 
     public String getDisplayText() {
-        return String.format("%s (%s)", entry, count);
+        return String.format("%s (%s)", entry, citationList.size());
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", ReferenceWrapper.class.getSimpleName() + "[", "]")
                 .add("entry='" + entry + "'")
-                .add("count=" + count)
                 .add("citationList=" + citationList)
                 .toString();
     }
