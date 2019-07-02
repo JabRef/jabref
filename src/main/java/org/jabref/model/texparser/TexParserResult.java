@@ -2,24 +2,24 @@ package org.jabref.model.texparser;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 public class TexParserResult {
 
     private final List<Path> fileList;
     private final List<Path> nestedFiles;
-    private final Map<String, Set<Citation>> citations;
+    private final Multimap<String, Citation> citations;
 
     public TexParserResult() {
         this.fileList = new ArrayList<>();
         this.nestedFiles = new ArrayList<>();
-        this.citations = new HashMap<>();
+        this.citations = HashMultimap.create();
     }
 
     public List<Path> getFileList() {
@@ -30,7 +30,7 @@ public class TexParserResult {
         return nestedFiles;
     }
 
-    public Map<String, Set<Citation>> getCitations() {
+    public Multimap<String, Citation> getCitations() {
         return citations;
     }
 
@@ -40,6 +40,13 @@ public class TexParserResult {
 
     public Set<Citation> getCitationsByKey(String key) {
         return citations.get(key);
+    }
+
+    /**
+     * Return a set of strings with the keys of the citations multimap.
+     */
+    public Set<String> getCitationsKeySet() {
+        return citations.keySet();
     }
 
     /**
@@ -54,12 +61,11 @@ public class TexParserResult {
     }
 
     /**
-     * Add a citation to the citations map. It puts a new key into the map if does not exist yet.
+     * Add a citation to the citations multimap.
      */
     public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
         Citation citation = new Citation(file, lineNumber, start, end, line);
-        citations.computeIfAbsent(key, value -> new HashSet<>())
-                 .add(citation);
+        citations.put(key, citation);
     }
 
     @Override

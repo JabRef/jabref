@@ -44,11 +44,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
@@ -77,9 +77,6 @@ public class GlobalSearchBar extends HBox {
     private final Button searchModeButton = new Button();
     private final Label currentResults = new Label("");
     private final Tooltip tooltip = new Tooltip();
-    private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private SearchWorker searchWorker;
-
     private SearchDisplayMode searchDisplayMode;
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -155,11 +152,16 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        this.getChildren().addAll(
-                                  searchField,
-                                  currentResults);
+        this.getChildren().addAll(searchField, currentResults);
 
         this.setAlignment(Pos.CENTER_LEFT);
+
+        EasyBind.subscribe(Globals.stateManager.activeSearchQueryProperty(), searchQuery -> {
+            searchQuery.ifPresent(query -> {
+                updateResults(Globals.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                              query.isGrammarBasedSearch());
+            });
+        });
     }
 
     private void toggleSearchModeAndSearch() {
@@ -181,7 +183,6 @@ public class GlobalSearchBar extends HBox {
             clearSearch();
             MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
             mainTable.requestFocus();
-            //SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
         }
     }
 
@@ -199,8 +200,6 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText("");
         searchField.setText("");
         setHintTooltip(null);
-        searchQueryHighlightObservable.reset();
-
         Globals.stateManager.clearSearchQuery();
     }
 
@@ -209,11 +208,6 @@ public class GlobalSearchBar extends HBox {
         if (currentBasePanel == null) {
             return;
         }
-
-        if (searchWorker != null) {
-            searchWorker.cancel(true);
-        }
-
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             clearSearch();
@@ -228,15 +222,10 @@ public class GlobalSearchBar extends HBox {
 
         Globals.stateManager.setSearchQuery(searchQuery);
 
-        // TODO: Remove search worker as this is doing the work twice now
-        searchWorker = new SearchWorker(currentBasePanel, searchQuery, searchDisplayMode);
-        searchWorker.execute();
     }
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-
-        searchQueryHighlightObservable.reset();
 
         Globals.stateManager.clearSearchQuery();
 
@@ -268,10 +257,6 @@ public class GlobalSearchBar extends HBox {
             LOGGER.error("Could not get access to auto completion popup", e);
             return new AutoCompletePopup<>();
         }
-    }
-
-    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
-        return searchQueryHighlightObservable;
     }
 
     private SearchQuery getSearchQuery() {
@@ -401,6 +386,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
+            //empty
         }
     }
 }

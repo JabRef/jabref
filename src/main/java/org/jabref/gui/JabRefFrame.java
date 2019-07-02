@@ -28,6 +28,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
@@ -155,7 +156,7 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
-    private PushToApplicationsManager pushApplications;
+    private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
     private SidePane sidePane;
 
@@ -163,6 +164,7 @@ public class JabRefFrame extends BorderPane {
         this.mainStage = mainStage;
         this.dialogService = new JabRefDialogService(mainStage, this);
         this.stateManager = Globals.stateManager;
+        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
     }
 
@@ -450,8 +452,6 @@ public class JabRefFrame extends BorderPane {
     private void initLayout() {
         setProgressBarVisible(false);
 
-        pushApplications = new PushToApplicationsManager(this.getDialogService());
-
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
         head.setCenter(createToolbar());
@@ -521,7 +521,10 @@ public class JabRefFrame extends BorderPane {
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
-        PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(stateManager, this.getPushApplications(), this.getDialogService());
+        final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
+
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
@@ -532,7 +535,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
-                factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction),
+                pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
@@ -757,10 +760,14 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager))
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR))
         );
 
-        final PushToApplicationAction pushToApplicationAction = new PushToApplicationAction(stateManager, this.getPushApplications(), this.getDialogService());
+        // PushToApplication
+        final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        pushToApplicationsManager.setMenuItem(pushToApplicationMenuItem);
+
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_TEX, new ParseTexAction(stateManager)),
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this, stateManager)),
@@ -778,7 +785,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
-                factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction),
+                pushToApplicationMenuItem,
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
                         factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, stateManager)),
@@ -1194,8 +1201,8 @@ public class JabRefFrame extends BorderPane {
         return sidePaneManager;
     }
 
-    public PushToApplicationsManager getPushApplications() {
-        return pushApplications;
+    public PushToApplicationsManager getPushToApplicationsManager() {
+        return pushToApplicationsManager;
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

@@ -25,12 +25,13 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
  */
 public class PushToApplicationAction extends SimpleCommand {
 
-    private final PushToApplication operation;
     private final StateManager stateManager;
     private final DialogService dialogService;
 
+    private PushToApplication application;
+
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.operation = pushToApplicationsManager.getLastUsedApplication(Globals.prefs);
+        this.application = Globals.prefs.getActivePushToApplication(pushToApplicationsManager);
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
@@ -38,12 +39,15 @@ public class PushToApplicationAction extends SimpleCommand {
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
     }
 
+    public void updateApplication(PushToApplication application) {
+        this.application = application;
+    }
+
     public Action getActionInformation() {
         return new Action() {
-
             @Override
             public Optional<JabRefIcon> getIcon() {
-                return Optional.of(operation.getIcon());
+                return Optional.of(application.getIcon());
             }
 
             @Override
@@ -53,7 +57,7 @@ public class PushToApplicationAction extends SimpleCommand {
 
             @Override
             public String getText() {
-                return Localization.lang("Push entries to external application (%0)", operation.getApplicationName());
+                return Localization.lang("Push entries to external application (%0)", application.getApplicationName());
             }
 
             @Override
@@ -86,11 +90,11 @@ public class PushToApplicationAction extends SimpleCommand {
     @Override
     public void execute() {
         // If required, check that all entries have BibTeX keys defined:
-        if (operation.requiresBibtexKeys()) {
+        if (application.requiresBibtexKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
                 if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
                     dialogService.showErrorDialogAndWait(
-                            operation.getApplicationName(),
+                            application.getApplicationName(),
                             Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
 
                     return;
@@ -100,13 +104,12 @@ public class PushToApplicationAction extends SimpleCommand {
 
         // All set, call the operation in a new thread:
         BackgroundTask.wrap(this::pushEntries)
-                      .onSuccess(s -> operation.operationCompleted())
+                      .onSuccess(s -> application.operationCompleted())
                       .executeWith(Globals.TASK_EXECUTOR);
-
     }
 
     private void pushEntries() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        operation.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries()));
+        application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries()));
     }
 }

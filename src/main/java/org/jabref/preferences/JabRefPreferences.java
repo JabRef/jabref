@@ -53,6 +53,8 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportSettingsTab;
+import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -2104,5 +2106,28 @@ public class JabRefPreferences implements PreferencesService {
 
         storeCustomEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
 
+    }
+
+    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
+        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
+    }
+
+    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
+        if (application.getApplicationName() != get(PUSH_TO_APPLICATION)) {
+            put(PUSH_TO_APPLICATION, application.getApplicationName());
+            manager.updateApplicationAction();
+        }
+    }
+
+    public NewLineSeparator getNewLineSeparator() {
+        return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
+    }
+
+    public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
+        String escapeChars = newLineSeparator.getEscapeChars();
+        put(JabRefPreferences.NEWLINE, escapeChars);
+
+        // we also have to change Globals variable as globals is not a getter, but a constant
+        OS.NEWLINE = escapeChars;
     }
 }

@@ -17,11 +17,11 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '2.3'
-    id 'com.install4j.gradle' version '7.0.11'
+    id 'com.install4j.gradle' version '7.0.12'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
-    id 'net.ltgt.errorprone' version '0.8'
+    id 'net.ltgt.errorprone' version '0.8.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
 }
 
@@ -97,7 +97,7 @@ dependencies {
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.21'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.61'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.62'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -117,11 +117,11 @@ dependencies {
 
     compile 'mysql:mysql-connector-java:8.0.16'
 
-    compile 'org.postgresql:postgresql:42.2.5'
+    compile 'org.postgresql:postgresql:42.2.6'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:27.1-jre'
+    compile 'com.google.guava:guava:28.0-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-commons:8.15'
@@ -133,7 +133,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.10.1'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
-    compile 'com.jfoenix:jfoenix:8.0.8'
+    compile 'com.jfoenix:jfoenix:8.0.9'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.16-SNAPSHOT'
@@ -142,7 +142,7 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta4'
+    compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
     compile 'org.apache.logging.log4j:log4j-jcl:2.11.2'
     compile 'org.apache.logging.log4j:log4j-api:2.11.2'
@@ -166,14 +166,14 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.28.2'
     testCompile 'com.github.tomakehurst:wiremock:2.23.2'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.6.2'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.3'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.10.2'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.10.2'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.21'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.22'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
     jython 'org.python:jython-standalone:2.7.1'
 }
