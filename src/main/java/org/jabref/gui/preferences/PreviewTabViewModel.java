@@ -14,6 +14,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
@@ -47,6 +49,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
 
+    private final ObjectProperty<PreviewLayout> layoutProperty = new SimpleObjectProperty<>();
+    private final StringProperty sourceTextProperty = new SimpleStringProperty("");
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final PreviewPreferences previewPreferences;
@@ -59,6 +64,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences = preferences.getPreviewPreferences();
 
         setValues();
+
+        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
+            if (getCurrentLayout() instanceof TextBasedPreviewLayout) {
+                ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
+            }
+        });
     }
 
     public void setValues() {
@@ -70,42 +81,178 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
-                .onSuccess(value -> value.stream()
-                        .map(CitationStylePreviewLayout::new)
-                        .sorted(Comparator.comparing(PreviewLayout::getName))
-                        .filter(style -> !chosenListProperty.contains(style))
-                        .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
-                .onFailure(ex -> {
-                    LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
-                    dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
-                })
-                .executeWith(taskExecutor);
+                      .onSuccess(value -> value.stream()
+                                               .map(CitationStylePreviewLayout::new)
+                                               .sorted(Comparator.comparing(PreviewLayout::getName))
+                                               .filter(style -> !chosenListProperty.contains(style))
+                                               .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
+                      .onFailure(ex -> {
+                          LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
+                          dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
+                      })
+                      .executeWith(taskExecutor);
 
         availableListProperty.setValue(availableLayouts);
     }
 
-    private PreviewLayout findLayoutByNameOrDefault(String name) {
-        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                .findAny()
-                .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                        .findAny()
-                        .orElse(previewPreferences.getTextBasedPreviewLayout()));
+    public void setPreviewLayout(PreviewLayout selectedLayout) {
+        if (selectedLayout == null) {
+            selectedIsEditableProperty.setValue(false);
+            return;
+        }
+
+        try {
+            layoutProperty.setValue(selectedLayout);
+        } catch (StringIndexOutOfBoundsException exception) {
+            LOGGER.warn("Parsing error.", exception);
+            dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"), Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
+        }
+
+        if (selectedLayout instanceof TextBasedPreviewLayout) {
+            sourceTextProperty.setValue(((TextBasedPreviewLayout) selectedLayout).getText().replace("__NEWLINE__", "\n"));
+            selectedIsEditableProperty.setValue(true);
+        } else {
+            sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
+            selectedIsEditableProperty.setValue(false);
+        }
     }
 
-    public PreviewLayout findLayoutByNameOrNull(String name) {
+    public void refreshPreview() {
+        layoutProperty.setValue(null);
+        setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
+    }
+
+    public PreviewLayout findLayoutByName(String name) {
         return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                .findAny()
-                .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                        .findAny()
-                        .orElse(null));
+                                    .findAny()
+                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                                                              .findAny()
+                                                              .orElse(null));
+    }
+
+    public PreviewLayout getCurrentLayout() {
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
+        }
+
+        if (!chosenListProperty.getValue().isEmpty()) {
+            return chosenListProperty.getValue().get(0);
+        }
+
+        PreviewLayout layout = findLayoutByName("Preview");
+        if (layout == null) {
+            layout = previewPreferences.getTextBasedPreviewLayout();
+        }
+
+        return layout;
+    }
+
+    @Override
+    public void storeSettings() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+
+        if (chosenListProperty.isEmpty()) {
+            chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
+        }
+
+        PreviewLayout previewStyle = findLayoutByName("Preview");
+        if (previewStyle == null) {
+            previewStyle = previewPreferences.getTextBasedPreviewLayout();
+        }
+
+        PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
+                                                              .getBuilder()
+                                                              .withPreviewCycle(chosenListProperty)
+                                                              .withPreviewStyle(((TextBasedPreviewLayout) previewStyle).getText())
+                                                              .build();
+
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
+        }
+        preferences.storePreviewPreferences(newPreviewPreferences);
+
+        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+            // TODO: Find a better way to update preview
+            basePanel.closeBottomPane();
+            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+        }
+    }
+
+    @Override
+    public boolean validateSettings() {
+        return !chosenListProperty.getValue().isEmpty();
+    }
+
+    public void addToChosen() {
+        List<PreviewLayout> selected = new ArrayList<>();
+        selected.addAll(availableSelectionModelProperty.getValue().getSelectedItems());
+        availableListProperty.removeAll(selected);
+        chosenListProperty.addAll(selected);
+    }
+
+    public void removeFromChosen() {
+        List<PreviewLayout> selected = new ArrayList<>();
+        selected.addAll(chosenSelectionModelProperty.getValue().getSelectedItems());
+        chosenListProperty.removeAll(selected);
+        availableListProperty.addAll(selected);
+        availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+    }
+
+    public void selectedInChosenUp() {
+        if (chosenSelectionModelProperty.getValue().isEmpty()) {
+            return;
+        }
+
+        List<Integer> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedIndices());
+        List<Integer> newIndices = new ArrayList<>();
+
+        for (int oldIndex : selected) {
+            boolean alreadyTaken = newIndices.contains(oldIndex - 1);
+            int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
+            newIndices.add(newIndex);
+        }
+
+        chosenSelectionModelProperty.getValue().clearSelection();
+        newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
+        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        refreshPreview();
+    }
+
+    public void selectedInChosenDown() {
+        if (chosenSelectionModelProperty.getValue().isEmpty()) {
+            return;
+        }
+
+        List<Integer> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedIndices());
+        List<Integer> newIndices = new ArrayList<>();
+
+        for (int i = selected.size() - 1; i >= 0; i--) {
+            int oldIndex = selected.get(i);
+            boolean alreadyTaken = newIndices.contains(oldIndex + 1);
+            int newIndex = ((oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
+            newIndices.add(newIndex);
+        }
+
+        chosenSelectionModelProperty.getValue().clearSelection();
+        newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
+        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        refreshPreview();
+    }
+
+    public void resetDefaultLayout() {
+        PreviewLayout defaultLayout = findLayoutByName("Preview");
+        if ((defaultLayout != null) && (defaultLayout instanceof TextBasedPreviewLayout)) {
+            ((TextBasedPreviewLayout) defaultLayout).setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
+        }
+        refreshPreview();
     }
 
     /**
-     * XML-Syntax-Highlighting for RichTextFX-Codearea
-     * created by (c) Carlos Martins (github: @cemartins)
-     * License: BSD-2-Clause
-     * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE
-     * and: https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
+     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github: @cemartins) License:
+     * BSD-2-Clause see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE and:
+     * https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
      *
      * @param text to parse and highlight
      * @return highlighted span for codeArea
@@ -167,98 +314,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return spansBuilder.create();
     }
 
-    @Override
-    public void storeSettings() {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-
-        if (chosenListProperty.isEmpty()) {
-            chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
-        }
-
-        PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
-                                                              .getBuilder()
-                                                              .withPreviewCycle(chosenListProperty)
-                                                              .withPreviewStyle(((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview")).getText())
-                                                              .build();
-
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
-        }
-        preferences.storePreviewPreferences(newPreviewPreferences);
-
-        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            // TODO: Find a better way to update preview
-            basePanel.closeBottomPane();
-            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
-        }
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return !chosenListProperty.getValue().isEmpty();
-    }
-
-    public void addToChosen() {
-        List<PreviewLayout> selected = new ArrayList<>();
-        selected.addAll(availableSelectionModelProperty.getValue().getSelectedItems());
-        availableListProperty.removeAll(selected);
-        chosenListProperty.addAll(selected);
-    }
-
-    public void removeFromChosen() {
-        List<PreviewLayout> selected = new ArrayList<>();
-        selected.addAll(chosenSelectionModelProperty.getValue().getSelectedItems());
-        chosenListProperty.removeAll(selected);
-        availableListProperty.addAll(selected);
-        availableListProperty.sort((a,b) -> a.getName().compareToIgnoreCase(b.getName()));
-    }
-
-    public List<Integer> selectedInChosenUp(List<Integer> oldIndices) {
-        List<Integer> selected = new ArrayList<>();
-        List<Integer> newIndices = new ArrayList<>();
-        selected.addAll(oldIndices); // oldIndices needs to be copied, because remove(oldIndex) alters oldIndices
-
-        for (int oldIndex : selected) {
-            boolean alreadyTaken = newIndices.contains(oldIndex - 1);
-            int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
-            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
-            newIndices.add(newIndex);
-        }
-        return newIndices;
-    }
-
-    public List<Integer> selectedInChosenDown(List<Integer> oldIndices) {
-        List<Integer> selected = new ArrayList<>();
-        List<Integer> newIndices = new ArrayList<>();
-        selected.addAll(oldIndices);
-
-        for (int i = selected.size() - 1; i >= 0; i--) {
-            int oldIndex = selected.get(i);
-            boolean alreadyTaken = newIndices.contains(oldIndex + 1);
-            int newIndex = ((oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
-            chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
-            newIndices.add(newIndex);
-        }
-        return newIndices;
-    }
-
-    public PreviewLayout getCurrentLayout() {
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
-        }
-
-        if (!chosenListProperty.getValue().isEmpty()) {
-            return chosenListProperty.getValue().get(0);
-        }
-
-        return findLayoutByNameOrDefault("Preview");
-    }
-
-    public void resetDefaultStyle() {
-        ((TextBasedPreviewLayout) findLayoutByNameOrDefault("Preview"))
-                .setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
-    }
-
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }
 
     public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() { return availableSelectionModelProperty; }
@@ -268,4 +323,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty() { return chosenSelectionModelProperty; }
 
     public BooleanProperty selectedIsEditableProperty() { return selectedIsEditableProperty; }
+
+    public ObjectProperty<PreviewLayout> layoutProperty() { return layoutProperty; }
+
+    public StringProperty sourceTextProperty() { return sourceTextProperty; }
 }
