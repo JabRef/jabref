@@ -21,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -32,6 +33,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 class IntegrityCheckTest {
+
+    private final JabRefPreferences prefs = JabRefPreferences.getInstance();
 
     @Test
     void testEntryTypeChecks() {
@@ -73,10 +76,14 @@ class IntegrityCheckTest {
 
     @Test
     void testEditionChecks() {
+        Boolean defaultPref = prefs.getBoolean(prefs.ALLOW_EDITION_INTEGER);
         assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
+        prefs.putBoolean(prefs.ALLOW_EDITION_INTEGER, false);
         assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
+        prefs.putBoolean(prefs.ALLOW_EDITION_INTEGER, true);
+        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
@@ -85,6 +92,7 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
         assertWrong(createContext("edition", "1"));
+        prefs.putBoolean(prefs.ALLOW_EDITION_INTEGER, defaultPref);
     }
 
     @Test
