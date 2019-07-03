@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
@@ -55,7 +56,7 @@ public class EditionChecker implements ValueChecker {
 
         //BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode()) {
-            if(ONLY_NUMERALS_OR_LITERALS.test(value.trim())){
+            if(StringUtils.isNumeric(value.trim())){
                 if(!prefs.getBoolean(JabRefPreferences.ALLOW_EDITION_INTEGER)){
                     return Optional.of(Localization.lang("should be a String but received a Integer"));
                 }
