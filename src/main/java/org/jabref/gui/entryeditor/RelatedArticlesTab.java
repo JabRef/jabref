@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
 public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
-    private static final String MDL_STATUS_RECEIVED = "received";
-    private static final String MDL_STATUS_DISPLAYED = "displayed";
     private final EntryEditorPreferences preferences;
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
