@@ -17,7 +17,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -151,7 +150,7 @@ public class MrDLibImporter extends Importer {
         BibEntry current = new BibEntry();
 
         // parse each of the relevant fields into variables
-        String authors = isRecommendationFieldPresent(recommendation, "authors") ? getAuthorsString(recommendation) : "";
+        String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
         String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
@@ -170,24 +169,6 @@ public class MrDLibImporter extends Importer {
 
     private Boolean isRecommendationFieldPresent(JSONObject recommendation, String field) {
         return recommendation.has(field) && !recommendation.isNull(field);
-    }
-
-    /**
-     * Creates an authors string from a JSON recommendation
-     * @param recommendation JSON Object recommendation from Mr. DLib
-     * @return A string of all authors, separated by commas and finished with a full stop.
-     */
-    private String getAuthorsString(JSONObject recommendation) {
-        String authorsString = "";
-        JSONArray array = recommendation.getJSONArray("authors");
-        for (int i = 0; i < array.length(); ++i) {
-            authorsString += array.getString(i) + "; ";
-        }
-        int stringLength = authorsString.length();
-        if (stringLength > 2) {
-            authorsString = authorsString.substring(0, stringLength - 2) + ".";
-        }
-        return authorsString;
     }
 
     public ParserResult getParserResult() {

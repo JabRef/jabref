@@ -66,17 +66,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
                       .wrap(() -> fetcher.performSearch(entry))
                       .onRunning(() -> progress.setVisible(true))
                       .onSuccess(relatedArticles -> {
-                          BackgroundTask
-                                  .wrap(() -> fetcher.confirmRecommendations(MDL_STATUS_RECEIVED))
-                                  .executeWith(Globals.TASK_EXECUTOR);
                           progress.setVisible(false);
                           root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
-                          if (entry.getAuthorTitleYear(100)
-                                  .equals(entryEditor.getEntry().getAuthorTitleYear(100))) {
-                              BackgroundTask
-                                      .wrap(() -> fetcher.confirmRecommendations(MDL_STATUS_DISPLAYED))
-                                      .executeWith(Globals.TASK_EXECUTOR);
-                          }
                       })
                       .onFailure(exception -> {
                           LOGGER.error("Error while fetching from Mr. DLib", exception);
