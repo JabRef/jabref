@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.Arrays;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -28,8 +29,8 @@ public class RisImporter extends Importer {
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
     //stores all the date tags from highest to lowest priority
-    private final String[] dateTags = {"Y1", "PY", "DA", "Y2"};
-
+    private final List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
+    
     @Override
     public String getName() {
         return "RIS";
@@ -65,7 +66,7 @@ public class RisImporter extends Importer {
 
             String dateTag = "";
             String dateValue = "";
-            int datePriority = dateTags.length;
+            int datePriority = dateTags.size();
 
             String type = "";
             String author = "";
@@ -315,22 +316,11 @@ public class RisImporter extends Importer {
         }
     }
 
-    private boolean isDateTag(String s) {
-        for (String dateTag : dateTags) {
-            if (dateTag.equals(s)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isDateTag(String searchTag) {
+        return dateTags.stream().anyMatch(tag -> tag.equals(searchTag));
     }
 
-    private int getDatePriority(String date) {
-        int i;
-        for (i = 0; i < dateTags.length; i++) {
-            if (dateTags[i].equals(date)) {
-                break;
-            }
-        }
-        return i;
+    private int getDatePriority(String dateTag) {
+        return dateTags.indexOf(dateTag);
     }
 }
