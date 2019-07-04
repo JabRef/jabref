@@ -1,7 +1,6 @@
 package org.jabref.gui.texparser;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -59,7 +58,6 @@ public class ParseTexResultView extends BaseDialog<Void> {
         String contextString = LatexToUnicodeAdapter.format(item.getLineText());
         String fileDataString = String.format("%n%s (%s:%s-%s)%n", item.getPath().getFileName(), item.getLine(),
                 item.getColStart(), item.getColEnd());
-        String jumpString = Localization.lang("Jump to file");
 
         Text context = new Text(contextString);
         context.setWrappingWidth(citationListView.getWidth() - 50.0);
@@ -68,11 +66,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
         Text fileData = new Text(fileDataString);
         fileData.getStyleClass().add("fileData");
-        Button jumpButton = new Button(jumpString);
-        jumpButton.getStyleClass().add("jumpButton");
-        jumpButton.setOnAction(e -> viewModel.jumpToFile(item.getPath(), item.getLine(), item.getColStart()));
-        HBox fileBox = new HBox(15, fileData, jumpButton);
 
-        return new VBox(contextBox, fileBox);
+        return new VBox(contextBox, fileData);
     }
 }

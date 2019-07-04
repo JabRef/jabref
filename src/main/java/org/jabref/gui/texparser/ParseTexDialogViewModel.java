@@ -96,7 +96,9 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     protected void searchButtonClicked() {
-        BackgroundTask.wrap(new WalkFileTreeTask(getSearchDirectory())::call)
+        WalkFileTreeTask fileTree = new WalkFileTreeTask(getSearchDirectory());
+
+        BackgroundTask.wrap(fileTree::call)
                       .onRunning(() -> {
                           noFilesFound.set(true);
                           searchInProgress.set(true);
