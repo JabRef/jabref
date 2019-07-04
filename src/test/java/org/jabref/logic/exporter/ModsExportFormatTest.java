@@ -14,14 +14,12 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(TempDirectory.class)
 public class ModsExportFormatTest {
 
     public Charset charset;
@@ -38,7 +36,7 @@ public class ModsExportFormatTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDirectory.TempDir Path tempFile) throws Exception {
+    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         modsExportFormat.export(databaseContext, tempFile, charset, Collections.emptyList());

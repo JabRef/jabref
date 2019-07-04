@@ -56,7 +56,6 @@ public class Author {
     }
 
     public static String addDotIfAbbreviation(String name) {
-        // Avoid arrayindexoutof.... :
         if ((name == null) || name.isEmpty()) {
             return name;
         }
@@ -114,23 +113,26 @@ public class Author {
             // AA -> A. A.
             // Only append ". " if the rest of the 'word' is uppercase
             boolean nextWordIsUppercase = true;
+            char furtherChar = Character.MIN_VALUE;
             for (int j = i + 1; j < name.length(); j++) {
-                char furtherChar = name.charAt(j);
-                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~')
-                        || (furtherChar == '.')) {
+                furtherChar = name.charAt(j);
+                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
                     // end of word
                     break;
                 }
 
-                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar)
-                        && Character.isUpperCase(furtherChar);
+                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
                 if (!furtherIsUppercaseLetter) {
                     nextWordIsUppercase = false;
                     break;
                 }
             }
             if (nextWordIsUppercase) {
-                sb.append(". ");
+                if (Character.isWhitespace(furtherChar)) {
+                    sb.append(".");
+                } else {
+                    sb.append(". ");
+                }
             }
         }
 

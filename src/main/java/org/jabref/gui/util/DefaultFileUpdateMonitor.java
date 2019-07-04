@@ -59,7 +59,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 Thread.yield();
             }
         } catch (Throwable e) {
-            LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...", e);
+            LOGGER.error("FileUpdateMonitor has been interrupted.", e);
         }
     }
 

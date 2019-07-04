@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
@@ -71,7 +70,7 @@ public class FileHistoryMenu extends Menu {
             setItems();
             return;
         }
-        JabRefExecutorService.INSTANCE.execute(() -> frame.getOpenDatabaseAction().openFile(file, true));
+        frame.getOpenDatabaseAction().openFile(file, true);
 
     }
 

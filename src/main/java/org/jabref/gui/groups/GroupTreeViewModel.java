@@ -106,7 +106,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the root
      */
     public void addNewGroupToRoot() {
-        addNewSubgroup(rootGroup.get());
+        if (currentDatabase.isPresent()) {
+            addNewSubgroup(rootGroup.get());
+        } else {
+            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
+        }
     }
 
     /**
@@ -124,8 +128,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(newRoot);
             this.selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
-                                .collect(Collectors.toList()));
+                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                            .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor, localDragboard));
         }
@@ -137,7 +141,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog(dialogService));
         newGroup.ifPresent(group -> {
             parent.addSubgroup(group);
 
@@ -162,7 +166,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
         Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+                .showCustomDialogAndWait(new GroupDialog(dialogService, oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
             // TODO: Keep assignments
             boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
@@ -228,7 +232,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
             groupNode.getParent()
-                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));

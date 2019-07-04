@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
@@ -21,6 +22,7 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
+import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.PreboundBinding;
 
 /**
@@ -59,6 +61,7 @@ public class BindingsHelper {
 
     public static <T, U> ObservableList<U> map(ObservableValue<T> source, Function<T, List<U>> mapper) {
         PreboundBinding<List<U>> binding = new PreboundBinding<List<U>>(source) {
+
             @Override
             protected List<U> computeValue() {
                 return mapper.apply(source.getValue());
@@ -102,10 +105,10 @@ public class BindingsHelper {
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ListProperty<B> propertyB, Consumer<ObservableList<B>> updateA, Consumer<List<A>> updateB) {
         bindContentBidirectional(
-                propertyA,
-                (ObservableValue<ObservableList<B>>) propertyB,
-                updateA,
-                updateB);
+                                 propertyA,
+                                 (ObservableValue<ObservableList<B>>) propertyB,
+                                 updateA,
+                                 updateB);
     }
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<List<A>> updateB) {
@@ -123,10 +126,10 @@ public class BindingsHelper {
         Consumer<List<A>> updateB = newValueList -> property.setValue(mapToB.apply(newValueList));
 
         bindContentBidirectional(
-                listProperty,
-                property,
-                updateList,
-                updateB);
+                                 listProperty,
+                                 property,
+                                 updateList,
+                                 updateB);
     }
 
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
@@ -142,14 +145,25 @@ public class BindingsHelper {
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
         Consumer<Map<A, V>> updateB = newValueList -> propertyB.setValue(mapToB.apply(newValueList));
         bindContentBidirectional(
-                propertyA,
-                propertyB,
-                updateA,
-                updateB);
+                                 propertyA,
+                                 propertyB,
+                                 updateA,
+                                 updateB);
     }
 
-    public static ObservableValue<? extends Boolean> constantOf(boolean value) {
+    public static <T> ObservableValue<T> constantOf(T value) {
+        return new ObjectBinding<T>() {
+
+            @Override
+            protected T computeValue() {
+                return value;
+            }
+        };
+    }
+
+    public static ObservableValue<Boolean> constantOf(boolean value) {
         return new BooleanBinding() {
+
             @Override
             protected boolean computeValue() {
                 return value;
@@ -159,11 +173,29 @@ public class BindingsHelper {
 
     public static ObservableValue<? extends String> emptyString() {
         return new StringBinding() {
+
             @Override
             protected String computeValue() {
                 return "";
             }
         };
+    }
+
+    /**
+     * Returns a wrapper around the given list that posts changes on the JavaFX thread.
+     */
+    public static <T> ObservableList<T> forUI(ObservableList<T> list) {
+        return new UiThreadList<>(list);
+    }
+
+    public static <T> ObservableValue<T> ifThenElse(ObservableValue<Boolean> condition, T value, T other) {
+        return EasyBind.map(condition, conditionValue -> {
+            if (conditionValue) {
+                return value;
+            } else {
+                return other;
+            }
+        });
     }
 
     private static class BidirectionalBinding<A, B> {

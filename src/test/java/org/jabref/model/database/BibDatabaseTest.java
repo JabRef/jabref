@@ -123,6 +123,33 @@ public class BibDatabaseTest {
     }
 
     @Test
+    public void setSingleStringAsCollection() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        List<BibtexString> strings = Arrays.asList(string);
+        database.setStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void setStringAsCollectionWithUpdatedContentOverridesString() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString newContent = new BibtexString("DSP", "ABCD");
+        List<BibtexString> strings = Arrays.asList(string, newContent);
+        database.setStrings(strings);
+        assertEquals(Optional.of(newContent), database.getStringByName("DSP"));
+    }
+
+    @Test
+    public void setStringAsCollectionWithNewContent() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
+        List<BibtexString> strings = Arrays.asList(string, vlsi);
+        database.setStrings(strings);
+        assertEquals(Optional.of(string), database.getStringByName("DSP"));
+        assertEquals(Optional.of(vlsi), database.getStringByName("VLSI"));
+    }
+
+    @Test
     public void addSameStringLabelTwiceThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
@@ -253,7 +280,7 @@ public class BibDatabaseTest {
 
     @Test
     public void getUsedStrings() {
-        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(),"required","optional"));
+        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(), "required", "optional"));
         entry.setField("author", "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");

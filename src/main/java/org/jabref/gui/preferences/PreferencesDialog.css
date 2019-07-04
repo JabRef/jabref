@@ -1,19 +1,28 @@
-#sideMenu {
-    -fx-background-color: -jr-white;
+#preferenceTabList {
+    -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 1;
 }
 
-#sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 8 8 8 8;
-    -fx-background: -jr-white;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: -fx-control-inner-background;
+}
+
+.split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
 }
 
 .preferencePaneContainer {
-    -fx-padding: 0em 1em 0em 3em;
+    -fx-padding: 1em 1em 1em 3em;
 }
 
-.sectionHeader {
-    -fx-font-size: 1.5em;
-    -fx-padding: 1em 0em 1em 0em;
+*:search-highlight {
+	-fx-background-color: -jr-light-red;
 }

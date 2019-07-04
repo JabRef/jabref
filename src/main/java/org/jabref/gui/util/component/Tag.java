@@ -14,7 +14,6 @@ import javafx.scene.layout.HBox;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
 
-
 /**
  * A tag item in a {@link TagBar}.
  */

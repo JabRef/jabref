@@ -18,18 +18,16 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
+    @Inject private final JournalAbbreviationLoader loader;
+    private final ExporterViewModel exporter;
     @FXML private Button browseButton;
     @FXML private TextField name;
     @FXML private TextField fileName;
     @FXML private TextField extension;
     @FXML private ButtonType saveExporter;
-
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private final JournalAbbreviationLoader loader;
     private CreateModifyExporterDialogViewModel viewModel;
-
-    private final ExporterViewModel exporter;
 
     public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
                                           PreferencesService preferences, JournalAbbreviationLoader loader) {

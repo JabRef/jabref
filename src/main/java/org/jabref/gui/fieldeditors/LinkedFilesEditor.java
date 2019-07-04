@@ -218,17 +218,21 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         MenuItem download = new MenuItem(Localization.lang("Download file"));
         download.setOnAction(event -> linkedFile.download());
 
-        MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
-        renameFile.setOnAction(event -> linkedFile.rename());
-        renameFile.setDisable(linkedFile.getFile().isOnlineLink());
+        MenuItem renameFile = new MenuItem(Localization.lang("Rename file to defined pattern"));
+        renameFile.setOnAction(event -> linkedFile.renameToSuggestion());
+        renameFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedNameSameAsOriginal());
+
+        MenuItem renameFileName = new MenuItem(Localization.lang("Rename file to a given name"));
+        renameFileName.setOnAction(event -> linkedFile.askForNameAndRename());
+        renameFileName.setDisable(linkedFile.getFile().isOnlineLink());
 
         MenuItem moveFile = new MenuItem(Localization.lang("Move file to file directory"));
         moveFile.setOnAction(event -> linkedFile.moveToDefaultDirectory());
-        moveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        moveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
         MenuItem renameAndMoveFile = new MenuItem(Localization.lang("Move file to file directory and rename file"));
         renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
-        renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
@@ -244,7 +248,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (linkedFile.getFile().isOnlineLink()) {
             menu.getItems().add(download);
         }
-        menu.getItems().addAll(renameFile, moveFile, renameAndMoveFile, deleteLink, deleteFile);
+        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, deleteLink, deleteFile);
 
         return menu;
     }

@@ -73,7 +73,7 @@ public class FileHelper {
             return Optional.empty();
         }
 
-        return Optional.of(extension.substring(1, extension.length()));
+        return Optional.of(extension.substring(1));
     }
 
     /**
@@ -174,5 +174,18 @@ public class FileHelper {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static Path relativize(Path path, List<Path> fileDirectories) {
+        if (!path.isAbsolute()) {
+            return path;
+        }
+
+        for (Path directory : fileDirectories) {
+            if (path.startsWith(directory)) {
+                return directory.relativize(path);
+            }
+        }
+        return path;
     }
 }

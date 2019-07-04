@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -23,6 +25,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.StandardSystemProperty;
+import com.mashape.unirest.http.Unirest;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
@@ -57,6 +60,7 @@ public class Globals {
 
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
+    public static CountingUndoManager undoManager = new CountingUndoManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
@@ -123,6 +127,9 @@ public class Globals {
 
     public static void stopBackgroundTasks() {
         stopTelemetryClient();
+        try {
+            Unirest.shutdown();
+        } catch (IOException ignore) { }
     }
 
     public static Optional<TelemetryClient> getTelemetryClient() {

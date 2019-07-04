@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -18,6 +17,7 @@ import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableInsertString;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -45,14 +45,12 @@ public class AppendDatabaseAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
-    private final JabRefFrame frame;
     private final BasePanel panel;
 
     private final List<Path> filesToOpen = new ArrayList<>();
     private final DialogService dialogService;
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
-        this.frame = frame;
         this.panel = panel;
         dialogService = frame.getDialogService();
     }
@@ -87,7 +85,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibtexString bs : fromDatabase.getStringValues()) {
                 if (!database.hasStringLabel(bs.getName())) {
                     database.addString(bs);
-                    ce.addEdit(new UndoableInsertString(panel, database, bs));
+                    ce.addEdit(new UndoableInsertString(database, bs));
                 }
             }
         }
@@ -161,32 +159,31 @@ public class AppendDatabaseAction implements BaseAction {
             }
             filesToOpen.addAll(chosen);
 
-            // Run the actual open in a thread to prevent the program locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(
-                    () -> openIt(dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()));
+            if (filesToOpen.isEmpty()) {
+                return;
+            }
+
+            for (Path file : filesToOpen) {
+                // Run the actual open in a thread to prevent the program locking until the file is loaded.
+                BackgroundTask.wrap(() -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
+                              .onSuccess(fileName -> dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'"))
+                              .onFailure(exception -> {
+                                  LOGGER.warn("Could not open database", exception);
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);})
+                              .executeWith(Globals.TASK_EXECUTOR);;
+            }
         }
     }
 
-    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups,
-                        boolean importSelectorWords) {
-        if (filesToOpen.isEmpty()) {
-            return;
-        }
-        for (Path file : filesToOpen) {
-            try {
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
-                // Should this be done _after_ we know it was successfully opened?
-                ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
-                        Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
-                        importSelectorWords);
-                panel.output(Localization.lang("Imported from library") + " '" + file + "'");
-            } catch (IOException | KeyCollisionException ex) {
-                LOGGER.warn("Could not open database", ex);
-
-                dialogService.showErrorDialogAndWait(Localization.lang("Open library"), ex);
-            }
-        }
+    private String openIt(Path file, boolean importEntries, boolean importStrings, boolean importGroups,
+                        boolean importSelectorWords) throws IOException, KeyCollisionException {
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
+            // Should this be done _after_ we know it was successfully opened?
+            ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+            AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
+                    importSelectorWords);
+            return file.toString();
     }
 
 }

@@ -38,7 +38,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFieldsForUnknownTypeReturnsTrue() {
-        BibEntry e = new BibEntry(new CustomEntryType("articlllleeeee","required","optional"));
+        BibEntry e = new BibEntry(new CustomEntryType("articlllleeeee", "required", "optional"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         assertTrue(typedEntry.hasAllRequiredFields());
@@ -54,7 +54,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void getTypeForDisplayForUnknownTypeCapitalizeFirstLetter() {
-        BibEntry e = new BibEntry(new CustomEntryType("articlllleeeee","required","optional"));
+        BibEntry e = new BibEntry(new CustomEntryType("articlllleeeee", "required", "optional"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         assertEquals("Articlllleeeee", typedEntry.getTypeForDisplay());

@@ -31,24 +31,28 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         this.position = position;
     }
 
+    @Override
     protected Node createErrorNode() {
         return IconTheme.JabRefIcons.ERROR.getGraphicNode();
     }
 
+    @Override
     protected Node createWarningNode() {
         return IconTheme.JabRefIcons.WARNING.getGraphicNode();
     }
 
+    @Override
     public Node createDecorationNode(ValidationMessage message) {
         Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
         graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
-        label.setAlignment(Pos.CENTER);
+        label.setAlignment(position);
         return label;
     }
 
+    @Override
     protected Tooltip createTooltip(ValidationMessage message) {
         Tooltip tooltip = new Tooltip(message.getText());
         tooltip.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "tooltip-error" : "tooltip-warning");

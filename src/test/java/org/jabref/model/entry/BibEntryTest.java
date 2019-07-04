@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BibEntryTest {
 
@@ -26,16 +25,6 @@ public class BibEntryTest {
     @AfterEach
     public void tearDown() {
         entry = null;
-    }
-
-    @Test
-    public void notOverrideReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.setField(BibEntry.ID_FIELD, "somevalue"));
-    }
-
-    @Test
-    public void notClearReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.clearField(BibEntry.ID_FIELD));
     }
 
     @Test

@@ -53,7 +53,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         }
 
         if (panel.getSelectedEntries().isEmpty()) {
-            panel.output(Localization.lang("This operation requires one or more entries to be selected."));
+            dialogService.notify(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
 
@@ -63,16 +63,16 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         //Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
-                .findAny()
-                .orElse(null);
+                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
+                                          .findAny()
+                                          .orElse(null);
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                    Localization.lang("Export"), defaultChoice, exporters);
+                Localization.lang("Export"), defaultChoice, exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                     .onSuccess(this::setContentToClipboard)
-                     .executeWith(Globals.TASK_EXECUTOR));
+                                                             .onSuccess(this::setContentToClipboard)
+                                                             .executeWith(Globals.TASK_EXECUTOR));
 
     }
 
@@ -123,7 +123,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         clipboardContent.putRtf(content);
         Globals.clipboardManager.setContent(clipboardContent);
 
-        panel.output(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
+        dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
 
     }
 

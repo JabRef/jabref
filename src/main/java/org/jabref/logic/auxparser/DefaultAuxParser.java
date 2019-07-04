@@ -24,16 +24,13 @@ import org.slf4j.LoggerFactory;
 /**
  * LaTeX Aux to BibTeX Parser
  * <p>
- * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file.
- * Also supports nested AUX files (latex \\include).
+ * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file. Also supports nested AUX
+ * files (latex \\include).
  *
- * There exists no specification of the AUX file.
- * Every package, class or document can write to the AUX file.
- * The AUX file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
+ * There exists no specification of the AUX file. Every package, class or document can write to the AUX file. The AUX
+ * file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
  *
- * BibTeX citation: \citation{x,y,z}
- * Biblatex citation: \abx@aux@cite{x,y,z}
- * Nested AUX files: \@input{x}
+ * BibTeX citation: \citation{x,y,z} Biblatex citation: \abx@aux@cite{x,y,z} Nested AUX files: \@input{x}
  */
 public class DefaultAuxParser implements AuxParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
@@ -77,7 +74,7 @@ public class DefaultAuxParser implements AuxParser {
                     matchNestedAux(auxFile, result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
-                LOGGER.info("Cannot locate input file", e);
+                LOGGER.warn("Cannot locate input file", e);
             } catch (IOException e) {
                 LOGGER.warn("Problem opening file", e);
             }
@@ -128,15 +125,14 @@ public class DefaultAuxParser implements AuxParser {
      */
     private void resolveTags(AuxParserResult result) {
         for (String key : result.getUniqueKeys()) {
-            Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
-
-            if (result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
-                // do nothing, key has already been processed
-            } else if (entry.isPresent()) {
-                insertEntry(entry.get(), result);
-                resolveCrossReferences(entry.get(), result);
-            } else {
-                result.getUnresolvedKeys().add(key);
+            if (!result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
+                Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
+                if (entry.isPresent()) {
+                    insertEntry(entry.get(), result);
+                    resolveCrossReferences(entry.get(), result);
+                } else {
+                    result.getUnresolvedKeys().add(key);
+                }
             }
         }
 

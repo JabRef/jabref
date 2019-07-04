@@ -316,8 +316,7 @@ public class DuplicateCheck {
         return 1 - missRate;
     }
 
-
-    /*
+    /**
      * Calculates the similarity (a number within 0 and 1) between two strings.
      * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
      */

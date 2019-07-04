@@ -1,12 +1,7 @@
 package org.jabref.gui.importer;
 
-import java.awt.Dimension;
 import java.util.List;
 import java.util.Objects;
-
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.importer.ParserResult;
@@ -71,17 +66,7 @@ public class ParserResultWarningDialog {
             dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().get().getName() + ")";
         }
 
-        // Create JTextArea with JScrollPane
-        final JTextArea textArea = new JTextArea(dialogContent.toString());
-        final JScrollPane scrollPane = new JScrollPane(textArea) {
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(800, Math.min(Math.max(100, warnings.size() * 15), 400)); // Guess a suitable height between 100 and 400
-            }
-        };
-
         // Show dialog
-        JOptionPane.showMessageDialog(null, scrollPane, dialogTitle, JOptionPane.WARNING_MESSAGE);
+        jabRefFrame.getDialogService().showWarningDialogAndWait(dialogTitle, dialogContent.toString());
     }
 }

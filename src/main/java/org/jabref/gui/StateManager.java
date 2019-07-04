@@ -6,50 +6,54 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.OptionalUtil;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.MonadicBinding;
-
 /**
  * This class manages the GUI-state of JabRef, including:
  * - currently selected database
  * - currently selected group
- * Coming soon:
- * - open databases
  * - active search
+ * - active number of search results
  */
 public class StateManager {
 
-    private final ObjectProperty<Optional<BibDatabaseContext>> activeDatabase = new SimpleObjectProperty<>(Optional.empty());
+    private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
-    private final ObjectProperty<Optional<SearchQuery>> activeSearchQuery = new SimpleObjectProperty<>(Optional.empty());
+    private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
+    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
 
     public StateManager() {
-        MonadicBinding<BibDatabaseContext> currentDatabase = EasyBind.map(activeDatabase, database -> database.orElse(null));
-        activeGroups.bind(Bindings.valueAt(selectedGroups, currentDatabase));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
     }
 
-    public ObjectProperty<Optional<BibDatabaseContext>> activeDatabaseProperty() {
+    public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {
         return activeDatabase;
     }
 
-    public ObjectProperty<Optional<SearchQuery>> activeSearchQueryProperty() {
+    public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
+    }
+
+    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
+        searchResultMap.put(database, resultSize);
+    }
+
+    public IntegerProperty getSearchResultSize() {
+        return searchResultMap.get(activeDatabase.getValue().orElse(new BibDatabaseContext()));
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -84,7 +88,7 @@ public class StateManager {
 
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
-                .collect(Collectors.toList());
+                           .collect(Collectors.toList());
     }
 
     public void clearSearchQuery() {
