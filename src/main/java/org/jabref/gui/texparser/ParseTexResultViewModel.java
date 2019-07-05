@@ -10,18 +10,19 @@ import org.jabref.model.texparser.TexParserResult;
 
 public class ParseTexResultViewModel extends AbstractViewModel {
 
-    private final ObservableList<ReferenceWrapper> referenceList;
+    private final ObservableList<ReferenceViewModel> referenceList;
     private final ObservableList<Citation> citationList;
 
     public ParseTexResultViewModel(TexParserResult texParserResult) {
         this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
 
-        texParserResult.getCitationsKeySet().forEach(key -> referenceList.add(
-                new ReferenceWrapper(key, texParserResult.getCitationsByKey(key))));
+        texParserResult.getCitations()
+                       .asMap()
+                       .forEach((entry, citations) -> referenceList.add(new ReferenceViewModel(entry, citations)));
     }
 
-    public ObservableList<ReferenceWrapper> getReferenceList() {
+    public ObservableList<ReferenceViewModel> getReferenceList() {
         return new ReadOnlyListWrapper<>(referenceList);
     }
 

@@ -40,7 +40,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
 
-        this.setTitle(Localization.lang("LaTeX integration tools"));
+        this.setTitle(Localization.lang("LaTeX references search"));
 
         ViewLoader.view(this)
                   .load()

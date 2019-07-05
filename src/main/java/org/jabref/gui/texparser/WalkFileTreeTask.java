@@ -59,12 +59,12 @@ public class WalkFileTreeTask extends BackgroundTask<FileNodeViewModel> {
             FileNodeViewModel subRoot = searchDirectory(subDirectory);
 
             if (subRoot != null && !subRoot.getChildren().isEmpty()) {
-                fileCount += subRoot.getFileNode().getFileCount();
+                fileCount += subRoot.getFileCount();
                 parent.getChildren().add(subRoot);
             }
         }
 
-        parent.getFileNode().setFileCount(files.size() + fileCount);
+        parent.setFileCount(files.size() + fileCount);
 
         files.forEach(file -> parent.getChildren().add(new FileNodeViewModel(file)));
 

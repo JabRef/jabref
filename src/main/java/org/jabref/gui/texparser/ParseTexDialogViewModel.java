@@ -61,10 +61,6 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return root;
     }
 
-    private void setRootProperty(FileNodeViewModel fileNode) {
-        root.set(fileNode);
-    }
-
     public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
         return checkedFileList;
     }
@@ -106,7 +102,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
                       })
                       .onFinished(() -> searchInProgress.set(false))
                       .onSuccess(root -> {
-                          setRootProperty(root);
+                          this.root.set(root);
                           noFilesFound.set(false);
                           successfulSearch.set(true);
                       })
@@ -132,7 +128,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     protected void parse() {
         List<Path> fileList = checkedFileList.stream()
-                                             .map(item -> item.getValue().getFileNode().getPath().toAbsolutePath())
+                                             .map(item -> item.getValue().getPath().toAbsolutePath())
                                              .filter(path -> path != null && Files.isRegularFile(path))
                                              .collect(Collectors.toList());
         if (fileList.isEmpty()) {

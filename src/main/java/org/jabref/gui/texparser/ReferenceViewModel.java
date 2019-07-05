@@ -10,12 +10,12 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.texparser.Citation;
 
-public class ReferenceWrapper {
+public class ReferenceViewModel {
 
     private final String entry;
     private final ObservableList<Citation> citationList;
 
-    public ReferenceWrapper(String entry, Collection<Citation> citationColl) {
+    public ReferenceViewModel(String entry, Collection<Citation> citationColl) {
         this.entry = entry;
         this.citationList = FXCollections.observableList(
                 citationColl instanceof List ? (List) citationColl : new ArrayList(citationColl));
@@ -25,7 +25,7 @@ public class ReferenceWrapper {
         return entry;
     }
 
-    public ObservableList<Citation> getCitationList() {
+    public ObservableList<Citation> getCitationsByReference() {
         return citationList;
     }
 
@@ -35,7 +35,7 @@ public class ReferenceWrapper {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", ReferenceWrapper.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", ReferenceViewModel.class.getSimpleName() + "[", "]")
                 .add("entry='" + entry + "'")
                 .add("citationList=" + citationList)
                 .toString();

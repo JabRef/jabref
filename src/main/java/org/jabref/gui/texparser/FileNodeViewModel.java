@@ -11,20 +11,30 @@ import org.jabref.logic.l10n.Localization;
 
 public class FileNodeViewModel {
 
-    private final FileNode fileNode;
+    private Path path;
+    private int fileCount;
     private final ObservableList<FileNodeViewModel> children;
 
     public FileNodeViewModel(Path path) {
-        this(new FileNode(path));
-    }
-
-    public FileNodeViewModel(FileNode fileNode) {
-        this.fileNode = fileNode;
+        this.path = path;
+        this.fileCount = 0;
         this.children = FXCollections.observableArrayList();
     }
 
-    public FileNode getFileNode() {
-        return fileNode;
+    public Path getPath() {
+        return path;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
+    }
+
+    public int getFileCount() {
+        return fileCount;
+    }
+
+    public void setFileCount(int fileCount) {
+        this.fileCount = fileCount;
     }
 
     public ObservableList<FileNodeViewModel> getChildren() {
@@ -32,17 +42,18 @@ public class FileNodeViewModel {
     }
 
     public String getDisplayText() {
-        if (Files.isDirectory(fileNode.getPath())) {
-            return String.format("%s (%s %s)", fileNode.getPath().getFileName(), fileNode.getFileCount(),
-                    fileNode.getFileCount() == 1 ? Localization.lang("file") : Localization.lang("files"));
+        if (Files.isDirectory(this.path)) {
+            return String.format("%s (%s %s)", path.getFileName(), fileCount,
+                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
         }
-        return fileNode.getPath().getFileName().toString();
+        return path.getFileName().toString();
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", FileNodeViewModel.class.getSimpleName() + "[", "]")
-                .add("fileNode=" + fileNode)
+                .add("path=" + path)
+                .add("fileCount=" + fileCount)
                 .add("children=" + children)
                 .toString();
     }

@@ -19,14 +19,14 @@ import org.fxmisc.easybind.EasyBind;
 public class ParseTexResultView extends BaseDialog<Void> {
 
     private final TexParserResult texParserResult;
-    @FXML private ListView<ReferenceWrapper> referenceListView;
+    @FXML private ListView<ReferenceViewModel> referenceListView;
     @FXML private ListView<Citation> citationListView;
     private ParseTexResultViewModel viewModel;
 
     public ParseTexResultView(TexParserResult texParserResult) {
         this.texParserResult = texParserResult;
 
-        this.setTitle(Localization.lang("Bibliographic entries search"));
+        this.setTitle(Localization.lang("LaTeX references search"));
 
         ViewLoader.view(this)
                   .load()
@@ -37,15 +37,15 @@ public class ParseTexResultView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
-        referenceListView.itemsProperty().setValue(viewModel.getReferenceList());
+        referenceListView.setItems(viewModel.getReferenceList());
         EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), reference -> {
             if (reference != null) {
-                viewModel.getCitationList().setAll(reference.getCitationList());
+                viewModel.getCitationList().setAll(reference.getCitationsByReference());
             }
         });
         referenceListView.getSelectionModel().selectFirst();
-        new ViewModelListCellFactory<ReferenceWrapper>()
-                .withText(ReferenceWrapper::getDisplayText)
+        new ViewModelListCellFactory<ReferenceViewModel>()
+                .withText(ReferenceViewModel::getDisplayText)
                 .install(referenceListView);
 
         citationListView.setItems(viewModel.getCitationList());

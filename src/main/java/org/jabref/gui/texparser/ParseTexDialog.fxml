@@ -15,7 +15,7 @@
     <content>
         <VBox spacing="10.0">
             <VBox spacing="5.0">
-                <Label text="%TEX files directory:"/>
+                <Label text="%LaTeX files directory:"/>
                 <HBox spacing="10.0">
                     <TextField fx:id="texDirectoryField" HBox.hgrow="ALWAYS"/>
                     <Button fx:id="browseButton" onAction="#browseButtonClicked" text="%Browse"/>
@@ -23,7 +23,7 @@
                 </HBox>
             </VBox>
             <VBox spacing="5.0">
-                <Label text="%TEX files found:"/>
+                <Label text="%LaTeX files found:"/>
                 <CheckTreeView fx:id="fileTreeView" prefHeight="500.0" VBox.vgrow="ALWAYS"/>
             </VBox>
             <VBox spacing="5.0">
