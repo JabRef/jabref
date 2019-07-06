@@ -137,7 +137,9 @@ public class FindFullTextAction extends SimpleCommand {
                     basePanel.getBibDatabaseContext(),
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    JabRefPreferences.getInstance().getXMPPreferences(),JabRefPreferences.getInstance().getFilePreferences(), ExternalFileTypes.getInstance());
+                    JabRefPreferences.getInstance().getXMPPreferences(),
+                    JabRefPreferences.getInstance().getFilePreferences(), 
+                    ExternalFileTypes.getInstance());
 
             try {
                 URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());

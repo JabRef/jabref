@@ -41,11 +41,9 @@ public class CopySingleFileAction {
 
     private void copyFileToDestination(Path exportPath) {
         Optional<Path> fileToExport = linkedFile.findIn(databaseContext, Globals.prefs.getFilePreferences());
-
         Optional<Path> newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
 
         if (newPath.isPresent()) {
-
             Path newFile = newPath.get();
             boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
             if (success) {
@@ -54,6 +52,9 @@ public class CopySingleFileAction {
             else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Copy linked file"), Localization.lang("Could not copy file to %0, maybe the file is already existing?", newPath.map(Path::getParent).map(Path::toString).orElse("")));
             }
+        }
+        else {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not resolve the file %0", fileToExport.map(Path::getParent).map(Path::toString).orElse("")));
         }
 
     }
