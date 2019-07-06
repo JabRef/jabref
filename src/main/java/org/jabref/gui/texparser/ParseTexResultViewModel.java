@@ -26,7 +26,15 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(referenceList);
     }
 
-    public ObservableList<Citation> getCitationList() {
+    public ObservableList<Citation> getCitationListByReference() {
         return new ReadOnlyListWrapper<>(citationList);
+    }
+
+    public void activeReferenceChanged(ReferenceViewModel reference) {
+        if (reference == null) {
+            getCitationListByReference().clear();
+        } else {
+            getCitationListByReference().setAll(reference.getCitationList());
+        }
     }
 }

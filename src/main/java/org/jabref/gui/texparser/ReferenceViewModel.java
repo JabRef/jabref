@@ -25,7 +25,7 @@ public class ReferenceViewModel {
         return entry;
     }
 
-    public ObservableList<Citation> getCitationsByReference() {
+    public ObservableList<Citation> getCitationList() {
         return citationList;
     }
 

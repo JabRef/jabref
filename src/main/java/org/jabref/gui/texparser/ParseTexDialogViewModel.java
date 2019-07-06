@@ -83,7 +83,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     protected void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(initialPath).build();
+                .withInitialDirectory(getSearchDirectory()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             texDirectory.set(selectedDirectory.toAbsolutePath().toString());

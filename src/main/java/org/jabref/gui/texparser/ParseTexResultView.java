@@ -38,17 +38,14 @@ public class ParseTexResultView extends BaseDialog<Void> {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.setItems(viewModel.getReferenceList());
-        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), reference -> {
-            if (reference != null) {
-                viewModel.getCitationList().setAll(reference.getCitationsByReference());
-            }
-        });
+        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(), reference ->
+                viewModel.activeReferenceChanged(reference));
         referenceListView.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<ReferenceViewModel>()
                 .withText(ReferenceViewModel::getDisplayText)
                 .install(referenceListView);
 
-        citationListView.setItems(viewModel.getCitationList());
+        citationListView.setItems(viewModel.getCitationListByReference());
         new ViewModelListCellFactory<Citation>()
                 .withGraphic(this::citationToGraphic)
                 .install(citationListView);
