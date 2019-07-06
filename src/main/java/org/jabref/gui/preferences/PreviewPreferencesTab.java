@@ -118,7 +118,7 @@ public class PreviewPreferencesTab implements PrefsTab {
 
         btnTest.setOnAction(event -> {
             try {
-                PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService);
+                PreviewViewer testPane = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
                 testPane.setEntry(TestEntry.getTestEntry());
 
                 PreviewLayout layout = chosen.getSelectionModel().getSelectedItem();

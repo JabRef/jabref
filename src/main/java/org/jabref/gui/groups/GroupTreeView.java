@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -280,12 +281,7 @@ public class GroupTreeView {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = new ArrayList<>();
-            for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if ((model != null) && (model.getValue() != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
-                    list.add(model.getValue());
-                }
-            }
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem<GroupNodeViewModel>::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }
@@ -304,15 +300,7 @@ public class GroupTreeView {
         if (root.getValue().equals(value)) {
             return Optional.of(root);
         }
-
-        for (TreeItem<GroupNodeViewModel> child : root.getChildren()) {
-            Optional<TreeItem<GroupNodeViewModel>> treeItemByValue = getTreeItemByValue(child, value);
-            if (treeItemByValue.isPresent()) {
-                return treeItemByValue;
-            }
-        }
-
-        return Optional.empty();
+        return root.getChildren().stream().filter(child -> getTreeItemByValue(child, value).isPresent()).findFirst();
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {

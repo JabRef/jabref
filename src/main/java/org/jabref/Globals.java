@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.StandardSystemProperty;
+import com.mashape.unirest.http.Unirest;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
@@ -125,6 +127,9 @@ public class Globals {
 
     public static void stopBackgroundTasks() {
         stopTelemetryClient();
+        try {
+            Unirest.shutdown();
+        } catch (IOException ignore) { }
     }
 
     public static Optional<TelemetryClient> getTelemetryClient() {

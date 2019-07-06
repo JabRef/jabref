@@ -37,6 +37,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 .filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
 
         otherFields.removeAll(entryType.getDeprecatedFields());
+        otherFields.removeAll(entryType.getOptionalFields());
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(customTabFieldNames);
         return otherFields;
