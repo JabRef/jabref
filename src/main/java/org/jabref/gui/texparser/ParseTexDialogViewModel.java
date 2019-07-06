@@ -1,5 +1,6 @@
 package org.jabref.gui.texparser;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +29,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class ParseTexDialogViewModel extends AbstractViewModel {
 
+    private static final String TEX_EXT = ".tex";
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
@@ -92,9 +94,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     protected void searchButtonClicked() {
-        WalkFileTreeTask fileTree = new WalkFileTreeTask(getSearchDirectory());
-
-        BackgroundTask.wrap(fileTree::call)
+        BackgroundTask.wrap(() -> searchDirectory(getSearchDirectory()))
                       .onRunning(() -> {
                           noFilesFound.set(true);
                           searchInProgress.set(true);
@@ -108,6 +108,37 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
                       })
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
+    }
+
+    private FileNodeViewModel searchDirectory(Path directory) throws IOException {
+        if (directory == null || !Files.exists(directory) || !Files.isDirectory(directory)) {
+            throw new IOException();
+        }
+
+        List<Path> files = Files.list(directory)
+                                .filter(path -> !Files.isDirectory(path) && path.toString().endsWith(TEX_EXT))
+                                .collect(Collectors.toList());
+
+        List<Path> subDirectories = Files.list(directory)
+                                         .filter(path -> Files.isDirectory(path))
+                                         .collect(Collectors.toList());
+
+        FileNodeViewModel parent = new FileNodeViewModel(directory);
+        int fileCount = 0;
+
+        for (Path subDirectory : subDirectories) {
+            FileNodeViewModel subRoot = searchDirectory(subDirectory);
+
+            if (subRoot != null && !subRoot.getChildren().isEmpty()) {
+                fileCount += subRoot.getFileCount();
+                parent.getChildren().add(subRoot);
+            }
+        }
+
+        parent.setFileCount(files.size() + fileCount);
+        files.forEach(file -> parent.getChildren().add(new FileNodeViewModel(file)));
+
+        return parent;
     }
 
     private Path getSearchDirectory() {
