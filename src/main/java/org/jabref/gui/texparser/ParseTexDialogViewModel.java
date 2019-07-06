@@ -157,18 +157,24 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return directory;
     }
 
-    protected void parse() {
-        List<Path> fileList = checkedFileList.stream()
-                                             .map(item -> item.getValue().getPath().toAbsolutePath())
-                                             .filter(path -> path != null && Files.isRegularFile(path))
-                                             .collect(Collectors.toList());
-        if (fileList.isEmpty()) {
-            return;
-        }
+    protected void parseButtonClicked() {
+        BackgroundTask.wrap(() -> parse())
+                      .onSuccess(fileList -> {
+                          if (fileList.isEmpty()) {
+                              return;
+                          }
+                          TexParserResult result = new DefaultTexParser().parse(fileList);
+                          ParseTexResultView dialog = new ParseTexResultView(result);
+                          dialog.showAndWait();
+                      })
+                      .onFailure(dialogService::showErrorDialogAndWait)
+                      .executeWith(taskExecutor);
+    }
 
-        TexParserResult result = new DefaultTexParser().parse(fileList);
-        ParseTexResultView dialog = new ParseTexResultView(result);
-
-        dialog.showAndWait();
+    private List<Path> parse() {
+        return checkedFileList.stream()
+                              .map(item -> item.getValue().getPath().toAbsolutePath())
+                              .filter(path -> path != null && Files.isRegularFile(path))
+                              .collect(Collectors.toList());
     }
 }

@@ -51,7 +51,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
         setResultConverter(button -> {
             if (button == parseButtonType) {
-                viewModel.parse();
+                viewModel.parseButtonClicked();
             }
             return null;
         });
