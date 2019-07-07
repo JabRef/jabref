@@ -11,9 +11,9 @@ import org.jabref.logic.l10n.Localization;
 
 public class FileNodeViewModel {
 
-    private Path path;
-    private int fileCount;
+    private final Path path;
     private final ObservableList<FileNodeViewModel> children;
+    private int fileCount;
 
     public FileNodeViewModel(Path path) {
         this.path = path;
@@ -23,10 +23,6 @@ public class FileNodeViewModel {
 
     public Path getPath() {
         return path;
-    }
-
-    public void setPath(Path path) {
-        this.path = path;
     }
 
     public int getFileCount() {

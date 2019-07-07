@@ -21,10 +21,6 @@ public class ReferenceViewModel {
                 citationColl instanceof List ? (List) citationColl : new ArrayList(citationColl));
     }
 
-    public String getEntry() {
-        return entry;
-    }
-
     public ObservableList<Citation> getCitationList() {
         return citationList;
     }
