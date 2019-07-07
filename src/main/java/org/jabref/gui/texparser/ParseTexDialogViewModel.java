@@ -52,20 +52,19 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
-        this.texDirectory = new SimpleStringProperty("");
+        this.texDirectory = new SimpleStringProperty(
+                databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                               .orElse(preferencesService.getWorkingDir())
+                               .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
         this.noFilesFound = new SimpleBooleanProperty(true);
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        texDirectory.set(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                        .orElse(preferencesService.getWorkingDir())
-                                        .toAbsolutePath().toString());
-        Predicate<String> itExists = path -> (path != null) && Paths.get(path).toFile().exists();
-        Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
-        Predicate<String> isDirectoryAndExists = itExists.and(isDirectory);
-        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectoryAndExists,
+        Predicate<String> isDirectory = path ->
+                path != null && Paths.get(path).toFile().exists() && Paths.get(path).toFile().isDirectory();
+        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
