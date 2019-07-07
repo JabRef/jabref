@@ -38,7 +38,6 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
-    private final Path initialPath;
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final StringProperty texDirectory;
@@ -52,9 +51,6 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
-        this.initialPath = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                          .orElse(preferencesService.getWorkingDir());
-
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
         this.texDirectory = new SimpleStringProperty("");
@@ -62,11 +58,14 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        texDirectory.set(initialPath.toAbsolutePath().toString());
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
-        Predicate<String> fileExists = input -> Files.exists(Paths.get(input));
-        Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
-        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, notEmptyAndfilesExist,
+        texDirectory.set(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                                        .orElse(preferencesService.getWorkingDir())
+                                        .toAbsolutePath().toString());
+        Predicate<String> itExists = input -> (input != null) && Files.exists(Paths.get(input));
+        Predicate<String> isDirectory = input -> Files.isDirectory(Paths.get(input));
+        Predicate<String> isDirectoryAndExists = itExists.and(isDirectory);
+
+        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectoryAndExists,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
@@ -100,7 +99,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     protected void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(getSearchDirectory()).build();
+                .withInitialDirectory(Paths.get(texDirectory.get())).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             texDirectory.set(selectedDirectory.toAbsolutePath().toString());
@@ -108,24 +107,8 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         });
     }
 
-    private Path getSearchDirectory() {
-        Path directory = Paths.get(texDirectory.get());
-
-        if (Files.notExists(directory)) {
-            directory = initialPath;
-            texDirectory.set(directory.toAbsolutePath().toString());
-        }
-
-        if (!Files.isDirectory(directory)) {
-            directory = directory.getParent();
-            texDirectory.set(directory.toAbsolutePath().toString());
-        }
-
-        return directory;
-    }
-
     protected void searchButtonClicked() {
-        BackgroundTask.wrap(() -> searchDirectory(getSearchDirectory()))
+        BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
                       .onRunning(() -> {
                           noFilesFound.set(true);
                           searchInProgress.set(true);

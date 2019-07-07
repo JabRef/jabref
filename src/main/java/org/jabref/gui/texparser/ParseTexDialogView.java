@@ -88,7 +88,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField));
 
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
-        searchButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
+        searchButton.disableProperty().bind(viewModel.texDirectoryValidation().validProperty().not());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
     }
