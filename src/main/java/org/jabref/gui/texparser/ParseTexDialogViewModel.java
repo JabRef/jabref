@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -38,10 +39,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
-    private final ObjectProperty<FileNodeViewModel> root;
-    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final StringProperty texDirectory;
     private final FunctionBasedValidator texDirectoryValidator;
+    private final ObjectProperty<FileNodeViewModel> root;
+    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final BooleanProperty noFilesFound;
     private final BooleanProperty searchInProgress;
     private final BooleanProperty successfulSearch;
@@ -51,10 +52,9 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
+        this.texDirectory = new SimpleStringProperty("");
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
-
-        this.texDirectory = new SimpleStringProperty("");
         this.noFilesFound = new SimpleBooleanProperty(true);
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
@@ -65,17 +65,8 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         Predicate<String> itExists = path -> (path != null) && Paths.get(path).toFile().exists();
         Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
         Predicate<String> isDirectoryAndExists = itExists.and(isDirectory);
-
         texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectoryAndExists,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-    }
-
-    public ObjectProperty<FileNodeViewModel> rootProperty() {
-        return root;
-    }
-
-    public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
-        return checkedFileList;
     }
 
     public StringProperty texDirectoryProperty() {
@@ -84,6 +75,14 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus texDirectoryValidation() {
         return texDirectoryValidator.getValidationStatus();
+    }
+
+    public ObjectProperty<FileNodeViewModel> rootProperty() {
+        return root;
+    }
+
+    public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
+        return new ReadOnlyListWrapper<>(checkedFileList);
     }
 
     public BooleanProperty noFilesFoundProperty() {
@@ -98,7 +97,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return successfulSearch;
     }
 
-    protected void browseButtonClicked() {
+    public void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(Paths.get(texDirectory.get())).build();
 
@@ -108,7 +107,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         });
     }
 
-    protected void searchButtonClicked() {
+    public void searchButtonClicked() {
         BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
                       .onRunning(() -> {
                           root.set(null);
@@ -157,7 +156,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return parent;
     }
 
-    protected void parseButtonClicked() {
+    public void parseButtonClicked() {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath().toAbsolutePath())
                                              .filter(path -> path != null && path.toFile().isFile())

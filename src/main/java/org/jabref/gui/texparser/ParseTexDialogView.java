@@ -29,6 +29,7 @@ import org.fxmisc.easybind.EasyBind;
 public class ParseTexDialogView extends BaseDialog<Void> {
 
     private final BibDatabaseContext databaseContext;
+    private final ControlsFxVisualizer validationVisualizer;
     @FXML private TextField texDirectoryField;
     @FXML private Button browseButton;
     @FXML private Button searchButton;
@@ -40,8 +41,6 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
     private ParseTexDialogViewModel viewModel;
-    private ControlsFxVisualizer validationVisualizer;
-    private Button parseButton;
 
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -53,7 +52,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
+        Button parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
         parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(
                 Bindings.isEmpty(viewModel.getCheckedFileList())));
 
