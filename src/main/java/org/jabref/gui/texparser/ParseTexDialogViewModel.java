@@ -53,6 +53,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
+
         this.texDirectory = new SimpleStringProperty("");
         this.noFilesFound = new SimpleBooleanProperty(true);
         this.searchInProgress = new SimpleBooleanProperty(false);
@@ -61,16 +62,12 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         texDirectory.set(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                         .orElse(preferencesService.getWorkingDir())
                                         .toAbsolutePath().toString());
-        Predicate<String> itExists = input -> (input != null) && Files.exists(Paths.get(input));
-        Predicate<String> isDirectory = input -> Files.isDirectory(Paths.get(input));
+        Predicate<String> itExists = path -> (path != null) && Paths.get(path).toFile().exists();
+        Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
         Predicate<String> isDirectoryAndExists = itExists.and(isDirectory);
 
         texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectoryAndExists,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-    }
-
-    public ValidationStatus texDirectoryValidation() {
-        return texDirectoryValidator.getValidationStatus();
     }
 
     public ObjectProperty<FileNodeViewModel> rootProperty() {
@@ -83,6 +80,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     public StringProperty texDirectoryProperty() {
         return texDirectory;
+    }
+
+    public ValidationStatus texDirectoryValidation() {
+        return texDirectoryValidator.getValidationStatus();
     }
 
     public BooleanProperty noFilesFoundProperty() {
@@ -110,13 +111,14 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     protected void searchButtonClicked() {
         BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
                       .onRunning(() -> {
+                          root.set(null);
                           noFilesFound.set(true);
                           searchInProgress.set(true);
                           successfulSearch.set(false);
                       })
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(root -> {
-                          this.root.set(root);
+                      .onSuccess(newRoot -> {
+                          root.set(newRoot);
                           noFilesFound.set(false);
                           successfulSearch.set(true);
                       })
@@ -125,16 +127,16 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
-        if (directory == null || !Files.exists(directory) || !Files.isDirectory(directory)) {
+        if (directory == null || !directory.toFile().exists() || !directory.toFile().isDirectory()) {
             throw new IOException();
         }
 
         List<Path> files = Files.list(directory)
-                                .filter(path -> !Files.isDirectory(path) && path.toString().endsWith(TEX_EXT))
+                                .filter(path -> !path.toFile().isDirectory() && path.toString().endsWith(TEX_EXT))
                                 .collect(Collectors.toList());
 
         List<Path> subDirectories = Files.list(directory)
-                                         .filter(path -> Files.isDirectory(path))
+                                         .filter(path -> path.toFile().isDirectory())
                                          .collect(Collectors.toList());
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
@@ -158,7 +160,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     protected void parseButtonClicked() {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath().toAbsolutePath())
-                                             .filter(path -> path != null && Files.isRegularFile(path))
+                                             .filter(path -> path != null && path.toFile().isFile())
                                              .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             return;

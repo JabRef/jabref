@@ -3,6 +3,7 @@ package org.jabref.gui.texparser;
 import javax.inject.Inject;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -40,6 +41,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     private ParseTexDialogViewModel viewModel;
     private ControlsFxVisualizer validationVisualizer;
+    private Button parseButton;
 
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -51,8 +53,9 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        Button parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
-        parseButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
+        parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
+        parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(
+                Bindings.isEmpty(viewModel.getCheckedFileList())));
 
         setResultConverter(button -> {
             if (button == parseButtonType) {

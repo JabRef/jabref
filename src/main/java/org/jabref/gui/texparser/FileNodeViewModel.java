@@ -1,6 +1,5 @@
 package org.jabref.gui.texparser;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.StringJoiner;
 
@@ -38,7 +37,7 @@ public class FileNodeViewModel {
     }
 
     public String getDisplayText() {
-        if (Files.isDirectory(this.path)) {
+        if (this.path.toFile().isDirectory()) {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,
                     fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
         }
