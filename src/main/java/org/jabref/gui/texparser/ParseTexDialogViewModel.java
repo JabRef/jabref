@@ -24,7 +24,6 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.texparser.DefaultTexParser;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.texparser.TexParserResult;
 import org.jabref.preferences.PreferencesService;
 
 public class ParseTexDialogViewModel extends AbstractViewModel {
@@ -93,6 +92,22 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         });
     }
 
+    private Path getSearchDirectory() {
+        Path directory = Paths.get(texDirectory.get());
+
+        if (Files.notExists(directory)) {
+            directory = initialPath;
+            texDirectory.set(directory.toAbsolutePath().toString());
+        }
+
+        if (!Files.isDirectory(directory)) {
+            directory = directory.getParent();
+            texDirectory.set(directory.toAbsolutePath().toString());
+        }
+
+        return directory;
+    }
+
     protected void searchButtonClicked() {
         BackgroundTask.wrap(() -> searchDirectory(getSearchDirectory()))
                       .onRunning(() -> {
@@ -141,40 +156,18 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return parent;
     }
 
-    private Path getSearchDirectory() {
-        Path directory = Paths.get(texDirectory.get());
-
-        if (Files.notExists(directory)) {
-            directory = initialPath;
-            texDirectory.set(directory.toAbsolutePath().toString());
-        }
-
-        if (!Files.isDirectory(directory)) {
-            directory = directory.getParent();
-            texDirectory.set(directory.toAbsolutePath().toString());
-        }
-
-        return directory;
-    }
-
     protected void parseButtonClicked() {
-        BackgroundTask.wrap(() -> parse())
-                      .onSuccess(fileList -> {
-                          if (fileList.isEmpty()) {
-                              return;
-                          }
-                          TexParserResult result = new DefaultTexParser().parse(fileList);
-                          ParseTexResultView dialog = new ParseTexResultView(result);
-                          dialog.showAndWait();
-                      })
+        List<Path> fileList = checkedFileList.stream()
+                                             .map(item -> item.getValue().getPath().toAbsolutePath())
+                                             .filter(path -> path != null && Files.isRegularFile(path))
+                                             .collect(Collectors.toList());
+        if (fileList.isEmpty()) {
+            return;
+        }
+
+        BackgroundTask.wrap(() -> new DefaultTexParser().parse(fileList))
+                      .onSuccess(result -> new ParseTexResultView(result).showAndWait())
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
-    }
-
-    private List<Path> parse() {
-        return checkedFileList.stream()
-                              .map(item -> item.getValue().getPath().toAbsolutePath())
-                              .filter(path -> path != null && Files.isRegularFile(path))
-                              .collect(Collectors.toList());
     }
 }
