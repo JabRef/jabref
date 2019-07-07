@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -22,9 +23,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class ParseTexDialogViewModel extends AbstractViewModel {
 
@@ -36,6 +42,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final StringProperty texDirectory;
+    private final FunctionBasedValidator texDirectoryValidator;
     private final BooleanProperty noFilesFound;
     private final BooleanProperty searchInProgress;
     private final BooleanProperty successfulSearch;
@@ -56,6 +63,15 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.successfulSearch = new SimpleBooleanProperty(false);
 
         texDirectory.set(initialPath.toAbsolutePath().toString());
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> fileExists = input -> Files.exists(Paths.get(input));
+        Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
+        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, notEmptyAndfilesExist,
+                ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+    }
+
+    public ValidationStatus texDirectoryValidation() {
+        return texDirectoryValidator.getValidationStatus();
     }
 
     public ObjectProperty<FileNodeViewModel> rootProperty() {

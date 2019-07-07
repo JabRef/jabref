@@ -2,6 +2,7 @@ package org.jabref.gui.texparser;
 
 import javax.inject.Inject;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -11,6 +12,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
@@ -19,6 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckTreeView;
 import org.fxmisc.easybind.EasyBind;
 
@@ -36,9 +39,11 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
     private ParseTexDialogViewModel viewModel;
+    private ControlsFxVisualizer validationVisualizer;
 
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
+        this.validationVisualizer = new ControlsFxVisualizer();
 
         this.setTitle(Localization.lang("LaTeX references search"));
 
@@ -79,6 +84,9 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                 .install(fileTreeView);
 
         texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField));
+
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
         searchButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
