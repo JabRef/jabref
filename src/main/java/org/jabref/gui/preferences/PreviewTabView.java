@@ -1,8 +1,11 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
-import javafx.collections.ObservableList;
+import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -11,7 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
@@ -21,7 +23,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -60,8 +61,6 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
-
-    private ListView<PreviewLayout> dragSourceList = null;
 
     private long lastKeyPressTime;
     private String listSearchTerm;
@@ -126,8 +125,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 .withText(PreviewLayout::getName)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
-        availableListView.setOnDragDetected(event -> dragDetected(availableListView, event));
-        availableListView.setOnDragDropped(event -> dragDropped(availableListView, event));
+        availableListView.setOnDragDetected(this::dragDetectedInAvailable);
+        availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -138,8 +137,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 .setOnDragDropped(this::dragDroppedInChosenCell)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
-        chosenListView.setOnDragDetected(event -> dragDetected(chosenListView, event));
-        chosenListView.setOnDragDropped(event -> dragDropped(chosenListView, event));
+        chosenListView.setOnDragDetected(this::dragDetectedInChosen);
+        chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
@@ -151,8 +150,6 @@ public class PreviewTabView extends VBox implements PrefsTab {
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
         previewPane.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
-        // previewPane.setMaxWidth(650); // FixMe: PreviewViewer is too large
-        // previewPane.getContent().maxWidth(650);
         ((PreviewViewer) previewPane.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewPane.getContent()).setLayout(value));
         previewPane.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
@@ -179,6 +176,13 @@ public class PreviewTabView extends VBox implements PrefsTab {
         editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
     }
 
+    /**
+     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView.
+     * The ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+     * @param list The ListView currently focused
+     * @param keypressed The pressed character
+     */
+
     public void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
             return;
@@ -197,74 +201,35 @@ public class PreviewTabView extends VBox implements PrefsTab {
     }
 
     public void dragOver(DragEvent event) {
-        if (event.getDragboard().hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
-            event.acceptTransferModes(TransferMode.MOVE);
-        }
+        viewModel.dragOver(event);
     }
 
-    public void dragDetected(ListView<PreviewLayout> sourceListView, MouseEvent event) {
-        PreviewLayout layout = sourceListView.getSelectionModel().getSelectedItem();
-        if (layout != null) {
-            ClipboardContent content = new ClipboardContent();
-            Dragboard dragboard = sourceListView.startDragAndDrop(TransferMode.MOVE);
-            content.put(DragAndDropDataFormats.PREVIEWLAYOUT, layout.getName());
-            dragboard.setContent(content);
-            dragSourceList = sourceListView;
+    public void dragDetectedInAvailable(MouseEvent event) {
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+        if (!selectedLayouts.isEmpty()) {
+            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+            viewModel.dragDetected(viewModel.availableListProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
 
-    public void dragDropped(ListView<PreviewLayout> targetListView, DragEvent event) {
-        Dragboard dragboard = event.getDragboard();
-        boolean success = false;
-
-        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
-            PreviewLayout draggedLayout = viewModel.findLayoutByName((String) dragboard.getContent(DragAndDropDataFormats.PREVIEWLAYOUT));
-            if (draggedLayout != null) {
-                if (dragSourceList != null) {
-                    dragSourceList.getItems().remove(draggedLayout);
-                }
-
-                targetListView.getItems().add(draggedLayout);
-
-                success = true;
-
-                if (targetListView == availableListView) {
-                    targetListView.getItems().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-                }
-            }
+    public void dragDetectedInChosen(MouseEvent event) {
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
+        if (!selectedLayouts.isEmpty()) {
+            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+            viewModel.dragDetected(viewModel.chosenListProperty(), selectedLayouts, dragboard);
         }
+        event.consume();
+    }
 
+    public void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
+        boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }
 
     public void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
-        Dragboard dragboard = event.getDragboard();
-        ObservableList<PreviewLayout> items = dragSourceList.itemsProperty().get();
-        boolean success = false;
-
-        int targetId = chosenListView.getItems().indexOf(targetLayout);;
-
-        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUT)) {
-            String draggedLayoutName = (String) dragboard.getContent(DragAndDropDataFormats.PREVIEWLAYOUT);
-            if (!draggedLayoutName.isEmpty()) {
-                PreviewLayout draggedLayout = null;
-                for (int i = 0; i < items.size(); i++) {
-                    if (items.get(i).getName().equals(draggedLayoutName)) {
-                        draggedLayout = dragSourceList.getItems().remove(i);
-                        break;
-                    }
-                }
-
-                if (draggedLayout != null) {
-                    chosenListView.getItems().add(targetId, draggedLayout);
-                    chosenListView.getSelectionModel().clearAndSelect(targetId);
-                    success = true;
-                }
-            }
-        }
-
+        boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }

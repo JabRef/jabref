@@ -19,11 +19,18 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -57,6 +64,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
 
+    private ListProperty<PreviewLayout> dragSourceList = null;
+    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
+
     public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -84,11 +94,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
-                      .onSuccess(value -> value.stream()
-                                               .map(CitationStylePreviewLayout::new)
-                                               .filter(style -> !chosenListProperty.getValue().contains(style))
-                                               .sorted(Comparator.comparing(PreviewLayout::getName))
-                                               .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
+                      .onSuccess(styles -> styles.stream()
+                                                 .map(CitationStylePreviewLayout::new)
+                                                 .filter(style -> chosenListProperty.getValue().filtered(item ->
+                                                         item.getName().equals(style.getName())).isEmpty())
+                                                 .sorted(Comparator.comparing(PreviewLayout::getName))
+                                                 .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
                       .onFailure(ex -> {
                           LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
@@ -313,6 +324,92 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
+    }
+
+    public void dragOver(DragEvent event) {
+        if (event.getDragboard().hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    public void dragDetected(ListProperty<PreviewLayout> sourceList, List<PreviewLayout> selectedLayouts, Dragboard dragboard) {
+        ClipboardContent content = new ClipboardContent();
+        content.put(DragAndDropDataFormats.PREVIEWLAYOUTS, "");
+        dragboard.setContent(content);
+        localDragboard.putPreviewLayouts(selectedLayouts);
+        dragSourceList = sourceList;
+    }
+
+    /**
+     * Is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of
+     * chosenListView
+     *
+     * @param targetList either availableListView or chosenListView
+     */
+
+    public boolean dragDropped(ListProperty<PreviewLayout> targetList, Dragboard dragboard) {
+        boolean success = false;
+
+        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
+            List<PreviewLayout> draggedLayouts = localDragboard.getPreviewLayouts();
+            if (!draggedLayouts.isEmpty()) {
+                dragSourceList.getValue().removeAll(draggedLayouts);
+                targetList.getValue().addAll(draggedLayouts);
+                success = true;
+
+                if (targetList == availableListProperty) {
+                    targetList.getValue().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                }
+            }
+        }
+
+        return success;
+    }
+
+    /**
+     * This is called, when the user drops some PreviewLayouts on another cell to sort them
+     *
+     * @param targetLayout the Layout, the user drops a layout on
+     */
+
+    public boolean dragDroppedInChosenCell(PreviewLayout targetLayout, Dragboard dragboard) {
+        boolean success = false;
+
+        if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
+            List<PreviewLayout> draggedSelectedLayouts = new ArrayList<>(localDragboard.getPreviewLayouts());
+            if (!draggedSelectedLayouts.isEmpty()) {
+
+                int targetId = chosenListProperty.getValue().indexOf(targetLayout);
+
+                // see https://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
+                int onSelectedDelta = 0;
+                while (draggedSelectedLayouts.contains(targetLayout)) {
+                    onSelectedDelta = 1;
+                    targetId--;
+                    if (targetId < 0) {
+                        targetId = 0;
+                        targetLayout = null;
+                        break;
+                    }
+                    targetLayout = chosenListProperty.getValue().get(targetId);
+                }
+
+                dragSourceList.getValue().removeAll(draggedSelectedLayouts);
+
+                if (targetLayout != null) {
+                    targetId = chosenListProperty.getValue().indexOf(targetLayout) + onSelectedDelta;
+                } else if (targetId != 0) {
+                    targetId = chosenListProperty.getValue().size();
+                }
+
+                chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);
+                chosenSelectionModelProperty.getValue().clearSelection();
+                draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
+                success = true;
+            }
+        }
+
+        return success;
     }
 
     public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }
