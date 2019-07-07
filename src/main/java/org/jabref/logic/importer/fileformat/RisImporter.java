@@ -6,13 +6,13 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.Arrays;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -28,8 +28,6 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
-    //stores all the date tags from highest to lowest priority
-    private final List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
     
     @Override
     public String getName() {
@@ -62,11 +60,15 @@ public class RisImporter extends Importer {
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                                         .split("ER  -.*\\n");
 
+        //stores all the date tags from highest to lowest priority
+        List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
+
         for (String entry1 : entries) {
 
             String dateTag = "";
             String dateValue = "";
             int datePriority = dateTags.size();
+            int tagPriority;
 
             String type = "";
             String author = "";
@@ -198,8 +200,7 @@ public class RisImporter extends Importer {
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(FieldName.URL, value);
-                    } else if (isDateTag(tag) && value.length() >= 4) {
-                        int tagPriority = getDatePriority(tag);
+                    } else if ((tagPriority = dateTags.indexOf(tag)) != -1 && value.length() >= 4) {
 
                         if (tagPriority < datePriority) {
                             String year = value.substring(0, 4);
@@ -314,13 +315,5 @@ public class RisImporter extends Importer {
             doi = doi.replaceAll("(?i)doi:", "").trim();
             hm.put(FieldName.DOI, doi);
         }
-    }
-
-    private boolean isDateTag(String searchTag) {
-        return dateTags.stream().anyMatch(tag -> tag.equals(searchTag));
-    }
-
-    private int getDatePriority(String dateTag) {
-        return dateTags.indexOf(dateTag);
     }
 }
