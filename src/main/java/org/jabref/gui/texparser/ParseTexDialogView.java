@@ -2,12 +2,12 @@ package org.jabref.gui.texparser;
 
 import javax.inject.Inject;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 
@@ -33,6 +33,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @FXML private TextField texDirectoryField;
     @FXML private Button browseButton;
     @FXML private Button searchButton;
+    @FXML private ProgressIndicator progressIndicator;
     @FXML private CheckTreeView<FileNodeViewModel> fileTreeView;
     @FXML private Button selectAllButton;
     @FXML private Button unselectAllButton;
@@ -87,12 +88,14 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
         texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField));
+        validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField);
 
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
         searchButton.disableProperty().bind(viewModel.texDirectoryValidation().validProperty().not());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
+
+        progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());
     }
 
     @FXML
