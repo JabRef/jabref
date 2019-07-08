@@ -76,7 +76,7 @@ public class CustomLocalDragboard {
     /**
      * Get a List of {@link PreviewLayout} from the dragboard
      *
-     * @return List of BibEntry or empty list if no entries are avaiable
+     * @return List of PreviewLayout or empty list if no entries are avaiable
      */
     public List<PreviewLayout> getPreviewLayouts() {
         if (hasType(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS)) {
