@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -40,6 +39,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
@@ -58,6 +60,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final ObjectProperty<PreviewLayout> layoutProperty = new SimpleObjectProperty<>();
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
+
+    private FunctionBasedValidator chosenListValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -80,15 +84,24 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
             }
         });
+
+        chosenListValidator = new FunctionBasedValidator<>(
+                chosenListProperty,
+                input -> !chosenListProperty.getValue().isEmpty(),
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("Entry preview"),
+                        Localization.lang("Selected"),
+                        Localization.lang("Selected Layouts can not be empty")
+                        )
+                )
+        );
     }
 
     public void setValues() {
-        ObservableList<PreviewLayout> availableLayouts = availableListProperty.getValue();
-
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
 
-        availableLayouts.clear();
+        availableListProperty.clear();
         if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
             availableListProperty.getValue().add(previewPreferences.getTextBasedPreviewLayout());
         }
@@ -99,7 +112,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))
-                                                 .forEach(availableLayouts::add)) // does not accept a property, so this is using availableLayouts
+                                                 .forEach(availableListProperty::add))
                       .onFailure(ex -> {
                           LOGGER.error("Something went wrong while adding the discovered CitationStyles to the list. ", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
@@ -134,7 +147,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
     }
 
-    public PreviewLayout findLayoutByName(String name) {
+    private PreviewLayout findLayoutByName(String name) {
         return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                     .findAny()
                                     .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
@@ -142,7 +155,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .orElse(null));
     }
 
-    public PreviewLayout getCurrentLayout() {
+    private PreviewLayout getCurrentLayout() {
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
         }
@@ -190,9 +203,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    public ValidationStatus chosenListValidationStatus() {
+        return chosenListValidator.getValidationStatus();
+    }
+
     @Override
     public boolean validateSettings() {
-        return !chosenListProperty.getValue().isEmpty();
+        ValidationStatus status = chosenListValidationStatus();
+        if (!status.isValid()) {
+            if (status.getHighestMessage().isPresent()) {
+                dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+            }
+            return false;
+        }
+        return true;
     }
 
     public void addToChosen() {

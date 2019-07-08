@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -27,6 +28,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citationstyle.PreviewLayout;
@@ -36,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -66,6 +69,8 @@ public class PreviewTabView extends VBox implements PrefsTab {
     private String listSearchTerm;
 
     private PreviewTabViewModel viewModel;
+
+    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private class EditAction extends SimpleCommand {
 
@@ -174,6 +179,9 @@ public class PreviewTabView extends VBox implements PrefsTab {
         contextMenu.getItems().get(0).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
+
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
     }
 
     /**
@@ -183,7 +191,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
      * @param keypressed The pressed character
      */
 
-    public void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
+    private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
             return;
         }
@@ -200,11 +208,11 @@ public class PreviewTabView extends VBox implements PrefsTab {
             .findFirst().ifPresent(list::scrollTo);
     }
 
-    public void dragOver(DragEvent event) {
+    private void dragOver(DragEvent event) {
         viewModel.dragOver(event);
     }
 
-    public void dragDetectedInAvailable(MouseEvent event) {
+    private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
@@ -213,7 +221,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
         event.consume();
     }
 
-    public void dragDetectedInChosen(MouseEvent event) {
+    private void dragDetectedInChosen(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
@@ -222,13 +230,13 @@ public class PreviewTabView extends VBox implements PrefsTab {
         event.consume();
     }
 
-    public void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
+    private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }
 
-    public void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
+    private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
         boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
