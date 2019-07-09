@@ -171,6 +171,7 @@ public class AuthorList {
         final boolean authorsContainOpeningBrace = authors.contains("{");
         final boolean authorsContainSemicolon = authors.contains(";");
         final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
+
         if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
             List<String> arrayNameList = Arrays.asList(authors.split(","));
 
@@ -186,6 +187,7 @@ public class AuthorList {
             // If not, we check if spaces separate pre- and lastname
             if (spaceInAllParts) {
                 authors = authors.replaceAll(",", " and");
+
             } else {
                 // Looking for name affixes to avoid
                 // arrayNameList needs to reduce by the count off avoiding terms
@@ -207,13 +209,16 @@ public class AuthorList {
                     authors = buildWithAffix(avoidIndex, arrayNameList).toString();
                 }
             }
+
         }
+
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();
             authorList = parser.parse(authors);
             AUTHOR_CACHE.put(authors, authorList);
+
         }
         return authorList;
     }
@@ -278,7 +283,7 @@ public class AuthorList {
      * @see AuthorList#getForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
-        return AuthorList.parse(authors).getForAlphabetization();
+        return AuthorList.parse(authors).getAsFirstLastNamesWithAnd();
     }
 
     /**

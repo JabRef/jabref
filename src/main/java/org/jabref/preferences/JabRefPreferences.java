@@ -1541,7 +1541,6 @@ public class JabRefPreferences implements PreferencesService {
                                               getFileLinkPreferences(), journalAbbreviationLoader);
     }
 
-    @Override
     public XmpPreferences getXMPPreferences() {
         return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                                   getKeywordDelimiter());
@@ -1816,7 +1815,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
     }
 
-    @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
         return new AutoLinkPreferences(
                                        getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),

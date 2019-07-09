@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,5 +40,13 @@ class AuthorTest {
         assertEquals("J{\\\"o}rg", Author.addDotIfAbbreviation("J{\\\"o}rg"));
         assertEquals("Moore, O. and O. Moore", Author.addDotIfAbbreviation("Moore, O. and O. Moore"));
         assertEquals("Moore, O. and O. Moore and Moore, O. O.", Author.addDotIfAbbreviation("Moore, O. and O. Moore and Moore, O. O."));
+    }
+
+    @Test
+    public void testAuthEtAlBraces() {
+        assertEquals("{\\v{S}}pan{\\v{e}}l",
+                     BibtexKeyGenerator.authEtal("Patrik {\\v{S}}pan{\\v{e}}l and Kseniya Dryahina and David Smith", "", "EtAl"));
+        assertEquals("\\v{S}pan\\v{e}lEtAl",
+                     BibtexKeyGenerator.authEtal("Patrik \\v{S}pan\\v{e}l and Kseniya Dryahina and David Smith", "", "EtAl"));
     }
 }

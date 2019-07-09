@@ -200,7 +200,10 @@ public class Author {
      * * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
      * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
      */
+    /**/
     private String removeStartAndEndBraces(String name) {
+
+
         if (StringUtil.isBlank(name)) {
             return null;
         }
@@ -376,6 +379,7 @@ public class Author {
      * @return "Last, Jr, F." as described above or "" if all these parts
      * are empty.
      */
+    /*REFATORAR ESSA FUNÇÃO POIS ESTÁ REMOVENDO A CHAVE DE FORMA ERRADA*/
     public String getNameForAlphabetization() {
         StringBuilder res = new StringBuilder();
         getLast().ifPresent(res::append);

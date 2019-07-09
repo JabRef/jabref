@@ -18,17 +18,18 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.when;
 class LinkedFileViewModelTest {
 
     private Path tempFile;
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private LinkedFile linkedFile;
     private BibEntry entry;
     private BibDatabaseContext databaseContext;
@@ -51,7 +53,6 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
     private ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private FilePreferences filePreferences = mock(FilePreferences.class);
-    private XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
@@ -74,7 +75,7 @@ class LinkedFileViewModelTest {
         linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
         doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -92,7 +93,7 @@ class LinkedFileViewModelTest {
                                                          any(ButtonType.class),
                                                          any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -110,7 +111,7 @@ class LinkedFileViewModelTest {
                                                          any(ButtonType.class),
                                                          any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -128,7 +129,7 @@ class LinkedFileViewModelTest {
                                                          any(ButtonType.class),
                                                          any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -145,7 +146,7 @@ class LinkedFileViewModelTest {
                                                          any(ButtonType.class),
                                                          any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
@@ -158,8 +159,9 @@ class LinkedFileViewModelTest {
 
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); //use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, externalFileType);
 
         BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {

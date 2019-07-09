@@ -29,7 +29,6 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -49,28 +48,23 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    private final DialogService dialogService;
-    private final BibDatabaseContext databaseContext;
-
     public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              JabRefPreferences preferences) {
-
         this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
-        this.dialogService = dialogService;
-        this.databaseContext = databaseContext;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                   .withTooltip(LinkedFileViewModel::getDescription)
-                   .withGraphic(LinkedFilesEditor::createFileDisplay)
-                   .withContextMenu(this::createContextMenuForFile)
-                   .withOnMouseClickedEvent(this::handleItemMouseClick)
-                   .setOnDragDetected(this::handleOnDragDetected)
-                   .setOnDragDropped(this::handleOnDragDropped)
-                   .setOnDragOver(this::handleOnDragOver);
+                .withTooltip(LinkedFileViewModel::getDescription)
+                .withGraphic(LinkedFilesEditor::createFileDisplay)
+                .withContextMenu(this::createContextMenuForFile)
+                .withOnMouseClickedEvent(this::handleItemMouseClick)
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver);
 
         listView.setCellFactory(cellFactory);
 
@@ -240,10 +234,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
         renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
 
-        MenuItem copyLinkedFile = new MenuItem(Localization.lang("Copy linked file to folder..."));
-        copyLinkedFile.setOnAction(event -> new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext).copyFile());
-        copyLinkedFile.setDisable(linkedFile.getFile().isOnlineLink());
-
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
         deleteFile.setDisable(linkedFile.getFile().isOnlineLink());
@@ -258,7 +248,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (linkedFile.getFile().isOnlineLink()) {
             menu.getItems().add(download);
         }
-        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, copyLinkedFile, deleteLink, deleteFile);
+        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, deleteLink, deleteFile);
 
         return menu;
     }

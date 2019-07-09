@@ -32,12 +32,12 @@ public class CopyFilesAction extends SimpleCommand {
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
     }
 
-    private void showDialog(List<CopyFilesResultItemViewModel> data) {
+    private void showDialog(List<CopyFilesResultItemViewModel> data, BibDatabaseContext database) {
         if (data.isEmpty()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
             return;
         }
-        CopyFilesDialogView dialog = new CopyFilesDialogView(new CopyFilesResultListDependency(data));
+        CopyFilesDialogView dialog = new CopyFilesDialogView(database, new CopyFilesResultListDependency(data));
         dialog.showAndWait();
     }
 
@@ -57,7 +57,7 @@ public class CopyFilesAction extends SimpleCommand {
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);
             Globals.TASK_EXECUTOR.execute(exportTask);
-            exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue()));
+            exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue(), database));
         });
     }
 }
