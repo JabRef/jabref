@@ -88,27 +88,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         return description;
     }
 
-    public void confirmRecommendations(String status) {
-        try {
-            URIBuilder builder = new URIBuilder();
-            builder.setScheme("http");
-            builder.setHost(MDL_URL);
-            builder.setPath("/v2/recommendations/" + recommendationSetId + "/status/" + status);
-            try {
-                URI uri = builder.build();
-                URLDownload urlDownload = new URLDownload(uri.toString());
-                URLDownload.bypassSSLVerification();
-                urlDownload.asString();
-            }
-            catch (URISyntaxException se) {
-                LOGGER.error("Problem connecting to Mr. DLib", se);
-            }
-
-        } catch (IOException e) {
-            LOGGER.error("Problem connecting to Mr. DLib", e);
-        }
-    }
-
     /**
      * Contact the server with the title of the selected item
      *
