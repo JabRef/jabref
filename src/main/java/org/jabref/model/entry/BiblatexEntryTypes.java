@@ -22,7 +22,7 @@ public class BiblatexEntryTypes {
 
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE,
-                    FieldName.orFields(FieldName.JOURNAL, FieldName.JOURNALTITLE),
+                    FieldName.orFields(FieldName.JOURNALTITLE),
                     FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.SUBTITLE,
                     FieldName.TITLEADDON, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,

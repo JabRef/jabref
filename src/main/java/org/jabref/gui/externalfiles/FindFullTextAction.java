@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,18 +97,24 @@ public class FindFullTextAction extends AbstractWorker {
                 DownloadExternalFile fileDownload = new DownloadExternalFile(basePanel.frame(),
                         basePanel.getBibDatabaseContext(), entry);
                 try {
-                    fileDownload.download(result.get(), "application/pdf", file -> {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            Optional<FieldChange> fieldChange = entry.addFile(file);
-                            if (fieldChange.isPresent()) {
-                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                                basePanel.getUndoManager().addEdit(edit);
-                                basePanel.markBaseChanged();
-                            }
-                        });
+ 		    String str = dir.toString() + entry.getField(FieldName.FILE);
+                    File f = new File(str);
+                    if (f.isFile()) {
+                        return;
+                    } else {
+		            fileDownload.download(result.get(), "application/pdf", file -> {
+		                DefaultTaskExecutor.runInJavaFXThread(() -> {
+		                    Optional<FieldChange> fieldChange = entry.addFile(file);
+		                    if (fieldChange.isPresent()) {
+		                        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+		                                entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+		                        basePanel.getUndoManager().addEdit(edit);
+		                        basePanel.markBaseChanged();
+		                   }
+		                });
 
-                    });
+                              });
+		    }
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);
                     basePanel.output(Localization.lang("Full text document download failed for entry %0",
