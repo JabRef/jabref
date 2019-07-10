@@ -228,7 +228,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        if (chosenSelectionModelProperty.isNull().getValue()) {
+        if (availableSelectionModelProperty.isNull().getValue()) {
             return;
         }
 
