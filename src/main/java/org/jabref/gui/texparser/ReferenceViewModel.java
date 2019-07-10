@@ -25,6 +25,9 @@ public class ReferenceViewModel {
         return citationList;
     }
 
+    /**
+     * Return a string for displaying an entry key and its number of uses.
+     */
     public String getDisplayText() {
         return String.format("%s (%s)", entry, citationList.size());
     }

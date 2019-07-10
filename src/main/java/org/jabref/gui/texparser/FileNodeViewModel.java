@@ -36,6 +36,9 @@ public class FileNodeViewModel {
         return children;
     }
 
+    /**
+     * Return a string for displaying a node name (and its number of children if it is a directory).
+     */
     public String getDisplayText() {
         if (this.path.toFile().isDirectory()) {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,

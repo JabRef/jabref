@@ -80,7 +80,7 @@ public class TexBibEntriesResolverResult {
      * Insert into the list of new entries an entry with the given key.
      */
     public void insertEntry(BibDatabase masterDatabase, String key) {
-        insertEntry(masterDatabase.getEntryByKey(key).get());
+        masterDatabase.getEntryByKey(key).ifPresent(this::insertEntry);
     }
 
     /**

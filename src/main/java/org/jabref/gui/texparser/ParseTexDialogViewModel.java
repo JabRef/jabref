@@ -106,6 +106,9 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         });
     }
 
+    /**
+     * Run a recursive search in a background task.
+     */
     public void searchButtonClicked() {
         BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
                       .onRunning(() -> {
@@ -130,7 +133,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         }
 
         List<Path> files = Files.list(directory)
-                                .filter(path -> !path.toFile().isDirectory() && path.toString().endsWith(TEX_EXT))
+                                .filter(path -> path.toFile().isFile() && path.toString().endsWith(TEX_EXT))
                                 .collect(Collectors.toList());
 
         List<Path> subDirectories = Files.list(directory)
@@ -155,6 +158,9 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         return parent;
     }
 
+    /**
+     * Parse all checked files in a background task.
+     */
     public void parseButtonClicked() {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath().toAbsolutePath())

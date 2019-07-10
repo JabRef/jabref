@@ -75,11 +75,9 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                 new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
         EasyBind.subscribe(fileTreeView.rootProperty(), root -> {
-            if (root != null) {
-                ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
-                root.setExpanded(true);
-                EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
-            }
+            ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
+            root.setExpanded(true);
+            EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
         });
 
         new ViewModelTreeCellFactory<FileNodeViewModel>()

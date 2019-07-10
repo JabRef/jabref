@@ -9,7 +9,7 @@ public class Citation {
     /**
      * The total number of characters that are shown around a cite (cite width included).
      */
-    private static final int CONTEXT_WIDTH = 50;
+    private static final int CONTEXT_WIDTH = 200;
 
     private final Path path;
     private final int line;

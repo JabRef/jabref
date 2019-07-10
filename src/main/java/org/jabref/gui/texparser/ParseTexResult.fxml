@@ -12,10 +12,10 @@
     <content>
         <VBox spacing="10.0">
             <HBox spacing="10.0" VBox.vgrow="ALWAYS">
-                <ListView fx:id="referenceListView" prefWidth="200.0" />
-                <ListView fx:id="citationListView" HBox.hgrow="ALWAYS" />
+                <ListView fx:id="referenceListView" prefWidth="200.0"/>
+                <ListView fx:id="citationListView" HBox.hgrow="ALWAYS"/>
             </HBox>
         </VBox>
     </content>
-    <ButtonType fx:constant="CLOSE" />
+    <ButtonType fx:constant="CLOSE"/>
 </DialogPane>

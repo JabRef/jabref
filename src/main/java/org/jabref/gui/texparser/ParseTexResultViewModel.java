@@ -30,6 +30,9 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
+    /**
+     * Update the citation list depending on the selected reference.
+     */
     public void activeReferenceChanged(ReferenceViewModel reference) {
         if (reference == null) {
             getCitationListByReference().clear();
