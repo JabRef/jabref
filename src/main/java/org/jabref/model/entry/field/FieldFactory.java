@@ -10,7 +10,6 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.util.OptionalUtil;
 
 public class FieldFactory {

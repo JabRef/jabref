@@ -34,7 +34,7 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 

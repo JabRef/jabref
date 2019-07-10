@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.model.entry.FieldProperty;
-
 /**
  * Standard BibTeX and BibLaTex fields
  */

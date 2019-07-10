@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.strings.StringUtil;
 
 public interface Field<SelfType extends Field<SelfType>> extends Comparable<SelfType> {

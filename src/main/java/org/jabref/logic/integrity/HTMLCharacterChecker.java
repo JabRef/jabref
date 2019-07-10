@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
 
 public class HTMLCharacterChecker implements Checker {

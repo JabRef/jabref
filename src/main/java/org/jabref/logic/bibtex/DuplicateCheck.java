@@ -15,7 +15,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
