@@ -1,8 +1,6 @@
 package org.jabref.gui.maintable;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -18,10 +16,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 
 public class NormalTableColumn extends MainTableColumn<String> {
 
-    private final Set<Field> bibtexFields;
+    private final OrFields bibtexFields;
 
     private final boolean isIconColumn;
 
@@ -32,7 +31,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
     private final LayoutFormatter toUnicode = new LatexToUnicodeFormatter();
     private final String columnName;
 
-    public NormalTableColumn(String columnName, Set<Field> bibtexFields, BibDatabase database) {
+    public NormalTableColumn(String columnName, OrFields bibtexFields, BibDatabase database) {
         super(columnName);
         this.columnName = columnName;
         this.bibtexFields = bibtexFields;
@@ -47,15 +46,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
      * @return name to be displayed. null if field is empty.
      */
     public String getDisplayName() {
-        if (bibtexFields.isEmpty()) {
-            return null;
-        }
-
-        StringJoiner joiner = new StringJoiner("/");
-        for (Field field : bibtexFields) {
-            joiner.add(field.getDisplayName());
-        }
-        return joiner.toString();
+        return bibtexFields.getDisplayName();
     }
 
     @Override

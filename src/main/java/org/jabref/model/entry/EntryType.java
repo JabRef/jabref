@@ -15,6 +15,7 @@ import org.jabref.model.entry.field.StandardField;
  * Interface for all EntryTypes.
  */
 public interface EntryType extends Comparable<EntryType> {
+
     /**
      * Returns the tag name of the entry type.
      *

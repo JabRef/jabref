@@ -14,6 +14,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
@@ -29,7 +30,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         NAME, TYPE, YEAR, MONTH, OTHER
     }
 
-    private final Field[] fields;
+    private final OrFields fields;
     private final FieldType fieldType;
     private final boolean isNumeric;
     private final int multiplier;

@@ -40,10 +40,11 @@ public class FieldFactory {
         return Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
     }
 
-    public static Set<Field> parseOrFields(String fieldNames) {
-        return Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
+    public static OrFields parseOrFields(String fieldNames) {
+        Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
                      .map(FieldFactory::parseField)
                      .collect(Collectors.toSet());
+        return new OrFields(fields);
     }
 
     public static Set<Field> parseFields(String fieldNames) {
