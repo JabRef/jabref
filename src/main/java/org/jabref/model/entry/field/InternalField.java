@@ -1,7 +1,12 @@
 package org.jabref.model.entry.field;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
+
+import org.jabref.model.entry.FieldProperty;
 
 /**
  * JabRef internal fields
@@ -9,11 +14,9 @@ import java.util.Optional;
 public enum InternalField implements Field<InternalField> {
     INTERNAL_ALL_FIELD("all"),
     INTERNAL_ALL_TEXT_FIELDS_FIELD("all-text-fields"),
-    SEARCH_INTERNAL("__search"),
-    GROUPSEARCH_INTERNAL("__groupsearch"),
     MARKED_INTERNAL("__markedentry"),
     OWNER("owner"),
-    TIMESTAMP("timestamp"), // Not the actual field name, but the default value
+    TIMESTAMP("timestamp", FieldProperty.DATE),
     GROUPS("groups"),
     KEY_FIELD("bibtexkey"),
     TYPE_HEADER("entrytype"),
@@ -22,9 +25,16 @@ public enum InternalField implements Field<InternalField> {
     INTERNAL_ID_FIELD("JabRef-internal-id");
 
     private final String name;
+    private final Set<FieldProperty> properties;
 
     InternalField(String name) {
         this.name = name;
+        this.properties = EnumSet.noneOf(FieldProperty.class);
+    }
+
+    InternalField(String name, FieldProperty first, FieldProperty... rest) {
+        this.name = name;
+        this.properties = EnumSet.of(first, rest);
     }
 
     public static Optional<InternalField> fromName(String name) {
@@ -34,7 +44,17 @@ public enum InternalField implements Field<InternalField> {
     }
 
     @Override
+    public Set<FieldProperty> getProperties() {
+        return Collections.unmodifiableSet(properties);
+    }
+
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean isStandardField() {
+        return false;
     }
 }

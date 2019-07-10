@@ -15,6 +15,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -336,7 +337,7 @@ public class RepecNepImporter extends Importer {
                         importFormatPreferences.getKeywordSeparator());
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
-                be.setField("jel", readMultipleLines(in));
+                be.setField(new UnknownField("jel"), readMultipleLines(in));
 
             } else if (keyword.startsWith("Date")) {
                 // parse date field

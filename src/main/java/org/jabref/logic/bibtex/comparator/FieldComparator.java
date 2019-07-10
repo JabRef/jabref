@@ -5,14 +5,13 @@ import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -30,13 +29,12 @@ public class FieldComparator implements Comparator<BibEntry> {
         NAME, TYPE, YEAR, MONTH, OTHER
     }
 
-    private final String[] field;
-    private final String fieldName;
+    private final Field[] fields;
     private final FieldType fieldType;
     private final boolean isNumeric;
     private final int multiplier;
 
-    public FieldComparator(String field) {
+    public FieldComparator(Field field) {
         this(field, false);
     }
 
@@ -44,11 +42,10 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(sortCriterion.field, sortCriterion.descending);
     }
 
-    public FieldComparator(String field, boolean descending) {
-        this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(FieldFactory.FIELD_SEPARATOR);
+    public FieldComparator(String fieldText, boolean descending) {
+        this.fields = FieldFactory.parseOrFields(fieldText);
         fieldType = determineFieldType();
-        isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
+        isNumeric = this.fields[0].isNumeric();
         multiplier = descending ? -1 : 1;
     }
 
@@ -62,21 +59,21 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.field[0])) {
+        if (InternalField.TYPE_HEADER.equals(this.fields[0])) {
             return FieldType.TYPE;
-        } else if (InternalBibtexFields.getFieldProperties(this.field[0]).contains(FieldProperty.PERSON_NAMES)) {
+        } else if (this.fields[0].getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.field[0])) {
+        } else if (StandardField.YEAR.equals(this.fields[0])) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.field[0])) {
+        } else if (StandardField.MONTH.equals(this.fields[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
         }
     }
 
-    private String getField(BibEntry entry) {
-        for (String aField : field) {
+    private String getFieldValue(BibEntry entry) {
+        for (Field aField : fields) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
@@ -97,8 +94,8 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else {
             // If the field is author or editor, we rearrange names so they are
             // sorted according to last name.
-            f1 = getField(e1);
-            f2 = getField(e2);
+            f1 = getFieldValue(e1);
+            f2 = getFieldValue(e2);
         }
 
         // Catch all cases involving null:
@@ -147,14 +144,5 @@ public class FieldComparator implements Comparator<BibEntry> {
         String ours = f1.toLowerCase(Locale.ENGLISH);
         String theirs = f2.toLowerCase(Locale.ENGLISH);
         return COLLATOR.compare(ours, theirs) * multiplier;
-    }
-
-    /**
-     * Returns the field this Comparator compares by.
-     *
-     * @return The field name.
-     */
-    public String getFieldName() {
-        return fieldName;
     }
 }

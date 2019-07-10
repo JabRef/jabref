@@ -37,7 +37,7 @@ public class BibEntryWriterTest {
     public void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), true);
+        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences));
     }
 
     @Test

@@ -22,6 +22,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -236,7 +237,7 @@ public class BracketedPattern {
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
@@ -279,7 +280,7 @@ public class BracketedPattern {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
                 return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
@@ -351,7 +352,7 @@ public class BracketedPattern {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
             }
         }
         catch (NullPointerException ex) {
@@ -1307,7 +1308,7 @@ public class BracketedPattern {
                 if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
-                if (StandardField.SCHOOL.equalsIgnoreCase(k)) {
+                if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
                 if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
@@ -1344,7 +1345,7 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !StandardField.SCHOOL.equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {

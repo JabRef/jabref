@@ -6,6 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.field.Field;
+
 /**
  * Abstract base class for all biblatex entry types.
  */
@@ -26,7 +28,7 @@ public abstract class BiblatexEntryType implements EntryType {
     }
 
     @Override
-    public Set<String> getRequiredFields() {
+    public Set<Field> getRequiredFields() {
         return Collections.unmodifiableSet(requiredFields);
     }
 

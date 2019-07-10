@@ -21,7 +21,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 public class RisImporter extends Importer {
 
@@ -70,7 +72,7 @@ public class RisImporter extends Importer {
             String endPage = "";
             String comment = "";
             Optional<Month> month = Optional.empty();
-            Map<String, String> fields = new HashMap<>();
+            Map<Field, String> fields = new HashMap<>();
 
             String[] lines = entry1.split("\n");
 
@@ -158,9 +160,9 @@ public class RisImporter extends Importer {
                     } else if ("LA".equals(tag)) {
                         fields.put(StandardField.LANGUAGE, value);
                     } else if ("CA".equals(tag)) {
-                        fields.put("caption", value);
+                        fields.put(new UnknownField("caption"), value);
                     } else if ("DB".equals(tag)) {
-                        fields.put("database", value);
+                        fields.put(new UnknownField("database"), value);
                     } else if ("IS".equals(tag) || "AN".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
                         fields.put(StandardField.NUMBER, value);
                     } else if ("SP".equals(tag)) {
@@ -242,23 +244,23 @@ public class RisImporter extends Importer {
                     }
                     // fields for which there is no direct mapping in the bibtext standard
                     else if ("AV".equals(tag)) {
-                        fields.put("archive_location", value);
+                        fields.put(new UnknownField("archive_location"), value);
                     } else if ("CN".equals(tag) || "VO".equals(tag)) {
-                        fields.put("call-number", value);
+                        fields.put(new UnknownField("call-number"), value);
                     } else if ("DB".equals(tag)) {
-                        fields.put("archive", value);
+                        fields.put(new UnknownField("archive"), value);
                     } else if ("NV".equals(tag)) {
-                        fields.put("number-of-volumes", value);
+                        fields.put(new UnknownField("number-of-volumes"), value);
                     } else if ("OP".equals(tag)) {
-                        fields.put("original-title", value);
+                        fields.put(new UnknownField("original-title"), value);
                     } else if ("RI".equals(tag)) {
-                        fields.put("reviewed-title", value);
+                        fields.put(new UnknownField("reviewed-title"), value);
                     } else if ("RP".equals(tag)) {
-                        fields.put("status", value);
+                        fields.put(new UnknownField("status"), value);
                     } else if ("SE".equals(tag)) {
-                        fields.put("section", value);
+                        fields.put(new UnknownField("section"), value);
                     } else if ("ID".equals(tag)) {
-                        fields.put("refid", value);
+                        fields.put(new UnknownField("refid"), value);
                     }
                 }
                 // fix authors
@@ -293,7 +295,7 @@ public class RisImporter extends Importer {
 
     }
 
-    private void addDoi(Map<String, String> hm, String val) {
+    private void addDoi(Map<Field, String> hm, String val) {
         String doi = val.toLowerCase(Locale.ENGLISH);
         if (doi.startsWith("doi:")) {
             doi = doi.replaceAll("(?i)doi:", "").trim();

@@ -15,6 +15,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -69,10 +70,10 @@ public class CoinsParser implements Parser {
         return Collections.singletonList(entry);
     }
 
-    private void appendData(String data, BibEntry entry, Pattern pattern, String fieldName) {
+    private void appendData(String data, BibEntry entry, Pattern pattern, Field field) {
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
-            entry.setField(fieldName, matcher.group(1));
+            entry.setField(field, matcher.group(1));
         }
     }
 }

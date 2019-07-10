@@ -97,9 +97,7 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -278,7 +276,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
-    public static final String NUMERIC_FIELDS = "numericFields";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
@@ -695,7 +692,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
-        defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
@@ -993,7 +989,7 @@ public class JabRefPreferences implements PreferencesService {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = InternalBibtexFields.getDefaultGeneralFields().stream().collect(Collectors.joining(";"));
+        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(";"));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
 
         // Entry editor tab 1:
@@ -1535,7 +1531,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public TimestampPreferences getTimestampPreferences() {
-        return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), get(TIME_STAMP_FIELD), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
+        return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
     }
 
     @Override
@@ -1829,12 +1825,12 @@ public class JabRefPreferences implements PreferencesService {
 
     public AutoCompletePreferences getAutoCompletePreferences() {
         return new AutoCompletePreferences(
-                                           getBoolean(AUTO_COMPLETE),
-                                           AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                                           getBoolean(AUTOCOMPLETER_LAST_FIRST),
-                                           getBoolean(AUTOCOMPLETER_FIRST_LAST),
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                                           getJournalAbbreviationPreferences());
+                getBoolean(AUTO_COMPLETE),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
+                getBoolean(AUTOCOMPLETER_LAST_FIRST),
+                getBoolean(AUTOCOMPLETER_FIRST_LAST),
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
+                getJournalAbbreviationPreferences());
     }
 
     public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
@@ -1906,7 +1902,7 @@ public class JabRefPreferences implements PreferencesService {
                                                                   return Double.parseDouble(string);
                                                               } catch (NumberFormatException e) {
                                                                   LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                  return BibtexSingleField.DEFAULT_FIELD_LENGTH;
+                                                                  return ColumnPreferences.DEFAULT_FIELD_LENGTH;
                                                               }
                                                           })
                                                           .collect(Collectors.toList());

@@ -27,6 +27,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -78,7 +79,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      * @param textToAppend The value to set. A null in this case will simply preserve the current field state.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
+    private static UndoableEdit massAppendField(Collection<BibEntry> entries, Field field, String textToAppend) {
         String newValue = "";
 
         if (textToAppend != null) {
@@ -105,7 +106,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      *                        entries with existing value in the new field.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField,
+    private static UndoableEdit massRenameField(Collection<BibEntry> entries, Field field, Field newField,
                                                 boolean overwriteValues) {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Rename field"));
         for (BibEntry entry : entries) {
@@ -140,7 +141,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
+    private static UndoableEdit massSetField(Collection<BibEntry> entries, Field field, String textToSet,
                                              boolean overwriteValues) {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {

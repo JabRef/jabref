@@ -34,8 +34,8 @@ import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
@@ -262,7 +262,7 @@ public class MergeEntries extends BorderPane {
         allFields.addAll(rightEntry.getFieldNames());
 
         // Do not show internal fields
-        Set<Field> internalFields = allFields.stream().filter(InternalBibtexFields::isInternalField).collect(Collectors.toSet());
+        Set<Field> internalFields = allFields.stream().filter(FieldFactory::isInternalField).collect(Collectors.toSet());
         allFields.removeAll(internalFields);
     }
 

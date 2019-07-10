@@ -1,8 +1,8 @@
 package org.jabref.gui.autocompleter;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 import org.jabref.model.entry.Author;
@@ -17,17 +17,17 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
  */
 public class PersonNameSuggestionProvider extends SuggestionProvider<Author> implements AutoCompleteSuggestionProvider<Author> {
 
-    private final List<Field> fieldNames;
+    private final Collection<Field> fields;
     private final Comparator<Author> authorComparator = Comparator.comparing(Author::getNameForAlphabetization);
 
     PersonNameSuggestionProvider(Field fieldName) {
         this(Collections.singletonList(Objects.requireNonNull(fieldName)));
     }
 
-    public PersonNameSuggestionProvider(List<Field> fieldNames) {
+    public PersonNameSuggestionProvider(Collection<Field> fields) {
         super();
 
-        this.fieldNames = Objects.requireNonNull(fieldNames);
+        this.fields = Objects.requireNonNull(fields);
 
     }
 
@@ -37,8 +37,8 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> imp
             return;
         }
 
-        for (Field fieldName : fieldNames) {
-            entry.getField(fieldName).ifPresent(fieldValue ->  {
+        for (Field field : fields) {
+            entry.getField(field).ifPresent(fieldValue -> {
                 AuthorList authorList = AuthorList.parse(fieldValue);
                 for (Author author : authorList.getAuthors()) {
                     addPossibleSuggestions(author);

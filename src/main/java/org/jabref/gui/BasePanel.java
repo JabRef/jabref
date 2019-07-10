@@ -92,11 +92,11 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.entry.field.StandardField;
@@ -809,7 +809,7 @@ public class BasePanel extends StackPane {
     }
 
     private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = new PersonNameSuggestionProvider(InternalBibtexFields.getPersonNameFields());
+        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields());
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
             searchAutoCompleter.indexEntry(entry);
         }

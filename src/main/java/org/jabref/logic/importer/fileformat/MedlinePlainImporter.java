@@ -17,8 +17,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -90,7 +92,7 @@ public class MedlinePlainImporter extends Importer {
             String author = "";
             String editor = "";
             String comment = "";
-            Map<String, String> fields = new HashMap<>();
+            Map<Field, String> fieldConversionMap = new HashMap<>();
 
             String[] lines = entry1.split("\n");
 
@@ -125,11 +127,11 @@ public class MedlinePlainImporter extends Importer {
                 if ("PT".equals(label)) {
                     type = addSourceType(value, type);
                 }
-                addDates(fields, label, value);
-                addAbstract(fields, label, value);
-                addTitles(fields, label, value, type);
-                addIDs(fields, label, value);
-                addStandardNumber(fields, label, value);
+                addDates(fieldConversionMap, label, value);
+                addAbstract(fieldConversionMap, label, value);
+                addTitles(fieldConversionMap, label, value, type);
+                addIDs(fieldConversionMap, label, value);
+                addStandardNumber(fieldConversionMap, label, value);
 
                 if ("FAU".equals(label)) {
                     if ("".equals(author)) {
@@ -146,53 +148,53 @@ public class MedlinePlainImporter extends Importer {
                 }
 
                 //store the fields in a map
-                Map<String, String> hashMap = new HashMap<>();
+                Map<String, Field> hashMap = new HashMap<>();
                 hashMap.put("PG", StandardField.PAGES);
                 hashMap.put("PL", StandardField.ADDRESS);
-                hashMap.put("PHST", "history");
-                hashMap.put("PST", "publication-status");
+                hashMap.put("PHST", new UnknownField("history"));
+                hashMap.put("PST", new UnknownField("publication-status"));
                 hashMap.put("VI", StandardField.VOLUME);
                 hashMap.put("LA", StandardField.LANGUAGE);
-                hashMap.put("PUBM", "model");
-                hashMap.put("RN", "registry-number");
-                hashMap.put("NM", "substance-name");
-                hashMap.put("OCI", "copyright-owner");
-                hashMap.put("CN", "corporate");
+                hashMap.put("PUBM", new UnknownField("model"));
+                hashMap.put("RN", new UnknownField("registry-number"));
+                hashMap.put("NM", new UnknownField("substance-name"));
+                hashMap.put("OCI", new UnknownField("copyright-owner"));
+                hashMap.put("CN", new UnknownField("corporate"));
                 hashMap.put("IP", StandardField.ISSUE);
                 hashMap.put("EN", StandardField.EDITION);
-                hashMap.put("GS", "gene-symbol");
+                hashMap.put("GS", new UnknownField("gene-symbol"));
                 hashMap.put("GN", StandardField.NOTE);
-                hashMap.put("GR", "grantno");
-                hashMap.put("SO", "source");
-                hashMap.put("NR", "number-of-references");
-                hashMap.put("SFM", "space-flight-mission");
-                hashMap.put("STAT", "status");
-                hashMap.put("SB", "subset");
-                hashMap.put("OTO", "termowner");
+                hashMap.put("GR", new UnknownField("grantno"));
+                hashMap.put("SO", new UnknownField("source"));
+                hashMap.put("NR", new UnknownField("number-of-references"));
+                hashMap.put("SFM", new UnknownField("space-flight-mission"));
+                hashMap.put("STAT", new UnknownField("status"));
+                hashMap.put("SB", new UnknownField("subset"));
+                hashMap.put("OTO", new UnknownField("termowner"));
                 hashMap.put("OWN", InternalField.OWNER);
 
                 //add the fields to hm
-                for (Map.Entry<String, String> mapEntry : hashMap.entrySet()) {
+                for (Map.Entry<String, Field> mapEntry : hashMap.entrySet()) {
                     String medlineKey = mapEntry.getKey();
-                    String bibtexKey = mapEntry.getValue();
+                    Field bibtexKey = mapEntry.getValue();
                     if (medlineKey.equals(label)) {
-                        fields.put(bibtexKey, value);
+                        fieldConversionMap.put(bibtexKey, value);
                     }
                 }
 
                 if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
-                    String oldInvestigator = fields.get("investigator");
+                    String oldInvestigator = fieldConversionMap.get("investigator");
                     if (oldInvestigator == null) {
-                        fields.put("investigator", value);
+                        fieldConversionMap.put(new UnknownField("investigator"), value);
                     } else {
-                        fields.put("investigator", oldInvestigator + ", " + value);
+                        fieldConversionMap.put(new UnknownField("investigator"), oldInvestigator + ", " + value);
                     }
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fields.containsKey(StandardField.KEYWORDS)) {
-                        fields.put(StandardField.KEYWORDS, value);
+                    if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
+                        fieldConversionMap.put(StandardField.KEYWORDS, value);
                     } else {
-                        String kw = fields.get(StandardField.KEYWORDS);
-                        fields.put(StandardField.KEYWORDS, kw + ", " + value);
+                        String kw = fieldConversionMap.get(StandardField.KEYWORDS);
+                        fieldConversionMap.put(StandardField.KEYWORDS, kw + ", " + value);
                     }
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
@@ -204,19 +206,19 @@ public class MedlinePlainImporter extends Importer {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, StandardField.AUTHOR);
-            fixAuthors(fields, editor, StandardField.EDITOR);
+            fixAuthors(fieldConversionMap, author, StandardField.AUTHOR);
+            fixAuthors(fieldConversionMap, editor, StandardField.EDITOR);
             if (!comment.isEmpty()) {
-                fields.put(StandardField.COMMENT, comment);
+                fieldConversionMap.put(StandardField.COMMENT, comment);
             }
 
             BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
 
             // Remove empty fields:
-            fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);
+            fieldConversionMap.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fieldConversionMap::remove);
 
             // create one here
-            b.setField(fields);
+            b.setField(fieldConversionMap);
             bibitems.add(b);
         }
 
@@ -266,16 +268,16 @@ public class MedlinePlainImporter extends Importer {
         return theType;
     }
 
-    private void addStandardNumber(Map<String, String> hm, String lab, String value) {
+    private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = StandardField.ISSN;
+            Field key = StandardField.ISSN;
             //it is possible to have two issn, one for electronic and for print
             //if there are two then it comes at the end in brackets (electronic) or (print)
             //so search for the brackets
             if (value.indexOf('(') > 0) {
                 int keyStart = value.indexOf('(');
                 int keyEnd = value.indexOf(')');
-                key = value.substring(keyStart + 1, keyEnd) + "-" + key;
+                key = new UnknownField(value.substring(keyStart + 1, keyEnd) + "-" + key);
                 String numberValue = value.substring(0, keyStart - 1);
                 hm.put(key, numberValue);
             } else {
@@ -286,16 +288,16 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
-    private void fixAuthors(Map<String, String> hm, String author, String field) {
+    private void fixAuthors(Map<Field, String> hm, String author, Field field) {
         if (!author.isEmpty()) {
             String fixedAuthor = AuthorList.fixAuthorLastNameFirst(author);
             hm.put(field, fixedAuthor);
         }
     }
 
-    private void addIDs(Map<String, String> hm, String lab, String value) {
+    private void addIDs(Map<Field, String> hm, String lab, String value) {
         if ("AID".equals(lab)) {
-            String key = "article-id";
+            Field key = new UnknownField("article-id");
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
@@ -303,25 +305,25 @@ public class MedlinePlainImporter extends Importer {
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');
-                key = "article-" + value.substring(startOfIdentifier + 1, endOfIdentifier);
+                key = new UnknownField("article-" + value.substring(startOfIdentifier + 1, endOfIdentifier));
                 idValue = value.substring(0, startOfIdentifier - 1);
             }
             hm.put(key, idValue);
 
         } else if ("LID".equals(lab)) {
-            hm.put("location-id", value);
+            hm.put(new UnknownField("location-id"), value);
         } else if ("MID".equals(lab)) {
-            hm.put("manuscript-id", value);
+            hm.put(new UnknownField("manuscript-id"), value);
         } else if ("JID".equals(lab)) {
-            hm.put("nlm-unique-id", value);
+            hm.put(new UnknownField("nlm-unique-id"), value);
         } else if ("OID".equals(lab)) {
-            hm.put("other-id", value);
+            hm.put(new UnknownField("other-id"), value);
         } else if ("SI".equals(lab)) {
-            hm.put("second-id", value);
+            hm.put(new UnknownField("second-id"), value);
         }
     }
 
-    private void addTitles(Map<String, String> hm, String lab, String val, String type) {
+    private void addTitles(Map<Field, String> hm, String lab, String val, String type) {
         if ("TI".equals(lab)) {
             String oldVal = hm.get(StandardField.TITLE);
             if (oldVal == null) {
@@ -342,17 +344,17 @@ public class MedlinePlainImporter extends Importer {
                 hm.put(StandardField.JOURNAL, val);
             }
         } else if ("CTI".equals(lab)) {
-            hm.put("collection-title", val);
+            hm.put(new UnknownField("collection-title"), val);
         } else if ("TA".equals(lab)) {
-            hm.put("title-abbreviation", val);
+            hm.put(new UnknownField("title-abbreviation"), val);
         } else if ("TT".equals(lab)) {
-            hm.put("transliterated-title", val);
+            hm.put(new UnknownField("transliterated-title"), val);
         } else if ("VTI".equals(lab)) {
-            hm.put("volume-title", val);
+            hm.put(new UnknownField("volume-title"), val);
         }
     }
 
-    private void addAbstract(Map<String, String> hm, String lab, String value) {
+    private void addAbstract(Map<Field, String> hm, String lab, String value) {
         String abstractValue = "";
         if ("AB".equals(lab)) {
             //adds copyright information that comes at the end of an abstract
@@ -360,7 +362,7 @@ public class MedlinePlainImporter extends Importer {
                 int copyrightIndex = value.lastIndexOf("Copyright");
                 //remove the copyright from the field since the name of the field is copyright
                 String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
-                hm.put("copyright", copyrightInfo);
+                hm.put(new UnknownField("copyright"), copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);
             } else {
                 abstractValue = value;
@@ -372,21 +374,21 @@ public class MedlinePlainImporter extends Importer {
                 hm.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
-            hm.put("other-abstract", value);
+            hm.put(new UnknownField("other-abstract"), value);
         }
     }
 
-    private void addDates(Map<String, String> hm, String lab, String val) {
+    private void addDates(Map<Field, String> hm, String lab, String val) {
         if ("CRDT".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("create-date", val);
+            hm.put(new UnknownField("create-date"), val);
         } else if ("DEP".equals(lab) && isDateFormat(val)) {
-            hm.put("electronic-publication", val);
+            hm.put(new UnknownField("electronic-publication"), val);
         } else if ("DA".equals(lab) && isDateFormat(val)) {
-            hm.put("date-created", val);
+            hm.put(new UnknownField("date-created"), val);
         } else if ("DCOM".equals(lab) && isDateFormat(val)) {
-            hm.put("completed", val);
+            hm.put(new UnknownField("completed"), val);
         } else if ("LR".equals(lab) && isDateFormat(val)) {
-            hm.put("revised", val);
+            hm.put(new UnknownField("revised"), val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
             hm.put(StandardField.YEAR, parts[0]);
@@ -394,9 +396,9 @@ public class MedlinePlainImporter extends Importer {
                 hm.put(StandardField.MONTH, parts[1]);
             }
         } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("publication", val);
+            hm.put(new UnknownField("publication"), val);
         } else if ("MHDA".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("mesh-date", val);
+            hm.put(new UnknownField("mesh-date"), val);
         }
     }
 

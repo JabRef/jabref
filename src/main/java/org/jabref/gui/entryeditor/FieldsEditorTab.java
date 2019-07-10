@@ -35,7 +35,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -162,7 +161,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     private String getPrompt(Field field) {
-        Set<FieldProperty> fieldProperties = InternalBibtexFields.getFieldProperties(field);
+        Set<FieldProperty> fieldProperties = ((Field) (Field<?>) field).getProperties();
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
         } else if (fieldProperties.contains(FieldProperty.DOI)) {

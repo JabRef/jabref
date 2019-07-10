@@ -1,134 +1,157 @@
 package org.jabref.model.entry.field;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
+
+import org.jabref.model.entry.FieldProperty;
 
 /**
  * Standard BibTeX and BibLaTex fields
  */
 public enum StandardField implements Field<StandardField> {
 
-    ABSTRACT("abstract"),
+    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
-    AFTERWORD("afterword"),
+    AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
     ANNOTE("annote"),
     ANNOTATION("annotation"),
-    ANNOTATOR("annotator"),
+    ANNOTATOR("annotator", FieldProperty.PERSON_NAMES),
     ARCHIVEPREFIX("archiveprefix"),
-    ASSIGNEE("assignee"),
-    AUTHOR("author"),
-    BOOKAUTHOR("bookauthor"),
-    BOOKPAGINATION("bookpagination"),
-    BOOKSUBTITLE("booksubtitle"),
-    BOOKTITLE("booktitle"),
+    ASSIGNEE("assignee", FieldProperty.PERSON_NAMES),
+    AUTHOR("author", FieldProperty.PERSON_NAMES),
+    BOOKAUTHOR("bookauthor", FieldProperty.PERSON_NAMES),
+    BOOKPAGINATION("bookpagination", FieldProperty.PAGINATION),
+    BOOKSUBTITLE("booksubtitle", FieldProperty.BOOK_NAME),
+    BOOKTITLE("booktitle", FieldProperty.BOOK_NAME),
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
-    COMMENTATOR("commentator"),
-    COMMENT("comment"),
-    CROSSREF("crossref"),
-    DATE("date"),
+    COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
+    COMMENT("comment", FieldProperty.MULTILINE_TEXT),
+    CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
+    DATE("date", FieldProperty.DATE),
     DAY("day"),
     DAYFILED("dayfiled"),
-    DOI("doi", "DOI"),
-    EDITION("edition"),
-    EDITOR("editor"),
-    EDITORA("editora"),
-    EDITORB("editorb"),
-    EDITORC("editorc"),
-    EDITORTYPE("editortype"),
-    EDITORATYPE("editoratype"),
-    EDITORBTYPE("editorbtype"),
-    EDITORCTYPE("editorctype"),
+    DOI("doi", "DOI", FieldProperty.DOI),
+    EDITION("edition", FieldProperty.NUMERIC),
+    EDITOR("editor", FieldProperty.PERSON_NAMES),
+    EDITORA("editora", FieldProperty.PERSON_NAMES),
+    EDITORB("editorb", FieldProperty.PERSON_NAMES),
+    EDITORC("editorc", FieldProperty.PERSON_NAMES),
+    EDITORTYPE("editortype", FieldProperty.EDITOR_TYPE),
+    EDITORATYPE("editoratype", FieldProperty.EDITOR_TYPE),
+    EDITORBTYPE("editorbtype", FieldProperty.EDITOR_TYPE),
+    EDITORCTYPE("editorctype", FieldProperty.EDITOR_TYPE),
     EID("eid"),
-    ENTRYSET("entryset"),
-    EPRINT("eprint"),
+    ENTRYSET("entryset", FieldProperty.MULTIPLE_ENTRY_LINK),
+    EPRINT("eprint", FieldProperty.EPRINT),
     EPRINTCLASS("eprintclass"),
     EPRINTTYPE("eprinttype"),
-    EVENTDATE("eventdate"),
+    EVENTDATE("eventdate", FieldProperty.DATE),
     EVENTTITLE("eventtitle"),
     EVENTTITLEADDON("eventtitleaddon"),
-    FILE("file"),
-    FOREWORD("foreword"),
+    FILE("file", FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM),
+    FOREWORD("foreword", FieldProperty.PERSON_NAMES),
     FOLDER("folder"),
-    GENDER("gender"),
-    HOLDER("holder"),
+    GENDER("gender", FieldProperty.GENDER),
+    HOLDER("holder", FieldProperty.PERSON_NAMES),
     HOWPUBLISHED("howpublished"),
+    IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
-    INTRODUCTION("introduction"),
-    ISBN("isbn", "ISBN"),
+    INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
+    ISBN("isbn", "ISBN", FieldProperty.ISBN),
     ISRN("isrn", "ISRN"),
     ISSN("issn", "ISSN"),
     ISSUE("issue"),
     ISSUETITLE("issuetitle"),
     ISSUESUBTITLE("issuesubtitle"),
-    JOURNAL("journal"),
-    JOURNALSUBTITLE("journalsubtitle"),
-    JOURNALTITLE("journaltitle"),
+    JOURNAL("journal", FieldProperty.JOURNAL_NAME),
+    JOURNALSUBTITLE("journalsubtitle", FieldProperty.JOURNAL_NAME),
+    JOURNALTITLE("journaltitle", FieldProperty.JOURNAL_NAME),
     KEY("key"),
     KEYWORDS("keywords"),
-    LANGUAGE("language"),
+    LANGUAGE("language", FieldProperty.LANGUAGE),
     LOCATION("location"),
-    MAINSUBTITLE("mainsubtitle"),
-    MAINTITLE("maintitle"),
+    MAINSUBTITLE("mainsubtitle", FieldProperty.BOOK_NAME),
+    MAINTITLE("maintitle", FieldProperty.BOOK_NAME),
     MAINTITLEADDON("maintitleaddon"),
-    MONTH("month"),
-    MONTHFILED("monthfiled"),
+    MONTH("month", FieldProperty.MONTH),
+    MONTHFILED("monthfiled", FieldProperty.MONTH),
     NAMEADDON("nameaddon"),
     NATIONALITY("nationality"),
     NOTE("note"),
-    NUMBER("number"),
+    NUMBER("number", FieldProperty.NUMERIC),
     ORGANIZATION("organization"),
-    ORIGDATE("origdate"),
-    ORIGLANGUAGE("origlanguage"),
-    PAGES("pages"),
+    ORIGDATE("origdate", FieldProperty.DATE),
+    ORIGLANGUAGE("origlanguage", FieldProperty.LANGUAGE),
+    PAGES("pages", FieldProperty.PAGES),
     PAGETOTAL("pagetotal"),
-    PAGINATION("pagination"),
+    PAGINATION("pagination", FieldProperty.PAGINATION),
     PART("part"),
     PDF("pdf", "PDF"),
-    PMID("pmid", "PMID"),
+    PMID("pmid", "PMID", FieldProperty.NUMERIC),
     PS("ps", "PS"),
     PUBLISHER("publisher"),
-    PUBSTATE("pubstate"),
+    PUBSTATE("pubstate", FieldProperty.PUBLICATION_STATE),
     PRIMARYCLASS("primaryclass"),
-    RELATED("related"),
+    RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
     REVIEW("review"),
     REVISION("revision"),
     SCHOOL("school"),
     SERIES("series"),
-    SHORTAUTHOR("shortauthor"),
-    SHORTEDITOR("shorteditor"),
+    SHORTAUTHOR("shortauthor", FieldProperty.PERSON_NAMES),
+    SHORTEDITOR("shorteditor", FieldProperty.PERSON_NAMES),
     SHORTTITLE("shorttitle"),
     SORTKEY("sortkey"),
-    SORTNAME("sortname"),
+    SORTNAME("sortname", FieldProperty.PERSON_NAMES),
     SUBTITLE("subtitle"),
     TITLE("title"),
     TITLEADDON("titleaddon"),
-    TRANSLATOR("translator"),
-    TYPE("type"),
+    TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
+    TYPE("type", FieldProperty.TYPE),
     URI("uri", "URI"),
-    URL("url", "URL"),
-    URLDATE("urldate"),
+    URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
+    URLDATE("urldate", FieldProperty.DATE),
     VENUE("venue"),
     VERSION("version"),
-    VOLUME("volume"),
-    VOLUMES("volumes"),
-    YEAR("year"),
+    VOLUME("volume", FieldProperty.NUMERIC),
+    VOLUMES("volumes", FieldProperty.NUMERIC),
+    YEAR("year", FieldProperty.NUMERIC),
     YEARFILED("yearfiled"),
-    MR_NUMBER("mrnumber");
+    MR_NUMBER("mrnumber"),
+    XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
+    XREF("xref", FieldProperty.SINGLE_ENTRY_LINK);
 
     private final String name;
     private final String displayName;
+    private final Set<FieldProperty> properties;
 
     StandardField(String name) {
         this.name = name;
         this.displayName = null;
+        this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
     StandardField(String name, String displayName) {
         this.name = name;
         this.displayName = displayName;
+        this.properties = EnumSet.noneOf(FieldProperty.class);
+    }
+
+    StandardField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
+        this.name = name;
+        this.displayName = displayName;
+        this.properties = EnumSet.of(first, rest);
+    }
+
+    StandardField(String name, FieldProperty first, FieldProperty... rest) {
+        this.name = name;
+        this.displayName = null;
+        this.properties = EnumSet.of(first, rest);
     }
 
     public static Optional<StandardField> fromName(String name) {
@@ -138,8 +161,18 @@ public enum StandardField implements Field<StandardField> {
     }
 
     @Override
+    public Set<FieldProperty> getProperties() {
+        return Collections.unmodifiableSet(properties);
+    }
+
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean isStandardField() {
+        return true;
     }
 
     @Override

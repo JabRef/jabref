@@ -7,8 +7,9 @@ import java.util.List;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
@@ -17,20 +18,8 @@ public class KeyChangeListener {
 
     private final BibDatabase database;
 
-    private final List<String> keyFields = new ArrayList<>();
-
-
     public KeyChangeListener(BibDatabase database) {
         this.database = database;
-
-        // Look for fields with FieldProperies.SINGLE_ENTRY_LINK or FieldProperties.MULTIPLE_ENTRY_LINK to speed up the search later
-
-        for (String fieldName : InternalBibtexFields.getAllPublicFieldNames()) {
-            if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)
-                    || InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-                keyFields.add(fieldName);
-            }
-        }
     }
 
     @Subscribe
@@ -49,9 +38,9 @@ public class KeyChangeListener {
 
     private void updateEntryLinks(String newKey, String oldKey) {
         for (BibEntry entry : database.getEntries()) {
-            for (String field : keyFields) {
+            for (Field field : FieldFactory.getKeyFields()) {
                 entry.getField(field).ifPresent(fieldContent -> {
-                    if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+                    if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                         replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
                     } else { // MULTIPLE_ENTRY_LINK
                         replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
@@ -61,8 +50,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, String field,
-            String fieldContent) {
+    private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
         List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
         int index = keys.indexOf(oldKey);
         if (index != -1) {
@@ -75,8 +63,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void replaceSingleKeyInField(String newKey, String oldKey, BibEntry entry, String field,
-            String fieldContent) {
+    private void replaceSingleKeyInField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
         if (fieldContent.equals(oldKey)) {
             if (newKey == null) {
                 entry.clearField(field);

@@ -14,8 +14,10 @@ import org.jabref.logic.layout.format.RemoveBrackets;
 import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,10 @@ class OOCalcDatabase {
         }
         Collections.sort(entryList, new FieldComparatorStack<>(comparators));
         this.entries = entryList;
+    }
+
+    private static String getField(BibEntry e, Field field) {
+        return e.getField(field).orElse("");
     }
 
     public Document getDOMrepresentation() {
@@ -156,7 +162,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, StandardField.SERIES));
                 addTableCell(result, row, getField(e, StandardField.EDITOR));//new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, StandardField.PUBLISHER));
-                addTableCell(result, row, getField(e, "reporttype"));
+                addTableCell(result, row, getField(e, new UnknownField("reporttype")));
                 addTableCell(result, row, getField(e, StandardField.HOWPUBLISHED));
                 addTableCell(result, row, getField(e, StandardField.INSTITUTION));
                 addTableCell(result, row, getField(e, StandardField.ORGANIZATION));
@@ -186,10 +192,6 @@ class OOCalcDatabase {
             LOGGER.warn("Exception caught...", e);
         }
         return result;
-    }
-
-    private static String getField(BibEntry e, String field) {
-        return e.getField(field).orElse("");
     }
 
     private static void addTableCell(Document doc, Element parent, String content) {

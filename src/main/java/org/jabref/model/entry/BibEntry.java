@@ -482,7 +482,7 @@ public class BibEntry implements Cloneable {
      */
     public boolean allFieldsPresent(Collection<String> allFields, BibDatabase database) {
         return allFields.stream()
-                        .flatMap(fieldNames -> FieldFactory.parseFields(fieldNames).stream())
+                        .flatMap(fieldNames -> FieldFactory.parseOrFields(fieldNames).stream())
                         .allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
@@ -797,6 +797,7 @@ public class BibEntry implements Cloneable {
     }
 
     public ObjectBinding<String> getFieldBinding(Field field) {
+        //noinspection unchecked
         return Bindings.valueAt(fields, field);
     }
 

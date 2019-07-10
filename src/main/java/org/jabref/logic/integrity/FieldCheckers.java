@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
@@ -26,13 +26,13 @@ public class FieldCheckers {
     private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
-        for (Field field : InternalBibtexFields.getJournalNameFields()) {
+        for (Field field : FieldFactory.getJournalNameFields()) {
             fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
-        for (Field field : InternalBibtexFields.getBookNameFields()) {
+        for (Field field : FieldFactory.getBookNameFields()) {
             fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
-        for (Field field : InternalBibtexFields.getPersonNameFields()) {
+        for (Field field : FieldFactory.getPersonNameFields()) {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());

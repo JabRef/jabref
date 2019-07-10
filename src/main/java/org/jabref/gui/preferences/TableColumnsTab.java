@@ -36,10 +36,10 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
 class TableColumnsTab extends Pane implements PrefsTab {
@@ -386,12 +386,12 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         public TableRow() {
             name = new SimpleStringProperty("");
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
             this.name = new SimpleStringProperty(name);
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name, double length) {

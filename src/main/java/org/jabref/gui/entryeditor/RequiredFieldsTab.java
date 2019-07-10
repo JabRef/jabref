@@ -15,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
@@ -27,8 +28,8 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        Set<String> fields = new LinkedHashSet<>();
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+        Set<Field> fields = new LinkedHashSet<>();
         fields.addAll(entryType.getRequiredFieldsFlat());
 
         // Add the edit field for Bibtex-key.

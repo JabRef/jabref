@@ -25,12 +25,12 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
@@ -137,7 +137,7 @@ public class BibDatabase {
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
+        return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
                         .collect(Collectors.toSet());
     }
 

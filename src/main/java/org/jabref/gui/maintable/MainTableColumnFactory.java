@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -153,10 +152,7 @@ class MainTableColumnFactory {
 
         // Read table columns from preferences
         for (String columnName : preferences.getNormalColumns()) {
-            // Stored column name will be used as header
-            // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
-            String[] fields = columnName.split(FieldFactory.FIELD_SEPARATOR);
-            NormalTableColumn column = new NormalTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
+            NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);

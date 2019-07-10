@@ -45,7 +45,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -134,7 +133,7 @@ public class SourceTab extends EntryEditorTab {
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
+        new BibEntryWriter(formatter).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
@@ -283,7 +282,7 @@ public class SourceTab extends EntryEditorTab {
                 Field fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
-                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
+                if (!newEntry.hasField(fieldName)) {
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                     outOfFocusEntry.clearField(fieldName);
                 }

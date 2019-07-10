@@ -10,6 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -74,7 +75,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         BibEntry entry = fetchedEntries.get(0);
 
         // chimbori does not return an ISBN. Thus, we add the one searched for
-        entry.setField("isbn", identifier);
+        entry.setField(StandardField.ISBN, identifier);
 
         doPostCleanup(entry);
 

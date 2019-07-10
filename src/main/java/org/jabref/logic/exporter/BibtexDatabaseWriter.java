@@ -129,7 +129,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()), true);
+                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()));
         bibtexEntryWriter.write(entry, writer, mode, preferences.isReformatFile());
     }
 }

@@ -58,7 +58,7 @@ public class CellFactory {
         for (ExternalFileType fileType : externalFileTypes.getExternalFileTypeSelection()) {
             icon = fileType.getIcon();
             //icon.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
-            TABLE_ICONS.put(fileType, icon);
+            TABLE_ICONS.put(fileType.getField(), icon);
         }
 
         SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager);

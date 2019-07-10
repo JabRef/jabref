@@ -1,8 +1,7 @@
 package org.jabref.gui;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -12,9 +11,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
 import org.jabref.preferences.PreferencesService;
@@ -42,10 +40,7 @@ public class SaveOrderConfigDisplayViewModel {
     public SaveOrderConfigDisplayViewModel(SaveOrderConfig config, PreferencesService prefs) {
         this.prefs = prefs;
 
-        List<Field> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
-        fieldNames.add(InternalField.KEY_FIELD);
-        Collections.sort(fieldNames);
-
+        Set<Field> fieldNames = FieldFactory.getCommonFields();
         priSortFieldsProperty.addAll(fieldNames);
         secSortFieldsProperty.addAll(fieldNames);
         terSortFieldsProperty.addAll(fieldNames);

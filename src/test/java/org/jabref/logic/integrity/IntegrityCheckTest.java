@@ -18,7 +18,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -156,7 +156,7 @@ class IntegrityCheckTest {
 
     @Test
     void testAuthorNameChecks() {
-        for (String field : InternalBibtexFields.getPersonNameFields()) {
+        for (String field : FieldFactory.getPersonNameFields()) {
             // getPersonNameFields returns fields that are available in biblatex only
             // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
@@ -325,7 +325,7 @@ class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
 
         // populate with all known fields
-        for (String fieldName : InternalBibtexFields.getAllPublicAndInternalFieldNames()) {
+        for (String fieldName : FieldFactory.getCommonFields()) {
             entry.setField(fieldName, UUID.randomUUID().toString());
         }
         // add a random field

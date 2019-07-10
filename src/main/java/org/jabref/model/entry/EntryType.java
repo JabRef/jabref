@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,7 +36,7 @@ public interface EntryType extends Comparable<EntryType> {
      *
      * @return a List of required field name Strings
      */
-    Set<String> getRequiredFields();
+    Set<Field> getRequiredFields();
 
     /**
      * Returns all required field names.
@@ -45,11 +44,10 @@ public interface EntryType extends Comparable<EntryType> {
      *
      * @return a List of required field name Strings
      */
-    default Set<String> getRequiredFieldsFlat() {
-        List<String> requiredFlat = getRequiredFields().stream()
-                                                       .map(field -> field.split(FieldFactory.FIELD_SEPARATOR))
-                                                       .flatMap(Arrays::stream)
-                                                       .collect(Collectors.toList());
+    default Set<Field> getRequiredFieldsFlat() {
+        List<Field> requiredFlat = getRequiredFields().stream()
+                                                      .flatMap(text -> FieldFactory.parseOrFields(text).stream())
+                                                      .collect(Collectors.toList());
 
         return Collections.unmodifiableSet(new LinkedHashSet<>(requiredFlat));
     }
@@ -96,9 +94,9 @@ public interface EntryType extends Comparable<EntryType> {
     /**
      * Get list of all optional fields of this entry and their aliases.
      */
-    default Set<String> getOptionalFieldsAndAliases() {
-        Set<String> optionalFieldsAndAliases = new LinkedHashSet<>();
-        for (String field : getOptionalFields()) {
+    default Set<Field> getOptionalFieldsAndAliases() {
+        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>();
+        for (Field field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field);
             if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field)) {
                 optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field));

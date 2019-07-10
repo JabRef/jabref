@@ -27,7 +27,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -72,7 +72,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tableView.getColumns().setAll(column, deleteIconColumn);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(InternalBibtexFields.getAllPublicAndInternalFieldNames()));
+        ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()));
         bibtexFields.setEditable(true);
 
         BorderPane tablePanel = new BorderPane();

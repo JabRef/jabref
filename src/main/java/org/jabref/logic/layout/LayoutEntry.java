@@ -81,7 +81,9 @@ import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -189,7 +191,7 @@ class LayoutEntry {
             case LayoutHelper.IS_LAYOUT_TEXT:
                 return text;
             case LayoutHelper.IS_SIMPLE_COMMAND:
-                String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
+                String value = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text), database).orElse("");
 
                 // If a post formatter has been set, call it:
                 if (postFormatter != null) {
@@ -208,7 +210,7 @@ class LayoutEntry {
                 // Printing the encoding name is not supported in entry layouts, only
                 // in begin/end layouts. This prevents breakage if some users depend
                 // on a field called "encoding". We simply return this field instead:
-                return bibtex.getResolvedFieldOrAlias("encoding", database).orElse(null);
+                return bibtex.getResolvedFieldOrAlias(new UnknownField("encoding"), database).orElse(null);
             default:
                 return "";
         }
@@ -217,9 +219,9 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if (InternalField.TYPE_HEADER.equals(text)) {
+        if (InternalField.TYPE_HEADER.getName().equals(text)) {
             fieldEntry = bibtex.getType();
-        } else if (InternalField.OBSOLETE_TYPE_HEADER.equals(text)) {
+        } else if (InternalField.OBSOLETE_TYPE_HEADER.getName().equals(text)) {
             LOGGER.warn("'" + InternalField.OBSOLETE_TYPE_HEADER
                     + "' is an obsolete name for the entry type. Please update your layout to use '"
                     + InternalField.TYPE_HEADER + "' instead.");
@@ -228,7 +230,7 @@ class LayoutEntry {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? bibtex
-                    .getResolvedFieldOrAlias(text.substring(1), database)
+                    .getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database)
                     .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
@@ -250,13 +252,13 @@ class LayoutEntry {
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
-            field = bibtex.getResolvedFieldOrAlias(text, database);
+            field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text), database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(part), database);
                 if (!field.isPresent()) {
                     break;
                 }
@@ -266,7 +268,7 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(part), database);
                 if (field.isPresent()) {
                     break;
                 }

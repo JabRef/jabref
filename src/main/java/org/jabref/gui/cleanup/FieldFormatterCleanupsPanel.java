@@ -1,9 +1,9 @@
 package org.jabref.gui.cleanup;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,8 +29,8 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 
@@ -162,9 +162,8 @@ public class FieldFormatterCleanupsPanel extends GridPane {
      */
     private GridPane getSelectorPanel() {
         GridPane builder = new GridPane();
-        List<Field> fields = InternalBibtexFields.getAllPublicAndInternalFieldNames();
+        Set<Field> fields = FieldFactory.getCommonFields();
         fields.add(InternalField.KEY_FIELD);
-        Collections.sort(fields);
         selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fields));
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox, 1, 1);

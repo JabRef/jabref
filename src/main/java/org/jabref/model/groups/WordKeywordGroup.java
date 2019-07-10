@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
@@ -28,9 +29,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private final Set<String> searchWords;
     private final boolean onlySplitWordsAtSeparator;
 
-    public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
-            String searchExpression, boolean caseSensitive, Character keywordSeparator,
-            boolean onlySplitWordsAtSeparator) {
+    public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
+                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                            boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;

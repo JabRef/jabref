@@ -2,10 +2,13 @@ package org.jabref.model.entry.field;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.KeywordList;
 
 public enum SpecialField implements Field<SpecialField> {
@@ -75,14 +78,6 @@ public enum SpecialField implements Field<SpecialField> {
                      .findAny();
     }
 
-    /**
-     * @param fieldName the name of the field to check
-     * @return true if given field is a special field, false otherwise
-     */
-    public static boolean isSpecialField(String fieldName) {
-        return SpecialField.fromName(fieldName).isPresent();
-    }
-
     public boolean isSingleValueField() {
         return this.values.size() == 1;
     }
@@ -92,8 +87,18 @@ public enum SpecialField implements Field<SpecialField> {
     }
 
     @Override
+    public Set<FieldProperty> getProperties() {
+        return EnumSet.noneOf(FieldProperty.class);
+    }
+
+    @Override
     public String getName() {
         return fieldName;
+    }
+
+    @Override
+    public boolean isStandardField() {
+        return false;
     }
 
 }

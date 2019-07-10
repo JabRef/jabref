@@ -8,6 +8,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryConverter;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
@@ -36,14 +37,14 @@ public class ConvertToBibtexCleanup implements CleanupJob {
             }
         });
 
-        for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
-            String oldFieldName = alias.getValue();
-            String newFieldName = alias.getKey();
-            entry.getField(oldFieldName).ifPresent(oldValue -> {
-                if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
+        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
+            Field oldField = alias.getValue();
+            Field newField = alias.getKey();
+            entry.getField(oldField).ifPresent(oldValue -> {
+                if (!oldValue.isEmpty() && (!entry.getField(newField).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
-                    entry.setField(newFieldName, oldValue).ifPresent(changes::add);
-                    entry.clearField(oldFieldName).ifPresent(changes::add);
+                    entry.setField(newField, oldValue).ifPresent(changes::add);
+                    entry.clearField(oldField).ifPresent(changes::add);
                 }
             });
         }

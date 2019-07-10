@@ -16,7 +16,10 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.xmpbox.DateConverter;
@@ -157,18 +160,16 @@ public class DublinCoreExtractor {
             String temp = s.substring("bibtex/".length());
             int i = temp.indexOf('/');
             if (i != -1) {
-                String key = temp.substring(0, i);
+                Field key = FieldFactory.parseField(temp.substring(0, i));
                 String value = temp.substring(i + 1);
                 bibEntry.setField(key, value);
 
                 // only for month field - override value
                 // workaround, because the date value of the xmp component of pdf box is corrupted
                 // see also DublinCoreExtractor#extractYearAndMonth
-                if ("month".equals(key)) {
+                if (StandardField.MONTH.equals(key)) {
                     Optional<Month> parsedMonth = Month.parse(value);
-                    if (parsedMonth.isPresent()) {
-                        bibEntry.setField(key, parsedMonth.get().getShortName());
-                    }
+                    parsedMonth.ifPresent(month -> bibEntry.setField(key, month.getShortName()));
                 }
             }
 
@@ -189,7 +190,7 @@ public class DublinCoreExtractor {
     private void extractRights() {
         String rights = dcSchema.getRights();
         if (!StringUtil.isNullOrEmpty(rights)) {
-            bibEntry.setField("rights", rights);
+            bibEntry.setField(new UnknownField("rights"), rights);
         }
     }
 
@@ -202,7 +203,7 @@ public class DublinCoreExtractor {
     private void extractSource() {
         String source = dcSchema.getSource();
         if (!StringUtil.isNullOrEmpty(source)) {
-            bibEntry.setField("source", source);
+            bibEntry.setField(new UnknownField("source"), source);
         }
     }
 
@@ -380,8 +381,7 @@ public class DublinCoreExtractor {
         // Fields for which not to write XMP data later on:
         Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
-        for (Entry<String, String> field : bibEntry.getFieldMap().entrySet()) {
-
+        for (Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
             if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
                 continue;
             }

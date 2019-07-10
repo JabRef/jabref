@@ -6,13 +6,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.field.Field;
+
 /**
  * Abstract base class for all BibTex entry types.
  */
 public abstract class BibtexEntryType implements EntryType {
 
-    private final Set<String> requiredFields;
-    private final Set<String> optionalFields;
+    private final Set<Field> requiredFields;
+    private final Set<Field> optionalFields;
 
 
     public BibtexEntryType() {
@@ -29,12 +31,12 @@ public abstract class BibtexEntryType implements EntryType {
     }
 
     @Override
-    public Set<String> getOptionalFields() {
+    public Set<Field> getOptionalFields() {
         return Collections.unmodifiableSet(optionalFields);
     }
 
     @Override
-    public Set<String> getRequiredFields() {
+    public Set<Field> getRequiredFields() {
         return Collections.unmodifiableSet(requiredFields);
     }
 
@@ -44,16 +46,16 @@ public abstract class BibtexEntryType implements EntryType {
     }
 
     @Override
-    public Set<String> getPrimaryOptionalFields() {
+    public Set<Field> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
     @Override
-    public Set<String> getSecondaryOptionalFields() {
+    public Set<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream().filter(field -> !isPrimary(field)).collect(Collectors.toSet());
     }
 
-    private boolean isPrimary(String field) {
+    private boolean isPrimary(Field field) {
         return getPrimaryOptionalFields().contains(field);
     }
 

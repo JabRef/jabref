@@ -11,11 +11,12 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.Field;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
-    private final List<String> fields;
+    private final List<Field> fields;
 
-    public UserDefinedFieldsTab(String name, List<String> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
+    public UserDefinedFieldsTab(String name, List<Field> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService);
         this.fields = fields;
 
@@ -24,7 +25,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         return fields;
     }
 }

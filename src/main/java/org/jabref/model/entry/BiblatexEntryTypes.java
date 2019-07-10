@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.StandardField;
@@ -149,7 +150,7 @@ public class BiblatexEntryTypes {
 
         // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.INBOOK.getRequiredFields();
         }
 
@@ -173,7 +174,7 @@ public class BiblatexEntryTypes {
 
         // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.INBOOK.getRequiredFields();
         }
 
@@ -317,7 +318,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.INCOLLECTION.getRequiredFields();
         }
 
@@ -467,7 +468,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "ARTICLE" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.ARTICLE.getRequiredFields();
         }
 
@@ -584,7 +585,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "COLLECTION" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.COLLECTION.getRequiredFields();
         }
 
@@ -608,7 +609,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "MVCOLLECTION" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.MVCOLLECTION.getRequiredFields();
         }
 
@@ -632,7 +633,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.INCOLLECTION.getRequiredFields();
         }
 
@@ -747,7 +748,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "INPROCEEDINGS" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.INPROCEEDINGS.getRequiredFields();
         }
 
@@ -771,7 +772,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.ONLINE.getRequiredFields();
         }
 
@@ -877,7 +878,7 @@ public class BiblatexEntryTypes {
 
         // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
-        public Set<String> getRequiredFields() {
+        public Set<Field> getRequiredFields() {
             return BiblatexEntryTypes.ONLINE.getRequiredFields();
         }
 

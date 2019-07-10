@@ -18,6 +18,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
@@ -51,10 +52,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
      */
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = {StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH};
+        Field[] singleFields = {StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH};
 
         // Fields that are accessible in the journal part of the BibJson object
-        String[] journalSingleFieldStrings = {StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME};
+        Field[] journalSingleFields = {StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME};
 
         BibEntry entry = new BibEntry();
         entry.setType("article");
@@ -76,9 +77,9 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         }
 
         // Direct accessible fields
-        for (String field : singleFieldStrings) {
-            if (bibJsonEntry.has(field)) {
-                entry.setField(field, bibJsonEntry.getString(field));
+        for (Field field : singleFields) {
+            if (bibJsonEntry.has(field.getName())) {
+                entry.setField(field, bibJsonEntry.getString(field.getName()));
             }
         }
 
@@ -102,9 +103,9 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                 LOGGER.info("No journal title found.");
             }
             // Other journal related fields
-            for (String field : journalSingleFieldStrings) {
-                if (journal.has(field)) {
-                    entry.setField(field, journal.getString(field));
+            for (Field field : journalSingleFields) {
+                if (journal.has(field.getName())) {
+                    entry.setField(field, journal.getString(field.getName()));
                 }
             }
         } else {

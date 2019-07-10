@@ -30,6 +30,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -160,9 +161,9 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
 
         // Remove ADS note
-        new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
-        new MoveFieldCleanup("adsurl", StandardField.URL).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }

@@ -21,8 +21,8 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
@@ -119,7 +119,7 @@ public class FetchAndMergeEntry {
 
             // Remove fields which are not in the merged entry, unless they are internal fields
             for (Field field : originalFields) {
-                if (!jointFields.contains(field) && !InternalBibtexFields.isInternalField(field)) {
+                if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
                     Optional<String> originalString = originalEntry.getField(field);
                     originalEntry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present

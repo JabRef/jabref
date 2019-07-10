@@ -30,6 +30,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -710,19 +711,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @param entry    The entry.
      * @param database The database the entry belongs to.
-     * @param field    The field, or succession of fields, to look up. If backup fields are needed, separate
+     * @param fields   The field, or succession of fields, to look up. If backup fields are needed, separate
      *                 field names by /. E.g. to use "author" with "editor" as backup, specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
-    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
+    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String fields) {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        String authorField = getStringCitProperty(AUTHOR_FIELD);
-        String[] fields = field.split(FieldFactory.FIELD_SEPARATOR);
-        for (String s : fields) {
-
-            Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
+        Field authorField = FieldFactory.parseField(getStringCitProperty(AUTHOR_FIELD));
+        for (Field field : FieldFactory.parseOrFields(fields)) {
+            Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
                 if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {

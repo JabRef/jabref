@@ -14,8 +14,10 @@ import org.jabref.logic.layout.format.RemoveBrackets;
 import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +171,7 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, StandardField.SCHOOL));
                 addTableCell(result, row, getField(e, StandardField.SERIES));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, StandardField.TITLE))));
-                addTableCell(result, row, getField(e, "reporttype"));
+                addTableCell(result, row, getField(e, new UnknownField("reporttype")));
                 addTableCell(result, row, getField(e, StandardField.VOLUME));
                 addTableCell(result, row, getField(e, StandardField.YEAR));
                 addTableCell(result, row, getField(e, StandardField.YEARFILED));
@@ -194,7 +196,7 @@ class OpenDocumentRepresentation {
         return result;
     }
 
-    private String getField(BibEntry e, String field) {
+    private String getField(BibEntry e, Field field) {
         return e.getResolvedFieldOrAlias(field, database).orElse("");
     }
 

@@ -21,7 +21,7 @@ public class EditExternalFileTypeViewModel {
     public EditExternalFileTypeViewModel(CustomExternalFileType fileType) {
         this.fileType = fileType;
         extensionProperty.setValue(fileType.getExtension());
-        nameProperty.setValue(fileType.getFieldName());
+        nameProperty.setValue(fileType.getField().getDisplayName());
         mimeTypeProperty.setValue(fileType.getMimeType());
         selectedApplicationProperty.setValue(fileType.getOpenWithApplication());
         icon = fileType.getIcon().getGraphicNode();

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.util.OS;
@@ -18,19 +18,16 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
 
     private final LatexFieldFormatter fieldFormatter;
-    private final boolean write;
 
-
-    public BibEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
+    public BibEntryWriter(LatexFieldFormatter fieldFormatter) {
         this.fieldFormatter = fieldFormatter;
-        this.write = write;
     }
 
     public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
@@ -100,7 +97,7 @@ public class BibEntryWriter {
 
         writeKeyField(entry, out);
 
-        Set<String> written = new HashSet<>();
+        Set<Field> written = new HashSet<>();
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
@@ -125,15 +122,13 @@ public class BibEntryWriter {
             }
         }
         // Then write remaining fields in alphabetic order.
-        Set<String> remainingFields = new TreeSet<>();
-        for (String key : entry.getFieldNames()) {
-            boolean writeIt = write ? InternalBibtexFields.isWriteableField(key) :
-                    InternalBibtexFields.isDisplayableField(key);
-            if (!written.contains(key) && writeIt) {
-                remainingFields.add(key);
-            }
-        }
-        for (String field : remainingFields) {
+        Set<Field> remainingFields = entry.getFieldNames()
+                                          .stream()
+                                          .filter(key -> !written.contains(key))
+                                          .sorted()
+                                          .collect(Collectors.toSet());
+
+        for (Field field : remainingFields) {
             writeField(entry, out, field, indentation);
         }
 
@@ -154,12 +149,12 @@ public class BibEntryWriter {
      * @param name  The field name
      * @throws IOException In case of an IO error
      */
-    private void writeField(BibEntry entry, Writer out, String name, int indentation) throws IOException {
+    private void writeField(BibEntry entry, Writer out, Field name, int indentation) throws IOException {
         Optional<String> field = entry.getField(name);
         // only write field if is is not empty
         // field.ifPresent does not work as an IOException may be thrown
         if (field.isPresent() && !field.get().trim().isEmpty()) {
-            out.write("  " + getFieldDisplayName(name, indentation));
+            out.write("  " + getFormattedFieldName(name, indentation));
 
             try {
                 out.write(fieldFormatter.format(field.get(), name));
@@ -171,8 +166,13 @@ public class BibEntryWriter {
     }
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<String> isNotBibtexKey = field -> !InternalField.KEY_FIELD.equals(field);
-        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(String::length).max().orElse(0);
+        Predicate<Field> isNotBibtexKey = field -> !InternalField.KEY_FIELD.equals(field);
+        return entry.getFieldNames()
+                    .stream()
+                    .filter(isNotBibtexKey)
+                    .mapToInt(field -> field.getName().length())
+                    .max()
+                    .orElse(0);
     }
 
     /**
@@ -189,13 +189,8 @@ public class BibEntryWriter {
      * @param field The name of the field.
      * @return The display version of the field name.
      */
-    private String getFieldDisplayName(String field, int intendation) {
-        String actualField = field;
-        if (actualField.isEmpty()) {
-            // hard coded "UNKNOWN" is assigned to a field without any name
-            actualField = "UNKNOWN";
-        }
-
-        return actualField.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
+    private String getFormattedFieldName(Field field, int intendation) {
+        String fieldName = field.getName();
+        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intendation - fieldName.length()) + " = ";
     }
 }

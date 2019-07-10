@@ -45,11 +45,11 @@ public class ContentSelectors {
         return Collections.unmodifiableList(contentSelectors);
     }
 
-    public void removeSelector(String fieldName) {
+    public void removeSelector(Field field) {
         ContentSelector toRemove = null;
 
         for (ContentSelector selector : contentSelectors) {
-            if (selector.getField().equals(fieldName)) {
+            if (selector.getField().equals(field)) {
                 toRemove = selector;
                 break;
             }
