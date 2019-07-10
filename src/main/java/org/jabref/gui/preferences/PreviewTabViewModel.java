@@ -144,7 +144,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void refreshPreview() {
         layoutProperty.setValue(null);
-        setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
+        if (chosenSelectionModelProperty.isNotNull().getValue()) {
+            setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
+        } else {
+            setPreviewLayout(null);
+        }
     }
 
     private PreviewLayout findLayoutByName(String name) {
@@ -156,7 +160,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     private PreviewLayout getCurrentLayout() {
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+        if (chosenSelectionModelProperty.isNotNull().getValue() && !chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
         }
 
@@ -191,9 +195,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .withPreviewStyle(((TextBasedPreviewLayout) previewStyle).getText())
                                                               .build();
 
-        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
-            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(chosenListProperty.getValue().indexOf(chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
+        if (chosenSelectionModelProperty.isNotNull().getValue()
+                && !chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+            newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(
+                    chosenListProperty.getValue().indexOf(
+                            chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
         }
+
         preferences.storePreviewPreferences(newPreviewPreferences);
 
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
@@ -220,22 +228,29 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        List<PreviewLayout> selected = new ArrayList<>();
-        selected.addAll(availableSelectionModelProperty.getValue().getSelectedItems());
+        if (chosenSelectionModelProperty.isNull().getValue()) {
+            return;
+        }
+
+        List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
         availableListProperty.removeAll(selected);
         chosenListProperty.addAll(selected);
     }
 
     public void removeFromChosen() {
-        List<PreviewLayout> selected = new ArrayList<>();
-        selected.addAll(chosenSelectionModelProperty.getValue().getSelectedItems());
+        if (chosenSelectionModelProperty.isNull().getValue()) {
+            return;
+        }
+
+        List<PreviewLayout> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedItems());
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
         availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
     }
 
     public void selectedInChosenUp() {
-        if (chosenSelectionModelProperty.getValue().isEmpty()) {
+        if (chosenSelectionModelProperty.isNull().getValue()
+                || chosenSelectionModelProperty.getValue().isEmpty()) {
             return;
         }
 
@@ -256,7 +271,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void selectedInChosenDown() {
-        if (chosenSelectionModelProperty.getValue().isEmpty()) {
+        if (chosenSelectionModelProperty.isNull().getValue()
+                || chosenSelectionModelProperty.getValue().isEmpty()) {
             return;
         }
 
@@ -279,7 +295,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void resetDefaultLayout() {
         PreviewLayout defaultLayout = findLayoutByName("Preview");
-        if ((defaultLayout != null) && (defaultLayout instanceof TextBasedPreviewLayout)) {
+        if (defaultLayout instanceof TextBasedPreviewLayout) {
             ((TextBasedPreviewLayout) defaultLayout).setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
         }
         refreshPreview();
@@ -309,11 +325,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         final int GROUP_ATTRIBUTE_VALUE = 3;
 
         Matcher matcher = XML_TAG.matcher(text);
-        int lastKwEnd = 0;
+        int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
 
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
             if (matcher.group("COMMENT") != null) {
                 spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
             } else {
@@ -325,29 +341,29 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
                     if (!attributesText.isEmpty()) {
 
-                        lastKwEnd = 0;
+                        lastKeywordEnd = 0;
 
-                        Matcher amatcher = ATTRIBUTES.matcher(attributesText);
-                        while (amatcher.find()) {
-                            spansBuilder.add(Collections.emptyList(), amatcher.start() - lastKwEnd);
-                            spansBuilder.add(Collections.singleton("attribute"), amatcher.end(GROUP_ATTRIBUTE_NAME) - amatcher.start(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("tagmark"), amatcher.end(GROUP_EQUAL_SYMBOL) - amatcher.end(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("avalue"), amatcher.end(GROUP_ATTRIBUTE_VALUE) - amatcher.end(GROUP_EQUAL_SYMBOL));
-                            lastKwEnd = amatcher.end();
+                        Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);
+                        while (attributesMatcher.find()) {
+                            spansBuilder.add(Collections.emptyList(), attributesMatcher.start() - lastKeywordEnd);
+                            spansBuilder.add(Collections.singleton("attribute"), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));
+                            spansBuilder.add(Collections.singleton("tagmark"), attributesMatcher.end(GROUP_EQUAL_SYMBOL) - attributesMatcher.end(GROUP_ATTRIBUTE_NAME));
+                            spansBuilder.add(Collections.singleton("avalue"), attributesMatcher.end(GROUP_ATTRIBUTE_VALUE) - attributesMatcher.end(GROUP_EQUAL_SYMBOL));
+                            lastKeywordEnd = attributesMatcher.end();
                         }
-                        if (attributesText.length() > lastKwEnd) {
-                            spansBuilder.add(Collections.emptyList(), attributesText.length() - lastKwEnd);
+                        if (attributesText.length() > lastKeywordEnd) {
+                            spansBuilder.add(Collections.emptyList(), attributesText.length() - lastKeywordEnd);
                         }
                     }
 
-                    lastKwEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
+                    lastKeywordEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
 
-                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKwEnd);
+                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKeywordEnd);
                 }
             }
-            lastKwEnd = matcher.end();
+            lastKeywordEnd = matcher.end();
         }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKeywordEnd);
         return spansBuilder.create();
     }
 
@@ -429,8 +445,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 }
 
                 chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);
-                chosenSelectionModelProperty.getValue().clearSelection();
-                draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
+
+                if (chosenSelectionModelProperty.isNotNull().getValue()) {
+                    chosenSelectionModelProperty.getValue().clearSelection();
+                    draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
+                }
                 success = true;
             }
         }
