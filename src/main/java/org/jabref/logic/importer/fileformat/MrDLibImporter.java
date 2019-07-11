@@ -12,13 +12,11 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -29,9 +27,11 @@ import org.slf4j.LoggerFactory;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching from Mr.DLib.");
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
+    private String recommendationsHeading;
+    private String recommendationsDescription;
+    private String recommendationSetId;
 
     @SuppressWarnings("unused")
     @Override
@@ -111,12 +111,13 @@ public class MrDLibImporter extends Importer {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse
-        String recommendations = convertToString(input);
+        String recommendationSet = convertToString(input);
+        JSONObject recommendationSetJson = new JSONObject(recommendationSet);
         // The sorted BibEntries gets stored here later
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
         // Get recommendations from response and populate bib entries
-        JSONObject recommendationsJson = new JSONObject(recommendations).getJSONObject("recommendations");
+        JSONObject recommendationsJson = recommendationSetJson.getJSONObject("recommendations");
         Iterator<String> keys = recommendationsJson.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -133,6 +134,11 @@ public class MrDLibImporter extends Importer {
             bibDatabase.insertEntry(bibentry);
         }
         parserResult = new ParserResult(bibDatabase);
+
+        JSONObject label = recommendationSetJson.getJSONObject("label");
+        recommendationsHeading = label.getString("label-text");
+        recommendationsDescription = label.getString("label-description");
+        recommendationSetId = recommendationSetJson.getBigInteger("recommendation_set_id").toString();
     }
 
     /**
@@ -144,7 +150,7 @@ public class MrDLibImporter extends Importer {
         BibEntry current = new BibEntry();
 
         // parse each of the relevant fields into variables
-        String authors = isRecommendationFieldPresent(recommendation, "authors") ? getAuthorsString(recommendation) : "";
+        String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
         String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
@@ -165,43 +171,20 @@ public class MrDLibImporter extends Importer {
         return recommendation.has(field) && !recommendation.isNull(field);
     }
 
-    /**
-     * Creates an authors string from a JSON recommendation
-     * @param recommendation JSON Object recommendation from Mr. DLib
-     * @return A string of all authors, separated by commas and finished with a full stop.
-     */
-    private String getAuthorsString(JSONObject recommendation) {
-        String authorsString = "";
-        JSONArray array = recommendation.getJSONArray("authors");
-        for (int i = 0; i < array.length(); ++i) {
-            authorsString += array.getString(i) + "; ";
-        }
-        int stringLength = authorsString.length();
-        if (stringLength > 2) {
-            authorsString = authorsString.substring(0, stringLength - 2) + ".";
-        }
-        return authorsString;
-    }
-
     public ParserResult getParserResult() {
         return parserResult;
     }
 
-    /**
-     * Gets the error message to be returned if there has been an error in returning recommendations.
-     * Returns default error message if there is no message from Mr. DLib.
-     * @param response The response from the MDL server as a string.
-     * @return String error message to be shown to the user.
-     */
-    public String getResponseErrorMessage(String response) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            if (!jsonObject.has("message")) {
-                return jsonObject.getString("message");
-            }
-        } catch (JSONException ex) {
-            return DEFAULT_MRDLIB_ERROR_MESSAGE;
-        }
-        return DEFAULT_MRDLIB_ERROR_MESSAGE;
+    public String getRecommendationsHeading() {
+        return recommendationsHeading;
     }
+
+    public String getRecommendationsDescription() {
+        return recommendationsDescription;
+    }
+
+    public String getRecommendationSetId() {
+        return recommendationSetId;
+    }
+
 }
