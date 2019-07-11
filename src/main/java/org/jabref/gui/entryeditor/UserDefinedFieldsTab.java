@@ -1,7 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -14,9 +14,9 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
-    private final List<Field> fields;
+    private final Set<Field> fields;
 
-    public UserDefinedFieldsTab(String name, List<Field> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
+    public UserDefinedFieldsTab(String name, Set<Field> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService);
         this.fields = fields;
 

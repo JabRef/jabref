@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
@@ -278,7 +279,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new OtherFieldsTab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames(), dialogService));
 
         // General fields from preferences
-        for (Map.Entry<String, List<String>> tab : preferences.getEntryEditorTabList().entrySet()) {
+        for (Map.Entry<String, Set<Field>> tab : preferences.getEntryEditorTabList().entrySet()) {
             tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
         }
 

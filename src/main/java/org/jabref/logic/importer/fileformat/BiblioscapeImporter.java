@@ -13,7 +13,8 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -188,7 +189,7 @@ public class BiblioscapeImporter extends Importer {
                     }
                 }
 
-                String bibtexType = BibEntry.DEFAULT_TYPE;
+                EntryType bibtexType = BibEntry.DEFAULT_TYPE;
                 // to find type, first check TW, then RT
                 for (int i = 1; (i >= 0) && BibEntry.DEFAULT_TYPE.equals(bibtexType); --i) {
                     if (type[i] == null) {
@@ -196,24 +197,24 @@ public class BiblioscapeImporter extends Importer {
                     }
                     type[i] = type[i].toLowerCase(Locale.ROOT);
                     if (type[i].contains("article")) {
-                        bibtexType = "article";
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("journal")) {
-                        bibtexType = "article";
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("book section")) {
-                        bibtexType = "inbook";
+                        bibtexType = StandardEntryType.InBook;
                     } else if (type[i].contains("book")) {
-                        bibtexType = "book";
+                        bibtexType = StandardEntryType.Book;
                     } else if (type[i].contains("conference")) {
-                        bibtexType = "inproceedings";
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("proceedings")) {
-                        bibtexType = "inproceedings";
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("report")) {
-                        bibtexType = "techreport";
+                        bibtexType = StandardEntryType.TechReport;
                     } else if (type[i].contains("thesis")
                             && type[i].contains("master")) {
-                        bibtexType = "mastersthesis";
+                        bibtexType = StandardEntryType.MastersThesis;
                     } else if (type[i].contains("thesis")) {
-                        bibtexType = "phdthesis";
+                        bibtexType = StandardEntryType.PhdThesis;
                     }
                 }
 
@@ -257,7 +258,7 @@ public class BiblioscapeImporter extends Importer {
                 if (!comments.isEmpty()) { // set comment if present
                     hm.put(StandardField.COMMENT, String.join(";", comments));
                 }
-                BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(bibtexType));
+                BibEntry b = new BibEntry(bibtexType);
                 b.setField(hm);
                 bibItems.add(b);
 

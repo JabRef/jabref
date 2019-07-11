@@ -1316,15 +1316,15 @@ class BibtexParserTest {
     }
 
     @Test
-    void integrationTestCustomEntryType() throws IOException {
+    void integrationTestBibEntryType() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
 
-        Map<String, EntryType> customEntryTypes = result.getEntryTypes();
-        EntryType entryType = customEntryTypes.get("Lecturenotes");
+        Map<String, EntryType> BibEntryTypes = result.getEntryTypes();
+        EntryType entryType = BibEntryTypes.get("Lecturenotes");
 
-        assertEquals(1, customEntryTypes.size());
-        assertEquals("Lecturenotes", customEntryTypes.keySet().toArray()[0]);
+        assertEquals(1, BibEntryTypes.size());
+        assertEquals("Lecturenotes", BibEntryTypes.keySet().toArray()[0]);
         assertEquals("Lecturenotes", entryType.getType());
         assertEquals(new HashSet<>(Arrays.asList("author", "title")), entryType.getRequiredFields());
         assertEquals(new HashSet<>(Arrays.asList("language", "url")), entryType.getOptionalFields());

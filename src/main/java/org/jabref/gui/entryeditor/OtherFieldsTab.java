@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -33,8 +34,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        Set<Field> allKnownFields = entryType.getAllFields();
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, BibEntryType entryType) {
+        Set<Field> allKnownFields = new HashSet<>(entryType.getAllFields());
         List<Field> otherFields = entry.getFieldNames().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
 
         otherFields.removeAll(entryType.getDeprecatedFields());

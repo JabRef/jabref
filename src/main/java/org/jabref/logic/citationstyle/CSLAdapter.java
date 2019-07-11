@@ -89,7 +89,7 @@ public class CSLAdapter {
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
-            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
+            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
             HTMLChars latexToHtmlConverter = new HTMLChars();

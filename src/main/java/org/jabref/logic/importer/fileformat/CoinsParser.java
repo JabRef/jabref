@@ -14,7 +14,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -50,11 +50,11 @@ public class CoinsParser implements Parser {
         if (matcherType.find()) {
             switch (matcherType.group(1)) {
                 case "article":
-                    entry.setType(StandardEntryType.ARTICLE);
+                    entry.setType(StandardEntryType.Article);
                     break;
                 case "unknown":
                 default:
-                    entry.setType(BiblatexEntryTypes.MISC);
+                    entry.setType(StandardEntryType.Misc);
                     break;
             }
         }

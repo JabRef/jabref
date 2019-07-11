@@ -12,8 +12,9 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
@@ -97,10 +98,10 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeEntryTypeDefinition(CustomEntryType customType) throws IOException {
+    protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
         writer.write(OS.NEWLINE);
         writer.write(COMMENT_PREFIX + "{");
-        writer.write(customType.getAsString());
+        writer.write(BibEntryTypesManager.getAsString(customType));
         writer.write("}");
         writer.write(OS.NEWLINE);
     }

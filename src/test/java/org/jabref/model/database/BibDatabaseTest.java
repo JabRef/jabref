@@ -11,8 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.event.TestEventListener;
 
@@ -278,7 +278,7 @@ public class BibDatabaseTest {
 
     @Test
     public void getUsedStrings() {
-        BibEntry entry = new BibEntry(new CustomEntryType(IdGenerator.next(), "required", "optional"));
+        BibEntry entry = new BibEntry(new BibEntryType(IdGenerator.next(), "required", "optional"));
         entry.setField("author", "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");

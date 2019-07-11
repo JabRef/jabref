@@ -18,21 +18,21 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
 
-public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
+public class ImportBibEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML private CheckListView<EntryType> unknownEntryTypesCheckList;
     @FXML private VBox boxDifferentCustomization;
     @FXML private CheckListView<EntryType> differentCustomizationCheckList;
     @Inject private PreferencesService preferencesService;
 
-    private ImportCustomEntryTypesDialogViewModel viewModel;
+    private final List<EntryType> BibEntryTypes;
 
     private final BibDatabaseMode mode;
-    private final List<EntryType> customEntryTypes;
+    private ImportBibEntryTypesDialogViewModel viewModel;
 
-    public ImportCustomEntryTypesDialog(BibDatabaseMode mode, List<EntryType> customEntryTypes) {
+    public ImportBibEntryTypesDialog(BibDatabaseMode mode, List<EntryType> BibEntryTypes) {
         this.mode = mode;
-        this.customEntryTypes = customEntryTypes;
+        this.BibEntryTypes = BibEntryTypes;
 
         ViewLoader.view(this)
                   .load()
@@ -40,7 +40,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
-                viewModel.importCustomEntryTypes(unknownEntryTypesCheckList.getCheckModel().getCheckedItems(), differentCustomizationCheckList.getCheckModel().getCheckedItems());
+                viewModel.importBibEntryTypes(unknownEntryTypesCheckList.getCheckModel().getCheckedItems(), differentCustomizationCheckList.getCheckModel().getCheckedItems());
             }
             return null;
         });
@@ -51,7 +51,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
+        viewModel = new ImportBibEntryTypesDialogViewModel(mode, BibEntryTypes, preferencesService);
 
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());

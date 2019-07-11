@@ -210,12 +210,12 @@ public class MergeEntries extends BorderPane {
         mergePanel.add(new Label(Localization.lang("Entry type")), 0, 1);
 
         if (leftEntry.getType().equals(rightEntry.getType())) {
-            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType()), 1, 1);
-            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType()), 5, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, 1);
             identicalTypes = true;
         } else {
-            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType()), 1, 1);
-            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType()), 5, 1);
+            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, 1);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, 1);
             identicalTypes = false;
             ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);

@@ -15,9 +15,11 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
@@ -36,7 +38,7 @@ public class FieldEditors {
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
                                             final JabRefPreferences preferences,
                                             final BibDatabaseContext databaseContext,
-                                            final String entryType,
+                                            final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,
                                             final UndoManager undoManager) {
         final Set<FieldProperty> fieldProperties = field.getProperties();
@@ -76,7 +78,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
             return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers));
         } else if (fieldProperties.contains(FieldProperty.TYPE)) {
-            if ("patent".equalsIgnoreCase(entryType)) {
+            if (entryType.equals(StandardEntryType.Patent)) {
                 return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             } else {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));

@@ -3,7 +3,6 @@ package org.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -16,10 +15,11 @@ import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
@@ -101,31 +101,24 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
-        EntryType type = BibEntryTypesManager.getTypeOrDefault(entry.getType(), bibDatabaseMode);
+        BibEntryType type = BibEntryTypesManager.getTypeOrDefault(entry.getType(), bibDatabaseMode);
 
         // Write required fields first.
-        Collection<String> fields = type.getRequiredFieldsFlat();
-        if (fields != null) {
-            for (String value : fields) {
-                writeField(entry, out, value, indentation);
-                written.add(value);
-            }
+        for (OrFields value : type.getRequiredFields()) {
+            writeField(entry, out, value.getPrimary(), indentation);
+            written.add(value.getPrimary());
         }
         // Then optional fields.
-        fields = type.getOptionalFields();
-        if (fields != null) {
-            for (String value : fields) {
-                if (!written.contains(value)) { // If field appears both in req. and opt. don't repeat.
-                    writeField(entry, out, value, indentation);
-                    written.add(value);
-                }
+        for (Field field : type.getOptionalFields()) {
+            if (!written.contains(field)) { // If field appears both in req. and opt. don't repeat.
+                writeField(entry, out, field, indentation);
+                written.add(field);
             }
         }
         // Then write remaining fields in alphabetic order.
         Set<Field> remainingFields = entry.getFieldNames()
                                           .stream()
                                           .filter(key -> !written.contains(key))
-                                          .sorted()
                                           .collect(Collectors.toSet());
 
         for (Field field : remainingFields) {

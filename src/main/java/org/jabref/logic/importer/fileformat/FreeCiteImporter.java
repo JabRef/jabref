@@ -26,8 +26,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -119,7 +119,7 @@ public class FreeCiteImporter extends Importer {
 
                     BibEntry e = new BibEntry();
                     // fallback type
-                    EntryType type = BibtexEntryTypes.INPROCEEDINGS;
+                    EntryType type = StandardEntryType.InProceedings;
 
                     while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
                             && "citation".equals(parser.getLocalName()))) {
@@ -154,10 +154,10 @@ public class FreeCiteImporter extends Importer {
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
                                 // the drawback is that ctx:context-objects is NOT nested in citation, but a separate element
                                 // we would have to change the whole parser to parse that format.
-                                type = StandardEntryType.ARTICLE;
+                                type = StandardEntryType.Article;
                                 e.setField(field, parser.getElementText());
                             } else if (new UnknownField("tech").equals(field)) {
-                                type = BibtexEntryTypes.TECHREPORT;
+                                type = StandardEntryType.TechReport;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField(StandardField.NUMBER, parser.getElementText());
                             } else if (StandardField.DOI.equals(field) || StandardField.INSTITUTION.equals(field)

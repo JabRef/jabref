@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.BibEntryTypes;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
@@ -15,8 +15,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -94,7 +94,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
             // in this case as well. If it is a standard type it cannot be removed.
-            if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
+            if (type.isPresent() && (type.get() instanceof BibEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.
@@ -114,7 +114,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
         if (BibEntryTypesManager.getStandardType(typeName, mode).isPresent()) {
             Optional<EntryType> entryType = BibEntryTypesManager.getType(typeName, mode);
-            if (isChanged || (entryType.isPresent() && (entryType.get() instanceof CustomEntryType))) {
+            if (isChanged || (entryType.isPresent() && (entryType.get() instanceof BibEntryType))) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);

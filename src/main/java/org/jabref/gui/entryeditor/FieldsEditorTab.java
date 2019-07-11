@@ -32,8 +32,8 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
@@ -82,8 +82,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
 
-        EntryType entryType = BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        fields = determineFieldsToShow(entry, entryType);
+        fields = determineFieldsToShow(entry, BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode()));
 
         List<Label> labels = new ArrayList<>();
         boolean isFirstField = true;
@@ -161,7 +160,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     private String getPrompt(Field field) {
-        Set<FieldProperty> fieldProperties = ((Field) (Field<?>) field).getProperties();
+        Set<FieldProperty> fieldProperties = field.getProperties();
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
         } else if (fieldProperties.contains(FieldProperty.DOI)) {
@@ -193,8 +192,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        EntryType entryType = BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        return !determineFieldsToShow(entry, entryType).isEmpty();
+        return !determineFieldsToShow(entry, BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode())).isEmpty();
     }
 
     @Override
@@ -221,7 +219,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         });
     }
 
-    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType);
+    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry, BibEntryType entryType);
 
     public Collection<Field> getShownFields() {
         return fields;

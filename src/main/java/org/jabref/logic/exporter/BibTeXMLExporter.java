@@ -40,6 +40,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -75,53 +76,37 @@ public class BibTeXMLExporter extends Exporter {
 
             bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
-            String type = bibEntry.getType().toLowerCase(ENGLISH);
-            switch (type) {
-                case "article":
-                    parse(new Article(), bibEntry, entry);
-                    break;
-                case "book":
-                    parse(new Book(), bibEntry, entry);
-                    break;
-                case "booklet":
-                    parse(new Booklet(), bibEntry, entry);
-                    break;
-                case "conference":
-                    parse(new Conference(), bibEntry, entry);
-                    break;
-                case "inbook":
-                    parseInbook(new Inbook(), bibEntry, entry);
-                    break;
-                case "incollection":
-                    parse(new Incollection(), bibEntry, entry);
-                    break;
-                case "inproceedings":
-                    parse(new Inproceedings(), bibEntry, entry);
-                    break;
-                case "mastersthesis":
-                    parse(new Mastersthesis(), bibEntry, entry);
-                    break;
-                case "manual":
-                    parse(new Manual(), bibEntry, entry);
-                    break;
-                case "misc":
-                    parse(new Misc(), bibEntry, entry);
-                    break;
-                case "phdthesis":
-                    parse(new Phdthesis(), bibEntry, entry);
-                    break;
-                case "proceedings":
-                    parse(new Proceedings(), bibEntry, entry);
-                    break;
-                case "techreport":
-                    parse(new Techreport(), bibEntry, entry);
-                    break;
-                case "unpublished":
-                    parse(new Unpublished(), bibEntry, entry);
-                    break;
-                default:
-                    LOGGER.warn("unexpected type appeared");
-                    break;
+            org.jabref.model.entry.EntryType i = bibEntry.getType();
+            if (StandardEntryType.Article.equals(i)) {
+                parse(new Article(), bibEntry, entry);
+            } else if (StandardEntryType.Book.equals(i)) {
+                parse(new Book(), bibEntry, entry);
+            } else if (StandardEntryType.Booklet.equals(i)) {
+                parse(new Booklet(), bibEntry, entry);
+            } else if (StandardEntryType.Conference.equals(i)) {
+                parse(new Conference(), bibEntry, entry);
+            } else if (StandardEntryType.InBook.equals(i)) {
+                parseInbook(new Inbook(), bibEntry, entry);
+            } else if (StandardEntryType.InCollection.equals(i)) {
+                parse(new Incollection(), bibEntry, entry);
+            } else if (StandardEntryType.InProceedings.equals(i)) {
+                parse(new Inproceedings(), bibEntry, entry);
+            } else if (StandardEntryType.MastersThesis.equals(i)) {
+                parse(new Mastersthesis(), bibEntry, entry);
+            } else if (StandardEntryType.Manual.equals(i)) {
+                parse(new Manual(), bibEntry, entry);
+            } else if (StandardEntryType.Misc.equals(i)) {
+                parse(new Misc(), bibEntry, entry);
+            } else if (StandardEntryType.PhdThesis.equals(i)) {
+                parse(new Phdthesis(), bibEntry, entry);
+            } else if (StandardEntryType.Proceedings.equals(i)) {
+                parse(new Proceedings(), bibEntry, entry);
+            } else if (StandardEntryType.TechReport.equals(i)) {
+                parse(new Techreport(), bibEntry, entry);
+            } else if (StandardEntryType.Unpublished.equals(i)) {
+                parse(new Unpublished(), bibEntry, entry);
+            } else {
+                LOGGER.warn("unexpected type appeared");
             }
             file.getEntry().add(entry);
         }

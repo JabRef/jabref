@@ -13,11 +13,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
@@ -77,7 +79,7 @@ public class DuplicateCheck {
             return false;
         }
 
-        final EntryType type = BibEntryTypesManager.getTypeOrDefault(one.getType(), bibDatabaseMode);
+        final BibEntryType type = BibEntryTypesManager.getTypeOrDefault(one.getType(), bibDatabaseMode);
         final double[] reqCmpResult = compareRequiredFields(type, one, two);
 
         if (isFarFromThreshold(reqCmpResult[0])) {
@@ -118,8 +120,8 @@ public class DuplicateCheck {
 
     }
 
-    private static double[] compareRequiredFields(final EntryType type, final BibEntry one, final BibEntry two) {
-        final Collection<String> requiredFields = type.getRequiredFieldsFlat();
+    private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
+        final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields == null
                 ? new double[]{0., 0.}
                 : DuplicateCheck.compareFieldSet(requiredFields, one, two);
@@ -129,11 +131,11 @@ public class DuplicateCheck {
         return Math.abs(value - DuplicateCheck.DUPLICATE_THRESHOLD) > DuplicateCheck.DOUBT_RANGE;
     }
 
-    private static boolean compareOptionalFields(final EntryType type,
+    private static boolean compareOptionalFields(final BibEntryType type,
                                                  final BibEntry one,
                                                  final BibEntry two,
                                                  final double[] req) {
-        final Collection<Field> optionalFields = type.getOptionalFields();
+        final Set<BibField> optionalFields = type.getOptionalFields();
         if (optionalFields == null) {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }

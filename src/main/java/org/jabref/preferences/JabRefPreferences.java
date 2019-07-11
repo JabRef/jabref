@@ -96,8 +96,8 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -434,7 +434,7 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
-    private Map<String, List<String>> tabList;
+    private Map<String, Set<Field>> tabList;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1171,7 +1171,7 @@ public class JabRefPreferences implements PreferencesService {
      * @throws BackingStoreException
      */
     public void clear() throws BackingStoreException {
-        clearAllCustomEntryTypes();
+        clearAllBibEntryTypes();
         clearKeyPatterns();
         prefs.clear();
         new SharedDatabasePreferences().clear();
@@ -1253,15 +1253,15 @@ public class JabRefPreferences implements PreferencesService {
         pre.clear();
     }
 
-    public void storeCustomEntryTypes(List<CustomEntryType> customEntryTypes, BibDatabaseMode bibDatabaseMode) {
+    public void storeBibEntryTypes(List<BibEntryType> BibEntryTypes, BibDatabaseMode bibDatabaseMode) {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
         try {
             // clear old custom types
-            clearCustomEntryTypes(bibDatabaseMode);
+            clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            customEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), type.getAsString()));
+            BibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.getAsString(type)));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -1269,27 +1269,27 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public List<CustomEntryType> loadCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<CustomEntryType> storedEntryTypes = new ArrayList<>();
+    public List<BibEntryType> loadBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<BibEntryType> storedEntryTypes = new ArrayList<>();
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
         try {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
-                  .forEach(typeString -> CustomEntryType.parse(typeString).ifPresent(storedEntryTypes::add));
+                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
         return storedEntryTypes;
     }
 
-    private void clearAllCustomEntryTypes() throws BackingStoreException {
+    private void clearAllBibEntryTypes() throws BackingStoreException {
         for (BibDatabaseMode mode : BibDatabaseMode.values()) {
-            clearCustomEntryTypes(mode);
+            clearBibEntryTypes(mode);
         }
     }
 
-    private void clearCustomEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
+    private void clearBibEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
         prefsNode.clear();
     }
@@ -1338,7 +1338,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Map<String, List<String>> getEntryEditorTabList() {
+    public Map<String, Set<Field>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
         }
@@ -2094,17 +2094,17 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void saveCustomEntryTypes() {
-        saveCustomEntryTypes(BibDatabaseMode.BIBTEX);
-        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX);
+    public void saveBibEntryTypes() {
+        saveBibEntryTypes(BibDatabaseMode.BIBTEX);
+        saveBibEntryTypes(BibDatabaseMode.BIBLATEX);
     }
 
-    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<CustomEntryType> customBiblatexBibTexTypes = BibEntryTypesManager.getAllValues(bibDatabaseMode).stream()
-                                                                              .filter(type -> type instanceof CustomEntryType)
-                                                                              .map(entryType -> (CustomEntryType) entryType).collect(Collectors.toList());
+    private void saveBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<BibEntryType> customBiblatexBibTexTypes = BibEntryTypesManager.getAllValues(bibDatabaseMode).stream()
+                                                                           .filter(type -> type instanceof BibEntryType)
+                                                                           .map(entryType -> entryType).collect(Collectors.toList());
 
-        storeCustomEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+        storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
 
     }
 

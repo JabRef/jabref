@@ -30,9 +30,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
@@ -293,13 +293,13 @@ public abstract class BibDatabaseWriter {
 
     protected void writeEntryTypeDefinitions(Map<String, EntryType> types) throws IOException {
         for (EntryType type : types.values()) {
-            if (type instanceof CustomEntryType) {
-                writeEntryTypeDefinition((CustomEntryType) type);
+            if (type instanceof BibEntryType) {
+                writeEntryTypeDefinition((BibEntryType) type);
             }
         }
     }
 
-    protected abstract void writeEntryTypeDefinition(CustomEntryType customType) throws IOException;
+    protected abstract void writeEntryTypeDefinition(BibEntryType customType) throws IOException;
 
     /**
      * Generate keys for all entries that are lacking keys.

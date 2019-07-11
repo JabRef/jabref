@@ -19,8 +19,9 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -65,7 +66,7 @@ public class RisImporter extends Importer {
 
             boolean foundDate = false;
 
-            String type = "";
+            EntryType type = StandardEntryType.Misc;
             String author = "";
             String editor = "";
             String startPage = "";
@@ -99,23 +100,23 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         if ("BOOK".equals(value)) {
-                            type = "book";
+                            type = StandardEntryType.Book;
                         } else if ("JOUR".equals(value) || "MGZN".equals(value)) {
-                            type = "article";
+                            type = StandardEntryType.Article;
                         } else if ("THES".equals(value)) {
-                            type = "phdthesis";
+                            type = StandardEntryType.PhdThesis;
                         } else if ("UNPB".equals(value)) {
-                            type = "unpublished";
+                            type = StandardEntryType.Unpublished;
                         } else if ("RPRT".equals(value)) {
-                            type = "techreport";
+                            type = StandardEntryType.TechReport;
                         } else if ("CONF".equals(value)) {
-                            type = "inproceedings";
+                            type = StandardEntryType.InProceedings;
                         } else if ("CHAP".equals(value)) {
-                            type = "incollection";//"inbook";
+                            type = StandardEntryType.InCollection;
                         } else if ("PAT".equals(value)) {
-                            type = "patent";
+                            type = StandardEntryType.Patent;
                         } else {
-                            type = "other";
+                            type = StandardEntryType.Misc;
                         }
                     } else if ("T1".equals(tag) || "TI".equals(tag)) {
                         String oldVal = fields.get(StandardField.TITLE);
@@ -284,7 +285,7 @@ public class RisImporter extends Importer {
 
             // create one here
             // type is set in the loop above
-            BibEntry entry = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
+            BibEntry entry = new BibEntry(type);
             entry.setField(fields);
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
             month.ifPresent(entry::setMonth);

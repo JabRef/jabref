@@ -30,9 +30,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
@@ -292,11 +293,11 @@ public class BibtexParser implements Parser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0, Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length()))
-                .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
+        } else if (comment.substring(0, Math.min(comment.length(), BibEntryTypesManager.ENTRYTYPE_FLAG.length()))
+                          .equals(BibEntryTypesManager.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            Optional<CustomEntryType> typ = CustomEntryType.parse(comment);
+            Optional<BibEntryType> typ = BibEntryTypesManager.parse(comment);
             if (typ.isPresent()) {
                 entryTypes.put(typ.get().getType(), typ.get());
             } else {

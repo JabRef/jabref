@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.CustomEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +42,7 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void detectUnknownTypeAsBibtex() {
-        BibEntry entry = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        BibEntry entry = new BibEntry(new BibEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
         Collection<BibEntry> entries = Arrays.asList(entry);
 
         assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
@@ -50,7 +50,7 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void ignoreUnknownTypesForBibtexDecision() {
-        BibEntry custom = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        BibEntry custom = new BibEntry(new BibEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
         BibEntry bibtex = new BibEntry(StandardEntryType.ARTICLE);
         BibEntry biblatex = new BibEntry(StandardEntryType.ARTICLE);
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
@@ -60,7 +60,7 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void ignoreUnknownTypesForBiblatexDecision() {
-        BibEntry custom = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
+        BibEntry custom = new BibEntry(new BibEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)));
         BibEntry bibtex = new BibEntry(StandardEntryType.ARTICLE);
         BibEntry biblatex = new BibEntry(BiblatexEntryTypes.MVBOOK);
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);

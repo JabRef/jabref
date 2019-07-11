@@ -13,7 +13,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 
 public class DeprecatedFieldsTab extends FieldsEditorTab {
@@ -26,7 +26,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<Field> determineFieldsToShow(BibEntry entry, BibEntryType entryType) {
         return entryType.getDeprecatedFields()
                         .stream()
                         .filter(entry::hasField)

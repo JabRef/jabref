@@ -6,13 +6,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.preferences.PreferencesService;
 
-public class ImportCustomEntryTypesDialogViewModel {
+public class ImportBibEntryTypesDialogViewModel {
 
     private final BibDatabaseMode mode;
     private final PreferencesService preferencesService;
@@ -20,15 +20,15 @@ public class ImportCustomEntryTypesDialogViewModel {
     private final ObservableList<EntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<EntryType> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<EntryType> customEntryTypes, PreferencesService preferencesService) {
+    public ImportBibEntryTypesDialogViewModel(BibDatabaseMode mode, List<EntryType> BibEntryTypes, PreferencesService preferencesService) {
         this.mode = mode;
         this.preferencesService = preferencesService;
 
-        for (EntryType customType : customEntryTypes) {
-            if (!BibEntryTypesManager.getType(customType.getType(), mode).isPresent()) {
+        for (EntryType customType : BibEntryTypes) {
+            if (!BibEntryTypesManager.getType(customType, mode).isPresent()) {
                 newTypes.add(customType);
             } else {
-                EntryType currentlyStoredType = BibEntryTypesManager.getType(customType.getType(), mode).get();
+                BibEntryType currentlyStoredType = BibEntryTypesManager.getType(customType, mode).get();
                 if (!EntryTypeFactory.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
                     differentCustomizationTypes.add(customType);
                 }
@@ -45,14 +45,14 @@ public class ImportCustomEntryTypesDialogViewModel {
         return this.differentCustomizationTypes;
     }
 
-    public void importCustomEntryTypes(List<EntryType> checkedUnknownEntryTypes, List<EntryType> checkedDifferentEntryTypes) {
+    public void importBibEntryTypes(List<EntryType> checkedUnknownEntryTypes, List<EntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyCustomEntryType((CustomEntryType) type, mode));
-            preferencesService.saveCustomEntryTypes();
+            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyBibEntryType((BibEntryType) type, mode));
+            preferencesService.saveBibEntryTypes();
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyCustomEntryType((CustomEntryType) type, mode));
-            preferencesService.saveCustomEntryTypes();
+            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyBibEntryType((BibEntryType) type, mode));
+            preferencesService.saveBibEntryTypes();
         }
 
     }

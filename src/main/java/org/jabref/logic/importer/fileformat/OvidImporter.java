@@ -14,7 +14,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -203,15 +205,15 @@ public class OvidImporter extends Importer {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey(InternalField.TYPE_HEADER) ? h.get(InternalField.TYPE_HEADER) : BibEntry.DEFAULT_TYPE;
+            EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
             h.remove(InternalField.TYPE_HEADER);
-            if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
+            if (entryType.equals(StandardEntryType.Book) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.
-                entryType = "incollection";
+                entryType = StandardEntryType.InCollection;
                 // Move the "chaptertitle" to just "title":
                 h.put(StandardField.TITLE, h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
+            BibEntry b = new BibEntry(entryType);
             b.setField(h);
 
             bibitems.add(b);

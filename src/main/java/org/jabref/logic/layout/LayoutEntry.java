@@ -220,12 +220,12 @@ class LayoutEntry {
         String fieldEntry;
 
         if (InternalField.TYPE_HEADER.getName().equals(text)) {
-            fieldEntry = bibtex.getType();
+            fieldEntry = bibtex.getType().getDisplayName();
         } else if (InternalField.OBSOLETE_TYPE_HEADER.getName().equals(text)) {
             LOGGER.warn("'" + InternalField.OBSOLETE_TYPE_HEADER
                     + "' is an obsolete name for the entry type. Please update your layout to use '"
                     + InternalField.TYPE_HEADER + "' instead.");
-            fieldEntry = bibtex.getType();
+            fieldEntry = bibtex.getType().getDisplayName();
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text

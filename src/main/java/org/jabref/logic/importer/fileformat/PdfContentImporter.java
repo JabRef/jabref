@@ -22,9 +22,9 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -256,7 +256,7 @@ public class PdfContentImporter extends Importer {
             // year is a class variable as the method extractYear() uses it;
             String publisher = null;
 
-            EntryType type = BibtexEntryTypes.INPROCEEDINGS;
+            EntryType type = StandardEntryType.InProceedings;
             if (curString.length() > 4) {
                 // special case: possibly conference as first line on the page
                 extractYear();
@@ -336,7 +336,7 @@ public class PdfContentImporter extends Importer {
 
                     int pos = lower.indexOf("technical");
                     if (pos >= 0) {
-                        type = BibtexEntryTypes.TECHREPORT;
+                        type = StandardEntryType.TechReport;
                         pos = curString.trim().lastIndexOf(' ');
                         if (pos >= 0) {
                             // assumption: last character of curString is NOT ' '

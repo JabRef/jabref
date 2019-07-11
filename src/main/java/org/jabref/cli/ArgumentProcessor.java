@@ -458,8 +458,8 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            BibEntryTypesManager.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                    Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+            BibEntryTypesManager.loadBibEntryTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                    Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
             List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);

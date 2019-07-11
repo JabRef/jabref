@@ -8,8 +8,8 @@ import java.util.Collections;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class LayoutTest {
 
     @Test
     void entryTypeForUnknown() throws IOException {
-        BibEntry entry = new BibEntry(new CustomEntryType("unknown", "required", "optional")).withField("author", "test");
+        BibEntry entry = new BibEntry(new BibEntryType("unknown", "required", "optional")).withField("author", "test");
 
         assertEquals("Unknown", layout("\\bibtextype", entry));
     }

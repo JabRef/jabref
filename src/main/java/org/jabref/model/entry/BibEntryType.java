@@ -32,7 +32,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * @return a List of optional field name Strings
      */
-    Set<BibField> getOptionalFields() {
+    public Set<BibField> getOptionalFields() {
         return getAllFields().stream()
                              .filter(field -> !isRequired(field))
                              .collect(Collectors.toSet());
@@ -50,14 +50,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * @return a List of required field name Strings
      */
-    Set<OrFields> getRequiredFields() {
+    public Set<OrFields> getRequiredFields() {
         return requiredFields;
     }
 
     /**
      * Returns all defined fields.
      */
-    Set<BibField> getAllFields() {
+    public Set<BibField> getAllFields() {
         return Collections.unmodifiableSet(fields);
     }
 
@@ -73,7 +73,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .collect(Collectors.toSet());
     }
 
-    Set<Field> getDeprecatedFields() {
+    public Set<Field> getDeprecatedFields() {
         Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
         deprecatedFields.add(StandardField.YEAR);
         deprecatedFields.add(StandardField.MONTH);
@@ -83,7 +83,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    Set<Field> getSecondaryOptionalNotDeprecatedFields() {
+    public Set<Field> getSecondaryOptionalNotDeprecatedFields() {
         Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
         return optionalFieldsNotPrimaryOrDeprecated;

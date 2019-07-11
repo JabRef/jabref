@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.exporter.SavePreferences;
@@ -15,6 +16,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
@@ -44,7 +46,7 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    Map<String, List<String>> getEntryEditorTabList();
+    Map<String, Set<Field>> getEntryEditorTabList();
 
     Boolean getEnforceLegalKeys();
 
@@ -88,5 +90,5 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveCustomEntryTypes();
+    void saveBibEntryTypes();
 }

@@ -25,9 +25,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -248,7 +248,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
         try {
-            BibEntryTypesManager.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
+            BibEntryTypesManager.addOrModifyBibEntryType(new BibEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
             database.insertEntry(entry);
@@ -263,7 +263,7 @@ class BibtexDatabaseWriterTest {
                             + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + OS.NEWLINE,
                     stringWriter.toString());
         } finally {
-            BibEntryTypesManager.removeAllCustomEntryTypes();
+            BibEntryTypesManager.removeAllBibEntryTypes();
         }
     }
 

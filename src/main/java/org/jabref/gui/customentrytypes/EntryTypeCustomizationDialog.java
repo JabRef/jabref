@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.BibEntryTypes;
 
 import org.jabref.gui.util.BaseDialog;
 
@@ -240,11 +240,11 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
             }
 
             if (changesMade) {
-                CustomEntryType customType = biblatexMode ?
-                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList, secondaryOptionalFieldsLists) :
-                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList);
+                BibEntryType customType = biblatexMode ?
+                        new BibEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList, secondaryOptionalFieldsLists) :
+                        new BibEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList);
 
-                EntryTypeFactory.addOrModifyCustomEntryType(customType, bibDatabaseMode);
+                EntryTypeFactory.addOrModifyBibEntryType(customType, bibDatabaseMode);
                 actuallyChangedTypes.add(customType.getName().toLowerCase(Locale.ENGLISH));
             }
         }
@@ -268,13 +268,13 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
             }
         }
 
-        CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
+        BibEntryTypesManager.saveBibEntryTypes(Globals.prefs);
     }
 
     private void deleteType(String name) {
         Optional<EntryType> type = EntryTypeFactory.getType(name, bibDatabaseMode);
 
-        if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
+        if (type.isPresent() && (type.get() instanceof BibEntryType)) {
             if (!EntryTypeFactory.getStandardType(name, bibDatabaseMode).isPresent()) {
 
                 boolean deleteCustomClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Delete custom format") +

@@ -27,4 +27,8 @@ public class OrFields extends HashSet<Field> {
         }
         return joiner.toString();
     }
+
+    public Field getPrimary() {
+        return this.iterator().next();
+    }
 }

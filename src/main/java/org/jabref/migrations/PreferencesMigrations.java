@@ -38,7 +38,7 @@ public class PreferencesMigrations {
         upgradeFaultyEncodingStrings(Globals.prefs);
         upgradeLabelPatternToBibtexKeyPattern(Globals.prefs);
         upgradeImportFileAndDirePatterns(Globals.prefs, mainPrefsNode);
-        upgradeStoredCustomEntryTypes(Globals.prefs, mainPrefsNode);
+        upgradeStoredBibEntryTypes(Globals.prefs, mainPrefsNode);
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
@@ -149,7 +149,7 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    private static void upgradeStoredCustomEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
+    private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
@@ -157,7 +157,7 @@ public class PreferencesMigrations {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
-                CustomEntryTypePreferenceMigration.upgradeStoredCustomEntryTypes(prefs.getDefaultBibDatabaseMode());
+                BibEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getDefaultBibDatabaseMode());
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old custom entry types failed.", ex);

@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -11,7 +12,7 @@ import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
 
-    private final Map<String, List<String>> entryEditorTabList;
+    private final Map<String, Set<Field>> entryEditorTabList;
     private final LatexFieldFormatterPreferences latexFieldFormatterPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -22,7 +23,7 @@ public class EntryEditorPreferences {
     private final KeyBindingRepository keyBindings;
     private boolean avoidOverwritingCiteKey;
 
-    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
@@ -35,7 +36,7 @@ public class EntryEditorPreferences {
         this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
     }
 
-    public Map<String, List<String>> getEntryEditorTabList() {
+    public Map<String, Set<Field>> getEntryEditorTabList() {
         return entryEditorTabList;
     }
 

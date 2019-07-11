@@ -22,6 +22,7 @@ import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -161,7 +162,7 @@ public abstract class DBMSProcessor {
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
                 new String[] {"SHARED_ID"})) {
 
-            preparedEntryStatement.setString(1, bibEntry.getType());
+            preparedEntryStatement.setString(1, bibEntry.getType().getName());
             preparedEntryStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
@@ -281,7 +282,7 @@ public abstract class DBMSProcessor {
                     .append(" = ?");
 
                 try (PreparedStatement preparedUpdateEntryTypeStatement = connection.prepareStatement(updateEntryTypeQuery.toString())) {
-                    preparedUpdateEntryTypeStatement.setString(1, localBibEntry.getType());
+                    preparedUpdateEntryTypeStatement.setString(1, localBibEntry.getType().getName());
                     preparedUpdateEntryTypeStatement.setInt(2, localBibEntry.getSharedBibEntryData().getSharedID());
                     preparedUpdateEntryTypeStatement.executeUpdate();
                 }
@@ -466,7 +467,7 @@ public abstract class DBMSProcessor {
                 if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
                     bibEntry = new BibEntry();
                     bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
-                    bibEntry.setType(selectEntryResultSet.getString("TYPE"));
+                    bibEntry.setType(EntryTypeFactory.parse(selectEntryResultSet.getString("TYPE")));
                     bibEntry.getSharedBibEntryData().setVersion(selectEntryResultSet.getInt("VERSION"));
                     sharedEntries.add(bibEntry);
                     lastId = selectEntryResultSet.getInt("SHARED_ID");
