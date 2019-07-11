@@ -70,14 +70,20 @@ public class FindFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+       Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
             @Override
             protected Map<BibEntry, Optional<URL>> call() {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+                util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
+
                 for (BibEntry entry : basePanel.getSelectedEntries()) {
-                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-                    downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    List<LinkedFile> l = entry.getFiles();
+                    if(l.isEmpty()){
+                        FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                        downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    }
                     updateProgress(++count, basePanel.getSelectedEntries().size());
                 }
                 return downloads;
