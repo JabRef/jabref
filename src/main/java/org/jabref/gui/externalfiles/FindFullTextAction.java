@@ -82,7 +82,7 @@ public class FindFullTextAction extends SimpleCommand {
 
                 for (BibEntry entry : basePanel.getSelectedEntries()) {
                     List<LinkedFile> l = entry.getFiles();
-                    if(l.isEmpty()){
+                    if (l.isEmpty()) {
                         FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
                         downloads.put(entry, fetchers.findFullTextPDF(entry));
                     }
