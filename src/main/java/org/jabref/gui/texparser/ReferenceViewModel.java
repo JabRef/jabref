@@ -1,28 +1,28 @@
 package org.jabref.gui.texparser;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.StringJoiner;
 
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.texparser.Citation;
 
-public class ReferenceViewModel {
+class ReferenceViewModel {
 
     private final String entry;
     private final ObservableList<Citation> citationList;
 
     public ReferenceViewModel(String entry, Collection<Citation> citationColl) {
         this.entry = entry;
-        this.citationList = FXCollections.observableList(
-                citationColl instanceof List ? (List) citationColl : new ArrayList(citationColl));
+        this.citationList = FXCollections.observableArrayList();
+
+        citationList.setAll(citationColl);
     }
 
     public ObservableList<Citation> getCitationList() {
-        return citationList;
+        return new ReadOnlyListWrapper<>(citationList);
     }
 
     /**

@@ -66,7 +66,7 @@ public class TexBibEntriesResolverResult {
      * Check if an entry with the given key is present in the list of new entries.
      */
     public boolean checkEntryNewDatabase(String key) {
-        return newEntries.stream().anyMatch(e -> e.getCiteKeyOptional().get().equals(key));
+        return newEntries.stream().anyMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
     }
 
     /**

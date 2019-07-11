@@ -35,7 +35,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
-public class ParseTexDialogViewModel extends AbstractViewModel {
+class ParseTexDialogViewModel extends AbstractViewModel {
 
     private static final String TEX_EXT = ".tex";
     private final DialogService dialogService;
