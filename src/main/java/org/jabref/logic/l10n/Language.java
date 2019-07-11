@@ -9,25 +9,26 @@ import java.util.Optional;
  */
 public enum Language {
 
-    BahasaIndonesia("Bahasa Indonesia", "in"),
-    BrazilianPortuguese("Brazilian Portuguese", "pt_BR"),
-    Danish("Dansk", "da"),
-    German("Deutsch", "de"),
-    English("English", "en"),
-    Spanish("Español", "es"),
-    French("Français", "fr"),
-    Italian("Italiano", "it"),
-    Japanese("Japanese", "ja"),
-    Dutch("Nederlands", "nl"),
-    Norwegian("Norsk", "no"),
-    Persian("Persian (فارسی)", "fa"),
-    Russian("Russian", "ru"),
-    SimplifiedChinese("Simplified Chinese", "zh"),
-    Svenska("Svenska", "sv"),
-    Turkish("Turkish", "tr"),
-    Vietnamese("Vietnamese", "vi"),
-    Greek("ελληνικά", "el"),
-    Tagalog("Tagalog/Filipino", "tl");
+    BAHASA_INDONESIA("Bahasa Indonesia", "in"),
+    BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt_BR"),
+    DANISH("Dansk", "da"),
+    GERMAN("Deutsch", "de"),
+    ENGLISH("English", "en"),
+    SPANISH("Español", "es"),
+    FRENCH("Français", "fr"),
+    ITALIAN("Italiano", "it"),
+    JAPANESE("Japanese", "ja"),
+    DUTCH("Nederlands", "nl"),
+    NORWEGIAN("Norsk", "no"),
+    PERSIAN("Persian (فارسی)", "fa"),
+    RUSSIAN("Russian", "ru"),
+    SIMPLIFIED_CHINESE("Simplified Chinese", "zh"),
+    SVENSKA("Svenska", "sv"),
+    TURKISH("Turkish", "tr"),
+    VIETNAMESE("Vietnamese", "vi"),
+    GREEK("ελληνικά", "el"),
+    TAGALOG("Tagalog/Filipino", "tl"),
+    POLISH("Polish", "pl");
 
     private final String displayName;
     private final String id;

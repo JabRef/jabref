@@ -1983,7 +1983,7 @@ public class JabRefPreferences implements PreferencesService {
         return Stream.of(Language.values())
                      .filter(language -> language.getId().equalsIgnoreCase(languageId))
                      .findFirst()
-                     .orElse(Language.English);
+                     .orElse(Language.ENGLISH);
     }
 
     public void setLanguage(Language language) {
