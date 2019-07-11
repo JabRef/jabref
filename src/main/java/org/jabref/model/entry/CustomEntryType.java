@@ -16,7 +16,7 @@ import org.jabref.model.strings.StringUtil;
 /**
  * This class is used to represent customized entry types.
  */
-public class CustomEntryType implements EntryType {
+public class CustomEntryType extends BibEntryType {
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
@@ -62,11 +62,6 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public int compareTo(EntryType o) {
-        return getName().compareTo(o.getName());
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -79,7 +74,7 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public String getName() {
+    public EntryType getType() {
         return name;
     }
 
@@ -113,7 +108,7 @@ public class CustomEntryType implements EntryType {
     public String getAsString() {
         StringBuilder builder = new StringBuilder();
         builder.append(ENTRYTYPE_FLAG);
-        builder.append(getName());
+        builder.append(getType());
         builder.append(": req[");
         builder.append(FieldFactory.orFields(required));
         builder.append("] opt[");
@@ -124,6 +119,6 @@ public class CustomEntryType implements EntryType {
 
     @Override
     public String toString() {
-        return getName();
+        return getType();
     }
 }

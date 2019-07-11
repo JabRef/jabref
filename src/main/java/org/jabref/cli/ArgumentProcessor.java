@@ -44,11 +44,11 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.Defaults;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 
@@ -458,7 +458,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
+            BibEntryTypesManager.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                     Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
             List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs

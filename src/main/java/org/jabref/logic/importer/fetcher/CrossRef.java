@@ -21,8 +21,8 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
@@ -156,9 +156,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     private EntryType convertType(String type) {
         switch (type) {
             case "journal-article":
-                return BiblatexEntryTypes.ARTICLE;
+                return StandardEntryType.Article;
             default:
-                return BiblatexEntryTypes.MISC;
+                return StandardEntryType.Misc;
         }
     }
 

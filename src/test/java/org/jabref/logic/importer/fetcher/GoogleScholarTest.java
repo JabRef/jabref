@@ -59,7 +59,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void findSingleEntry() throws FetcherException {
-        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
+        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getType());
         entry.setCiteKey("geiger2013detecting");
         entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
         entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");

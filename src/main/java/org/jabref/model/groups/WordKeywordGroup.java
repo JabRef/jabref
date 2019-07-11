@@ -10,10 +10,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -121,9 +121,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private Set<String> getFieldContentAsWords(BibEntry entry) {
         if (onlySplitWordsAtSeparator) {
             if (InternalField.TYPE_HEADER.equals(searchField)) {
-                Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
+                Optional<EntryType> entryType = BibEntryTypesManager.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
                 if (entryType.isPresent()) {
-                    return searchWords.stream().filter(sw -> entryType.get().getName().equals(sw)).collect(Collectors.toSet());
+                    return searchWords.stream().filter(sw -> entryType.get().getType().equals(sw)).collect(Collectors.toSet());
                 }
             }
             return entry.getField(searchField)

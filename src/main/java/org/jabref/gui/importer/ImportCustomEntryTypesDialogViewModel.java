@@ -5,10 +5,11 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.preferences.PreferencesService;
 
 public class ImportCustomEntryTypesDialogViewModel {
@@ -24,11 +25,11 @@ public class ImportCustomEntryTypesDialogViewModel {
         this.preferencesService = preferencesService;
 
         for (EntryType customType : customEntryTypes) {
-            if (!EntryTypes.getType(customType.getName(), mode).isPresent()) {
+            if (!BibEntryTypesManager.getType(customType.getType(), mode).isPresent()) {
                 newTypes.add(customType);
             } else {
-                EntryType currentlyStoredType = EntryTypes.getType(customType.getName(), mode).get();
-                if (!EntryTypes.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
+                EntryType currentlyStoredType = BibEntryTypesManager.getType(customType.getType(), mode).get();
+                if (!EntryTypeFactory.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
                     differentCustomizationTypes.add(customType);
                 }
             }
@@ -46,11 +47,11 @@ public class ImportCustomEntryTypesDialogViewModel {
 
     public void importCustomEntryTypes(List<EntryType> checkedUnknownEntryTypes, List<EntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> EntryTypes.addOrModifyCustomEntryType((CustomEntryType) type, mode));
+            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyCustomEntryType((CustomEntryType) type, mode));
             preferencesService.saveCustomEntryTypes();
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> EntryTypes.addOrModifyCustomEntryType((CustomEntryType) type, mode));
+            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addOrModifyCustomEntryType((CustomEntryType) type, mode));
             preferencesService.saveCustomEntryTypes();
         }
 

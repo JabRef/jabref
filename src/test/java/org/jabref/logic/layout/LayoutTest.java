@@ -46,7 +46,7 @@ class LayoutTest {
 
     @Test
     void entryTypeForArticle() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "test");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("author", "test");
 
         assertEquals("Article", layout("\\bibtextype", entry));
     }
@@ -60,7 +60,7 @@ class LayoutTest {
 
     @Test
     void HTMLChar() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "This\nis\na\ntext");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("author", "This\nis\na\ntext");
 
         String actual = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}", entry);
 
@@ -69,7 +69,7 @@ class LayoutTest {
 
     @Test
     void HTMLCharWithDoubleLineBreak() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "This\nis\na\n\ntext");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("author", "This\nis\na\n\ntext");
 
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ", entry);
 
@@ -78,7 +78,7 @@ class LayoutTest {
 
     @Test
     void nameFormatter() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "Joe Doe and Jane, Moon");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("author", "Joe Doe and Jane, Moon");
 
         String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}", entry);
 
@@ -87,7 +87,7 @@ class LayoutTest {
 
     @Test
     void HTMLCharsWithDotlessIAndTiled() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE)
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE)
                 .withField("abstract", "\\~{n} \\~n \\'i \\i \\i");
 
         String layoutText = layout(
@@ -106,7 +106,7 @@ class LayoutTest {
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
                 new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
         entry.addFile(new LinkedFile("Test file", "encrypted.pdf", "PDF"));
 
         String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}", entry);
@@ -118,7 +118,7 @@ class LayoutTest {
 
     @Test
     void expandCommandIfTerminatedByMinus() throws IOException {
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("edition", "2");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("edition", "2");
 
         String layoutText = layout("\\edition-th ed.-", entry);
 
@@ -129,7 +129,7 @@ class LayoutTest {
     void customNameFormatter() throws IOException {
         when(layoutFormatterPreferences.getNameFormatterPreferences()).thenReturn(
                 new NameFormatterPreferences(Collections.singletonList("DCA"), Collections.singletonList("1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{l}@@*@*@more")));
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE).withField("author", "Joe Doe and Mary Jane");
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE).withField("author", "Joe Doe and Mary Jane");
 
         String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);
 

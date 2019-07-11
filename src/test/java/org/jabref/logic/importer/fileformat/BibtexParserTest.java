@@ -25,7 +25,6 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryType;
@@ -327,8 +326,8 @@ class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE).withField(InternalField.KEY_FIELD, "test")
-                                                                  .withField("author", "Ed von T@st");
+        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE).withField(InternalField.KEY_FIELD, "test")
+                                                                   .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
@@ -338,7 +337,7 @@ class BibtexParserTest {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
                 + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
         String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE)
+        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE)
                 .withField(InternalField.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
@@ -1326,7 +1325,7 @@ class BibtexParserTest {
 
         assertEquals(1, customEntryTypes.size());
         assertEquals("Lecturenotes", customEntryTypes.keySet().toArray()[0]);
-        assertEquals("Lecturenotes", entryType.getName());
+        assertEquals("Lecturenotes", entryType.getType());
         assertEquals(new HashSet<>(Arrays.asList("author", "title")), entryType.getRequiredFields());
         assertEquals(new HashSet<>(Arrays.asList("language", "url")), entryType.getOptionalFields());
     }

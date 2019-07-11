@@ -21,11 +21,11 @@ public class DuplicateCheckTest {
 
     @BeforeEach
     public void setUp() {
-        simpleArticle = new BibEntry(BibtexEntryTypes.ARTICLE)
+        simpleArticle = new BibEntry(StandardEntryType.ARTICLE)
                 .withField(StandardField.AUTHOR, "Single Author")
                 .withField(StandardField.TITLE, "A serious paper about something")
                 .withField(StandardField.YEAR, "2017");
-        unrelatedArticle = new BibEntry(BibtexEntryTypes.ARTICLE)
+        unrelatedArticle = new BibEntry(StandardEntryType.ARTICLE)
                 .withField(StandardField.AUTHOR, "Completely Different")
                 .withField(StandardField.TITLE, "Holy Moly Uffdada und Trallalla")
                 .withField(StandardField.YEAR, "1992");
@@ -46,9 +46,9 @@ public class DuplicateCheckTest {
 
     @Test
     public void testDuplicateDetection() {
-        BibEntry one = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry one = new BibEntry(StandardEntryType.ARTICLE);
 
-        BibEntry two = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry two = new BibEntry(StandardEntryType.ARTICLE);
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");
@@ -61,7 +61,7 @@ public class DuplicateCheckTest {
         two.setType(BibtexEntryTypes.BOOK);
         assertFalse(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
 
-        two.setType(BibtexEntryTypes.ARTICLE);
+        two.setType(StandardEntryType.ARTICLE);
         one.setField("year", "2005");
         two.setField("year", "2005");
         one.setField("title", "A title");

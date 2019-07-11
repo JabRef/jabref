@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.IdGenerator;
@@ -328,9 +326,9 @@ public class BibDatabaseTest {
 
     @Test
     public void getEntriesSortedWithTwoEntries() {
-        BibEntry entryB = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry entryB = new BibEntry(StandardEntryType.ARTICLE);
         entryB.setId("2");
-        BibEntry entryA = new BibEntry(BiblatexEntryTypes.ARTICLE);
+        BibEntry entryA = new BibEntry(StandardEntryType.ARTICLE);
         entryB.setId("1");
         database.insertEntries(entryB, entryA);
         assertEquals(Arrays.asList(entryA, entryB), database.getEntriesSorted(Comparator.comparing(BibEntry::getId)));

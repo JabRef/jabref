@@ -15,7 +15,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFieldsFail() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -26,7 +26,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.ARTICLE);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");

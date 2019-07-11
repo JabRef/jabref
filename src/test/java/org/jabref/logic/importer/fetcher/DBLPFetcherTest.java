@@ -7,7 +7,6 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -32,7 +31,7 @@ public class DBLPFetcherTest {
         dblpFetcher = new DBLPFetcher(importFormatPreferences);
         entry = new BibEntry();
 
-        entry.setType(BibtexEntryTypes.ARTICLE.getName());
+        entry.setType(StandardEntryType.ARTICLE.getType());
         entry.setCiteKey("DBLP:journals/stt/GeigerHL16");
         entry.setField(StandardField.TITLE,
                 "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");

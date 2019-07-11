@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.util.OS;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -101,7 +101,7 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), bibDatabaseMode);
+        EntryType type = BibEntryTypesManager.getTypeOrDefault(entry.getType(), bibDatabaseMode);
 
         // Write required fields first.
         Collection<String> fields = type.getRequiredFieldsFlat();

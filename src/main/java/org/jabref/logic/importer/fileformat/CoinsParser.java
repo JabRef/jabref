@@ -50,7 +50,7 @@ public class CoinsParser implements Parser {
         if (matcherType.find()) {
             switch (matcherType.group(1)) {
                 case "article":
-                    entry.setType(BiblatexEntryTypes.ARTICLE);
+                    entry.setType(StandardEntryType.ARTICLE);
                     break;
                 case "unknown":
                 default:

@@ -69,7 +69,7 @@ public class NewEntryAction extends SimpleCommand {
 
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
-        properties.put("EntryType", type.getName());
+        properties.put("EntryType", type.getType());
 
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
     }

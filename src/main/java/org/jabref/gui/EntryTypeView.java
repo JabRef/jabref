@@ -18,8 +18,8 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -87,7 +87,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private void addEntriesToPane(FlowPane pane, Collection<? extends EntryType> entries) {
 
         for (EntryType entryType : entries) {
-            Button entryButton = new Button(entryType.getName());
+            Button entryButton = new Button(entryType.getType());
             entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(entryType));
             pane.getChildren().add(entryButton);
@@ -124,7 +124,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
 
-            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            List<EntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -136,7 +136,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
-            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            List<EntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {

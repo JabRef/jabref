@@ -22,8 +22,8 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -162,7 +162,7 @@ public class JabRefMain extends Application {
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
-        EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
+        BibEntryTypesManager.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                                         preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 

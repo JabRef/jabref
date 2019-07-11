@@ -23,6 +23,7 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,14 +251,14 @@ public class TemplateExporter extends Exporter {
                     LOGGER.warn("Missing formatters found ", missingFormatters);
                 }
             }
-            Map<String, Layout> layouts = new HashMap<>();
+            Map<EntryType, Layout> layouts = new HashMap<>();
             Layout layout;
 
             ExporterFactory.entryNumber = 0;
             for (BibEntry entry : sorted) {
                 ExporterFactory.entryNumber++; // Increment entry counter.
                 // Get the layout
-                String type = entry.getType();
+                EntryType type = entry.getType();
                 if (layouts.containsKey(type)) {
                     layout = layouts.get(type);
                 } else {

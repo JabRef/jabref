@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -32,7 +31,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE);
         expected.setField("author", "Wei Wang and Yun He and Tong Li and Jiajun Zhu and Jinzhuo Liu");
         expected.setField("doi", "10.1155/2018/5913634");
         expected.setField("issn", "1875-919X");

@@ -16,7 +16,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.Defaults;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -26,7 +25,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -115,7 +114,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeEntry() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         database.insertEntry(entry);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
@@ -130,7 +129,7 @@ class BibtexDatabaseWriterTest {
     void writeEncodingAndEntry() throws Exception {
         when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         database.insertEntry(entry);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
@@ -249,7 +248,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
         try {
-            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
+            BibEntryTypesManager.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
             database.insertEntry(entry);
@@ -264,7 +263,7 @@ class BibtexDatabaseWriterTest {
                             + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + OS.NEWLINE,
                     stringWriter.toString());
         } finally {
-            EntryTypes.removeAllCustomEntryTypes();
+            BibEntryTypesManager.removeAllCustomEntryTypes();
         }
     }
 
@@ -366,7 +365,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeSavedSerializationOfEntryIfUnchanged() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("presaved serialization");
         entry.setChanged(false);
@@ -381,7 +380,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void reformatEntryIfAskedToDoSo() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("wrong serialization");
         entry.setChanged(false);
@@ -503,17 +502,17 @@ class BibtexDatabaseWriterTest {
         metaData.setSaveOrderConfig(saveOrderConfig);
 
         BibEntry firstEntry = new BibEntry();
-        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setType(StandardEntryType.ARTICLE);
         firstEntry.setField("author", "A");
         firstEntry.setField("year", "2010");
 
         BibEntry secondEntry = new BibEntry();
-        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setType(StandardEntryType.ARTICLE);
         secondEntry.setField("author", "A");
         secondEntry.setField("year", "2000");
 
         BibEntry thirdEntry = new BibEntry();
-        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setType(StandardEntryType.ARTICLE);
         thirdEntry.setField("author", "B");
         thirdEntry.setField("year", "2000");
 
@@ -547,17 +546,17 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws Exception {
         BibEntry firstEntry = new BibEntry();
-        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setType(StandardEntryType.ARTICLE);
         firstEntry.setField("author", "A");
         firstEntry.setField("year", "2010");
 
         BibEntry secondEntry = new BibEntry();
-        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setType(StandardEntryType.ARTICLE);
         secondEntry.setField("author", "B");
         secondEntry.setField("year", "2000");
 
         BibEntry thirdEntry = new BibEntry();
-        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setType(StandardEntryType.ARTICLE);
         thirdEntry.setField("author", "A");
         thirdEntry.setField("year", "2000");
 

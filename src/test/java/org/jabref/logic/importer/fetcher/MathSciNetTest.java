@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -33,7 +32,7 @@ class MathSciNetTest {
         fetcher = new MathSciNet(importFormatPreferences);
 
         ratiuEntry = new BibEntry();
-        ratiuEntry.setType(BibtexEntryTypes.ARTICLE);
+        ratiuEntry.setType(StandardEntryType.ARTICLE);
         ratiuEntry.setCiteKey("MR3537908");
         ratiuEntry.setField("author", "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
         ratiuEntry.setField("title", "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");

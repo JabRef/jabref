@@ -93,7 +93,7 @@ class IEEETest {
 
     @Test
     void searchResultHasNoKeywordTerms() throws FetcherException {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE);
 
         expected.setField("author", "Shatakshi Jha and Ikhlaq Hussain and Bhim Singh and Sukumar Mishra");
         expected.setField("date", "25 2 2019");

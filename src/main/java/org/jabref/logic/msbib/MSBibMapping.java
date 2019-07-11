@@ -1,10 +1,10 @@
 package org.jabref.logic.msbib;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -81,44 +81,42 @@ public class MSBibMapping {
     private MSBibMapping() {
     }
 
-    public static String getBiblatexEntryType(String msbibType) {
-        final String defaultType = BibtexEntryTypes.MISC.getName();
+    public static EntryType getBiblatexEntryType(String msbibType) {
+        Map<String, EntryType> entryTypeMapping = new HashMap<>();
 
-        Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        entryTypeMapping.put("Book", StandardEntryType.Book);
+        entryTypeMapping.put("BookSection", StandardEntryType.Book);
+        entryTypeMapping.put("JournalArticle", StandardEntryType.Article);
+        entryTypeMapping.put("ArticleInAPeriodical", StandardEntryType.Periodical);
+        entryTypeMapping.put("ConferenceProceedings", StandardEntryType.InProceedings);
+        entryTypeMapping.put("Report", StandardEntryType.TechReport);
+        entryTypeMapping.put("Patent", StandardEntryType.Patent);
+        entryTypeMapping.put("InternetSite", StandardEntryType.Online);
 
-        entryTypeMapping.put("Book", BiblatexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("BookSection", BiblatexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("JournalArticle", BiblatexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ArticleInAPeriodical", BiblatexEntryTypes.PERIODICAL.getName());
-        entryTypeMapping.put("ConferenceProceedings", BiblatexEntryTypes.INPROCEEDINGS.getName());
-        entryTypeMapping.put("Report", BiblatexEntryTypes.TECHREPORT.getName());
-        entryTypeMapping.put("Patent", BiblatexEntryTypes.PATENT.getName());
-        entryTypeMapping.put("InternetSite", BiblatexEntryTypes.ONLINE.getName());
-
-        return entryTypeMapping.getOrDefault(msbibType, defaultType);
+        return entryTypeMapping.getOrDefault(msbibType, StandardEntryType.Misc);
     }
 
-    public static MSBibEntryType getMSBibEntryType(String bibtexType) {
-        Map<String, MSBibEntryType> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    public static MSBibEntryType getMSBibEntryType(EntryType bibtexType) {
+        Map<EntryType, MSBibEntryType> entryTypeMapping = new HashMap<>();
 
-        entryTypeMapping.put("book", MSBibEntryType.Book);
-        entryTypeMapping.put("inbook", MSBibEntryType.BookSection);
-        entryTypeMapping.put("booklet", MSBibEntryType.BookSection);
-        entryTypeMapping.put("incollection", MSBibEntryType.BookSection);
-        entryTypeMapping.put("article", MSBibEntryType.JournalArticle);
-        entryTypeMapping.put("inproceedings", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("conference", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("proceedings", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("collection", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("techreport", MSBibEntryType.Report);
-        entryTypeMapping.put("manual", MSBibEntryType.Report);
-        entryTypeMapping.put("mastersthesis", MSBibEntryType.Report);
-        entryTypeMapping.put("phdthesis", MSBibEntryType.Report);
-        entryTypeMapping.put("unpublished", MSBibEntryType.Report);
-        entryTypeMapping.put("patent", MSBibEntryType.Patent);
-        entryTypeMapping.put("misc", MSBibEntryType.Misc);
-        entryTypeMapping.put("electronic", MSBibEntryType.ElectronicSource);
-        entryTypeMapping.put("online", MSBibEntryType.InternetSite);
+        entryTypeMapping.put(StandardEntryType.Book, MSBibEntryType.Book);
+        entryTypeMapping.put(StandardEntryType.InBook, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.Booklet, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.InCollection, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.Article, MSBibEntryType.JournalArticle);
+        entryTypeMapping.put(StandardEntryType.InProceedings, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Conference, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Proceedings, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Collection, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.TechReport, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Manual, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.MastersThesis, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.PhdThesis, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Unpublished, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Patent, MSBibEntryType.Patent);
+        entryTypeMapping.put(StandardEntryType.Misc, MSBibEntryType.Misc);
+        entryTypeMapping.put(StandardEntryType.Electronic, MSBibEntryType.ElectronicSource);
+        entryTypeMapping.put(StandardEntryType.Online, MSBibEntryType.InternetSite);
 
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }

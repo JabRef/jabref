@@ -49,9 +49,9 @@ import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.importer.fileformat.endnote.Year;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryType;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -156,23 +156,23 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
     }
 
-    private static BiblatexEntryType convertRefNameToType(String refName) {
+    private static EntryType convertRefNameToType(String refName) {
         switch (refName.toLowerCase().trim()) {
             case "artwork":
-                return BiblatexEntryTypes.MISC;
+                return StandardEntryType.Misc;
             case "generic":
-                return BiblatexEntryTypes.MISC;
+                return StandardEntryType.Misc;
             case "electronic rticle":
-                return BiblatexEntryTypes.ELECTRONIC;
+                return StandardEntryType.Electronic;
             case "book section":
-                return BiblatexEntryTypes.INBOOK;
+                return StandardEntryType.InBook;
             case "book":
-                return BiblatexEntryTypes.BOOK;
+                return StandardEntryType.Book;
             case "journal article":
-                return BiblatexEntryTypes.ARTICLE;
+                return StandardEntryType.Article;
 
             default:
-                return BiblatexEntryTypes.ARTICLE;
+                return StandardEntryType.Article;
         }
     }
 
@@ -233,11 +233,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return entry;
     }
 
-    private BiblatexEntryType getType(Record record) {
+    private EntryType getType(Record record) {
         return Optional.ofNullable(record.getRefType())
                        .map(RefType::getName)
                        .map(EndnoteXmlImporter::convertRefNameToType)
-                       .orElse(BiblatexEntryTypes.ARTICLE);
+                       .orElse(StandardEntryType.Article);
     }
 
     private List<LinkedFile> getLinkedFiles(Record record) {

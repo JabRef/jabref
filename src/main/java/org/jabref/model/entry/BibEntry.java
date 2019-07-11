@@ -18,15 +18,13 @@ import java.util.regex.Pattern;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -45,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 public class BibEntry implements Cloneable {
 
-    public static final String DEFAULT_TYPE = "misc";
+    public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
@@ -59,7 +57,7 @@ public class BibEntry implements Cloneable {
     private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
     private final EventBus eventBus = new EventBus();
     private String id;
-    private final StringProperty type = new SimpleStringProperty();
+    private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>();
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
@@ -85,7 +83,7 @@ public class BibEntry implements Cloneable {
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    private BibEntry(String id, String type) {
+    private BibEntry(String id, EntryType type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
@@ -97,7 +95,7 @@ public class BibEntry implements Cloneable {
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
     public BibEntry(EntryType type) {
-        this(IdGenerator.next(), type.getName());
+        this(IdGenerator.next(), type);
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -120,12 +118,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
         if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)) {
-            Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
-            if (entryType.isPresent()) {
-                return Optional.of(entryType.get().getName());
-            } else {
-                return Optional.of(StringUtil.capitalizeFirst(getType()));
-            }
+            return Optional.of(type.get().getDisplayName());
         }
 
         if (InternalField.KEY_FIELD.equals(field)) {
@@ -196,11 +189,11 @@ public class BibEntry implements Cloneable {
     /**
      * Returns this entry's type.
      */
-    public String getType() {
+    public EntryType getType() {
         return type.getValue();
     }
 
-    public StringProperty typeProperty() {
+    public ObjectProperty<EntryType> typeProperty() {
         return type;
     }
 
@@ -208,35 +201,22 @@ public class BibEntry implements Cloneable {
      * Sets this entry's type.
      */
     public Optional<FieldChange> setType(EntryType type) {
-        return this.setType(type.getName());
-    }
-
-    /**
-     * Sets this entry's type.
-     */
-    public Optional<FieldChange> setType(String type) {
         return setType(type, EntryEventSource.LOCAL);
     }
 
     /**
      * Sets this entry's type.
      */
-    public Optional<FieldChange> setType(String type, EntryEventSource eventSource) {
-        String newType;
-        if (Strings.isNullOrEmpty(type)) {
-            newType = DEFAULT_TYPE;
-        } else {
-            newType = type;
-        }
-        String oldType = getField(InternalField.TYPE_HEADER).orElse(null);
+    public Optional<FieldChange> setType(EntryType newType, EntryEventSource eventSource) {
+        EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
         }
 
-        this.type.setValue(newType.toLowerCase(Locale.ENGLISH));
+        this.type.setValue(newType);
         changed = true;
 
-        FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType, newType);
+        FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());
         eventBus.post(new FieldChangedEvent(change, eventSource));
         return Optional.of(change);
     }
@@ -744,14 +724,9 @@ public class BibEntry implements Cloneable {
             latexFreeFields.put(field, citeKey.get());
             return citeKey;
         } else if (InternalField.TYPE_HEADER.equals(field)) {
-            Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
-            if (entryType.isPresent()) {
-                String entryName = entryType.get().getName();
-                latexFreeFields.put(field, entryName);
-                return Optional.of(entryName);
-            } else {
-                return Optional.of(StringUtil.capitalizeFirst(getType()));
-            }
+            String typeName = type.get().getDisplayName();
+            latexFreeFields.put(field, typeName);
+            return Optional.of(typeName);
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(field).get()).intern();
             latexFreeFields.put(field, latexFreeField);

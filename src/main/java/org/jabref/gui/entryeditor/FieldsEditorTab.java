@@ -30,12 +30,12 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -82,7 +82,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
 
-        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
+        EntryType entryType = BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode());
         fields = determineFieldsToShow(entry, entryType);
 
         List<Label> labels = new ArrayList<>();
@@ -193,7 +193,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
+        EntryType entryType = BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode());
         return !determineFieldsToShow(entry, entryType).isEmpty();
     }
 

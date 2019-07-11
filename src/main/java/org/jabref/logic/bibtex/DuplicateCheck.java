@@ -9,15 +9,15 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.util.strings.StringSimilarity;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class DuplicateCheck {
             return false;
         }
 
-        final EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
+        final EntryType type = BibEntryTypesManager.getTypeOrDefault(one.getType(), bibDatabaseMode);
         final double[] reqCmpResult = compareRequiredFields(type, one, two);
 
         if (isFarFromThreshold(reqCmpResult[0])) {

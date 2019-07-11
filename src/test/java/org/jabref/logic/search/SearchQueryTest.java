@@ -119,7 +119,7 @@ public class SearchQueryTest {
     @Test
     public void testIsMatch() {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         entry.setField("author", "asdf");
 
         assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
@@ -180,7 +180,7 @@ public class SearchQueryTest {
     @Test
     public void isMatchedForNormalAndFieldBasedSearchMixed() {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         entry.setField("author", "asdf");
         entry.setField("abstract", "text");
 

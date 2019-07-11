@@ -30,7 +30,7 @@ public class BibEntryTests {
     public void setUp() {
         // Default entry for most keyword and some type tests
         keywordEntry = new BibEntry();
-        keywordEntry.setType(BibtexEntryTypes.ARTICLE);
+        keywordEntry.setType(StandardEntryType.Article);
         keywordEntry.setField("keywords", "Foo, Bar");
         keywordEntry.setChanged(false);
 
@@ -51,7 +51,7 @@ public class BibEntryTests {
 
     @Test
     public void allFieldsPresentDefault() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -67,7 +67,7 @@ public class BibEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -83,13 +83,13 @@ public class BibEntryTests {
 
     @Test
     public void isNullCiteKeyThrowsNPE() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.Article);
         assertThrows(NullPointerException.class, () -> e.setCiteKey(null));
     }
 
     @Test
     public void isEmptyCiteKey() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry(StandardEntryType.Article);
         assertFalse(e.hasCiteKey());
 
         e.setCiteKey("");
@@ -105,7 +105,7 @@ public class BibEntryTests {
     @Test
     public void typeOfBibEntryIsMiscAfterSettingToNullString() {
         assertEquals("article", keywordEntry.getType());
-        keywordEntry.setType((String) null);
+        keywordEntry.setType(null);
         assertEquals("misc", keywordEntry.getType());
     }
 

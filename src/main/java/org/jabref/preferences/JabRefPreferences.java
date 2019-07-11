@@ -93,10 +93,10 @@ import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -1261,7 +1261,7 @@ public class JabRefPreferences implements PreferencesService {
             clearCustomEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            customEntryTypes.forEach(type -> prefsNode.put(type.getName(), type.getAsString()));
+            customEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), type.getAsString()));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -2100,9 +2100,9 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<CustomEntryType> customBiblatexBibTexTypes = EntryTypes.getAllValues(bibDatabaseMode).stream()
-                                                                    .filter(type -> type instanceof CustomEntryType)
-                                                                    .map(entryType -> (CustomEntryType) entryType).collect(Collectors.toList());
+        List<CustomEntryType> customBiblatexBibTexTypes = BibEntryTypesManager.getAllValues(bibDatabaseMode).stream()
+                                                                              .filter(type -> type instanceof CustomEntryType)
+                                                                              .map(entryType -> (CustomEntryType) entryType).collect(Collectors.toList());
 
         storeCustomEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
 

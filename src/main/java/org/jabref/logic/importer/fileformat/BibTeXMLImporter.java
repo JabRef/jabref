@@ -92,7 +92,7 @@ public class BibTeXMLImporter extends Importer {
             for (Entry entry : entries) {
                 BibEntry bibEntry = new BibEntry();
                 if (entry.getArticle() != null) {
-                    bibEntry.setType(BibtexEntryTypes.ARTICLE);
+                    bibEntry.setType(StandardEntryType.ARTICLE);
                     parse(entry.getArticle(), fields);
                 } else if (entry.getBook() != null) {
                     bibEntry.setType(BibtexEntryTypes.BOOK);

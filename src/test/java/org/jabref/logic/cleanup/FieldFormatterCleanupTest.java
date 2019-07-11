@@ -7,7 +7,6 @@ import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.field.InternalField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +24,7 @@ public class FieldFormatterCleanupTest {
         fieldMap = new HashMap<>();
         entry = new BibEntry();
 
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         fieldMap.put("title", "JabRef");
         fieldMap.put("booktitle", "JabRefBook");
         fieldMap.put("year", "twohundredsixteen");

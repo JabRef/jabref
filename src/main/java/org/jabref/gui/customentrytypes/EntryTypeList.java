@@ -14,8 +14,8 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
@@ -89,7 +89,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         for (int i = 0; i < selected.length; i++) {
             String typeName = listModel.get(selected[selected.length - 1 - i]);
-            Optional<EntryType> type = EntryTypes.getType(typeName, this.mode);
+            Optional<EntryType> type = BibEntryTypesManager.getType(typeName, this.mode);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
@@ -112,8 +112,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     public void enable(String typeName, boolean isChanged) {
         //String s = (String)list.getSelectedValue();
 
-        if (EntryTypes.getStandardType(typeName, mode).isPresent()) {
-            Optional<EntryType> entryType = EntryTypes.getType(typeName, mode);
+        if (BibEntryTypesManager.getStandardType(typeName, mode).isPresent()) {
+            Optional<EntryType> entryType = BibEntryTypesManager.getType(typeName, mode);
             if (isChanged || (entryType.isPresent() && (entryType.get() instanceof CustomEntryType))) {
                 def.setEnabled(true);
             } else {

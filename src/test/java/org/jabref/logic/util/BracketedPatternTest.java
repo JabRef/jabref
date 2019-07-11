@@ -3,7 +3,6 @@ package org.jabref.logic.util;
 import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 
@@ -28,7 +27,7 @@ public class BracketedPatternTest {
         bibentry.setField("pages", "213--216");
 
         dbentry = new BibEntry();
-        dbentry.setType(BibtexEntryTypes.ARTICLE);
+        dbentry.setType(StandardEntryType.ARTICLE);
         dbentry.setCiteKey("HipKro03");
         dbentry.setField("author", "Eric von Hippel and Georg von Krogh");
         dbentry.setField("title", "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");

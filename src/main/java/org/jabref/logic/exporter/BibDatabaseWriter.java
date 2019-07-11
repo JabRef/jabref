@@ -23,7 +23,6 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -31,6 +30,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
@@ -181,11 +181,11 @@ public abstract class BibDatabaseWriter {
             // Check if we must write the type definition for this
             // entry, as well. Our criterion is that all non-standard
             // types (*not* all customized standard types) must be written.
-            if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+            if (!BibEntryTypesManager.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
                 // If user-defined entry type, then add it
                 // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
-                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
-                        entryType -> typesToWrite.put(entryType.getName(), entryType));
+                BibEntryTypesManager.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
+                        entryType -> typesToWrite.put(entryType.getType(), entryType));
             }
 
             writeEntry(entry, bibDatabaseContext.getMode());

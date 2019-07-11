@@ -7,9 +7,10 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -35,8 +36,8 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         return parserResult.getEntryTypes().values().stream()
-                           .filter(type -> (!EntryTypes.getType(type.getName(), mode).isPresent())
-                                           || !EntryTypes.isEqualNameAndFieldBased(type, EntryTypes.getType(type.getName(), mode).get()))
+                           .filter(type -> (!BibEntryTypesManager.getType(type.getType(), mode).isPresent())
+                                   || !EntryTypeFactory.isEqualNameAndFieldBased(type, BibEntryTypesManager.getType(type.getType(), mode).get()))
                            .collect(Collectors.toList());
     }
 

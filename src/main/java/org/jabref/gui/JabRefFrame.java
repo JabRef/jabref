@@ -120,7 +120,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
@@ -525,7 +525,7 @@ public class JabRefFrame extends BorderPane {
         pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
 
         HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs, stateManager)),
+                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),

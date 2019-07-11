@@ -80,4 +80,12 @@ public class OptionalUtil {
             return valueTwo.map(f -> f);
         }
     }
+
+    public static <T extends S, S> S orElse(Optional<T> optional, S otherwise) {
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            return otherwise;
+        }
+    }
 }

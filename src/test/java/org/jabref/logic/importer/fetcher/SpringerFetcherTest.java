@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.json.JSONObject;
@@ -26,7 +25,7 @@ class SpringerFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE);
         expected.setField("author", "Steinmacher, Igor and Gerosa, Marco and Conte, Tayana U. and Redmiles, David F.");
         expected.setField("date", "2018-06-14");
         expected.setField("doi", "10.1007/s10606-018-9335-z");

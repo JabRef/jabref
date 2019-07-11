@@ -154,7 +154,7 @@ public class FreeCiteImporter extends Importer {
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
                                 // the drawback is that ctx:context-objects is NOT nested in citation, but a separate element
                                 // we would have to change the whole parser to parse that format.
-                                type = BibtexEntryTypes.ARTICLE;
+                                type = StandardEntryType.ARTICLE;
                                 e.setField(field, parser.getElementText());
                             } else if (new UnknownField("tech").equals(field)) {
                                 type = BibtexEntryTypes.TECHREPORT;

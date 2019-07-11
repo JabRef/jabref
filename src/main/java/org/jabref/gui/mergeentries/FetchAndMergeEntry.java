@@ -21,6 +21,7 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -96,10 +97,10 @@ public class FetchAndMergeEntry {
             boolean edited = false;
 
             // entry type
-            String oldType = originalEntry.getType();
-            String newType = mergedEntry.get().getType();
+            EntryType oldType = originalEntry.getType();
+            EntryType newType = mergedEntry.get().getType();
 
-            if (!oldType.equalsIgnoreCase(newType)) {
+            if (!oldType.equals(newType)) {
                 originalEntry.setType(newType);
                 ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
                 edited = true;

@@ -9,8 +9,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 public class BibTeXConverter {
@@ -27,10 +28,10 @@ public class BibTeXConverter {
      */
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
-        Map<String, String> fieldValues = new HashMap<>();
+        Map<Field, String> fieldValues = new HashMap<>();
 
-        String bibTexEntryType = MSBibMapping.getBiblatexEntryType(entry.getType());
-        result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(bibTexEntryType));
+        EntryType bibTexEntryType = MSBibMapping.getBiblatexEntryType(entry.getType());
+        result = new BibEntry(bibTexEntryType);
 
         // add String fields
         for (Map.Entry<String, String> field : entry.fields.entrySet()) {

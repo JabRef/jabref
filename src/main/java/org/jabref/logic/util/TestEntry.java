@@ -13,7 +13,7 @@ public class TestEntry {
 
     public static BibEntry getTestEntry() {
 
-        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
         entry.setCiteKey("Smith2016");
         entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(StandardField.EDITOR, "Taylor, Phil");

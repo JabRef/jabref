@@ -18,11 +18,11 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -74,8 +74,8 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(button, 3, rowIndex);
 
         columnIndex = 1;
-        for (EntryType type : EntryTypes.getAllValues(mode)) {
-            Label label1 = new Label(type.getName());
+        for (EntryType type : BibEntryTypesManager.getAllValues(mode)) {
+            Label label1 = new Label(type.getType());
             TextField textField = new TextField();
             Button button1 = new Button("Default");
             button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
@@ -84,7 +84,7 @@ public class BibtexKeyPatternPanel extends Pane {
             gridPane.add(textField, 2 + (columnIndex * 3), rowIndex);
             gridPane.add(button1, 3 + (columnIndex * 3), rowIndex);
 
-            textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
+            textFields.put(type.getType().toLowerCase(Locale.ROOT), textField);
 
             if (columnIndex == (columnsNumber - 1)) {
                 columnIndex = 0;

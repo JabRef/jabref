@@ -14,7 +14,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -75,7 +77,7 @@ public class SilverPlatterImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        String type = "";
+        EntryType type = StandardEntryType.Misc;
         Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
@@ -154,18 +156,18 @@ public class SilverPlatterImporter extends Importer {
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
                     if ("Monograph".equals(frest)) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                     } else if (frest.startsWith("Dissertation")) {
-                        type = "phdthesis";
+                        type = StandardEntryType.PhdThesis;
                     } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                        type = "incollection";
+                        type = StandardEntryType.InCollection;
                         // This entry type contains page numbers and booktitle in the
                         // title field.
                         isChapter = true;
                     } else {
-                        type = frest.replace(" ", "");
+                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
                     }
                 }
             }
@@ -182,7 +184,7 @@ public class SilverPlatterImporter extends Importer {
 
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
+            BibEntry b = new BibEntry(type);
             // create one here
             b.setField(h);
 

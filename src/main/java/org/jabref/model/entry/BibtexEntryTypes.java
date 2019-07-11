@@ -2,9 +2,9 @@ package org.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.IEEEField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -20,18 +20,11 @@ public class BibtexEntryTypes {
      * Required fields: author, title, journal, year.
      * Optional fields: volume, number, pages, month, note.
      */
-    public static final EntryType ARTICLE = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNAL, StandardField.YEAR);
-            addAllOptional(StandardField.VOLUME, StandardField.NUMBER, StandardField.PAGES, StandardField.MONTH, StandardField.ISSN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Article";
-        }
-    };
+    private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Article)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNAL, StandardField.YEAR)
+            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.PAGES, StandardField.MONTH, StandardField.ISSN, StandardField.NOTE)
+            .build();
 
     /**
      * A book with an explicit publisher.
@@ -39,18 +32,11 @@ public class BibtexEntryTypes {
      * Required fields: author or editor, title, publisher, year.
      * Optional fields: volume or number, series, address, edition, month, note.
      */
-    public static final EntryType BOOK = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR, FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR));
-            addAllOptional(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Book";
-        }
-    };
+    private static final BibEntryType BOOK = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Book)
+            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR)
+            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)
+            .build();
 
     /**
      * A work that is printed and bound, but without a named publisher or sponsoring institution.
@@ -58,18 +44,11 @@ public class BibtexEntryTypes {
      * Required field: title.
      * Optional fields: author, howpublished, address, month, year, note.
      */
-    public static final EntryType BOOKLET = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.TITLE);
-            addAllOptional(StandardField.AUTHOR, StandardField.HOWPUBLISHED, StandardField.ADDRESS, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Booklet";
-        }
-    };
+    private static final BibEntryType BOOKLET = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Booklet)
+            .withRequiredFields(StandardField.TITLE)
+            .withImportantFields(StandardField.AUTHOR, StandardField.HOWPUBLISHED, StandardField.ADDRESS, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)
+            .build();
 
     /**
      * An article in a conference proceedings.
@@ -77,19 +56,11 @@ public class BibtexEntryTypes {
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
-    public static final EntryType CONFERENCE = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR);
-            addAllOptional(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION,
-                    StandardField.PUBLISHER, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Conference";
-        }
-    };
+    private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Conference)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR)
+            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.NOTE)
+            .build();
 
     /**
      * A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
@@ -97,37 +68,22 @@ public class BibtexEntryTypes {
      * Required fields: author or editor, title, chapter and/or pages, publisher, year.
      * Optional fields: volume or number, series, type, address, edition, month, note.
      */
-    public static final EntryType INBOOK = new BibtexEntryType() {
-
-        {
-            addAllRequired(FieldFactory.orFields(StandardField.CHAPTER, StandardField.PAGES), StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR, FieldFactory.orFields(StandardField.AUTHOR, StandardField.EDITOR));
-            addAllOptional(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "InBook";
-        }
-    };
+    private static final BibEntryType INBOOK = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.InBook)
+            .withRequiredFields(Arrays.asList(new OrFields(StandardField.CHAPTER, StandardField.PAGES), new OrFields(StandardField.AUTHOR, StandardField.EDITOR)), StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR)
+            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)
+            .build();
 
     /**
      * A part of a book having its own title.
      * Required fields: author, title, booktitle, publisher, year.
      * Optional fields: editor, volume or number, series, type, chapter, pages, address, edition, month, note.
      */
-    public static final EntryType INCOLLECTION = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.PUBLISHER, StandardField.YEAR);
-            addAllOptional(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.CHAPTER, StandardField.PAGES, StandardField.ADDRESS, StandardField.EDITION,
-                    StandardField.MONTH, StandardField.ISBN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "InCollection";
-        }
-    };
+    private static final BibEntryType INCOLLECTION = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.InCollection)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.PUBLISHER, StandardField.YEAR)
+            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.CHAPTER, StandardField.PAGES, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)
+            .build();
 
     /**
      * An article in a conference proceedings.
@@ -135,37 +91,19 @@ public class BibtexEntryTypes {
      * Required fields: author, title, booktitle, year.
      * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
      */
-    public static final EntryType INPROCEEDINGS = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR);
-            addAllOptional(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION,
-                    StandardField.PUBLISHER, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "InProceedings";
-        }
-    };
+    private static final BibEntryType INPROCEEDINGS = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.InProceedings)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR)
+            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.NOTE)
+            .build();
 
     /**
      * Technical documentation.
      * Required field: title.
      * Optional fields: author, organization, address, edition, month, year, note.
      */
-    public static final EntryType MANUAL = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.TITLE);
-            addAllOptional(StandardField.AUTHOR, StandardField.ORGANIZATION, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.YEAR, StandardField.ISBN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Manual";
-        }
-    };
+    private static final BibEntryType MANUAL = new BibEntryTypeBuilder().withRequiredFields(StandardField.TITLE).withImportantFields(StandardField.AUTHOR, StandardField.ORGANIZATION, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.YEAR, StandardField.ISBN, StandardField.NOTE).withType(StandardEntryType.Manual)
+                                                                        .build();
 
     /**
      * A Master's thesis.
@@ -173,18 +111,11 @@ public class BibtexEntryTypes {
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
-    public static final EntryType MASTERSTHESIS = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR);
-            addAllOptional(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "MastersThesis";
-        }
-    };
+    private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.MastersThesis)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR)
+            .withImportantFields(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)
+            .build();
 
     /**
      * Use this type when nothing else fits.
@@ -192,17 +123,10 @@ public class BibtexEntryTypes {
      * Required fields: none.
      * Optional fields: author, title, howpublished, month, year, note.
      */
-    public static final EntryType MISC = new BibtexEntryType() {
-
-        {
-            addAllOptional(StandardField.AUTHOR, StandardField.TITLE, StandardField.HOWPUBLISHED, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Misc";
-        }
-    };
+    private static final BibEntryType MISC = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Misc)
+            .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.HOWPUBLISHED, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)
+            .build();
 
     /**
      * A PhD thesis.
@@ -210,18 +134,11 @@ public class BibtexEntryTypes {
      * Required fields: author, title, school, year.
      * Optional fields: type, address, month, note.
      */
-    public static final EntryType PHDTHESIS = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR);
-            addAllOptional(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "PhdThesis";
-        }
-    };
+    private static final BibEntryType PHDTHESIS = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.PhdThesis)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR)
+            .withImportantFields(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)
+            .build();
 
     /**
      * The proceedings of a conference.
@@ -229,19 +146,11 @@ public class BibtexEntryTypes {
      * Required fields: title, year.
      * Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
      */
-    public static final EntryType PROCEEDINGS = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.TITLE, StandardField.YEAR);
-            addAllOptional(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.MONTH,
-                    StandardField.ORGANIZATION, StandardField.ISBN, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "Proceedings";
-        }
-    };
+    private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Proceedings)
+            .withRequiredFields(StandardField.TITLE, StandardField.YEAR)
+            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.ISBN, StandardField.NOTE)
+            .build();
 
     /**
      * A report published by a school or other institution, usually numbered within a series.
@@ -249,18 +158,11 @@ public class BibtexEntryTypes {
      * Required fields: author, title, institution, year.
      * Optional fields: type, number, address, month, note.
      */
-    public static final EntryType TECHREPORT = new BibtexEntryType() {
-
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.YEAR);
-            addAllOptional(StandardField.TYPE, StandardField.NUMBER, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE);
-        }
-
-        @Override
-        public String getName() {
-            return "TechReport";
-        }
-    };
+    private static final BibEntryType TECHREPORT = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.TechReport)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.YEAR)
+            .withImportantFields(StandardField.TYPE, StandardField.NUMBER, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)
+            .build();
 
     /**
      * A document having an author and title, but not formally published.
@@ -268,30 +170,26 @@ public class BibtexEntryTypes {
      * Required fields: author, title, note.
      * Optional fields: month, year.
      */
-    public static final EntryType UNPUBLISHED = new BibtexEntryType() {
+    private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.Unpublished)
+            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.NOTE)
+            .withImportantFields(StandardField.MONTH, StandardField.YEAR)
+            .build();
 
-        {
-            addAllRequired(StandardField.AUTHOR, StandardField.TITLE, StandardField.NOTE);
-            addAllOptional(StandardField.MONTH, StandardField.YEAR);
-        }
+    /**
+     * This type is used by the IEEEtran.bst to control the appearance of the bibliography
+     */
+    private static final BibEntryType IEEETRANBSTCTL = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.IEEEtranBSTCTL)
+            .withDetailFields(IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_FORCED_ETAL,
+                    IEEEField.CTLUSE_URL, IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL,
+                    IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLALT_STRETCH_FACTOR, IEEEField.CTLDASH_REPEATED_NAMES,
+                    IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX)
+            .build();
 
-        @Override
-        public String getName() {
-            return "Unpublished";
-        }
-    };
-
-    public static final List<EntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
-            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
+    public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
+            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC, IEEETRANBSTCTL);
 
     private BibtexEntryTypes() {
-    }
-
-    public static Optional<EntryType> getType(String name) {
-        return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
-    }
-
-    public static EntryType getTypeOrDefault(String name) {
-        return getType(name).orElseGet(() -> new CustomEntryType(name, "required", "optional"));
     }
 }

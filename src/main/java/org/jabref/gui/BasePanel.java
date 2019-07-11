@@ -638,7 +638,7 @@ public class BasePanel extends StackPane {
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
-                output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
+                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getDisplayName()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {

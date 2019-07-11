@@ -7,6 +7,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -23,7 +24,7 @@ public class MSBibConverter {
         MSBibEntry result = new MSBibEntry();
 
         // memorize original type
-        result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType());
+        result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType().getName());
         // define new type
         String msbibType = result.fields.put("SourceType", MSBibMapping.getMSBibEntryType(entry.getType()).name());
 
@@ -53,7 +54,7 @@ public class MSBibConverter {
 
         result.number = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
 
-        if ("Patent".equalsIgnoreCase(entry.getType())) {
+        if (entry.getType() == StandardEntryType.Patent) {
             result.patentNumber = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
             result.number = null;
         }
@@ -87,13 +88,13 @@ public class MSBibConverter {
             result.thesisType = entry.getLatexFreeField(StandardField.TYPE).get();
 
         } else {
-            if ("techreport".equalsIgnoreCase(entry.getType())) {
+            if (entry.getType() == StandardEntryType.TechReport) {
                 result.thesisType = "Tech. rep.";
-            } else if ("mastersthesis".equalsIgnoreCase(entry.getType())) {
+            } else if (entry.getType() == StandardEntryType.MastersThesis) {
                 result.thesisType = "Master's thesis";
-            } else if ("phdthesis".equalsIgnoreCase(entry.getType())) {
+            } else if (entry.getType() == StandardEntryType.PhdThesis) {
                 result.thesisType = "Ph.D. dissertation";
-            } else if ("unpublished".equalsIgnoreCase(entry.getType())) {
+            } else if (entry.getType() == StandardEntryType.Unpublished) {
                 result.thesisType = "unpublished";
             }
         }

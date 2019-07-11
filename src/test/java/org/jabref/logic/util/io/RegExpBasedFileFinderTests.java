@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ public class RegExpBasedFileFinderTests {
     public void setUp() {
 
         entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setType(StandardEntryType.ARTICLE);
         entry.setCiteKey("HipKro03");
         entry.setField("author", "Eric von Hippel and Georg von Krogh");
         entry.setField("title", "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
@@ -46,7 +45,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFiles() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
         localEntry.setCiteKey("pdfInDatabase");
         localEntry.setField("year", "2001");
 
@@ -82,7 +81,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testAuthorWithDiacritics() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
         localEntry.setCiteKey("Grazulis2017");
         localEntry.setField("year", "2017");
         localEntry.setField("author", "Gražulis, Saulius and O. Kitsune");
@@ -104,7 +103,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileInSubdirectory() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 
@@ -124,7 +123,7 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileNonRecursive() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField("year", "2017");
 

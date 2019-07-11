@@ -75,7 +75,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
                 entry.setType(BiblatexEntryTypes.MISC);
                 break;
             default:
-                entry.setType(BiblatexEntryTypes.ARTICLE);
+                entry.setType(StandardEntryType.ARTICLE);
                 break;
         }
 

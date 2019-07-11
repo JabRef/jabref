@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
@@ -30,7 +30,7 @@ class CustomEntryTypePreferenceMigration {
         int number = 0;
         Optional<CustomEntryType> type;
         while ((type = getCustomEntryType(number)).isPresent()) {
-            EntryTypes.addOrModifyCustomEntryType(type.get(), defaultBibDatabaseMode);
+            BibEntryTypesManager.addOrModifyCustomEntryType(type.get(), defaultBibDatabaseMode);
             storedOldTypes.add(type.get());
             number++;
         }
