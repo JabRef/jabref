@@ -81,8 +81,8 @@ public class FindFullTextAction extends SimpleCommand {
                 util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
 
                 for (BibEntry entry : basePanel.getSelectedEntries()) {
-                    List<LinkedFile> l = entry.getFiles();
-                    if (l.isEmpty()) {
+                    List<LinkedFile> fileList = entry.getFiles();
+                    if (fileList.isEmpty()) {
                         FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
                         downloads.put(entry, fetchers.findFullTextPDF(entry));
                     }
