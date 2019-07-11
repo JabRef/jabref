@@ -34,12 +34,8 @@ import org.jabref.preferences.PreferencesService;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ParseTexDialogViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParseTexDialogViewModel.class);
 
     private static final String TEX_EXT = ".tex";
     private final DialogService dialogService;
@@ -68,8 +64,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        Predicate<String> isDirectory = path ->
-                path != null && Paths.get(path).toFile().exists() && Paths.get(path).toFile().isDirectory();
+        Predicate<String> isDirectory = path -> Paths.get(path) != null && Paths.get(path).toFile().isDirectory();
         texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
@@ -133,27 +128,25 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
                       .executeWith(taskExecutor);
     }
 
-    private FileNodeViewModel searchDirectory(Path directory) {
+    private FileNodeViewModel searchDirectory(Path directory) throws IOException {
         if (directory == null || !directory.toFile().exists() || !directory.toFile().isDirectory()) {
-            LOGGER.error("An error occurred while searching an invalid directory.");
-            return null;
+            throw new IOException("An error occurred while searching an invalid directory.");
         }
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
-        Map<Boolean, List<Path>> fileListPartitionIsDirectory;
+        Map<Boolean, List<Path>> fileListPartition;
 
         try (Stream<Path> filesStream = Files.list(directory)) {
-            fileListPartitionIsDirectory = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
+            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.error("An error occurred while searching files: ", e);
-            return parent;
+            throw new IOException("An error occurred while searching files: ", e);
         }
 
-        List<Path> subDirectories = fileListPartitionIsDirectory.get(true);
-        List<Path> files = fileListPartitionIsDirectory.get(false)
-                                                       .stream()
-                                                       .filter(path -> path.toString().endsWith(TEX_EXT))
-                                                       .collect(Collectors.toList());
+        List<Path> subDirectories = fileListPartition.get(true);
+        List<Path> files = fileListPartition.get(false)
+                                            .stream()
+                                            .filter(path -> path.toString().endsWith(TEX_EXT))
+                                            .collect(Collectors.toList());
         int fileCount = 0;
 
         for (Path subDirectory : subDirectories) {
@@ -166,8 +159,9 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         }
 
         parent.setFileCount(files.size() + fileCount);
-        parent.getChildren().addAll(files.stream().map(FileNodeViewModel::new).collect(Collectors.toList()));
-
+        parent.getChildren().addAll(files.stream()
+                                         .map(FileNodeViewModel::new)
+                                         .collect(Collectors.toList()));
         return parent;
     }
 

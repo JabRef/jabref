@@ -35,9 +35,9 @@ public class ParseTexResultViewModel extends AbstractViewModel {
      */
     public void activeReferenceChanged(ReferenceViewModel reference) {
         if (reference == null) {
-            getCitationListByReference().clear();
+            citationList.clear();
         } else {
-            getCitationListByReference().setAll(reference.getCitationList());
+            citationList.setAll(reference.getCitationList());
         }
     }
 }
