@@ -94,7 +94,7 @@ public class OvidImporterTest {
         BibEntry entry = entries.get(0);
         assertEquals("misc", entry.getType());
         assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getField("author"));
-        assertEquals(Optional.of("Short abstract"), entry.getField("abstract"));
+        assertEquals(Optional.of("Short abstract"), entry.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("Musterbuch"), entry.getField("title"));
         assertEquals(Optional.of("Einleitung"), entry.getField("chaptertitle"));
 
@@ -104,7 +104,7 @@ public class OvidImporterTest {
         assertEquals(Optional.of("Max the Editor"), entry.getField("title"));
         assertEquals(Optional.of("Very Long Title"), entry.getField("journal"));
         assertEquals(Optional.of("28"), entry.getField("volume"));
-        assertEquals(Optional.of("2"), entry.getField("issue"));
+        assertEquals(Optional.of("2"), entry.getField(StandardField.ISSUE));
         assertEquals(Optional.of("2015"), entry.getField("year"));
         assertEquals(Optional.of("103--106"), entry.getField("pages"));
 
@@ -114,7 +114,7 @@ public class OvidImporterTest {
         assertEquals(Optional.of("Test"), entry.getField("title"));
         assertEquals(Optional.of("Very Long Title"), entry.getField("journal"));
         assertEquals(Optional.of("28"), entry.getField("volume"));
-        assertEquals(Optional.of("2"), entry.getField("issue"));
+        assertEquals(Optional.of("2"), entry.getField(StandardField.ISSUE));
         assertEquals(Optional.of("April"), entry.getField("month"));
         assertEquals(Optional.of("2015"), entry.getField("year"));
         assertEquals(Optional.of("103--106"), entry.getField("pages"));
@@ -126,14 +126,14 @@ public class OvidImporterTest {
         assertEquals(Optional.of("Editor"), entry.getField("editor"));
         assertEquals(Optional.of("Very Long Title"), entry.getField("booktitle"));
         assertEquals(Optional.of("103--106"), entry.getField("pages"));
-        assertEquals(Optional.of("Address"), entry.getField("address"));
+        assertEquals(Optional.of("Address"), entry.getField(StandardField.ADDRESS));
         assertEquals(Optional.of("Publisher"), entry.getField("publisher"));
 
         entry = entries.get(4);
         assertEquals("article", entry.getType());
         assertEquals(Optional.of("2014"), entry.getField("year"));
         assertEquals(Optional.of("58"), entry.getField("pages"));
-        assertEquals(Optional.of("Test"), entry.getField("address"));
+        assertEquals(Optional.of("Test"), entry.getField(StandardField.ADDRESS));
         assertEquals(Optional.empty(), entry.getField("title"));
         assertEquals(Optional.of("TestPublisher"), entry.getField("publisher"));
     }

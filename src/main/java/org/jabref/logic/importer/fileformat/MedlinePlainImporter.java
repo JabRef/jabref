@@ -301,7 +301,7 @@ public class MedlinePlainImporter extends Importer {
             hm.put(key, idValue);
 
         } else if ("LID".equals(lab)) {
-            hm.put(new UnknownField("location-id"), value);
+            hm.put(StandardField.LOCATION, value);
         } else if ("MID".equals(lab)) {
             hm.put(new UnknownField("manuscript-id"), value);
         } else if ("JID".equals(lab)) {

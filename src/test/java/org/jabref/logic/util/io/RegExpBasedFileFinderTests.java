@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,19 +26,19 @@ public class RegExpBasedFileFinderTests {
     public void setUp() {
 
         entry = new BibEntry();
-        entry.setType(StandardEntryType.ARTICLE);
+        entry.setType(StandardEntryType.Article);
         entry.setCiteKey("HipKro03");
-        entry.setField("author", "Eric von Hippel and Georg von Krogh");
-        entry.setField("title", "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
-        entry.setField("journal", "Organization Science");
-        entry.setField("year", "2003");
-        entry.setField("volume", "14");
-        entry.setField("pages", "209--223");
-        entry.setField("number", "2");
-        entry.setField("address", "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
-        entry.setField("doi", "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
-        entry.setField("issn", "1526-5455");
-        entry.setField("publisher", "INFORMS");
+        entry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
+        entry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
+        entry.setField(StandardField.JOURNAL, "Organization Science");
+        entry.setField(StandardField.YEAR, "2003");
+        entry.setField(StandardField.VOLUME, "14");
+        entry.setField(StandardField.PAGES, "209--223");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
+        entry.setField(StandardField.ISSN, "1526-5455");
+        entry.setField(StandardField.PUBLISHER, "INFORMS");
 
         database = new BibDatabase();
         database.insertEntry(entry);
@@ -45,9 +47,9 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFiles() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInDatabase");
-        localEntry.setField("year", "2001");
+        localEntry.setField(StandardField.YEAR, "2001");
 
         List<String> extensions = Collections.singletonList("pdf");
 
@@ -81,11 +83,11 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testAuthorWithDiacritics() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("Grazulis2017");
-        localEntry.setField("year", "2017");
-        localEntry.setField("author", "Gražulis, Saulius and O. Kitsune");
-        localEntry.setField("pages", "726--729");
+        localEntry.setField(StandardField.YEAR, "2017");
+        localEntry.setField(StandardField.AUTHOR, "Gražulis, Saulius and O. Kitsune");
+        localEntry.setField(StandardField.PAGES, "726--729");
 
         List<String> extensions = Collections.singletonList("pdf");
 
@@ -103,9 +105,9 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileInSubdirectory() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInSubdirectory");
-        localEntry.setField("year", "2017");
+        localEntry.setField(StandardField.YEAR, "2017");
 
         List<String> extensions = Collections.singletonList("pdf");
 
@@ -123,9 +125,9 @@ public class RegExpBasedFileFinderTests {
     @Test
     public void testFindFileNonRecursive() throws Exception {
         //given
-        BibEntry localEntry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInSubdirectory");
-        localEntry.setField("year", "2017");
+        localEntry.setField(StandardField.YEAR, "2017");
 
         List<String> extensions = Collections.singletonList("pdf");
 

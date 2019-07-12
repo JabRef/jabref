@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,16 +32,16 @@ class IsbnFetcherTest {
         fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntry = new BibEntry();
-        bibEntry.setType(BiblatexEntryTypes.BOOK);
-        bibEntry.setField("bibtexkey", "9780134685991");
-        bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "Addison Wesley");
-        bibEntry.setField("year", "2018");
-        bibEntry.setField("author", "Bloch, Joshua");
-        bibEntry.setField("date", "2018-01-11");
-        bibEntry.setField("ean", "9780134685991");
-        bibEntry.setField("isbn", "0134685997");
-        bibEntry.setField("url", "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
+        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setCiteKey("9780134685991");
+        bibEntry.setField(StandardField.TITLE, "Effective Java");
+        bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
+        bibEntry.setField(StandardField.YEAR, "2018");
+        bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
+        bibEntry.setField(StandardField.DATE, "2018-01-11");
+        bibEntry.setField(new UnknownField("ean"), "9780134685991");
+        bibEntry.setField(StandardField.ISBN, "0134685997");
+        bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
     }
 
     @Test
@@ -87,7 +89,7 @@ class IsbnFetcherTest {
 
     @Test
     void searchByEntryWithISBNSuccessful() throws FetcherException {
-        BibEntry input = new BibEntry().withField("isbn", "0134685997");
+        BibEntry input = new BibEntry().withField(StandardField.ISBN, "0134685997");
 
         List<BibEntry> fetchedEntry = fetcher.performSearch(input);
         assertEquals(Collections.singletonList(bibEntry), fetchedEntry);

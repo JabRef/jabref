@@ -10,6 +10,8 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -30,47 +32,44 @@ class XmpUtilWriterTest {
     private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
-        olly2018 = new BibEntry();
-        olly2018.setType("article");
+        olly2018 = new BibEntry(StandardEntryType.Article);
         olly2018.setCiteKey("Olly2018");
-        olly2018.setField("author", "Olly and Johannes");
-        olly2018.setField("title", "Stefan's palace");
-        olly2018.setField("journal", "Test Journal");
-        olly2018.setField("volume", "1");
-        olly2018.setField("number", "1");
-        olly2018.setField("pages", "1-2");
+        olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
+        olly2018.setField(StandardField.TITLE, "Stefan's palace");
+        olly2018.setField(StandardField.JOURNAL, "Test Journal");
+        olly2018.setField(StandardField.VOLUME, "1");
+        olly2018.setField(StandardField.NUMBER, "1");
+        olly2018.setField(StandardField.PAGES, "1-2");
         olly2018.setMonth(Month.MARCH);
-        olly2018.setField("issn", "978-123-123");
-        olly2018.setField("note", "NOTE");
-        olly2018.setField("abstract", "ABSTRACT");
-        olly2018.setField("comment", "COMMENT");
-        olly2018.setField("doi", "10/3212.3123");
-        olly2018.setField("file", ":article_dublinCore.pdf:PDF");
-        olly2018.setField("groups", "NO");
-        olly2018.setField("howpublished", "online");
-        olly2018.setField("keywords", "k1, k2");
-        olly2018.setField("owner", "me");
-        olly2018.setField("review", "review");
-        olly2018.setField("url", "https://www.olly2018.edu");
+        olly2018.setField(StandardField.ISSN, "978-123-123");
+        olly2018.setField(StandardField.NOTE, "NOTE");
+        olly2018.setField(StandardField.ABSTRACT, "ABSTRACT");
+        olly2018.setField(StandardField.COMMENT, "COMMENT");
+        olly2018.setField(StandardField.DOI, "10/3212.3123");
+        olly2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
+        olly2018.setField(InternalField.GROUPS, "NO");
+        olly2018.setField(StandardField.HOWPUBLISHED, "online");
+        olly2018.setField(StandardField.KEYWORDS, "k1, k2");
+        olly2018.setField(InternalField.OWNER, "me");
+        olly2018.setField(StandardField.REVIEW, "review");
+        olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
-        toral2006 = new BibEntry();
-        toral2006.setType("InProceedings");
-        toral2006.setField("author", "Toral, Antonio and Munoz, Rafael");
-        toral2006.setField("title", "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
-        toral2006.setField("booktitle", "Proceedings of EACL");
-        toral2006.setField("pages", "56--61");
-        toral2006.setField("eprinttype", "asdf");
-        toral2006.setField("owner", "Ich");
-        toral2006.setField("url", "www.url.de");
+        toral2006 = new BibEntry(StandardEntryType.InProceedings);
+        toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
+        toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
+        toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
+        toral2006.setField(StandardField.PAGES, "56--61");
+        toral2006.setField(StandardField.EPRINTTYPE, "asdf");
+        toral2006.setField(InternalField.OWNER, "Ich");
+        toral2006.setField(StandardField.URL, "www.url.de");
 
-        vapnik2000 = new BibEntry();
-        vapnik2000.setType("Book");
+        vapnik2000 = new BibEntry(StandardEntryType.Book);
         vapnik2000.setCiteKey("vapnik2000");
-        vapnik2000.setField("title", "The Nature of Statistical Learning Theory");
-        vapnik2000.setField("publisher", "Springer Science + Business Media");
-        vapnik2000.setField("author", "Vladimir N. Vapnik");
-        vapnik2000.setField("doi", "10.1007/978-1-4757-3264-1");
-        vapnik2000.setField("owner", "Ich");
+        vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
+        vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
+        vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
+        vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
+        vapnik2000.setField(InternalField.OWNER, "Ich");
     }
 
     /**

@@ -61,7 +61,7 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("Effect of immobilization on catalytic characteristics"),
                         entry.getField("indextitle"));
                 assertEquals(Optional.of("#jomch#"), entry.getField("journal"));
-                assertEquals(Optional.of("13"), entry.getField("number"));
+                assertEquals(Optional.of("13"), entry.getField(StandardField.NUMBER));
                 assertEquals(Optional.of("3027-3036"), entry.getField("pages"));
                 assertEquals(Optional
                                 .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
@@ -85,13 +85,13 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("set"), entry.getField("bibtexkey"));
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField("entryset"));
             } else if (entry.getCiteKeyOptional().get().equals("Preissel2016")) {
-                assertEquals(Optional.of("Heidelberg"), entry.getField("address"));
+                assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
                 assertEquals(Optional.of("Preißel, René"), entry.getField("author"));
                 assertEquals(Optional.of("Preissel2016"), entry.getField("bibtexkey"));
                 assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"),
                         entry.getField("edition"));
                 assertEquals(Optional.of("978-3-86490-311-3"), entry.getField("isbn"));
-                assertEquals(Optional.of("Versionsverwaltung"), entry.getField("keywords"));
+                assertEquals(Optional.of("Versionsverwaltung"), entry.getField(StandardField.KEYWORDS));
                 assertEquals(Optional.of("XX, 327 Seiten"), entry.getField("pages"));
                 assertEquals(Optional.of("dpunkt.verlag"), entry.getField("publisher"));
                 assertEquals(Optional.of("Git: dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),

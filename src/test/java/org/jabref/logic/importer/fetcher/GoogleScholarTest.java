@@ -10,7 +10,7 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
@@ -40,7 +40,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void linkFound() throws IOException, FetcherException {
-        entry.setField("title", "Towards Application Portability in Platform as a Service");
+        entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
 
         assertEquals(
                 Optional.of(new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf")),
@@ -51,7 +51,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void noLinkFound() throws IOException, FetcherException {
-        entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
+        entry.setField(StandardField.TITLE, "Pro WF: Windows Workflow in NET 3.5");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
@@ -59,7 +59,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void findSingleEntry() throws FetcherException {
-        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getType());
+        entry.setType(StandardEntryType.InProceedings);
         entry.setCiteKey("geiger2013detecting");
         entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
         entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");

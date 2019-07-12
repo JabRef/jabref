@@ -37,7 +37,7 @@ public class SpringerLinkTest {
 
     @Test
     public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1186/s13677-015-0042-8");
+        entry.setField(StandardField.DOI, "10.1186/s13677-015-0042-8");
         assertEquals(
                 Optional.of(new URL("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf")),
                 finder.findFullText(entry));
@@ -45,7 +45,7 @@ public class SpringerLinkTest {
 
     @Test
     public void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1186/unknown-doi");
+        entry.setField(StandardField.DOI, "10.1186/unknown-doi");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }

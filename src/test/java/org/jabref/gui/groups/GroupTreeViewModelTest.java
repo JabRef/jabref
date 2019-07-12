@@ -59,7 +59,7 @@ public class GroupTreeViewModelTest {
     @Test
     public void keywordGroupsAreNotRemovedFromEntriesOnDelete() {
         String groupName = "A";
-        WordKeywordGroup group = new WordKeywordGroup(groupName, GroupHierarchyType.INCLUDING, "keywords", groupName, true, ',', true);
+        WordKeywordGroup group = new WordKeywordGroup(groupName, GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, groupName, true, ',', true);
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 

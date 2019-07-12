@@ -92,7 +92,7 @@ public class EndnoteImporterTest {
 
         BibEntry second = bibEntries.get(1);
         assertEquals("misc", second.getType());
-        assertEquals(Optional.of("testC"), second.getField("address"));
+        assertEquals(Optional.of("testC"), second.getField(StandardField.ADDRESS));
         assertEquals(Optional.of("testB2"), second.getField("booktitle"));
         assertEquals(Optional.of("test8"), second.getField("date"));
         assertEquals(Optional.of("test7"), second.getField("edition"));
@@ -110,12 +110,12 @@ public class EndnoteImporterTest {
 
         BibEntry fifth = bibEntries.get(4);
         assertEquals("mastersthesis", fifth.getType());
-        assertEquals(Optional.of("testX"), fifth.getField("abstract"));
+        assertEquals(Optional.of("testX"), fifth.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("testF"), fifth.getField("bibtexkey"));
         assertEquals(Optional.of("testR"), fifth.getField("doi"));
-        assertEquals(Optional.of("testK"), fifth.getField("keywords"));
-        assertEquals(Optional.of("testO1"), fifth.getField("note"));
-        assertEquals(Optional.of("testN"), fifth.getField("number"));
+        assertEquals(Optional.of("testK"), fifth.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("testO1"), fifth.getField(StandardField.NOTE));
+        assertEquals(Optional.of("testN"), fifth.getField(StandardField.NUMBER));
         assertEquals(Optional.of("testP"), fifth.getField("pages"));
         assertEquals(Optional.of("testI1"), fifth.getField("school"));
         assertEquals(Optional.of("testU"), fifth.getField("url"));
@@ -146,10 +146,10 @@ public class EndnoteImporterTest {
 
         assertEquals(1, bibEntries.size());
         assertEquals("book", entry.getType());
-        assertEquals(Optional.of("Heidelberg"), entry.getField("address"));
+        assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
         assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), entry.getField("author"));
         assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), entry.getField("edition"));
-        assertEquals(Optional.of("Versionsverwaltung"), entry.getField("keywords"));
+        assertEquals(Optional.of("Versionsverwaltung"), entry.getField(StandardField.KEYWORDS));
         assertEquals(Optional.of("XX, 327"), entry.getField("pages"));
         assertEquals(Optional.of("dpunkt.verlag"), entry.getField("publisher"));
         assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),

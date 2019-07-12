@@ -39,10 +39,10 @@ public class BiblioscapeImporterTestTypes {
                                                              .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Baklouti, F.");
-        entry.setField("keywords", "Cells; Rna; Isoforms");
-        entry.setField("title", "Blood");
-        entry.setField("year", "1999");
+        entry.setField(StandardField.AUTHOR, "Baklouti, F.");
+        entry.setField(StandardField.KEYWORDS, "Cells; Rna; Isoforms");
+        entry.setField(StandardField.TITLE, "Blood");
+        entry.setField(StandardField.YEAR, "1999");
         entry.setType(bibtexType);
 
         Assertions.assertEquals(Collections.singletonList(entry), bibEntries);

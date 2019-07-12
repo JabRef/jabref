@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,28 +37,28 @@ public class LayoutEntryTest {
     @BeforeEach
     public void setUp() {
         mBTE = new BibEntry();
-        mBTE.setField("abstract", "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
+        mBTE.setField(StandardField.ABSTRACT, "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
-        mBTE.setField("keywords", "android, mobile devices, security");
-        mBTE.setField("posted-at", "2010-08-11 15:00:49");
-        mBTE.setField("location", "Dublin, Ireland");
-        mBTE.setField("bibtexkey", "chaudhuri-plas09");
-        mBTE.setField("pages", "1--7");
-        mBTE.setField("booktitle", "PLAS '09: Proceedings of the ACM SIGPLAN Fourth Workshop on Programming Languages and Analysis for Security");
-        mBTE.setField("citeulike-article-id", "7615801");
-        mBTE.setField("citeulike-linkout-1", "http://dx.doi.org/10.1145/1554339.1554341");
-        mBTE.setField("url", "http://dx.doi.org/10.1145/1554339.1554341");
-        mBTE.setField("publisher", "ACM");
-        mBTE.setField("timestamp", "2010.11.11");
-        mBTE.setField("author", "Chaudhuri, Avik");
-        mBTE.setField("title", "Language-based security on Android");
-        mBTE.setField("address", "New York, NY, USA");
-        mBTE.setField("priority", "2");
-        mBTE.setField("isbn", "978-1-60558-645-8");
-        mBTE.setField("owner", "Arne");
-        mBTE.setField("year", "2009");
-        mBTE.setField("citeulike-linkout-0", "http://portal.acm.org/citation.cfm?id=1554339.1554341");
-        mBTE.setField("doi", "10.1145/1554339.1554341");
+        mBTE.setField(StandardField.KEYWORDS, "android, mobile devices, security");
+        mBTE.setField(new UnknownField("posted-at"), "2010-08-11 15:00:49");
+        mBTE.setField(StandardField.LOCATION, "Dublin, Ireland");
+        mBTE.setCiteKey("chaudhuri-plas09");
+        mBTE.setField(StandardField.PAGES, "1--7");
+        mBTE.setField(StandardField.BOOKTITLE, "PLAS '09: Proceedings of the ACM SIGPLAN Fourth Workshop on Programming Languages and Analysis for Security");
+        mBTE.setField(new UnknownField("citeulike-article-id"), "7615801");
+        mBTE.setField(new UnknownField("citeulike-linkout-1"), "http://dx.doi.org/10.1145/1554339.1554341");
+        mBTE.setField(StandardField.URL, "http://dx.doi.org/10.1145/1554339.1554341");
+        mBTE.setField(StandardField.PUBLISHER, "ACM");
+        mBTE.setField(InternalField.TIMESTAMP, "2010.11.11");
+        mBTE.setField(StandardField.AUTHOR, "Chaudhuri, Avik");
+        mBTE.setField(StandardField.TITLE, "Language-based security on Android");
+        mBTE.setField(StandardField.ADDRESS, "New York, NY, USA");
+        mBTE.setField(SpecialField.PRIORITY, "2");
+        mBTE.setField(StandardField.ISBN, "978-1-60558-645-8");
+        mBTE.setField(InternalField.OWNER, "Arne");
+        mBTE.setField(StandardField.YEAR, "2009");
+        mBTE.setField(new UnknownField("citeulike-linkout-0"), "http://portal.acm.org/citation.cfm?id=1554339.1554341");
+        mBTE.setField(StandardField.DOI, "10.1145/1554339.1554341");
     }
 
     public String layout(String layoutFile, BibEntry entry) throws IOException {

@@ -79,9 +79,9 @@ class BibtexParserTest {
                 .parseEntries("@article{test,author={Ed von Test}}");
 
         BibEntry expected = new BibEntry();
-        expected.setType("article");
+        expected.setType(StandardEntryType.Article);
         expected.setCiteKey("test");
-        expected.setField("author", "Ed von Test");
+        expected.setField(StandardField.AUTHOR, "Ed von Test");
 
         assertEquals(Collections.singletonList(expected), parsed);
     }
@@ -110,10 +110,10 @@ class BibtexParserTest {
                 importFormatPreferences, fileMonitor);
 
         BibEntry expected = new BibEntry();
-        expected.setType("article");
+        expected.setType(StandardEntryType.Article);
         expected.setCiteKey("canh05");
-        expected.setField("author", "Crowston, K. and Annabi, H.");
-        expected.setField("title", "Title A");
+        expected.setField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.");
+        expected.setField(StandardField.TITLE, "Title A");
 
         assertEquals(Optional.of(expected), parsed);
     }
@@ -353,16 +353,16 @@ class BibtexParserTest {
     void parseRecognizesMultipleEntries() throws IOException {
         List<BibEntry> expected = new ArrayList<>();
         BibEntry firstEntry = new BibEntry();
-        firstEntry.setType("article");
+        firstEntry.setType(StandardEntryType.Article);
         firstEntry.setCiteKey("canh05");
-        firstEntry.setField("author", "Crowston, K. and Annabi, H.");
-        firstEntry.setField("title", "Title A");
+        firstEntry.setField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.");
+        firstEntry.setField(StandardField.TITLE, "Title A");
         expected.add(firstEntry);
 
         BibEntry secondEntry = new BibEntry();
         secondEntry.setType("inproceedings");
         secondEntry.setCiteKey("foo");
-        secondEntry.setField("author", "Norton Bar");
+        secondEntry.setField(StandardField.AUTHOR, "Norton Bar");
         expected.add(secondEntry);
 
         ParserResult result = parser.parse(
@@ -395,7 +395,7 @@ class BibtexParserTest {
     void parseRecognizesMultipleEntriesOnSameLine() throws IOException {
         List<BibEntry> expected = new ArrayList<>();
         BibEntry firstEntry = new BibEntry();
-        firstEntry.setType("article");
+        firstEntry.setType(StandardEntryType.Article);
         firstEntry.setCiteKey("canh05");
         expected.add(firstEntry);
 
@@ -453,7 +453,7 @@ class BibtexParserTest {
         assertEquals("article", entry.getType());
         assertEquals(Optional.of("test"), entry.getCiteKeyOptional());
         assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("Test, Second Keyword, Third Keyword"), entry.getField("keywords"));
+        assertEquals(Optional.of("Test, Second Keyword, Third Keyword"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -480,7 +480,7 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField("booktitle"));
         assertEquals(Optional.of("2005"), entry.getField("year"));
-        assertEquals(Optional.of("oezbek"), entry.getField("owner"));
+        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
         assertEquals(Optional.of("2006.05.29"), entry.getField("timestamp"));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField("url"));
     }
@@ -508,7 +508,7 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField("booktitle"));
         assertEquals(Optional.of("2005"), entry.getField("year"));
-        assertEquals(Optional.of("oezbek"), entry.getField("owner"));
+        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
         assertEquals(Optional.of("2006.05.29"), entry.getField("timestamp"));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField("url"));
     }
@@ -570,7 +570,7 @@ class BibtexParserTest {
         assertEquals("article", entry.getType());
         assertEquals(Optional.of("test"), entry.getCiteKeyOptional());
         assertEquals(2, entry.getFields().size());
-        assertEquals(Optional.of("D:\\Documents\\literature\\Tansel-PRL2006.pdf"), entry.getField("file"));
+        assertEquals(Optional.of("D:\\Documents\\literature\\Tansel-PRL2006.pdf"), entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -627,8 +627,8 @@ class BibtexParserTest {
     @Test
     void parseNotWarnsAboutEntryWithoutBibtexKey() throws IOException {
         BibEntry expected = new BibEntry();
-        expected.setField("author", "Ed von Test");
-        expected.setType("article");
+        expected.setField(StandardField.AUTHOR, "Ed von Test");
+        expected.setType(StandardEntryType.Article);
 
         ParserResult result = parser
                 .parse(new StringReader("@article{,author={Ed von Test}}"));
@@ -949,7 +949,7 @@ class BibtexParserTest {
         assertEquals(1, parsedEntries.size());
         assertEquals("book", parsedEntry.getType());
         assertEquals(Optional.of("bourdieu-2002-questions-sociologie"), parsedEntry.getCiteKeyOptional());
-        assertEquals(Optional.of("Paris"), parsedEntry.getField("address"));
+        assertEquals(Optional.of("Paris"), parsedEntry.getField(StandardField.ADDRESS));
         assertEquals(Optional.of("#bourdieu#"), parsedEntry.getField("author"));
         assertEquals(Optional.of("2707318256"), parsedEntry.getField("isbn"));
         assertEquals(Optional.of("Minuit"), parsedEntry.getField("publisher"));
@@ -1109,7 +1109,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("ups  sala"), parsedEntry.getField("file"));
+        assertEquals(Optional.of("ups  sala"), parsedEntry.getField(StandardField.FILE));
     }
 
     @Test
@@ -1422,7 +1422,7 @@ class BibtexParserTest {
         BibEntry expectedEntry = new BibEntry();
         expectedEntry.setType("Reallyunknowntype");
         expectedEntry.setCiteKey("test");
-        expectedEntry.setField("comment", "testentry");
+        expectedEntry.setField(StandardField.COMMENT, "testentry");
 
         assertEquals(Collections.singletonList(expectedEntry), entries);
     }
@@ -1437,7 +1437,7 @@ class BibtexParserTest {
         BibEntry expectedEntry = new BibEntry();
         expectedEntry.setType("Other");
         expectedEntry.setCiteKey("test");
-        expectedEntry.setField("comment", "testentry");
+        expectedEntry.setField(StandardField.COMMENT, "testentry");
 
         assertEquals(Collections.singletonList(expectedEntry), entries);
     }
@@ -1486,12 +1486,12 @@ class BibtexParserTest {
     void parseReturnsEntriesInSameOrder() throws IOException {
         List<BibEntry> expected = new ArrayList<>();
         BibEntry first = new BibEntry();
-        first.setType("article");
+        first.setType(StandardEntryType.Article);
         first.setCiteKey("a");
         expected.add(first);
 
         BibEntry second = new BibEntry();
-        second.setType("article");
+        second.setType(StandardEntryType.Article);
         second.setCiteKey("b");
         expected.add(second);
 
@@ -1558,9 +1558,9 @@ class BibtexParserTest {
     @Test
     void preserveEncodingPrefixInsideEntry() throws ParseException {
         BibEntry expected = new BibEntry();
-        expected.setType("article");
+        expected.setType(StandardEntryType.Article);
         expected.setCiteKey("test");
-        expected.setField("author", SavePreferences.ENCODING_PREFIX);
+        expected.setField(StandardField.AUTHOR, SavePreferences.ENCODING_PREFIX);
 
         List<BibEntry> parsed = parser
                 .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");

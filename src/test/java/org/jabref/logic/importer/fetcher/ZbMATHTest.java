@@ -6,6 +6,9 @@ import java.util.List;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -29,19 +32,19 @@ class ZbMATHTest {
         fetcher = new ZbMATH(importFormatPreferences);
 
         donaldsonEntry = new BibEntry();
-        donaldsonEntry.setType(StandardEntryType.ARTICLE);
+        donaldsonEntry.setType(StandardEntryType.Article);
         donaldsonEntry.setCiteKey("zbMATH03800580");
-        donaldsonEntry.setField("author", "S.K. {Donaldson}");
-        donaldsonEntry.setField("journal", "Journal of Differential Geometry");
-        donaldsonEntry.setField("issn", "0022-040X; 1945-743X/e");
-        donaldsonEntry.setField("language", "English");
-        donaldsonEntry.setField("keywords", "57N13 57R10 53C05 58J99 57R65");
-        donaldsonEntry.setField("pages", "279--315");
-        donaldsonEntry.setField("publisher", "International Press of Boston, Somerville, MA");
-        donaldsonEntry.setField("title", "An application of gauge theory to four dimensional topology.");
-        donaldsonEntry.setField("volume", "18");
-        donaldsonEntry.setField("year", "1983");
-        donaldsonEntry.setField("zbl", "0507.57010");
+        donaldsonEntry.setField(StandardField.AUTHOR, "S.K. {Donaldson}");
+        donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
+        donaldsonEntry.setField(StandardField.ISSN, "0022-040X; 1945-743X/e");
+        donaldsonEntry.setField(StandardField.LANGUAGE, "English");
+        donaldsonEntry.setField(StandardField.KEYWORDS, "57N13 57R10 53C05 58J99 57R65");
+        donaldsonEntry.setField(StandardField.PAGES, "279--315");
+        donaldsonEntry.setField(StandardField.PUBLISHER, "International Press of Boston, Somerville, MA");
+        donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology.");
+        donaldsonEntry.setField(StandardField.VOLUME, "18");
+        donaldsonEntry.setField(StandardField.YEAR, "1983");
+        donaldsonEntry.setField(new UnknownField("zbl"), "0507.57010");
     }
 
     @Test

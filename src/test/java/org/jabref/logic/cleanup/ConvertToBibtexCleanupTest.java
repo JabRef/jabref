@@ -21,7 +21,7 @@ public class ConvertToBibtexCleanupTest {
 
     @Test
     public void cleanupMovesDateToYearAndMonth() {
-        BibEntry entry = new BibEntry().withField("date", "2011-01");
+        BibEntry entry = new BibEntry().withField(StandardField.DATE, "2011-01");
 
         worker.cleanup(entry);
 
@@ -33,8 +33,8 @@ public class ConvertToBibtexCleanupTest {
     @Test
     public void cleanupWithYearAlreadyPresentDoesNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField("year", "2011");
-        entry.setField("date", "2012");
+        entry.setField(StandardField.YEAR, "2011");
+        entry.setField(StandardField.DATE, "2012");
 
         worker.cleanup(entry);
 
@@ -44,7 +44,7 @@ public class ConvertToBibtexCleanupTest {
 
     @Test
     public void cleanupMovesJournaltitleToJournal() {
-        BibEntry entry = new BibEntry().withField("journaltitle", "Best of JabRef");
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNALTITLE, "Best of JabRef");
 
         worker.cleanup(entry);
 

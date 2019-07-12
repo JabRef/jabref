@@ -34,25 +34,25 @@ class MathSciNetTest {
         ratiuEntry = new BibEntry();
         ratiuEntry.setType(StandardEntryType.ARTICLE);
         ratiuEntry.setCiteKey("MR3537908");
-        ratiuEntry.setField("author", "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
-        ratiuEntry.setField("title", "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");
-        ratiuEntry.setField("journal", "Journal of Mathematical Fluid Mechanics");
-        ratiuEntry.setField("volume", "18");
-        ratiuEntry.setField("year", "2016");
-        ratiuEntry.setField("number", "3");
-        ratiuEntry.setField("pages", "571--589");
-        ratiuEntry.setField("issn", "1422-6928");
-        ratiuEntry.setField("keywords", "76A15 (35A01 35A02 35K61 82D30)");
-        ratiuEntry.setField("mrnumber", "3537908");
-        ratiuEntry.setField("doi", "10.1007/s00021-016-0250-0");
+        ratiuEntry.setField(StandardField.AUTHOR, "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
+        ratiuEntry.setField(StandardField.TITLE, "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");
+        ratiuEntry.setField(StandardField.JOURNAL, "Journal of Mathematical Fluid Mechanics");
+        ratiuEntry.setField(StandardField.VOLUME, "18");
+        ratiuEntry.setField(StandardField.YEAR, "2016");
+        ratiuEntry.setField(StandardField.NUMBER, "3");
+        ratiuEntry.setField(StandardField.PAGES, "571--589");
+        ratiuEntry.setField(StandardField.ISSN, "1422-6928");
+        ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
+        ratiuEntry.setField(StandardField.MRNUMBER, "3537908");
+        ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");
     }
 
     @Test
     void searchByEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
-        searchEntry.setField("title", "existence");
-        searchEntry.setField("author", "Ratiu");
-        searchEntry.setField("journal", "fluid");
+        searchEntry.setField(StandardField.TITLE, "existence");
+        searchEntry.setField(StandardField.AUTHOR, "Ratiu");
+        searchEntry.setField(StandardField.JOURNAL, "fluid");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
         assertEquals(Collections.singletonList(ratiuEntry), fetchedEntries);
@@ -61,7 +61,7 @@ class MathSciNetTest {
     @Test
     void searchByIdInEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
-        searchEntry.setField("mrnumber", "3537908");
+        searchEntry.setField(StandardField.MRNUMBER, "3537908");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
         assertEquals(Collections.singletonList(ratiuEntry), fetchedEntries);

@@ -53,7 +53,7 @@ public class CsvExportFormatTest {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Someone, Van Something");
+        entry.setField(StandardField.AUTHOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
         exportFormat.export(databaseContext, path, charset, entries);
@@ -70,7 +70,7 @@ public class CsvExportFormatTest {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "von Neumann, John and Smith, John and Black Brown, Peter");
+        entry.setField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
         exportFormat.export(databaseContext, path, charset, entries);

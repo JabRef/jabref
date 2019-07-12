@@ -29,56 +29,56 @@ public class WordKeywordGroupTest {
 
     @Test
     public void containsFindsSameWord() {
-        entry.setField("keywords", "test");
+        entry.setField(StandardField.KEYWORDS, "test");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsWordInSentence() throws Exception {
-        entry.setField("keywords", "Some sentence containing test word");
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing test word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsWordInCommaSeparatedList() throws Exception {
-        entry.setField("keywords", "Some,list,containing,test,word");
+        entry.setField(StandardField.KEYWORDS, "Some,list,containing,test,word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsWordInSemicolonSeparatedList() throws Exception {
-        entry.setField("keywords", "Some;list;containing;test;word");
+        entry.setField(StandardField.KEYWORDS, "Some;list;containing;test;word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
     public void containsFindsSameComplexWord() throws Exception {
-        entry.setField("keywords", "\\H2O");
+        entry.setField(StandardField.KEYWORDS, "\\H2O");
 
         assertTrue(waterGroup.contains(entry));
     }
 
     @Test
     public void containsFindsComplexWordInSentence() throws Exception {
-        entry.setField("keywords", "Some sentence containing \\H2O word");
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing \\H2O word");
 
         assertTrue(waterGroup.contains(entry));
     }
 
     @Test
     public void containsDoesNotFindWordIfCaseDiffers() throws Exception {
-        entry.setField("keywords", "Test");
+        entry.setField(StandardField.KEYWORDS, "Test");
 
         assertFalse(testCaseSensitiveGroup.contains(entry));
     }
 
     @Test
     public void containsDoesNotFindsWordInSentenceIfCaseDiffers() throws Exception {
-        entry.setField("keywords", "Some sentence containing Test word");
+        entry.setField(StandardField.KEYWORDS, "Some sentence containing Test word");
 
         assertFalse(testCaseSensitiveGroup.contains(entry));
     }

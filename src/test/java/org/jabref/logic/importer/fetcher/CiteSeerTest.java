@@ -26,9 +26,9 @@ class CiteSeerTest {
     void searchByQueryFindsEntry() throws Exception {
         BibEntry expected = new BibEntry();
         expected.setType(BibtexEntryTypes.MISC);
-        expected.setField("author", "Wang Wei and Zhang Pingwen and Zhang Zhifei");
-        expected.setField("title", "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory");
-        expected.setField("doi", "10.1.1.744.5780");
+        expected.setField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei");
+        expected.setField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory");
+        expected.setField(StandardField.DOI, "10.1.1.744.5780");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
@@ -38,10 +38,10 @@ class CiteSeerTest {
     void searchByQueryFindsEntry2() throws Exception {
         BibEntry expected = new BibEntry();
         expected.setType(BibtexEntryTypes.MISC);
-        expected.setField("author", "Lazarus Richard S.");
-        expected.setField("title", "Coping Theory and Research: Past Present and Future");
-        expected.setField("doi", "10.1.1.115.9665");
-        expected.setField("year", "1993");
+        expected.setField(StandardField.AUTHOR, "Lazarus Richard S.");
+        expected.setField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future");
+        expected.setField(StandardField.DOI, "10.1.1.115.9665");
+        expected.setField(StandardField.YEAR, "1993");
         expected.setField("journaltitle", "PSYCHOSOMATIC MEDICINE");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef");

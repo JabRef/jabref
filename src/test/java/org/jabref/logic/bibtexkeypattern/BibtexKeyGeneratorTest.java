@@ -876,7 +876,7 @@ public class BibtexKeyGeneratorTest {
     @Test
     public void keywordNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry();
-        entry.setField("keywords", "w1, w2a w2b, w3");
+        entry.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         String result = BibtexKeyGenerator.generateKey(entry, "keyword1");
         assertEquals("w1", result);
@@ -899,7 +899,7 @@ public class BibtexKeyGeneratorTest {
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField("keywords", "w1, w2a w2b, w3");
+        entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         String result = BibtexKeyGenerator.generateKey(entry1, "keyword1", database);
 
@@ -909,7 +909,7 @@ public class BibtexKeyGeneratorTest {
     @Test
     public void keywordsNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry();
-        entry.setField("keywords", "w1, w2a w2b, w3");
+        entry.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         // all keywords
         String result = BibtexKeyGenerator.generateKey(entry, "keywords");
@@ -933,7 +933,7 @@ public class BibtexKeyGeneratorTest {
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField("keywords", "w1, w2a w2b, w3");
+        entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         String result = BibtexKeyGenerator.generateKey(entry1, "keywords", database);
 
@@ -963,7 +963,7 @@ public class BibtexKeyGeneratorTest {
     @Test
     public void testApplyModifiers() {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Green Scheduling of Whatever");
+        entry.setField(StandardField.TITLE, "Green Scheduling of Whatever");
         assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI"));
         assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry, "shorttitle",
                 new BibDatabase()));
@@ -978,7 +978,7 @@ public class BibtexKeyGeneratorTest {
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField("title", "Green Scheduling of Whatever");
+        entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
         assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
                 database));
@@ -993,7 +993,7 @@ public class BibtexKeyGeneratorTest {
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField("title", "Green Scheduling of Whatever");
+        entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
         assertEquals("GSo", BibtexKeyGenerator.generateKey(entry1, "shorttitleINI", database));
     }
@@ -1001,89 +1001,89 @@ public class BibtexKeyGeneratorTest {
     @Test
     public void generateKeyStripsColonFromTitle() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Green Scheduling of: Whatever");
+        entry.setField(StandardField.TITLE, "Green Scheduling of: Whatever");
         assertEquals("GreenSchedulingOfWhatever", BibtexKeyGenerator.generateKey(entry, "title"));
     }
 
     @Test
     public void generateKeyStripsApostropheFromTitle() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Green Scheduling of `Whatever`");
+        entry.setField(StandardField.TITLE, "Green Scheduling of `Whatever`");
         assertEquals("GreenSchedulingofWhatever", BibtexKeyGenerator.generateKey(entry, "title"));
     }
 
     @Test
     public void generateKeyWithOneModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "The Interesting Title");
+        entry.setField(StandardField.TITLE, "The Interesting Title");
         assertEquals("theinterestingtitle", BibtexKeyGenerator.generateKey(entry, "title:lower"));
     }
 
     @Test
     public void generateKeyWithTwoModifiers() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "The Interesting Title");
+        entry.setField(StandardField.TITLE, "The Interesting Title");
         assertEquals("theinterestingtitle", BibtexKeyGenerator.generateKey(entry, "title:lower:(_)"));
     }
 
     @Test
     public void generateKeyWithTitleCapitalizeModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "the InTeresting title longer than THREE words");
+        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "title:capitalize"));
     }
 
     @Test
     public void generateKeyWithShortTitleCapitalizeModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "the InTeresting title longer than THREE words");
+        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "shorttitle:capitalize"));
     }
 
     @Test
     public void generateKeyWithTitleTitleCaseModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "A title WITH some of The key words");
+        entry.setField(StandardField.TITLE, "A title WITH some of The key words");
         assertEquals("ATitlewithSomeoftheKeyWords", BibtexKeyGenerator.generateKey(entry, "title:titlecase"));
     }
 
     @Test
     public void generateKeyWithShortTitleTitleCaseModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "the InTeresting title longer than THREE words");
+        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "shorttitle:titlecase"));
     }
 
     @Test
     public void generateKeyWithTitleSentenceCaseModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "A title WITH some of The key words");
+        entry.setField(StandardField.TITLE, "A title WITH some of The key words");
         assertEquals("Atitlewithsomeofthekeywords", BibtexKeyGenerator.generateKey(entry, "title:sentencecase"));
     }
 
     @Test
     public void generateKeyWithAuthUpperYearShortTitleCapitalizeModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
-        entry.setField("year", "2019");
-        entry.setField("title", "the InTeresting title longer than THREE words");
+        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+        entry.setField(StandardField.YEAR, "2019");
+        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("NEWTON2019InterestingTitleLonger", BibtexKeyGenerator.generateKey(entry, "[auth:upper][year][shorttitle:capitalize]"));
     }
 
     @Test
     public void generateKeyWithYearAuthUpperTitleSentenceCaseModifier() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
-        entry.setField("year", "2019");
-        entry.setField("title", "the InTeresting title longer than THREE words");
+        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
+        entry.setField(StandardField.YEAR, "2019");
+        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", BibtexKeyGenerator.generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
     }
 
     @Test
     public void generateKeyWithMinusInCitationStyleOutsideAField() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("author", AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
-        entry.setField("year", "2019");
+        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+        entry.setField(StandardField.YEAR, "2019");
 
         assertEquals("Newton-2019", BibtexKeyGenerator.generateKey(entry, "[auth]-[year]"));
     }

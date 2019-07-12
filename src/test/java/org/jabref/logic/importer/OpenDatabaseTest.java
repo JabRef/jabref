@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -82,7 +83,7 @@ public class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
+        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -92,7 +93,7 @@ public class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
+        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -102,7 +103,7 @@ public class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
+        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
     }
 
     /**

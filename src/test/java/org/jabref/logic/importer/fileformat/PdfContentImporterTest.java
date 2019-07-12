@@ -9,8 +9,8 @@ import java.util.List;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +52,7 @@ class PdfContentImporterTest {
         Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
         expected.setField(StandardField.AUTHOR, "1 ");
         expected.setField(StandardField.TITLE, "Hello World");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));

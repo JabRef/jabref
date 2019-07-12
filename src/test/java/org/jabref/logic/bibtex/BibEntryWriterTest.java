@@ -12,7 +12,11 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -42,13 +46,13 @@ public class BibEntryWriterTest {
     public void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         //set a required field
-        entry.setField("author", "Foo Bar");
-        entry.setField("journal", "International Journal of Something");
+        entry.setField(StandardField.AUTHOR, "Foo Bar");
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
         //set an optional field
-        entry.setField("number", "1");
-        entry.setField("note", "some note");
+        entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.NOTE, "some note");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
 
@@ -72,9 +76,8 @@ public class BibEntryWriterTest {
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
 
-        BibEntry entry = new BibEntry();
-        entry.setType("other");
-        entry.setField("Comment", "testentry");
+        BibEntry entry = new BibEntry(EntryTypeFactory.parse("other"));
+        entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 
         //write out bibtex string
@@ -87,7 +90,7 @@ public class BibEntryWriterTest {
 
     @Test
     void writeEntryWithFile() throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         LinkedFile file = new LinkedFile("test", "/home/uers/test.pdf", "PDF");
         entry.addFile(file);
 
@@ -109,8 +112,8 @@ public class BibEntryWriterTest {
                 "}" + OS.NEWLINE;
 
         BibEntry entry = new BibEntry();
-        entry.setType("ReallyUnknownType");
-        entry.setField("Comment", "testentry");
+        entry.setType(EntryTypeFactory.parse("ReallyUnknownType"));
+        entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 
         //write out bibtex string
@@ -186,7 +189,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // Modify entry
-        entry.setField("author", "BlaBla");
+        entry.setField(StandardField.AUTHOR, "BlaBla");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -222,7 +225,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify entry
-        entry.setField("author", "BlaBla");
+        entry.setField(StandardField.AUTHOR, "BlaBla");
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -259,7 +262,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify entry
-        entry.setType("inproceedings");
+        entry.setType(StandardEntryType.InProceedings);
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -352,9 +355,9 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify month field
-        Set<String> fields = entry.getFields();
-        assertTrue(fields.contains("month"));
-        assertEquals("#mar#", entry.getField("month").get());
+        Set<Field> fields = entry.getFields();
+        assertTrue(fields.contains(StandardField.MONTH));
+        assertEquals("#mar#", entry.getField(StandardField.MONTH).get());
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -381,7 +384,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify entry
-        entry.setField("howpublished", "asdf");
+        entry.setField(StandardField.HOWPUBLISHED, "asdf");
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -404,9 +407,9 @@ public class BibEntryWriterTest {
     public void doNotWriteEmptyFields() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
-        entry.setField("author", "  ");
-        entry.setField("note", "some note");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "  ");
+        entry.setField(StandardField.NOTE, "some note");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
 
@@ -423,8 +426,8 @@ public class BibEntryWriterTest {
     public void trimFieldContents() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
-        entry.setField("note", "        some note    \t");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.NOTE, "        some note    \t");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
 
@@ -441,8 +444,8 @@ public class BibEntryWriterTest {
     public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
-        entry.setField("note", "some text with unbalanced { braces");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.NOTE, "some text with unbalanced { braces");
 
         assertThrows(IOException.class, () -> writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX));
     }
@@ -490,7 +493,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // change the entry
-        entry.setField("author", "John Doe");
+        entry.setField(StandardField.AUTHOR, "John Doe");
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();

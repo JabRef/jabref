@@ -51,7 +51,7 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Alan Turing");
+        entry.setField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
         String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
@@ -79,10 +79,10 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entryTuring = new BibEntry();
-        entryTuring.setField("author", "Alan Turing");
+        entryTuring.setField(StandardField.AUTHOR, "Alan Turing");
 
         BibEntry entryArmbrust = new BibEntry();
-        entryArmbrust.setField("author", "Michael Armbrust");
+        entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCiteKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
@@ -131,10 +131,10 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entryTuring = new BibEntry();
-        entryTuring.setField("author", "Alan Turing");
+        entryTuring.setField(StandardField.AUTHOR, "Alan Turing");
 
         BibEntry entryArmbrust = new BibEntry();
-        entryArmbrust.setField("author", "Michael Armbrust");
+        entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCiteKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
@@ -200,7 +200,7 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Alan Turing");
+        entry.setField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
         String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
