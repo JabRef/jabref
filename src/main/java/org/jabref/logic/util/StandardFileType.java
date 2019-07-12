@@ -35,6 +35,7 @@ public enum StandardFileType implements FileType {
     RDF("rdf"),
     RTF("rtf"),
     SXC("sxc"),
+    TEX("tex"),
     XML("xml"),
     JSON("json"),
     XMP("xmp"),

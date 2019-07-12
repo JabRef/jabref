@@ -66,7 +66,7 @@ public class TexBibEntriesResolverResult {
      * Check if an entry with the given key is present in the list of new entries.
      */
     public boolean checkEntryNewDatabase(String key) {
-        return newEntries.stream().anyMatch(e -> e.getCiteKeyOptional().get().equals(key));
+        return newEntries.stream().anyMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
     }
 
     /**
@@ -80,7 +80,7 @@ public class TexBibEntriesResolverResult {
      * Insert into the list of new entries an entry with the given key.
      */
     public void insertEntry(BibDatabase masterDatabase, String key) {
-        insertEntry(masterDatabase.getEntryByKey(key).get());
+        masterDatabase.getEntryByKey(key).ifPresent(this::insertEntry);
     }
 
     /**
