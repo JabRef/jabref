@@ -174,7 +174,7 @@ class ModsExporter extends Exporter {
 
     private void addGenre(BibEntry bibEntry, ModsDefinition mods) {
         GenreDefinition genre = new GenreDefinition();
-        genre.setValue(bibEntry.getType());
+        genre.setValue(bibEntry.getType().getDisplayName());
         mods.getModsGroup().add(genre);
     }
 

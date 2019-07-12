@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 
 public class TypeChecker implements Checker {
@@ -18,7 +19,7 @@ public class TypeChecker implements Checker {
             return Collections.emptyList();
         }
 
-        if ("proceedings".equalsIgnoreCase(entry.getType())) {
+        if (StandardEntryType.Proceedings.equals(entry.getType())) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("wrong entry type as proceedings has page numbers"), entry, StandardField.PAGES));
         }

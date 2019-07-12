@@ -153,7 +153,7 @@ public class RightClickMenu {
     private static boolean isAnyFieldSetForSelectedEntry(List<Field> fields, BasePanel panel) {
         if (panel.getMainTable().getSelectedEntries().size() == 1) {
             BibEntry entry = panel.getMainTable().getSelectedEntries().get(0);
-            return !Collections.disjoint(fields, entry.getFieldNames());
+            return !Collections.disjoint(fields, entry.getFields());
         }
         return false;
     }

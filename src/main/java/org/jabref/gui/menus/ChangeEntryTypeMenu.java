@@ -57,7 +57,7 @@ public class ChangeEntryTypeMenu {
     private void populateComplete(ObservableList<MenuItem> items, BibEntry entry, BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager) {
         if (bibDatabaseContext.isBiblatexMode()) {
             // Default BibLaTeX
-            populate(items, BibEntryTypesManager.getAllValues(BibDatabaseMode.BIBLATEX), entry, undoManager);
+            populate(items, BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
 
             // Custom types
             populateSubMenu(items, Localization.lang("Custom"), BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);

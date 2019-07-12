@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
@@ -22,6 +23,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,16 +81,21 @@ public class DuplicateCheck {
             return false;
         }
 
-        final BibEntryType type = BibEntryTypesManager.getTypeOrDefault(one.getType(), bibDatabaseMode);
-        final double[] reqCmpResult = compareRequiredFields(type, one, two);
+        final Optional<BibEntryType> type = BibEntryTypesManager.enrich(one.getType(), bibDatabaseMode);
+        if (type.isPresent()) {
+            final double[] reqCmpResult = compareRequiredFields(type.get(), one, two);
 
-        if (isFarFromThreshold(reqCmpResult[0])) {
-            // Far from the threshold value, so we base our decision on the required fields only
-            return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+            if (isFarFromThreshold(reqCmpResult[0])) {
+                // Far from the threshold value, so we base our decision on the required fields only
+                return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+            }
+
+            // Close to the threshold value, so we take a look at the optional fields, if any:
+            return compareOptionalFields(type.get(), one, two, reqCmpResult);
+        } else {
+            // We don't know about the type, so simply compare fields without any distinction between optional/required
+            return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-
-        // Close to the threshold value, so we take a look at the optional fields, if any:
-        return compareOptionalFields(type, one, two, reqCmpResult);
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
@@ -124,7 +131,7 @@ public class DuplicateCheck {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields == null
                 ? new double[]{0., 0.}
-                : DuplicateCheck.compareFieldSet(requiredFields, one, two);
+                : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
     private static boolean isFarFromThreshold(double value) {
@@ -139,7 +146,7 @@ public class DuplicateCheck {
         if (optionalFields == null) {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-        final double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
+        final double[] opt = DuplicateCheck.compareFieldSet(new HashSet<>(optionalFields), one, two);
         final double numerator = (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1]);
         final double denominator = (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
         final double totValue = numerator / denominator;
@@ -252,8 +259,8 @@ public class DuplicateCheck {
 
     public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
         final Set<Field> allFields = new HashSet<>();
-        allFields.addAll(one.getFieldNames());
-        allFields.addAll(two.getFieldNames());
+        allFields.addAll(one.getFields());
+        allFields.addAll(two.getFields());
 
         int score = 0;
         for (final Field field : allFields) {

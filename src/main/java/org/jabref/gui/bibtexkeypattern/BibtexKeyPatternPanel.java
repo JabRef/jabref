@@ -82,7 +82,7 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(button, 3, rowIndex);
 
         columnIndex = 1;
-        for (BibEntryType type : BibEntryTypesManager.getAllValues(mode)) {
+        for (BibEntryType type : BibEntryTypesManager.getAllTypes(mode)) {
             Label label1 = new Label(type.getType().getDisplayName());
             TextField textField = new TextField();
             Button button1 = new Button("Default");

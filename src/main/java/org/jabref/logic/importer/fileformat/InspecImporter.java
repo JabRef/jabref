@@ -13,7 +13,10 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -66,8 +69,8 @@ public class InspecImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        String type = "";
-        Map<String, String> h = new HashMap<>();
+        EntryType type = BibEntry.DEFAULT_TYPE;
+        Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.indexOf("Record") != 0) {
                 continue;
@@ -113,15 +116,15 @@ public class InspecImporter extends Importer {
                 } else if ("RT".equals(f3)) {
                     frest = frest.trim();
                     if ("Journal-Paper".equals(frest)) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
-                        type = "inproceedings";
+                        type = StandardEntryType.InProceedings;
                     } else {
-                        type = frest.replace(" ", "");
+                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
                     }
                 }
             }
-            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
+            BibEntry b = new BibEntry(type);
             b.setField(h);
 
             bibitems.add(b);

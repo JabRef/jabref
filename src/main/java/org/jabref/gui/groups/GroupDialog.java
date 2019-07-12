@@ -332,7 +332,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                                     autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
                         } else {
                             resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
-                                    autoGroupPersonsField.getText().trim());
+                                    FieldFactory.parseField(autoGroupPersonsField.getText().trim()));
                         }
                     } else if (texRadioButton.isSelected()) {
                         resultingGroup = TexGroup.create(groupName, getContext(),
@@ -414,7 +414,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     autoGroupKeywordsField.setText(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
-                    autoGroupPersonsField.setText(group.getField());
+                    autoGroupPersonsField.setText(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 texRadioButton.setSelected(true);

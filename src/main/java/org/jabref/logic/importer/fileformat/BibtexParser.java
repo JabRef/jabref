@@ -10,12 +10,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentParser;
@@ -32,10 +34,10 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
@@ -68,7 +70,7 @@ public class BibtexParser implements Parser {
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
     private BibDatabase database;
-    private Map<String, EntryType> entryTypes;
+    private Set<BibEntryType> entryTypes;
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
@@ -147,7 +149,7 @@ public class BibtexParser implements Parser {
 
     private void initializeParserResult() {
         database = new BibDatabase();
-        entryTypes = new HashMap<>(); // To store custom entry types parsed.
+        entryTypes = new HashSet<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
@@ -299,7 +301,7 @@ public class BibtexParser implements Parser {
             // "@comment"
             Optional<BibEntryType> typ = BibEntryTypesManager.parse(comment);
             if (typ.isPresent()) {
-                entryTypes.put(typ.get().getType(), typ.get());
+                entryTypes.add(typ.get());
             } else {
                 parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
             }
@@ -500,7 +502,7 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         LOGGER.debug("Now the contents");
         consume('=');
-        String content = parseFieldContent(name);
+        String content = parseFieldContent(FieldFactory.parseField(name));
         LOGGER.debug("Now I'm going to consume a }");
         consume('}', ')');
         // Consume new line which signals end of entry
@@ -517,7 +519,7 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(BibtexEntryTypes.getTypeOrDefault(entryType));
+        BibEntry result = new BibEntry(EntryTypeFactory.parse(entryType));
 
         skipWhitespace();
         consume('{', '(');
@@ -557,35 +559,35 @@ public class BibtexParser implements Parser {
     }
 
     private void parseField(BibEntry entry) throws IOException {
-        String key = parseTextToken().toLowerCase(Locale.ROOT);
+        Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
 
         skipWhitespace();
         consume('=');
-        String content = parseFieldContent(key);
+        String content = parseFieldContent(field);
         if (!content.isEmpty()) {
-            if (entry.hasField(key)) {
+            if (entry.hasField(field)) {
                 // The following hack enables the parser to deal with multiple
                 // author or
                 // editor lines, stringing them together instead of getting just
                 // one of them.
                 // Multiple author or editor lines are not allowed by the bibtex
                 // format, but
-                // at least one online database exports bibtex like that, making
+                // at least one online database exports bibtex likes to do that, making
                 // it inconvenient
                 // for users if JabRef did not accept it.
-                if (((Field) (Field<?>) (Field) key).getProperties().contains(FieldProperty.PERSON_NAMES)) {
-                    entry.setField(key, entry.getField(key).get() + " and " + content);
-                } else if (StandardField.KEYWORDS.equals(key)) {
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    entry.setField(field, entry.getField(field).get() + " and " + content);
+                } else if (StandardField.KEYWORDS.equals(field)) {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {
-                entry.setField(key, content);
+                entry.setField(field, content);
             }
         }
     }
 
-    private String parseFieldContent(String key) throws IOException {
+    private String parseFieldContent(Field field) throws IOException {
         skipWhitespace();
         StringBuilder value = new StringBuilder();
         int character;
@@ -597,13 +599,13 @@ public class BibtexParser implements Parser {
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
-                value.append(fieldContentParser.format(text, key));
+                value.append(fieldContentParser.format(text, field));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside of a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
-                value.append(fieldContentParser.format(text, key));
+                value.append(fieldContentParser.format(text, field));
 
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();

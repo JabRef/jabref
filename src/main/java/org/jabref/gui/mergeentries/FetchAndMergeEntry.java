@@ -92,8 +92,8 @@ public class FetchAndMergeEntry {
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 
             // Updated the original entry with the new fields
-            Set<Field> jointFields = new TreeSet<>(mergedEntry.get().getFieldNames());
-            Set<Field> originalFields = new TreeSet<>(originalEntry.getFieldNames());
+            Set<Field> jointFields = new TreeSet<>(mergedEntry.get().getFields());
+            Set<Field> originalFields = new TreeSet<>(originalEntry.getFields());
             boolean edited = false;
 
             // entry type

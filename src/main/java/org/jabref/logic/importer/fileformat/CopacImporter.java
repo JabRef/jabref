@@ -11,8 +11,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 /**
  * Importer for COPAC format.
@@ -54,6 +57,14 @@ public class CopacImporter extends Importer {
             }
         }
         return false;
+    }
+
+    private static void setOrAppend(BibEntry b, Field field, String value, String separator) {
+        if (b.hasField(field)) {
+            b.setField(field, b.getField(field).get() + separator + value);
+        } else {
+            b.setField(field, value);
+        }
     }
 
     @Override
@@ -99,7 +110,7 @@ public class CopacImporter extends Importer {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry(BibtexEntryTypes.BOOK);
+            BibEntry b = new BibEntry(StandardEntryType.Book);
 
             String[] lines = entry.split("\n");
 
@@ -127,24 +138,16 @@ public class CopacImporter extends Importer {
                 } else if ("NT- ".equals(code)) {
                     setOrAppend(b, StandardField.NOTE, line.substring(4).trim(), ", ");
                 } else if ("PD- ".equals(code)) {
-                    setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
+                    setOrAppend(b, new UnknownField("physicaldimensions"), line.substring(4).trim(), ", ");
                 } else if ("DT- ".equals(code)) {
-                    setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
+                    setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
                 } else {
-                    setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldFactory.parseField(code.substring(0, 2)), line.substring(4).trim(), ", ");
                 }
             }
             results.add(b);
         }
 
         return new ParserResult(results);
-    }
-
-    private static void setOrAppend(BibEntry b, String field, String value, String separator) {
-        if (b.hasField(field)) {
-            b.setField(field, b.getField(field).get() + separator + value);
-        } else {
-            b.setField(field, value);
-        }
     }
 }

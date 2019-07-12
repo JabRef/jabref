@@ -17,6 +17,7 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -58,7 +59,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                     // For displaying An ErrorMessage
                     String error = importer.getResponseErrorMessage(response);
                     BibEntry errorBibEntry = new BibEntry();
-                    errorBibEntry.setField("html_representation", error);
+                    errorBibEntry.setField(new UnknownField("html_representation"), error);
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);

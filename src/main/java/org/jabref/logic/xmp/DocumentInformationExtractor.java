@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -59,10 +62,11 @@ public class DocumentInformationExtractor {
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
-                if (InternalField.TYPE_HEADER.equals(key)) {
-                    bibEntry.setType(value);
+                Field field = FieldFactory.parseField(key);
+                if (InternalField.TYPE_HEADER.equals(field)) {
+                    bibEntry.setType(EntryTypeFactory.parse(value));
                 } else {
-                    bibEntry.setField(key, value);
+                    bibEntry.setField(field, value);
                 }
             }
         }
@@ -78,7 +82,6 @@ public class DocumentInformationExtractor {
      * The BibEntry is build by mapping individual fields in the document
      * information (like author, title, keywords) to fields in a bibtex entry.
      *
-     * @param di The document information from which to build a BibEntry.
      * @return The bibtex entry found in the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
@@ -91,7 +94,7 @@ public class DocumentInformationExtractor {
         this.extractSubject();
         this.extractOtherFields();
 
-        if (bibEntry.getFieldNames().isEmpty()) {
+        if (bibEntry.getFields().isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(bibEntry);

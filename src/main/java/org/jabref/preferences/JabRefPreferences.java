@@ -98,6 +98,8 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -1212,7 +1214,7 @@ public class JabRefPreferences implements PreferencesService {
             String[] keys = pre.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    keyPattern.addBibtexKeyPattern(key, pre.get(key, null));
+                    keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
@@ -1237,13 +1239,12 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
-        Set<String> allKeys = pattern.getAllKeys();
-        for (String key : allKeys) {
-            if (!pattern.isDefaultValue(key)) {
+        for (EntryType entryType : pattern.getAllKeys()) {
+            if (!pattern.isDefaultValue(entryType)) {
                 // no default value
                 // the first entry in the array is the full pattern
                 // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
-                pre.put(key, pattern.getValue(key).get(0));
+                pre.put(entryType.getName(), pattern.getValue(entryType).get(0));
             }
         }
     }
@@ -1261,7 +1262,7 @@ public class JabRefPreferences implements PreferencesService {
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            BibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.getAsString(type)));
+            BibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -1443,7 +1444,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                                          getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)),
                                           get(TIME_STAMP_FORMAT));
     }
 
@@ -1542,7 +1543,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public XmpPreferences getXMPPreferences() {
-        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                                   getKeywordDelimiter());
     }
 
@@ -2100,7 +2101,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void saveBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = BibEntryTypesManager.getAllValues(bibDatabaseMode).stream()
+        List<BibEntryType> customBiblatexBibTexTypes = BibEntryTypesManager.getAllTypes(bibDatabaseMode).stream()
                                                                            .filter(type -> type instanceof BibEntryType)
                                                                            .map(entryType -> entryType).collect(Collectors.toList());
 

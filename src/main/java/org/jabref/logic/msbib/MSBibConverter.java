@@ -28,7 +28,7 @@ public class MSBibConverter {
         // define new type
         String msbibType = result.fields.put("SourceType", MSBibMapping.getMSBibEntryType(entry.getType()).name());
 
-        for (Field field : entry.getFieldNames()) {
+        for (Field field : entry.getFields()) {
             // clean field
             String unicodeField = entry.getLatexFreeField(field).orElse("");
 

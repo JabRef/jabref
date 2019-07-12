@@ -56,7 +56,11 @@ import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.base.Joiner;
 import org.slf4j.Logger;
@@ -128,7 +132,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseMods(List<BibEntry> bibItems, ModsDefinition modsDefinition) {
         BibEntry entry = new BibEntry();
-        Map<String, String> fields = new HashMap<>();
+        Map<Field, String> fields = new HashMap<>();
         if (modsDefinition.getID() != null) {
             entry.setCiteKey(modsDefinition.getID());
         }
@@ -139,7 +143,7 @@ public class ModsImporter extends Importer implements Parser {
         bibItems.add(entry);
     }
 
-    private void parseModsGroup(Map<String, String> fields, List<Object> modsGroup, BibEntry entry) {
+    private void parseModsGroup(Map<Field, String> fields, List<Object> modsGroup, BibEntry entry) {
         List<String> keywords = new ArrayList<>();
         List<String> authors = new ArrayList<>();
         List<String> notes = new ArrayList<>();
@@ -165,7 +169,7 @@ public class ModsImporter extends Importer implements Parser {
             abstractDefinition
                     .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
 
-            genreDefinition.ifPresent(genre -> entry.setType(genre.getValue()));
+            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(genre.getValue())));
 
             languageDefinition.ifPresent(
                     languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
@@ -202,7 +206,7 @@ public class ModsImporter extends Importer implements Parser {
 
     }
 
-    private void parseTitle(Map<String, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
+    private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
         for (Object object : titleOrSubTitleOrPartNumber) {
             if (object instanceof JAXBElement) {
                 @SuppressWarnings("unchecked")
@@ -215,17 +219,17 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void parseIdentifier(Map<String, String> fields, IdentifierDefinition identifier, BibEntry entry) {
+    private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
         if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
             entry.setCiteKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             //put all identifiers (doi, issn, isbn,...) except of local and citekey
-            putIfValueNotNull(fields, identifier.getType(), identifier.getValue());
+            putIfValueNotNull(fields, FieldFactory.parseField(identifier.getType()), identifier.getValue());
         }
     }
 
-    private void parseTopic(Map<String, String> fields, List<JAXBElement<?>> topicOrGeographicOrTemporal,
+    private void parseTopic(Map<Field, String> fields, List<JAXBElement<?>> topicOrGeographicOrTemporal,
                             List<String> keywords) {
         for (JAXBElement<?> jaxbElement : topicOrGeographicOrTemporal) {
             Object value = jaxbElement.getValue();
@@ -256,7 +260,7 @@ public class ModsImporter extends Importer implements Parser {
         return Optional.empty();
     }
 
-    private void parseGeographicInformation(Map<String, String> fields,
+    private void parseGeographicInformation(Map<Field, String> fields,
                                             HierarchicalGeographicDefinition hierarchichalGeographic) {
         List<JAXBElement<? extends StringPlusLanguage>> areaOrContinentOrCountry = hierarchichalGeographic
                 .getExtraTerrestrialAreaOrContinentOrCountry();
@@ -264,15 +268,15 @@ public class ModsImporter extends Importer implements Parser {
             String localName = element.getName().getLocalPart();
             if ("city".equals(localName)) {
                 StringPlusLanguage city = element.getValue();
-                putIfValueNotNull(fields, "city", city.getValue());
+                putIfValueNotNull(fields, new UnknownField("city"), city.getValue());
             } else if ("country".equals(localName)) {
                 StringPlusLanguage country = element.getValue();
-                putIfValueNotNull(fields, "country", country.getValue());
+                putIfValueNotNull(fields, new UnknownField("country"), country.getValue());
             }
         }
     }
 
-    private void parseLocationAndUrl(Map<String, String> fields, LocationDefinition locationDefinition) {
+    private void parseLocationAndUrl(Map<Field, String> fields, LocationDefinition locationDefinition) {
         List<String> locations = locationDefinition.getPhysicalLocation().stream()
                 .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
         putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
@@ -282,13 +286,13 @@ public class ModsImporter extends Importer implements Parser {
         putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
     }
 
-    private void parseRecordInfo(Map<String, String> fields, RecordInfoDefinition recordInfo) {
+    private void parseRecordInfo(Map<Field, String> fields, RecordInfoDefinition recordInfo) {
         List<JAXBElement<?>> recordContent = recordInfo.getRecordContentSourceOrRecordCreationDateOrRecordChangeDate();
         for (JAXBElement<?> jaxbElement : recordContent) {
             Object value = jaxbElement.getValue();
             if (value instanceof StringPlusLanguagePlusAuthority) {
                 StringPlusLanguagePlusAuthority source = (StringPlusLanguagePlusAuthority) value;
-                putIfValueNotNull(fields, "source", source.getValue());
+                putIfValueNotNull(fields, new UnknownField("source"), source.getValue());
             } else if (value instanceof LanguageDefinition) {
                 LanguageDefinition language = (LanguageDefinition) value;
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
@@ -304,7 +308,7 @@ public class ModsImporter extends Importer implements Parser {
      * But Informations like volume, issue and the pages appear here instead of in the ModsGroup.
      * Also if there appears a title field, then this indicates that is the name of journal which the article belongs to.
      */
-    private void parseRelatedModsGroup(Map<String, String> fields, List<Object> relatedModsGroup) {
+    private void parseRelatedModsGroup(Map<Field, String> fields, List<Object> relatedModsGroup) {
         for (Object groupElement : relatedModsGroup) {
             if (groupElement instanceof PartDefinition) {
                 PartDefinition part = (PartDefinition) groupElement;
@@ -319,7 +323,7 @@ public class ModsImporter extends Importer implements Parser {
                         for (JAXBElement<StringPlusLanguage> jaxbElement : numberOrCaptionOrTitle) {
                             StringPlusLanguage value = jaxbElement.getValue();
                             //put details like volume, issue,...
-                            putIfValueNotNull(fields, detail.getType(), value.getValue());
+                            putIfValueNotNull(fields, FieldFactory.parseField(detail.getType()), value.getValue());
                         }
                     } else if (object instanceof ExtentDefinition) {
                         ExtentDefinition extentDefinition = (ExtentDefinition) object;
@@ -343,7 +347,7 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putPageInformation(ExtentDefinition extentDefinition, Map<String, String> fields) {
+    private void putPageInformation(ExtentDefinition extentDefinition, Map<Field, String> fields) {
         if (extentDefinition.getTotal() != null) {
             putIfValueNotNull(fields, StandardField.PAGES, String.valueOf(extentDefinition.getTotal()));
         } else if (extentDefinition.getStart() != null) {
@@ -358,14 +362,14 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putPlaceOrPublisherOrDate(Map<String, String> fields, String elementName, Object object) {
+    private void putPlaceOrPublisherOrDate(Map<Field, String> fields, String elementName, Object object) {
         Optional<IssuanceDefinition> issuanceDefinition = getElement(object, IssuanceDefinition.class);
         Optional<PlaceDefinition> placeDefinition = getElement(object, PlaceDefinition.class);
         Optional<DateDefinition> dateDefinition = getElement(object, DateDefinition.class);
         Optional<StringPlusLanguagePlusSupplied> publisherOrEdition = getElement(object,
                 StringPlusLanguagePlusSupplied.class);
 
-        issuanceDefinition.ifPresent(issuance -> putIfValueNotNull(fields, "issuance", issuance.value()));
+        issuanceDefinition.ifPresent(issuance -> putIfValueNotNull(fields, new UnknownField("issuance"), issuance.value()));
 
         List<String> places = new ArrayList<>();
         placeDefinition
@@ -378,7 +382,7 @@ public class ModsImporter extends Importer implements Parser {
         publisherOrEdition.ifPresent(pubOrEd -> putPublisherOrEdition(fields, elementName, pubOrEd));
     }
 
-    private void putPublisherOrEdition(Map<String, String> fields, String elementName,
+    private void putPublisherOrEdition(Map<Field, String> fields, String elementName,
                                        StringPlusLanguagePlusSupplied pubOrEd) {
         if ("publisher".equals(elementName)) {
             putIfValueNotNull(fields, StandardField.PUBLISHER, pubOrEd.getValue());
@@ -387,7 +391,7 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putDate(Map<String, String> fields, String elementName, DateDefinition date) {
+    private void putDate(Map<Field, String> fields, String elementName, DateDefinition date) {
         if (date.getValue() != null) {
             switch (elementName) {
 
@@ -397,16 +401,14 @@ public class ModsImporter extends Importer implements Parser {
                     break;
                 case "dateCreated":
                     //If there was no year in date issued, then take the year from date created
-                    if (fields.get(StandardField.YEAR) == null) {
-                        fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
-                    }
-                    fields.put("created", date.getValue());
+                    fields.computeIfAbsent(StandardField.YEAR, k -> date.getValue().substring(0, 4));
+                    fields.put(new UnknownField("created"), date.getValue());
                     break;
                 case "dateCaptured":
-                    fields.put("captured", date.getValue());
+                    fields.put(new UnknownField("captured"), date.getValue());
                     break;
                 case "dateModified":
-                    fields.put("modified", date.getValue());
+                    fields.put(new UnknownField("modified"), date.getValue());
                     break;
                 default:
                     break;
@@ -414,13 +416,13 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putIfListIsNotEmpty(Map<String, String> fields, List<String> list, String key, String separator) {
+    private void putIfListIsNotEmpty(Map<Field, String> fields, List<String> list, Field key, String separator) {
         if (!list.isEmpty()) {
             fields.put(key, list.stream().collect(Collectors.joining(separator)));
         }
     }
 
-    private void handleAuthorsInNamePart(NameDefinition name, List<String> authors, Map<String, String> fields) {
+    private void handleAuthorsInNamePart(NameDefinition name, List<String> authors, Map<Field, String> fields) {
         List<JAXBElement<?>> namePartOrDisplayFormOrAffiliation = name.getNamePartOrDisplayFormOrAffiliation();
         List<String> foreName = new ArrayList<>();
         String familyName = "";
@@ -451,7 +453,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             } else if ((value instanceof StringPlusLanguage) && "affiliation".equals(elementName)) {
                 StringPlusLanguage affiliation = (StringPlusLanguage) value;
-                putIfValueNotNull(fields, "affiliation", affiliation.getValue());
+                putIfValueNotNull(fields, new UnknownField("affiliation"), affiliation.getValue());
             }
         }
 
@@ -465,9 +467,9 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void putIfValueNotNull(Map<String, String> fields, String modsKey, String value) {
+    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
         if (value != null) {
-            fields.put(modsKey, value);
+            fields.put(field, value);
         }
     }
 

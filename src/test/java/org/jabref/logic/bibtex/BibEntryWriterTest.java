@@ -352,7 +352,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify month field
-        Set<String> fields = entry.getFieldNames();
+        Set<String> fields = entry.getFields();
         assertTrue(fields.contains("month"));
         assertEquals("#mar#", entry.getField("month").get());
 

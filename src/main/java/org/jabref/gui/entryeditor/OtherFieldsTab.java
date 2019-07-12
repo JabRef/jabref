@@ -1,8 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -34,14 +37,20 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry, BibEntryType entryType) {
-        Set<Field> allKnownFields = new HashSet<>(entryType.getAllFields());
-        List<Field> otherFields = entry.getFieldNames().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
+    protected Collection<Field> determineFieldsToShow(BibEntry entry) {
+        Optional<BibEntryType> entryType = BibEntryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        if (entryType.isPresent()) {
+            Set<Field> allKnownFields = new HashSet<>(entryType.get().getAllFields());
+            List<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toList());
 
-        otherFields.removeAll(entryType.getDeprecatedFields());
-        otherFields.removeAll(entryType.getOptionalFields());
-        otherFields.remove(InternalField.KEY_FIELD);
-        otherFields.removeAll(customTabFieldNames);
-        return otherFields;
+            otherFields.removeAll(entryType.get().getDeprecatedFields());
+            otherFields.removeAll(entryType.get().getOptionalFields());
+            otherFields.remove(InternalField.KEY_FIELD);
+            otherFields.removeAll(customTabFieldNames);
+            return otherFields;
+        } else {
+            // Entry type unknown -> treat all fields as required
+            return Collections.emptySet();
+        }
     }
 }

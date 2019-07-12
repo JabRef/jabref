@@ -32,8 +32,6 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
@@ -48,7 +46,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final SuggestionProviders suggestionProviders;
 
     private FieldEditorFX activeField;
-    private final BibDatabaseContext databaseContext;
+    protected final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private final DialogService dialogService;
@@ -82,7 +80,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
 
-        fields = determineFieldsToShow(entry, BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode()));
+        fields = determineFieldsToShow(entry);
 
         List<Label> labels = new ArrayList<>();
         boolean isFirstField = true;
@@ -192,7 +190,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return !determineFieldsToShow(entry, BibEntryTypesManager.getTypeOrDefault(entry.getType(), databaseContext.getMode())).isEmpty();
+        return !determineFieldsToShow(entry).isEmpty();
     }
 
     @Override
@@ -219,7 +217,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         });
     }
 
-    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry, BibEntryType entryType);
+    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry);
 
     public Collection<Field> getShownFields() {
         return fields;

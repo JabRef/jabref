@@ -16,7 +16,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -88,7 +89,7 @@ public class MedlinePlainImporter extends Importer {
                 continue;
             }
 
-            String type = BibEntry.DEFAULT_TYPE;
+            EntryType type = BibEntry.DEFAULT_TYPE;
             String author = "";
             String editor = "";
             String comment = "";
@@ -212,7 +213,7 @@ public class MedlinePlainImporter extends Importer {
                 fieldConversionMap.put(StandardField.COMMENT, comment);
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
+            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fieldConversionMap.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fieldConversionMap::remove);
@@ -230,42 +231,31 @@ public class MedlinePlainImporter extends Importer {
         return (line.length() >= 5) && (line.charAt(4) == '-');
     }
 
-    private String addSourceType(String value, String type) {
+    private EntryType addSourceType(String value, EntryType type) {
         String val = value.toLowerCase(Locale.ENGLISH);
-        String theType = type;
         switch (val) {
-        case "book":
-            theType = "book";
-            break;
-        case "journal article":
-        case "classical article":
-        case "corrected and republished article":
-        case "historical article":
-        case "introductory journal article":
-        case "newspaper article":
-            theType = "article";
-            break;
-        case "clinical conference":
-        case "consensus development conference":
-        case "consensus development conference, nih":
-            theType = "conference";
-            break;
-        case "technical report":
-            theType = "techreport";
-            break;
-        case "editorial":
-            theType = "inproceedings";
-            break;
-        case "overall":
-            theType = "proceedings";
-            break;
-        default:
-            break;
+            case "book":
+                return StandardEntryType.Book;
+            case "journal article":
+            case "classical article":
+            case "corrected and republished article":
+            case "historical article":
+            case "introductory journal article":
+            case "newspaper article":
+                return StandardEntryType.Article;
+            case "clinical conference":
+            case "consensus development conference":
+            case "consensus development conference, nih":
+                return StandardEntryType.Conference;
+            case "technical report":
+                return StandardEntryType.TechReport;
+            case "editorial":
+                return StandardEntryType.InProceedings;
+            case "overall":
+                return StandardEntryType.Proceedings;
+            default:
+                return type;
         }
-        if ("".equals(theType)) {
-            theType = "other";
-        }
-        return theType;
     }
 
     private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
@@ -323,7 +313,7 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
-    private void addTitles(Map<Field, String> hm, String lab, String val, String type) {
+    private void addTitles(Map<Field, String> hm, String lab, String val, EntryType type) {
         if ("TI".equals(lab)) {
             String oldVal = hm.get(StandardField.TITLE);
             if (oldVal == null) {

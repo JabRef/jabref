@@ -72,11 +72,11 @@ public class AutoCompletePreferences {
     }
 
     public void setCompleteNames(String input) {
-        setCompleteFields(FieldFactory.parseFields(input));
+        setCompleteFields(FieldFactory.parseFieldList(input));
     }
 
     public String getCompleteNamesAsString() {
-        return FieldFactory.serializeFields(completeFields);
+        return FieldFactory.serializeFieldsList(completeFields);
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {

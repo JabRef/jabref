@@ -19,6 +19,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -84,10 +85,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     }
 
-    private void addEntriesToPane(FlowPane pane, Collection<? extends EntryType> entries) {
-
-        for (EntryType entryType : entries) {
-            Button entryButton = new Button(entryType.getType());
+    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
+        for (BibEntryType entryType : entries) {
+            Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(entryType));
             pane.getChildren().add(entryButton);
@@ -124,7 +124,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
 
-            List<EntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            List<BibEntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -136,7 +136,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
-            List<EntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            List<BibEntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -162,8 +162,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    private void setEntryTypeForReturnAndClose(EntryType entryType) {
-        type = entryType;
+    private void setEntryTypeForReturnAndClose(BibEntryType entryType) {
+        type = entryType.getType();
         viewModel.stopFetching();
         this.close();
     }

@@ -29,8 +29,8 @@ import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
@@ -100,6 +100,16 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
         return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());
+    }
+
+    public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
+        for (Field field : fields) {
+            Optional<String> value = getResolvedFieldOrAlias(field, database);
+            if (value.isPresent()) {
+                return value;
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -227,7 +237,7 @@ public class BibEntry implements Cloneable {
      *
      * @return a set of existing field names
      */
-    public Set<Field> getFieldNames() {
+    public Set<Field> getFields() {
         return new TreeSet<>(fields.keySet());
     }
 
@@ -455,15 +465,13 @@ public class BibEntry implements Cloneable {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param allFields An array of field names to be checked.
+     * @param fields An array of field names to be checked.
      * @param database  The database in which to look up crossref'd entries, if any. This
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    public boolean allFieldsPresent(Collection<String> allFields, BibDatabase database) {
-        return allFields.stream()
-                        .flatMap(fieldNames -> FieldFactory.parseOrFields(fieldNames).stream())
-                        .allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
+    public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
+        return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
     /**

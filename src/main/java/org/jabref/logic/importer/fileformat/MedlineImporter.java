@@ -74,8 +74,12 @@ import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
@@ -200,7 +204,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {
-        Map<String, String> fields = new HashMap<>();
+        Map<Field, String> fields = new HashMap<>();
         if (currentArticle.getBookDocument() != null) {
             BookDocument bookDocument = currentArticle.getBookDocument();
             fields.put(StandardField.PMID, bookDocument.getPMID().getContent());
@@ -226,7 +230,7 @@ public class MedlineImporter extends Importer implements Parser {
                         }
                     }
                 }
-                fields.put("sections", join(result, "; "));
+                fields.put(new UnknownField("sections"), join(result, "; "));
             }
             if (bookDocument.getKeywordList() != null) {
                 addKeyWords(fields, bookDocument.getKeywordList());
@@ -241,7 +245,7 @@ public class MedlineImporter extends Importer implements Parser {
                         result.add(type.getContent());
                     }
                 }
-                fields.put("pubtype", join(result, ", "));
+                fields.put(new UnknownField("pubtype"), join(result, ", "));
             }
             if (bookDocument.getArticleTitle() != null) {
                 ArticleTitle articleTitle = bookDocument.getArticleTitle();
@@ -251,7 +255,7 @@ public class MedlineImporter extends Importer implements Parser {
                         titles.add((String) content);
                     }
                 }
-                fields.put("article", join(titles, ", "));
+                fields.put(new UnknownField("article"), join(titles, ", "));
             }
             if (bookDocument.getBook() != null) {
                 addBookInformation(fields, bookDocument.getBook());
@@ -260,19 +264,19 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (currentArticle.getPubmedBookData() != null) {
             PubmedBookData bookData = currentArticle.getPubmedBookData();
-            putIfValueNotNull(fields, "pubstatus", bookData.getPublicationStatus());
+            putIfValueNotNull(fields, StandardField.PUBSTATE, bookData.getPublicationStatus());
         }
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
         bibItems.add(entry);
     }
 
-    private void addBookInformation(Map<String, String> fields, Book book) {
+    private void addBookInformation(Map<Field, String> fields, Book book) {
         if (book.getPublisher() != null) {
             Publisher publisher = book.getPublisher();
-            putIfValueNotNull(fields, "publocation", publisher.getPublisherLocation());
+            putIfValueNotNull(fields, new UnknownField("publocation"), publisher.getPublisherLocation());
             putStringFromSerializableList(fields, StandardField.PUBLISHER, publisher.getPublisherName().getContent());
         }
         if (book.getBookTitle() != null) {
@@ -296,8 +300,8 @@ public class MedlineImporter extends Importer implements Parser {
 
         putIfValueNotNull(fields, StandardField.VOLUME, book.getVolume());
         putIfValueNotNull(fields, StandardField.EDITION, book.getEdition());
-        putIfValueNotNull(fields, "medium", book.getMedium());
-        putIfValueNotNull(fields, "reportnumber", book.getReportNumber());
+        putIfValueNotNull(fields, new UnknownField("medium"), book.getMedium());
+        putIfValueNotNull(fields, new UnknownField("reportnumber"), book.getReportNumber());
 
         if (book.getELocationID() != null) {
             for (ELocationID id : book.getELocationID()) {
@@ -309,8 +313,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void putStringFromSerializableList(Map<String, String> fields, String medlineKey,
-            List<Serializable> contentList) {
+    private void putStringFromSerializableList(Map<Field, String> fields, Field field, List<Serializable> contentList) {
         StringBuilder result = new StringBuilder();
         for (Serializable content : contentList) {
             if (content instanceof String) {
@@ -318,16 +321,16 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
         if (result.length() > 0) {
-            fields.put(medlineKey, result.toString());
+            fields.put(field, result.toString());
         }
     }
 
-    private void addContributionDate(Map<String, String> fields, ContributionDate contributionDate) {
+    private void addContributionDate(Map<Field, String> fields, ContributionDate contributionDate) {
         if ((contributionDate.getDay() != null) && (contributionDate.getMonth() != null)
                 && (contributionDate.getYear() != null)) {
             String result = convertToDateFormat(contributionDate.getYear(), contributionDate.getMonth(),
                     contributionDate.getDay());
-            fields.put("contribution", result);
+            fields.put(new UnknownField("contribution"), result);
         }
     }
 
@@ -336,13 +339,13 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void parseArticle(PubmedArticle article, List<BibEntry> bibItems) {
-        Map<String, String> fields = new HashMap<>();
+        Map<Field, String> fields = new HashMap<>();
 
         if (article.getPubmedData() != null) {
             if (article.getMedlineCitation().getDateRevised() != null) {
                 DateRevised dateRevised = article.getMedlineCitation().getDateRevised();
                 addDateRevised(fields, dateRevised);
-                putIfValueNotNull(fields, "pubstatus", article.getPubmedData().getPublicationStatus());
+                putIfValueNotNull(fields, StandardField.PUBSTATE, article.getPubmedData().getPublicationStatus());
                 if (article.getPubmedData().getArticleIdList() != null) {
                     ArticleIdList articleIdList = article.getPubmedData().getArticleIdList();
                     addArticleIdList(fields, articleIdList);
@@ -352,17 +355,17 @@ public class MedlineImporter extends Importer implements Parser {
         if (article.getMedlineCitation() != null) {
             MedlineCitation medlineCitation = article.getMedlineCitation();
 
-            fields.put("status", medlineCitation.getStatus());
+            fields.put(new UnknownField("status"), medlineCitation.getStatus());
             DateCreated dateCreated = medlineCitation.getDateCreated();
             if (medlineCitation.getDateCreated() != null) {
-                fields.put("created",
+                fields.put(new UnknownField("created"),
                         convertToDateFormat(dateCreated.getYear(), dateCreated.getMonth(), dateCreated.getDay()));
             }
-            fields.put("pubmodel", medlineCitation.getArticle().getPubModel());
+            fields.put(new UnknownField("pubmodel"), medlineCitation.getArticle().getPubModel());
 
             if (medlineCitation.getDateCompleted() != null) {
                 DateCompleted dateCompleted = medlineCitation.getDateCompleted();
-                fields.put("completed",
+                fields.put(new UnknownField("completed"),
                         convertToDateFormat(dateCompleted.getYear(), dateCompleted.getMonth(), dateCompleted.getDay()));
             }
 
@@ -372,17 +375,17 @@ public class MedlineImporter extends Importer implements Parser {
             addArticleInformation(fields, medlineCitation.getArticle().getContent());
 
             MedlineJournalInfo medlineJournalInfo = medlineCitation.getMedlineJournalInfo();
-            putIfValueNotNull(fields, "country", medlineJournalInfo.getCountry());
-            putIfValueNotNull(fields, "journal-abbreviation", medlineJournalInfo.getMedlineTA());
-            putIfValueNotNull(fields, "nlm-id", medlineJournalInfo.getNlmUniqueID());
-            putIfValueNotNull(fields, "issn-linking", medlineJournalInfo.getISSNLinking());
+            putIfValueNotNull(fields, new UnknownField("country"), medlineJournalInfo.getCountry());
+            putIfValueNotNull(fields, new UnknownField("journal-abbreviation"), medlineJournalInfo.getMedlineTA());
+            putIfValueNotNull(fields, new UnknownField("nlm-id"), medlineJournalInfo.getNlmUniqueID());
+            putIfValueNotNull(fields, new UnknownField("issn-linking"), medlineJournalInfo.getISSNLinking());
             if (medlineCitation.getChemicalList() != null) {
                 if (medlineCitation.getChemicalList().getChemical() != null) {
                     addChemicals(fields, medlineCitation.getChemicalList().getChemical());
                 }
             }
             if (medlineCitation.getCitationSubset() != null) {
-                fields.put("citation-subset", join(medlineCitation.getCitationSubset(), ", "));
+                fields.put(new UnknownField("citation-subset"), join(medlineCitation.getCitationSubset(), ", "));
             }
             if (medlineCitation.getGeneSymbolList() != null) {
                 addGeneSymbols(fields, medlineCitation.getGeneSymbolList());
@@ -390,7 +393,7 @@ public class MedlineImporter extends Importer implements Parser {
             if (medlineCitation.getMeshHeadingList() != null) {
                 addMeashHeading(fields, medlineCitation.getMeshHeadingList());
             }
-            putIfValueNotNull(fields, "references", medlineCitation.getNumberOfReferences());
+            putIfValueNotNull(fields, new UnknownField("references"), medlineCitation.getNumberOfReferences());
             if (medlineCitation.getPersonalNameSubjectList() != null) {
                 addPersonalNames(fields, medlineCitation.getPersonalNameSubjectList());
             }
@@ -401,7 +404,7 @@ public class MedlineImporter extends Importer implements Parser {
                 addKeyWords(fields, medlineCitation.getKeywordList());
             }
             if (medlineCitation.getSpaceFlightMission() != null) {
-                fields.put("space-flight-mission", join(medlineCitation.getSpaceFlightMission(), ", "));
+                fields.put(new UnknownField("space-flight-mission"), join(medlineCitation.getSpaceFlightMission(), ", "));
             }
             if (medlineCitation.getInvestigatorList() != null) {
                 addInvestigators(fields, medlineCitation.getInvestigatorList());
@@ -411,25 +414,25 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        BibEntry entry = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
         bibItems.add(entry);
     }
 
-    private void addArticleIdList(Map<String, String> fields, ArticleIdList articleIdList) {
+    private void addArticleIdList(Map<Field, String> fields, ArticleIdList articleIdList) {
         for (ArticleId id : articleIdList.getArticleId()) {
             if (id.getIdType() != null) {
                 if ("pubmed".equals(id.getIdType())) {
-                    fields.put("pmid", id.getContent());
+                    fields.put(StandardField.PMID, id.getContent());
                 } else {
-                    fields.put(id.getIdType(), id.getContent());
+                    fields.put(FieldFactory.parseField(id.getIdType()), id.getContent());
                 }
             }
         }
     }
 
-    private void addNotes(Map<String, String> fields, List<GeneralNote> generalNote) {
+    private void addNotes(Map<Field, String> fields, List<GeneralNote> generalNote) {
         List<String> notes = new ArrayList<>();
         for (GeneralNote note : generalNote) {
             if (note != null) {
@@ -439,7 +442,7 @@ public class MedlineImporter extends Importer implements Parser {
         fields.put(StandardField.NOTE, join(notes, ", "));
     }
 
-    private void addInvestigators(Map<String, String> fields, InvestigatorList investigatorList) {
+    private void addInvestigators(Map<Field, String> fields, InvestigatorList investigatorList) {
         List<String> investigatorNames = new ArrayList<>();
         List<String> affiliationInfos = new ArrayList<>();
         String name = "";
@@ -462,14 +465,14 @@ public class MedlineImporter extends Importer implements Parser {
                             }
                         }
                     }
-                    fields.put("affiliation", join(affiliationInfos, ", "));
+                    fields.put(new UnknownField("affiliation"), join(affiliationInfos, ", "));
                 }
             }
-            fields.put("investigator", join(investigatorNames, " and "));
+            fields.put(new UnknownField("investigator"), join(investigatorNames, " and "));
         }
     }
 
-    private void addKeyWords(Map<String, String> fields, List<KeywordList> allKeywordLists) {
+    private void addKeyWords(Map<Field, String> fields, List<KeywordList> allKeywordLists) {
         List<String> keywordStrings = new ArrayList<>();
         //add keywords to the list
         for (KeywordList keywordList : allKeywordLists) {
@@ -494,15 +497,15 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addOtherId(Map<String, String> fields, List<OtherID> otherID) {
+    private void addOtherId(Map<Field, String> fields, List<OtherID> otherID) {
         for (OtherID id : otherID) {
             if ((id.getSource() != null) && (id.getContent() != null)) {
-                fields.put(id.getSource(), id.getContent());
+                fields.put(FieldFactory.parseField(id.getSource()), id.getContent());
             }
         }
     }
 
-    private void addPersonalNames(Map<String, String> fields, PersonalNameSubjectList personalNameSubjectList) {
+    private void addPersonalNames(Map<Field, String> fields, PersonalNameSubjectList personalNameSubjectList) {
         if (fields.get(StandardField.AUTHOR) == null) {
             //if no authors appear, then add the personal names as authors
             List<String> personalNames = new ArrayList<>();
@@ -520,7 +523,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addMeashHeading(Map<String, String> fields, MeshHeadingList meshHeadingList) {
+    private void addMeashHeading(Map<Field, String> fields, MeshHeadingList meshHeadingList) {
         ArrayList<String> keywords = new ArrayList<>();
         for (MeshHeading keyword : meshHeadingList.getMeshHeading()) {
             String result = keyword.getDescriptorName().getContent();
@@ -534,22 +537,22 @@ public class MedlineImporter extends Importer implements Parser {
         fields.put(StandardField.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
     }
 
-    private void addGeneSymbols(Map<String, String> fields, GeneSymbolList geneSymbolList) {
+    private void addGeneSymbols(Map<Field, String> fields, GeneSymbolList geneSymbolList) {
         List<String> geneSymbols = geneSymbolList.getGeneSymbol();
-        fields.put("gene-symbols", join(geneSymbols, ", "));
+        fields.put(new UnknownField("gene-symbols"), join(geneSymbols, ", "));
     }
 
-    private void addChemicals(Map<String, String> fields, List<Chemical> chemicals) {
+    private void addChemicals(Map<Field, String> fields, List<Chemical> chemicals) {
         List<String> chemicalNames = new ArrayList<>();
         for (Chemical chemical : chemicals) {
             if (chemical != null) {
                 chemicalNames.add(chemical.getNameOfSubstance().getContent());
             }
         }
-        fields.put("chemicals", join(chemicalNames, ", "));
+        fields.put(new UnknownField("chemicals"), join(chemicalNames, ", "));
     }
 
-    private void addArticleInformation(Map<String, String> fields, List<Object> content) {
+    private void addArticleInformation(Map<Field, String> fields, List<Object> content) {
         for (Object object : content) {
             if (object instanceof Journal) {
                 Journal journal = (Journal) object;
@@ -584,16 +587,16 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addElocationID(Map<String, String> fields, ELocationID eLocationID) {
+    private void addElocationID(Map<Field, String> fields, ELocationID eLocationID) {
         if (StandardField.DOI.equals(eLocationID.getEIdType())) {
             fields.put(StandardField.DOI, eLocationID.getContent());
         }
         if ("pii".equals(eLocationID.getEIdType())) {
-            fields.put("pii", eLocationID.getContent());
+            fields.put(new UnknownField("pii"), eLocationID.getContent());
         }
     }
 
-    private void addPubDate(Map<String, String> fields, PubDate pubDate) {
+    private void addPubDate(Map<Field, String> fields, PubDate pubDate) {
         if (pubDate.getYear() == null) {
             //if year of the pubdate is null, the medlineDate shouldn't be null
             fields.put(StandardField.YEAR, extractYear(pubDate.getMedlineDate()));
@@ -602,13 +605,13 @@ public class MedlineImporter extends Importer implements Parser {
             if (pubDate.getMonth() != null) {
                 fields.put(StandardField.MONTH, pubDate.getMonth());
             } else if (pubDate.getSeason() != null) {
-                fields.put("season", pubDate.getSeason());
+                fields.put(new UnknownField("season"), pubDate.getSeason());
             }
         }
     }
 
-    private void addAbstract(Map<String, String> fields, Abstract abs) {
-        putIfValueNotNull(fields, "copyright", abs.getCopyrightInformation());
+    private void addAbstract(Map<Field, String> fields, Abstract abs) {
+        putIfValueNotNull(fields, new UnknownField("copyright"), abs.getCopyrightInformation());
         List<String> abstractText = new ArrayList<>();
         for (AbstractText text : abs.getAbstractText()) {
             for (Serializable textContent : text.getContent()) {
@@ -620,7 +623,7 @@ public class MedlineImporter extends Importer implements Parser {
         fields.put(StandardField.ABSTRACT, join(abstractText, " "));
     }
 
-    private void addPagination(Map<String, String> fields, Pagination pagination) {
+    private void addPagination(Map<Field, String> fields, Pagination pagination) {
         String startPage = "";
         String endPage = "";
         for (JAXBElement<String> element : pagination.getContent()) {
@@ -643,7 +646,7 @@ public class MedlineImporter extends Importer implements Parser {
         return medlineDate.substring(0, 4);
     }
 
-    private void handleAuthors(Map<String, String> fields, AuthorList authors) {
+    private void handleAuthors(Map<Field, String> fields, AuthorList authors) {
         List<String> authorNames = new ArrayList<>();
         for (Author author : authors.getAuthor()) {
             if (author.getCollectiveName() != null) {
@@ -664,16 +667,16 @@ public class MedlineImporter extends Importer implements Parser {
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
     }
 
-    private void addDateRevised(Map<String, String> fields, DateRevised dateRevised) {
+    private void addDateRevised(Map<Field, String> fields, DateRevised dateRevised) {
         if ((dateRevised.getDay() != null) && (dateRevised.getMonth() != null) && (dateRevised.getYear() != null)) {
-            fields.put("revised",
+            fields.put(new UnknownField("revised"),
                     convertToDateFormat(dateRevised.getYear(), dateRevised.getMonth(), dateRevised.getDay()));
         }
     }
 
-    private void putIfValueNotNull(Map<String, String> fields, String medlineKey, String value) {
+    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
         if (value != null) {
-            fields.put(medlineKey, value);
+            fields.put(field, value);
         }
     }
 

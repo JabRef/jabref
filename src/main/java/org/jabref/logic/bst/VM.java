@@ -266,7 +266,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
             }
-            VM.this.execute(context.getBibtexEntry().getType(), context);
+            VM.this.execute(context.getBibtexEntry().getType().getName(), context);
         });
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));

@@ -18,6 +18,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -46,21 +48,21 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,
+        Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,
                 StandardField.PUBLISHER};
 
         BibEntry entry = new BibEntry();
-        String nametype;
+        Field nametype;
 
         // Guess publication type
         String isbn = springerJsonEntry.optString("isbn");
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
-            entry.setType("article");
+            entry.setType(StandardEntryType.Article);
             nametype = StandardField.JOURNAL;
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType("incollection");
+            entry.setType(StandardEntryType.InCollection);
             nametype = StandardField.BOOKTITLE;
             entry.setField(StandardField.ISBN, isbn);
         }
@@ -82,9 +84,9 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         }
 
         // Direct accessible fields
-        for (String field : singleFieldStrings) {
-            if (springerJsonEntry.has(field)) {
-                String text = springerJsonEntry.getString(field);
+        for (Field field : singleFieldStrings) {
+            if (springerJsonEntry.has(field.getName())) {
+                String text = springerJsonEntry.getString(field.getName());
                 if (!text.isEmpty()) {
                     entry.setField(field, text);
                 }

@@ -101,22 +101,23 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
-        BibEntryType type = BibEntryTypesManager.getTypeOrDefault(entry.getType(), bibDatabaseMode);
-
-        // Write required fields first.
-        for (OrFields value : type.getRequiredFields()) {
-            writeField(entry, out, value.getPrimary(), indentation);
-            written.add(value.getPrimary());
-        }
-        // Then optional fields.
-        for (Field field : type.getOptionalFields()) {
-            if (!written.contains(field)) { // If field appears both in req. and opt. don't repeat.
-                writeField(entry, out, field, indentation);
-                written.add(field);
+        Optional<BibEntryType> type = BibEntryTypesManager.enrich(entry.getType(), bibDatabaseMode);
+        if (type.isPresent()) {
+            // Write required fields first.
+            for (OrFields value : type.get().getRequiredFields()) {
+                writeField(entry, out, value.getPrimary(), indentation);
+                written.add(value.getPrimary());
+            }
+            // Then optional fields.
+            for (Field field : type.get().getOptionalFields()) {
+                if (!written.contains(field)) { // If field appears both in req. and opt. don't repeat.
+                    writeField(entry, out, field, indentation);
+                    written.add(field);
+                }
             }
         }
         // Then write remaining fields in alphabetic order.
-        Set<Field> remainingFields = entry.getFieldNames()
+        Set<Field> remainingFields = entry.getFields()
                                           .stream()
                                           .filter(key -> !written.contains(key))
                                           .collect(Collectors.toSet());
@@ -160,7 +161,7 @@ public class BibEntryWriter {
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
         Predicate<Field> isNotBibtexKey = field -> !InternalField.KEY_FIELD.equals(field);
-        return entry.getFieldNames()
+        return entry.getFields()
                     .stream()
                     .filter(isNotBibtexKey)
                     .mapToInt(field -> field.getName().length())

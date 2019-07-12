@@ -258,8 +258,8 @@ public class MergeEntries extends BorderPane {
     }
 
     private void setupFields() {
-        allFields.addAll(leftEntry.getFieldNames());
-        allFields.addAll(rightEntry.getFieldNames());
+        allFields.addAll(leftEntry.getFields());
+        allFields.addAll(rightEntry.getFields());
 
         // Do not show internal fields
         Set<Field> internalFields = allFields.stream().filter(FieldFactory::isInternalField).collect(Collectors.toSet());

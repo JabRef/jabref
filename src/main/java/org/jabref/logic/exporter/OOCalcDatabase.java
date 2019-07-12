@@ -142,7 +142,7 @@ class OOCalcDatabase {
 
             for (BibEntry e : entries) {
                 row = result.createElement("table:table-row");
-                addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
+                addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, StandardField.ISBN));
                 addTableCell(result, row, getField(e, InternalField.KEY_FIELD));
                 addTableCell(result, row, getField(e, StandardField.AUTHOR));//new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));

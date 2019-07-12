@@ -9,10 +9,9 @@ import java.util.Optional;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
@@ -36,17 +35,17 @@ public class FieldComparator implements Comparator<BibEntry> {
     private final int multiplier;
 
     public FieldComparator(Field field) {
-        this(field, false);
+        this(new OrFields(field), false);
     }
 
     public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
-        this(sortCriterion.field, sortCriterion.descending);
+        this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 
-    public FieldComparator(String fieldText, boolean descending) {
-        this.fields = FieldFactory.parseOrFields(fieldText);
+    public FieldComparator(OrFields fields, boolean descending) {
+        this.fields = fields;
         fieldType = determineFieldType();
-        isNumeric = this.fields[0].isNumeric();
+        isNumeric = this.fields.getPrimary().isNumeric();
         multiplier = descending ? -1 : 1;
     }
 
@@ -60,13 +59,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.fields[0])) {
+        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
             return FieldType.TYPE;
-        } else if (this.fields[0].getProperties().contains(FieldProperty.PERSON_NAMES)) {
+        } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.fields[0])) {
+        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.fields[0])) {
+        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
@@ -90,8 +89,8 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         if (fieldType == FieldType.TYPE) {
             // Sort by type.
-            f1 = e1.getType();
-            f2 = e2.getType();
+            f1 = e1.getType().getDisplayName();
+            f2 = e2.getType().getDisplayName();
         } else {
             // If the field is author or editor, we rearrange names so they are
             // sorted according to last name.

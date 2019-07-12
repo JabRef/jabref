@@ -15,7 +15,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -94,9 +96,9 @@ public class EndnoteImporter extends Importer {
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        Map<String, String> hm = new HashMap<>();
+        Map<Field, String> hm = new HashMap<>();
         String author;
-        String type;
+        EntryType type;
         String editor;
         String artnum;
         for (String entry : entries) {
@@ -147,22 +149,22 @@ public class EndnoteImporter extends Importer {
                     hm.put(StandardField.TITLE, val);
                 } else if ("0".equals(prefix)) {
                     if (val.indexOf("Journal") == 0) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if (val.indexOf("Book Section") == 0) {
-                        type = "incollection";
+                        type = StandardEntryType.InCollection;
                     } else if (val.indexOf("Book") == 0) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                     } else if (val.indexOf("Edited Book") == 0) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                         isEditedBook = true;
                     } else if (val.indexOf("Conference") == 0) {
-                        type = "inproceedings";
+                        type = StandardEntryType.InProceedings;
                     } else if (val.indexOf("Report") == 0) {
-                        type = "techreport";
+                        type = StandardEntryType.TechReport;
                     } else if (val.indexOf("Review") == 0) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if (val.indexOf("Thesis") == 0) {
-                        type = "phdthesis";
+                        type = StandardEntryType.PhdThesis;
                     } else {
                         type = BibEntry.DEFAULT_TYPE; //
                     }
@@ -225,10 +227,10 @@ public class EndnoteImporter extends Importer {
                     hm.put(StandardField.ABSTRACT, val);
                 } else if ("9".equals(prefix)) {
                     if (val.indexOf("Ph.D.") == 0) {
-                        type = "phdthesis";
+                        type = StandardEntryType.PhdThesis;
                     }
                     if (val.indexOf("Masters") == 0) {
-                        type = "mastersthesis";
+                        type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
                     hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
@@ -255,9 +257,9 @@ public class EndnoteImporter extends Importer {
                 hm.put(StandardField.PAGES, artnum);
             }
 
-            BibEntry b = new BibEntry(BibtexEntryTypes.getTypeOrDefault(type));
+            BibEntry b = new BibEntry(type);
             b.setField(hm);
-            if (!b.getFieldNames().isEmpty()) {
+            if (!b.getFields().isEmpty()) {
                 bibitems.add(b);
             }
 

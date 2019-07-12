@@ -10,11 +10,11 @@ public class StandardFieldTest {
 
     @Test
     public void testOrFieldsTwoTerms() {
-        assertEquals("aaa/bbb", FieldFactory.orFields("aaa", "bbb"));
+        assertEquals("aaa/bbb", FieldFactory.serializeOrFields("aaa", "bbb"));
     }
 
     @Test
     public void testOrFieldsThreeTerms() {
-        assertEquals("aaa/bbb/ccc", FieldFactory.orFields("aaa", "bbb", "ccc"));
+        assertEquals("aaa/bbb/ccc", FieldFactory.serializeOrFields("aaa", "bbb", "ccc"));
     }
 }

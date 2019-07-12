@@ -44,7 +44,7 @@ public class BibField implements Field<BibField> {
     }
 
     @Override
-    public int compareTo(Field o) {
+    public int compareTo(BibField o) {
         return field.compareTo(o);
     }
 

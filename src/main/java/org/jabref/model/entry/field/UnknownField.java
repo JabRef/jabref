@@ -16,6 +16,11 @@ public class UnknownField implements Field<UnknownField> {
     }
 
     @Override
+    public int compareTo(UnknownField o) {
+        return name.compareTo(o.name);
+    }
+
+    @Override
     public String getName() {
         return name;
     }

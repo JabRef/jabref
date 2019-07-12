@@ -12,27 +12,26 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
 
-public class ImportBibEntryTypesDialog extends BaseDialog<Void> {
+public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
-    @FXML private CheckListView<EntryType> unknownEntryTypesCheckList;
+    private final List<BibEntryType> customEntryTypes;
     @FXML private VBox boxDifferentCustomization;
-    @FXML private CheckListView<EntryType> differentCustomizationCheckList;
+    @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;
     @Inject private PreferencesService preferencesService;
-
-    private final List<EntryType> BibEntryTypes;
+    @FXML private CheckListView<BibEntryType> differentCustomizationCheckList;
 
     private final BibDatabaseMode mode;
-    private ImportBibEntryTypesDialogViewModel viewModel;
+    private ImportCustomEntryTypesDialogViewModel viewModel;
 
-    public ImportBibEntryTypesDialog(BibDatabaseMode mode, List<EntryType> BibEntryTypes) {
+    public ImportCustomEntryTypesDialog(BibDatabaseMode mode, List<BibEntryType> customEntryTypes) {
         this.mode = mode;
-        this.BibEntryTypes = BibEntryTypes;
+        this.customEntryTypes = customEntryTypes;
 
         ViewLoader.view(this)
                   .load()
@@ -51,7 +50,7 @@ public class ImportBibEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ImportBibEntryTypesDialogViewModel(mode, BibEntryTypes, preferencesService);
+        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
 
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());

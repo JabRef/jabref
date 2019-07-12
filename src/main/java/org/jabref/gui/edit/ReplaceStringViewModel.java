@@ -39,7 +39,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     public int replace() {
         findString = findStringProperty.getValue();
         replaceString = replaceStringProperty.getValue();
-        fields = FieldFactory.parseFields(fieldStringProperty.getValue());
+        fields = FieldFactory.parseFieldList(fieldStringProperty.getValue());
         boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
@@ -64,7 +64,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private int replaceItem(BibEntry entry, NamedCompound compound) {
         int counter = 0;
         if (this.allFieldReplace) {
-            for (Field field : entry.getFieldNames()) {
+            for (Field field : entry.getFields()) {
                 counter += replaceField(entry, field, compound);
             }
         } else {

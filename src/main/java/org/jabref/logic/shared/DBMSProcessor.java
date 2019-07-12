@@ -215,7 +215,7 @@ public abstract class DBMSProcessor {
     private void insertIntoFieldTable(BibEntry bibEntry) {
         try {
             // Inserting into FIELD table
-            for (Field field : bibEntry.getFieldNames()) {
+            for (Field field : bibEntry.getFields()) {
                 StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
                     .append(escape("FIELD"))
@@ -304,8 +304,8 @@ public abstract class DBMSProcessor {
      * Helping method. Removes shared fields which do not exist locally
      */
     private void removeSharedFieldsByDifference(BibEntry localBibEntry, BibEntry sharedBibEntry) throws SQLException {
-        Set<Field> nullFields = new HashSet<>(sharedBibEntry.getFieldNames());
-        nullFields.removeAll(localBibEntry.getFieldNames());
+        Set<Field> nullFields = new HashSet<>(sharedBibEntry.getFields());
+        nullFields.removeAll(localBibEntry.getFields());
         for (Field nullField : nullFields) {
             StringBuilder deleteFieldQuery = new StringBuilder()
                 .append("DELETE FROM ")
@@ -329,7 +329,7 @@ public abstract class DBMSProcessor {
      * Helping method. Inserts a key-value pair into FIELD table for every field if not existing. Otherwise only an update is performed.
      */
     private void insertOrUpdateFields(BibEntry localBibEntry) throws SQLException {
-        for (Field field : localBibEntry.getFieldNames()) {
+        for (Field field : localBibEntry.getFields()) {
             // avoiding to use deprecated BibEntry.getField() method. null values are accepted by PreparedStatement!
             Optional<String> valueOptional = localBibEntry.getField(field);
             String value = null;

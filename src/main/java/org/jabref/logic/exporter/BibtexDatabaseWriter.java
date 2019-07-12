@@ -101,7 +101,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
         writer.write(OS.NEWLINE);
         writer.write(COMMENT_PREFIX + "{");
-        writer.write(BibEntryTypesManager.getAsString(customType));
+        writer.write(BibEntryTypesManager.serialize(customType));
         writer.write("}");
         writer.write(OS.NEWLINE);
     }

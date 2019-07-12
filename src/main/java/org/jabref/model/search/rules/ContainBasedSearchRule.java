@@ -37,7 +37,7 @@ public class ContainBasedSearchRule implements SearchRule {
 
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
-        for (Field fieldKey : bibEntry.getFieldNames()) {
+        for (Field fieldKey : bibEntry.getFields()) {
             String formattedFieldContent = bibEntry.getLatexFreeField(fieldKey).get();
             if (!caseSensitive) {
                 formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);

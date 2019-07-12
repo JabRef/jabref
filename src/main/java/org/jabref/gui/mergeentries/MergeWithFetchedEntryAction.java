@@ -6,7 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
 public class MergeWithFetchedEntryAction implements BaseAction {
@@ -25,10 +25,8 @@ public class MergeWithFetchedEntryAction implements BaseAction {
             BibEntry originalEntry = basePanel.getMainTable().getSelectedEntries().get(0);
             new FetchAndMergeEntry(basePanel, Globals.TASK_EXECUTOR).fetchAndMerge(originalEntry);
         } else {
-            dialogService.showInformationDialogAndWait(Localization.lang("Merge entry with %0 information",
-                    FieldFactory.orFields(StandardField.DOI.getDisplayName(),
-                            StandardField.ISBN.getDisplayName(),
-                            StandardField.EPRINT.getDisplayName())),
+            dialogService.showInformationDialogAndWait(
+                    Localization.lang("Merge entry with %0 information", new OrFields(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT).getDisplayName()),
                     Localization.lang("This operation requires exactly one item to be selected."));
 
         }

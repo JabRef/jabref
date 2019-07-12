@@ -10,7 +10,6 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
@@ -25,7 +24,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<Field> determineFieldsToShow(BibEntry entry) {
         return fields;
     }
 }

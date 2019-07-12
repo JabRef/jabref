@@ -27,7 +27,9 @@ import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
@@ -87,55 +89,55 @@ public class BibTeXMLImporter extends Importer {
             File file = (File) unmarshaller.unmarshal(reader);
 
             List<Entry> entries = file.getEntry();
-            Map<String, String> fields = new HashMap<>();
+            Map<Field, String> fields = new HashMap<>();
 
             for (Entry entry : entries) {
                 BibEntry bibEntry = new BibEntry();
                 if (entry.getArticle() != null) {
-                    bibEntry.setType(StandardEntryType.ARTICLE);
+                    bibEntry.setType(StandardEntryType.Article);
                     parse(entry.getArticle(), fields);
                 } else if (entry.getBook() != null) {
-                    bibEntry.setType(BibtexEntryTypes.BOOK);
+                    bibEntry.setType(StandardEntryType.Book);
                     parse(entry.getBook(), fields);
                 } else if (entry.getBooklet() != null) {
-                    bibEntry.setType(BibtexEntryTypes.BOOKLET);
+                    bibEntry.setType(StandardEntryType.Booklet);
                     parse(entry.getBooklet(), fields);
                 } else if (entry.getConference() != null) {
-                    bibEntry.setType(BibtexEntryTypes.CONFERENCE);
+                    bibEntry.setType(StandardEntryType.Conference);
                     parse(entry.getConference(), fields);
                 } else if (entry.getInbook() != null) {
-                    bibEntry.setType(BibtexEntryTypes.INBOOK);
+                    bibEntry.setType(StandardEntryType.InBook);
                     parseInbook(entry.getInbook(), fields);
                 } else if (entry.getIncollection() != null) {
-                    bibEntry.setType(BibtexEntryTypes.INCOLLECTION);
+                    bibEntry.setType(StandardEntryType.InCollection);
                     Incollection incollection = entry.getIncollection();
                     if (incollection.getChapter() != null) {
                         fields.put(StandardField.CHAPTER, String.valueOf(incollection.getChapter()));
                     }
                     parse(incollection, fields);
                 } else if (entry.getInproceedings() != null) {
-                    bibEntry.setType(BibtexEntryTypes.INPROCEEDINGS);
+                    bibEntry.setType(StandardEntryType.InProceedings);
                     parse(entry.getInproceedings(), fields);
                 } else if (entry.getManual() != null) {
-                    bibEntry.setType(BibtexEntryTypes.MANUAL);
+                    bibEntry.setType(StandardEntryType.Manual);
                     parse(entry.getManual(), fields);
                 } else if (entry.getMastersthesis() != null) {
-                    bibEntry.setType(BibtexEntryTypes.MASTERSTHESIS);
+                    bibEntry.setType(StandardEntryType.MastersThesis);
                     parse(entry.getMastersthesis(), fields);
                 } else if (entry.getMisc() != null) {
-                    bibEntry.setType(BibtexEntryTypes.MISC);
+                    bibEntry.setType(StandardEntryType.Misc);
                     parse(entry.getMisc(), fields);
                 } else if (entry.getPhdthesis() != null) {
-                    bibEntry.setType(BibtexEntryTypes.PHDTHESIS);
+                    bibEntry.setType(StandardEntryType.PhdThesis);
                     parse(entry.getPhdthesis(), fields);
                 } else if (entry.getProceedings() != null) {
-                    bibEntry.setType(BibtexEntryTypes.PROCEEDINGS);
+                    bibEntry.setType(StandardEntryType.Proceedings);
                     parse(entry.getProceedings(), fields);
                 } else if (entry.getTechreport() != null) {
-                    bibEntry.setType(BibtexEntryTypes.TECHREPORT);
+                    bibEntry.setType(StandardEntryType.TechReport);
                     parse(entry.getTechreport(), fields);
                 } else if (entry.getUnpublished() != null) {
-                    bibEntry.setType(BibtexEntryTypes.UNPUBLISHED);
+                    bibEntry.setType(StandardEntryType.Unpublished);
                     parse(entry.getUnpublished(), fields);
                 }
 
@@ -164,7 +166,7 @@ public class BibTeXMLImporter extends Importer {
      * @param entryType This can be all possible BibTeX types. It contains all fields of the entry and their values.
      * @param fields A map where the name and the value of all fields that the entry contains will be put.
      */
-    private <T> void parse(T entryType, Map<String, String> fields) {
+    private <T> void parse(T entryType, Map<Field, String> fields) {
         Method[] declaredMethods = entryType.getClass().getDeclaredMethods();
         for (Method method : declaredMethods) {
             try {
@@ -177,7 +179,7 @@ public class BibTeXMLImporter extends Importer {
                 } else if (isMethodToIgnore(method.getName())) {
                     continue;
                 } else if (method.getName().startsWith("get")) {
-                    putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
+                    putIfValueNotNull(fields, FieldFactory.parseField(method.getName().replace("get", "")), (String) method.invoke(entryType));
                 }
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
                 LOGGER.error("Could not invoke method", e);
@@ -199,24 +201,24 @@ public class BibTeXMLImporter extends Importer {
      * Inbook needs a special Treatment, because <Code>inbook.getContent()</Code> returns a list of <Code>JAXBElements</Code>.
      * The other types have just <Code>get</Code> methods, which return the values as Strings.
      */
-    private void parseInbook(Inbook inbook, Map<String, String> fields) {
+    private void parseInbook(Inbook inbook, Map<Field, String> fields) {
         List<JAXBElement<?>> content = inbook.getContent();
         for (JAXBElement<?> element : content) {
-            String localName = element.getName().getLocalPart();
+            Field field = FieldFactory.parseField(element.getName().getLocalPart());
             Object elementValue = element.getValue();
             if (elementValue instanceof String) {
                 String value = (String) elementValue;
-                putIfValueNotNull(fields, localName, value);
+                putIfValueNotNull(fields, field, value);
             } else if (elementValue instanceof BigInteger) {
                 BigInteger value = (BigInteger) elementValue;
-                if (StandardField.NUMBER.equals(localName)) {
+                if (StandardField.NUMBER.equals(field)) {
                     fields.put(StandardField.NUMBER, String.valueOf(value));
-                } else if (StandardField.CHAPTER.equals(localName)) {
+                } else if (StandardField.CHAPTER.equals(field)) {
                     fields.put(StandardField.CHAPTER, String.valueOf(value));
                 }
             } else if (elementValue instanceof XMLGregorianCalendar) {
                 XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;
-                if (StandardField.YEAR.equals(localName)) {
+                if (StandardField.YEAR.equals(field)) {
                     putYear(fields, value);
                 } else {
                     LOGGER.info("Unexpected field was found");
@@ -227,21 +229,21 @@ public class BibTeXMLImporter extends Importer {
         }
     }
 
-    private void putYear(Map<String, String> fields, XMLGregorianCalendar year) {
+    private void putYear(Map<Field, String> fields, XMLGregorianCalendar year) {
         if (year != null) {
             fields.put(StandardField.YEAR, String.valueOf(year));
         }
     }
 
-    private void putNumber(Map<String, String> fields, BigInteger number) {
+    private void putNumber(Map<Field, String> fields, BigInteger number) {
         if (number != null) {
             fields.put(StandardField.NUMBER, String.valueOf(number));
         }
     }
 
-    private void putIfValueNotNull(Map<String, String> fields, String key, String value) {
+    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
         if (value != null) {
-            fields.put(key, value);
+            fields.put(field, value);
         }
     }
 }

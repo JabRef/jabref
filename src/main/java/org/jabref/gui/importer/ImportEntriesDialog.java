@@ -34,6 +34,8 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -153,13 +155,11 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         return entryContainer;
     }
 
-    private IconTheme.JabRefIcons getIcon(String type) {
-        switch (type.toLowerCase()) {
-            case "book":
-                return IconTheme.JabRefIcons.BOOK;
-            default:
-                return IconTheme.JabRefIcons.ARTICLE;
+    private IconTheme.JabRefIcons getIcon(EntryType type) {
+        if (StandardEntryType.Book.equals(type)) {
+            return IconTheme.JabRefIcons.BOOK;
         }
+        return IconTheme.JabRefIcons.ARTICLE;
     }
 
     public void unselectAll() {

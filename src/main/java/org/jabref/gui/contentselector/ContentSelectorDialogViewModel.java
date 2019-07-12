@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -38,7 +40,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private ListProperty<Field> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private StringProperty selectedFieldName = new SimpleStringProperty();
+    private ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
     private StringProperty selectedKeyword = new SimpleStringProperty();
 
     ContentSelectorDialogViewModel(BasePanel basePanel, DialogService dialogService) {
@@ -68,8 +70,8 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         return fields;
     }
 
-    StringProperty selectedFieldNameProperty() {
-        return selectedFieldName;
+    ObjectProperty<Field> selectedFieldProperty() {
+        return selectedField;
     }
 
     BooleanBinding isFieldNameListEmpty() {
@@ -77,7 +79,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
     }
 
     BooleanBinding isNoFieldNameSelected() {
-        return Bindings.isEmpty(selectedFieldName);
+        return Bindings.isEmpty(selectedField.asString());
     }
 
     ListProperty<String> getKeywordsBackingList() {
@@ -156,15 +158,15 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         populateKeywords(field);
     }
 
-    void showRemoveKeywordConfirmationDialog(String fieldName, String keywordToRemove) {
+    void showRemoveKeywordConfirmationDialog(Field field, String keywordToRemove) {
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang("Remove keyword"), Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keywordToRemove));
         if (deleteConfirmed) {
-            removeKeyword(fieldName, keywordToRemove);
+            removeKeyword(field, keywordToRemove);
         }
     }
 
-    private void removeKeyword(String fieldName, String keywordToRemove) {
-        fieldKeywordsMap.get(fieldName).remove(keywordToRemove);
+    private void removeKeyword(Field field, String keywordToRemove) {
+        fieldKeywordsMap.get(field).remove(keywordToRemove);
         keywords.remove(keywordToRemove);
     }
 

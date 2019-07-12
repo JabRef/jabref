@@ -21,14 +21,18 @@ public class FieldFactory {
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
 
-    public static String orFields(Field... fields) {
-        return orFields(Arrays.asList(fields));
+    public static String serializeOrFields(Field... fields) {
+        return serializeOrFields(new OrFields(fields));
     }
 
-    public static String orFields(Collection<Field> fields) {
+    public static String serializeOrFields(OrFields fields) {
         return fields.stream()
                      .map(Field::getName)
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+    }
+
+    public static String serializeOrFieldsList(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
     public static List<Field> getNotTextFieldNames() {
@@ -46,25 +50,31 @@ public class FieldFactory {
         return new OrFields(fields);
     }
 
-    public static Set<Field> parseFields(String fieldNames) {
+    public static Set<OrFields> parseOrFieldsList(String fieldNames) {
+        return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
+                     .map(FieldFactory::parseOrFields)
+                     .collect(Collectors.toSet());
+    }
+
+    public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .map(FieldFactory::parseField)
                      .collect(Collectors.toSet());
     }
 
-    public static String serializeFields(Collection<Field> fields) {
+    public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
                      .map(Field::getName)
                      .collect(Collectors.joining(DELIMITER));
     }
 
     public static Field parseField(String fieldName) {
-        return OptionalUtil.orElse(OptionalUtil.orElse(OptionalUtil.<Field>orElse(
+        return OptionalUtil.<Field>orElse(OptionalUtil.<Field>orElse(OptionalUtil.<Field>orElse(
                 InternalField.fromName(fieldName),
                 StandardField.fromName(fieldName)),
                 SpecialField.fromName(fieldName)),
                 IEEEField.fromName(fieldName))
-                           .orElse(new UnknownField(fieldName));
+                .orElse(new UnknownField(fieldName));
     }
 
     public static Set<Field> getKeyFields() {

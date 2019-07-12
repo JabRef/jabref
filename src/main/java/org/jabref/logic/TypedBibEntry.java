@@ -7,9 +7,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.strings.StringUtil;
 
 /**
  * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
@@ -39,7 +38,7 @@ public class TypedBibEntry {
      * complete.
      */
     public boolean hasAllRequiredFields() {
-        Optional<EntryType> type = BibEntryTypesManager.getType(entry.getType(), this.mode);
+        Optional<BibEntryType> type = BibEntryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
@@ -51,11 +50,6 @@ public class TypedBibEntry {
      * Gets the display name for the type of the entry.
      */
     public String getTypeForDisplay() {
-        Optional<EntryType> entryType = BibEntryTypesManager.getType(entry.getType(), mode);
-        if (entryType.isPresent()) {
-            return entryType.get().getType();
-        } else {
-            return StringUtil.capitalizeFirst(entry.getType());
-        }
+        return entry.getType().getDisplayName();
     }
 }

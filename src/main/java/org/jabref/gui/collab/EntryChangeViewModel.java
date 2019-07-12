@@ -45,9 +45,9 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
                 + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
 
         Set<Field> allFields = new TreeSet<>();
-        allFields.addAll(memEntry.getFieldNames());
-        allFields.addAll(tmpEntry.getFieldNames());
-        allFields.addAll(diskEntry.getFieldNames());
+        allFields.addAll(memEntry.getFields());
+        allFields.addAll(tmpEntry.getFields());
+        allFields.addAll(diskEntry.getFields());
 
         for (Field field : allFields) {
             Optional<String> mem = memEntry.getField(field);

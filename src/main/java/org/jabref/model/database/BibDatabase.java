@@ -135,7 +135,7 @@ public class BibDatabase {
     public Set<Field> getAllVisibleFields() {
         Set<Field> allFields = new TreeSet<>();
         for (BibEntry e : getEntries()) {
-            allFields.addAll(e.getFieldNames());
+            allFields.addAll(e.getFields());
         }
         return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
                         .collect(Collectors.toSet());

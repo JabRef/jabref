@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TreeMap;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,7 +34,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -155,7 +155,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Map<String, EntryType> typesToWrite = new TreeMap<>();
+        Set<BibEntryType> typesToWrite = new HashSet<>();
 
         // Some file formats write something at the start of the file (like the encoding)
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
@@ -181,11 +181,10 @@ public abstract class BibDatabaseWriter {
             // Check if we must write the type definition for this
             // entry, as well. Our criterion is that all non-standard
             // types (*not* all customized standard types) must be written.
-            if (!BibEntryTypesManager.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+            if (BibEntryTypesManager.isCustomType(entry.getType(), bibDatabaseContext.getMode())) {
                 // If user-defined entry type, then add it
-                // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
-                BibEntryTypesManager.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
-                        entryType -> typesToWrite.put(entryType.getType(), entryType));
+                // Otherwise (enrich returns empty optional) it is a completely unknown entry type, so ignore it
+                BibEntryTypesManager.enrich(entry.getType(), bibDatabaseContext.getMode()).ifPresent(typesToWrite::add);
             }
 
             writeEntry(entry, bibDatabaseContext.getMode());
@@ -291,11 +290,9 @@ public abstract class BibDatabaseWriter {
     protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength)
             throws IOException;
 
-    protected void writeEntryTypeDefinitions(Map<String, EntryType> types) throws IOException {
-        for (EntryType type : types.values()) {
-            if (type instanceof BibEntryType) {
-                writeEntryTypeDefinition((BibEntryType) type);
-            }
+    protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
+        for (BibEntryType type : types) {
+            writeEntryTypeDefinition(type);
         }
     }
 

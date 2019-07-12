@@ -61,7 +61,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return Collections.unmodifiableSet(fields);
     }
 
-    Set<BibField> getPrimaryOptionalFields() {
+    public Set<BibField> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.IMPORTANT)
                                   .collect(Collectors.toSet());

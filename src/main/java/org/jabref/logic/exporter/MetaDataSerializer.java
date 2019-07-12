@@ -11,6 +11,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
@@ -99,7 +100,7 @@ public class MetaDataSerializer {
     private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
         AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
-        for (String key : citeKeyPattern.getAllKeys()) {
+        for (EntryType key : citeKeyPattern.getAllKeys()) {
             if (!citeKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(citeKeyPattern.getValue(key).get(0));

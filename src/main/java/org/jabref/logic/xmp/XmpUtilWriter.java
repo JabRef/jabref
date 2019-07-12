@@ -20,8 +20,8 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -51,7 +51,7 @@ public class XmpUtilWriter {
      *
      * This is a convenience method for writeXMP(File, BibEntry).
      *
-     * @param filename The filename from which to open the file.
+     * @param fileName The filename from which to open the file.
      * @param entry    The entry to write.
      * @param database maybenull An optional database which the given bibtex entries belong to, which will be used to
      *                 resolve strings. If the database is null the strings will not be resolved.
@@ -75,7 +75,7 @@ public class XmpUtilWriter {
      *
      * This is a convenience method for writeXMP(File, Collection).
      *
-     * @param path     The path to write to.
+     * @param file     The path to write to.
      * @param entry    The entry to write.
      * @param database maybenull An optional database which the given bibtex entries belong to, which will be used to
      *                 resolve strings. If the database is null the strings will not be resolved.
@@ -273,12 +273,11 @@ public class XmpUtilWriter {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
         // Fields for which not to write XMP data later on:
-        Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
+        Set<Field> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
         // Set all the values including key and entryType
-        for (Entry<String, String> field : resolvedEntry.getFieldMap().entrySet()) {
-
-            String fieldName = field.getKey();
+        for (Entry<Field, String> field : resolvedEntry.getFieldMap().entrySet()) {
+            Field fieldName = field.getKey();
             String fieldContent = field.getValue();
 
             if (useXmpPrivacyFilter && filters.contains(fieldName)) {
@@ -309,7 +308,7 @@ public class XmpUtilWriter {
                 di.setCustomMetadataValue("bibtex/" + fieldName, fieldContent);
             }
         }
-        di.setCustomMetadataValue("bibtex/entrytype", StringUtil.capitalizeFirst(resolvedEntry.getType()));
+        di.setCustomMetadataValue("bibtex/entrytype", resolvedEntry.getType().getDisplayName());
     }
 
     /**
@@ -322,11 +321,11 @@ public class XmpUtilWriter {
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
      *
-     * @param file          The file to write the entries to.
+     * @param path          The file to write the entries to.
      * @param bibtexEntries The entries to write to the file. *
      * @param database      maybenull An optional database which the given bibtex entries belong to, which will be used
      *                      to resolve strings. If the database is null the strings will not be resolved.
-     * @param writePDFInfo  Write information also in PDF document properties
+     * @param xmpPreferences  Write information also in PDF document properties
      * @throws TransformerException If the entry was malformed or unsupported.
      * @throws IOException          If the file could not be written to or could not be found.
      */

@@ -13,6 +13,7 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 public class BibTeXConverter {
 
@@ -53,17 +54,17 @@ public class BibTeXConverter {
         addAuthor(fieldValues, StandardField.BOOKAUTHOR, entry.bookAuthors);
         addAuthor(fieldValues, StandardField.EDITOR, entry.editors);
         addAuthor(fieldValues, StandardField.TRANSLATOR, entry.translators);
-        addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
-        addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
-        addAuthor(fieldValues, MSBIB_PREFIX + "conductor", entry.conductors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "performer", entry.performers);
-        addAuthor(fieldValues, MSBIB_PREFIX + "writer", entry.writers);
-        addAuthor(fieldValues, MSBIB_PREFIX + "director", entry.directors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "compiler", entry.compilers);
-        addAuthor(fieldValues, MSBIB_PREFIX + "interviewer", entry.interviewers);
-        addAuthor(fieldValues, MSBIB_PREFIX + "interviewee", entry.interviewees);
-        addAuthor(fieldValues, MSBIB_PREFIX + "inventor", entry.inventors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "counsel", entry.counsels);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "producername"), entry.producerNames);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "composer"), entry.composers);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "conductor"), entry.conductors);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "performer"), entry.performers);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "writer"), entry.writers);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "director"), entry.directors);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "compiler"), entry.compilers);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "interviewer"), entry.interviewers);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "interviewee"), entry.interviewees);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "inventor"), entry.inventors);
+        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + "counsel"), entry.counsels);
 
         if (entry.pages != null) {
             fieldValues.put(StandardField.PAGES, entry.pages.toString("--"));
@@ -80,7 +81,7 @@ public class BibTeXConverter {
         }
 
         if (entry.dateAccessed != null) {
-            fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
+            fieldValues.put(new UnknownField(MSBIB_PREFIX + "accessed"), entry.dateAccessed);
         }
 
         if (entry.journalName != null) {
@@ -88,7 +89,7 @@ public class BibTeXConverter {
         }
         if (entry.month != null) {
             Optional<Month> month = Month.parse(entry.month);
-            month.ifPresent(parsedMonth ->  result.setMonth(parsedMonth));
+            month.ifPresent(result::setMonth);
         }
         if (entry.number != null) {
             fieldValues.put(StandardField.NUMBER, entry.number);
@@ -100,32 +101,31 @@ public class BibTeXConverter {
         return result;
     }
 
-    private static void addAuthor(Map<String, String> map, String type, List<MsBibAuthor> authors) {
+    private static void addAuthor(Map<Field, String> map, Field field, List<MsBibAuthor> authors) {
         if (authors == null) {
             return;
         }
         String allAuthors = authors.stream().map(MsBibAuthor::getLastFirst).collect(Collectors.joining(" and "));
 
-        map.put(type, allAuthors);
+        map.put(field, allAuthors);
     }
 
-    private static void parseSingleStandardNumber(String type, String bibtype, String standardNum,
-            Map<String, String> map) {
+    private static void parseSingleStandardNumber(String type, Field field, String standardNum, Map<Field, String> map) {
         Pattern pattern = Pattern.compile(':' + type + ":(.[^:]+)");
         Matcher matcher = pattern.matcher(standardNum);
         if (matcher.matches()) {
-            map.put(bibtype, matcher.group(1));
+            map.put(field, matcher.group(1));
         }
     }
 
-    private static void parseStandardNumber(String standardNum, Map<String, String> map) {
+    private static void parseStandardNumber(String standardNum, Map<Field, String> map) {
         if (standardNum == null) {
             return;
         }
         parseSingleStandardNumber("ISBN", StandardField.ISBN, standardNum, map);
         parseSingleStandardNumber("ISSN", StandardField.ISSN, standardNum, map);
-        parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
-        parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
+        parseSingleStandardNumber("LCCN", new UnknownField("lccn"), standardNum, map);
+        parseSingleStandardNumber("MRN", StandardField.MR_NUMBER, standardNum, map);
         parseSingleStandardNumber("DOI", StandardField.DOI, standardNum, map);
     }
 }

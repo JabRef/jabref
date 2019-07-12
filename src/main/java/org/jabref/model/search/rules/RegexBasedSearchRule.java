@@ -49,7 +49,7 @@ public class RegexBasedSearchRule implements SearchRule {
             return false;
         }
 
-        for (Field field : bibEntry.getFieldNames()) {
+        for (Field field : bibEntry.getFields()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
                 String fieldContentNoBrackets = bibEntry.getLatexFreeField(field).get();

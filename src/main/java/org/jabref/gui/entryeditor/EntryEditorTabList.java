@@ -25,7 +25,7 @@ public final class EntryEditorTabList {
             // The user has modified from the default values:
             while (preferences.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + i)) {
                 name = preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + i);
-                Set<Field> entry = FieldFactory.parseFields(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i));
+                Set<Field> entry = FieldFactory.parseFieldList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i));
                 tabs.put(name, entry);
                 i++;
             }
@@ -33,7 +33,7 @@ public final class EntryEditorTabList {
             // Nothing set, so we use the default values:
             while (preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
                 name = preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
-                Set<Field> entry = FieldFactory.parseFields(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
+                Set<Field> entry = FieldFactory.parseFieldList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
                 tabs.put(name, entry);
                 i++;
             }

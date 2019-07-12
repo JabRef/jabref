@@ -31,7 +31,7 @@ public class SpecialFieldsUtils {
     public static List<FieldChange> updateField(SpecialField field, String value, BibEntry entry, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        UpdateField.updateField(entry, field.getName(), value, nullFieldIfValueIsTheSame)
+        UpdateField.updateField(entry, field, value, nullFieldIfValueIsTheSame)
                    .ifPresent(fieldChanges::add);
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         if (isKeywordSyncEnabled) {
@@ -45,7 +45,7 @@ public class SpecialFieldsUtils {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         KeywordList keyWords = specialField.getKeyWords();
-        Optional<Keyword> newValue = entry.getField(specialField.getName()).map(Keyword::new);
+        Optional<Keyword> newValue = entry.getField(specialField).map(Keyword::new);
         newValue.map(value -> entry.replaceKeywords(keyWords, newValue.get(), keywordDelimiter))
                 .orElseGet(() -> entry.removeKeywords(keyWords, keywordDelimiter))
                 .ifPresent(changeValue -> fieldChanges.add(changeValue));
@@ -78,7 +78,7 @@ public class SpecialFieldsUtils {
             }
         }
 
-        UpdateField.updateNonDisplayableField(entry, field.getName(), newValue.map(Keyword::toString).orElse(null))
+        UpdateField.updateNonDisplayableField(entry, field, newValue.map(Keyword::toString).orElse(null))
                    .ifPresent(fieldChanges::add);
         return fieldChanges;
     }

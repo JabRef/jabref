@@ -11,6 +11,7 @@ import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -19,7 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
     // Field name and file type name (from ExternalFileTypes)
-    private final Map<String, String> fields = new HashMap<>();
+    private final Map<Field, String> fields = new HashMap<>();
 
 
     public UpgradePdfPsToFileCleanup() {
@@ -36,7 +37,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
         List<LinkedFile> fileList = new ArrayList<>(entry.getFiles());
         int oldItemCount = fileList.size();
-        for (Map.Entry<String, String> field : fields.entrySet()) {
+        for (Map.Entry<Field, String> field : fields.entrySet()) {
             entry.getField(field.getKey()).ifPresent(o -> {
                 if (o.trim().isEmpty()) {
                     return;
