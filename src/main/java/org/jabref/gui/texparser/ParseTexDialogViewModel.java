@@ -117,6 +117,7 @@ class ParseTexDialogViewModel extends AbstractViewModel {
                           noFilesFound.set(true);
                           searchInProgress.set(true);
                           successfulSearch.set(false);
+
                       })
                       .onFinished(() -> searchInProgress.set(false))
                       .onSuccess(newRoot -> {

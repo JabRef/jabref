@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
@@ -53,16 +54,10 @@ public class ParseTexDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        Button parseButton = (Button) this.getDialogPane().lookupButton(parseButtonType);
+        ControlHelper.setAction(parseButtonType, getDialogPane(), event -> viewModel.parseButtonClicked());
+        Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);
         parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(
                 Bindings.isEmpty(viewModel.getCheckedFileList())));
-
-        setResultConverter(button -> {
-            if (button == parseButtonType) {
-                viewModel.parseButtonClicked();
-            }
-            return null;
-        });
     }
 
     @FXML
