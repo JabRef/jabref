@@ -12,6 +12,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.MrDLibImporter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
@@ -30,8 +31,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
     private static final String MDL_JABREF_PARTNER_ID = "1";
+    private static final String MDL_URL = "api.mr-dlib.org";
+    private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching recommendations from Mr.DLib.");
     private final String LANGUAGE;
     private final Version VERSION;
+    private String heading;
+    private String description;
+    private String recommendationSetId;
 
 
     public MrDLibFetcher(String language, Version version) {
@@ -54,13 +60,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             try {
                 if (importer.isRecognizedFormat(response)) {
                     parserResult = importer.importDatabase(response);
+                    heading = importer.getRecommendationsHeading();
+                    description = importer.getRecommendationsDescription();
+                    recommendationSetId = importer.getRecommendationSetId();
                 } else {
                     // For displaying An ErrorMessage
-                    String error = importer.getResponseErrorMessage(response);
-                    BibEntry errorBibEntry = new BibEntry();
-                    errorBibEntry.setField("html_representation", error);
+                    description = DEFAULT_MRDLIB_ERROR_MESSAGE;
                     BibDatabase errorBibDataBase = new BibDatabase();
-                    errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);
                 }
             } catch (IOException e) {
@@ -72,6 +78,14 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             // without a title there is no reason to ask MrDLib
             return new ArrayList<>(0);
         }
+    }
+
+    public String getHeading() {
+        return heading;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -106,7 +120,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost(getMdlUrl());
+        builder.setHost(MDL_URL);
         builder.setPath("/v2/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", MDL_JABREF_PARTNER_ID);
         builder.addParameter("app_id", "jabref_desktop");
@@ -131,9 +145,5 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             LOGGER.error(e.getMessage(), e);
         }
         return "";
-    }
-
-    private String getMdlUrl() {
-        return VERSION.isDevelopmentVersion() ? "api-dev.darwingoliath.com" : "api.mr-dlib.org";
     }
 }
