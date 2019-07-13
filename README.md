@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/jabref/localized.svg)](https://crowdin.com/project/jabref)
 
 JabRef is an open-source, cross-platform citation and reference management tool licensed under the  [MIT license](https://tldrlegal.com/license/mit-license).
 
