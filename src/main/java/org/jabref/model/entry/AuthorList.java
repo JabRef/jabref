@@ -211,8 +211,6 @@ public class AuthorList {
             }
 
         }
-
-
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();

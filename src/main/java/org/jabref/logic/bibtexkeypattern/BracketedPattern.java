@@ -797,38 +797,28 @@ public class BracketedPattern {
      * Note that [authEtAl] equals [authors2]
      */
     public static String authEtal(String authorField, String delim, String append) {
-        System.out.println("AUTHOR FIELD: " + authorField);
         String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        System.out.println("FIXED: " + fixedAuthorField);
-        //        fixedAuthorField = fixedAuthorField;
-        // \\s*\\band\\b\\s* ESPAÇO EM QUALQUER LUGAR E A PALAVRA "AND"
-        //fixedAuthorField= fixedAuthorField.replaceAll(regex, replacement)("and", ";");
         String[] tokens = fixedAuthorField.split("\\s*\\band\\b\\s*");
-        //        String[] tokens = fixedAuthorField.split(";");
+
         if (tokens.length == 0) {
             return "";
         }
 
         StringBuilder author = new StringBuilder();
-
-
         author.append((tokens[0].split(","))[0]);
-        //        String aux = "";
-        //        for (int i = 0; i < tokens.length; i++) {
-        //            aux += tokens[i] + "+";
-        //        }
-        //        System.out.println("Dentro do if tokens: " + aux);
+
         if (tokens.length == 2) {
             author.append(delim).append((tokens[1].split(","))[0]);
         } else if (tokens.length > 2) {
             author.append(append);
         }
 
+        if (author.toString().split("\\s")[1].charAt(0) == '{') {
+            return author.toString().split("\\s")[1].replace("EtAl", "");
+        } else {
+            return (author.toString().split("\\s")[1]);
+        }
 
-        System.out.println("AQUI TA PRINTANDO Saida " + author.toString().split("\\s")[1]);
-
-        return author.toString().split("\\s")[1];
     }
 
     /**
@@ -906,7 +896,6 @@ public class BracketedPattern {
                 author.append('+');
             }
         }
-
         return author.toString();
     }
 
