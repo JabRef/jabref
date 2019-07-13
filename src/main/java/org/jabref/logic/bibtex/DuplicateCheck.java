@@ -9,13 +9,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.Globals;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -81,7 +81,7 @@ public class DuplicateCheck {
             return false;
         }
 
-        final Optional<BibEntryType> type = BibEntryTypesManager.enrich(one.getType(), bibDatabaseMode);
+        final Optional<BibEntryType> type = Globals.entryTypesManager.enrich(one.getType(), bibDatabaseMode);
         if (type.isPresent()) {
             final double[] reqCmpResult = compareRequiredFields(type.get(), one, two);
 

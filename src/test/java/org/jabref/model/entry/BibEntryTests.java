@@ -44,8 +44,7 @@ public class BibEntryTests {
     @Test
     public void testDefaultConstructor() {
         BibEntry entry = new BibEntry();
-        // we have to use `getType("misc")` in the case of biblatex mode
-        assertEquals("misc", entry.getType());
+        assertEquals(StandardEntryType.Misc, entry.getType());
         assertNotNull(entry.getId());
         assertFalse(entry.getField(StandardField.AUTHOR).isPresent());
     }
@@ -103,10 +102,8 @@ public class BibEntryTests {
     }
 
     @Test
-    public void typeOfBibEntryIsMiscAfterSettingToNullString() {
-        assertEquals("article", keywordEntry.getType());
-        keywordEntry.setType(null);
-        assertEquals("misc", keywordEntry.getType());
+    public void settingTypeToNullThrowsException() {
+        assertThrows(NullPointerException.class, () -> keywordEntry.setType(null));
     }
 
     @Test

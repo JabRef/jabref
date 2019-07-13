@@ -1,9 +1,10 @@
 package org.jabref.model.entry.field;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-public class BibField implements Field<BibField> {
+public class BibField implements Field {
 
     private final FieldPriority priority;
     private final Field field;
@@ -44,16 +45,32 @@ public class BibField implements Field<BibField> {
     }
 
     @Override
-    public int compareTo(BibField o) {
-        return field.compareTo(o);
-    }
-
-    @Override
     public boolean isNumeric() {
         return field.isNumeric();
     }
 
     public FieldPriority getPriority() {
         return priority;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Field)) return false;
+        Field other = (Field) o;
+        return field.getName().equalsIgnoreCase(other.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field);
+    }
+
+    @Override
+    public String toString() {
+        return "BibField{" +
+                "priority=" + priority +
+                ", field=" + field +
+                '}';
     }
 }

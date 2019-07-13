@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
@@ -13,60 +15,11 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 
 public class BibEntryTypesManager {
-    public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.ALL);
-    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.ALL);
+    private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypes.ALL.stream(), IEEETranEntryTypes.ALL.stream()).collect(Collectors.toList()));
+    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.ALL);
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
 
-    /**
-     * This method returns the BibtexEntryType for the entry type.
-     */
-    public static Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
-        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.enrich(type) : BIBTEX.enrich(type);
-    }
-
-    public static boolean isCustomType(EntryType type, BibDatabaseMode mode) {
-        return getAllCustomTypes(mode).stream().anyMatch(customType -> customType.getType().equals(type));
-    }
-
-    public static void addCustomizedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
-        if (BibDatabaseMode.BIBLATEX == mode) {
-            BIBLATEX.addCustomizedType(entryType);
-        } else if (BibDatabaseMode.BIBTEX == mode) {
-            BIBTEX.addCustomizedType(entryType);
-        }
-    }
-
-    public static Collection<BibEntryType> getAllTypes(BibDatabaseMode type) {
-        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
-    }
-
-    /**
-     * For a given database mode, determine all custom entry types, i.e. types that are not overwritten standard types but real custom types.
-     * For example, a modified "article" type will not be included in the list, but an entry type like "MyCustomType" will be included.
-     *
-     * @param mode the BibDatabaseMode to be checked
-     * @return the list of all found custom types
-     */
-    public static List<BibEntryType> getAllCustomTypes(BibDatabaseMode mode) {
-        Collection<BibEntryType> customizedTypes = getAllTypes(mode);
-        if (mode == BibDatabaseMode.BIBTEX) {
-            return customizedTypes.stream()
-                                  .filter(entryType -> BibtexEntryTypes.ALL.stream().noneMatch(bibtexType -> bibtexType.getType().equals(entryType.getType())))
-                                  .filter(entryType -> IEEETranEntryTypes.ALL.stream().noneMatch(ieeeType -> ieeeType.getType().equals(entryType.getType())))
-                                  .collect(Collectors.toList());
-        } else {
-            return customizedTypes.stream()
-                                  .filter(entryType -> BiblatexEntryTypes.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
-                                  .collect(Collectors.toList());
-        }
-    }
-
-    /**
-     * Sets the given custom entry types for BibTeX and biblatex mode
-     */
-    public static void addCustomizedEntryTypes(List<BibEntryType> customBibtexEntryTypes, List<BibEntryType> customBiblatexEntryTypes) {
-        customBibtexEntryTypes.forEach(type -> addCustomizedEntryType(type, BibDatabaseMode.BIBTEX));
-        customBiblatexEntryTypes.forEach(type -> addCustomizedEntryType(type, BibDatabaseMode.BIBLATEX));
+    public BibEntryTypesManager() {
     }
 
     public static Optional<BibEntryType> parse(String comment) {
@@ -108,19 +61,71 @@ public class BibEntryTypesManager {
     /**
      * Returns true if the type is a custom type, or if it is a standard type which has customized fields
      */
-    public static boolean isCustomizedType(BibEntryType type, BibDatabaseMode mode) {
+    public boolean isCustomizedType(BibEntryType type, BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.isCustomizedType(type) : BIBTEX.isCustomizedType(type);
+    }
+
+    /**
+     * Sets the given custom entry types for BibTeX and biblatex mode
+     */
+    public void addCustomizedEntryTypes(List<BibEntryType> customBibtexEntryTypes, List<BibEntryType> customBiblatexEntryTypes) {
+        customBibtexEntryTypes.forEach(type -> addCustomizedEntryType(type, BibDatabaseMode.BIBTEX));
+        customBiblatexEntryTypes.forEach(type -> addCustomizedEntryType(type, BibDatabaseMode.BIBLATEX));
+    }
+
+    /**
+     * For a given database mode, determine all custom entry types, i.e. types that are not overwritten standard types but real custom types.
+     * For example, a modified "article" type will not be included in the list, but an entry type like "MyCustomType" will be included.
+     *
+     * @param mode the BibDatabaseMode to be checked
+     * @return the list of all found custom types
+     */
+    public List<BibEntryType> getAllCustomTypes(BibDatabaseMode mode) {
+        Collection<BibEntryType> customizedTypes = getAllTypes(mode);
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return customizedTypes.stream()
+                                  .filter(entryType -> BibtexEntryTypes.ALL.stream().noneMatch(bibtexType -> bibtexType.getType().equals(entryType.getType())))
+                                  .filter(entryType -> IEEETranEntryTypes.ALL.stream().noneMatch(ieeeType -> ieeeType.getType().equals(entryType.getType())))
+                                  .collect(Collectors.toList());
+        } else {
+            return customizedTypes.stream()
+                                  .filter(entryType -> BiblatexEntryTypes.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
+                                  .collect(Collectors.toList());
+        }
+    }
+
+    public void addCustomizedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
+            BIBLATEX.addCustomizedType(entryType);
+        } else if (BibDatabaseMode.BIBTEX == mode) {
+            BIBTEX.addCustomizedType(entryType);
+        }
+    }
+
+    public Collection<BibEntryType> getAllTypes(BibDatabaseMode type) {
+        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
+    }
+
+    public boolean isCustomType(EntryType type, BibDatabaseMode mode) {
+        return getAllCustomTypes(mode).stream().anyMatch(customType -> customType.getType().equals(type));
+    }
+
+    /**
+     * This method returns the BibtexEntryType for the entry type.
+     */
+    public Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.enrich(type) : BIBTEX.enrich(type);
     }
 
     /**
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
     static class InternalEntryTypes {
-        private final Set<BibEntryType> customizedTypes = new HashSet<>();
-        private final Set<BibEntryType> standardTypes;
+        private final SortedSet<BibEntryType> customizedTypes = new TreeSet<>();
+        private final SortedSet<BibEntryType> standardTypes;
 
         public InternalEntryTypes(List<BibEntryType> standardTypes) {
-            this.standardTypes = new HashSet<>(standardTypes);
+            this.standardTypes = new TreeSet<>(standardTypes);
         }
 
         /**
@@ -141,11 +146,12 @@ public class BibEntryTypesManager {
         }
 
         private void addCustomizedType(BibEntryType type) {
+            customizedTypes.remove(type);
             customizedTypes.add(type);
         }
 
-        public Set<BibEntryType> getAllTypes() {
-            Set<BibEntryType> allTypes = new HashSet<>(customizedTypes);
+        public SortedSet<BibEntryType> getAllTypes() {
+            SortedSet<BibEntryType> allTypes = new TreeSet<>(customizedTypes);
             allTypes.addAll(standardTypes);
             return allTypes;
         }

@@ -6,8 +6,8 @@ import java.util.Objects;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
 /**
@@ -61,7 +61,7 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (((Field) (Field<?>) sortField).getProperties().contains(FieldProperty.PERSON_NAMES)) {
+        if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase(Locale.ROOT);
             }

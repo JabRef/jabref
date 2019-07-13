@@ -21,6 +21,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -66,6 +67,7 @@ public class Globals {
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
+    public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
     private Globals() {
     }

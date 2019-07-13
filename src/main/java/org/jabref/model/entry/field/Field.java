@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.jabref.model.strings.StringUtil;
 
-public interface Field<SelfType extends Field<SelfType>> extends Comparable<SelfType> {
+public interface Field {
 
     /**
      * properties contains mappings to tell the EntryEditor to add a specific function to this field,
@@ -30,10 +30,6 @@ public interface Field<SelfType extends Field<SelfType>> extends Comparable<Self
 
     default Optional<Field> getAlias() {
         return Optional.empty();
-    }
-
-    default int compareTo(Field o) {
-        return getName().compareTo(o.getName());
     }
 
     default boolean isNumeric() {

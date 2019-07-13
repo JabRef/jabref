@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -20,7 +21,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -124,7 +124,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
 
-            List<BibEntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -136,7 +136,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
-            List<BibEntryType> customTypes = BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {

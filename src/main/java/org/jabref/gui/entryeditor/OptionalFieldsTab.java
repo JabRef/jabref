@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
@@ -16,7 +17,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 
 public class OptionalFieldsTab extends FieldsEditorTab {
@@ -30,7 +30,7 @@ public class OptionalFieldsTab extends FieldsEditorTab {
 
     @Override
     protected Collection<Field> determineFieldsToShow(BibEntry entry) {
-        Optional<BibEntryType> entryType = BibEntryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
             return new HashSet<>(entryType.get().getPrimaryOptionalFields());
         } else {

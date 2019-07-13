@@ -104,6 +104,15 @@ public class BibEntryType implements Comparable<BibEntryType> {
     }
 
     @Override
+    public String toString() {
+        return "BibEntryType{" +
+                "type=" + type +
+                ", requiredFields=" + requiredFields +
+                ", fields=" + fields +
+                '}';
+    }
+
+    @Override
     public int compareTo(BibEntryType o) {
         return this.getType().getName().compareTo(o.getType().getName());
     }

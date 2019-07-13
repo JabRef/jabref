@@ -14,6 +14,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -67,7 +68,7 @@ public class SaveDatabaseAction {
                                                .withSaveType(saveType);
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, Globals.entryTypesManager);
 
             if (selectedOnly) {
                 databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());

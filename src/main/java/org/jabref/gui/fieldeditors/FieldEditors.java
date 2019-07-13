@@ -32,7 +32,7 @@ public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    public static FieldEditorFX getForField(final Field<?> field,
+    public static FieldEditorFX getForField(final Field field,
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,

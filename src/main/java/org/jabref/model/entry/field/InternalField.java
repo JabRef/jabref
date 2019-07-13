@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * JabRef internal fields
  */
-public enum InternalField implements Field<InternalField> {
+public enum InternalField implements Field {
     INTERNAL_ALL_FIELD("all"),
     INTERNAL_ALL_TEXT_FIELDS_FIELD("all-text-fields"),
     MARKED_INTERNAL("__markedentry"),

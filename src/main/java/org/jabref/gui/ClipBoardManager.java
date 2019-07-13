@@ -81,7 +81,7 @@ public class ClipBoardManager {
 
     public void setContent(List<BibEntry> entries) throws IOException {
         final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()));
+        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), Globals.entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
         content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
         content.putString(serializedEntries);

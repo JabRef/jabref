@@ -22,7 +22,6 @@ import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -82,7 +81,7 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(button, 3, rowIndex);
 
         columnIndex = 1;
-        for (BibEntryType type : BibEntryTypesManager.getAllTypes(mode)) {
+        for (BibEntryType type : Globals.entryTypesManager.getAllTypes(mode)) {
             Label label1 = new Label(type.getType().getDisplayName());
             TextField textField = new TextField();
             Button button1 = new Button("Default");

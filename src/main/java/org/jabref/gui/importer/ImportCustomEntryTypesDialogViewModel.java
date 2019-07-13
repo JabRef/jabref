@@ -6,9 +6,9 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.preferences.PreferencesService;
 
@@ -25,7 +25,7 @@ public class ImportCustomEntryTypesDialogViewModel {
         this.preferencesService = preferencesService;
 
         for (BibEntryType customType : entryTypes) {
-            Optional<BibEntryType> currentlyStoredType = BibEntryTypesManager.enrich(customType.getType(), mode);
+            Optional<BibEntryType> currentlyStoredType = Globals.entryTypesManager.enrich(customType.getType(), mode);
             if (!currentlyStoredType.isPresent()) {
                 newTypes.add(customType);
             } else {
@@ -47,11 +47,11 @@ public class ImportCustomEntryTypesDialogViewModel {
 
     public void importBibEntryTypes(List<BibEntryType> checkedUnknownEntryTypes, List<BibEntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addCustomizedEntryType(type, mode));
+            checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomizedEntryType(type, mode));
             preferencesService.saveBibEntryTypes();
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> BibEntryTypesManager.addCustomizedEntryType(type, mode));
+            checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomizedEntryType(type, mode));
             preferencesService.saveBibEntryTypes();
         }
 

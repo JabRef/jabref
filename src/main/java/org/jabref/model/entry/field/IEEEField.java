@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * IEEE BSTctl fields
  */
-public enum IEEEField implements Field<IEEEField> {
+public enum IEEEField implements Field {
     CTLALT_STRETCH_FACTOR("ctlalt_stretch_factor", FieldProperty.NUMERIC),
     CTLDASH_REPEATED_NAMES("ctldash_repeated_names", FieldProperty.YES_NO),
     CTLMAX_NAMES_FORCED_ETAL("ctlmax_names_forced_etal", FieldProperty.NUMERIC),

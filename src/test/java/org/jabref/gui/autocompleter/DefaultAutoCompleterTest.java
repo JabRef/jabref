@@ -54,7 +54,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "testTitle");
+        entry.setField(StandardField.AUTHOR, "testAuthor");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
@@ -72,7 +72,7 @@ public class DefaultAutoCompleterTest {
     }
 
     @Test
-    public void completeBeginnigOfValueReturnsValue() {
+    public void completeBeginningOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "testValue");
         autoCompleter.indexEntry(entry);

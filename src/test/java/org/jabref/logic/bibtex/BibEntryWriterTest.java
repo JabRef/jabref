@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.UnknownEntryType;
@@ -39,7 +40,7 @@ public class BibEntryWriterTest {
     public void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences));
+        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), new BibEntryTypesManager());
     }
 
     @Test

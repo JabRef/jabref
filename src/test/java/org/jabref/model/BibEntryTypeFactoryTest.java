@@ -1,9 +1,8 @@
 package org.jabref.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
@@ -33,6 +32,7 @@ class BibEntryTypeFactoryTest {
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
     private BibEntryType newCustomType;
     private BibEntryType overwrittenStandardType;
+    private BibEntryTypesManager entryTypesManager;
 
     private static Stream<BibDatabaseMode> mode() {
         return Stream.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX);
@@ -48,85 +48,80 @@ class BibEntryTypeFactoryTest {
                 StandardEntryType.Article,
                 Collections.singleton(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
                 Collections.emptySet());
+        entryTypesManager = new BibEntryTypesManager();
     }
 
     @Test
     void allTypesBibtexAreCorrect() {
-        List<BibEntryType> defaultTypes = new ArrayList<>(BibtexEntryTypes.ALL);
+        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BibtexEntryTypes.ALL);
         defaultTypes.addAll(IEEETranEntryTypes.ALL);
 
-        assertEquals(defaultTypes, BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX));
+        assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX));
     }
 
     @Test
     void allTypesBiblatexAreCorrect() {
-        List<BibEntryType> defaultTypes = new ArrayList<>(BiblatexEntryTypes.ALL);
-        assertEquals(defaultTypes, BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX));
+        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BiblatexEntryTypes.ALL);
+        assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void unknownTypeIsNotFound(BibDatabaseMode mode) {
-        assertEquals(Optional.empty(), BibEntryTypesManager.enrich(UNKNOWN_TYPE, mode));
-        assertFalse(BibEntryTypesManager.isCustomType(UNKNOWN_TYPE, mode));
+        assertEquals(Optional.empty(), entryTypesManager.enrich(UNKNOWN_TYPE, mode));
+        assertFalse(entryTypesManager.isCustomType(UNKNOWN_TYPE, mode));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void newCustomEntryTypeFound(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(newCustomType, mode);
-        assertEquals(Optional.of(newCustomType), BibEntryTypesManager.enrich(CUSTOM_TYPE, mode));
+        entryTypesManager.addCustomizedEntryType(newCustomType, mode);
+        assertEquals(Optional.of(newCustomType), entryTypesManager.enrich(CUSTOM_TYPE, mode));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void registeredBibEntryTypeIsContainedInListOfCustomizedEntryTypes(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(newCustomType, mode);
-        assertEquals(Collections.singletonList(newCustomType), BibEntryTypesManager.getAllCustomTypes(mode));
+        entryTypesManager.addCustomizedEntryType(newCustomType, mode);
+        assertEquals(Collections.singletonList(newCustomType), entryTypesManager.getAllCustomTypes(mode));
     }
 
     @Test
     void registerBibEntryTypeDoesNotAffectOtherMode() {
-        BibEntryTypesManager.addCustomizedEntryType(newCustomType, BibDatabaseMode.BIBTEX);
-        assertFalse(BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX).contains(newCustomType));
+        entryTypesManager.addCustomizedEntryType(newCustomType, BibDatabaseMode.BIBTEX);
+        assertFalse(entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX).contains(newCustomType));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void overwriteBibEntryTypeFields(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(newCustomType, mode);
+        entryTypesManager.addCustomizedEntryType(newCustomType, mode);
         BibEntryType newBibEntryTypeTitle = new BibEntryType(
                 CUSTOM_TYPE,
                 Collections.singleton(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
                 Collections.emptySet());
-        BibEntryTypesManager.addCustomizedEntryType(newBibEntryTypeTitle, mode);
-        assertEquals(Optional.of(newBibEntryTypeTitle), BibEntryTypesManager.enrich(CUSTOM_TYPE, mode));
+        entryTypesManager.addCustomizedEntryType(newBibEntryTypeTitle, mode);
+        assertEquals(Optional.of(newBibEntryTypeTitle), entryTypesManager.enrich(CUSTOM_TYPE, mode));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void overwriteStandardTypeRequiredFields(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
-        assertEquals(Optional.of(overwrittenStandardType), BibEntryTypesManager.enrich(overwrittenStandardType.getType(), mode));
+        entryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
+        assertEquals(Optional.of(overwrittenStandardType), entryTypesManager.enrich(overwrittenStandardType.getType(), mode));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void registeredCustomizedStandardEntryTypeIsNotContainedInListOfCustomEntryTypes(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
-        assertEquals(Collections.emptyList(), BibEntryTypesManager.getAllCustomTypes(mode));
+        entryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
+        assertEquals(Collections.emptyList(), entryTypesManager.getAllCustomTypes(mode));
     }
 
     @ParameterizedTest
     @MethodSource("mode")
     void standardTypeIsStillAccessibleIfOverwritten(BibDatabaseMode mode) {
-        BibEntryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
-        assertFalse(BibEntryTypesManager.isCustomType(overwrittenStandardType.getType(), mode));
-    }
-
-    @Test
-    void overwriteStandardTypeRequiredFieldsDoesNotAffectOtherMode() {
-        BibEntryTypesManager.addCustomizedEntryType(overwrittenStandardType, BibDatabaseMode.BIBTEX);
-        assertFalse(BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX).contains(overwrittenStandardType));
+        entryTypesManager.addCustomizedEntryType(overwrittenStandardType, mode);
+        assertFalse(entryTypesManager.isCustomType(overwrittenStandardType.getType(), mode));
     }
 }

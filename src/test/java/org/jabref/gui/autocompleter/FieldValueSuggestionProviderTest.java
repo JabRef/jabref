@@ -54,7 +54,7 @@ public class FieldValueSuggestionProviderTest {
     @Test
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "testTitle");
+        entry.setField(StandardField.AUTHOR, "testAuthor");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));

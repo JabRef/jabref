@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Standard BibTeX and BibLaTex fields
  */
-public enum StandardField implements Field<StandardField> {
+public enum StandardField implements Field {
 
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),

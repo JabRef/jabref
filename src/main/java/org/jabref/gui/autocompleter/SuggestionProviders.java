@@ -8,8 +8,8 @@ import java.util.Set;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
 public class SuggestionProviders {
@@ -56,7 +56,7 @@ public class SuggestionProviders {
         }
     }
 
-    private AutoCompleteSuggestionProvider<?> initalizeSuggestionProvider(Field<?> field, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
+    private AutoCompleteSuggestionProvider<?> initalizeSuggestionProvider(Field field, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         Set<FieldProperty> fieldProperties = field.getProperties();
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonNameSuggestionProvider(field);

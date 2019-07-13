@@ -65,6 +65,7 @@ class BibtexDatabaseWriterTest {
     private ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private SavePreferences preferences;
+    private BibEntryTypesManager entryTypesManager;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +74,8 @@ class BibtexDatabaseWriterTest {
         when(preferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(preferences.getEncoding()).thenReturn(null);
         when(preferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences);
+        entryTypesManager = new BibEntryTypesManager();
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
 
         database = new BibDatabase();
         metaData = new MetaData();
@@ -261,7 +263,7 @@ class BibtexDatabaseWriterTest {
                 customizedType,
                 new HashSet<>(Arrays.asList(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT), new BibField(StandardField.YEAR, FieldPriority.IMPORTANT))),
                 Collections.singleton(new OrFields(StandardField.TITLE)));
-        BibEntryTypesManager.addCustomizedEntryType(customizedBibType, BibDatabaseMode.BIBTEX);
+        entryTypesManager.addCustomizedEntryType(customizedBibType, BibDatabaseMode.BIBTEX);
         BibEntry entry = new BibEntry(customizedType);
         database.insertEntry(entry);
 

@@ -1,9 +1,11 @@
 package org.jabref.model.entry.field;
 
 import java.util.EnumSet;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
-public class UnknownField implements Field<UnknownField> {
+public class UnknownField implements Field {
     private final String name;
 
     public UnknownField(String name) {
@@ -16,11 +18,6 @@ public class UnknownField implements Field<UnknownField> {
     }
 
     @Override
-    public int compareTo(UnknownField o) {
-        return name.compareTo(o.name);
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -29,4 +26,26 @@ public class UnknownField implements Field<UnknownField> {
     public boolean isStandardField() {
         return false;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Field)) return false;
+        Field other = (Field) o;
+        return name.equalsIgnoreCase(other.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name.toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public String toString() {
+        return "UnknownField{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
+
 }

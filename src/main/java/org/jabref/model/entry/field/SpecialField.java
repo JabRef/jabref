@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.jabref.model.entry.KeywordList;
 
-public enum SpecialField implements Field<SpecialField> {
+public enum SpecialField implements Field {
 
     PRINTED("printed",
         SpecialFieldValue.PRINTED

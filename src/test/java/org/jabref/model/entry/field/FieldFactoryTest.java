@@ -1,21 +1,17 @@
-package org.jabref.model.entry;
-
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.UnknownField;
+package org.jabref.model.entry.field;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StandardFieldTest {
-
+class FieldFactoryTest {
     @Test
-    public void testOrFieldsTwoTerms() {
+    void testOrFieldsTwoTerms() {
         assertEquals("aaa/bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
     }
 
     @Test
-    public void testOrFieldsThreeTerms() {
+    void testOrFieldsThreeTerms() {
         assertEquals("aaa/bbb/ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
     }
 }

@@ -48,7 +48,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 
@@ -391,7 +390,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults));
 
@@ -458,7 +457,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            BibEntryTypesManager.addCustomizedEntryTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+            Globals.entryTypesManager.addCustomizedEntryTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                     Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
             List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs

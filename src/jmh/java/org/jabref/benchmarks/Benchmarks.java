@@ -22,6 +22,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -74,7 +75,7 @@ public class Benchmarks {
 
     private StringWriter getOutputWriter() throws IOException {
         StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class), new BibEntryTypesManager());
         databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
         return outputWriter;

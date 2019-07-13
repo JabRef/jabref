@@ -9,7 +9,6 @@ import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -36,7 +35,7 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
         return parserResult.getEntryTypes()
                            .stream()
-                           .filter(type -> BibEntryTypesManager.isCustomizedType(type, mode))
+                           .filter(type -> Globals.entryTypesManager.isCustomizedType(type, mode))
                            .collect(Collectors.toList());
     }
 

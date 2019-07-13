@@ -23,7 +23,6 @@ import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -158,7 +157,7 @@ public class JabRefMain extends Application {
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
-        BibEntryTypesManager.addCustomizedEntryTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+        Globals.entryTypesManager.addCustomizedEntryTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 

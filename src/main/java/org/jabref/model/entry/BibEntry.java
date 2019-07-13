@@ -6,12 +6,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -57,7 +55,7 @@ public class BibEntry implements Cloneable {
     private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
     private final EventBus eventBus = new EventBus();
     private String id;
-    private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>();
+    private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(DEFAULT_TYPE);
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
@@ -218,6 +216,8 @@ public class BibEntry implements Cloneable {
      * Sets this entry's type.
      */
     public Optional<FieldChange> setType(EntryType newType, EntryEventSource eventSource) {
+        Objects.requireNonNull(newType);
+
         EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
@@ -238,7 +238,7 @@ public class BibEntry implements Cloneable {
      * @return a set of existing field names
      */
     public Set<Field> getFields() {
-        return new TreeSet<>(fields.keySet());
+        return Collections.unmodifiableSet(fields.keySet());
     }
 
     /**
@@ -253,12 +253,6 @@ public class BibEntry implements Cloneable {
      */
     public boolean hasField(Field field) {
         return fields.containsKey(field);
-    }
-
-    private String toLowerCase(String fieldName) {
-        Objects.requireNonNull(fieldName, "field name must not be null");
-
-        return fieldName.toLowerCase(Locale.ENGLISH);
     }
 
     /**

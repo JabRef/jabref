@@ -11,6 +11,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
+import org.jabref.Globals;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
@@ -19,7 +20,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
@@ -57,10 +57,10 @@ public class ChangeEntryTypeMenu {
     private void populateComplete(ObservableList<MenuItem> items, BibEntry entry, BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager) {
         if (bibDatabaseContext.isBiblatexMode()) {
             // Default BibLaTeX
-            populate(items, BibEntryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
+            populate(items, Globals.entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
 
             // Custom types
-            populateSubMenu(items, Localization.lang("Custom"), BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
+            populateSubMenu(items, Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
         } else {
             // Default BibTeX
             populateSubMenu(items, BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypes.ALL, entry, undoManager);
@@ -70,7 +70,7 @@ public class ChangeEntryTypeMenu {
             populateSubMenu(items, "IEEETran", IEEETranEntryTypes.ALL, entry, undoManager);
 
             // Custom types
-            populateSubMenu(items, Localization.lang("Custom"), BibEntryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);
+            populateSubMenu(items, Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);
         }
     }
 

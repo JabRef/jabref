@@ -10,6 +10,13 @@ public class UnknownEntryType implements EntryType {
     }
 
     @Override
+    public String toString() {
+        return "UnknownEntryType{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
+    @Override
     public String getName() {
         return name;
     }

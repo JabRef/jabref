@@ -25,9 +25,11 @@ import org.jabref.model.strings.StringUtil;
 public class BibEntryWriter {
 
     private final LatexFieldFormatter fieldFormatter;
+    private final BibEntryTypesManager entryTypesManager;
 
-    public BibEntryWriter(LatexFieldFormatter fieldFormatter) {
+    public BibEntryWriter(LatexFieldFormatter fieldFormatter, BibEntryTypesManager entryTypesManager) {
         this.fieldFormatter = fieldFormatter;
+        this.entryTypesManager = entryTypesManager;
     }
 
     public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
@@ -101,7 +103,7 @@ public class BibEntryWriter {
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
-        Optional<BibEntryType> type = BibEntryTypesManager.enrich(entry.getType(), bibDatabaseMode);
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), bibDatabaseMode);
         if (type.isPresent()) {
             // Write required fields first.
             for (OrFields value : type.get().getRequiredFields()) {

@@ -133,7 +133,7 @@ public class SourceTab extends EntryEditorTab {
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
-        new BibEntryWriter(formatter).writeWithoutPrependedNewlines(entry, stringWriter, type);
+        new BibEntryWriter(formatter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
