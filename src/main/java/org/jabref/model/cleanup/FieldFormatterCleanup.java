@@ -24,6 +24,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         this.formatter = formatter;
     }
 
+
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         if (FieldName.INTERNAL_ALL_FIELD.equalsIgnoreCase(field)) {
