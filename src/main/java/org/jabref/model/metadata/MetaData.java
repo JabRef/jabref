@@ -55,12 +55,17 @@ public class MetaData {
     private final ContentSelectors contentSelectors = new ContentSelectors();
     private final Map<String, List<String>> unkownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
+    private boolean allowIntegerEdition;
 
     /**
      * Constructs an empty metadata.
      */
     public MetaData() {
         // Do nothing
+    }
+
+    public void setAllowIntegerEdition(boolean allowIntegerEdition) {
+        this.allowIntegerEdition = allowIntegerEdition;
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
