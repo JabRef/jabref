@@ -274,6 +274,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
+    public static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
@@ -697,6 +698,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
+        defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
@@ -1350,6 +1352,11 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public Boolean getEnforceLegalKeys() {
         return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    }
+
+    @Override
+    public Boolean getAllowIntegerEdition() {
+        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
     }
 
     @Override

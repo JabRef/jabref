@@ -35,9 +35,9 @@ public interface PreferencesService {
     void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
 
     FilePreferences getFilePreferences();
-    
+
     XmpPreferences getXMPPreferences();
-    
+
     AutoLinkPreferences getAutoLinkPreferences();
 
     Path getWorkingDir();
@@ -95,4 +95,6 @@ public interface PreferencesService {
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
     void saveCustomEntryTypes();
+
+    public Boolean getAllowIntegerEdition();
 }
