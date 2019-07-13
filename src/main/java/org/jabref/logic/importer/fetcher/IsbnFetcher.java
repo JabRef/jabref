@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetcher for ISBN trying ebook.de first, chimbori.com second and then ottobib
+ * Fetcher for ISBN trying ebook.de first, chimbori.com and then ottobib
  */
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 

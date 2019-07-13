@@ -75,7 +75,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
         BibEntry entry = fetchedEntries.get(0);
 
-        // ottobib does not return an ISBN. Thus, we add the one searched for
+        // ottobib does not return an ISBN.
         entry.setField("isbn", identifier);
 
         doPostCleanup(entry);
@@ -85,9 +85,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        // We MUST NOT clean the URL. this is the deal with @manastungare - see https://github.com/JabRef/jabref/issues/684#issuecomment-266541507
-        // DO NOT add following code:
-        // new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+
     }
 
 }
