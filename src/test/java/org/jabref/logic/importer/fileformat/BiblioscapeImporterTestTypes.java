@@ -3,35 +3,39 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class BiblioscapeImporterTestTypes {
+class BiblioscapeImporterTestTypes {
 
-    private static Stream<String[]> types() {
-        return Arrays.stream(new String[][]{
-                {"journal", "article"},
-                {"book section", "inbook"},
-                {"book", "book"},
-                {"conference", "inproceedings"},
-                {"proceedings", "inproceedings"},
-                {"report", "techreport"},
-                {"master thesis", "mastersthesis"},
-                {"thesis", "phdthesis"},
-                {"master", "misc"}});
+    private static Stream<Arguments> types() {
+        return Stream.of(
+                Arguments.of("journal", StandardEntryType.Article),
+                Arguments.of("book section", StandardEntryType.InBook),
+                Arguments.of("book", StandardEntryType.Book),
+                Arguments.of("conference", StandardEntryType.InProceedings),
+                Arguments.of("proceedings", StandardEntryType.InProceedings),
+                Arguments.of("report", StandardEntryType.TechReport),
+                Arguments.of("master thesis", StandardEntryType.MastersThesis),
+                Arguments.of("thesis", StandardEntryType.PhdThesis),
+                Arguments.of("master", StandardEntryType.Misc)
+        );
     }
 
     @ParameterizedTest
     @MethodSource("types")
-    public void importConvertsToCorrectBibType(String biblioscapeType, String bibtexType) throws IOException {
+    void importConvertsToCorrectBibType(String biblioscapeType, EntryType bibtexType) throws IOException {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 

@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
@@ -24,10 +23,11 @@ import static org.mockito.Mockito.when;
 public class EntryAnnotationImporterTest {
 
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final BibEntry entry = new BibEntry(new BibEntryType("EntryKey", "required", "optional"));
+    private BibEntry entry;
 
     @BeforeEach
     public void setUp() {
+        entry = new BibEntry();
         when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs/")));
     }
 

@@ -31,8 +31,8 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
@@ -256,7 +256,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
-        EntryType customizedType = EntryTypeFactory.parse("customizedType");
+        EntryType customizedType = new UnknownEntryType("customizedType");
         BibEntryType customizedBibType = new BibEntryType(
                 customizedType,
                 new HashSet<>(Arrays.asList(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT), new BibField(StandardField.YEAR, FieldPriority.IMPORTANT))),

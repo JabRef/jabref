@@ -5,6 +5,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +30,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField(StandardField.YEAR, "2018");
         bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
         bibEntry.setField(StandardField.DATE, "2018-01-11");
-        bibEntry.setField("ean", "9780134685991");
+        bibEntry.setField(new UnknownField("ean"), "9780134685991");
         bibEntry.setField(StandardField.ISBN, "0134685997");
         bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
 
@@ -71,7 +74,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField(StandardField.YEAR, "2018");
         bibEntry.setField(StandardField.AUTHOR, "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
         bibEntry.setField(StandardField.DATE, "2018-03-23");
-        bibEntry.setField("ean", "9783662565094");
+        bibEntry.setField(new UnknownField("ean"), "9783662565094");
         bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/33399253/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-3-662-56509-4");

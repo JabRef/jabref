@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;

@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -32,7 +34,7 @@ class MathSciNetTest {
         fetcher = new MathSciNet(importFormatPreferences);
 
         ratiuEntry = new BibEntry();
-        ratiuEntry.setType(StandardEntryType.ARTICLE);
+        ratiuEntry.setType(StandardEntryType.Article);
         ratiuEntry.setCiteKey("MR3537908");
         ratiuEntry.setField(StandardField.AUTHOR, "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
         ratiuEntry.setField(StandardField.TITLE, "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");
@@ -43,7 +45,7 @@ class MathSciNetTest {
         ratiuEntry.setField(StandardField.PAGES, "571--589");
         ratiuEntry.setField(StandardField.ISSN, "1422-6928");
         ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
-        ratiuEntry.setField(StandardField.MRNUMBER, "3537908");
+        ratiuEntry.setField(StandardField.MR_NUMBER, "3537908");
         ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");
     }
 
@@ -61,7 +63,7 @@ class MathSciNetTest {
     @Test
     void searchByIdInEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
-        searchEntry.setField(StandardField.MRNUMBER, "3537908");
+        searchEntry.setField(StandardField.MR_NUMBER, "3537908");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
         assertEquals(Collections.singletonList(ratiuEntry), fetchedEntries);

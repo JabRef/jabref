@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -37,7 +38,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performMigration(parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField(InternalField.GROUPS));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performMigration(parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField(InternalField.GROUPS));
     }
 
     private ParserResult generateParserResult(GroupTreeNode groupRoot) {

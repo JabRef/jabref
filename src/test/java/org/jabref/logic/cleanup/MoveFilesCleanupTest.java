@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 

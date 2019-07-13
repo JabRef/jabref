@@ -6,6 +6,7 @@ import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -200,7 +201,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyEmptyFieldDefaultText() {
         bibtexKeyPattern.setDefaultValue("[author:(No Author Provided)]");
-        entry.clearField("author");
+        entry.clearField(StandardField.AUTHOR);
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("NoAuthorProvided"), entry.getCiteKeyOptional());
     }
@@ -208,7 +209,7 @@ class MakeLabelWithDatabaseTest {
     @Test
     void generateKeyEmptyFieldNoColonInDefaultText() {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
-        entry.clearField("author");
+        entry.clearField(StandardField.AUTHOR);
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCiteKeyOptional());
     }

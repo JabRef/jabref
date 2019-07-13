@@ -15,6 +15,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -193,7 +194,7 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author"));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList(StandardField.AUTHOR));
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");

@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibDatabaseModeDetectionTest {
 
-    private static final EntryType UNKNOWN_TYPE = EntryTypeFactory.parse("unknowntype");
+    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknowntype");
 
     @Test
     public void detectBiblatex() {

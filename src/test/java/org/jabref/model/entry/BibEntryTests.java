@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -46,7 +47,7 @@ public class BibEntryTests {
         // we have to use `getType("misc")` in the case of biblatex mode
         assertEquals("misc", entry.getType());
         assertNotNull(entry.getId());
-        assertFalse(entry.getField("author").isPresent());
+        assertFalse(entry.getField(StandardField.AUTHOR).isPresent());
     }
 
     @Test
@@ -55,13 +56,13 @@ public class BibEntryTests {
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
-        List<String> requiredFields = new ArrayList<>();
 
-        requiredFields.add("author");
-        requiredFields.add("title");
+        List<OrFields> requiredFields = new ArrayList<>();
+        requiredFields.add(new OrFields(StandardField.AUTHOR));
+        requiredFields.add(new OrFields(StandardField.TITLE));
         assertTrue(e.allFieldsPresent(requiredFields, null));
 
-        requiredFields.add("year");
+        requiredFields.add(new OrFields(StandardField.YEAR));
         assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
@@ -71,13 +72,12 @@ public class BibEntryTests {
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
-        List<String> requiredFields = new ArrayList<>();
 
-        // XOR required
-        requiredFields.add("journal/year");
+        List<OrFields> requiredFields = new ArrayList<>();
+        requiredFields.add(new OrFields(StandardField.JOURNAL, StandardField.YEAR));
         assertTrue(e.allFieldsPresent(requiredFields, null));
 
-        requiredFields.add("year/address");
+        requiredFields.add(new OrFields(StandardField.YEAR, StandardField.ADDRESS));
         assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
@@ -110,103 +110,96 @@ public class BibEntryTests {
     }
 
     @Test
-    public void typeOfBibEntryIsMiscAfterSettingToEmptyString() {
-        assertEquals("article", keywordEntry.getType());
-        keywordEntry.setType("");
-        assertEquals("misc", keywordEntry.getType());
-    }
-
-    @Test
     public void getFieldOrAliasDateWithYearNumericalMonthString() {
         emptyEntry.setField(StandardField.YEAR, "2003");
         emptyEntry.setField(StandardField.MONTH, "3");
-        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias("date"));
+        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias(StandardField.DATE));
     }
 
     @Test
     public void getFieldOrAliasDateWithYearAbbreviatedMonth() {
         emptyEntry.setField(StandardField.YEAR, "2003");
         emptyEntry.setField(StandardField.MONTH, "#mar#");
-        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias("date"));
+        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias(StandardField.DATE));
     }
 
     @Test
     public void getFieldOrAliasDateWithYearAbbreviatedMonthString() {
         emptyEntry.setField(StandardField.YEAR, "2003");
         emptyEntry.setField(StandardField.MONTH, "mar");
-        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias("date"));
+        assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias(StandardField.DATE));
     }
 
     @Test
     public void getFieldOrAliasDateWithOnlyYear() {
         emptyEntry.setField(StandardField.YEAR, "2003");
-        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias("date"));
+        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias(StandardField.DATE));
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYY() {
         emptyEntry.setField(StandardField.DATE, "2003");
-        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias("year"));
+        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias(StandardField.YEAR));
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYYMM() {
         emptyEntry.setField(StandardField.DATE, "2003-03");
-        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias("year"));
+        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias(StandardField.YEAR));
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYYMMDD() {
         emptyEntry.setField(StandardField.DATE, "2003-03-30");
-        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias("year"));
+        assertEquals(Optional.of("2003"), emptyEntry.getFieldOrAlias(StandardField.YEAR));
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYReturnsNull() {
         emptyEntry.setField(StandardField.DATE, "2003");
-        assertEquals(Optional.empty(), emptyEntry.getFieldOrAlias("month"));
+        assertEquals(Optional.empty(), emptyEntry.getFieldOrAlias(StandardField.MONTH));
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMM() {
         emptyEntry.setField(StandardField.DATE, "2003-03");
-        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias("month"));
+        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMMDD() {
         emptyEntry.setField(StandardField.DATE, "2003-03-30");
-        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias("month"));
+        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
     }
 
     @Test
     public void getFieldOrAliasLatexFreeAlreadyFreeValueIsUnchanged() {
         emptyEntry.setField(StandardField.TITLE, "A Title Without any LaTeX commands");
-        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree("title"));
+        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree(StandardField.TITLE));
     }
 
     @Test
     public void getFieldOrAliasLatexFreeAlreadyFreeAliasValueIsUnchanged() {
         emptyEntry.setField(StandardField.JOURNAL, "A Title Without any LaTeX commands");
-        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree(StandardField.JOURNALTITLE));
     }
 
     @Test
     public void getFieldOrAliasLatexFreeBracesAreRemoved() {
         emptyEntry.setField(StandardField.TITLE, "{A Title with some {B}ra{C}es}");
-        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree("title"));
+        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree(StandardField.TITLE));
     }
 
     @Test
     public void getFieldOrAliasLatexFreeBracesAreRemovedFromAlias() {
         emptyEntry.setField(StandardField.JOURNAL, "{A Title with some {B}ra{C}es}");
-        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree(StandardField.JOURNALTITLE));
     }
 
     @Test
     public void getFieldOrAliasLatexFreeComplexConversionInAlias() {
         emptyEntry.setField(StandardField.JOURNAL, "A 32~{mA} {$\\Sigma\\Delta$}-modulator");
-        assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+        assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree(StandardField.JOURNALTITLE));
     }
 
     @Test
@@ -345,13 +338,13 @@ public class BibEntryTests {
     @Test
     public void clearKeywordsReturnsChange() {
         Optional<FieldChange> change = keywordEntry.putKeywords(Collections.emptyList(), ',');
-        assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", null)), change);
+        assertEquals(Optional.of(new FieldChange(keywordEntry, StandardField.KEYWORDS, "Foo, Bar", null)), change);
     }
 
     @Test
     public void changeKeywordsReturnsChange() {
         Optional<FieldChange> change = keywordEntry.putKeywords(Arrays.asList("Test", "FooTest"), ',');
-        assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", "Test, FooTest")),
+        assertEquals(Optional.of(new FieldChange(keywordEntry, StandardField.KEYWORDS, "Foo, Bar", "Test, FooTest")),
                 change);
     }
 
@@ -406,8 +399,8 @@ public class BibEntryTests {
         be.setCiteKey("Einstein1931");
         assertTrue(be.hasCiteKey());
         assertEquals(Optional.of("Einstein1931"), be.getCiteKeyOptional());
-        assertEquals(Optional.of("Albert Einstein"), be.getField("author"));
-        be.clearField("author");
-        assertEquals(Optional.empty(), be.getField("author"));
+        assertEquals(Optional.of("Albert Einstein"), be.getField(StandardField.AUTHOR));
+        be.clearField(StandardField.AUTHOR);
+        assertEquals(Optional.empty(), be.getField(StandardField.AUTHOR));
     }
 }

@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,15 +27,15 @@ public class RfcFetcherTest {
 
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Misc);
-        bibEntry.setField("series", "Request for Comments");
+        bibEntry.setField(StandardField.SERIES, "Request for Comments");
         bibEntry.setField(StandardField.NUMBER, "1945");
-        bibEntry.setField("howpublished", "RFC 1945");
+        bibEntry.setField(StandardField.HOWPUBLISHED, "RFC 1945");
         bibEntry.setField(StandardField.PUBLISHER, "RFC Editor");
         bibEntry.setField(StandardField.DOI, "10.17487/RFC1945");
         bibEntry.setField(StandardField.URL, "https://rfc-editor.org/rfc/rfc1945.txt");
         bibEntry.setField(StandardField.AUTHOR, "Henrik Frystyk Nielsen and Roy T. Fielding and Tim Berners-Lee");
         bibEntry.setField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}");
-        bibEntry.setField("pagetotal", "60");
+        bibEntry.setField(StandardField.PAGETOTAL, "60");
         bibEntry.setField(StandardField.YEAR, "1996");
         bibEntry.setField(StandardField.MONTH, "#may#");
         bibEntry.setField(StandardField.ABSTRACT, "The Hypertext Transfer Protocol (HTTP) is an application-level protocol with the lightness and speed necessary for distributed, collaborative, hypermedia information systems. This memo provides information for the Internet community. This memo does not specify an Internet standard of any kind.");

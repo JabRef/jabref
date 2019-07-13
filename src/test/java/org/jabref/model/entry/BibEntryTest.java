@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +31,9 @@ public class BibEntryTest {
 
     @Test
     public void getFieldIsCaseInsensitive() throws Exception {
-        entry.setField("TeSt", "value");
+        entry.setField(new UnknownField("TeSt"), "value");
 
-        assertEquals(Optional.of("value"), entry.getField("tEsT"));
+        assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
     }
 
     @Test

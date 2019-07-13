@@ -12,9 +12,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.IEEETranEntryTypes;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
@@ -29,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class BibEntryTypeFactoryTest {
 
-    private static final EntryType UNKNOWN_TYPE = EntryTypeFactory.parse("aaaaarticle");
-    private static final EntryType CUSTOM_TYPE = EntryTypeFactory.parse("customType");
+    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("aaaaarticle");
+    private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
     private BibEntryType newCustomType;
     private BibEntryType overwrittenStandardType;
 

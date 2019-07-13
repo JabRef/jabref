@@ -12,9 +12,9 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -76,7 +76,7 @@ public class BibEntryWriterTest {
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
 
-        BibEntry entry = new BibEntry(EntryTypeFactory.parse("other"));
+        BibEntry entry = new BibEntry(new UnknownEntryType("other"));
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 
@@ -112,7 +112,7 @@ public class BibEntryWriterTest {
                 "}" + OS.NEWLINE;
 
         BibEntry entry = new BibEntry();
-        entry.setType(EntryTypeFactory.parse("ReallyUnknownType"));
+        entry.setType(new UnknownEntryType("ReallyUnknownType"));
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 

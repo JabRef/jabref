@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 public class EntryTypeFactory {
@@ -43,23 +42,5 @@ public class EntryTypeFactory {
 
     public static EntryType parse(String typeName) {
         return OptionalUtil.orElse(StandardEntryType.fromName(typeName), new UnknownEntryType(typeName));
-    }
-
-    private static class UnknownEntryType implements EntryType {
-        private final String name;
-
-        private UnknownEntryType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return StringUtil.capitalizeFirst(name);
-        }
     }
 }

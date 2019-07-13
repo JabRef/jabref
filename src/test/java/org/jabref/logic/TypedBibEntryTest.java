@@ -2,8 +2,8 @@ package org.jabref.logic;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFieldsForUnknownTypeReturnsTrue() {
-        BibEntry e = new BibEntry(EntryTypeFactory.parse("articlllleeeee"));
+        BibEntry e = new BibEntry(new UnknownEntryType("articlllleeeee"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         assertTrue(typedEntry.hasAllRequiredFields());
@@ -55,7 +55,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void getTypeForDisplayForUnknownTypeCapitalizeFirstLetter() {
-        BibEntry e = new BibEntry(EntryTypeFactory.parse("articlllleeeee"));
+        BibEntry e = new BibEntry(new UnknownEntryType("articlllleeeee"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         assertEquals("Articlllleeeee", typedEntry.getTypeForDisplay());

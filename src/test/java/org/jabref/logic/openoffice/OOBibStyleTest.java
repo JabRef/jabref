@@ -21,6 +21,9 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -167,14 +170,14 @@ public class OOBibStyleTest {
                 layoutFormatterPreferences);
         BibDatabase db = result.getDatabase();
 
-        Layout l = style.getReferenceFormat("default");
+        Layout l = style.getReferenceFormat(new UnknownEntryType("default"));
         l.setPostFormatter(new OOPreFormatter());
         BibEntry entry = db.getEntryByKey("1137631").get();
         assertEquals(
                 "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>,   : 11-18.",
                 l.doLayout(entry, db));
 
-        l = style.getReferenceFormat("incollection");
+        l = style.getReferenceFormat(StandardEntryType.InCollection);
         l.setPostFormatter(new OOPreFormatter());
         assertEquals(
                 "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>. In:  (Ed.), <i>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</i>, ACM.",
@@ -187,7 +190,7 @@ public class OOBibStyleTest {
                 layoutFormatterPreferences);
         BibDatabase database = new BibDatabase();
 
-        Layout l = style.getReferenceFormat("article");
+        Layout l = style.getReferenceFormat(StandardEntryType.Article);
         l.setPostFormatter(new OOPreFormatter());
 
         BibEntry entry = new BibEntry();
@@ -206,7 +209,7 @@ public class OOBibStyleTest {
                 layoutFormatterPreferences);
         BibDatabase database = new BibDatabase();
 
-        Layout l = style.getReferenceFormat("article");
+        Layout l = style.getReferenceFormat(StandardEntryType.Article);
         l.setPostFormatter(new OOPreFormatter());
 
         BibEntry entry = new BibEntry();

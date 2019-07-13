@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,40 +87,40 @@ public class EndnoteImporterTest {
 
         BibEntry first = bibEntries.get(0);
         assertEquals("misc", first.getType());
-        assertEquals(Optional.of("testA0 and testA1"), first.getField("author"));
-        assertEquals(Optional.of("testE0 and testE1"), first.getField("editor"));
-        assertEquals(Optional.of("testT"), first.getField("title"));
+        assertEquals(Optional.of("testA0 and testA1"), first.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("testE0 and testE1"), first.getField(StandardField.EDITOR));
+        assertEquals(Optional.of("testT"), first.getField(StandardField.TITLE));
 
         BibEntry second = bibEntries.get(1);
         assertEquals("misc", second.getType());
         assertEquals(Optional.of("testC"), second.getField(StandardField.ADDRESS));
-        assertEquals(Optional.of("testB2"), second.getField("booktitle"));
-        assertEquals(Optional.of("test8"), second.getField("date"));
-        assertEquals(Optional.of("test7"), second.getField("edition"));
-        assertEquals(Optional.of("testJ"), second.getField("journal"));
-        assertEquals(Optional.of("testD"), second.getField("year"));
+        assertEquals(Optional.of("testB2"), second.getField(StandardField.BOOKTITLE));
+        assertEquals(Optional.of("test8"), second.getField(StandardField.DATE));
+        assertEquals(Optional.of("test7"), second.getField(StandardField.EDITION));
+        assertEquals(Optional.of("testJ"), second.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("testD"), second.getField(StandardField.YEAR));
 
         BibEntry third = bibEntries.get(2);
         assertEquals("article", third.getType());
-        assertEquals(Optional.of("testB0"), third.getField("journal"));
+        assertEquals(Optional.of("testB0"), third.getField(StandardField.JOURNAL));
 
         BibEntry fourth = bibEntries.get(3);
         assertEquals("book", fourth.getType());
-        assertEquals(Optional.of("testI0"), fourth.getField("publisher"));
-        assertEquals(Optional.of("testB1"), fourth.getField("series"));
+        assertEquals(Optional.of("testI0"), fourth.getField(StandardField.PUBLISHER));
+        assertEquals(Optional.of("testB1"), fourth.getField(StandardField.SERIES));
 
         BibEntry fifth = bibEntries.get(4);
         assertEquals("mastersthesis", fifth.getType());
         assertEquals(Optional.of("testX"), fifth.getField(StandardField.ABSTRACT));
-        assertEquals(Optional.of("testF"), fifth.getField("bibtexkey"));
-        assertEquals(Optional.of("testR"), fifth.getField("doi"));
+        assertEquals(Optional.of("testF"), fifth.getCiteKeyOptional());
+        assertEquals(Optional.of("testR"), fifth.getField(StandardField.DOI));
         assertEquals(Optional.of("testK"), fifth.getField(StandardField.KEYWORDS));
         assertEquals(Optional.of("testO1"), fifth.getField(StandardField.NOTE));
         assertEquals(Optional.of("testN"), fifth.getField(StandardField.NUMBER));
-        assertEquals(Optional.of("testP"), fifth.getField("pages"));
-        assertEquals(Optional.of("testI1"), fifth.getField("school"));
-        assertEquals(Optional.of("testU"), fifth.getField("url"));
-        assertEquals(Optional.of("testV"), fifth.getField("volume"));
+        assertEquals(Optional.of("testP"), fifth.getField(StandardField.PAGES));
+        assertEquals(Optional.of("testI1"), fifth.getField(StandardField.SCHOOL));
+        assertEquals(Optional.of("testU"), fifth.getField(StandardField.URL));
+        assertEquals(Optional.of("testV"), fifth.getField(StandardField.VOLUME));
     }
 
     @Test
@@ -132,9 +133,9 @@ public class EndnoteImporterTest {
 
         assertEquals(1, bibEntries.size());
         assertEquals("misc", entry.getType());
-        assertEquals(Optional.of("testA"), entry.getField("author"));
-        assertEquals(Optional.of("testE0, testE1"), entry.getField("editor"));
-        assertEquals(Optional.of("testO"), entry.getField("pages"));
+        assertEquals(Optional.of("testA"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("testE0, testE1"), entry.getField(StandardField.EDITOR));
+        assertEquals(Optional.of("testO"), entry.getField(StandardField.PAGES));
     }
 
     @Test
@@ -147,14 +148,14 @@ public class EndnoteImporterTest {
         assertEquals(1, bibEntries.size());
         assertEquals("book", entry.getType());
         assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
-        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), entry.getField("author"));
-        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), entry.getField("edition"));
+        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), entry.getField(StandardField.EDITION));
         assertEquals(Optional.of("Versionsverwaltung"), entry.getField(StandardField.KEYWORDS));
-        assertEquals(Optional.of("XX, 327"), entry.getField("pages"));
-        assertEquals(Optional.of("dpunkt.verlag"), entry.getField("publisher"));
+        assertEquals(Optional.of("XX, 327"), entry.getField(StandardField.PAGES));
+        assertEquals(Optional.of("dpunkt.verlag"), entry.getField(StandardField.PUBLISHER));
         assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),
-                entry.getField("title"));
-        assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getField("url"));
-        assertEquals(Optional.of("2016"), entry.getField("year"));
+                entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getField(StandardField.URL));
+        assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
     }
 }

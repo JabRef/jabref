@@ -13,6 +13,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,7 +88,7 @@ public class CsvExportFormatTest {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry();
-        entry.setField("editor", "Someone, Van Something");
+        entry.setField(StandardField.EDITOR, "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
@@ -104,7 +105,7 @@ public class CsvExportFormatTest {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry();
-        entry.setField("editor", "von Neumann, John and Smith, John and Black Brown, Peter");
+        entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);

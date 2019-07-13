@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -31,7 +33,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.ARTICLE);
+        BibEntry expected = new BibEntry(StandardEntryType.Article);
         expected.setField(StandardField.AUTHOR, "Wei Wang and Yun He and Tong Li and Jiajun Zhu and Jinzhuo Liu");
         expected.setField(StandardField.DOI, "10.1155/2018/5913634");
         expected.setField(StandardField.ISSN, "1875-919X");
@@ -62,11 +64,11 @@ class DOAJFetcherTest {
         BibEntry bibEntry = DOAJFetcher.parseBibJSONtoBibtex(jsonObject, ',');
 
         assertEquals("article", bibEntry.getType());
-        assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));
-        assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField("doi"));
-        assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField("author"));
-        assertEquals(Optional.of("Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"), bibEntry.getField("title"));
-        assertEquals(Optional.of("2014"), bibEntry.getField("year"));
+        assertEquals(Optional.of("VLSI Design"), bibEntry.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField(StandardField.DOI));
+        assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"), bibEntry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("2014"), bibEntry.getField(StandardField.YEAR));
     }
 
     @Test

@@ -8,9 +8,9 @@ import java.util.Collections;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ class LayoutTest {
 
     @Test
     void entryTypeForUnknown() throws IOException {
-        BibEntry entry = new BibEntry(EntryTypeFactory.parse("unknown")).withField(StandardField.AUTHOR, "test");
+        BibEntry entry = new BibEntry(new UnknownEntryType("unknown")).withField(StandardField.AUTHOR, "test");
 
         assertEquals("Unknown", layout("\\bibtextype", entry));
     }
