@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetcher for ISBN trying ebook.de first and then chimbori.com
+ * Fetcher for ISBN trying ebook.de first, chimbori.com second and then ottobib
  */
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
@@ -47,12 +47,19 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+        
         // nothing found at ebook.de, try chimbori.com
         if (!bibEntry.isPresent()) {
             LOGGER.debug("No entry found at ebook.de try chimbori.com");
             IsbnViaChimboriFetcher isbnViaChimboriFetcher = new IsbnViaChimboriFetcher(importFormatPreferences);
             bibEntry = isbnViaChimboriFetcher.performSearchById(identifier);
+        }
 
+        //nothing found at ebook.de and chimbori.com, try ottobib
+        if (!bibEntry.isPresent()) {
+            LOGGER.debug("No entry found at ebook.de and chimbori.com try ottobib");
+            IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
+            bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
         }
 
         return bibEntry;
