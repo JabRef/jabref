@@ -54,8 +54,8 @@ group = "org.jabref"
 version = "5.0-dev"
 project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
-sourceCompatibility = 9
-targetCompatibility = 9
+sourceCompatibility = 11
+targetCompatibility = 11
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
@@ -599,11 +599,11 @@ jlink {
 
     addOptions("--bind-services")
 
-    // TODO: Remove the following as soon as the dependencies are update 
+    // TODO: Remove the following as soon as the dependencies are update
     // forceMerge is usually needed when some non-modular artifacts in the dependency graph use code that was previously part of the JDK
-    // but it was removed in the newer releases. 
+    // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
-    // (because the artifact was published when this code was still available in the JDK). 
+    // (because the artifact was published when this code was still available in the JDK).
     forceMerge "javafx"
     forceMerge "controlsfx", "bcprov", "jaxb", "javax", "istack", "stax", "log4j"
 
@@ -680,7 +680,6 @@ task bundleLibreOffice(type: Jar) {
         attributes 'Automatic-Module-Name': 'org.jabref.thirdparty.libreoffice'
     }
 
-    
     destinationDir = file('lib')
     archiveName = 'libreoffice.jar'
 }
