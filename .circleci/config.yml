@@ -16,7 +16,7 @@ jobs:
           key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
           paths:
             - "~/downloads"
-            - "~/.install4j7"
+            - "~/.install4j8"
     filters:
       tags:
         only: /.*/
@@ -33,8 +33,8 @@ jobs:
       - restore_cache:
           key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
-      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: install4j8/bin/install4jc --verbose --license=$INSTALL4J8_KEY
+      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j8" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -56,8 +56,8 @@ jobs:
       - restore_cache:
           key: install4j-{{ checksum "scripts/extract-install4j.sh" }}
       - run: scripts/extract-install4j.sh
-      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - run: install4j8/bin/install4jc --verbose --license=$INSTALL4J8_KEY
+      - run: ./gradlew -Pinstall4jDir="install4j8" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
@@ -82,4 +82,3 @@ workflows:
               ignore: /.*/
             tags:
               only: /.*/
-

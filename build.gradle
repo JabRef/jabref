@@ -21,7 +21,7 @@ buildscript {
 plugins {
     id 'application'
     id 'com.gradle.build-scan' version '2.3'
-    id 'com.install4j.gradle' version '7.0.12'
+    id 'com.install4j.gradle' version '8.0'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     // TODO: Modernizer does not yet work with Java 11
     //id "com.simonharrer.modernizer" version '1.6.0-1'
@@ -53,10 +53,10 @@ apply from: 'eclipse.gradle'
 group = "org.jabref"
 version = "5.0-dev"
 project.ext.threeDotVersion = "5.0.0.0"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
 sourceCompatibility = 11
 targetCompatibility = 11
-mainClassName = "$moduleName/org.jabref.JabRefLauncher"
+mainClassName = "$moduleName/JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names

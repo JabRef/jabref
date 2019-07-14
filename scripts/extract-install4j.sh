@@ -1,4 +1,4 @@
 #!/bin/bash
-tar -xf ~/downloads/install4j_unix_7_0_11.tar.gz
-# fix directory name (until install4j 6.1.5 it was install4j6
-mv install4j7.0.11 install4j7
+tar -xf ~/downloads/install4j_unix_8_0.tar.gz
+https://download-gcdn.ej-technologies.com/install4j/install4j_unix_8_0.tar.gz
+mv install4j8.0 install4j8
