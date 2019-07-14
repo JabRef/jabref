@@ -79,7 +79,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         );
     }
 
-	public void setValues() {
+    public void setValues() {
         languagesListProperty.setValue(FXCollections.observableArrayList(Language.values()));
         selectedLanguageProperty.setValue(preferences.getLanguage());
 
@@ -112,7 +112,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         updateTimeStampProperty.setValue(preferences.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
     }
 
-	public void storeSettings() {
+    public void storeSettings() {
         if (selectedLanguageProperty.getValue() != preferences.getLanguage()) {
             preferences.setLanguage(selectedLanguageProperty.getValue());
             Localization.setLanguage(selectedLanguageProperty.getValue());
@@ -156,7 +156,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return markTimeStampFormatValidator.getValidationStatus();
     }
 
-	public boolean validateSettings() {
+    public boolean validateSettings() {
         ValidationStatus status = markTimeStampFormatValidationStatus();
         if (!status.isValid()) {
             dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
