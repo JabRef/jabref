@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
-import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
@@ -16,6 +15,8 @@ import org.reflections.Reflections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+
+import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 
 class WebFetchersTest {
 
