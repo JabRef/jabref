@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
+import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,6 @@ import org.reflections.Reflections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-
-import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 
 class WebFetchersTest {
 
@@ -36,9 +35,9 @@ class WebFetchersTest {
         expected.remove(AbstractIsbnFetcher.class);
         expected.remove(IdBasedParserFetcher.class);
         // Remove special ISBN fetcher since we don't want to expose them to the user
-        expected.remove(IsbnViaOttoBibFetcher.class);
         expected.remove(IsbnViaChimboriFetcher.class);
         expected.remove(IsbnViaEbookDeFetcher.class);
+        expected.remove(IsbnViaOttoBibFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 
