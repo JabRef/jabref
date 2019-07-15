@@ -78,8 +78,6 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
         // ottobib does not return an ISBN.
         entry.setField("isbn", identifier);
 
-        doPostCleanup(entry);
-
         return Optional.of(entry);
     }
 }
