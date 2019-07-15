@@ -811,8 +811,13 @@ public class BracketedPattern {
         } else if (tokens.length > 2) {
             author.append(append);
         }
+        if (author.toString().split("\\s")[1].charAt(0) == '{') {
+            return author.toString().split("\\s")[1].replace("EtAl", "");
+        } else {
+            return (author.toString().split("\\s")[1]);
+        }
 
-        return author.toString();
+        
     }
 
     /**
