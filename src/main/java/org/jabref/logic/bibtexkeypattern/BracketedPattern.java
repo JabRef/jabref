@@ -816,8 +816,6 @@ public class BracketedPattern {
         } else {
             return (author.toString().split("\\s")[1]);
         }
-
-        
     }
 
     /**
