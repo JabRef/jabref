@@ -82,10 +82,4 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
         return Optional.of(entry);
     }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-
-    }
-
 }
