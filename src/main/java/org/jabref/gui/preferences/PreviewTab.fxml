@@ -11,7 +11,6 @@
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <fx:root prefWidth="650.0" spacing="4.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.212"
@@ -48,11 +47,7 @@
             <children>
                 <TabPane prefHeight="250.0" prefWidth="650.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                        <Tab text="%Preview">
-                            <content>
-                                <ScrollPane fx:id="previewPane"/>
-                            </content>
-                        </Tab>
+                        <Tab text="%Preview" fx:id="previewTab" />
                         <Tab text="%Edit">
                             <content>
                                 <VirtualizedScrollPane>

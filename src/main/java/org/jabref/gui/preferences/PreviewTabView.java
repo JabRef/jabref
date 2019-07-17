@@ -13,8 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
@@ -56,7 +56,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @FXML private Label readOnlyLabel;
     @FXML private Button resetDefaultButton;
 
-    @FXML private ScrollPane previewPane;
+    @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
 
     private final ContextMenu contextMenu;
@@ -155,11 +155,10 @@ public class PreviewTabView extends VBox implements PrefsTab {
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        previewPane.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
-        ((PreviewViewer) previewPane.getContent()).setEntry(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewPane.getContent()).setLayout(value));
-        previewPane.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        ((PreviewViewer) previewPane.getContent()).setMaxWidth(640.0);
+        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
+        ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
+        EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
+        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
