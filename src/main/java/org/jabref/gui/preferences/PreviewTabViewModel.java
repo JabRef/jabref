@@ -30,6 +30,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -98,6 +99,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
+        availableSelectionModelProperty.setValue(new NoSelectionModel<>());
+        chosenSelectionModelProperty.setValue(new NoSelectionModel<>());
+
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
 
@@ -144,11 +148,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void refreshPreview() {
         layoutProperty.setValue(null);
-        if (chosenSelectionModelProperty.isNotNull().getValue()) {
-            setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
-        } else {
-            setPreviewLayout(null);
-        }
+        setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
     }
 
     private PreviewLayout findLayoutByName(String name) {
@@ -160,7 +160,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     private PreviewLayout getCurrentLayout() {
-        if (chosenSelectionModelProperty.isNotNull().getValue() && !chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
         }
 
@@ -195,8 +195,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                                                               .withPreviewStyle(((TextBasedPreviewLayout) previewStyle).getText())
                                                               .build();
 
-        if (chosenSelectionModelProperty.isNotNull().getValue()
-                && !chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
+        if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             newPreviewPreferences = newPreviewPreferences.getBuilder().withPreviewCyclePosition(
                     chosenListProperty.getValue().indexOf(
                             chosenSelectionModelProperty.getValue().getSelectedItems().get(0))).build();
@@ -228,20 +227,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        if (availableSelectionModelProperty.isNull().getValue()) {
-            return;
-        }
-
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
         availableListProperty.removeAll(selected);
         chosenListProperty.addAll(selected);
     }
 
     public void removeFromChosen() {
-        if (chosenSelectionModelProperty.isNull().getValue()) {
-            return;
-        }
-
         List<PreviewLayout> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedItems());
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
@@ -249,8 +240,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void selectedInChosenUp() {
-        if (chosenSelectionModelProperty.isNull().getValue()
-                || chosenSelectionModelProperty.getValue().isEmpty()) {
+        if (chosenSelectionModelProperty.getValue().isEmpty()) {
             return;
         }
 
@@ -271,8 +261,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void selectedInChosenDown() {
-        if (chosenSelectionModelProperty.isNull().getValue()
-                || chosenSelectionModelProperty.getValue().isEmpty()) {
+        if (chosenSelectionModelProperty.getValue().isEmpty()) {
             return;
         }
 
@@ -446,10 +435,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
                 chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);
 
-                if (chosenSelectionModelProperty.isNotNull().getValue()) {
-                    chosenSelectionModelProperty.getValue().clearSelection();
-                    draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
-                }
+                chosenSelectionModelProperty.getValue().clearSelection();
+                draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
+
                 success = true;
             }
         }
