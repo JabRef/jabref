@@ -67,6 +67,6 @@
     -fx-font-family: sans-serif;
 }
 
-.code-area .context-menu .menu-item {
+.code-area .context-menu .menu-item .label {
     -fx-padding: 2;
 }

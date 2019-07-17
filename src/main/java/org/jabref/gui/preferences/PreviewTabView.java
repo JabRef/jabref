@@ -122,6 +122,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
                 factory.createMenuItem(StandardActions.PASTE, new PreviewTabView.EditAction(StandardActions.PASTE)),
                 factory.createMenuItem(StandardActions.SELECT_ALL, new PreviewTabView.EditAction(StandardActions.SELECT_ALL))
         );
+        contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
 
         availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
@@ -158,6 +159,7 @@ public class PreviewTabView extends VBox implements PrefsTab {
         ((PreviewViewer) previewPane.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewPane.getContent()).setLayout(value));
         previewPane.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        ((PreviewViewer) previewPane.getContent()).setMaxWidth(640.0);
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
