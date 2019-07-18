@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -126,24 +125,22 @@ class ParseTexDialogViewModel extends AbstractViewModel {
                           noFilesFound.set(false);
                           successfulSearch.set(true);
                       })
-                      .onFailure(handleFailure())
+                      .onFailure(this::handleFailure)
                       .executeWith(taskExecutor);
     }
 
-    private Consumer<Exception> handleFailure() {
-        return exception -> {
-            root.set(null);
-            noFilesFound.set(true);
-            searchInProgress.set(false);
-            successfulSearch.set(false);
+    private void handleFailure(Exception exception) {
+        root.set(null);
+        noFilesFound.set(true);
+        searchInProgress.set(false);
+        successfulSearch.set(false);
 
-            final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
-            if (permissionProblem) {
-                dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
-            } else {
-                dialogService.showErrorDialogAndWait(exception);
-            }
-        };
+        final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
+        if (permissionProblem) {
+            dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
+        } else {
+            dialogService.showErrorDialogAndWait(exception);
+        }
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
