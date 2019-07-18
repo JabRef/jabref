@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import org.jabref.model.entry.BibEntry;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -47,6 +49,13 @@ public class TexParserResult {
      */
     public Collection<Citation> getCitationsByKey(String key) {
         return citations.get(key);
+    }
+
+    /**
+     * Return a collection of citations using a BibEntry as reference.
+     */
+    public Collection<Citation> getCitationsByKey(BibEntry entry) {
+        return getCitationsByKey(entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
