@@ -291,6 +291,9 @@ public class EntryEditor extends BorderPane {
                 entryEditorPreferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager);
         tabs.add(sourceTab);
 
+        // LaTeX references tab
+        tabs.add(new LatexReferencesTab(databaseContext, preferencesService, taskExecutor));
+
         return tabs;
     }
 
