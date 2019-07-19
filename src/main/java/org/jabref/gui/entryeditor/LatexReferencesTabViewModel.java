@@ -44,8 +44,24 @@ public class LatexReferencesTabViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.entry = new SimpleObjectProperty<>();
         this.citationList = FXCollections.observableArrayList();
-        this.searchInProgress = new SimpleBooleanProperty(false);
+        this.searchInProgress = new SimpleBooleanProperty(true);
         this.successfulSearch = new SimpleBooleanProperty(false);
+    }
+
+    public void setEntry(BibEntry entry) {
+        this.entry.set(entry);
+    }
+
+    public ObservableList<Citation> getCitationList() {
+        return new ReadOnlyListWrapper<>(citationList);
+    }
+
+    public BooleanProperty searchInProgressProperty() {
+        return searchInProgress;
+    }
+
+    public BooleanProperty successfulSearchProperty() {
+        return successfulSearch;
     }
 
     public void initSearch() {
@@ -54,8 +70,10 @@ public class LatexReferencesTabViewModel extends AbstractViewModel {
                           searchInProgress.set(true);
                           successfulSearch.set(false);
                       })
-                      .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(successfulSearch::set)
+                      .onSuccess(resultsFound -> {
+                          successfulSearch.set(resultsFound);
+                          searchInProgress.set(false);
+                      })
                       .executeWith(taskExecutor);
     }
 
@@ -76,22 +94,6 @@ public class LatexReferencesTabViewModel extends AbstractViewModel {
         citationList.setAll(citationCollection);
 
         return !citationCollection.isEmpty();
-    }
-
-    public void setEntry(BibEntry entry) {
-        this.entry.set(entry);
-    }
-
-    public ObservableList<Citation> getCitationList() {
-        return new ReadOnlyListWrapper<>(citationList);
-    }
-
-    public BooleanProperty searchInProgressProperty() {
-        return searchInProgress;
-    }
-
-    public BooleanProperty successfulSearchProperty() {
-        return successfulSearch;
     }
 
     public boolean shouldShow() {

@@ -45,6 +45,7 @@ public class LatexReferencesTab extends EntryEditorTab {
 
         searchPane = new StackPane();
         searchPane.getStyleClass().add("latexReferences-tab");
+        searchPane.getChildren().add(progressIndicator);
 
         setContent(searchPane);
     }
@@ -53,23 +54,21 @@ public class LatexReferencesTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         setupSearchPane();
 
-        progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());
-
         viewModel.setEntry(entry);
         viewModel.initSearch();
 
-        EasyBind.subscribe(viewModel.successfulSearchProperty(), success -> {
-            searchPane.getChildren().setAll(progressIndicator);
-            if (success) {
-                formattedCitationList = EasyBind.map(viewModel.getCitationList(), this::citationToVBox);
-                searchPane.getChildren().add(getCitationsPane());
-            } else {
-                searchPane.getChildren().add(getNotFoundPane());
+        EasyBind.subscribe(viewModel.searchInProgressProperty(), stillWorking -> {
+            if (!stillWorking) {
+                formattedCitationList = EasyBind.map(viewModel.getCitationList(), this::citationToGraphic);
+                searchPane.getChildren().setAll(
+                        viewModel.successfulSearchProperty().get()
+                                ? getCitationsPane()
+                                : getNotFoundPane());
             }
         });
     }
 
-    private VBox citationToVBox(Citation citation) {
+    private VBox citationToGraphic(Citation citation) {
         HBox contextBox = new HBox(new Text(LatexToUnicodeAdapter.format(citation.getLineText())));
         contextBox.getStyleClass().add("latexReferences-contextBox");
 
