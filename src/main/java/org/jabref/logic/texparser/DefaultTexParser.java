@@ -72,16 +72,12 @@ public class DefaultTexParser implements TexParser {
         result.addFiles(texFiles);
 
         for (Path file : texFiles) {
-            try (LineNumberReader lnr = new LineNumberReader(Files.newBufferedReader(file))) {
-                for (String line = lnr.readLine(); line != null; line = lnr.readLine()) {
-                    if (line.isEmpty() || line.charAt(0) == '%') {
-                        // Skip comments and blank lines.
-                        continue;
-                    }
-
-                    matchCitation(file, lnr.getLineNumber(), line);
+            try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
+                // Skip comments and blank lines.
+                lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
+                    matchCitation(file, lineNumberReader.getLineNumber(), line);
                     matchNestedFile(file, texFiles, referencedFiles, line);
-                }
+                });
             } catch (IOException e) {
                 LOGGER.warn("Error opening the TEX file", e);
             }
