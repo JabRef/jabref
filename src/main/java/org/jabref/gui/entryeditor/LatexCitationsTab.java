@@ -31,7 +31,6 @@ public class LatexCitationsTab extends EntryEditorTab {
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                              TaskExecutor taskExecutor) {
         this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
-
         this.searchPane = new StackPane();
         this.progressIndicator = new ProgressIndicator();
         this.graphicCitationList = FXCollections.observableArrayList();
@@ -44,7 +43,6 @@ public class LatexCitationsTab extends EntryEditorTab {
     private void setupSearchPane() {
         progressIndicator.setMaxSize(100.0, 100.0);
         searchPane.getStyleClass().add("latex-citations-tab");
-        searchPane.getChildren().setAll(progressIndicator);
 
         setContent(searchPane);
     }
@@ -53,28 +51,21 @@ public class LatexCitationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         setupSearchPane();
 
-        EasyBind.subscribe(viewModel.workingInProgressProperty(), working -> {
-            if (working) {
-                searchPane.getChildren().setAll(progressIndicator);
-            }
-        });
-
-        EasyBind.subscribe(viewModel.successfulSearchProperty(), success -> {
-            if (success) {
-                graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
-                searchPane.getChildren().setAll(getCitationsPane());
-            }
-        });
-
-        EasyBind.subscribe(viewModel.notFoundResultsProperty(), noResults -> {
-            if (noResults) {
-                searchPane.getChildren().setAll(getNotFoundPane());
-            }
-        });
-
-        EasyBind.subscribe(viewModel.searchErrorProperty(), exception -> {
-            if (exception != null) {
-                searchPane.getChildren().setAll(getErrorPane(exception));
+        EasyBind.subscribe(viewModel.statusProperty(), status -> {
+            switch (status) {
+                case IN_PROGRESS:
+                    searchPane.getChildren().setAll(progressIndicator);
+                    break;
+                case CITATIONS_FOUND:
+                    graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
+                    searchPane.getChildren().setAll(getCitationsPane());
+                    break;
+                case NO_RESULTS:
+                    searchPane.getChildren().setAll(getNotFoundPane());
+                    break;
+                case ERROR:
+                    searchPane.getChildren().setAll(getErrorPane(viewModel.getSearchError()));
+                    break;
             }
         });
 
