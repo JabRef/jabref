@@ -182,7 +182,7 @@ public class BasePanel extends StackPane {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this, Globals.prefs, Globals.getFileUpdateMonitor(), dialogService, externalFileTypes, Globals.TASK_EXECUTOR, Globals.stateManager);
+        this.entryEditor = new EntryEditor(this, externalFileTypes);
 
         this.preview = new PreviewPanel(getBibDatabaseContext(), this, dialogService, externalFileTypes, Globals.getKeyPrefs(), preferences.getPreviewPreferences());
     }

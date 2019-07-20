@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -68,14 +70,8 @@ public class EntryEditor extends BorderPane {
 
     private final BasePanel panel;
     private final BibDatabaseContext databaseContext;
-    private final CountingUndoManager undoManager;
-    private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final FileUpdateMonitor fileMonitor;
-    private final DialogService dialogService;
     private final ExternalFilesEntryLinker fileLinker;
-    private final TaskExecutor taskExecutor;
-    private final StateManager stateManager;
     private final List<EntryEditorTab> tabs;
     private Subscription typeSubscription;
     private BibEntry entry;  // A reference to the entry this editor works on.
@@ -84,24 +80,24 @@ public class EntryEditor extends BorderPane {
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
     @FXML private Label typeLabel;
+    @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
+    @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private CountingUndoManager undoManager;
 
-    public EntryEditor(BasePanel panel, PreferencesService preferencesService, FileUpdateMonitor fileMonitor,
-                       DialogService dialogService, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor,
-                       StateManager stateManager) {
+    public EntryEditor(BasePanel panel, ExternalFileTypes externalFileTypes) {
         this.panel = panel;
         this.databaseContext = panel.getBibDatabaseContext();
-        this.undoManager = panel.getUndoManager();
-        this.preferencesService = preferencesService;
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileMonitor = fileMonitor;
-        this.dialogService = dialogService;
-        this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(), databaseContext);
-        this.taskExecutor = taskExecutor;
-        this.stateManager = stateManager;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
+                databaseContext);
 
         if (GUIGlobals.currentFont != null) {
             setStyle(String.format("text-area-background: %s;text-area-foreground: %s;text-area-highlight: %s;",
