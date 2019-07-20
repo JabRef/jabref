@@ -316,7 +316,8 @@ public class IconTheme {
         OWNER(MaterialDesignIcon.ACCOUNT),
         CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
         ARTICLE(MaterialDesignIcon.FILE_DOCUMENT),
-        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT);
+        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT),
+        PASSWORD_REVEALED(MaterialDesignIcon.EYE);
 
         private final JabRefIcon icon;
 

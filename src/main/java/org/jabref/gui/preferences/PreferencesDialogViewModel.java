@@ -44,23 +44,23 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.prefs = Globals.prefs;
         this.frame = frame;
 
-        preferenceTabs = FXCollections.observableArrayList();
-        preferenceTabs.add(new GeneralTabView(prefs));
-        preferenceTabs.add(new FileTabView(prefs));
-        preferenceTabs.add(new TablePrefsTab(prefs));
-        preferenceTabs.add(new TableColumnsTab(prefs, frame));
-        preferenceTabs.add(new PreviewTabView(prefs));
-        preferenceTabs.add(new ExternalTabView(prefs, frame));
-        preferenceTabs.add(new GroupsPrefsTab(prefs));
-        preferenceTabs.add(new EntryEditorPrefsTab(prefs));
-        preferenceTabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
-        preferenceTabs.add(new ImportSettingsTab(prefs));
-        preferenceTabs.add(new ExportSortingPrefsTab(prefs));
-        preferenceTabs.add(new NameFormatterTab(prefs));
-        preferenceTabs.add(new XmpPrefsTab(prefs));
-        preferenceTabs.add(new NetworkTab(dialogService, prefs));
-        preferenceTabs.add(new AdvancedTab(dialogService, prefs));
-        preferenceTabs.add(new AppearancePrefsTab(dialogService, prefs));
+        preferenceTabs = FXCollections.observableArrayList(
+                new GeneralTabView(prefs),
+                new FileTabView(prefs),
+                new TablePrefsTab(prefs),
+                new TableColumnsTab(prefs, frame),
+                new PreviewTabView(prefs),
+                new ExternalTabView(prefs, frame),
+                new GroupsPrefsTab(prefs),
+                new EntryEditorPrefsTab(prefs),
+                new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()),
+                new ImportSettingsTab(prefs),
+                new ExportSortingPrefsTab(prefs),
+                new NameFormatterTab(prefs),
+                new XmpPrefsTab(prefs),
+                new AdvancedTabView(prefs),
+                new AppearancePrefsTab(dialogService, prefs)
+        );
     }
 
     public ObservableList<PrefsTab> getPreferenceTabs() {

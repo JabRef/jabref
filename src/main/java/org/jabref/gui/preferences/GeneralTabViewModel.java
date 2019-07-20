@@ -59,7 +59,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.preferences = preferences;
         setValues();
 
-        markTimeStampFormatValidator = new FunctionBasedValidator(
+        markTimeStampFormatValidator = new FunctionBasedValidator<>(
                 markTimeStampFormatProperty,
                 input -> {
                     try {
