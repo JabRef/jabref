@@ -3,8 +3,8 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +26,12 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LatexCitationsTabViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
 
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
@@ -34,47 +39,82 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<BibEntry> entry;
     private final ObservableList<Citation> citationList;
-    private final BooleanProperty searchInProgress;
+    private final BooleanProperty workingInProgress;
     private final BooleanProperty successfulSearch;
+    private final BooleanProperty notFoundResults;
+    private final ObjectProperty<Exception> searchError;
+    private Future<?> searchTask;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
-                                       TaskExecutor taskExecutor) {
+                                      TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
-        this.entry = new SimpleObjectProperty<>();
+
+        this.entry = new SimpleObjectProperty<>(null);
         this.citationList = FXCollections.observableArrayList();
-        this.searchInProgress = new SimpleBooleanProperty(true);
+        this.workingInProgress = new SimpleBooleanProperty(true);
         this.successfulSearch = new SimpleBooleanProperty(false);
+        this.notFoundResults = new SimpleBooleanProperty(false);
+        this.searchError = new SimpleObjectProperty<>(null);
     }
 
-    public void setEntry(BibEntry entry) {
+    public void init(BibEntry entry) {
+        cancelSearch();
+        this.workingInProgress.set(true);
+        this.citationList.clear();
         this.entry.set(entry);
+        startSearch();
     }
 
     public ObservableList<Citation> getCitationList() {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
-    public BooleanProperty searchInProgressProperty() {
-        return searchInProgress;
+    public BooleanProperty workingInProgressProperty() {
+        return workingInProgress;
     }
 
     public BooleanProperty successfulSearchProperty() {
         return successfulSearch;
     }
 
-    public void initSearch() {
-        BackgroundTask.wrap(this::searchAndParse)
-                      .onRunning(() -> {
-                          searchInProgress.set(true);
-                          successfulSearch.set(false);
-                      })
-                      .onSuccess(resultsFound -> {
-                          successfulSearch.set(resultsFound);
-                          searchInProgress.set(false);
-                      })
-                      .executeWith(taskExecutor);
+    public BooleanProperty notFoundResultsProperty() {
+        return notFoundResults;
+    }
+
+    public ObjectProperty<Exception> searchErrorProperty() {
+        return searchError;
+    }
+
+    private void startSearch() {
+        searchTask = BackgroundTask.wrap(this::searchAndParse)
+                                   .onRunning(() -> {
+                                       workingInProgress.set(true);
+                                       successfulSearch.set(false);
+                                       notFoundResults.set(false);
+                                       searchError.set(null);
+                                   })
+                                   .onFailure(searchError::set)
+                                   .onSuccess(noResults -> {
+                                       workingInProgress.set(false);
+                                       successfulSearch.set(!noResults);
+                                       notFoundResults.set(noResults);
+                                   })
+                                   .executeWith(taskExecutor);
+    }
+
+    private void cancelSearch() {
+        if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
+            return;
+        }
+
+        searchTask.cancel(true);
+
+        LOGGER.info("Trying to cancel previous search");
+        if (searchTask.isCancelled()) {
+            LOGGER.info("Last search has been cancelled");
+        }
     }
 
     private boolean searchAndParse() throws IOException {
@@ -86,14 +126,14 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             texFiles = filesStream.filter(path -> path.toFile().isFile() && path.toString().endsWith(TEX_EXT))
                                   .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new IOException("An error occurred while searching files: ", e);
+            LOGGER.error("Error searching files", e);
+            throw new IOException("Error searching files", e);
         }
 
         TexParserResult texParserResult = new DefaultTexParser().parse(texFiles);
-        Collection<Citation> citationCollection = texParserResult.getCitationsByKey(entry.get());
-        citationList.setAll(citationCollection);
+        citationList.setAll(texParserResult.getCitationsByKey(entry.get()));
 
-        return !citationCollection.isEmpty();
+        return citationList.isEmpty();
     }
 
     public boolean shouldShow() {

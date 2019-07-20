@@ -128,8 +128,8 @@
     -fx-padding: 20px;
 }
 
-.latex-citations-title-tex {
-    -fx-font-size: 130%;
+.latex-citations-title-text {
+    -fx-font-size: 140%;
     -fx-font-weight: bold;
 }
 
@@ -147,6 +147,15 @@
 }
 
 .latex-citations-not-found-text {
-    -fx-font-style: italic;
-    -fx-padding: 20px;
+    -fx-font-size: 110%;
+}
+
+.latex-citations-not-found-advice-text {
+    -fx-font-weight: bold;
+}
+
+.latex-citations-error-text {
+    -fx-font-size: 110%;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-accent;
 }

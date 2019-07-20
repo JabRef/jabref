@@ -131,7 +131,7 @@ class ParseTexDialogViewModel extends AbstractViewModel {
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
         if (directory == null || !directory.toFile().exists() || !directory.toFile().isDirectory()) {
-            throw new IOException("An error occurred while searching an invalid directory.");
+            throw new IOException("Error searching an invalid directory");
         }
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
@@ -140,7 +140,7 @@ class ParseTexDialogViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            throw new IOException("An error occurred while searching files: ", e);
+            throw new IOException("Error searching files", e);
         }
 
         List<Path> subDirectories = fileListPartition.get(true);

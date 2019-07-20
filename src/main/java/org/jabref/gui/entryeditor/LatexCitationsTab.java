@@ -24,13 +24,17 @@ import org.fxmisc.easybind.EasyBind;
 public class LatexCitationsTab extends EntryEditorTab {
 
     private final LatexCitationsTabViewModel viewModel;
-    private ProgressIndicator progressIndicator;
-    private ObservableList<VBox> formattedCitationList;
-    private StackPane searchPane;
+    private final StackPane searchPane;
+    private final ProgressIndicator progressIndicator;
+    private final ObservableList<VBox> graphicCitationList;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
-                              TaskExecutor taskExecutor) {
+                             TaskExecutor taskExecutor) {
         this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
+
+        this.searchPane = new StackPane();
+        this.progressIndicator = new ProgressIndicator();
+        this.graphicCitationList = FXCollections.observableArrayList();
 
         setText(Localization.lang("LaTeX citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
@@ -38,14 +42,9 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private void setupSearchPane() {
-        progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxSize(100.0, 100.0);
-
-        formattedCitationList = FXCollections.observableArrayList();
-
-        searchPane = new StackPane();
         searchPane.getStyleClass().add("latex-citations-tab");
-        searchPane.getChildren().add(progressIndicator);
+        searchPane.getChildren().setAll(progressIndicator);
 
         setContent(searchPane);
     }
@@ -54,18 +53,32 @@ public class LatexCitationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         setupSearchPane();
 
-        viewModel.setEntry(entry);
-        viewModel.initSearch();
-
-        EasyBind.subscribe(viewModel.searchInProgressProperty(), stillWorking -> {
-            if (!stillWorking) {
-                formattedCitationList = EasyBind.map(viewModel.getCitationList(), this::citationToGraphic);
-                searchPane.getChildren().setAll(
-                        viewModel.successfulSearchProperty().get()
-                                ? getCitationsPane()
-                                : getNotFoundPane());
+        EasyBind.subscribe(viewModel.workingInProgressProperty(), working -> {
+            if (working) {
+                searchPane.getChildren().setAll(progressIndicator);
             }
         });
+
+        EasyBind.subscribe(viewModel.successfulSearchProperty(), success -> {
+            if (success) {
+                graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
+                searchPane.getChildren().setAll(getCitationsPane());
+            }
+        });
+
+        EasyBind.subscribe(viewModel.notFoundResultsProperty(), noResults -> {
+            if (noResults) {
+                searchPane.getChildren().setAll(getNotFoundPane());
+            }
+        });
+
+        EasyBind.subscribe(viewModel.searchErrorProperty(), exception -> {
+            if (exception != null) {
+                searchPane.getChildren().setAll(getErrorPane(exception));
+            }
+        });
+
+        viewModel.init(entry);
     }
 
     private VBox citationToGraphic(Citation citation) {
@@ -80,11 +93,11 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private ScrollPane getCitationsPane() {
-        Text titleText = new Text(Localization.lang("Citations found:"));
+        Text titleText = new Text(Localization.lang("Citations found"));
         titleText.getStyleClass().add("latex-citations-title-text");
 
         VBox citationsBox = new VBox(20.0, titleText);
-        citationsBox.getChildren().setAll(formattedCitationList);
+        citationsBox.getChildren().addAll(graphicCitationList);
 
         ScrollPane citationsPane = new ScrollPane();
         citationsPane.setContent(citationsBox);
@@ -93,13 +106,37 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private ScrollPane getNotFoundPane() {
-        Text notFoundText = new Text(Localization.lang("No citations found for this entry."));
+        Text notFoundTitleText = new Text(Localization.lang("No citations found"));
+        notFoundTitleText.getStyleClass().add("latex-citations-title-text");
+
+        Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
         notFoundText.getStyleClass().add("latex-citations-not-found-text");
 
+        Text notFoundAdviceText = new Text(Localization.lang(
+                "You can set the LaTeX file directory in the 'Library properties' dialog."));
+        notFoundAdviceText.getStyleClass().add("latex-citations-not-found-advice-text");
+
+        VBox notFoundBox = new VBox(20.0, notFoundTitleText, notFoundText, notFoundAdviceText);
         ScrollPane notFoundPane = new ScrollPane();
-        notFoundPane.setContent(notFoundText);
+        notFoundPane.setContent(notFoundBox);
 
         return notFoundPane;
+    }
+
+    private ScrollPane getErrorPane(Exception exception) {
+        Text errorTitleText = new Text(Localization.lang("Error"));
+        errorTitleText.getStyleClass().add("latex-citations-title-text");
+
+        Text errorMessageText = new Text(exception.getMessage());
+        errorMessageText.getStyleClass().add("latex-citations-error-text");
+
+        Text errorCauseText = new Text(exception.getCause().toString());
+
+        VBox errorBox = new VBox(20.0, errorTitleText, errorMessageText, errorCauseText);
+        ScrollPane errorPane = new ScrollPane();
+        errorPane.setContent(errorBox);
+
+        return errorPane;
     }
 
     @Override
