@@ -3,6 +3,7 @@ package org.jabref.logic.layout;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -80,6 +81,10 @@ public class Layout {
         for (LayoutEntry layoutEntry : layoutEntries) {
             layoutEntry.setPostFormatter(formatter);
         }
+    }
+
+    public String getText() {
+        return layoutEntries.stream().map(LayoutEntry::getText).collect(Collectors.joining("\n"));
     }
 
     /**

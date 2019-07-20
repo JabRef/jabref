@@ -45,7 +45,8 @@ public class FieldEditors {
                 databaseContext,
                 preferences.getFilePreferences(),
                 journalAbbreviationRepository,
-                preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+                preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
+                preferences.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
         final boolean isSingleLine = InternalBibtexFields.isSingleLineField(fieldName);
 

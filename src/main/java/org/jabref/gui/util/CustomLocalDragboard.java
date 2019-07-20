@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -63,4 +64,24 @@ public class CustomLocalDragboard {
         return Collections.emptyList();
     }
 
+    /**
+     * Puts A List of {@link PreviewLayout} in the map All previous content is cleared
+     *
+     * @param previewLayouts The list to put
+     */
+    public void putPreviewLayouts(List<PreviewLayout> previewLayouts) {
+        putValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS, previewLayouts);
+    }
+
+    /**
+     * Get a List of {@link PreviewLayout} from the dragboard
+     *
+     * @return List of PreviewLayout or empty list if no entries are avaiable
+     */
+    public List<PreviewLayout> getPreviewLayouts() {
+        if (hasType(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS)) {
+            return getValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS);
+        }
+        return Collections.emptyList();
+    }
 }
