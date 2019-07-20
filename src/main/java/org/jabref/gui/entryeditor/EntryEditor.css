@@ -123,22 +123,17 @@
     -fx-fill: -fx-text-background-color;
 }
 
-.latexReferences-tab {
+.latex-citations-tab {
     -fx-background-color: -fx-control-inner-background;
     -fx-padding: 20px;
 }
 
-.latexReferences-title {
+.latex-citations-title-tex {
     -fx-font-size: 130%;
     -fx-font-weight: bold;
 }
 
-.latexReferences-description {
-    -fx-font-style: italic;
-    -fx-padding: 20px;
-}
-
-.latexReferences-contextBox {
+.latex-citations-context-box {
     -fx-border-color: grey;
     -fx-border-style: dashed;
     -fx-border-width: 2px;
@@ -147,6 +142,11 @@
     -fx-padding: 15px;
 }
 
-.latexReferences-fileData {
+.latex-citations-position-text {
     -fx-font-family: 'Courier New', Courier, monospace;
+}
+
+.latex-citations-not-found-text {
+    -fx-font-style: italic;
+    -fx-padding: 20px;
 }

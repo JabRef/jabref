@@ -21,19 +21,19 @@ import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class LatexReferencesTab extends EntryEditorTab {
+public class LatexCitationsTab extends EntryEditorTab {
 
-    private final LatexReferencesTabViewModel viewModel;
+    private final LatexCitationsTabViewModel viewModel;
     private ProgressIndicator progressIndicator;
     private ObservableList<VBox> formattedCitationList;
     private StackPane searchPane;
 
-    public LatexReferencesTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
+    public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                               TaskExecutor taskExecutor) {
-        this.viewModel = new LatexReferencesTabViewModel(databaseContext, preferencesService, taskExecutor);
+        this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
 
-        setText(Localization.lang("LaTeX references"));
-        setTooltip(new Tooltip(Localization.lang("Search this reference in the LaTeX file directory")));
+        setText(Localization.lang("LaTeX citations"));
+        setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO.getGraphicNode());
     }
 
@@ -44,7 +44,7 @@ public class LatexReferencesTab extends EntryEditorTab {
         formattedCitationList = FXCollections.observableArrayList();
 
         searchPane = new StackPane();
-        searchPane.getStyleClass().add("latexReferences-tab");
+        searchPane.getStyleClass().add("latex-citations-tab");
         searchPane.getChildren().add(progressIndicator);
 
         setContent(searchPane);
@@ -70,34 +70,34 @@ public class LatexReferencesTab extends EntryEditorTab {
 
     private VBox citationToGraphic(Citation citation) {
         HBox contextBox = new HBox(new Text(LatexToUnicodeAdapter.format(citation.getLineText())));
-        contextBox.getStyleClass().add("latexReferences-contextBox");
+        contextBox.getStyleClass().add("latex-citations-context-box");
 
-        Text fileData = new Text(String.format("%n%s (%s:%s-%s)", citation.getPath().toAbsolutePath(),
+        Text positionText = new Text(String.format("%n%s (%s:%s-%s)", citation.getPath().toAbsolutePath(),
                 citation.getLine(), citation.getColStart(), citation.getColEnd()));
-        fileData.getStyleClass().add("latexReferences-fileData");
+        positionText.getStyleClass().add("latex-citations-position-text");
 
-        return new VBox(contextBox, fileData);
+        return new VBox(contextBox, positionText);
     }
 
     private ScrollPane getCitationsPane() {
-        Text titleText = new Text(Localization.lang("References found:"));
-        titleText.getStyleClass().add("latexReferences-title");
+        Text titleText = new Text(Localization.lang("Citations found:"));
+        titleText.getStyleClass().add("latex-citations-title-text");
 
-        VBox vBox = new VBox(20.0, titleText);
-        vBox.getChildren().setAll(formattedCitationList);
+        VBox citationsBox = new VBox(20.0, titleText);
+        citationsBox.getChildren().setAll(formattedCitationList);
 
         ScrollPane citationsPane = new ScrollPane();
-        citationsPane.setContent(vBox);
+        citationsPane.setContent(citationsBox);
 
         return citationsPane;
     }
 
     private ScrollPane getNotFoundPane() {
-        Text descriptionText = new Text(Localization.lang("No references found for this entry."));
-        descriptionText.getStyleClass().add("latexReferences-description");
+        Text notFoundText = new Text(Localization.lang("No citations found for this entry."));
+        notFoundText.getStyleClass().add("latex-citations-not-found-text");
 
         ScrollPane notFoundPane = new ScrollPane();
-        notFoundPane.setContent(descriptionText);
+        notFoundPane.setContent(notFoundText);
 
         return notFoundPane;
     }

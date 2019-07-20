@@ -299,7 +299,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
-    public static final String SHOW_LATEX_REFERENCES = "showLatexReferences";
+    public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
     public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
     public static final String SEND_OS_DATA = "sendOSData";
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
@@ -575,7 +575,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
-        defaults.put(SHOW_LATEX_REFERENCES, Boolean.TRUE);
+        defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
@@ -903,7 +903,7 @@ public class JabRefPreferences implements PreferencesService {
                                           getCustomTabFieldNames(),
                                           getBoolean(SHOW_RECOMMENDATIONS),
                                           getBoolean(ACCEPT_RECOMMENDATIONS),
-                                          getBoolean(SHOW_LATEX_REFERENCES),
+                                          getBoolean(SHOW_LATEX_CITATIONS),
                                           getBoolean(DEFAULT_SHOW_SOURCE),
                                           getBibtexKeyPatternPreferences(),
                                           Globals.getKeyPrefs(),

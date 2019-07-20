@@ -26,7 +26,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 import org.jabref.preferences.PreferencesService;
 
-public class LatexReferencesTabViewModel extends AbstractViewModel {
+public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
@@ -37,7 +37,7 @@ public class LatexReferencesTabViewModel extends AbstractViewModel {
     private final BooleanProperty searchInProgress;
     private final BooleanProperty successfulSearch;
 
-    public LatexReferencesTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
+    public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                                        TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
@@ -97,6 +97,6 @@ public class LatexReferencesTabViewModel extends AbstractViewModel {
     }
 
     public boolean shouldShow() {
-        return preferencesService.getEntryEditorPreferences().shouldShowLatexReferencesTab();
+        return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
     }
 }

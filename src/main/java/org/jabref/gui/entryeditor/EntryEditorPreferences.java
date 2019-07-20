@@ -20,9 +20,9 @@ public class EntryEditorPreferences {
     private boolean showSourceTabByDefault;
     private final KeyBindingRepository keyBindings;
     private boolean avoidOverwritingCiteKey;
-    private final boolean shouldShowLatexReferencesTab;
+    private final boolean shouldShowLatexCitationsTab;
 
-    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexReferencesTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
@@ -33,7 +33,7 @@ public class EntryEditorPreferences {
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
         this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
-        this.shouldShowLatexReferencesTab = shouldShowLatexReferencesTab;
+        this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
     }
 
     public Map<String, List<String>> getEntryEditorTabList() {
@@ -80,8 +80,8 @@ public class EntryEditorPreferences {
         this.showSourceTabByDefault = showSourceTabByDefault;
     }
 
-    public boolean shouldShowLatexReferencesTab() {
-        return shouldShowLatexReferencesTab;
+    public boolean shouldShowLatexCitationsTab() {
+        return shouldShowLatexCitationsTab;
     }
 
     public boolean avoidOverwritingCiteKey() {
