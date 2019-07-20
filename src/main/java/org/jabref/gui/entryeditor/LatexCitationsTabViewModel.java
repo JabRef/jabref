@@ -111,9 +111,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         searchTask.cancel(true);
 
-        LOGGER.info("Trying to cancel previous search");
         if (searchTask.isCancelled()) {
-            LOGGER.info("Last search has been cancelled");
+            LOGGER.debug("Last search has been cancelled");
+        } else {
+            LOGGER.warn("Could not cancel last search");
         }
     }
 
