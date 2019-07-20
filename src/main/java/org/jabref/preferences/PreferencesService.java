@@ -54,7 +54,7 @@ public interface PreferencesService {
 
     Map<String, List<String>> getEntryEditorTabList();
 
-    Boolean getEnforceLegalKeys();
+    boolean getEnforceLegalKeys();
 
     Map<String, String> getCustomTabsNamesAndFields();
 
@@ -98,7 +98,7 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes();
 
-    Boolean getAllowIntegerEdition();
+    boolean getAllowIntegerEdition();
 
     FileDragDropPreferenceType getEntryEditorFileLinkPreference();
 

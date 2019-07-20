@@ -1353,12 +1353,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Boolean getEnforceLegalKeys() {
+    public boolean getEnforceLegalKeys() {
         return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
     }
 
     @Override
-    public Boolean getAllowIntegerEdition() {
+    public boolean getAllowIntegerEdition() {
         return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
     }
 
