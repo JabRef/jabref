@@ -146,6 +146,7 @@ public class EntryEditor extends BorderPane {
                         LOGGER.debug("Mode MOVE");
                         fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                     }
+                    success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
@@ -162,6 +163,7 @@ public class EntryEditor extends BorderPane {
                         LOGGER.debug("Mode COPY");
                         fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                     }
+                    success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
@@ -178,10 +180,11 @@ public class EntryEditor extends BorderPane {
                         LOGGER.debug("Mode LINK");
                         fileLinker.addFilesToEntry(entry, files);
                     }
+                    success = true;
                 }
             }
 
-            event.setDropCompleted(success);  // Always false
+            event.setDropCompleted(success);
             event.consume();
         });
     }
