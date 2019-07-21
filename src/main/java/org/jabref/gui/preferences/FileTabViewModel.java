@@ -59,7 +59,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         this.preferences = preferences;
         setValues();
 
-        mainFileDirValidator = new FunctionBasedValidator(
+        mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirProperty,
                 input -> {
                     Path path = Paths.get(mainFileDirProperty.getValue());

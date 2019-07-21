@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
@@ -46,8 +47,10 @@ public class GeneralTabView extends VBox implements PrefsTab {
     @FXML private Button markOwnerHelp;
     @FXML private CheckBox markTimestamp;
     @FXML private TextField markTimeStampFormat;
+    @FXML private Label markTimeStampFormatLabel;
     @FXML private CheckBox markTimeStampOverwrite;
     @FXML private TextField markTimeStampFieldName;
+    @FXML private Label markTimeStampFieldNameLabel;
     @FXML private Button markTimeStampHelp;
     @FXML private CheckBox updateTimeStamp;
 
@@ -87,12 +90,19 @@ public class GeneralTabView extends VBox implements PrefsTab {
 
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
+        markOwnerName.disableProperty().bind(markOwner.selectedProperty().not());
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
+        markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
         markTimestamp.selectedProperty().bindBidirectional(viewModel.markTimestampProperty());
+        markTimeStampFormatLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
         markTimeStampFormat.textProperty().bindBidirectional(viewModel.markTimeStampFormatProperty());
+        markTimeStampFormat.disableProperty().bind(markTimestamp.selectedProperty().not());
         markTimeStampOverwrite.selectedProperty().bindBidirectional(viewModel.markTimeStampOverwriteProperty());
+        markTimeStampOverwrite.disableProperty().bind(markTimestamp.selectedProperty().not());
+        markTimeStampFieldNameLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
         markTimeStampFieldName.textProperty().bindBidirectional(viewModel.markTimeStampFieldNameProperty());
+        markTimeStampFieldName.disableProperty().bind(markTimestamp.selectedProperty().not());
         updateTimeStamp.selectedProperty().bindBidirectional(viewModel.updateTimeStampProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());

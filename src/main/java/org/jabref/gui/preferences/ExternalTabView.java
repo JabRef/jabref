@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
@@ -30,15 +31,19 @@ public class ExternalTabView extends VBox implements PrefsTab {
     @FXML private RadioButton useTerminalDefault;
     @FXML private RadioButton useTerminalSpecial;
     @FXML private TextField useTerminalCommand;
+    @FXML private Button useTerminalBrowse;
 
     @FXML private RadioButton usePDFAcrobat;
     @FXML private TextField usePDFAcrobatCommand;
+    @FXML private Button usePDFAcrobatBrowse;
     @FXML private RadioButton usePDFSumatra;
     @FXML private TextField usePDFSumatraCommand;
+    @FXML private Button usePDFSumatraBrowse;
 
     @FXML private RadioButton useFileBrowserDefault;
     @FXML private RadioButton useFileBrowserSpecial;
     @FXML private TextField useFileBrowserSpecialCommand;
+    @FXML private Button useFileBrowserSpecialBrowse;
 
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -59,8 +64,8 @@ public class ExternalTabView extends VBox implements PrefsTab {
         viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
 
         new ViewModelListCellFactory<PushToApplication>()
-                .withText(application -> application.getApplicationName())
-                .withIcon(application -> application.getIcon())
+                .withText(PushToApplication::getApplicationName)
+                .withIcon(PushToApplication::getIcon)
                 .install(pushToApplicationCombo);
 
         eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());
@@ -73,15 +78,24 @@ public class ExternalTabView extends VBox implements PrefsTab {
         useTerminalDefault.selectedProperty().bindBidirectional(viewModel.useTerminalDefaultProperty());
         useTerminalSpecial.selectedProperty().bindBidirectional(viewModel.useTerminalSpecialProperty());
         useTerminalCommand.textProperty().bindBidirectional(viewModel.useTerminalCommandProperty());
+        useTerminalCommand.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
+        useTerminalBrowse.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
 
         usePDFAcrobat.selectedProperty().bindBidirectional(viewModel.usePDFAcrobatProperty());
         usePDFAcrobatCommand.textProperty().bindBidirectional(viewModel.usePDFAcrobatCommandProperty());
+        usePDFAcrobatCommand.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
+        usePDFAcrobatBrowse.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
+
         usePDFSumatra.selectedProperty().bindBidirectional(viewModel.usePDFSumatraProperty());
         usePDFSumatraCommand.textProperty().bindBidirectional(viewModel.usePDFSumatraCommandProperty());
+        usePDFSumatraCommand.disableProperty().bind(usePDFSumatra.selectedProperty().not());
+        usePDFSumatraBrowse.disableProperty().bind(usePDFSumatra.selectedProperty().not());
 
         useFileBrowserDefault.selectedProperty().bindBidirectional(viewModel.useFileBrowserDefaultProperty());
         useFileBrowserSpecial.selectedProperty().bindBidirectional(viewModel.useFileBrowserSpecialProperty());
         useFileBrowserSpecialCommand.textProperty().bindBidirectional(viewModel.useFileBrowserSpecialCommandProperty());
+        useFileBrowserSpecialCommand.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
+        useFileBrowserSpecialBrowse.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
     }
 
     @FXML

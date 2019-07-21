@@ -73,6 +73,7 @@ public class FileTabView extends VBox implements PrefsTab {
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
         resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
         resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolvStringsExceptProperty());
+        resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
         newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
@@ -83,6 +84,7 @@ public class FileTabView extends VBox implements PrefsTab {
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
+        autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
         searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
         openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
 
