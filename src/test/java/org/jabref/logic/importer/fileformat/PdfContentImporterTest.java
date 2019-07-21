@@ -5,10 +5,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
@@ -35,8 +37,7 @@ class PdfContentImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals(
-                     "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
+        assertEquals("PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
                      importer.getDescription());
     }
 
@@ -62,4 +63,31 @@ class PdfContentImporterTest {
         assertEquals(Collections.singletonList(expected), resultSecondImport);
     }
 
+    @Test
+    void testParsingEditorWithoutPagesorSeriesInformation() {
+
+        BibEntry entry = new BibEntry(BiblatexEntryTypes.INPROCEEDINGS);
+        entry.setField(FieldName.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
+        entry.setField(FieldName.EDITOR, "Anke Lüdeling and Merja Kytö");
+        entry.setField(FieldName.PUBLISHER, "Springer");
+        entry.setField(FieldName.TITLE, "Corpus Linguistics – An International Handbook – Lüdeling, Anke, Kytö, Merja (Eds.)");
+
+        String firstPageContents = "Corpus Linguistics – An International Handbook – Lüdeling, Anke,\r\n" +
+                                   "Kytö, Merja (Eds.)\r\n" +
+                                   "\r\n" +
+                                   "Anke Lüdeling, Merja Kytö (Eds.)\r\n" +
+                                   "\r\n" +
+                                   "VOLUME 2\r\n" +
+                                   "\r\n" +
+                                   "This handbook provides an up-to-date survey of the field of corpus linguistics, a Handbücher zur Sprach- und\r\n" +
+                                   "field whose methodology has revolutionized much of the empirical work done in Kommunikationswissenschaft / Handbooks\r\n" +
+                                   "\r\n" +
+                                   "of Linguistics and Communication Science\r\n" +
+                                   "most fields of linguistic study over the past decade. (HSK) 29/2\r\n" +
+                                   "\r\n" +
+                                   "vii, 578 pages\r\n" +
+                                   "Corpus linguistics investigates human language by starting out from large\r\n";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents));
+    }
 }
