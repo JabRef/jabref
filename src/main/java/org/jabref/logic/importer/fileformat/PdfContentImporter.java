@@ -63,7 +63,7 @@ public class PdfContentImporter extends Importer {
      * TODO: Additionally replace multiple subsequent spaces by one space, which will cause a rename of this method
      * </p>
      */
-    private static String removeNonLettersAtEnd(String input) {
+    private String removeNonLettersAtEnd(String input) {
         String result = input.trim();
         if (result.isEmpty()) {
             return result;
@@ -81,7 +81,7 @@ public class PdfContentImporter extends Importer {
         return result;
     }
 
-    private static String streamlineNames(String names) {
+    private String streamlineNames(String names) {
         // TODO: replace with NormalizeNamesFormatter?!
         String res;
         // supported formats:
@@ -177,7 +177,7 @@ public class PdfContentImporter extends Importer {
         return res;
     }
 
-    private static String streamlineTitle(String title) {
+    private String streamlineTitle(String title) {
         return removeNonLettersAtEnd(title);
     }
 
@@ -390,7 +390,7 @@ public class PdfContentImporter extends Importer {
                 if (posWithEditor > curString.length()) {
                     curString = curString.substring(posWithEditor - 2); //we don't have any spaces after Eds so we substract the 2
                 } else {
-                    curString = curString.substring(posWithEditor); 
+                    curString = curString.substring(posWithEditor);
                 }
                 String[] springerSplit = curString.split(", ");
                 if (springerSplit.length >= 4) {
