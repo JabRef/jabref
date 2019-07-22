@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
@@ -217,7 +218,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         });
     }
 
-    protected abstract Collection<Field> determineFieldsToShow(BibEntry entry);
+    protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);
 
     public Collection<Field> getShownFields() {
         return fields;

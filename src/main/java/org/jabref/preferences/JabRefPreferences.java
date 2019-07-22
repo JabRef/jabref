@@ -1354,7 +1354,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Boolean getAllowIntegerEdition() {
+    public boolean getAllowIntegerEdition() {
         return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
     }
 
@@ -2104,12 +2104,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void saveBibEntryTypes() {
-        saveBibEntryTypes(BibDatabaseMode.BIBTEX);
-        saveBibEntryTypes(BibDatabaseMode.BIBLATEX);
+    public void saveCustomEntryTypes() {
+        saveCustomEntryTypes(BibDatabaseMode.BIBTEX);
+        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX);
     }
 
-    private void saveBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
         List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()
                                                                                 .filter(type -> type instanceof BibEntryType)
                                                                                 .map(entryType -> entryType).collect(Collectors.toList());

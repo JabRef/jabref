@@ -1,9 +1,9 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -32,17 +32,17 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry) {
+    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         if (entryType.isPresent()) {
-            Set<Field> fields = new LinkedHashSet<>();
             fields.addAll(entryType.get().getRequiredFields().stream().map(OrFields::getPrimary).collect(Collectors.toSet()));
             // Add the edit field for Bibtex-key.
             fields.add(InternalField.KEY_FIELD);
-            return fields;
         } else {
             // Entry type unknown -> treat all fields as required
-            return entry.getFields();
+            fields.addAll(entry.getFields());
         }
+        return fields;
     }
 }

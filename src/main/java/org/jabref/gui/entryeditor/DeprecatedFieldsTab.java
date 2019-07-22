@@ -1,8 +1,10 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -29,16 +31,16 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Collection<Field> determineFieldsToShow(BibEntry entry) {
+    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
             return entryType.get().getDeprecatedFields()
                             .stream()
                             .filter(entry::hasField)
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
         } else {
             // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
+            return Collections.emptySortedSet();
         }
     }
 }

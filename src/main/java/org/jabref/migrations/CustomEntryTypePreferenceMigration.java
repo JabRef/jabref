@@ -37,7 +37,7 @@ class CustomEntryTypePreferenceMigration {
             number++;
         }
 
-        prefs.saveBibEntryTypes();
+        prefs.saveCustomEntryTypes();
     }
 
     /**

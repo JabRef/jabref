@@ -1535,7 +1535,7 @@ class BibtexParserTest {
         assertEquals(1, entries.size());
         assertEquals(Optional.of("test"), entry.getCiteKeyOptional());
         assertEquals(5, entry.getFields().size());
-        assertTrue(entry.getFields().contains("author"));
+        assertTrue(entry.getFields().contains(StandardField.AUTHOR));
         assertEquals(Optional.of("Foo Bar"), entry.getField(StandardField.AUTHOR));
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
@@ -1559,7 +1559,7 @@ class BibtexParserTest {
         assertEquals(1, entries.size());
         assertEquals(Optional.of("test"), entry.getCiteKeyOptional());
         assertEquals(5, entry.getFields().size());
-        assertTrue(entry.getFields().contains("author"));
+        assertTrue(entry.getFields().contains(StandardField.AUTHOR));
         assertEquals(Optional.of("Foo Bar"), entry.getField(StandardField.AUTHOR));
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }

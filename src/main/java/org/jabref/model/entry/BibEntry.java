@@ -186,6 +186,11 @@ public class BibEntry implements Cloneable {
         return setField(InternalField.KEY_FIELD, newCiteKey);
     }
 
+    public BibEntry withCiteKey(String newCiteKey) {
+        setCiteKey(newCiteKey);
+        return this;
+    }
+
     public Optional<String> getCiteKeyOptional() {
         return Optional.ofNullable(fields.get(InternalField.KEY_FIELD));
     }
