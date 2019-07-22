@@ -17,6 +17,8 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.model.entry.field.Field;
+import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
@@ -35,6 +37,10 @@ public interface PreferencesService {
     void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
 
     FilePreferences getFilePreferences();
+
+    XmpPreferences getXMPPreferences();
+
+    AutoLinkPreferences getAutoLinkPreferences();
 
     Path getWorkingDir();
 
@@ -90,5 +96,7 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveBibEntryTypes();
+    void saveCustomEntryTypes();
+
+    boolean getAllowIntegerEdition();
 }

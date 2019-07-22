@@ -82,6 +82,7 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.EDITION, "Third"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext(StandardField.EDITION, "second"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX), true);
         assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "10"), BibDatabaseMode.BIBLATEX));
@@ -346,7 +347,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
+                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
                 .checkBibtexDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -384,7 +385,17 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                .checkBibtexDatabase();
+        assertFalse(messages.isEmpty(), messages.toString());
+    }
+
+    private void assertWrong(BibDatabaseContext context, boolean allowIntegerEdition) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                allowIntegerEdition)
                 .checkBibtexDatabase();
         assertFalse(messages.isEmpty(), messages.toString());
     }
@@ -393,7 +404,17 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
+        ).checkBibtexDatabase();
+        assertEquals(Collections.emptyList(), messages);
+    }
+
+    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                allowIntegerEdition
         ).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }

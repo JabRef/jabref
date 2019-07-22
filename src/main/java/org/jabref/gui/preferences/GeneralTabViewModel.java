@@ -37,6 +37,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
     private final BooleanProperty enforceLegalKeysProperty = new SimpleBooleanProperty();
+    private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
@@ -94,6 +95,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         inspectionWarningDuplicateProperty.setValue(preferences.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         confirmDeleteProperty.setValue(preferences.getBoolean(JabRefPreferences.CONFIRM_DELETE));
         enforceLegalKeysProperty.setValue(preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+        allowIntegerEditionProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
         memoryStickModeProperty.setValue(preferences.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
         collectTelemetryProperty.setValue(preferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
@@ -125,6 +127,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarningDuplicateProperty.getValue());
         preferences.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDeleteProperty.getValue());
         preferences.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeysProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX, allowIntegerEditionProperty.getValue());
         if (preferences.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStickModeProperty.getValue()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
@@ -181,6 +184,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty collectTelemetryProperty() { return this.collectTelemetryProperty; }
 
     public BooleanProperty enforceLegalKeysProperty() { return this.enforceLegalKeysProperty; }
+
+    public BooleanProperty allowIntegerEditionProperty() { return this.allowIntegerEditionProperty; }
 
     public BooleanProperty showAdvancedHintsProperty() { return this.showAdvancedHintsProperty; }
 

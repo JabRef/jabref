@@ -19,11 +19,13 @@ public class FieldCheckers {
 
     private final Multimap<Field, ValueChecker> fieldChecker;
 
-    public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
-        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey);
+    public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences,
+                         JournalAbbreviationRepository abbreviationRepository,
+                         boolean enforceLegalKey, boolean allowIntegerEdition) {
+        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey, allowIntegerEdition);
     }
 
-    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
+    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey, boolean allowIntegerEdition) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (Field field : FieldFactory.getJournalNameFields()) {
@@ -39,7 +41,7 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(StandardField.DOI, new DOIValidityChecker());
-        fieldCheckers.put(StandardField.EDITION, new EditionChecker(databaseContext));
+        fieldCheckers.put(StandardField.EDITION, new EditionChecker(databaseContext, allowIntegerEdition));
         fieldCheckers.put(StandardField.FILE, new FileChecker(databaseContext, filePreferences));
         fieldCheckers.put(StandardField.HOWPUBLISHED, new HowPublishedChecker(databaseContext));
         fieldCheckers.put(StandardField.ISBN, new ISBNChecker());

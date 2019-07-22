@@ -6,6 +6,7 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -62,9 +63,15 @@ public class RisImporter extends Importer {
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                                         .split("ER  -.*\\n");
 
+        //stores all the date tags from highest to lowest priority
+        List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
+
         for (String entry1 : entries) {
 
-            boolean foundDate = false;
+            String dateTag = "";
+            String dateValue = "";
+            int datePriority = dateTags.size();
+            int tagPriority;
 
             EntryType type = StandardEntryType.Misc;
             String author = "";
@@ -196,25 +203,19 @@ public class RisImporter extends Importer {
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(StandardField.URL, value);
-                    } else if (!foundDate && (("Y1".equals(tag) || "Y2".equals(tag) || "PY".equals(tag) || "DA".equals(tag)) && (value.length() >= 4))) {
-                        String year = value.substring(0, 4);
+                    } else if ((tagPriority = dateTags.indexOf(tag)) != -1 && value.length() >= 4) {
 
-                        try {
-                            Year.parse(year, formatter);
-                            //if the year is parsebale we have found our date
-                            fields.put(StandardField.YEAR, value.substring(0, 4));
-                            foundDate = true;
-                        } catch (DateTimeParseException ex) {
-                            //We can't parse the year, we ignore it
-                        }
+                        if (tagPriority < datePriority) {
+                            String year = value.substring(0, 4);
 
-                        String[] parts = value.split("/");
-                        if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
-                                int monthNumber = Integer.parseInt(parts[1]);
-                                month = Month.getMonthByNumber(monthNumber);
-                            } catch (NumberFormatException ex) {
-                                // The month part is unparseable, so we ignore it.
+                                    Year.parse(year, formatter);
+                                    //if the year is parsebale we have found a higher priority date
+                                    dateTag = tag;
+                                    dateValue = value;
+                                    datePriority = tagPriority;
+                            } catch (DateTimeParseException ex) {
+                                //We can't parse the year, we ignore it
                             }
                         }
                     } else if ("KW".equals(tag)) {
@@ -278,6 +279,21 @@ public class RisImporter extends Importer {
                 }
 
                 fields.put(StandardField.PAGES, startPage + endPage);
+            }
+
+            // if we found a date
+            if (dateTag.length() > 0) {
+                fields.put(StandardField.YEAR, dateValue.substring(0, 4));
+
+                String[] parts = dateValue.split("/");
+                if ((parts.length > 1) && !parts[1].isEmpty()) {
+                    try {
+                        int monthNumber = Integer.parseInt(parts[1]);
+                        month = Month.getMonthByNumber(monthNumber);
+                    } catch (NumberFormatException ex) {
+                        // The month part is unparseable, so we ignore it.
+                    }
+                }
             }
 
             // Remove empty fields:
