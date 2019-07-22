@@ -18,6 +18,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
@@ -215,7 +216,7 @@ public class PdfContentImporter extends Importer {
                 return parserResult;
             }
 
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents);
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
 
         } catch (EncryptedPdfsNotSupportedException e) {
@@ -231,7 +232,7 @@ public class PdfContentImporter extends Importer {
     }
 
     //make this method package visible so we can test it
-    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents) {
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
 
         // idea: split[] contains the different lines
         // blocks are separated by empty lines
@@ -241,7 +242,7 @@ public class PdfContentImporter extends Importer {
         // i points to the current line
         // curString (mostly) contains the current block
         //   the different lines are joined into one and thereby separated by " "
-        lines = firstpageContents.split(System.lineSeparator());
+        lines = firstpageContents.split(lineSeparator);
 
         lineIndex = 0; //to prevent array index out of bounds exception on second run we need to reset i to zero
 
