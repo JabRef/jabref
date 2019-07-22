@@ -3,12 +3,12 @@ package org.jabref.logic;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
  * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
@@ -36,9 +36,10 @@ public class TypedBibEntry {
     /**
      * Returns true if this entry contains the fields it needs to be
      * complete.
+     * @param entryTypesManager
      */
-    public boolean hasAllRequiredFields() {
-        Optional<BibEntryType> type = Globals.entryTypesManager.enrich(entry.getType(), this.mode);
+    public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {

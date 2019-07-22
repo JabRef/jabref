@@ -2,6 +2,7 @@ package org.jabref.model.cleanup;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -83,7 +84,7 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-        Set<Field> fields = entry.getFields();
+        Set<Field> fields = new HashSet<>(entry.getFields());
         fields.removeAll(FieldFactory.getNotTextFieldNames());
         for (Field fieldKey : fields) {
             if (!fieldKey.equals(InternalField.KEY_FIELD)) {

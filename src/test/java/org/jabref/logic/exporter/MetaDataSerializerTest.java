@@ -50,7 +50,7 @@ public class MetaDataSerializerTest {
 
     @Test
     public void serializeSingleContentSelectors() {
-        List<String> values = new ArrayList(4);
+        List<String> values = new ArrayList<>(4);
         values.add("approved");
         values.add("captured");
         values.add("received");

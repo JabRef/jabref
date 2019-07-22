@@ -1,7 +1,6 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -12,7 +11,6 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldPriority;
 
 public class BibEntryTypesManager {
     private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypes.ALL.stream(), IEEETranEntryTypes.ALL.stream()).collect(Collectors.toList()));
@@ -41,7 +39,7 @@ public class BibEntryTypesManager {
 
         BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
                 .withType(type)
-                .withImportantFields(FieldFactory.parseFieldList(optFields).stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)).collect(Collectors.toSet()))
+                .withImportantFields(FieldFactory.parseFieldList(optFields))
                 .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields));
         return Optional.of(entryTypeBuilder.build());
     }
@@ -49,11 +47,11 @@ public class BibEntryTypesManager {
     public static String serialize(BibEntryType entryType) {
         StringBuilder builder = new StringBuilder();
         builder.append(ENTRYTYPE_FLAG);
-        builder.append(entryType.getType());
+        builder.append(entryType.getType().getName());
         builder.append(": req[");
         builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
         builder.append("] opt[");
-        builder.append(FieldFactory.serializeFieldsList(new HashSet<>(entryType.getOptionalFields())));
+        builder.append(FieldFactory.serializeFieldsList(entryType.getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet())));
         builder.append("]");
         return builder.toString();
     }

@@ -9,13 +9,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -60,42 +60,10 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() {
-    }
+    private final BibEntryTypesManager entryTypesManager;
 
-    /**
-     * Checks if the two entries represent the same publication.
-     *
-     * @param one BibEntry
-     * @param two BibEntry
-     * @return boolean
-     */
-    public static boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
-        if (haveSameIdentifier(one, two)) {
-            return true;
-        }
-
-        if (haveDifferentEntryType(one, two) ||
-                haveDifferentEditions(one, two) ||
-                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
-            return false;
-        }
-
-        final Optional<BibEntryType> type = Globals.entryTypesManager.enrich(one.getType(), bibDatabaseMode);
-        if (type.isPresent()) {
-            final double[] reqCmpResult = compareRequiredFields(type.get(), one, two);
-
-            if (isFarFromThreshold(reqCmpResult[0])) {
-                // Far from the threshold value, so we base our decision on the required fields only
-                return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
-            }
-
-            // Close to the threshold value, so we take a look at the optional fields, if any:
-            return compareOptionalFields(type.get(), one, two, reqCmpResult);
-        } else {
-            // We don't know about the type, so simply compare fields without any distinction between optional/required
-            return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
-        }
+    public DuplicateCheck(BibEntryTypesManager entryTypesManager) {
+        this.entryTypesManager = entryTypesManager;
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
@@ -146,7 +114,7 @@ public class DuplicateCheck {
         if (optionalFields == null) {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-        final double[] opt = DuplicateCheck.compareFieldSet(new HashSet<>(optionalFields), one, two);
+        final double[] opt = DuplicateCheck.compareFieldSet(optionalFields.stream().map(BibField::getField).collect(Collectors.toSet()), one, two);
         final double numerator = (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1]);
         final double denominator = (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
         final double totValue = numerator / denominator;
@@ -277,24 +245,6 @@ public class DuplicateCheck {
     }
 
     /**
-     * Goes through all entries in the given database, and if at least one of
-     * them is a duplicate of the given entry, as per
-     * Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
-     * The search is terminated when the first duplicate is found.
-     *
-     * @param database The database to search.
-     * @param entry    The entry of which we are looking for duplicates.
-     * @return The first duplicate entry found. Empty Optional if no duplicates are found.
-     */
-    public static Optional<BibEntry> containsDuplicate(final BibDatabase database,
-                                                       final BibEntry entry,
-                                                       final BibDatabaseMode bibDatabaseMode) {
-
-        return database.getEntries().stream().filter(other -> DuplicateCheck.isDuplicate(entry, other, bibDatabaseMode)).findFirst();
-
-    }
-
-    /**
      * Compare two strings on the basis of word-by-word correlation analysis.
      *
      * @param s1 The first string
@@ -341,5 +291,57 @@ public class DuplicateCheck {
         final double similarity = (longerLength - distanceIgnoredCase) / longerLength;
         LOGGER.debug("Longer string: " + longer + " Shorter string: " + shorter + " Similarity: " + similarity);
         return similarity;
+    }
+
+    /**
+     * Checks if the two entries represent the same publication.
+     *
+     * @param one BibEntry
+     * @param two BibEntry
+     * @return boolean
+     */
+    public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
+        if (haveSameIdentifier(one, two)) {
+            return true;
+        }
+
+        if (haveDifferentEntryType(one, two) ||
+                haveDifferentEditions(one, two) ||
+                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
+            return false;
+        }
+
+        final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
+        if (type.isPresent()) {
+            final double[] reqCmpResult = compareRequiredFields(type.get(), one, two);
+
+            if (isFarFromThreshold(reqCmpResult[0])) {
+                // Far from the threshold value, so we base our decision on the required fields only
+                return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+            }
+
+            // Close to the threshold value, so we take a look at the optional fields, if any:
+            return compareOptionalFields(type.get(), one, two, reqCmpResult);
+        } else {
+            // We don't know about the type, so simply compare fields without any distinction between optional/required
+            return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+        }
+    }
+
+    /**
+     * Goes through all entries in the given database, and if at least one of
+     * them is a duplicate of the given entry, as per
+     * Util.isDuplicate(BibEntry, BibEntry), the duplicate is returned.
+     * The search is terminated when the first duplicate is found.
+     *
+     * @param database The database to search.
+     * @param entry    The entry of which we are looking for duplicates.
+     * @return The first duplicate entry found. Empty Optional if no duplicates are found.
+     */
+    public Optional<BibEntry> containsDuplicate(final BibDatabase database,
+                                                final BibEntry entry,
+                                                final BibDatabaseMode bibDatabaseMode) {
+
+        return database.getEntries().stream().filter(other -> isDuplicate(entry, other, bibDatabaseMode)).findFirst();
     }
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -1327,15 +1326,15 @@ class BibtexParserTest {
 
         BibEntryType expectedEntryType = new BibEntryType(
                 new UnknownEntryType("lecturenotes"),
-                new HashSet<>(Arrays.asList(
+                Arrays.asList(
                         new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT),
                         new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
                         new BibField(StandardField.LANGUAGE, FieldPriority.IMPORTANT),
-                        new BibField(StandardField.URL, FieldPriority.IMPORTANT))),
-                new HashSet<>(Arrays.asList(
+                        new BibField(StandardField.URL, FieldPriority.IMPORTANT)),
+                Arrays.asList(
                         new OrFields(StandardField.AUTHOR),
                         new OrFields(StandardField.TITLE)
-                )));
+                ));
 
         assertEquals(Collections.singleton(expectedEntryType), result.getEntryTypes());
     }

@@ -79,7 +79,6 @@ public class LatexFieldFormatter {
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
     public String format(String content, Field field) throws InvalidFieldValueException {
-
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
         }
@@ -94,11 +93,8 @@ public class LatexFieldFormatter {
             result = result.replace("\n", OS.NEWLINE);
         }
 
-        // If the field is non-standard, we will just append braces,
-        // wrap and write.
-        boolean resolveStrings = shouldResolveStrings(field);
-
-        if (!resolveStrings) {
+        // If the field is non-standard, we will just append braces, wrap and write.
+        if (!shouldResolveStrings(field)) {
             return formatWithoutResolvingStrings(result, field);
         }
 
@@ -196,7 +192,6 @@ public class LatexFieldFormatter {
     }
 
     private void writeText(String text, int startPos, int endPos) {
-
         stringBuilder.append(FIELD_START);
         boolean escape = false;
         boolean inCommandName = false;
@@ -258,8 +253,7 @@ public class LatexFieldFormatter {
         stringBuilder.append(FIELD_END);
     }
 
-    private void writeStringLabel(String text, int startPos, int endPos,
-                                  boolean first, boolean last) {
+    private void writeStringLabel(String text, int startPos, int endPos, boolean first, boolean last) {
         putIn((first ? "" : " # ") + text.substring(startPos, endPos)
               + (last ? "" : " # "));
     }

@@ -25,11 +25,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String STRING_PREFIX = "@String";
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
-    private final BibEntryTypesManager entryTypesManager;
 
     public BibtexDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
-        super(writer, preferences);
-        this.entryTypesManager = entryTypesManager;
+        super(writer, preferences, entryTypesManager);
     }
 
     @Override

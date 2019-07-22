@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -94,14 +95,14 @@ public class OvidImporterTest {
         assertEquals(5, entries.size());
 
         BibEntry entry = entries.get(0);
-        assertEquals("misc", entry.getType());
+        assertEquals(StandardEntryType.Misc, entry.getType());
         assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Short abstract"), entry.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("Musterbuch"), entry.getField(StandardField.TITLE));
         assertEquals(Optional.of("Einleitung"), entry.getField(new UnknownField("chaptertitle")));
 
         entry = entries.get(1);
-        assertEquals("inproceedings", entry.getType());
+        assertEquals(StandardEntryType.InProceedings, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.EDITOR));
         assertEquals(Optional.of("Max the Editor"), entry.getField(StandardField.TITLE));
         assertEquals(Optional.of("Very Long Title"), entry.getField(StandardField.JOURNAL));
@@ -111,7 +112,7 @@ public class OvidImporterTest {
         assertEquals(Optional.of("103--106"), entry.getField(StandardField.PAGES));
 
         entry = entries.get(2);
-        assertEquals("incollection", entry.getType());
+        assertEquals(StandardEntryType.InCollection, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Test"), entry.getField(StandardField.TITLE));
         assertEquals(Optional.of("Very Long Title"), entry.getField(StandardField.JOURNAL));
@@ -122,7 +123,7 @@ public class OvidImporterTest {
         assertEquals(Optional.of("103--106"), entry.getField(StandardField.PAGES));
 
         entry = entries.get(3);
-        assertEquals("book", entry.getType());
+        assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.of("Max"), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("2015"), entry.getField(StandardField.YEAR));
         assertEquals(Optional.of("Editor"), entry.getField(StandardField.EDITOR));
@@ -132,7 +133,7 @@ public class OvidImporterTest {
         assertEquals(Optional.of("Publisher"), entry.getField(StandardField.PUBLISHER));
 
         entry = entries.get(4);
-        assertEquals("article", entry.getType());
+        assertEquals(StandardEntryType.Article, entry.getType());
         assertEquals(Optional.of("2014"), entry.getField(StandardField.YEAR));
         assertEquals(Optional.of("58"), entry.getField(StandardField.PAGES));
         assertEquals(Optional.of("Test"), entry.getField(StandardField.ADDRESS));

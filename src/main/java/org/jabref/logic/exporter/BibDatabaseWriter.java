@@ -18,7 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
@@ -33,6 +32,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
@@ -45,10 +45,12 @@ public abstract class BibDatabaseWriter {
     protected final Writer writer;
     protected final SavePreferences preferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
+    protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(Writer writer, SavePreferences preferences) {
+    public BibDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.writer = Objects.requireNonNull(writer);
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
@@ -181,10 +183,10 @@ public abstract class BibDatabaseWriter {
             // Check if we must write the type definition for this
             // entry, as well. Our criterion is that all non-standard
             // types (*not* all customized standard types) must be written.
-            if (Globals.entryTypesManager.isCustomType(entry.getType(), bibDatabaseContext.getMode())) {
+            if (entryTypesManager.isCustomType(entry.getType(), bibDatabaseContext.getMode())) {
                 // If user-defined entry type, then add it
                 // Otherwise (enrich returns empty optional) it is a completely unknown entry type, so ignore it
-                Globals.entryTypesManager.enrich(entry.getType(), bibDatabaseContext.getMode()).ifPresent(typesToWrite::add);
+                entryTypesManager.enrich(entry.getType(), bibDatabaseContext.getMode()).ifPresent(typesToWrite::add);
             }
 
             writeEntry(entry, bibDatabaseContext.getMode());

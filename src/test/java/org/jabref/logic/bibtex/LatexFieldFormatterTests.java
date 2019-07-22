@@ -27,7 +27,6 @@ public class LatexFieldFormatterTests {
     public void normalizeNewlineInAbstractField() throws Exception {
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
 
-        // The newlines are normalized according to the globally configured newline setting in the formatter
         String expected = "{" + "lorem" + OS.NEWLINE + " ipsum lorem ipsum" + OS.NEWLINE
                 + "lorem ipsum "
                 + OS.NEWLINE + "lorem ipsum"
@@ -39,9 +38,18 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
+    public void newlineAtEndOfAbstractFieldIsDeleted() throws Exception {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = formatter.format(text + OS.NEWLINE, StandardField.ABSTRACT);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void preserveNewlineInAbstractField() throws Exception {
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = formatter.format(text, StandardField.ABSTRACT);
         String expected = "{" + text + "}";
@@ -51,9 +59,7 @@ public class LatexFieldFormatterTests {
 
     @Test
     public void preserveMultipleNewlinesInAbstractField() throws Exception {
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum"
-                + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = formatter.format(text, StandardField.ABSTRACT);
         String expected = "{" + text + "}";
@@ -63,8 +69,7 @@ public class LatexFieldFormatterTests {
 
     @Test
     public void preserveNewlineInReviewField() throws Exception {
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = formatter.format(text, StandardField.REVIEW);
         String expected = "{" + text + "}";

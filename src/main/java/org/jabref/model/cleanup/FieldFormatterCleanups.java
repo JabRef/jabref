@@ -110,7 +110,7 @@ public class FieldFormatterCleanups {
         // convert the contents of the hashmap into the correct serialization
         StringBuilder result = new StringBuilder();
         for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
-            result.append(entry.getKey());
+            result.append(entry.getKey().getName());
 
             StringJoiner joiner = new StringJoiner(",", "[", "]" + newline);
             entry.getValue().forEach(joiner::add);

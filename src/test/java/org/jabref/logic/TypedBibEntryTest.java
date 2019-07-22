@@ -2,10 +2,12 @@ package org.jabref.logic;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,6 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypedBibEntryTest {
+    private BibEntryTypesManager entryTypesManager;
+
+    @BeforeEach
+    void setUp() {
+        entryTypesManager = new BibEntryTypesManager();
+    }
 
     @Test
     public void hasAllRequiredFieldsFail() {
@@ -22,7 +30,7 @@ public class TypedBibEntryTest {
         e.setField(StandardField.JOURNAL, "abc");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        assertFalse(typedEntry.hasAllRequiredFields());
+        assertFalse(typedEntry.hasAllRequiredFields(entryTypesManager));
     }
 
     @Test
@@ -34,7 +42,7 @@ public class TypedBibEntryTest {
         e.setField(StandardField.YEAR, "2015");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        assertTrue(typedEntry.hasAllRequiredFields());
+        assertTrue(typedEntry.hasAllRequiredFields(entryTypesManager));
     }
 
     @Test
@@ -42,7 +50,7 @@ public class TypedBibEntryTest {
         BibEntry e = new BibEntry(new UnknownEntryType("articlllleeeee"));
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        assertTrue(typedEntry.hasAllRequiredFields());
+        assertTrue(typedEntry.hasAllRequiredFields(entryTypesManager));
     }
 
     @Test

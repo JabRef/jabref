@@ -201,8 +201,8 @@ public class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author  = {BlaBla}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  number  = {1}," + OS.NEWLINE +
                 "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
@@ -237,8 +237,8 @@ public class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
                 "  note         = {some note}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -273,8 +273,8 @@ public class BibEntryWriterTest {
         // @formatter:off
         String expectedNewEntry = OS.NEWLINE + "@InProceedings{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
                 "  note         = {some note}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
@@ -396,8 +396,8 @@ public class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
                 "  note         = {some note}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -505,8 +505,8 @@ public class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  author  = {John Doe}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  number  = {1}," + OS.NEWLINE +
                 "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
 

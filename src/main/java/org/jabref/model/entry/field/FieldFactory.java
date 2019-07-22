@@ -1,5 +1,6 @@
 package org.jabref.model.entry.field;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -132,7 +133,7 @@ public class FieldFactory {
      * separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = Arrays.asList(StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP);
+        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }

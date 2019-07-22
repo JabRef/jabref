@@ -10,9 +10,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.EntryTypeFactory;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.preferences.JabRefPreferences;
 
 class CustomEntryTypePreferenceMigration {
@@ -62,15 +60,15 @@ class CustomEntryTypePreferenceMigration {
                 .withRequiredFields(req.stream().map(FieldFactory::parseOrFields).collect(Collectors.toList()));
         if (priOpt.isEmpty()) {
             entryTypeBuilder = entryTypeBuilder
-                    .withImportantFields(opt.stream().map(FieldFactory::parseField).map(field -> new BibField(field, FieldPriority.IMPORTANT)).collect(Collectors.toSet()));
+                    .withImportantFields(opt.stream().map(FieldFactory::parseField).collect(Collectors.toSet()));
             return Optional.of(entryTypeBuilder.build());
         } else {
             List<String> secondary = new ArrayList<>(opt);
             secondary.removeAll(priOpt);
 
             entryTypeBuilder = entryTypeBuilder
-                    .withImportantFields(priOpt.stream().map(FieldFactory::parseField).map(field -> new BibField(field, FieldPriority.IMPORTANT)).collect(Collectors.toSet()))
-                    .withDetailFields(secondary.stream().map(FieldFactory::parseField).map(field -> new BibField(field, FieldPriority.DETAIL)).collect(Collectors.toSet()));
+                    .withImportantFields(priOpt.stream().map(FieldFactory::parseField).collect(Collectors.toSet()))
+                    .withDetailFields(secondary.stream().map(FieldFactory::parseField).collect(Collectors.toSet()));
             return Optional.of(entryTypeBuilder.build());
         }
     }

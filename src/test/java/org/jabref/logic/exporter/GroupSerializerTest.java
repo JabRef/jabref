@@ -147,15 +147,15 @@ class GroupSerializerTest {
                 "1 StaticGroup:ExplicitA;2;1;;;;",
                 "1 StaticGroup:ExplicitGrandParent;0;1;;;;",
                 "2 StaticGroup:ExplicitB;1;1;;;;",
-                "2 KeywordGroup:KeywordParent;0;searchField;searchExpression;1;0;1;;;;",
-                "3 KeywordGroup:KeywordNode;0;searchField;searchExpression;1;0;1;;;;",
+                "2 KeywordGroup:KeywordParent;0;keywords;searchExpression;1;0;1;;;;",
+                "3 KeywordGroup:KeywordNode;0;keywords;searchExpression;1;0;1;;;;",
                 "4 StaticGroup:ExplicitChild;1;1;;;;",
                 "3 SearchGroup:SearchC;2;searchExpression;1;0;1;;;;",
                 "3 StaticGroup:ExplicitC;1;1;;;;",
-                "3 KeywordGroup:KeywordC;0;searchField;searchExpression;1;0;1;;;;",
+                "3 KeywordGroup:KeywordC;0;keywords;searchExpression;1;0;1;;;;",
                 "2 SearchGroup:SearchB;2;searchExpression;1;0;1;;;;",
-                "2 KeywordGroup:KeywordB;0;searchField;searchExpression;1;0;1;;;;",
-                "1 KeywordGroup:KeywordA;0;searchField;searchExpression;1;0;1;;;;"
+                "2 KeywordGroup:KeywordB;0;keywords;searchExpression;1;0;1;;;;",
+                "1 KeywordGroup:KeywordA;0;keywords;searchExpression;1;0;1;;;;"
         );
         assertEquals(expected, groupSerializer.serializeTree(root));
     }

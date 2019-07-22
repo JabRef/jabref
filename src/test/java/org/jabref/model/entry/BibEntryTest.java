@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -34,6 +36,20 @@ public class BibEntryTest {
         entry.setField(new UnknownField("TeSt"), "value");
 
         assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
+    }
+
+    @Test
+    public void getFieldWorksWithBibFieldAsWell() throws Exception {
+        entry.setField(StandardField.AUTHOR, "value");
+
+        assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField()));
+    }
+
+    @Test
+    public void setFieldWorksWithBibFieldAsWell() throws Exception {
+        entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField(), "value");
+
+        assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
     }
 
     @Test

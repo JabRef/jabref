@@ -29,7 +29,6 @@ public class NoBibtexFieldChecker implements Checker {
                                      .filter(field -> !field.equals(StandardField.COMMENT))
                                      .filter(field -> !field.equals(StandardField.DOI))
                                      .filter(field -> !field.equals(StandardField.URL))
-                                     .sorted()
                                      .collect(Collectors.toList());
     }
 

@@ -1,6 +1,8 @@
 package org.jabref.model.entry;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,40 +13,40 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 
+import com.google.common.collect.Streams;
+
 public class BibEntryTypeBuilder {
-    private EntryType type;
-    private Set<BibField> fields;
-    private Set<OrFields> requiredFields;
+    private EntryType type = StandardEntryType.Misc;
+    private Set<BibField> fields = new HashSet<>();
+    private Set<OrFields> requiredFields = new HashSet<>();
 
     public BibEntryTypeBuilder withType(EntryType type) {
         this.type = type;
         return this;
     }
 
-    public BibEntryTypeBuilder withImportantFields(Set<BibField> fields) {
-        this.fields = fields;
-        return this;
+    public BibEntryTypeBuilder withImportantFields(Set<BibField> newFields) {
+        return withImportantFields(newFields.stream().map(BibField::getField).collect(Collectors.toSet()));
     }
 
-    public BibEntryTypeBuilder withImportantFields(Field... fields) {
-        this.fields = Arrays.stream(fields)
-                            .map(field -> new BibField(field, FieldPriority.IMPORTANT))
+    public BibEntryTypeBuilder withImportantFields(Collection<Field> newFields) {
+        this.fields = Streams.concat(fields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
                             .collect(Collectors.toSet());
         return this;
     }
 
-    public BibEntryTypeBuilder withDetailFields(Set<Field> fields) {
-        this.fields = fields.stream()
-                            .map(field -> new BibField(field, FieldPriority.DETAIL))
-                            .collect(Collectors.toSet());
+    public BibEntryTypeBuilder withImportantFields(Field... newFields) {
+        return withImportantFields(Arrays.asList(newFields));
+    }
+
+    public BibEntryTypeBuilder withDetailFields(Collection<Field> newFields) {
+        this.fields = Streams.concat(fields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.DETAIL)))
+                             .collect(Collectors.toSet());
         return this;
     }
 
     public BibEntryTypeBuilder withDetailFields(Field... fields) {
-        this.fields = Arrays.stream(fields)
-                            .map(field -> new BibField(field, FieldPriority.DETAIL))
-                            .collect(Collectors.toSet());
-        return this;
+        return withDetailFields(Arrays.asList(fields));
     }
 
     public BibEntryTypeBuilder withRequiredFields(Set<OrFields> requiredFields) {

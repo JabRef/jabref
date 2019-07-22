@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 
-public class OrFields extends TreeSet<Field> {
+public class OrFields extends TreeSet<Field> implements Comparable<OrFields> {
 
     public OrFields(Field field) {
         super(Comparator.comparing(Field::getName));
@@ -33,5 +33,10 @@ public class OrFields extends TreeSet<Field> {
 
     public Field getPrimary() {
         return this.iterator().next();
+    }
+
+    @Override
+    public int compareTo(OrFields o) {
+        return FieldFactory.serializeOrFields(this).compareTo(FieldFactory.serializeOrFields(o));
     }
 }

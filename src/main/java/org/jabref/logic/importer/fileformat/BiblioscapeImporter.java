@@ -50,7 +50,6 @@ public class BiblioscapeImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-
         List<BibEntry> bibItems = new ArrayList<>();
         String line;
         Map<Field, String> hm = new HashMap<>();
@@ -220,14 +219,14 @@ public class BiblioscapeImporter extends Importer {
 
                 // depending on bibtexType, decide where to place the titleRT and
                 // titleTI
-                if ("article".equals(bibtexType)) {
+                if (bibtexType.equals(StandardEntryType.Article)) {
                     if (titleST != null) {
                         hm.put(StandardField.JOURNAL, titleST);
                     }
                     if (titleTI != null) {
                         hm.put(StandardField.TITLE, titleTI);
                     }
-                } else if ("inbook".equals(bibtexType)) {
+                } else if (bibtexType.equals(StandardEntryType.InBook)) {
                     if (titleST != null) {
                         hm.put(StandardField.BOOKTITLE, titleST);
                     }
@@ -236,10 +235,8 @@ public class BiblioscapeImporter extends Importer {
                     }
                 } else {
                     if (titleST != null) {
-                        hm.put(StandardField.BOOKTITLE, titleST); // should not
+                        hm.put(StandardField.BOOKTITLE, titleST);
                     }
-                    // happen, I
-                    // think
                     if (titleTI != null) {
                         hm.put(StandardField.TITLE, titleTI);
                     }

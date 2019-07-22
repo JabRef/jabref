@@ -3,11 +3,12 @@ package org.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
@@ -99,7 +101,7 @@ public class BibEntryWriter {
 
         writeKeyField(entry, out);
 
-        Set<Field> written = new HashSet<>();
+        TreeSet<Field> written = new TreeSet<>(Comparator.comparing(Field::getName));
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
@@ -107,22 +109,22 @@ public class BibEntryWriter {
         if (type.isPresent()) {
             // Write required fields first.
             for (OrFields value : type.get().getRequiredFields()) {
-                writeField(entry, out, value.getPrimary(), indentation);
-                written.add(value.getPrimary());
+                for (Field field : value) {
+                    writeField(entry, out, field, indentation);
+                    written.add(value.getPrimary());
+                }
             }
             // Then optional fields.
-            for (Field field : type.get().getOptionalFields()) {
-                if (!written.contains(field)) { // If field appears both in req. and opt. don't repeat.
-                    writeField(entry, out, field, indentation);
-                    written.add(field);
-                }
+            for (BibField field : type.get().getOptionalFields()) {
+                writeField(entry, out, field.getField(), indentation);
+                written.add(field.getField());
             }
         }
         // Then write remaining fields in alphabetic order.
-        Set<Field> remainingFields = entry.getFields()
-                                          .stream()
-                                          .filter(key -> !written.contains(key))
-                                          .collect(Collectors.toSet());
+        SortedSet<Field> remainingFields = entry.getFields()
+                                                .stream()
+                                                .filter(key -> !written.contains(key))
+                                                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
 
         for (Field field : remainingFields) {
             writeField(entry, out, field, indentation);

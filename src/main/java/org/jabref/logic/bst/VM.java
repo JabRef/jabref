@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -577,7 +577,7 @@ public class VM implements Warn {
                 throw new VMException("type$ need a context.");
             }
 
-            stack.push(context.getBibtexEntry().getType());
+            stack.push(context.getBibtexEntry().getType().getName());
         });
 
         /**
@@ -854,9 +854,8 @@ public class VM implements Warn {
 
         // Create entries
         entries = new ArrayList<>(bibtex.size());
-        ListIterator<BstEntry> listIter = entries.listIterator();
         for (BibEntry entry : bibtex) {
-            listIter.add(new BstEntry(entry));
+            entries.add(new BstEntry(entry));
         }
 
         // Go
@@ -1025,8 +1024,7 @@ public class VM implements Warn {
      * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
      */
     private void sort() {
-        Collections.sort(entries, (o1, o2) -> (o1.localStrings.get("sort.key$"))
-                .compareTo(o2.localStrings.get("sort.key$")));
+        entries.sort(Comparator.comparing(o -> (o.localStrings.get("sort.key$"))));
     }
 
     private void executeInContext(Object o, BstEntry context) {

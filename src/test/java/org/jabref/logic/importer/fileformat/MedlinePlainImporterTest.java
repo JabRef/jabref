@@ -85,7 +85,7 @@ class MedlinePlainImporterTest {
         BibEntry testEntry = entries.get(0);
 
         assertEquals(7, entries.size());
-        assertEquals("article", testEntry.getType());
+        assertEquals(StandardEntryType.Article, testEntry.getType());
         assertEquals(Optional.empty(), testEntry.getField(StandardField.MONTH));
         assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getField(StandardField.AUTHOR));
         assertEquals(
@@ -94,24 +94,24 @@ class MedlinePlainImporterTest {
                 testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(1);
-        assertEquals("conference", testEntry.getType());
+        assertEquals(StandardEntryType.Conference, testEntry.getType());
         assertEquals(Optional.of("06"), testEntry.getField(StandardField.MONTH));
         assertEquals(Optional.empty(), testEntry.getField(StandardField.AUTHOR));
         assertEquals(Optional.empty(), testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(2);
-        assertEquals("book", testEntry.getType());
+        assertEquals(StandardEntryType.Book, testEntry.getType());
         assertEquals(
                 Optional.of(
                         "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle"),
                 testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(3);
-        assertEquals("techreport", testEntry.getType());
+        assertEquals(StandardEntryType.TechReport, testEntry.getType());
         assertTrue(testEntry.getField(StandardField.DOI).isPresent());
 
         testEntry = entries.get(4);
-        assertEquals("inproceedings", testEntry.getType());
+        assertEquals(StandardEntryType.InProceedings, testEntry.getType());
         assertEquals(Optional.of("Inproceedings book title"), testEntry.getField(StandardField.BOOKTITLE));
 
         BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings);

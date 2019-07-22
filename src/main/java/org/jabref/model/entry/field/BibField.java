@@ -1,10 +1,8 @@
 package org.jabref.model.entry.field;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 
-public class BibField implements Field {
+public class BibField implements Comparable<BibField> {
 
     private final FieldPriority priority;
     private final Field field;
@@ -14,39 +12,8 @@ public class BibField implements Field {
         this.field = field;
     }
 
-    @Override
-    public Set<FieldProperty> getProperties() {
-        return field.getProperties();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return field.getDisplayName();
-    }
-
-    @Override
-    public String getName() {
-        return field.getName();
-    }
-
-    @Override
-    public boolean isStandardField() {
-        return field.isStandardField();
-    }
-
-    @Override
-    public boolean isDeprecated() {
-        return field.isDeprecated();
-    }
-
-    @Override
-    public Optional<Field> getAlias() {
-        return field.getAlias();
-    }
-
-    @Override
-    public boolean isNumeric() {
-        return field.isNumeric();
+    public Field getField() {
+        return field;
     }
 
     public FieldPriority getPriority() {
@@ -63,14 +30,19 @@ public class BibField implements Field {
 
     @Override
     public int hashCode() {
-        return Objects.hash(field);
+        return Objects.hash(field.getName());
     }
 
     @Override
     public String toString() {
         return "BibField{" +
-                "priority=" + priority +
-                ", field=" + field +
+                "field=" + field.getName() +
+                ", priority=" + priority +
                 '}';
+    }
+
+    @Override
+    public int compareTo(BibField o) {
+        return field.getName().compareTo(o.field.getName());
     }
 }

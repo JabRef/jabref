@@ -69,7 +69,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent()
                 ||
-                DuplicateCheck.containsDuplicate(database.getDatabase(), entry, database.getMode()).isPresent();
+                new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(database.getDatabase(), entry, database.getMode()).isPresent();
     }
 
     public void importEntries(List<BibEntry> entriesToImport) {
@@ -127,7 +127,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
-            if (DuplicateCheck.isDuplicate(entry, othEntry, database.getMode())) {
+            if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(entry, othEntry, database.getMode())) {
                 return Optional.of(othEntry);
             }
         }
@@ -136,7 +136,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public void resolveDuplicate(BibEntry entry) {
         // First, try to find duplicate in the existing library
-        Optional<BibEntry> other = DuplicateCheck.containsDuplicate(database.getDatabase(), entry, database.getMode());
+        Optional<BibEntry> other = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(database.getDatabase(), entry, database.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
                     entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, database);
