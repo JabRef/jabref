@@ -24,7 +24,7 @@ import org.jabref.preferences.JabRefPreferences;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class GeneralTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class GeneralTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;

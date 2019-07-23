@@ -20,7 +20,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * The Preferences panel for key generation.
  */
-class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PreferenceTabView {
+class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final GridPane builder = new GridPane();

@@ -42,7 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
-class TableColumnsTab extends Pane implements PreferenceTabView {
+class TableColumnsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;

@@ -10,7 +10,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GroupsTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class GroupsTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private CheckBox grayNonHits;
     @FXML private RadioButton groupViewModeIntersection;

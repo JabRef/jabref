@@ -23,7 +23,7 @@ import org.jabref.preferences.JabRefPreferences;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
-class EntryEditorPrefsTab extends Pane implements PreferenceTabView {
+class EntryEditorPrefsTab extends Pane implements PreferencesTab {
 
     private final CheckBox autoOpenForm;
     private final CheckBox defSource;

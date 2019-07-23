@@ -37,7 +37,7 @@ import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-public class PreviewTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class PreviewTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;

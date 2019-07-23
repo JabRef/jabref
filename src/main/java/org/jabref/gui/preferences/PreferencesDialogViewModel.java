@@ -36,7 +36,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final JabRefPreferences prefs;
-    private final ObservableList<PreferenceTabView> preferenceTabs;
+    private final ObservableList<PreferencesTab> preferenceTabs;
     private final JabRefFrame frame;
 
     public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame) {
@@ -64,7 +64,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         );
     }
 
-    public ObservableList<PreferenceTabView> getPreferenceTabs() {
+    public ObservableList<PreferencesTab> getPreferenceTabs() {
         return new ReadOnlyListWrapper<>(preferenceTabs);
     }
 
@@ -154,7 +154,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
 
     public boolean validSettings() {
-        for (PreferenceTabView tab : preferenceTabs) {
+        for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return false;
             }
@@ -171,7 +171,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         // Store settings
-        for (PreferenceTabView tab : preferenceTabs) {
+        for (PreferencesTab tab : preferenceTabs) {
             tab.storeSettings();
             restartWarnings.addAll(tab.getRestartWarnings());
         }
@@ -194,8 +194,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
      */
     public void setValues() {
-        for (PreferenceTabView preferenceTabView : preferenceTabs) {
-            preferenceTabView.setValues();
+        for (PreferencesTab preferencesTab : preferenceTabs) {
+            preferencesTab.setValues();
         }
     }
 }

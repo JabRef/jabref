@@ -37,7 +37,7 @@ import org.jabref.preferences.JabRefPreferences;
  *
  * Allows the user to enable and configure the XMP privacy filter.
  */
-class XmpPrefsTab extends Pane implements PreferenceTabView {
+class XmpPrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final GridPane builder = new GridPane();

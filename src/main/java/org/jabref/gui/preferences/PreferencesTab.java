@@ -9,7 +9,7 @@ import javafx.scene.Node;
  *
  * It needs to extend from Component.
  */
-interface PreferenceTabView {
+interface PreferencesTab {
 
     Node getBuilder();
 

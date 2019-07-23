@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-class AppearancePrefsTab extends Pane implements PreferenceTabView {
+class AppearancePrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final CheckBox fontTweaksLAF;

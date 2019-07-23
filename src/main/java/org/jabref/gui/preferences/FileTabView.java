@@ -21,7 +21,7 @@ import org.jabref.preferences.NewLineSeparator;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class FileTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class FileTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox backupOldFile;

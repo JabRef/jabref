@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ExternalTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class ExternalTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;

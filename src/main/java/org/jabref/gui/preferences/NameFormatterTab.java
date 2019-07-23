@@ -30,7 +30,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.preferences.JabRefPreferences;
 
-public class NameFormatterTab extends Pane implements PreferenceTabView {
+public class NameFormatterTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;

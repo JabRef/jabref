@@ -23,7 +23,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
-public class AdvancedTabView extends AbstractPreferenceTabView implements PreferenceTabView {
+public class AdvancedTabView extends AbstractPreferenceTabView implements PreferencesTab {
     @FXML private Label remoteLabel;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;

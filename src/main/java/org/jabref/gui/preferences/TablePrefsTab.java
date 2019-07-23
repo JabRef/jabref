@@ -14,7 +14,7 @@ import javafx.scene.layout.Pane;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-class TablePrefsTab extends Pane implements PreferenceTabView {
+class TablePrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
 

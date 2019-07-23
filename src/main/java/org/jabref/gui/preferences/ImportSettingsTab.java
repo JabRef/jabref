@@ -14,7 +14,7 @@ import javafx.scene.layout.GridPane;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ImportSettingsTab implements PreferenceTabView {
+public class ImportSettingsTab implements PreferencesTab {
 
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
                                                                           "[bibtexkey] - [title]"};

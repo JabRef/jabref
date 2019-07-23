@@ -17,12 +17,12 @@ import com.google.common.collect.ArrayListMultimap;
 class PreferencesSearchHandler {
 
     private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
-    private final List<PreferenceTabView> preferenceTabs;
-    private final ListProperty<PreferenceTabView> filteredPreferenceTabs;
-    private final ArrayListMultimap<PreferenceTabView, Labeled> preferenceTabsLabelNames;
+    private final List<PreferencesTab> preferenceTabs;
+    private final ListProperty<PreferencesTab> filteredPreferenceTabs;
+    private final ArrayListMultimap<PreferencesTab, Labeled> preferenceTabsLabelNames;
     private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
 
-    PreferencesSearchHandler(List<PreferenceTabView> preferenceTabs) {
+    PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
@@ -36,7 +36,7 @@ class PreferencesSearchHandler {
         }
 
         filteredPreferenceTabs.clear();
-        for (PreferenceTabView tab : preferenceTabsLabelNames.keySet()) {
+        for (PreferencesTab tab : preferenceTabsLabelNames.keySet()) {
             boolean tabContainsLabel = false;
             for (Labeled labeled : preferenceTabsLabelNames.get(tab)) {
                 if (labelContainsText(labeled, text)) {
@@ -69,20 +69,20 @@ class PreferencesSearchHandler {
     }
 
     /*
-     * Traverse all nodes of a PreferenceTabView and return a
-     * mapping from PreferenceTabView to all its Labeled type nodes.
+     * Traverse all nodes of a PreferencesTab and return a
+     * mapping from PreferencesTab to all its Labeled type nodes.
      */
-    private ArrayListMultimap<PreferenceTabView, Labeled> getPrefsTabLabelMap() {
-        ArrayListMultimap<PreferenceTabView, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
-        for (PreferenceTabView preferenceTabView : preferenceTabs) {
-            Node builder = preferenceTabView.getBuilder();
+    private ArrayListMultimap<PreferencesTab, Labeled> getPrefsTabLabelMap() {
+        ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
+        for (PreferencesTab preferencesTab : preferenceTabs) {
+            Node builder = preferencesTab.getBuilder();
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
                 for (Node child : parentBuilder.getChildrenUnmodifiable()) {
                     if (child instanceof Labeled) {
                         Labeled labeled = (Labeled) child;
                         if (!labeled.getText().isEmpty()) {
-                            prefsTabLabelMap.put(preferenceTabView, labeled);
+                            prefsTabLabelMap.put(preferencesTab, labeled);
                         }
                     }
                 }
@@ -91,7 +91,7 @@ class PreferencesSearchHandler {
         return prefsTabLabelMap;
     }
 
-    protected ListProperty<PreferenceTabView> filteredPreferenceTabsProperty() {
+    protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
 

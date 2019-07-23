@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * Preference tab for file sorting options.
  */
-class ExportSortingPrefsTab extends Pane implements PreferenceTabView {
+class ExportSortingPrefsTab extends Pane implements PreferencesTab {
 
     private final SaveOrderConfigDisplayView exportOrderPanel;
     private final GridPane builder = new GridPane();
