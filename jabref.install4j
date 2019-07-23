@@ -70,7 +70,9 @@
           <archive location="${compiler:buildFileName}" failOnError="false" />
         </classPath>
       </java>
-      <macStaticAssociationActions mode="selected" />
+      <macStaticAssociationActions mode="selected">
+        <id>32</id>
+      </macStaticAssociationActions>
       <vmOptionsFile mode="content" overwriteMode="1">
         <content>-XX:+UseG1GC
 -XX:+UseStringDeduplication
