@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -16,6 +18,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -47,6 +50,8 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
 
+    private List<String> restartWarning = new ArrayList<>();
+
     public AdvancedTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -60,10 +65,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
                 input -> {
                     try {
                         int portNumber = Integer.parseInt(remotePortProperty().getValue());
-                        if (RemoteUtil.isUserPort(portNumber)) {
-                            return true;
-                        }
-                        return false;
+                        return RemoteUtil.isUserPort(portNumber);
                     } catch (NumberFormatException ex) {
                         return false;
                     }
@@ -75,7 +77,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
         proxyHostnameValidator = new FunctionBasedValidator<>(
                 proxyHostnameProperty,
-                input -> input != null && !input.trim().isEmpty(),
+                input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
                         Localization.lang("Advanced"),
                         Localization.lang("Network"),
@@ -91,7 +93,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
         proxyUsernameValidator = new FunctionBasedValidator<>(
                 proxyUsernameProperty,
-                input -> input != null && !input.trim().isEmpty(),
+                input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
                         Localization.lang("Advanced"),
                         Localization.lang("Network"),
@@ -140,26 +142,28 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     }
 
     private void storeRemoteSettings() {
+        RemotePreferences newRemotePreferences = new RemotePreferences(
+                remotePreferences.getPort(),
+                remoteServerProperty.getValue()
+        );
+
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
-                remotePreferences.setPort(newPort);
+                newRemotePreferences.setPort(newPort);
 
-                if (remotePreferences.useRemoteServer()) {
-                    dialogService.showWarningDialogAndWait(Localization.lang("Remote server port"),
-                            Localization.lang("Remote server port")
-                                    .concat(" ")
-                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+                if (newRemotePreferences.useRemoteServer()) {
+                    restartWarning.add(Localization.lang("Remote server port") + ": " + newPort);
                 }
             }
         });
 
-        remotePreferences.setUseRemoteServer(remoteServerProperty.getValue());
-        if (remotePreferences.useRemoteServer()) {
+        if (newRemotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
         } else {
             Globals.REMOTE_LISTENER.stop();
         }
-        preferences.setRemotePreferences(remotePreferences);
+
+        preferences.setRemotePreferences(newRemotePreferences);
     }
 
     private void storeProxySettings() {
@@ -215,11 +219,15 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
         ValidationStatus validationStatus = validator.getValidationStatus();
         if (!validationStatus.isValid()) {
-            dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return restartWarning; }
 
     public BooleanProperty remoteServerProperty() { return remoteServerProperty; }
 

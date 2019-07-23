@@ -3,6 +3,8 @@ package org.jabref.gui.preferences;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -139,6 +141,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         }
         return true;
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =

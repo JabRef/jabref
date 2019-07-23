@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
@@ -35,7 +36,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final JabRefPreferences prefs;
-    private final ObservableList<PrefsTab> preferenceTabs;
+    private final ObservableList<PreferenceTabView> preferenceTabs;
     private final JabRefFrame frame;
 
     public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame) {
@@ -63,7 +64,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         );
     }
 
-    public ObservableList<PrefsTab> getPreferenceTabs() {
+    public ObservableList<PreferenceTabView> getPreferenceTabs() {
         return new ReadOnlyListWrapper<>(preferenceTabs);
     }
 
@@ -153,7 +154,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
 
     public boolean validSettings() {
-        for (PrefsTab tab : preferenceTabs) {
+        for (PreferenceTabView tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return false;
             }
@@ -162,16 +163,26 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void storeAllSettings() {
+        List<String> restartWarnings = new ArrayList<>();
+
         // Run validation checks
         if (!validSettings()) {
             return;
         }
 
         // Store settings
-        for (PrefsTab tab : preferenceTabs) {
-            tab.storeSettings(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().storeSettings();
+        for (PreferenceTabView tab : preferenceTabs) {
+            tab.storeSettings();
+            restartWarnings.addAll(tab.getRestartWarnings());
         }
         prefs.flush();
+
+        if (!restartWarnings.isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Restart required"),
+                    String.join(",\n", restartWarnings)
+                            + "\n\n"
+                            + Localization.lang("You must restart JabRef for this to come into effect."));
+        }
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
@@ -181,11 +192,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
-     * ToDo: Reword after conversion of all tabs: resetValues()
      */
     public void setValues() {
-        for (PrefsTab prefsTab : preferenceTabs) {
-            prefsTab.setValues(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().setValues();
+        for (PreferenceTabView preferenceTabView : preferenceTabs) {
+            preferenceTabView.setValues();
         }
     }
 }

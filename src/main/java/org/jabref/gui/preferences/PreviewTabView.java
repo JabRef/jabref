@@ -3,12 +3,9 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -20,16 +17,13 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -43,7 +37,7 @@ import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-public class PreviewTabView extends VBox implements PrefsTab {
+public class PreviewTabView extends AbstractPreferenceTabView implements PreferenceTabView {
 
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;
@@ -59,16 +53,10 @@ public class PreviewTabView extends VBox implements PrefsTab {
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
 
-    private final ContextMenu contextMenu;
-
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final ContextMenu contextMenu = new ContextMenu();
 
     private long lastKeyPressTime;
     private String listSearchTerm;
-
-    private PreviewTabViewModel viewModel;
 
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -103,15 +91,18 @@ public class PreviewTabView extends VBox implements PrefsTab {
     }
 
     public PreviewTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
-        contextMenu = new ContextMenu();
+        super(preferences);
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
+    @Override
+    public String getTabName() { return Localization.lang("Entry preview"); }
+
     public void initialize() {
-        viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
+        PreviewTabViewModel previewTabViewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
+        this.viewModel = previewTabViewModel;
 
         lastKeyPressTime = System.currentTimeMillis();
 
@@ -125,64 +116,64 @@ public class PreviewTabView extends VBox implements PrefsTab {
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
 
-        availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
-        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
+        availableListView.itemsProperty().bindBidirectional(previewTabViewModel.availableListProperty());
+        previewTabViewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getName)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
-        availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
+        availableListView.setOnDragDropped(event -> dragDropped(previewTabViewModel.availableListProperty(), event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
-        viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
+        chosenListView.itemsProperty().bindBidirectional(previewTabViewModel.chosenListProperty());
+        previewTabViewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getName)
                 .setOnDragDropped(this::dragDroppedInChosenCell)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
-        chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
+        chosenListView.setOnDragDropped(event -> dragDropped(previewTabViewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setPreviewLayout(newValue));
+        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) -> previewTabViewModel.setPreviewLayout(newValue));
 
-        toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        toRightButton.disableProperty().bind(previewTabViewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
-        sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
-        sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        toLeftButton.disableProperty().bind(previewTabViewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        sortUpButton.disableProperty().bind(previewTabViewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        sortDownButton.disableProperty().bind(previewTabViewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
         previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
-        previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        EasyBind.subscribe(previewTabViewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
+        previewTab.getContent().visibleProperty().bind(previewTabViewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        viewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> editArea.replaceText(newValue));
+        editArea.visibleProperty().bind(previewTabViewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        previewTabViewModel.sourceTextProperty().addListener((observable, oldValue, newValue) -> editArea.replaceText(newValue));
         editArea.textProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.sourceTextProperty().setValue(newValue);
-            editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue));
+            previewTabViewModel.sourceTextProperty().setValue(newValue);
+            editArea.setStyleSpans(0, previewTabViewModel.computeHighlighting(newValue));
         });
         editArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
-                viewModel.refreshPreview();
+                previewTabViewModel.refreshPreview();
             }
         });
 
-        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
-        resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
-        contextMenu.getItems().get(0).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
-        contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
-        editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
+        readOnlyLabel.visibleProperty().bind(previewTabViewModel.selectedIsEditableProperty().not());
+        resetDefaultButton.disableProperty().bind(previewTabViewModel.selectedIsEditableProperty().not());
+        contextMenu.getItems().get(0).disableProperty().bind(previewTabViewModel.selectedIsEditableProperty().not());
+        contextMenu.getItems().get(2).disableProperty().bind(previewTabViewModel.selectedIsEditableProperty().not());
+        editArea.editableProperty().bind(previewTabViewModel.selectedIsEditableProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
+        Platform.runLater(() -> validationVisualizer.initVisualization(previewTabViewModel.chosenListValidationStatus(), chosenListView));
     }
 
     /**
@@ -209,62 +200,47 @@ public class PreviewTabView extends VBox implements PrefsTab {
             .findFirst().ifPresent(list::scrollTo);
     }
 
-    private void dragOver(DragEvent event) {
-        viewModel.dragOver(event);
-    }
+    private void dragOver(DragEvent event) { ((PreviewTabViewModel) viewModel).dragOver(event); }
 
     private void dragDetectedInAvailable(MouseEvent event) {
-        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+        PreviewTabViewModel previewTabViewModel = (PreviewTabViewModel) viewModel;
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(previewTabViewModel.availableSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.availableListProperty(), selectedLayouts, dragboard);
+            previewTabViewModel.dragDetected(previewTabViewModel.availableListProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
 
     private void dragDetectedInChosen(MouseEvent event) {
-        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
+        PreviewTabViewModel previewTabViewModel = (PreviewTabViewModel) viewModel;
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(previewTabViewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.chosenListProperty(), selectedLayouts, dragboard);
+            previewTabViewModel.dragDetected(previewTabViewModel.chosenListProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
 
     private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
-        boolean success = viewModel.dragDropped(targetList, event.getDragboard());
+        boolean success = ((PreviewTabViewModel) viewModel).dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }
 
     private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
-        boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
+        boolean success = ((PreviewTabViewModel) viewModel).dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();
     }
 
-    public void toRightButtonAction() { viewModel.addToChosen(); }
+    public void toRightButtonAction() { ((PreviewTabViewModel) viewModel).addToChosen(); }
 
-    public void toLeftButtonAction() { viewModel.removeFromChosen(); }
+    public void toLeftButtonAction() { ((PreviewTabViewModel) viewModel).removeFromChosen(); }
 
-    public void sortUpButtonAction() { viewModel.selectedInChosenUp(); }
+    public void sortUpButtonAction() { ((PreviewTabViewModel) viewModel).selectedInChosenUp(); }
 
-    public void sortDownButtonAction() { viewModel.selectedInChosenDown(); }
+    public void sortDownButtonAction() { ((PreviewTabViewModel) viewModel).selectedInChosenDown(); }
 
-    public void resetDefaultButtonAction() { viewModel.resetDefaultLayout(); }
-
-    @Override
-    public Node getBuilder() { return this; }
-
-    @Override
-    public void setValues() { } // Done by bindings
-
-    @Override
-    public void storeSettings() { viewModel.storeSettings(); }
-
-    @Override
-    public boolean validateSettings() { return viewModel.validateSettings(); }
-
-    @Override
-    public String getTabName() { return Localization.lang("Entry preview"); }
+    public void resetDefaultButtonAction() { ((PreviewTabViewModel) viewModel).resetDefaultLayout(); }
 }

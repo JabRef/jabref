@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -62,6 +65,9 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() { return true; }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 
     public BooleanProperty grayNonHitsProperty() { return grayNonHitsProperty; }
 

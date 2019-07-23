@@ -24,12 +24,12 @@ import org.fxmisc.easybind.EasyBind;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
- * PrefsTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses ok.
+ * PreferenceTabView interface, since this dialog will call the storeSettings() method of all tabs when the user presses ok.
  */
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
     @FXML private CustomTextField searchBox;
-    @FXML private ListView<PrefsTab> preferenceTabList;
+    @FXML private ListView<PreferenceTabView> preferenceTabList;
     @FXML private ScrollPane preferencePaneContainer;
     @FXML private ButtonType saveButton;
 
@@ -84,8 +84,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
 
         preferenceTabList.getSelectionModel().selectFirst();
-        new ViewModelListCellFactory<PrefsTab>()
-                .withText(PrefsTab::getTabName)
+        new ViewModelListCellFactory<PreferenceTabView>()
+                .withText(PreferenceTabView::getTabName)
                 .install(preferenceTabList);
 
         viewModel.setValues(); // ToDo: Remove this after conversion of all tabs

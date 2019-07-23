@@ -2,6 +2,8 @@ package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -54,6 +56,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
+    private List<String> restartWarning = new ArrayList<>();
+
+    @SuppressWarnings("ReturnValueIgnored")
     public GeneralTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -113,15 +118,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
-        if (selectedLanguageProperty.getValue() != preferences.getLanguage()) {
-            preferences.setLanguage(selectedLanguageProperty.getValue());
-            Localization.setLanguage(selectedLanguageProperty.getValue());
-
-            dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
-                    Localization.lang("You have changed the language setting.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+        Language newLanguage = selectedLanguageProperty.getValue();
+        if (newLanguage != preferences.getLanguage()) {
+            preferences.setLanguage(newLanguage);
+            Localization.setLanguage(newLanguage);
+            restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
+
         preferences.setDefaultEncoding(selectedEncodingProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, selectedBiblatexModeProperty.getValue() == BibDatabaseMode.BIBLATEX);
 
@@ -157,13 +160,17 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean validateSettings() {
-        ValidationStatus status = markTimeStampFormatValidationStatus();
-        if (!status.isValid()) {
-            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = markTimeStampFormatValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return restartWarning; }
 
     // General
 

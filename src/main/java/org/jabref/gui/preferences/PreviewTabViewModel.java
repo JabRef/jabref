@@ -216,15 +216,19 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus status = chosenListValidationStatus();
-        if (!status.isValid()) {
-            if (status.getHighestMessage().isPresent()) {
-                dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = chosenListValidationStatus();
+        if (!validationStatus.isValid()) {
+            if (validationStatus.getHighestMessage().isPresent()) {
+                validationStatus.getHighestMessage().ifPresent(message ->
+                        dialogService.showErrorDialogAndWait(message.getMessage()));
             }
             return false;
         }
         return true;
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 
     public void addToChosen() {
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());

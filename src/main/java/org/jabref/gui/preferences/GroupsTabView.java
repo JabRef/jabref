@@ -1,21 +1,16 @@
 package org.jabref.gui.preferences;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GroupsTabView extends VBox implements PrefsTab {
+public class GroupsTabView extends AbstractPreferenceTabView implements PreferenceTabView {
 
     @FXML private CheckBox grayNonHits;
     @FXML private RadioButton groupViewModeIntersection;
@@ -24,47 +19,25 @@ public class GroupsTabView extends VBox implements PrefsTab {
     @FXML private TextField defaultGroupingField;
     @FXML private TextField keywordSeparator;
 
-    @Inject private DialogService dialogService;
-    private final JabRefPreferences preferences;
-
-    private GroupsTabViewModel viewModel;
-
     public GroupsTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
+        super(preferences);
         ViewLoader.view(this)
-                .root(this)
-                .load();
-    }
-
-    public void initialize() {
-        viewModel = new GroupsTabViewModel(dialogService, preferences);
-
-        grayNonHits.selectedProperty().bindBidirectional(viewModel.grayNonHitsProperty());
-        groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
-        groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
-        autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
-        defaultGroupingField.textProperty().bindBidirectional(viewModel.defaultGroupingFieldProperty());
-        keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
-    }
-
-    @Override
-    public Node getBuilder() { return this; }
-
-    @Override
-    public void setValues() {
-        // Done by bindings
-    }
-
-    @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return viewModel.validateSettings();
+                  .root(this)
+                  .load();
     }
 
     @Override
     public String getTabName() { return Localization.lang("Groups"); }
+
+    public void initialize() {
+        GroupsTabViewModel groupsTabViewModel = new GroupsTabViewModel(dialogService, preferences);
+        this.viewModel = groupsTabViewModel;
+
+        grayNonHits.selectedProperty().bindBidirectional(groupsTabViewModel.grayNonHitsProperty());
+        groupViewModeIntersection.selectedProperty().bindBidirectional(groupsTabViewModel.groupViewModeIntersectionProperty());
+        groupViewModeUnion.selectedProperty().bindBidirectional(groupsTabViewModel.groupViewModeUnionProperty());
+        autoAssignGroup.selectedProperty().bindBidirectional(groupsTabViewModel.autoAssignGroupProperty());
+        defaultGroupingField.textProperty().bindBidirectional(groupsTabViewModel.defaultGroupingFieldProperty());
+        keywordSeparator.textProperty().bindBidirectional(groupsTabViewModel.keywordSeparatorProperty());
+    }
 }

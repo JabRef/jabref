@@ -1,19 +1,14 @@
 package org.jabref.gui.preferences;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -26,7 +21,7 @@ import org.jabref.preferences.NewLineSeparator;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class FileTabView extends VBox implements PrefsTab {
+public class FileTabView extends AbstractPreferenceTabView implements PreferenceTabView {
 
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox backupOldFile;
@@ -50,22 +45,23 @@ public class FileTabView extends VBox implements PrefsTab {
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    @Inject private DialogService dialogService;
-    private final JabRefPreferences preferences;
-
-    private FileTabViewModel viewModel;
-
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public FileTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
+        super(preferences);
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("File");
     }
 
     public void initialize() {
-        viewModel = new FileTabViewModel(dialogService, preferences);
+        FileTabViewModel viewModel = new FileTabViewModel(dialogService, preferences);
+        this.viewModel = viewModel;
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         backupOldFile.selectedProperty().bindBidirectional(viewModel.backupOldFileProperty());
@@ -98,32 +94,7 @@ public class FileTabView extends VBox implements PrefsTab {
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
-    @Override
-    public Node getBuilder() {
-        return this;
-    }
-
-    @Override
-    public void setValues() {
-        // Done by bindings
-    }
-
-    @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return viewModel.validateSettings();
-    }
-
-    @Override
-    public String getTabName() {
-        return Localization.lang("File");
-    }
-
     public void mainFileDirBrowse() {
-        viewModel.mainFileDirBrowse();
+        ((FileTabViewModel) viewModel).mainFileDirBrowse();
     }
 }

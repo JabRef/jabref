@@ -42,7 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
-class TableColumnsTab extends Pane implements PrefsTab {
+class TableColumnsTab extends Pane implements PreferenceTabView {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -556,4 +556,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Entry table columns");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }
