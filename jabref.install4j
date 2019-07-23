@@ -62,7 +62,7 @@
   </files>
   <launchers>
     <launcher name="JabRef" id="23" icnsFile="./src/main/resources/icons/jabref.icns">
-      <executable name="JabRef" iconSet="true" iconFile="./src/main/resources/icons/jabref.ico" executableMode="gui" checkConsoleParameter="true" dpiAware="false">
+      <executable name="JabRef" iconSet="true" iconFile="./src/main/resources/icons/jabref.ico" executableMode="gui" checkConsoleParameter="true">
         <versionInfo include="true" fileVersion="${compiler:versionFourDots}" fileDescription="${compiler:sys.fullName}" legalCopyright="${compiler:sys.fullName}" internalName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="org.jabref.JabRefMain">
