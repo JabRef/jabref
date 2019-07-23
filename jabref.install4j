@@ -40,7 +40,11 @@
       <variable name="buildFileName" value="JabRef-3.1dev.jar" />
       <variable name="version" value="3.1dev" />
     </variables>
-    <jreBundles jdkProviderId="Liberica" release="OpenJDK 11.0.3" />
+    <jreBundles jdkProviderId="Liberica" release="OpenJDK 11.0.3">
+      <modules>
+        <defaultModules set="all" />
+      </modules>
+    </jreBundles>
   </application>
   <files>
     <mountPoints>
