@@ -23,13 +23,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.xmlunit.builder.Input;
-import org.xmlunit.builder.Input.Builder;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.ElementSelectors;
-import org.xmlunit.matchers.CompareMatcher;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class ModsExportFormatTestFiles {
@@ -73,16 +68,12 @@ public class ModsExportFormatTestFiles {
     public final void testPerformExport(String filename) throws Exception {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path tempFilename = tempFile.toAbsolutePath();
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(xmlFile));
-        Builder test = Input.from(Files.newInputStream(tempFilename));
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        assertEquals(Files.readAllLines(xmlFile), Files.readAllLines(tempFile));
     }
 
     @ParameterizedTest
@@ -100,17 +91,12 @@ public class ModsExportFormatTestFiles {
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path tempFilename = tempFile.toAbsolutePath();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 
         modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(xmlFile));
-        Builder test = Input.from(Files.newInputStream(tempFilename));
-
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        assertEquals(Files.readAllLines(xmlFile), Files.readAllLines(tempFile));
     }
 }

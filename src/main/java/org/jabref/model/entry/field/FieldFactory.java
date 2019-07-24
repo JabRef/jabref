@@ -3,6 +3,7 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -94,7 +95,7 @@ public class FieldFactory {
      * Returns a sorted List with all standard fields and including some common internal fields
      */
     public static Set<Field> getCommonFields() {
-        TreeSet<Field> publicAndInternalFields = new TreeSet<>();
+        TreeSet<Field> publicAndInternalFields = new TreeSet<>(Comparator.comparing(Field::getName));
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);

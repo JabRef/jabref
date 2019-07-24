@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,6 +71,11 @@ public class BibEntryTypeBuilder {
     }
 
     public BibEntryType build() {
-        return new BibEntryType(type, fields, requiredFields);
+        // Treat required fields as important ones
+        Stream<BibField> requiredAsImportant = requiredFields.stream()
+                                                             .flatMap(TreeSet::stream)
+                                                             .map(field -> new BibField(field, FieldPriority.IMPORTANT));
+        Set<BibField> allFields = Stream.concat(fields.stream(), requiredAsImportant).collect(Collectors.toSet());
+        return new BibEntryType(type, allFields, requiredFields);
     }
 }

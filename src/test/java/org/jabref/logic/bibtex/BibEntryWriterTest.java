@@ -63,8 +63,8 @@ public class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
                 "  author  = {Foo Bar}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  number  = {1}," + OS.NEWLINE +
                 "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
 

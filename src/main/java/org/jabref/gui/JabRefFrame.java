@@ -1006,7 +1006,7 @@ public class JabRefFrame extends BorderPane {
                 autosaver.registerListener(new AutosaveUIManager(basePanel));
             }
 
-            BackupManager.start(context);
+            BackupManager.start(context, Globals.entryTypesManager, prefs);
 
             // Track opening
             trackOpenNewDatabase(basePanel);

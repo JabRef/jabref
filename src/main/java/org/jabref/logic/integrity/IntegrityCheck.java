@@ -34,17 +34,17 @@ public class IntegrityCheck {
         this.allowIntegerEdition = allowIntegerEdition;
     }
 
-    public List<IntegrityMessage> checkBibtexDatabase() {
+    public List<IntegrityMessage> checkDatabase() {
         List<IntegrityMessage> result = new ArrayList<>();
 
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-            result.addAll(checkBibtexEntry(entry));
+            result.addAll(checkEntry(entry));
         }
 
         return result;
     }
 
-    public List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
+    public List<IntegrityMessage> checkEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -134,7 +134,7 @@ class IntegrityCheckTest {
     @Test
     void testJournaltitleChecks() {
         assertWrong(withMode(createContext(StandardField.JOURNALTITLE, "A journal"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext(StandardField.JOURNALTITLE, "A journal"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.JOURNAL, "A journal"), BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -348,7 +348,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                            new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
-                .checkBibtexDatabase();
+                .checkDatabase();
 
         assertEquals(clonedEntry, entry);
     }
@@ -386,18 +386,8 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
-                .checkBibtexDatabase();
-        assertFalse(messages.isEmpty(), messages.toString());
-    }
-
-    private void assertWrong(BibDatabaseContext context, boolean allowIntegerEdition) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
-                allowIntegerEdition)
-                .checkBibtexDatabase();
-        assertFalse(messages.isEmpty(), messages.toString());
+                .checkDatabase();
+        assertNotEquals(Collections.emptyList(), messages);
     }
 
     private void assertCorrect(BibDatabaseContext context) {
@@ -405,7 +395,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
-        ).checkBibtexDatabase();
+        ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -415,7 +405,7 @@ class IntegrityCheckTest {
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
                 allowIntegerEdition
-        ).checkBibtexDatabase();
+        ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 
