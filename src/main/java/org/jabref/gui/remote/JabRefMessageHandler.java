@@ -7,9 +7,9 @@ import javafx.application.Platform;
 import org.jabref.JabRefGUI;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.remote.server.MessageHandler;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
