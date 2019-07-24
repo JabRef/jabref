@@ -445,7 +445,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void addInvestigators(Map<Field, String> fields, InvestigatorList investigatorList) {
         List<String> investigatorNames = new ArrayList<>();
         List<String> affiliationInfos = new ArrayList<>();
-        String name = "";
+        String name;
         // add the investigators like the authors
         if (investigatorList.getInvestigator() != null) {
             List<Investigator> investigators = investigatorList.getInvestigator();
@@ -526,13 +526,13 @@ public class MedlineImporter extends Importer implements Parser {
     private void addMeashHeading(Map<Field, String> fields, MeshHeadingList meshHeadingList) {
         ArrayList<String> keywords = new ArrayList<>();
         for (MeshHeading keyword : meshHeadingList.getMeshHeading()) {
-            String result = keyword.getDescriptorName().getContent();
+            StringBuilder result = new StringBuilder(keyword.getDescriptorName().getContent());
             if (keyword.getQualifierName() != null) {
                 for (QualifierName qualifier : keyword.getQualifierName()) {
-                    result += ", " + qualifier.getContent();
+                    result.append(", ").append(qualifier.getContent());
                 }
             }
-            keywords.add(result);
+            keywords.add(result.toString());
         }
         fields.put(StandardField.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
     }
@@ -588,10 +588,10 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void addElocationID(Map<Field, String> fields, ELocationID eLocationID) {
-        if (StandardField.DOI.equals(eLocationID.getEIdType())) {
+        if (eLocationID.getEIdType().equals("doi")) {
             fields.put(StandardField.DOI, eLocationID.getContent());
         }
-        if ("pii".equals(eLocationID.getEIdType())) {
+        if (eLocationID.getEIdType().equals("pii")) {
             fields.put(new UnknownField("pii"), eLocationID.getContent());
         }
     }

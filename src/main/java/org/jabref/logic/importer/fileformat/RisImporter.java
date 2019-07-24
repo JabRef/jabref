@@ -160,7 +160,7 @@ public class RisImporter extends Importer {
                             editor += " and " + value;
                         }
                     } else if ("JA".equals(tag) || "JF".equals(tag)) {
-                        if ("inproceedings".equals(type)) {
+                        if (type.equals(StandardEntryType.InProceedings)) {
                             fields.put(StandardField.BOOKTITLE, value);
                         } else {
                             fields.put(StandardField.JOURNAL, value);
@@ -176,7 +176,7 @@ public class RisImporter extends Importer {
                     } else if ("SP".equals(tag)) {
                         startPage = value;
                     } else if ("PB".equals(tag)) {
-                        if ("phdthesis".equals(type)) {
+                        if (type.equals(StandardEntryType.PhdThesis)) {
                             fields.put(StandardField.SCHOOL, value);
                         } else {
                             fields.put(StandardField.PUBLISHER, value);

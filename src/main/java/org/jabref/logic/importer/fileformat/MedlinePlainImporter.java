@@ -184,7 +184,7 @@ public class MedlinePlainImporter extends Importer {
                 }
 
                 if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
-                    String oldInvestigator = fieldConversionMap.get("investigator");
+                    String oldInvestigator = fieldConversionMap.get(new UnknownField("investigator"));
                     if (oldInvestigator == null) {
                         fieldConversionMap.put(new UnknownField("investigator"), value);
                     } else {
@@ -214,9 +214,6 @@ public class MedlinePlainImporter extends Importer {
             }
 
             BibEntry b = new BibEntry(type);
-
-            // Remove empty fields:
-            fieldConversionMap.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fieldConversionMap::remove);
 
             // create one here
             b.setField(fieldConversionMap);

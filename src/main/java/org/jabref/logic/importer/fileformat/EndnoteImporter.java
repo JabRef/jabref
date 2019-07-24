@@ -183,16 +183,16 @@ public class EndnoteImporter extends Importer {
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    if ("article".equals(type)) {
+                    if (type.equals(StandardEntryType.Article)) {
                         hm.put(StandardField.JOURNAL, val);
-                    } else if ("book".equals(type) || "inbook".equals(type)) {
+                    } else if (type.equals(StandardEntryType.Book) || type.equals(StandardEntryType.InBook)) {
                         hm.put(StandardField.SERIES, val);
                     } else {
                         /* type = inproceedings */
                         hm.put(StandardField.BOOKTITLE, val);
                     }
                 } else if ("I".equals(prefix)) {
-                    if ("phdthesis".equals(type)) {
+                    if (type.equals(StandardEntryType.PhdThesis)) {
                         hm.put(StandardField.SCHOOL, val);
                     } else {
                         hm.put(StandardField.PUBLISHER, val);

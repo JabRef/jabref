@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -62,7 +62,7 @@ public class DocBook5ExporterTest {
         entry.setField(StandardField.ISBN, "1-2-34");
         entry.setCiteKey("mykey");
         entry.setDate(new org.jabref.model.entry.Date(myDate));
-        entries = Arrays.asList(entry);
+        entries = Collections.singletonList(entry);
     }
 
     @Test

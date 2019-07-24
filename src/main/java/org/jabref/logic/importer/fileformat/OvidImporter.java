@@ -207,11 +207,11 @@ public class OvidImporter extends Importer {
             // Set the entrytype properly:
             EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
             h.remove(InternalField.TYPE_HEADER);
-            if (entryType.equals(StandardEntryType.Book) && h.containsKey("chaptertitle")) {
+            if (entryType.equals(StandardEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
                 // This means we have an "incollection" entry.
                 entryType = StandardEntryType.InCollection;
                 // Move the "chaptertitle" to just "title":
-                h.put(StandardField.TITLE, h.remove("chaptertitle"));
+                h.put(StandardField.TITLE, h.remove(new UnknownField("chaptertitle")));
             }
             BibEntry b = new BibEntry(entryType);
             b.setField(h);
