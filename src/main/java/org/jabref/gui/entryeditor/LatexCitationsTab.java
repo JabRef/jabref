@@ -53,9 +53,6 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
             switch (status) {
-                case IN_PROGRESS:
-                    searchPane.getChildren().setAll(progressIndicator);
-                    break;
                 case CITATIONS_FOUND:
                     graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
                     searchPane.getChildren().setAll(getCitationsPane());
@@ -65,6 +62,10 @@ public class LatexCitationsTab extends EntryEditorTab {
                     break;
                 case ERROR:
                     searchPane.getChildren().setAll(getErrorPane(viewModel.getSearchError()));
+                    break;
+                case IN_PROGRESS:
+                default:
+                    searchPane.getChildren().setAll(progressIndicator);
                     break;
             }
         });
