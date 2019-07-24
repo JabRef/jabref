@@ -115,7 +115,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             throw new IOException("Error searching files", e);
         }
 
-        TexParserResult texParserResult = new DefaultTexParser().parse(texFiles);
+        TexParserResult texParserResult = new DefaultTexParser().parse(entry.get(), texFiles);
         citationList.setAll(texParserResult.getCitationsByKey(entry.get()));
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;

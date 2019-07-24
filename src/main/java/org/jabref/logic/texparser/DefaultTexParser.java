@@ -8,9 +8,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
 
@@ -62,11 +64,15 @@ public class DefaultTexParser implements TexParser {
 
     @Override
     public TexParserResult parse(Path texFile) {
-        return parse(Collections.singletonList(texFile));
+        return parse(null, Collections.singletonList(texFile));
     }
 
     @Override
     public TexParserResult parse(List<Path> texFiles) {
+        return parse(null, texFiles);
+    }
+
+    public TexParserResult parse(BibEntry entry, List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
 
         result.addFiles(texFiles);
@@ -75,7 +81,10 @@ public class DefaultTexParser implements TexParser {
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
                 // Skip comments and blank lines.
                 lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
-                    matchCitation(file, lineNumberReader.getLineNumber(), line);
+                    // Check if there is a given entry.
+                    if (entry == null || line.contains(Objects.requireNonNull(entry.getCiteKeyOptional().orElse(null)))) {
+                        matchCitation(file, lineNumberReader.getLineNumber(), line);
+                    }
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 });
             } catch (IOException e) {
@@ -85,7 +94,7 @@ public class DefaultTexParser implements TexParser {
 
         // Parse all files referenced by TEX files, recursively.
         if (!referencedFiles.isEmpty()) {
-            parse(referencedFiles);
+            parse(entry, referencedFiles);
         }
 
         return result;
