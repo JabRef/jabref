@@ -145,7 +145,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.16'
+    compile 'mysql:mysql-connector-java:8.0.17'
 
     compile 'org.postgresql:postgresql:42.2.6'
 
@@ -191,9 +191,9 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.0'
 
     testCompile 'junit:junit:4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.0'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.5.1'
 
     testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.12.0'
