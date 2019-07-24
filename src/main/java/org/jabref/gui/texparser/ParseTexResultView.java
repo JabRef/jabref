@@ -26,11 +26,9 @@ public class ParseTexResultView extends BaseDialog<Void> {
     public ParseTexResultView(TexParserResult texParserResult) {
         this.texParserResult = texParserResult;
 
-        this.setTitle(Localization.lang("LaTeX references search results"));
+        this.setTitle(Localization.lang("LaTeX Citations Search Results"));
 
-        ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+        ViewLoader.view(this).load().setAsDialogPane(this);
     }
 
     @FXML
