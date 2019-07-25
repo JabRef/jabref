@@ -115,30 +115,9 @@ public class XmpUtilWriter {
      * @param entry     The entry, which is added to the dublin core metadata.
      * @param xmpPreferences    The user's xmp preferences.
      */
-    private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry,
-            XmpPreferences xmpPreferences) {
-
+    private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, XmpPreferences xmpPreferences) {
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, entry);
         dcExtractor.fillDublinCoreSchema();
-    }
-
-    /**
-     * Try to write the given BibTexEntry as a DublinCore XMP Schema
-     *
-     * Existing DublinCore schemas in the document are not modified.
-     *
-     * @param document The pdf document to write to.
-     * @param entry    The BibTeX entry that is written as a schema.
-     * @param database maybenull An optional database which the given BibTeX entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
-     */
-    public static void writeDublinCore(PDDocument document, BibEntry entry,
-            BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
-
-        List<BibEntry> entries = new ArrayList<>();
-        entries.add(entry);
-
-        XmpUtilWriter.writeDublinCore(document, entries, database, xmpPreferences);
     }
 
     /**
@@ -206,7 +185,7 @@ public class XmpUtilWriter {
      * @return  If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
      *          otherwise it returns the xmp metadata as a string in dublin core format.
      */
-    public static String generateXmpStringWithXmpDeclaration(List<BibEntry> entries, XmpPreferences xmpPreferences) {
+    private static String generateXmpStringWithXmpDeclaration(List<BibEntry> entries, XmpPreferences xmpPreferences) {
         XMPMetadata meta = XMPMetadata.createXMPMetadata();
         for (BibEntry entry : entries) {
             DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
@@ -243,12 +222,10 @@ public class XmpUtilWriter {
         String xmpContent = XmpUtilWriter.generateXmpStringWithXmpDeclaration(entries, xmpPreferences);
         // remove the <?xpacket *> tags to enable the usage of the CTAN package xmpincl
         Predicate<String> isBeginOrEndTag = s -> s.contains(XMP_BEGIN_END_TAG);
-        String updatedXmpContent = Arrays.stream(xmpContent.split(System.lineSeparator()))
-                                         .filter(isBeginOrEndTag.negate())
-                                         .map(line -> line)
-                                         .collect(Collectors.joining(System.lineSeparator()));
 
-        return updatedXmpContent;
+        return Arrays.stream(xmpContent.split(System.lineSeparator()))
+                     .filter(isBeginOrEndTag.negate())
+                     .collect(Collectors.joining(System.lineSeparator()));
     }
 
     /**

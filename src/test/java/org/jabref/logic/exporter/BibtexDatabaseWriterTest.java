@@ -273,7 +273,7 @@ class BibtexDatabaseWriterTest {
                         "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: customizedType: req[title] opt[year]}" + OS.NEWLINE,
+                        + "@Comment{jabref-entrytype: customizedtype: req[title] opt[year]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 

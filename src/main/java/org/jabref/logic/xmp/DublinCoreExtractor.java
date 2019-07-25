@@ -2,6 +2,7 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -344,13 +345,14 @@ public class DublinCoreExtractor {
     }
 
     public void fillDublinCoreSchema() {
-
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
         // Fields for which not to write XMP data later on:
         Set<Field> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
-        for (Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
+        Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
+        fieldValues.addAll(bibEntry.getFieldMap().entrySet());
+        for (Entry<Field, String> field : fieldValues) {
             if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
                 continue;
             }

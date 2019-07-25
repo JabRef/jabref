@@ -5,12 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -19,7 +17,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -34,12 +31,7 @@ public class XmpExporterTest {
 
     @BeforeEach
     public void setUp() {
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
-
-        exporter = exporterFactory.getExporterByName("xmp").get();
+        exporter = new XmpExporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
         encoding = StandardCharsets.UTF_8;

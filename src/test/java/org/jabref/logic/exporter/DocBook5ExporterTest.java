@@ -38,7 +38,7 @@ public class DocBook5ExporterTest {
     public List<BibEntry> entries;
 
     private Path xmlFile;
-    private Exporter exportFormat;
+    private Exporter exporter;
 
     @BeforeEach
     void setUp() throws URISyntaxException {
@@ -50,7 +50,7 @@ public class DocBook5ExporterTest {
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
 
-        exportFormat = exporterFactory.getExporterByName("docbook5").get();
+        exporter = exporterFactory.getExporterByName("docbook5").get();
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
@@ -69,7 +69,7 @@ public class DocBook5ExporterTest {
     void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        exportFormat.export(databaseContext, path, charset, entries);
+        exporter.export(databaseContext, path, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(path));
