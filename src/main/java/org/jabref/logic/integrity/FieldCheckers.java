@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FilePreferences;
@@ -15,13 +16,17 @@ import com.google.common.collect.Multimap;
 
 public class FieldCheckers {
 
-    private Multimap<String, ValueChecker> fieldChecker;
+    private final Multimap<String, ValueChecker> fieldChecker;
 
-    public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
-        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey);
+    public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences,
+                         JournalAbbreviationRepository abbreviationRepository,
+                         boolean enforceLegalKey, boolean allowIntegerEdition) {
+        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey, allowIntegerEdition);
     }
 
-    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
+    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences,
+                                                            JournalAbbreviationRepository abbreviationRepository,
+                                                            boolean enforceLegalKey, boolean allowIntegerEdition) {
         ArrayListMultimap<String, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (String field : InternalBibtexFields.getJournalNameFields()) {
@@ -37,7 +42,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.TITLE, new BracketChecker());
         fieldCheckers.put(FieldName.TITLE, new TitleChecker(databaseContext));
         fieldCheckers.put(FieldName.DOI, new DOIValidityChecker());
-        fieldCheckers.put(FieldName.EDITION, new EditionChecker(databaseContext));
+        fieldCheckers.put(FieldName.EDITION, new EditionChecker(databaseContext, allowIntegerEdition));
         fieldCheckers.put(FieldName.FILE, new FileChecker(databaseContext, filePreferences));
         fieldCheckers.put(FieldName.HOWPUBLISHED, new HowPublishedChecker(databaseContext));
         fieldCheckers.put(FieldName.ISBN, new ISBNChecker());
@@ -49,6 +54,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
         fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
+        fieldCheckers.put(BibEntry.KEY_FIELD, new ValidBibtexKeyChecker(enforceLegalKey));
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(FieldName.DATE, new DateChecker());

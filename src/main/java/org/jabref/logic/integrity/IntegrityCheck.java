@@ -18,17 +18,20 @@ public class IntegrityCheck {
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final boolean enforceLegalKey;
+    private final boolean allowIntegerEdition;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
-                          boolean enforceLegalKey) {
+                          boolean enforceLegalKey,
+                          boolean allowIntegerEdition) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.enforceLegalKey = enforceLegalKey;
+        this.allowIntegerEdition = allowIntegerEdition;
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -48,7 +51,11 @@ public class IntegrityCheck {
             return result;
         }
 
-        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, filePreferences, journalAbbreviationRepository, enforceLegalKey);
+        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext,
+                                                        filePreferences,
+                                                        journalAbbreviationRepository,
+                                                        enforceLegalKey,
+                                                        allowIntegerEdition);
         for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }

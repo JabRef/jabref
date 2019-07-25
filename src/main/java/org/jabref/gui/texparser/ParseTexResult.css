@@ -1,0 +1,16 @@
+.list-view .list-cell {
+    -fx-padding: 10px;
+}
+
+.list-view .list-cell .contextBox {
+    -fx-border-color: grey;
+    -fx-border-style: dashed;
+    -fx-border-width: 2px;
+    -fx-font-size: 110%;
+    -fx-font-style: italic;
+    -fx-padding: 15px;
+}
+
+.list-view .list-cell .fileData {
+    -fx-font-family: 'Courier New', Courier, monospace;
+}

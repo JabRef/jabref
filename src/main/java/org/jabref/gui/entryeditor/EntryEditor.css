@@ -41,6 +41,10 @@
     -fx-font-weight: normal;
 }
 
+.code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
 .icon-button.narrow {
     -fx-padding: 0.1em;
 }
@@ -96,6 +100,19 @@
 
 .related-articles-tab {
     -fx-padding: 20 20 20 20;
+}
+
+.recommendation-heading {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+}
+
+.recommendation-description {
+    -fx-font-style: italic;
+}
+
+.recommendation-item {
+    -fx-padding: 0 0 0 20;
 }
 
 #bibtexSourceCodeArea .search {

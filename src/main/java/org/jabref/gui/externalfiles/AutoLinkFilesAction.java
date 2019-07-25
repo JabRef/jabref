@@ -13,6 +13,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,12 +32,14 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final JabRefPreferences preferences;
     private final StateManager stateManager;
     private UndoManager undoManager;
+    private TaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager) {
+    public AutoLinkFilesAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
@@ -51,6 +54,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(database, preferences.getFilePreferences(), preferences.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
         Task<List<BibEntry>> linkFilesTask = new Task<List<BibEntry>>() {
+
             @Override
             protected List<BibEntry> call() {
                 return util.linkAssociatedFiles(entries, nc);
@@ -71,9 +75,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
         };
 
         dialogService.showProgressDialogAndWait(
-                Localization.lang("Automatically setting file links"),
-                Localization.lang("Searching for files"),
-                linkFilesTask
-        );
+                                                Localization.lang("Automatically setting file links"),
+                                                Localization.lang("Searching for files"),
+                                                linkFilesTask);
+        taskExecutor.execute(linkFilesTask);
     }
 }
