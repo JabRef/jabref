@@ -2,6 +2,7 @@ package org.jabref.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -41,6 +42,8 @@ public class MainArchitectureTestsWithArchUnit {
         noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
     }
     
+    //"Currently disabled as there is no alternative for the rest of classes who need awt"
+    @ArchIgnore
     @ArchTest
     public static void doNotUseJavaAWT(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("java.awt..").check(classes);

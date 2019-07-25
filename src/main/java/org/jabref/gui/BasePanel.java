@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -963,16 +961,7 @@ public class BasePanel extends StackPane {
 
     public void markBaseChanged() {
         baseChanged = true;
-
-        if (SwingUtilities.isEventDispatchThread()) {
-            markBasedChangedInternal();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> markBasedChangedInternal());
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem marking database as changed", e);
-            }
-        }
+        markBasedChangedInternal();
     }
 
     private void markBasedChangedInternal() {

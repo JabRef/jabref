@@ -14,8 +14,6 @@ import java.util.Optional;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -293,9 +291,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                    SwingUtilities.invokeLater(() -> {
                         DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
-                    });
                 }
             }, 60000); // run in one minute
         }
@@ -401,6 +397,8 @@ public class JabRefFrame extends BorderPane {
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
+        // TODO: javafx variant only avaiable in java 9 and updwards
+        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
         for (Window window : Window.getWindows()) {
             window.dispose();
         }
