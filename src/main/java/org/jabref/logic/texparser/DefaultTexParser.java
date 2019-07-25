@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -107,11 +108,8 @@ public class DefaultTexParser implements TexParser {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            String[] keys = citeMatch.group(CITE_GROUP).split(",");
-
-            for (String key : keys) {
-                result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line);
-            }
+            Arrays.stream(citeMatch.group(CITE_GROUP).split(",")).forEach(key ->
+                    result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
         }
     }
 
@@ -120,10 +118,9 @@ public class DefaultTexParser implements TexParser {
      */
     private void matchNestedFile(Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
-        StringBuilder include;
 
         while (includeMatch.find()) {
-            include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
+            StringBuilder include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
 
             if (!include.toString().endsWith(TEX_EXT)) {
                 include.append(TEX_EXT);

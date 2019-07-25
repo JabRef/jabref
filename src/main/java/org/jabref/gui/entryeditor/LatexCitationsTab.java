@@ -61,7 +61,7 @@ public class LatexCitationsTab extends EntryEditorTab {
                     searchPane.getChildren().setAll(getNotFoundPane());
                     break;
                 case ERROR:
-                    searchPane.getChildren().setAll(getErrorPane(viewModel.getSearchError()));
+                    searchPane.getChildren().setAll(getErrorPane());
                     break;
                 case IN_PROGRESS:
                 default:
@@ -115,14 +115,14 @@ public class LatexCitationsTab extends EntryEditorTab {
         return notFoundPane;
     }
 
-    private ScrollPane getErrorPane(Exception exception) {
+    private ScrollPane getErrorPane() {
         Text errorTitleText = new Text(Localization.lang("Error"));
         errorTitleText.getStyleClass().add("latex-citations-title-text");
 
-        Text errorMessageText = new Text(exception.getMessage());
+        Text errorMessageText = new Text(viewModel.getSearchError().getMessage());
         errorMessageText.getStyleClass().add("latex-citations-error-text");
 
-        Text errorCauseText = new Text(exception.getCause().toString());
+        Text errorCauseText = new Text(viewModel.getSearchError().getCause().toString());
 
         VBox errorBox = new VBox(20.0, errorTitleText, errorMessageText, errorCauseText);
         ScrollPane errorPane = new ScrollPane();
