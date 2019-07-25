@@ -8,7 +8,7 @@ import org.jabref.model.strings.StringUtil;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.commons.util.AnnotationUtils;
+import org.junit.platform.commons.support.AnnotationSupport;
 
 public class CIServerCondition implements ExecutionCondition {
 
@@ -31,7 +31,7 @@ public class CIServerCondition implements ExecutionCondition {
         }
 
         Optional<AnnotatedElement> element = context.getElement();
-        Optional<DisabledOnCIServer> disabled = AnnotationUtils.findAnnotation(element, DisabledOnCIServer.class);
+        Optional<DisabledOnCIServer> disabled = AnnotationSupport.findAnnotation(element, DisabledOnCIServer.class);
         if (disabled.isPresent()) {
             String reason = disabled.map(DisabledOnCIServer::value)
                                     .filter(StringUtil::isNotBlank)

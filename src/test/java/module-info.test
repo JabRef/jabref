@@ -19,10 +19,6 @@
 --add-reads
     // Make junit5 module visible
     org.jabref=org.junit.platform.commons
---add-exports
-    // Make internal junit5 module visible
-    // TODO: Remove usage org.junit.platform.commons.util (currently used in CIServerCondition)
-    org.junit.platform.commons/org.junit.platform.commons.util=org.jabref
 --add-opens
      javafx.base/com.sun.javafx.beans=net.bytebuddy
 --add-opens
