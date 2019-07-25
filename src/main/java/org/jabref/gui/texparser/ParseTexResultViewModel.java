@@ -8,7 +8,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
-class ParseTexResultViewModel extends AbstractViewModel {
+public class ParseTexResultViewModel extends AbstractViewModel {
 
     private final ObservableList<ReferenceViewModel> referenceList;
     private final ObservableList<Citation> citationList;

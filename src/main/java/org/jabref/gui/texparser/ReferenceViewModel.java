@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.texparser.Citation;
 
-class ReferenceViewModel {
+public class ReferenceViewModel {
 
     private final String entry;
     private final ObservableList<Citation> citationList;

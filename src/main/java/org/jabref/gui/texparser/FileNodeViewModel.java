@@ -8,7 +8,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.l10n.Localization;
 
-class FileNodeViewModel {
+public class FileNodeViewModel {
 
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
