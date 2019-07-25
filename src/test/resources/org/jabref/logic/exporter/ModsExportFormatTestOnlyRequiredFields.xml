@@ -3,9 +3,6 @@
     <mods:mods ID="ShruthiVinodhkumarSelvamani2016">
         <mods:identifier type="citekey">ShruthiVinodhkumarSelvamani2016</mods:identifier>
         <mods:genre>article</mods:genre>
-        <mods:titleInfo>
-            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
-        </mods:titleInfo>
         <mods:name type="personal">
             <mods:namePart type="family">Shruthi</mods:namePart>
             <mods:namePart type="given">Basavaradhya</mods:namePart>
@@ -18,6 +15,9 @@
         <mods:name type="personal">
             <mods:namePart type="family"> Selvamani</mods:namePart>
         </mods:name>
+        <mods:titleInfo>
+            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
+        </mods:titleInfo>
         <mods:originInfo>
             <mods:dateIssued keyDate="yes">2016</mods:dateIssued>
         </mods:originInfo>

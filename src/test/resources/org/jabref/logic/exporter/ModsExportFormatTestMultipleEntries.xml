@@ -2,9 +2,18 @@
 <mods:modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <mods:mods>
         <mods:genre>article</mods:genre>
-        <mods:titleInfo>
-            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
-        </mods:titleInfo>
+        <mods:name type="personal">
+            <mods:namePart type="family">Shruthi</mods:namePart>
+            <mods:namePart type="given">Basavaradhya</mods:namePart>
+            <mods:namePart type="given">Sahukar</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family">Vinodhkumar</mods:namePart>
+            <mods:namePart type="given">Palani</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family">Selvamani</mods:namePart>
+        </mods:name>
         <mods:subject>
             <mods:topic>Biomarkers</mods:topic>
         </mods:subject>
@@ -20,18 +29,9 @@
         <mods:subject>
             <mods:topic>translation</mods:topic>
         </mods:subject>
-        <mods:name type="personal">
-            <mods:namePart type="family">Shruthi</mods:namePart>
-            <mods:namePart type="given">Basavaradhya</mods:namePart>
-            <mods:namePart type="given">Sahukar</mods:namePart>
-        </mods:name>
-        <mods:name type="personal">
-            <mods:namePart type="family"> Vinodhkumar</mods:namePart>
-            <mods:namePart type="given">Palani</mods:namePart>
-        </mods:name>
-        <mods:name type="personal">
-            <mods:namePart type="family"> Selvamani</mods:namePart>
-        </mods:name>
+        <mods:titleInfo>
+            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
+        </mods:titleInfo>
         <mods:originInfo>
             <mods:place>
                 <mods:placeTerm type="text">India</mods:placeTerm>
@@ -56,9 +56,6 @@
     <mods:mods ID="ShruthiVinodhkumarSelvamani2016">
         <mods:identifier type="citekey">ShruthiVinodhkumarSelvamani2016</mods:identifier>
         <mods:genre>inproceedings</mods:genre>
-        <mods:titleInfo>
-            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
-        </mods:titleInfo>
         <mods:name type="personal">
             <mods:namePart type="family">Shruthi</mods:namePart>
             <mods:namePart type="given">Basavaradhya</mods:namePart>
@@ -71,6 +68,9 @@
         <mods:name type="personal">
             <mods:namePart type="family"> Selvamani</mods:namePart>
         </mods:name>
+        <mods:titleInfo>
+            <mods:title>Proteomics: A new perspective for cancer.</mods:title>
+        </mods:titleInfo>
         <mods:originInfo>
             <mods:dateIssued keyDate="yes">2016</mods:dateIssued>
         </mods:originInfo>

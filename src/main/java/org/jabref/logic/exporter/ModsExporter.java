@@ -3,9 +3,11 @@ package org.jabref.logic.exporter;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -79,7 +81,8 @@ class ModsExporter extends Exporter {
                 ModsDefinition mods = new ModsDefinition();
                 bibEntry.getCiteKeyOptional().ifPresent(citeKey -> addIdentifier(new UnknownField("citekey"), citeKey, mods));
 
-                Map<Field, String> fieldMap = bibEntry.getFieldMap();
+                Map<Field, String> fieldMap = new TreeMap<>(Comparator.comparing(Field::getName));
+                fieldMap.putAll(bibEntry.getFieldMap());
                 addGenre(mods, bibEntry.getType());
 
                 OriginInfoDefinition originInfo = new OriginInfoDefinition();

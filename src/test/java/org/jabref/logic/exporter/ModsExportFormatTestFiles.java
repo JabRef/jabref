@@ -33,7 +33,7 @@ public class ModsExportFormatTestFiles {
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private Path tempFile;
-    private ModsExporter modsExportFormat;
+    private ModsExporter exporter;
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
     private Path importFile;
@@ -53,7 +53,7 @@ public class ModsExportFormatTestFiles {
     public void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        modsExportFormat = new ModsExporter();
+        exporter = new ModsExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         Files.createFile(path);
         tempFile = path.toAbsolutePath();
@@ -71,9 +71,11 @@ public class ModsExportFormatTestFiles {
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
-        modsExportFormat.export(databaseContext, tempFile, charset, entries);
+        exporter.export(databaseContext, tempFile, charset, entries);
 
-        assertEquals(Files.readAllLines(xmlFile), Files.readAllLines(tempFile));
+        assertEquals(
+                String.join("\n", Files.readAllLines(xmlFile)),
+                String.join("\n", Files.readAllLines(tempFile)));
     }
 
     @ParameterizedTest
@@ -82,7 +84,7 @@ public class ModsExportFormatTestFiles {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.export(databaseContext, tempFile, charset, entries);
+        exporter.export(databaseContext, tempFile, charset, entries);
         BibEntryAssert.assertEquals(entries, tempFile, modsImporter);
     }
 
@@ -95,8 +97,10 @@ public class ModsExportFormatTestFiles {
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.export(databaseContext, tempFile, charset, entries);
+        exporter.export(databaseContext, tempFile, charset, entries);
 
-        assertEquals(Files.readAllLines(xmlFile), Files.readAllLines(tempFile));
+        assertEquals(
+                String.join("\n", Files.readAllLines(xmlFile)),
+                String.join("\n", Files.readAllLines(tempFile)));
     }
 }
