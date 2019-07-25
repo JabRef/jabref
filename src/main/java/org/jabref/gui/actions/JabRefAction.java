@@ -38,6 +38,27 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         }
     }
 
+    /**
+     * especially for the track execute when the action run the same function but from different source.
+     * @param source is a string contains the source, for example "button"
+     */
+    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, String source) {
+        this(action, keyBindingRepository);
+
+        setEventHandler(event -> {
+            command.execute();
+            trackExecute(getActionName(action, command) + "From" + source);
+            System.out.println(getActionName(action, command) + "From" + source);
+        });
+
+        disabledProperty().bind(command.executableProperty().not());
+
+        if (command instanceof SimpleCommand) {
+            SimpleCommand ourCommand = (SimpleCommand) command;
+            longTextProperty().bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
+        }
+    }
+
     private String getActionName(Action action, Command command) {
         if (command.getClass().isAnonymousClass()) {
             return action.getText();
