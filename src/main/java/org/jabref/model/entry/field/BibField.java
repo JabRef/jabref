@@ -22,8 +22,12 @@ public class BibField implements Comparable<BibField> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BibField)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibField)) {
+            return false;
+        }
         BibField other = (BibField) o;
         return field.getName().equalsIgnoreCase(other.field.getName());
     }

@@ -13,9 +13,9 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class BibEntryTypesManager {
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypes.ALL.stream(), IEEETranEntryTypes.ALL.stream()).collect(Collectors.toList()));
     private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.ALL);
-    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
 
     public BibEntryTypesManager() {
     }

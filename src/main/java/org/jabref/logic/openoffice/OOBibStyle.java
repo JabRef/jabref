@@ -105,46 +105,23 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
-
-    private String name = "";
-
     private final SortedSet<String> journals = new TreeSet<>();
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
-
     // reference layout mapped from entry type:
     private final Map<EntryType, Layout> bibLayout = new HashMap<>();
-
-    private Layout defaultBibLayout;
-
-    public Layout getDefaultBibLayout() {
-        return defaultBibLayout;
-    }
-
     private final Map<String, Object> properties = new HashMap<>();
-
     private final Map<String, Object> citProperties = new HashMap<>();
-
-    private boolean valid;
     private final boolean fromResource;
     private final String path;
-
-    enum BibStyleMode {
-        NONE,
-        LAYOUT,
-        PROPERTIES,
-        CITATION,
-        NAME,
-        JOURNALS
-        }
-
-    private File styleFile;
     private final Charset encoding;
+    private final LayoutFormatterPreferences prefs;
+    private String name = "";
+    private Layout defaultBibLayout;
+    private boolean valid;
+    private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
-    private final LayoutFormatterPreferences prefs;
-
-
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
@@ -155,7 +132,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         fromResource = false;
         path = styleFile.getPath();
     }
-
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
@@ -164,6 +140,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
         fromResource = true;
         path = resourcePath;
+    }
+
+    public Layout getDefaultBibLayout() {
+        return defaultBibLayout;
     }
 
     private void setDefaultProperties() {
@@ -929,5 +909,14 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         sb.append(yearSep);
         return sb.toString();
+    }
+
+    enum BibStyleMode {
+        NONE,
+        LAYOUT,
+        PROPERTIES,
+        CITATION,
+        NAME,
+        JOURNALS
     }
 }

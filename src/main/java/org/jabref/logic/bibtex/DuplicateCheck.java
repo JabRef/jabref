@@ -27,7 +27,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * This class contains utility method for duplicate checking of entries.
  */

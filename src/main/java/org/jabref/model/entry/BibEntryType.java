@@ -111,8 +111,12 @@ public class BibEntryType implements Comparable<BibEntryType> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
                 requiredFields.equals(that.requiredFields) &&

@@ -42,15 +42,14 @@ import org.jabref.model.entry.field.StandardField;
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
 
+    protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
-
+    private final DialogService dialogService;
     private FieldEditorFX activeField;
-    protected final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
-    private final DialogService dialogService;
     private GridPane gridPane;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {

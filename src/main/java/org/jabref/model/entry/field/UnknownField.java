@@ -29,8 +29,12 @@ public class UnknownField implements Field {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Field)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Field)) {
+            return false;
+        }
         Field other = (Field) o;
         return name.equalsIgnoreCase(other.getName());
     }
@@ -46,6 +50,4 @@ public class UnknownField implements Field {
                 "name='" + name + '\'' +
                 '}';
     }
-
-
 }
