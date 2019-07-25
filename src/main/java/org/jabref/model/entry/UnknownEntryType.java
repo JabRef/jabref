@@ -9,7 +9,7 @@ public class UnknownEntryType implements EntryType {
     private final String name;
 
     public UnknownEntryType(String name) {
-        this.name = Objects.requireNonNull(name);
+        this.name = Objects.requireNonNull(name).toLowerCase(Locale.ENGLISH);
     }
 
     @Override
@@ -34,11 +34,11 @@ public class UnknownEntryType implements EntryType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UnknownEntryType that = (UnknownEntryType) o;
-        return name.equalsIgnoreCase(that.name);
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.toLowerCase(Locale.ENGLISH));
+        return Objects.hash(name);
     }
 }

@@ -32,7 +32,7 @@ public class MSBibMapping {
         BIBLATEX_TO_MS_BIB.put(StandardField.EDITION, "Edition");
         BIBLATEX_TO_MS_BIB.put(StandardField.PUBLISHER, "Publisher");
         BIBLATEX_TO_MS_BIB.put(StandardField.BOOKTITLE, "BookTitle");
-        BIBLATEX_TO_MS_BIB.put(new UnknownField("shorttitle"), "ShortTitle");
+        BIBLATEX_TO_MS_BIB.put(StandardField.SHORTTITLE, "ShortTitle");
         BIBLATEX_TO_MS_BIB.put(StandardField.NOTE, "Comments");
         BIBLATEX_TO_MS_BIB.put(StandardField.VOLUMES, "NumberVolumes");
 

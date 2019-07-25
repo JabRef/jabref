@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
@@ -77,8 +76,7 @@ public class MedlinePlainImporter extends Importer {
         List<BibEntry> bibitems = new ArrayList<>();
 
         //use optional here, so that no exception will be thrown if the file is empty
-        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
-        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
+        String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("\\n\\n");
@@ -298,7 +296,7 @@ public class MedlinePlainImporter extends Importer {
             hm.put(key, idValue);
 
         } else if ("LID".equals(lab)) {
-            hm.put(StandardField.LOCATION, value);
+            hm.put(new UnknownField("location-id"), value);
         } else if ("MID".equals(lab)) {
             hm.put(new UnknownField("manuscript-id"), value);
         } else if ("JID".equals(lab)) {
@@ -325,7 +323,7 @@ public class MedlinePlainImporter extends Importer {
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
             hm.put(StandardField.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
-            if ("inproceedings".equals(type)) {
+            if (type.equals(StandardEntryType.InProceedings)) {
                 hm.put(StandardField.BOOKTITLE, val);
             } else {
                 hm.put(StandardField.JOURNAL, val);

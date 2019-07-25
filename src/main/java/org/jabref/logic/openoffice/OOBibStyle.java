@@ -724,12 +724,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        Field authorField = FieldFactory.parseField(getStringCitProperty(AUTHOR_FIELD));
+        Set<Field> authorFields = FieldFactory.parseOrFields(getStringCitProperty(AUTHOR_FIELD));
         for (Field field : FieldFactory.parseOrFields(fields)) {
             Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
-                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
+                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content.get())) {
                     return "{" + fieldFormatter.format(content.get()) + "}";
                 }
                 return fieldFormatter.format(content.get());

@@ -26,14 +26,14 @@ public class MSBibConverter {
         // memorize original type
         result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType().getName());
         // define new type
-        String msbibType = result.fields.put("SourceType", MSBibMapping.getMSBibEntryType(entry.getType()).name());
+        String msBibType = MSBibMapping.getMSBibEntryType(entry.getType()).name();
+        result.fields.put("SourceType", msBibType);
 
         for (Field field : entry.getFields()) {
-            // clean field
-            String unicodeField = entry.getLatexFreeField(field).orElse("");
-
-            if (MSBibMapping.getMSBibField(field) != null) {
-                result.fields.put(MSBibMapping.getMSBibField(field), unicodeField);
+            String msBibField = MSBibMapping.getMSBibField(field);
+            if (msBibField != null) {
+                String value = entry.getLatexFreeField(field).orElse("");
+                result.fields.put(msBibField, value);
             }
         }
 
@@ -43,18 +43,18 @@ public class MSBibConverter {
         entry.getLatexFreeField(new UnknownField(MSBIB_PREFIX + "accessed")).ifPresent(accesed -> result.dateAccessed = accesed);
 
         // TODO: currently this can never happen
-        if ("SoundRecording".equals(msbibType)) {
+        if ("SoundRecording".equals(msBibType)) {
             result.albumTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 
         // TODO: currently this can never happen
-        if ("Interview".equals(msbibType)) {
+        if ("Interview".equals(msBibType)) {
             result.broadcastTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 
         result.number = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
 
-        if (entry.getType() == StandardEntryType.Patent) {
+        if (entry.getType().equals(StandardEntryType.Patent)) {
             result.patentNumber = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
             result.number = null;
         }
@@ -88,24 +88,24 @@ public class MSBibConverter {
             result.thesisType = entry.getLatexFreeField(StandardField.TYPE).get();
 
         } else {
-            if (entry.getType() == StandardEntryType.TechReport) {
+            if (entry.getType().equals(StandardEntryType.TechReport)) {
                 result.thesisType = "Tech. rep.";
-            } else if (entry.getType() == StandardEntryType.MastersThesis) {
+            } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {
                 result.thesisType = "Master's thesis";
-            } else if (entry.getType() == StandardEntryType.PhdThesis) {
+            } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {
                 result.thesisType = "Ph.D. dissertation";
-            } else if (entry.getType() == StandardEntryType.Unpublished) {
+            } else if (entry.getType().equals(StandardEntryType.Unpublished)) {
                 result.thesisType = "unpublished";
             }
         }
 
         // TODO: currently this can never happen
-        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))) {
+        if (("InternetSite".equals(msBibType) || "DocumentFromInternetSite".equals(msBibType))) {
             result.internetSiteTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen
-        if ("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType)) {
+        if ("ElectronicSource".equals(msBibType) || "Art".equals(msBibType) || "Misc".equals(msBibType)) {
             result.publicationTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 
