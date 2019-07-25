@@ -1,7 +1,28 @@
 --add-modules
     // Make junit4 module visible (only required for last remaining parameterized tests)
     junit
-
+--add-modules
+    // Add junit5 module dependency
+    org.junit.jupiter.api
+--add-reads
+    // Make junit5 module visible
+    org.jabref=org.junit.jupiter.api
+--add-modules
+    //  Add junit5 module dependency
+    org.junit.jupiter.params
+--add-reads
+    // Make junit5 module visible
+    org.jabref=org.junit.jupiter.params
+--add-modules
+    //  Add junit5 module dependency
+    org.junit.platform.commons
+--add-reads
+    // Make junit5 module visible
+    org.jabref=org.junit.platform.commons
+--add-exports
+    // Make internal junit5 module visible
+    // TODO: Remove usage org.junit.platform.commons.util (currently used in CIServerCondition)
+    org.junit.platform.commons/org.junit.platform.commons.util=org.jabref
 --add-opens
      javafx.base/com.sun.javafx.beans=net.bytebuddy
 --add-opens
