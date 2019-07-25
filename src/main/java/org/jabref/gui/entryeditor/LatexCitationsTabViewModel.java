@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -30,7 +32,6 @@ import org.slf4j.LoggerFactory;
 public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     enum Status {
-        INACTIVE,
         IN_PROGRESS,
         CITATIONS_FOUND,
         NO_RESULTS,
@@ -46,7 +47,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final ObjectProperty<BibEntry> entry;
     private final ObservableList<Citation> citationList;
     private final ObjectProperty<Status> status;
-    private Exception searchError;
+    private final StringProperty searchError;
     private Future<?> searchTask;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
@@ -56,11 +57,19 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.entry = new SimpleObjectProperty<>(null);
         this.citationList = FXCollections.observableArrayList();
-        this.status = new SimpleObjectProperty<>(Status.INACTIVE);
+        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+        this.searchError = new SimpleStringProperty("");
     }
 
     public void init(BibEntry entry) {
         cancelSearch();
+
+        if (!entry.getCiteKeyOptional().isPresent()) {
+            searchError.set("Selected entry does not have a key.");
+            status.set(Status.ERROR);
+            return;
+        }
+
         this.entry.set(entry);
         startSearch();
     }
@@ -73,7 +82,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         return status;
     }
 
-    public Exception getSearchError() {
+    public StringProperty searchErrorProperty() {
         return searchError;
     }
 
@@ -82,7 +91,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
                                    .onSuccess(status::set)
                                    .onFailure(error -> {
-                                       searchError = error;
+                                       searchError.set(String.format("%s%n%s", error.getMessage(), error.getCause()));
                                        status.set(Status.ERROR);
                                    })
                                    .executeWith(taskExecutor);
@@ -116,7 +125,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
 
         TexParserResult texParserResult = new DefaultTexParser().parse(entry.get(), texFiles);
-        citationList.setAll(texParserResult.getCitationsByKey(entry.get()));
+        citationList.setAll(texParserResult.getCitations().values());
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
     }

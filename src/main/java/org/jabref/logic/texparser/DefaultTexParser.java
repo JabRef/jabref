@@ -59,7 +59,7 @@ public class DefaultTexParser implements TexParser {
 
     @Override
     public TexParserResult parse(String citeString) {
-        matchCitation(Paths.get("foo/bar"), 1, citeString);
+        matchCitation(null, Paths.get("foo/bar"), 1, citeString);
         return result;
     }
 
@@ -73,6 +73,7 @@ public class DefaultTexParser implements TexParser {
         return parse(null, texFiles);
     }
 
+    @Override
     public TexParserResult parse(BibEntry entry, List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
 
@@ -84,7 +85,7 @@ public class DefaultTexParser implements TexParser {
                 lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
                     // Check if there is a given entry.
                     if (entry == null || line.contains(Objects.requireNonNull(entry.getCiteKeyOptional().orElse(null)))) {
-                        matchCitation(file, lineNumberReader.getLineNumber(), line);
+                        matchCitation(entry, file, lineNumberReader.getLineNumber(), line);
                     }
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 });
@@ -104,12 +105,13 @@ public class DefaultTexParser implements TexParser {
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(Path file, int lineNumber, String line) {
+    private void matchCitation(BibEntry entry, Path file, int lineNumber, String line) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            Arrays.stream(citeMatch.group(CITE_GROUP).split(",")).forEach(key ->
-                    result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+            Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
+                  .filter(key -> entry == null || key.equals(entry.getCiteKeyOptional().orElse(null)))
+                  .forEach(key -> result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
         }
     }
 

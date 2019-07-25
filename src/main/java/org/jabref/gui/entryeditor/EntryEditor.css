@@ -154,8 +154,13 @@
     -fx-font-weight: bold;
 }
 
-.latex-citations-error-text {
-    -fx-font-size: 110%;
+.latex-citations-error-title-text {
+    -fx-font-size: 140%;
     -fx-font-weight: bold;
     -fx-fill: -fx-accent;
+}
+
+.latex-citations-error-text {
+    -fx-font-family: 'Courier New', Courier, monospace;
+    -fx-font-size: 120%;
 }

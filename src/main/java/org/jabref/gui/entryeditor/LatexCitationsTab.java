@@ -53,6 +53,9 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
             switch (status) {
+                case IN_PROGRESS:
+                    searchPane.getChildren().setAll(progressIndicator);
+                    break;
                 case CITATIONS_FOUND:
                     graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
                     searchPane.getChildren().setAll(getCitationsPane());
@@ -63,9 +66,7 @@ public class LatexCitationsTab extends EntryEditorTab {
                 case ERROR:
                     searchPane.getChildren().setAll(getErrorPane());
                     break;
-                case IN_PROGRESS:
                 default:
-                    searchPane.getChildren().setAll(progressIndicator);
                     break;
             }
         });
@@ -117,14 +118,12 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private ScrollPane getErrorPane() {
         Text errorTitleText = new Text(Localization.lang("Error"));
-        errorTitleText.getStyleClass().add("latex-citations-title-text");
+        errorTitleText.getStyleClass().add("latex-citations-error-title-text");
 
-        Text errorMessageText = new Text(viewModel.getSearchError().getMessage());
+        Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
         errorMessageText.getStyleClass().add("latex-citations-error-text");
 
-        Text errorCauseText = new Text(viewModel.getSearchError().getCause().toString());
-
-        VBox errorBox = new VBox(20.0, errorTitleText, errorMessageText, errorCauseText);
+        VBox errorBox = new VBox(20.0, errorTitleText, errorMessageText);
         ScrollPane errorPane = new ScrollPane();
         errorPane.setContent(errorBox);
 
