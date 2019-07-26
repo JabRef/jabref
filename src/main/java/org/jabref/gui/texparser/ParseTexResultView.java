@@ -36,12 +36,13 @@ public class ParseTexResultView extends BaseDialog<Void> {
         viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.setItems(viewModel.getReferenceList());
-        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(),
-                viewModel::activeReferenceChanged);
         referenceListView.getSelectionModel().selectFirst();
         new ViewModelListCellFactory<ReferenceViewModel>()
                 .withText(ReferenceViewModel::getDisplayText)
                 .install(referenceListView);
+
+        EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(),
+                viewModel::activeReferenceChanged);
 
         citationListView.setItems(viewModel.getCitationListByReference());
         new ViewModelListCellFactory<Citation>()

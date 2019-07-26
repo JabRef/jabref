@@ -42,7 +42,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final StringProperty texDirectory;
-    private final FunctionBasedValidator texDirectoryValidator;
+    private final FunctionBasedValidator<String> texDirectoryValidator;
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final BooleanProperty noFilesFound;

@@ -51,13 +51,13 @@ public class DefaultTexParser implements TexParser {
         this.texParserResult = new TexParserResult();
     }
 
-    public TexParserResult getResult() {
+    public TexParserResult getTexParserResult() {
         return texParserResult;
     }
 
     @Override
     public TexParserResult parse(String citeString) {
-        matchCitation(null, Paths.get("foo/bar"), 1, citeString);
+        matchCitation(null, Paths.get(""), 1, citeString);
         return texParserResult;
     }
 

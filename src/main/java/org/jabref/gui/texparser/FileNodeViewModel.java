@@ -3,6 +3,7 @@ package org.jabref.gui.texparser;
 import java.nio.file.Path;
 import java.util.StringJoiner;
 
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -25,7 +26,7 @@ public class FileNodeViewModel {
     }
 
     public ObservableList<FileNodeViewModel> getChildren() {
-        return children;
+        return new ReadOnlyListWrapper<>(children);
     }
 
     public int getFileCount() {

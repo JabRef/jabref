@@ -77,7 +77,7 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private VBox citationToGraphic(Citation citation) {
-        HBox contextBox = new HBox(new Text(LatexToUnicodeAdapter.format(citation.getLineText())));
+        HBox contextBox = new HBox(new Text(LatexToUnicodeAdapter.format(citation.getContext())));
         contextBox.getStyleClass().add("latex-citations-context-box");
 
         Text positionText = new Text(String.format("%n%s (%s:%s-%s)", citation.getPath().toAbsolutePath(),
