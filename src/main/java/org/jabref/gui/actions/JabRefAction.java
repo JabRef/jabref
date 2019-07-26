@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
@@ -23,19 +24,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     }
 
     public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository) {
-        this(action, keyBindingRepository);
-
-        setEventHandler(event -> {
-            command.execute();
-            trackExecute(getActionName(action, command));
-        });
-
-        disabledProperty().bind(command.executableProperty().not());
-
-        if (command instanceof SimpleCommand) {
-            SimpleCommand ourCommand = (SimpleCommand) command;
-            longTextProperty().bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
-        }
+        this(action, command, keyBindingRepository, null);
     }
 
     /**
@@ -47,7 +36,11 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
         setEventHandler(event -> {
             command.execute();
-            trackExecute(getActionName(action, command) + "From" + source);
+            if (StringUtil.isNullOrEmpty(source)) {
+                trackExecute(getActionName(action, command));
+            } else {
+                trackExecute(getActionName(action, command) + "From" + source);
+            }
         });
 
         disabledProperty().bind(command.executableProperty().not());
