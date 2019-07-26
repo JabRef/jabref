@@ -48,7 +48,6 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         setEventHandler(event -> {
             command.execute();
             trackExecute(getActionName(action, command) + "From" + source);
-            System.out.println(getActionName(action, command) + "From" + source);
         });
 
         disabledProperty().bind(command.executableProperty().not());
@@ -63,7 +62,15 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         if (command.getClass().isAnonymousClass()) {
             return action.getText();
         } else {
-            return command.getClass().getSimpleName();
+            String ans = command.getClass().getSimpleName();
+            if (ans.contains("OldDatabaseCommandWrapper")) {
+                OldDatabaseCommandWrapper tmp = (OldDatabaseCommandWrapper) command;
+                return tmp.getActions().toString();
+            } else if (ans.contains("EditAction")) {
+                return command.toString();
+            } else {
+                return command.getClass().getSimpleName();
+            }
         }
     }
 

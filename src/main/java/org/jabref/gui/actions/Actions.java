@@ -3,7 +3,7 @@ package org.jabref.gui.actions;
 /**
  * Global String constants for GUI actions
  */
-@Deprecated
+//@Deprecated
 public enum Actions {
 
     ABBREVIATE_ISO,

@@ -51,6 +51,10 @@ public class OldDatabaseCommandWrapper extends CommandBase {
         return 0;
     }
 
+    public Actions getActions() {
+        return this.command;
+    }
+
     @Override
     public ReadOnlyDoubleProperty progressProperty() {
         return null;
