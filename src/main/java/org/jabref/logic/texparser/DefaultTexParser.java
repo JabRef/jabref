@@ -73,7 +73,13 @@ public class DefaultTexParser implements TexParser {
         return parse(null, texFiles);
     }
 
-    @Override
+    /**
+     * Parse a list of TEX files for searching a given entry.
+     *
+     * @param entry the BibEntry we are looking for (null if we search for all entries)
+     * @param texFiles List of Path objects linked to a TEX file
+     * @return a TexParserResult, which contains all data related to the bibliographic entries
+     */
     public TexParserResult parse(BibEntry entry, List<Path> texFiles) {
         List<Path> referencedFiles = new ArrayList<>();
 
@@ -83,7 +89,7 @@ public class DefaultTexParser implements TexParser {
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
                 // Skip comments and blank lines.
                 lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
-                    // Check if there is a given entry.
+                    // Check if the current line contains a given entry (or 'entry' parameter is null).
                     if (entry == null || line.contains(Objects.requireNonNull(entry.getCiteKeyOptional().orElse(null)))) {
                         matchCitation(entry, file, lineNumberReader.getLineNumber(), line);
                     }

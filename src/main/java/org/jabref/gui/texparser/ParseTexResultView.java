@@ -50,18 +50,15 @@ public class ParseTexResultView extends BaseDialog<Void> {
     }
 
     private VBox citationToGraphic(Citation item) {
-        String contextString = LatexToUnicodeAdapter.format(item.getLineText());
-        String fileDataString = String.format("%n%s (%s:%s-%s)%n", item.getPath().getFileName(), item.getLine(),
-                item.getColStart(), item.getColEnd());
+        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getLineText()));
+        contextText.setWrappingWidth(citationListView.getWidth() - 50.0);
+        HBox contextBox = new HBox(contextText);
+        contextBox.getStyleClass().add("context-box");
 
-        Text context = new Text(contextString);
-        context.setWrappingWidth(citationListView.getWidth() - 50.0);
-        HBox contextBox = new HBox(context);
-        contextBox.getStyleClass().add("contextBox");
+        Text positionText = new Text(String.format("%n%s (%s:%s-%s)%n", item.getPath().getFileName(), item.getLine(),
+                item.getColStart(), item.getColEnd()));
+        positionText.getStyleClass().add("position-text");
 
-        Text fileData = new Text(fileDataString);
-        fileData.getStyleClass().add("fileData");
-
-        return new VBox(contextBox, fileData);
+        return new VBox(contextBox, positionText);
     }
 }

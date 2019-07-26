@@ -79,7 +79,7 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
                 .add("fileList = " + fileList)
                 .add("nestedFiles = " + nestedFiles)
                 .add("citations = " + citations)

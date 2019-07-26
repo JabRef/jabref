@@ -39,7 +39,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
-
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;

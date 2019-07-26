@@ -2,15 +2,15 @@
     -fx-padding: 10px;
 }
 
-.list-view .list-cell .contextBox {
+.context-box {
     -fx-border-color: grey;
+    -fx-border-insets: 10px 0px;
     -fx-border-style: dashed;
     -fx-border-width: 2px;
     -fx-font-size: 110%;
-    -fx-font-style: italic;
-    -fx-padding: 15px;
+    -fx-padding: 10px;
 }
 
-.list-view .list-cell .fileData {
+.position-text {
     -fx-font-family: 'Courier New', Courier, monospace;
 }

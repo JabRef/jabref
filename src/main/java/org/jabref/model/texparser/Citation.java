@@ -78,7 +78,7 @@ public class Citation {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
                 .add("path = " + path)
                 .add("line = " + line)
                 .add("colStart = " + colStart)
