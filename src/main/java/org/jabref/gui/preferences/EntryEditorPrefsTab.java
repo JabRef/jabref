@@ -61,7 +61,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
         acceptRecommendations = new CheckBox(Localization.lang("Accept recommendations from Mr. DLib"));
-        latexCitations = new CheckBox(Localization.lang("Show 'LaTeX citations' tab"));
+        latexCitations = new CheckBox(Localization.lang("Show 'LaTeX Citations' tab"));
         validation = new CheckBox(Localization.lang("Show validation messages"));
 
         // allowed name formats

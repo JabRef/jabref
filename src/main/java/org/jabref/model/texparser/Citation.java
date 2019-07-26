@@ -18,10 +18,6 @@ public class Citation {
     private final String lineText;
 
     public Citation(Path path, int line, int colStart, int colEnd, String lineText) {
-        if (path == null) {
-            throw new IllegalArgumentException("Path cannot be null.");
-        }
-
         if (line <= 0) {
             throw new IllegalArgumentException("Line has to be greater than 0.");
         }
@@ -30,7 +26,7 @@ public class Citation {
             throw new IllegalArgumentException("Citation has to be between 0 and line length.");
         }
 
-        this.path = path;
+        this.path = Objects.requireNonNull(path);
         this.line = line;
         this.colStart = colStart;
         this.colEnd = colEnd;
@@ -78,7 +74,7 @@ public class Citation {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
                 .add("path = " + path)
                 .add("line = " + line)
                 .add("colStart = " + colStart)
@@ -88,16 +84,16 @@ public class Citation {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        Citation that = (Citation) o;
+        Citation that = (Citation) obj;
 
         return Objects.equals(path, that.path)
                 && Objects.equals(line, that.line)

@@ -79,7 +79,7 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
                 .add("fileList = " + fileList)
                 .add("nestedFiles = " + nestedFiles)
                 .add("citations = " + citations)
@@ -87,16 +87,16 @@ public class TexParserResult {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        TexParserResult that = (TexParserResult) o;
+        TexParserResult that = (TexParserResult) obj;
 
         return Objects.equals(fileList, that.fileList)
                 && Objects.equals(nestedFiles, that.nestedFiles)

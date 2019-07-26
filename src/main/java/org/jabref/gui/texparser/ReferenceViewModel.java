@@ -34,7 +34,7 @@ public class ReferenceViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
                 .add("entry = " + entry)
                 .add("citationList = " + citationList)
                 .toString();

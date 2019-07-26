@@ -92,7 +92,7 @@ public class TexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
                 .add("texParserResult = " + texParserResult)
                 .add("unresolvedKeys = " + unresolvedKeys)
                 .add("newEntries = " + newEntries)
@@ -101,16 +101,16 @@ public class TexBibEntriesResolverResult {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) o;
+        TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) obj;
 
         return Objects.equals(texParserResult, that.texParserResult)
                 && Objects.equals(unresolvedKeys, that.unresolvedKeys)

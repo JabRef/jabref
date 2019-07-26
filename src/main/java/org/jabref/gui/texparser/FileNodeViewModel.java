@@ -49,7 +49,7 @@ public class FileNodeViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
+        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
                 .add("path = " + path)
                 .add("children = " + children)
                 .add("fileCount = " + fileCount)

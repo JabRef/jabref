@@ -35,7 +35,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         this.progressIndicator = new ProgressIndicator();
         this.graphicCitationList = FXCollections.observableArrayList();
 
-        setText(Localization.lang("LaTeX citations"));
+        setText(Localization.lang("LaTeX Citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO.getGraphicNode());
     }

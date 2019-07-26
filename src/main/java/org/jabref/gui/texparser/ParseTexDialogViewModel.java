@@ -56,7 +56,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.texDirectory = new SimpleStringProperty(
                 databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                               .orElse(preferencesService.getWorkingDir())
+                               .orElseGet(preferencesService::getWorkingDir)
                                .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
