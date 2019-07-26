@@ -66,7 +66,9 @@ public class LatexCitationsTab extends EntryEditorTab {
                 case ERROR:
                     searchPane.getChildren().setAll(getErrorPane());
                     break;
+                case INACTIVE:
                 default:
+                    searchPane.getChildren().clear();
                     break;
             }
         });

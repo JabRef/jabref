@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +36,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         IN_PROGRESS,
         CITATIONS_FOUND,
         NO_RESULTS,
-        ERROR
+        ERROR,
+        INACTIVE
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
@@ -58,20 +58,20 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.entryKey = new SimpleStringProperty(null);
         this.citationList = FXCollections.observableArrayList();
-        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+        this.status = new SimpleObjectProperty<>(Status.INACTIVE);
         this.searchError = new SimpleStringProperty(null);
     }
 
     public void init(BibEntry entry) {
         cancelSearch();
 
-        if (!entry.getCiteKeyOptional().isPresent()) {
+        entryKey.set(entry.getCiteKeyOptional().orElse(null));
+        if (entryKey.get() == null) {
             searchError.set(Localization.lang("Selected entry does not have an associated BibTeX key."));
             status.set(Status.ERROR);
             return;
         }
 
-        this.entryKey.set(entry.getCiteKeyOptional().orElse(null));
         startSearch();
     }
 
@@ -107,6 +107,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         if (searchTask.isCancelled()) {
             LOGGER.debug("Last search has been cancelled");
+            status.set(Status.INACTIVE);
         } else {
             LOGGER.warn("Could not cancel last search");
         }
@@ -125,7 +126,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             throw new IOException("Error searching files", e);
         }
 
-        TexParserResult texParserResult = new DefaultTexParser().parse(Optional.of(entryKey.get()), texFiles);
+        TexParserResult texParserResult = new DefaultTexParser().parse(entryKey.get(), texFiles);
         citationList.setAll(texParserResult.getCitations().values());
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;

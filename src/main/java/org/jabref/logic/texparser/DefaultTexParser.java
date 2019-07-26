@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,41 +45,41 @@ public class DefaultTexParser implements TexParser {
 
     private static final String TEX_EXT = ".tex";
 
-    private final TexParserResult result;
+    private final TexParserResult texParserResult;
 
     public DefaultTexParser() {
-        this.result = new TexParserResult();
+        this.texParserResult = new TexParserResult();
     }
 
     public TexParserResult getResult() {
-        return result;
+        return texParserResult;
     }
 
     @Override
     public TexParserResult parse(String citeString) {
-        matchCitation(Optional.empty(), Paths.get("foo/bar"), 1, citeString);
-        return result;
+        matchCitation(null, Paths.get("foo/bar"), 1, citeString);
+        return texParserResult;
     }
 
     @Override
     public TexParserResult parse(Path texFile) {
-        return parse(Optional.empty(), Collections.singletonList(texFile));
+        return parse(null, Collections.singletonList(texFile));
     }
 
     @Override
     public TexParserResult parse(List<Path> texFiles) {
-        return parse(Optional.empty(), texFiles);
+        return parse(null, texFiles);
     }
 
     /**
      * Parse a list of TEX files for searching a given entry.
      *
-     * @param entryKey Optional that contains the cite key we are searching or an empty string for all entries
+     * @param entryKey String that contains the entry key we are searching (null for all entries)
      * @param texFiles List of Path objects linked to a TEX file
      * @return a TexParserResult, which contains all data related to the bibliographic entries
      */
-    public TexParserResult parse(Optional<String> entryKey, List<Path> texFiles) {
-        result.addFiles(texFiles);
+    public TexParserResult parse(String entryKey, List<Path> texFiles) {
+        texParserResult.addFiles(texFiles);
 
         List<Path> referencedFiles = new ArrayList<>();
 
@@ -89,7 +88,7 @@ public class DefaultTexParser implements TexParser {
                 // Skip comments and blank lines.
                 lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
                     // Check if the current line contains a given entry (or 'entry' parameter is null).
-                    if (!entryKey.isPresent() || line.contains(entryKey.orElse(null))) {
+                    if (entryKey == null || line.contains(entryKey)) {
                         matchCitation(entryKey, file, lineNumberReader.getLineNumber(), line);
                     }
                     matchNestedFile(file, texFiles, referencedFiles, line);
@@ -104,19 +103,19 @@ public class DefaultTexParser implements TexParser {
             parse(entryKey, referencedFiles);
         }
 
-        return result;
+        return texParserResult;
     }
 
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(Optional<String> entryKey, Path file, int lineNumber, String line) {
+    private void matchCitation(String entryKey, Path file, int lineNumber, String line) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
             Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
-                  .filter(key -> !entryKey.isPresent() || key.equals(entryKey.orElse(null)))
-                  .forEach(key -> result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+                  .filter(key -> entryKey == null || key.equals(entryKey))
+                  .forEach(key -> texParserResult.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
         }
     }
 

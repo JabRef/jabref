@@ -55,7 +55,7 @@ public class TexParserResult {
      * Return a collection of citations using a BibEntry as reference.
      */
     public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return getCitationsByKey(entry.getCiteKeyOptional().orElse(null));
+        return getCitationsByKey(Objects.requireNonNull(entry.getCiteKeyOptional().orElse(null)));
     }
 
     /**
@@ -79,7 +79,7 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
+        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
                 .add("fileList = " + fileList)
                 .add("nestedFiles = " + nestedFiles)
                 .add("citations = " + citations)

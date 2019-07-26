@@ -12,7 +12,8 @@ public class ParseTexAction extends SimpleCommand {
 
     public ParseTexAction(StateManager stateManager) {
         this.stateManager = stateManager;
-        this.executable.bind(needsDatabase(stateManager));
+
+        executable.bind(needsDatabase(stateManager));
     }
 
     @Override

@@ -16,12 +16,16 @@ public class FileNodeViewModel {
 
     public FileNodeViewModel(Path path) {
         this.path = path;
-        this.fileCount = 0;
         this.children = FXCollections.observableArrayList();
+        this.fileCount = 0;
     }
 
     public Path getPath() {
         return path;
+    }
+
+    public ObservableList<FileNodeViewModel> getChildren() {
+        return children;
     }
 
     public int getFileCount() {
@@ -30,10 +34,6 @@ public class FileNodeViewModel {
 
     public void setFileCount(int fileCount) {
         this.fileCount = fileCount;
-    }
-
-    public ObservableList<FileNodeViewModel> getChildren() {
-        return children;
     }
 
     /**
@@ -49,7 +49,7 @@ public class FileNodeViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
+        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
                 .add("path = " + path)
                 .add("children = " + children)
                 .add("fileCount = " + fileCount)

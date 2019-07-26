@@ -63,10 +63,10 @@ public class TexBibEntriesResolverResult {
     }
 
     /**
-     * Check if an entry with the given key is present in the list of new entries.
+     * Check if an entry with the given key is not present in the list of new entries.
      */
-    public boolean checkEntryNewDatabase(String key) {
-        return newEntries.stream().anyMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
+    public boolean isNotKeyIntoNewEntries(String key) {
+        return newEntries.stream().noneMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
     }
 
     /**
@@ -92,7 +92,7 @@ public class TexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
+        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
                 .add("texParserResult = " + texParserResult)
                 .add("unresolvedKeys = " + unresolvedKeys)
                 .add("newEntries = " + newEntries)

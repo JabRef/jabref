@@ -53,10 +53,6 @@ public class Citation {
         return lineText;
     }
 
-    public int getContextWidth() {
-        return CONTEXT_WIDTH;
-    }
-
     /**
      * Get a fixed-width string that contains a cite and the text that surrounds it along the same line.
      */
@@ -74,7 +70,7 @@ public class Citation {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + '[', "]")
+        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
                 .add("path = " + path)
                 .add("line = " + line)
                 .add("colStart = " + colStart)

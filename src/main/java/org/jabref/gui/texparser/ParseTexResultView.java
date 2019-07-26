@@ -26,7 +26,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
     public ParseTexResultView(TexParserResult texParserResult) {
         this.texParserResult = texParserResult;
 
-        this.setTitle(Localization.lang("LaTeX Citations Search Results"));
+        setTitle(Localization.lang("LaTeX Citations Search Results"));
 
         ViewLoader.view(this).load().setAsDialogPane(this);
     }
@@ -50,7 +50,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
     }
 
     private VBox citationToGraphic(Citation item) {
-        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getLineText()));
+        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
         contextText.setWrappingWidth(citationListView.getWidth() - 50.0);
         HBox contextBox = new HBox(contextText);
         contextBox.getStyleClass().add("context-box");
