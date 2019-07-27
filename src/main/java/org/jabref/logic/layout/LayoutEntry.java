@@ -669,4 +669,6 @@ class LayoutEntry {
 
         return result;
     }
+
+    public String getText() { return text; }
 }

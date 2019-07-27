@@ -41,6 +41,7 @@
                   text="%Warn about unresolved duplicates when closing inspection window"/>
         <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
         <CheckBox fx:id="enforceLegalKeys" text="%Enforce legal characters in BibTeX keys"/>
+        <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
         <CheckBox fx:id="memoryStickMode"
                   text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"/>
         <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef."/>
