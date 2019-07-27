@@ -21,7 +21,7 @@ public class CIServerCondition implements ExecutionCondition {
     }
 
     /**
-     * Containers and tests are disabled if they are annotated with {@link DisabledOnCIServer} and they tests are run on
+     * Containers and tests are disabled if they are annotated with {@link DisabledOnCIServer} and the tests are run on
      * the CI server.
      */
     @Override
