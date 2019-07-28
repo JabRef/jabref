@@ -3,6 +3,7 @@ package org.jabref.model.texparser;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class TexParserResult {
      * Return a collection of citations using a BibEntry as reference.
      */
     public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return getCitationsByKey(Objects.requireNonNull(entry.getCiteKeyOptional().orElse(null)));
+        return entry.getCiteKeyOptional().map(this::getCitationsByKey).orElse(Collections.emptyList());
     }
 
     /**
