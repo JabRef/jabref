@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +46,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
-    private final StringProperty entryKey;
     private final ObservableList<Citation> citationList;
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
@@ -56,7 +56,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
-        this.entryKey = new SimpleStringProperty(null);
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.INACTIVE);
         this.searchError = new SimpleStringProperty(null);
@@ -65,14 +64,13 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     public void init(BibEntry entry) {
         cancelSearch();
 
-        entryKey.set(entry.getCiteKeyOptional().orElse(null));
-        if (entryKey.get() == null) {
+        Optional<String> citeKey = entry.getCiteKeyOptional();
+        if (citeKey.isPresent()) {
+            startSearch(citeKey.get());
+        } else {
             searchError.set(Localization.lang("Selected entry does not have an associated BibTeX key."));
             status.set(Status.ERROR);
-            return;
         }
-
-        startSearch();
     }
 
     public ObservableList<Citation> getCitationList() {
@@ -87,8 +85,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         return searchError;
     }
 
-    private void startSearch() {
-        searchTask = BackgroundTask.wrap(this::searchAndParse)
+    private void startSearch(String citeKey) {
+        searchTask = BackgroundTask.wrap(() -> searchAndParse(citeKey))
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
                                    .onSuccess(status::set)
                                    .onFailure(error -> {
@@ -113,7 +111,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
-    private Status searchAndParse() throws IOException {
+    private Status searchAndParse(String citeKey) throws IOException {
         Path directory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                         .orElseGet(preferencesService::getWorkingDir);
 
@@ -126,7 +124,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             throw new IOException("Error searching files", e);
         }
 
-        TexParserResult texParserResult = new DefaultTexParser().parse(entryKey.get(), texFiles);
+        TexParserResult texParserResult = new DefaultTexParser().parse(citeKey, texFiles);
         citationList.setAll(texParserResult.getCitations().values());
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
