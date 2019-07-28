@@ -87,7 +87,7 @@ public class DefaultTexParser implements TexParser {
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
                 // Skip comments and blank lines.
                 lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
-                    // Check if the current line contains a given entry (or 'entry' parameter is null).
+                    // Skip the citation matching if the line does not contain the given entry to speed up the parsing.
                     if (entryKey == null || line.contains(entryKey)) {
                         matchCitation(entryKey, file, lineNumberReader.getLineNumber(), line);
                     }
