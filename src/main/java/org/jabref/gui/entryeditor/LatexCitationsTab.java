@@ -38,9 +38,10 @@ public class LatexCitationsTab extends EntryEditorTab {
         setText(Localization.lang("LaTeX Citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO.getGraphicNode());
+        setSearchPane();
     }
 
-    private void setupSearchPane() {
+    private void setSearchPane() {
         progressIndicator.setMaxSize(100.0, 100.0);
         searchPane.getStyleClass().add("latex-citations-tab");
 
@@ -49,8 +50,6 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setupSearchPane();
-
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
             switch (status) {
                 case IN_PROGRESS:
@@ -72,7 +71,6 @@ public class LatexCitationsTab extends EntryEditorTab {
                     break;
             }
         });
-
         viewModel.init(entry);
     }
 
