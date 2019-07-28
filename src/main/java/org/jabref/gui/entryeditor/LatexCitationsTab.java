@@ -37,7 +37,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         setText(Localization.lang("LaTeX Citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
-        setGraphic(IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());
         setSearchPane();
     }
 
