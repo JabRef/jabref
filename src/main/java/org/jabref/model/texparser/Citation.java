@@ -2,7 +2,6 @@ package org.jabref.model.texparser;
 
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 public class Citation {
 
@@ -70,13 +69,12 @@ public class Citation {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
-                .add("path = " + path)
-                .add("line = " + line)
-                .add("colStart = " + colStart)
-                .add("colEnd = " + colEnd)
-                .add("lineText = " + lineText)
-                .toString();
+        return String.format("Citation{path=%s, line=%s, colStart=%s, colEnd=%s, lineText='%s'}",
+                this.path,
+                this.line,
+                this.colStart,
+                this.colEnd,
+                this.lineText);
     }
 
     @Override

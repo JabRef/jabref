@@ -1,7 +1,6 @@
 package org.jabref.gui.texparser;
 
 import java.nio.file.Path;
-import java.util.StringJoiner;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -50,10 +49,9 @@ public class FileNodeViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
-                .add("path = " + path)
-                .add("children = " + children)
-                .add("fileCount = " + fileCount)
-                .toString();
+        return String.format("FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
+                this.path,
+                this.children,
+                this.fileCount);
     }
 }

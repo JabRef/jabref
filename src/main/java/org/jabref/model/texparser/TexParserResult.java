@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -80,11 +79,10 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
-                .add("fileList = " + fileList)
-                .add("nestedFiles = " + nestedFiles)
-                .add("citations = " + citations)
-                .toString();
+        return String.format("TexParserResult{fileList=%s, nestedFiles=%s, citations=%s}",
+                this.fileList,
+                this.nestedFiles,
+                this.citations);
     }
 
     @Override

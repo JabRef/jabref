@@ -1,7 +1,6 @@
 package org.jabref.gui.texparser;
 
 import java.util.Collection;
-import java.util.StringJoiner;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -34,9 +33,8 @@ public class ReferenceViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
-                .add("entry = " + entry)
-                .add("citationList = " + citationList)
-                .toString();
+        return String.format("ReferenceViewModel{entry='%s', citationList=%s}",
+                this.entry,
+                this.citationList);
     }
 }

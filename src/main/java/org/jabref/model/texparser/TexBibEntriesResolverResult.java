@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -92,12 +91,11 @@ public class TexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + '[', "]")
-                .add("texParserResult = " + texParserResult)
-                .add("unresolvedKeys = " + unresolvedKeys)
-                .add("newEntries = " + newEntries)
-                .add("crossRefsCount = " + crossRefsCount)
-                .toString();
+        return String.format("TexBibEntriesResolverResult{texParserResult=%s, unresolvedKeys=%s, newEntries=%s, crossRefsCount=%s}",
+                this.texParserResult,
+                this.unresolvedKeys,
+                this.newEntries,
+                this.crossRefsCount);
     }
 
     @Override
