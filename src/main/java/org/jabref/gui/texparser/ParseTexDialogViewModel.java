@@ -181,7 +181,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         BackgroundTask.wrap(() -> new DefaultTexParser().parse(fileList))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseTexResultView(result).showAndWait())
+                      .onSuccess(result -> new ParseTexResultView(result, Paths.get(texDirectory.get())).showAndWait())
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

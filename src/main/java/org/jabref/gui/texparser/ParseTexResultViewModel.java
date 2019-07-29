@@ -5,13 +5,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
 public class ParseTexResultViewModel extends AbstractViewModel {
 
     private final ObservableList<ReferenceViewModel> referenceList;
-    private final ObservableList<Citation> citationList;
+    private final ObservableList<CitationViewModel> citationList;
 
     public ParseTexResultViewModel(TexParserResult texParserResult) {
         this.referenceList = FXCollections.observableArrayList();
@@ -26,7 +25,7 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         return new ReadOnlyListWrapper<>(referenceList);
     }
 
-    public ObservableList<Citation> getCitationListByReference() {
+    public ObservableList<CitationViewModel> getCitationListByReference() {
         return new ReadOnlyListWrapper<>(citationList);
     }
 

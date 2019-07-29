@@ -1,11 +1,12 @@
 package org.jabref.gui.entryeditor;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -15,8 +16,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.texparser.Citation;
 import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
@@ -26,14 +25,12 @@ public class LatexCitationsTab extends EntryEditorTab {
     private final LatexCitationsTabViewModel viewModel;
     private final StackPane searchPane;
     private final ProgressIndicator progressIndicator;
-    private final ObservableList<VBox> graphicCitationList;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                              TaskExecutor taskExecutor) {
         this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
         this.searchPane = new StackPane();
         this.progressIndicator = new ProgressIndicator();
-        this.graphicCitationList = FXCollections.observableArrayList();
 
         setText(Localization.lang("LaTeX Citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
@@ -42,21 +39,17 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private void setSearchPane() {
-        progressIndicator.setMaxSize(100.0, 100.0);
-        searchPane.getStyleClass().add("latex-citations-tab");
+        progressIndicator.setMaxSize(100, 100);
+        searchPane.getStyleClass().add("related-articles-tab");
 
         setContent(searchPane);
-    }
 
-    @Override
-    protected void bindToEntry(BibEntry entry) {
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
             switch (status) {
                 case IN_PROGRESS:
                     searchPane.getChildren().setAll(progressIndicator);
                     break;
                 case CITATIONS_FOUND:
-                    graphicCitationList.setAll(EasyBind.map(viewModel.getCitationList(), this::citationToGraphic));
                     searchPane.getChildren().setAll(getCitationsPane());
                     break;
                 case NO_RESULTS:
@@ -65,32 +58,18 @@ public class LatexCitationsTab extends EntryEditorTab {
                 case ERROR:
                     searchPane.getChildren().setAll(getErrorPane());
                     break;
-                case INACTIVE:
-                default:
-                    searchPane.getChildren().clear();
-                    break;
             }
         });
-        viewModel.init(entry);
-    }
-
-    private VBox citationToGraphic(Citation citation) {
-        HBox contextBox = new HBox(new Text(LatexToUnicodeAdapter.format(citation.getContext())));
-        contextBox.getStyleClass().add("latex-citations-context-box");
-
-        Text positionText = new Text(String.format("%n%s (%s:%s-%s)", citation.getPath().toAbsolutePath(),
-                citation.getLine(), citation.getColStart(), citation.getColEnd()));
-        positionText.getStyleClass().add("latex-citations-position-text");
-
-        return new VBox(contextBox, positionText);
     }
 
     private ScrollPane getCitationsPane() {
         Text titleText = new Text(Localization.lang("Citations found"));
-        titleText.getStyleClass().add("latex-citations-title-text");
+        titleText.getStyleClass().add("recommendation-heading");
 
-        VBox citationsBox = new VBox(20.0, titleText);
-        citationsBox.getChildren().addAll(graphicCitationList);
+        VBox citationsBox = new VBox(20, titleText);
+        Path basePath = viewModel.directoryProperty().get();
+        citationsBox.getChildren().addAll(viewModel.getCitationList().stream().map(
+                citation -> citation.getDisplayGraphic(basePath, Optional.empty())).collect(Collectors.toList()));
 
         ScrollPane citationsPane = new ScrollPane();
         citationsPane.setContent(citationsBox);
@@ -100,16 +79,16 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private ScrollPane getNotFoundPane() {
         Text notFoundTitleText = new Text(Localization.lang("No citations found"));
-        notFoundTitleText.getStyleClass().add("latex-citations-title-text");
+        notFoundTitleText.getStyleClass().add("recommendation-heading");
 
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
-        notFoundText.getStyleClass().add("latex-citations-not-found-text");
+        notFoundText.setStyle("-fx-font-size: 110%");
 
         Text notFoundAdviceText = new Text(Localization.lang(
                 "You can set the LaTeX file directory in the 'Library properties' dialog."));
-        notFoundAdviceText.getStyleClass().add("latex-citations-not-found-advice-text");
+        notFoundAdviceText.setStyle("-fx-font-weight: bold;");
 
-        VBox notFoundBox = new VBox(20.0, notFoundTitleText, notFoundText, notFoundAdviceText);
+        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, notFoundAdviceText);
         ScrollPane notFoundPane = new ScrollPane();
         notFoundPane.setContent(notFoundBox);
 
@@ -118,16 +97,22 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private ScrollPane getErrorPane() {
         Text errorTitleText = new Text(Localization.lang("Error"));
-        errorTitleText.getStyleClass().add("latex-citations-error-title-text");
+        errorTitleText.setStyle("-fx-fill: -fx-accent;");
+        errorTitleText.getStyleClass().add("recommendation-heading");
 
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
-        errorMessageText.getStyleClass().add("latex-citations-error-text");
+        errorMessageText.setStyle("-fx-font-family: monospace;-fx-font-size: 120%;");
 
-        VBox errorBox = new VBox(20.0, errorTitleText, errorMessageText);
+        VBox errorBox = new VBox(20, errorTitleText, errorMessageText);
         ScrollPane errorPane = new ScrollPane();
         errorPane.setContent(errorBox);
 
         return errorPane;
+    }
+
+    @Override
+    protected void bindToEntry(BibEntry entry) {
+        viewModel.init(entry);
     }
 
     @Override

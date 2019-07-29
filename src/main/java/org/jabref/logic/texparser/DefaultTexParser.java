@@ -2,6 +2,7 @@ package org.jabref.logic.texparser;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,16 +86,22 @@ public class DefaultTexParser implements TexParser {
 
         for (Path file : texFiles) {
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
-                // Skip comments and blank lines.
-                lineNumberReader.lines().filter(line -> !line.isEmpty() && line.charAt(0) != '%').forEach(line -> {
+                for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
+                    // Skip comments and blank lines.
+                    if (line.isEmpty() || line.charAt(0) == '%') {
+                        continue;
+                    }
                     // Skip the citation matching if the line does not contain the given entry to speed up the parsing.
                     if (entryKey == null || line.contains(entryKey)) {
                         matchCitation(entryKey, file, lineNumberReader.getLineNumber(), line);
                     }
                     matchNestedFile(file, texFiles, referencedFiles, line);
-                });
+                }
+            } catch (ClosedChannelException e) {
+                LOGGER.info("Parsing has been interrupted");
+                return texParserResult;
             } catch (IOException e) {
-                LOGGER.warn("Error opening the TEX file", e);
+                LOGGER.error("Error opening a TEX file", e);
             }
         }
 

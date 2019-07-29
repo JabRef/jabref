@@ -18,13 +18,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.texparser.CitationViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 import org.jabref.preferences.PreferencesService;
 
@@ -37,8 +37,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         IN_PROGRESS,
         CITATIONS_FOUND,
         NO_RESULTS,
-        ERROR,
-        INACTIVE
+        ERROR
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
@@ -46,7 +45,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
-    private final ObservableList<Citation> citationList;
+    private final ObjectProperty<Path> directory;
+    private final ObservableList<CitationViewModel> citationList;
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
     private Future<?> searchTask;
@@ -56,9 +56,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
+        this.directory = new SimpleObjectProperty<>(null);
         this.citationList = FXCollections.observableArrayList();
-        this.status = new SimpleObjectProperty<>(Status.INACTIVE);
-        this.searchError = new SimpleStringProperty(null);
+        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+        this.searchError = new SimpleStringProperty("");
     }
 
     public void init(BibEntry entry) {
@@ -73,7 +74,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
-    public ObservableList<Citation> getCitationList() {
+    public ObjectProperty<Path> directoryProperty() {
+        return directory;
+    }
+
+    public ObservableList<CitationViewModel> getCitationList() {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
@@ -101,22 +106,15 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             return;
         }
 
+        status.set(Status.IN_PROGRESS);
         searchTask.cancel(true);
-
-        if (searchTask.isCancelled()) {
-            LOGGER.debug("Last search has been cancelled");
-            status.set(Status.INACTIVE);
-        } else {
-            LOGGER.warn("Could not cancel last search");
-        }
     }
 
     private Status searchAndParse(String citeKey) throws IOException {
-        Path directory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                        .orElseGet(preferencesService::getWorkingDir);
-
+        directory.set(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                                     .orElseGet(preferencesService::getWorkingDir));
         List<Path> texFiles;
-        try (Stream<Path> filesStream = Files.walk(directory)) {
+        try (Stream<Path> filesStream = Files.walk(directory.get())) {
             texFiles = filesStream.filter(path -> path.toFile().isFile() && path.toString().endsWith(TEX_EXT))
                                   .collect(Collectors.toList());
         } catch (IOException e) {
@@ -125,7 +123,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
 
         TexParserResult texParserResult = new DefaultTexParser().parse(citeKey, texFiles);
-        citationList.setAll(texParserResult.getCitations().values());
+        citationList.setAll(texParserResult.getCitations().values().stream().map(CitationViewModel::new).collect(Collectors.toList()));
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
     }

@@ -1,16 +1,14 @@
 package org.jabref.gui.texparser;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -19,12 +17,13 @@ import org.fxmisc.easybind.EasyBind;
 public class ParseTexResultView extends BaseDialog<Void> {
 
     private final TexParserResult texParserResult;
+    private final Path basePath;
     @FXML private ListView<ReferenceViewModel> referenceListView;
-    @FXML private ListView<Citation> citationListView;
-    private ParseTexResultViewModel viewModel;
+    @FXML private ListView<CitationViewModel> citationListView;
 
-    public ParseTexResultView(TexParserResult texParserResult) {
+    public ParseTexResultView(TexParserResult texParserResult, Path basePath) {
         this.texParserResult = texParserResult;
+        this.basePath = basePath;
 
         setTitle(Localization.lang("LaTeX Citations Search Results"));
 
@@ -33,7 +32,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseTexResultViewModel(texParserResult);
+        ParseTexResultViewModel viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.setItems(viewModel.getReferenceList());
         referenceListView.getSelectionModel().selectFirst();
@@ -41,25 +40,12 @@ public class ParseTexResultView extends BaseDialog<Void> {
                 .withText(ReferenceViewModel::getDisplayText)
                 .install(referenceListView);
 
+        citationListView.setItems(viewModel.getCitationListByReference());
+        new ViewModelListCellFactory<CitationViewModel>()
+                .withGraphic(citation -> citation.getDisplayGraphic(basePath, Optional.of(citationListView.getWidth() - 50)))
+                .install(citationListView);
+
         EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(),
                 viewModel::activeReferenceChanged);
-
-        citationListView.setItems(viewModel.getCitationListByReference());
-        new ViewModelListCellFactory<Citation>()
-                .withGraphic(this::citationToGraphic)
-                .install(citationListView);
-    }
-
-    private VBox citationToGraphic(Citation item) {
-        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
-        contextText.setWrappingWidth(citationListView.getWidth() - 50.0);
-        HBox contextBox = new HBox(contextText);
-        contextBox.getStyleClass().add("context-box");
-
-        Text positionText = new Text(String.format("%n%s (%s:%s-%s)%n", item.getPath().getFileName(), item.getLine(),
-                item.getColStart(), item.getColEnd()));
-        positionText.getStyleClass().add("position-text");
-
-        return new VBox(contextBox, positionText);
     }
 }
