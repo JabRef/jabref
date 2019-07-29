@@ -2,10 +2,12 @@ package org.jabref.logic.texparser;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,69 +46,83 @@ public class DefaultTexParser implements TexParser {
 
     private static final String TEX_EXT = ".tex";
 
-    private final TexParserResult result;
+    private final TexParserResult texParserResult;
 
     public DefaultTexParser() {
-        this.result = new TexParserResult();
+        this.texParserResult = new TexParserResult();
     }
 
-    public TexParserResult getResult() {
-        return result;
+    public TexParserResult getTexParserResult() {
+        return texParserResult;
     }
 
     @Override
     public TexParserResult parse(String citeString) {
-        matchCitation(Paths.get("foo/bar"), 1, citeString);
-        return result;
+        matchCitation(null, Paths.get(""), 1, citeString);
+        return texParserResult;
     }
 
     @Override
     public TexParserResult parse(Path texFile) {
-        return parse(Collections.singletonList(texFile));
+        return parse(null, Collections.singletonList(texFile));
     }
 
     @Override
     public TexParserResult parse(List<Path> texFiles) {
+        return parse(null, texFiles);
+    }
+
+    /**
+     * Parse a list of TEX files for searching a given entry.
+     *
+     * @param entryKey String that contains the entry key we are searching (null for all entries)
+     * @param texFiles List of Path objects linked to a TEX file
+     * @return a TexParserResult, which contains all data related to the bibliographic entries
+     */
+    public TexParserResult parse(String entryKey, List<Path> texFiles) {
+        texParserResult.addFiles(texFiles);
+
         List<Path> referencedFiles = new ArrayList<>();
 
-        result.addFiles(texFiles);
-
         for (Path file : texFiles) {
-            try (LineNumberReader lnr = new LineNumberReader(Files.newBufferedReader(file))) {
-                for (String line = lnr.readLine(); line != null; line = lnr.readLine()) {
+            try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
+                for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
+                    // Skip comments and blank lines.
                     if (line.isEmpty() || line.charAt(0) == '%') {
-                        // Skip comments and blank lines.
                         continue;
                     }
-
-                    matchCitation(file, lnr.getLineNumber(), line);
+                    // Skip the citation matching if the line does not contain the given entry to speed up the parsing.
+                    if (entryKey == null || line.contains(entryKey)) {
+                        matchCitation(entryKey, file, lineNumberReader.getLineNumber(), line);
+                    }
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 }
+            } catch (ClosedChannelException e) {
+                LOGGER.info("Parsing has been interrupted");
+                return texParserResult;
             } catch (IOException e) {
-                LOGGER.warn("Error opening the TEX file", e);
+                LOGGER.error("Error opening a TEX file", e);
             }
         }
 
         // Parse all files referenced by TEX files, recursively.
         if (!referencedFiles.isEmpty()) {
-            parse(referencedFiles);
+            parse(entryKey, referencedFiles);
         }
 
-        return result;
+        return texParserResult;
     }
 
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(Path file, int lineNumber, String line) {
+    private void matchCitation(String entryKey, Path file, int lineNumber, String line) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            String[] keys = citeMatch.group(CITE_GROUP).split(",");
-
-            for (String key : keys) {
-                result.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line);
-            }
+            Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
+                  .filter(key -> entryKey == null || key.equals(entryKey))
+                  .forEach(key -> texParserResult.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
         }
     }
 
@@ -115,10 +131,9 @@ public class DefaultTexParser implements TexParser {
      */
     private void matchNestedFile(Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
-        StringBuilder include;
 
         while (includeMatch.find()) {
-            include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
+            StringBuilder include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
 
             if (!include.toString().endsWith(TEX_EXT)) {
                 include.append(TEX_EXT);

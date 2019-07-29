@@ -1,14 +1,14 @@
 package org.jabref.gui.texparser;
 
 import java.nio.file.Path;
-import java.util.StringJoiner;
 
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.l10n.Localization;
 
-class FileNodeViewModel {
+public class FileNodeViewModel {
 
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
@@ -16,12 +16,16 @@ class FileNodeViewModel {
 
     public FileNodeViewModel(Path path) {
         this.path = path;
-        this.fileCount = 0;
         this.children = FXCollections.observableArrayList();
+        this.fileCount = 0;
     }
 
     public Path getPath() {
         return path;
+    }
+
+    public ObservableList<FileNodeViewModel> getChildren() {
+        return new ReadOnlyListWrapper<>(children);
     }
 
     public int getFileCount() {
@@ -30,10 +34,6 @@ class FileNodeViewModel {
 
     public void setFileCount(int fileCount) {
         this.fileCount = fileCount;
-    }
-
-    public ObservableList<FileNodeViewModel> getChildren() {
-        return children;
     }
 
     /**
@@ -49,10 +49,9 @@ class FileNodeViewModel {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", FileNodeViewModel.class.getSimpleName() + "[", "]")
-                .add("path=" + path)
-                .add("fileCount=" + fileCount)
-                .add("children=" + children)
-                .toString();
+        return String.format("FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
+                this.path,
+                this.children,
+                this.fileCount);
     }
 }

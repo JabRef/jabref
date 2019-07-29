@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -52,7 +54,7 @@ public interface PreferencesService {
 
     Map<String, List<String>> getEntryEditorTabList();
 
-    Boolean getEnforceLegalKeys();
+    boolean getEnforceLegalKeys();
 
     Map<String, String> getCustomTabsNamesAndFields();
 
@@ -78,13 +80,13 @@ public interface PreferencesService {
 
     String getExportWorkingDirectory();
 
+    void setExportWorkingDirectory(String layoutFileDirString);
+
     Charset getDefaultEncoding();
 
     void setDefaultEncoding(Charset encoding);
 
     String getUser();
-
-    void setExportWorkingDirectory(String layoutFileDirString);
 
     SaveOrderConfig loadExportSaveOrder();
 
@@ -96,5 +98,9 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes();
 
-    public Boolean getAllowIntegerEdition();
+    boolean getAllowIntegerEdition();
+
+    FileDragDropPreferenceType getEntryEditorFileLinkPreference();
+
+    EntryEditorPreferences getEntryEditorPreferences();
 }

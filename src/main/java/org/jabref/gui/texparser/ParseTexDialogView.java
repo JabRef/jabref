@@ -48,11 +48,9 @@ public class ParseTexDialogView extends BaseDialog<Void> {
         this.databaseContext = databaseContext;
         this.validationVisualizer = new ControlsFxVisualizer();
 
-        this.setTitle(Localization.lang("Search for Citations in LaTeX Files"));
+        setTitle(Localization.lang("Search for Citations in LaTeX Files"));
 
-        ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+        ViewLoader.view(this).load().setAsDialogPane(this);
 
         ControlHelper.setAction(parseButtonType, getDialogPane(), event -> viewModel.parseButtonClicked());
         Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);

@@ -26,7 +26,7 @@ public class DefaultTexParserTest {
         TexParserResult texParserResult = new DefaultTexParser().parse(citeString);
         TexParserResult expectedParserResult = new TexParserResult();
 
-        expectedParserResult.addKey(key, Paths.get("foo/bar"), 1, 0, citeString.length(), citeString);
+        expectedParserResult.addKey(key, Paths.get(""), 1, 0, citeString.length(), citeString);
 
         assertEquals(expectedParserResult, texParserResult);
     }
@@ -59,8 +59,8 @@ public class DefaultTexParserTest {
         TexParserResult texParserResult = new DefaultTexParser().parse(citeString);
         TexParserResult expectedParserResult = new TexParserResult();
 
-        expectedParserResult.addKey(EINSTEIN_C, Paths.get("foo/bar"), 1, 0, 21, citeString);
-        expectedParserResult.addKey(EINSTEIN_A, Paths.get("foo/bar"), 1, 26, 47, citeString);
+        expectedParserResult.addKey(EINSTEIN_C, Paths.get(""), 1, 0, 21, citeString);
+        expectedParserResult.addKey(EINSTEIN_A, Paths.get(""), 1, 26, 47, citeString);
 
         assertEquals(expectedParserResult, texParserResult);
     }
