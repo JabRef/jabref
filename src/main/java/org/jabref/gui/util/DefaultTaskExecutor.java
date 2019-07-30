@@ -104,7 +104,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         EXECUTOR.shutdownNow();
     }
 
-    public <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
+    private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
 
             {
