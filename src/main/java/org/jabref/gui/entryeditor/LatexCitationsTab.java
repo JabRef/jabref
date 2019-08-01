@@ -64,10 +64,12 @@ public class LatexCitationsTab extends EntryEditorTab {
     }
 
     private VBox getLatexDirectoryBox() {
-        Text latexDirectoryText = new Text(String.format("%s: %s", Localization.lang("Current search directory"),
+        Text latexDirectoryText = new Text(String.format("%n%n%s: %s", Localization.lang("Current search directory"),
                 viewModel.directoryProperty().get()));
+        latexDirectoryText.setStyle("-fx-font-weight: bold;");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
+
         return new VBox(15, latexDirectoryText, latexDirectoryButton);
     }
 
@@ -92,7 +94,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         notFoundTitleText.getStyleClass().add("recommendation-heading");
 
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
-        notFoundText.setStyle("-fx-font-size: 110%");
+        notFoundText.setStyle("-fx-font-size: 110%;");
 
         VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, getLatexDirectoryBox());
         ScrollPane notFoundPane = new ScrollPane();
