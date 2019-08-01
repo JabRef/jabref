@@ -3,7 +3,9 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -33,13 +35,6 @@ import org.slf4j.LoggerFactory;
 
 public class LatexCitationsTabViewModel extends AbstractViewModel {
 
-    enum Status {
-        IN_PROGRESS,
-        CITATIONS_FOUND,
-        NO_RESULTS,
-        ERROR
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
@@ -50,6 +45,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
     private Future<?> searchTask;
+    private TexParserResult texParserResult;
+    private List<Path> texFiles;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                                       TaskExecutor taskExecutor) {
@@ -110,25 +107,51 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    private Status searchAndParse(String citeKey) throws IOException {
-        directory.set(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                     .orElseGet(preferencesService::getWorkingDir));
-        List<Path> texFiles;
-        try (Stream<Path> filesStream = Files.walk(directory.get())) {
-            texFiles = filesStream.filter(path -> path.toFile().isFile() && path.toString().endsWith(TEX_EXT))
-                                  .collect(Collectors.toList());
-        } catch (IOException e) {
-            LOGGER.error("Error searching files", e);
-            throw new IOException("Error searching files", e);
+    private Status searchAndParse(String citeKey) {
+        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                                           .orElseGet(preferencesService::getWorkingDir);
+
+        if (texParserResult == null || !newDirectory.equals(directory.get())) {
+            directory.set(newDirectory);
+            texFiles = new ArrayList<>();
+            search(newDirectory);
+            texParserResult = new DefaultTexParser().parse(texFiles);
         }
 
-        TexParserResult texParserResult = new DefaultTexParser().parse(citeKey, texFiles);
-        citationList.setAll(texParserResult.getCitations().values().stream().map(CitationViewModel::new).collect(Collectors.toList()));
+        citationList.setAll(texParserResult.getCitationsByKey(citeKey).stream().map(CitationViewModel::new).collect(Collectors.toList()));
 
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
     }
 
+    private void search(Path directory) {
+        Map<Boolean, List<Path>> fileListPartition;
+        try (Stream<Path> filesStream = Files.list(directory)) {
+            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
+        } catch (IOException e) {
+            LOGGER.error("Error searching files", e);
+            return;
+        }
+
+        List<Path> subDirectories = fileListPartition.get(true);
+        List<Path> files = fileListPartition.get(false)
+                                            .stream()
+                                            .filter(path -> path.toString().endsWith(TEX_EXT))
+                                            .collect(Collectors.toList());
+        texFiles.addAll(files);
+
+        for (Path subDirectory : subDirectories) {
+            search(subDirectory);
+        }
+    }
+
     public boolean shouldShow() {
         return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
+    }
+
+    enum Status {
+        IN_PROGRESS,
+        CITATIONS_FOUND,
+        NO_RESULTS,
+        ERROR
     }
 }

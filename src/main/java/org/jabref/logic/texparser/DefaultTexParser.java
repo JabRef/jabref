@@ -2,6 +2,7 @@ package org.jabref.logic.texparser;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.UncheckedIOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -98,10 +99,12 @@ public class DefaultTexParser implements TexParser {
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 }
             } catch (ClosedChannelException e) {
-                LOGGER.info("Parsing has been interrupted");
-                return texParserResult;
+                LOGGER.error("Parsing has been interrupted");
+                return null;
             } catch (IOException e) {
-                LOGGER.error("Error opening a TEX file", e);
+                LOGGER.error("Error opening a TEX file: IOException");
+            } catch (UncheckedIOException e) {
+                LOGGER.error("Error searching files: UncheckedIOException");
             }
         }
 

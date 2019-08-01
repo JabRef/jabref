@@ -34,9 +34,12 @@ import org.jabref.preferences.PreferencesService;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ParseTexDialogViewModel extends AbstractViewModel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseTexDialogViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -140,7 +143,8 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            throw new IOException("Error searching files", e);
+            LOGGER.warn("Error searching files", e);
+            return parent;
         }
 
         List<Path> subDirectories = fileListPartition.get(true);

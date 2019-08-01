@@ -291,7 +291,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(sourceTab);
 
         // LaTeX citations tab
-        tabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor));
+        tabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
         return tabs;
     }
