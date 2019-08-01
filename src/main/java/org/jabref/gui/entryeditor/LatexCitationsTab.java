@@ -63,12 +63,12 @@ public class LatexCitationsTab extends EntryEditorTab {
         });
     }
 
-    // TODO: Localization
     private VBox getLatexDirectoryBox() {
-        Text latexDirText = new Text(String.format("Current LaTeX file directory: %s", viewModel.directoryProperty().get()));
-        Button latexDirButton = new Button("Set LaTeX file directory");
-        latexDirButton.setOnAction(event -> viewModel.setLatexDirectory());
-        return new VBox(latexDirText, latexDirButton);
+        Text latexDirectoryText = new Text(String.format("%s: %s", Localization.lang("Current search directory"),
+                viewModel.directoryProperty().get()));
+        Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
+        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
+        return new VBox(15, latexDirectoryText, latexDirectoryButton);
     }
 
     private ScrollPane getCitationsPane() {

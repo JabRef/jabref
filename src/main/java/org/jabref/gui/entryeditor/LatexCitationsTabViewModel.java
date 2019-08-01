@@ -153,11 +153,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public void setLatexDirectory() {
-        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                           .orElseGet(preferencesService::getWorkingDir);
-
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(newDirectory).build();
+                .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
                 databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
