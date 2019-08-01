@@ -143,7 +143,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.warn("Error searching files", e);
+            LOGGER.error("Error searching files", e);
             return parent;
         }
 

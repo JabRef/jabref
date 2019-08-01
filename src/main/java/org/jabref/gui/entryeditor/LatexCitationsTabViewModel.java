@@ -20,8 +20,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.texparser.CitationViewModel;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
@@ -35,24 +37,32 @@ import org.slf4j.LoggerFactory;
 
 public class LatexCitationsTabViewModel extends AbstractViewModel {
 
+    enum Status {
+        IN_PROGRESS,
+        CITATIONS_FOUND,
+        NO_RESULTS,
+        ERROR
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
+    private final DialogService dialogService;
     private final ObjectProperty<Path> directory;
     private final ObservableList<CitationViewModel> citationList;
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
     private Future<?> searchTask;
     private TexParserResult texParserResult;
-    private List<Path> texFiles;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
-                                      TaskExecutor taskExecutor) {
+                                      TaskExecutor taskExecutor, DialogService dialogService) {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
         this.directory = new SimpleObjectProperty<>(null);
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -113,8 +123,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         if (texParserResult == null || !newDirectory.equals(directory.get())) {
             directory.set(newDirectory);
-            texFiles = new ArrayList<>();
-            search(newDirectory);
+            List<Path> texFiles = searchDirectory(newDirectory, new ArrayList<>());
             texParserResult = new DefaultTexParser().parse(texFiles);
         }
 
@@ -123,13 +132,13 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
     }
 
-    private void search(Path directory) {
+    private List<Path> searchDirectory(Path directory, List<Path> texFiles) {
         Map<Boolean, List<Path>> fileListPartition;
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
             LOGGER.error("Error searching files", e);
-            return;
+            return texFiles;
         }
 
         List<Path> subDirectories = fileListPartition.get(true);
@@ -138,20 +147,23 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                             .filter(path -> path.toString().endsWith(TEX_EXT))
                                             .collect(Collectors.toList());
         texFiles.addAll(files);
+        subDirectories.forEach(subDirectory -> searchDirectory(subDirectory, texFiles));
 
-        for (Path subDirectory : subDirectories) {
-            search(subDirectory);
-        }
+        return texFiles;
+    }
+
+    public void setLatexDirectory() {
+        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                                           .orElseGet(preferencesService::getWorkingDir);
+
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(newDirectory).build();
+
+        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
+                databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
     }
 
     public boolean shouldShow() {
         return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
-    }
-
-    enum Status {
-        IN_PROGRESS,
-        CITATIONS_FOUND,
-        NO_RESULTS,
-        ERROR
     }
 }

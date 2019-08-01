@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,7 +13,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,19 +23,13 @@ import org.fxmisc.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
-    private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
-    private final DialogService dialogService;
     private final LatexCitationsTabViewModel viewModel;
     private final StackPane searchPane;
     private final ProgressIndicator progressIndicator;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                              TaskExecutor taskExecutor, DialogService dialogService) {
-        this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
-        this.dialogService = dialogService;
-        this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
+        this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor, dialogService);
         this.searchPane = new StackPane();
         this.progressIndicator = new ProgressIndicator();
 
@@ -71,24 +63,12 @@ public class LatexCitationsTab extends EntryEditorTab {
         });
     }
 
-    private VBox getLatexDirBox() {
-        Path basePath = viewModel.directoryProperty().get();
-        Text latexDirText = new Text(String.format("Current LaTeX file directory: %s", basePath));
+    // TODO: Localization
+    private VBox getLatexDirectoryBox() {
+        Text latexDirText = new Text(String.format("Current LaTeX file directory: %s", viewModel.directoryProperty().get()));
         Button latexDirButton = new Button("Set LaTeX file directory");
-        latexDirButton.setOnAction(e -> browseButtonClicked());
+        latexDirButton.setOnAction(event -> viewModel.setLatexDirectory());
         return new VBox(latexDirText, latexDirButton);
-    }
-
-    private void browseButtonClicked() {
-        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
-                                           .orElseGet(preferencesService::getWorkingDir);
-
-        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(newDirectory).build();
-
-        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
-            databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath());
-        });
     }
 
     private ScrollPane getCitationsPane() {
@@ -96,11 +76,10 @@ public class LatexCitationsTab extends EntryEditorTab {
         titleText.getStyleClass().add("recommendation-heading");
 
         VBox citationsBox = new VBox(20, titleText);
-        Path basePath = viewModel.directoryProperty().get();
         citationsBox.getChildren().addAll(viewModel.getCitationList().stream().map(
-                citation -> citation.getDisplayGraphic(basePath, Optional.empty())).collect(Collectors.toList()));
+                citation -> citation.getDisplayGraphic(viewModel.directoryProperty().get(), Optional.empty())).collect(Collectors.toList()));
 
-        citationsBox.getChildren().add(getLatexDirBox());
+        citationsBox.getChildren().add(getLatexDirectoryBox());
 
         ScrollPane citationsPane = new ScrollPane();
         citationsPane.setContent(citationsBox);
@@ -115,7 +94,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
         notFoundText.setStyle("-fx-font-size: 110%");
 
-        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, getLatexDirBox());
+        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, getLatexDirectoryBox());
         ScrollPane notFoundPane = new ScrollPane();
         notFoundPane.setContent(notFoundBox);
 
@@ -130,7 +109,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
         errorMessageText.setStyle("-fx-font-family: monospace;-fx-font-size: 120%;");
 
-        VBox errorBox = new VBox(20, errorTitleText, errorMessageText, getLatexDirBox());
+        VBox errorBox = new VBox(20, errorTitleText, errorMessageText, getLatexDirectoryBox());
         ScrollPane errorPane = new ScrollPane();
         errorPane.setContent(errorBox);
 
