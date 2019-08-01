@@ -102,7 +102,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
                                    .onSuccess(status::set)
                                    .onFailure(error -> {
-                                       searchError.set(String.format("%s%n%n%s", error.getMessage(), error.getCause()));
+                                       searchError.set(error.getMessage());
                                        status.set(Status.ERROR);
                                    })
                                    .executeWith(taskExecutor);
@@ -117,12 +117,17 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    private Status searchAndParse(String citeKey) {
+    private Status searchAndParse(String citeKey) throws IOException {
         Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                            .orElseGet(preferencesService::getWorkingDir);
 
         if (texParserResult == null || !newDirectory.equals(directory.get())) {
             directory.set(newDirectory);
+
+            if (Files.notExists(newDirectory)) {
+                throw new IOException(String.format("Current search directory does not exist: %s", newDirectory));
+            }
+
             List<Path> texFiles = searchDirectory(newDirectory, new ArrayList<>());
             texParserResult = new DefaultTexParser().parse(texFiles);
         }

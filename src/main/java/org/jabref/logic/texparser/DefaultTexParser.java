@@ -75,7 +75,7 @@ public class DefaultTexParser implements TexParser {
         List<Path> referencedFiles = new ArrayList<>();
 
         for (Path file : texFiles) {
-            if (!Files.exists(file)) {
+            if (Files.notExists(file)) {
                 LOGGER.error(String.format("File does not exist: %s", file));
                 continue;
             }
