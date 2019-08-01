@@ -137,7 +137,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.error("Error searching files", e);
+            LOGGER.error(String.format("Error searching files: %s", e.getMessage()));
             return texFiles;
         }
 
