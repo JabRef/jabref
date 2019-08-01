@@ -130,11 +130,6 @@ class ParseTexDialogViewModel extends AbstractViewModel {
     }
 
     private void handleFailure(Exception exception) {
-        root.set(null);
-        noFilesFound.set(true);
-        searchInProgress.set(false);
-        successfulSearch.set(false);
-
         final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
         if (permissionProblem) {
             dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
