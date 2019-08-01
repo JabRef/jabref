@@ -86,6 +86,11 @@ public class DefaultTexParser implements TexParser {
         List<Path> referencedFiles = new ArrayList<>();
 
         for (Path file : texFiles) {
+            if (!Files.exists(file)) {
+                LOGGER.error("File does not exist: " + file.toString());
+                continue;
+            }
+
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
                 for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                     // Skip comments and blank lines.
@@ -136,16 +141,12 @@ public class DefaultTexParser implements TexParser {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
-            StringBuilder include = new StringBuilder(includeMatch.group(INCLUDE_GROUP));
+            String include = includeMatch.group(INCLUDE_GROUP);
 
-            if (!include.toString().endsWith(TEX_EXT)) {
-                include.append(TEX_EXT);
-            }
-
-            Path folder = file.getParent();
-            Path inputFile = (folder == null)
-                    ? Paths.get(include.toString())
-                    : folder.resolve(include.toString());
+            Path inputFile = file.toAbsolutePath().getParent().resolve(
+                    include.endsWith(TEX_EXT)
+                            ? include
+                            : String.format("%s%s", include, TEX_EXT));
 
             if (!texFiles.contains(inputFile)) {
                 referencedFiles.add(inputFile);
