@@ -20,7 +20,6 @@ import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -150,9 +149,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         preferences.put(JabRefPreferences.TIME_STAMP_FIELD, markTimeStampFieldNameProperty.getValue().trim());
         preferences.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, markTimeStampOverwriteProperty.getValue());
         preferences.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStampProperty.getValue());
-
-        // Update name of the time stamp field based on preferences
-        InternalBibtexFields.updateTimeStampField(preferences.get(JabRefPreferences.TIME_STAMP_FIELD));
     }
 
     public ValidationStatus markTimeStampFormatValidationStatus() {

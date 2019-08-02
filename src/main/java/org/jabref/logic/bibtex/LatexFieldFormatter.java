@@ -1,7 +1,9 @@
 package org.jabref.logic.bibtex;
 
 import org.jabref.logic.util.OS;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -14,8 +16,6 @@ import org.jabref.model.strings.StringUtil;
  */
 public class LatexFieldFormatter {
 
-    // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
-    public static final String BIBTEX_STRING = "__string";
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
     private final boolean neverFailOnHashes;
@@ -74,12 +74,11 @@ public class LatexFieldFormatter {
      * Formats the content of a field.
      *
      * @param content   the content of the field
-     * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+     * @param field the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @return a formatted string suitable for output
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String format(String content, String fieldName) throws InvalidFieldValueException {
-
+    public String format(String content, Field field) throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
         }
@@ -94,17 +93,14 @@ public class LatexFieldFormatter {
             result = result.replace("\n", OS.NEWLINE);
         }
 
-        // If the field is non-standard, we will just append braces,
-        // wrap and write.
-        boolean resolveStrings = shouldResolveStrings(fieldName);
-
-        if (!resolveStrings) {
-            return formatWithoutResolvingStrings(result, fieldName);
+        // If the field is non-standard, we will just append braces, wrap and write.
+        if (!shouldResolveStrings(field)) {
+            return formatWithoutResolvingStrings(result, field);
         }
 
         // Trim whitespace
         result = result.trim();
-        return formatAndResolveStrings(result, fieldName);
+        return formatAndResolveStrings(result, field);
     }
 
     /**
@@ -112,7 +108,7 @@ public class LatexFieldFormatter {
      *
      * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
      */
-    private String formatAndResolveStrings(String content, String fieldName) throws InvalidFieldValueException {
+    private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
         stringBuilder = new StringBuilder();
         checkBraces(content);
 
@@ -170,33 +166,25 @@ public class LatexFieldFormatter {
             }
         }
 
-        return parser.format(stringBuilder, fieldName);
+        return parser.format(stringBuilder, field);
     }
 
-    private boolean shouldResolveStrings(String fieldName) {
-        boolean resolveStrings = true;
+    private boolean shouldResolveStrings(Field field) {
         if (prefs.isResolveStringsAllFields()) {
             // Resolve strings for all fields except some:
-            for (String exception : prefs.getDoNotResolveStringsFor()) {
-                if (exception.equals(fieldName)) {
-                    resolveStrings = false;
-                    break;
-                }
-            }
+            return !prefs.getDoNotResolveStringsFor().contains(field);
         } else {
             // Default operation - we only resolve strings for standard fields:
-            resolveStrings = InternalBibtexFields.isStandardField(fieldName)
-                             || BIBTEX_STRING.equals(fieldName);
+            return field instanceof StandardField || InternalField.BIBTEX_STRING.equals(field);
         }
-        return resolveStrings;
     }
 
-    private String formatWithoutResolvingStrings(String content, String fieldName) throws InvalidFieldValueException {
+    private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
 
-        stringBuilder.append(parser.format(content, fieldName));
+        stringBuilder.append(parser.format(content, field));
 
         stringBuilder.append(FIELD_END);
 
@@ -204,7 +192,6 @@ public class LatexFieldFormatter {
     }
 
     private void writeText(String text, int startPos, int endPos) {
-
         stringBuilder.append(FIELD_START);
         boolean escape = false;
         boolean inCommandName = false;
@@ -266,8 +253,7 @@ public class LatexFieldFormatter {
         stringBuilder.append(FIELD_END);
     }
 
-    private void writeStringLabel(String text, int startPos, int endPos,
-                                  boolean first, boolean last) {
+    private void writeStringLabel(String text, int startPos, int endPos, boolean first, boolean last) {
         putIn((first ? "" : " # ") + text.substring(startPos, endPos)
               + (last ? "" : " # "));
     }

@@ -11,7 +11,7 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {
 

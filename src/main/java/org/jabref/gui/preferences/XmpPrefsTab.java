@@ -24,11 +24,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -60,11 +60,9 @@ class XmpPrefsTab extends Pane implements PreferencesTab {
         deleteIconColumn.setPrefWidth(60);
         deleteIconColumn.setCellValueFactory(cellData -> cellData.getValue().field());
         new ValueTableCellFactory<XMPPrivacyFilter, String>()
-        .withGraphic(item -> {
-            return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-        }).withOnMouseClickedEvent(item -> {
-            return evt -> delete();
-        }).install(deleteIconColumn);
+                .withGraphic(item -> JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent(item -> evt -> delete())
+                .install(deleteIconColumn);
 
         column.setOnEditCommit((CellEditEvent<XMPPrivacyFilter, String> cell) -> {
             cell.getRowValue().setField(cell.getNewValue());
@@ -73,7 +71,7 @@ class XmpPrefsTab extends Pane implements PreferencesTab {
         tableView.getColumns().setAll(column, deleteIconColumn);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(InternalBibtexFields.getAllPublicAndInternalFieldNames()));
+        ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(FieldFactory.getCommonFields().stream().map(Field::getName).collect(Collectors.toSet())));
         bibtexFields.setEditable(true);
 
         BorderPane tablePanel = new BorderPane();

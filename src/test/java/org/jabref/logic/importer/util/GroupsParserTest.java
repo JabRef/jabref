@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -48,14 +49,14 @@ class GroupsParserTest {
 
     @Test
     void keywordDelimiterThatNeedsToBeEscaped() throws Exception {
-        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ';', '>');
+        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ';', '>');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;\\;;>;1;;;;;", ';', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
     void hierarchicalDelimiterThatNeedsToBeEscaped() throws Exception {
-        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ',', ';');
+        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', ';');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
@@ -106,15 +107,15 @@ class GroupsParserTest {
 
     @Test
     void fromStringParsesAutomaticKeywordGroup() throws Exception {
-        AutomaticGroup expected = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "keywords", ',', '>');
+        AutomaticGroup expected = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;>;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
     void fromStringParsesAutomaticPersonGroup() throws Exception {
-        AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
-        AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;", ',', fileMonitor, metaData);
+        AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR);
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 

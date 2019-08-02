@@ -20,7 +20,7 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.identifier.Identifier;
 
 import org.fxmisc.easybind.EasyBind;
@@ -33,21 +33,21 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
-    public IdentifierEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public IdentifierEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
 
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
 
         identifier.bind(
-                EasyBind.map(text, input -> IdentifierParser.parse(fieldName, input))
+                EasyBind.map(text, input -> IdentifierParser.parse(field, input))
         );
 
         validIdentifierIsNotPresent.bind(
                 EasyBind.map(identifier, parsedIdentifier -> !parsedIdentifier.isPresent())
         );
 
-        idFetcherAvailable.setValue(WebFetchers.getIdFetcherForField(fieldName).isPresent());
+        idFetcherAvailable.setValue(WebFetchers.getIdFetcherForField(field).isPresent());
     }
 
     public boolean isIdFetcherAvailable() {
@@ -88,20 +88,20 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchInformationByIdentifier(BibEntry entry) {
-        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentBasePanel(), taskExecutor).fetchAndMerge(entry, fieldName);
+        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentBasePanel(), taskExecutor).fetchAndMerge(entry, field);
     }
 
     public void lookupIdentifier(BibEntry entry) {
-        WebFetchers.getIdFetcherForField(fieldName).ifPresent(idFetcher -> {
+        WebFetchers.getIdFetcherForField(field).ifPresent(idFetcher -> {
             BackgroundTask
                     .wrap(() -> idFetcher.findIdentifier(entry))
                     .onRunning(() -> identifierLookupInProgress.setValue(true))
                     .onFinished(() -> identifierLookupInProgress.setValue(false))
                     .onSuccess(identifier -> {
                         if (identifier.isPresent()) {
-                            entry.setField(fieldName, identifier.get().getNormalized());
+                            entry.setField(field, identifier.get().getNormalized());
                         } else {
-                            dialogService.notify(Localization.lang("No %0 found", FieldName.getDisplayName(fieldName)));
+                            dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
                         }
                     })
                     .onFailure(dialogService::showErrorDialogAndWait)

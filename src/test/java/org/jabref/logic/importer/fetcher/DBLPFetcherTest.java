@@ -7,8 +7,9 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,19 +33,19 @@ public class DBLPFetcherTest {
         dblpFetcher = new DBLPFetcher(importFormatPreferences);
         entry = new BibEntry();
 
-        entry.setType(BibtexEntryTypes.ARTICLE.getName());
+        entry.setType(StandardEntryType.Article);
         entry.setCiteKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(FieldName.TITLE,
+        entry.setField(StandardField.TITLE,
                 "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
-        entry.setField(FieldName.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
-        entry.setField(FieldName.JOURNAL, "Softwaretechnik-Trends");
-        entry.setField(FieldName.VOLUME, "36");
-        entry.setField(FieldName.NUMBER, "2");
-        entry.setField(FieldName.YEAR, "2016");
-        entry.setField(FieldName.URL,
+        entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
+        entry.setField(StandardField.JOURNAL, "Softwaretechnik-Trends");
+        entry.setField(StandardField.VOLUME, "36");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.YEAR, "2016");
+        entry.setField(StandardField.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField("biburl", "https://dblp.org/rec/bib/journals/stt/GeigerHL16");
-        entry.setField("bibsource", "dblp computer science bibliography, https://dblp.org");
+        entry.setField(new UnknownField("biburl"), "https://dblp.org/rec/bib/journals/stt/GeigerHL16");
+        entry.setField(new UnknownField("bibsource"), "dblp computer science bibliography, https://dblp.org");
     }
 
     @Test

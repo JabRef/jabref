@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 
 import org.apache.tika.config.TikaConfig;
@@ -89,11 +90,9 @@ public class FileHelper {
      * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<Path> expandFilename(final BibDatabaseContext databaseContext, String name,
-                                                FilePreferences filePreferences) {
-        Optional<String> extension = getFileExtension(name);
+    public static Optional<Path> expandFilename(final BibDatabaseContext databaseContext, String name, FilePreferences filePreferences) {
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), filePreferences);
+        List<String> directories = databaseContext.getFileDirectories(StandardField.FILE, filePreferences);
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectories(filePreferences);
 

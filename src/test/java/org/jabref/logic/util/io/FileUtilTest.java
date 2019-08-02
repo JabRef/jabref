@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileHelper;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +70,7 @@ class FileUtilTest {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
-        entry.setField("title", "mytitle");
+        entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
                 FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
@@ -81,7 +82,7 @@ class FileUtilTest {
         String fileNamePattern = "[bibtexkey] - [title:lower]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
-        entry.setField("title", "mytitle");
+        entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
                 FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
@@ -93,7 +94,7 @@ class FileUtilTest {
         String fileNamePattern = "[bibtexkey]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
-        entry.setField("title", "mytitle");
+        entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234",
                 FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
@@ -104,7 +105,7 @@ class FileUtilTest {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
-        entry.setField("title", "mytitle");
+        entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
@@ -113,7 +114,7 @@ class FileUtilTest {
     void testGetDefaultFileNameNoPatternNoBibTeXKey() {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
-        entry.setField("title", "mytitle");
+        entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
@@ -142,9 +143,9 @@ class FileUtilTest {
         // bibkey - title
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
-        entry.setField("author", "O. Kitsune");
-        entry.setField("year", "1868");
-        entry.setField("pages", "567-579");
+        entry.setField(StandardField.AUTHOR, "O. Kitsune");
+        entry.setField(StandardField.YEAR, "1868");
+        entry.setField(StandardField.PAGES, "567-579");
 
         assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
@@ -360,9 +361,9 @@ class FileUtilTest {
         String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
-        entry.setField("title", "mytitle");
-        entry.setField("year", "1998");
-        entry.setField("author", "A. Åuthör and Author, Bete");
+        entry.setField(StandardField.TITLE, "mytitle");
+        entry.setField(StandardField.YEAR, "1998");
+        entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
 
         assertEquals("PDF/1998/Åuthör/1234 - mytitle",
                 FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));

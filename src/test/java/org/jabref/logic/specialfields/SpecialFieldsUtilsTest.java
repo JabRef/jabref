@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +22,15 @@ public class SpecialFieldsUtilsTest {
     @Test
     public void syncKeywordsFromSpecialFieldsWritesToKeywords() {
         BibEntry entry = new BibEntry();
-        entry.setField("ranking", "rank2");
+        entry.setField(SpecialField.RANKING, "rank2");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, ',');
-        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
+        assertEquals(Optional.of("rank2"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
     public void syncKeywordsFromSpecialFieldsCausesChange() {
         BibEntry entry = new BibEntry();
-        entry.setField("ranking", "rank2");
+        entry.setField(SpecialField.RANKING, "rank2");
         List<FieldChange> changes = SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, ',');
         assertTrue(changes.size() > 0);
     }
@@ -38,10 +38,10 @@ public class SpecialFieldsUtilsTest {
     @Test
     public void syncKeywordsFromSpecialFieldsOverwritesKeywords() {
         BibEntry entry = new BibEntry();
-        entry.setField("ranking", "rank2");
-        entry.setField("keywords", "rank3");
+        entry.setField(SpecialField.RANKING, "rank2");
+        entry.setField(StandardField.KEYWORDS, "rank3");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, ',');
-        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
+        assertEquals(Optional.of("rank2"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
@@ -54,15 +54,15 @@ public class SpecialFieldsUtilsTest {
     @Test
     public void syncSpecialFieldsFromKeywordWritesToSpecialField() {
         BibEntry entry = new BibEntry();
-        entry.setField("keywords", "rank2");
+        entry.setField(StandardField.KEYWORDS, "rank2");
         SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
-        assertEquals(Optional.of("rank2"), entry.getField("ranking"));
+        assertEquals(Optional.of("rank2"), entry.getField(SpecialField.RANKING));
     }
 
     @Test
     public void syncSpecialFieldsFromKeywordCausesChange() {
         BibEntry entry = new BibEntry();
-        entry.setField("keywords", "rank2");
+        entry.setField(StandardField.KEYWORDS, "rank2");
         List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
         assertTrue(changes.size() > 0);
     }
@@ -83,8 +83,8 @@ public class SpecialFieldsUtilsTest {
         SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
         // Remove it
         List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
-        assertEquals(Arrays.asList(new FieldChange(entry, specialField.getFieldName(), specialFieldKeyword.get(), null),
-                new FieldChange(entry, FieldName.KEYWORDS, specialFieldKeyword.get(), null)), changes);
+        assertEquals(Arrays.asList(new FieldChange(entry, specialField, specialFieldKeyword.get(), null),
+                new FieldChange(entry, StandardField.KEYWORDS, specialFieldKeyword.get(), null)), changes);
         KeywordList remainingKeywords = entry.getKeywords(',');
         assertFalse(remainingKeywords.contains(specialFieldKeyword));
     }

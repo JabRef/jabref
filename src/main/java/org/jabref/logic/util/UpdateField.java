@@ -7,7 +7,8 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 public class UpdateField {
 
@@ -21,7 +22,7 @@ public class UpdateField {
      * @param field      Field name
      * @param newValue   New field value
      */
-    public static Optional<FieldChange> updateField(BibEntry be, String field, String newValue) {
+    public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue) {
         return updateField(be, field, newValue, false);
     }
 
@@ -32,7 +33,7 @@ public class UpdateField {
      * @param field      Field name
      * @param newValue   New field value
      */
-    public static Optional<FieldChange> updateNonDisplayableField(BibEntry be, String field, String newValue) {
+    public static Optional<FieldChange> updateNonDisplayableField(BibEntry be, Field field, String newValue) {
         boolean changed = be.hasChanged();
         Optional<FieldChange> fieldChange = updateField(be, field, newValue, false);
         be.setChanged(changed);
@@ -47,8 +48,8 @@ public class UpdateField {
      * @param newValue                    New field value
      * @param nullFieldIfValueIsTheSame   If true the field value is removed when the current value is equals to newValue
      */
-    public static Optional<FieldChange> updateField(BibEntry be, String field, String newValue,
-            Boolean nullFieldIfValueIsTheSame) {
+    public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue,
+                                                    Boolean nullFieldIfValueIsTheSame) {
         String writtenValue = null;
         String oldValue = null;
         if (be.hasField(field)) {
@@ -91,8 +92,8 @@ public class UpdateField {
             UpdateFieldPreferences prefs) {
         String defaultOwner = prefs.getDefaultOwner();
         String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
-        String timeStampField = prefs.getTimeStampField();
-        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
+        Field timeStampField = prefs.getTimeStampField();
+        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(InternalField.OWNER)));
         boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -103,12 +104,12 @@ public class UpdateField {
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp,
-            String timeStampField, String timeStamp) {
+                                           Field timeStampField, String timeStamp) {
 
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(FieldName.OWNER, owner);
+            entry.setField(InternalField.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -133,13 +134,13 @@ public class UpdateField {
             return;
         }
 
-        String timeStampField = prefs.getTimeStampField();
+        Field timeStampField = prefs.getTimeStampField();
         String defaultOwner = prefs.getDefaultOwner();
         String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(FieldName.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalField.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }
