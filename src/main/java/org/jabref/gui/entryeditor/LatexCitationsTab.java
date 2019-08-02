@@ -1,9 +1,9 @@
 package org.jabref.gui.entryeditor;
 
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -27,8 +28,8 @@ public class LatexCitationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
-                             TaskExecutor taskExecutor) {
-        this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor);
+                             TaskExecutor taskExecutor, DialogService dialogService) {
+        this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor, dialogService);
         this.searchPane = new StackPane();
         this.progressIndicator = new ProgressIndicator();
 
@@ -62,14 +63,25 @@ public class LatexCitationsTab extends EntryEditorTab {
         });
     }
 
+    private VBox getLatexDirectoryBox() {
+        Text latexDirectoryText = new Text(String.format("%n%n%s: %s", Localization.lang("Current search directory"),
+                viewModel.directoryProperty().get()));
+        latexDirectoryText.setStyle("-fx-font-weight: bold;");
+        Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
+        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
+
+        return new VBox(15, latexDirectoryText, latexDirectoryButton);
+    }
+
     private ScrollPane getCitationsPane() {
         Text titleText = new Text(Localization.lang("Citations found"));
         titleText.getStyleClass().add("recommendation-heading");
 
         VBox citationsBox = new VBox(20, titleText);
-        Path basePath = viewModel.directoryProperty().get();
         citationsBox.getChildren().addAll(viewModel.getCitationList().stream().map(
-                citation -> citation.getDisplayGraphic(basePath, Optional.empty())).collect(Collectors.toList()));
+                citation -> citation.getDisplayGraphic(viewModel.directoryProperty().get(), Optional.empty())).collect(Collectors.toList()));
+
+        citationsBox.getChildren().add(getLatexDirectoryBox());
 
         ScrollPane citationsPane = new ScrollPane();
         citationsPane.setContent(citationsBox);
@@ -82,13 +94,9 @@ public class LatexCitationsTab extends EntryEditorTab {
         notFoundTitleText.getStyleClass().add("recommendation-heading");
 
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
-        notFoundText.setStyle("-fx-font-size: 110%");
+        notFoundText.setStyle("-fx-font-size: 110%;");
 
-        Text notFoundAdviceText = new Text(Localization.lang(
-                "You can set the LaTeX file directory in the 'Library properties' dialog."));
-        notFoundAdviceText.setStyle("-fx-font-weight: bold;");
-
-        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, notFoundAdviceText);
+        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, getLatexDirectoryBox());
         ScrollPane notFoundPane = new ScrollPane();
         notFoundPane.setContent(notFoundBox);
 
@@ -103,7 +111,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
         errorMessageText.setStyle("-fx-font-family: monospace;-fx-font-size: 120%;");
 
-        VBox errorBox = new VBox(20, errorTitleText, errorMessageText);
+        VBox errorBox = new VBox(20, errorTitleText, errorMessageText, getLatexDirectoryBox());
         ScrollPane errorPane = new ScrollPane();
         errorPane.setContent(errorBox);
 
