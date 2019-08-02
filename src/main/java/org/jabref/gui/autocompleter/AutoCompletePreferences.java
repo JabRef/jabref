@@ -1,22 +1,21 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
-    private static final String DELIMITER = ";";
     private boolean shouldAutoComplete;
     private AutoCompleteFirstNameMode firstNameMode;
     private boolean onlyCompleteLastFirst;
     private boolean onlyCompleteFirstLast;
-    private List<String> completeFields;
+    private Set<Field> completeFields;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
         this.onlyCompleteLastFirst = onlyCompleteLastFirst;
@@ -64,20 +63,20 @@ public class AutoCompletePreferences {
      * Returns the list of fields for which autocomplete is enabled
      * @return List of field names
      */
-    public List<String> getCompleteFields() {
+    public Set<Field> getCompleteFields() {
         return completeFields;
     }
 
-    public void setCompleteFields(List<String> completeFields) {
+    public void setCompleteFields(Set<Field> completeFields) {
         this.completeFields = completeFields;
     }
 
     public void setCompleteNames(String input) {
-        setCompleteFields(Arrays.asList(input.split(DELIMITER)));
+        setCompleteFields(FieldFactory.parseFieldList(input));
     }
 
     public String getCompleteNamesAsString() {
-        return completeFields.stream().collect(Collectors.joining(DELIMITER));
+        return FieldFactory.serializeFieldsList(completeFields);
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {

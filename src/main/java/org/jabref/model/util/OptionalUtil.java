@@ -73,11 +73,19 @@ public class OptionalUtil {
         }
     }
 
-    public static <T> Optional<T> orElse(Optional<T> valueOne, Optional<T> valueTwo) {
+    public static <T> Optional<T> orElse(Optional<? extends T> valueOne, Optional<? extends T> valueTwo) {
         if (valueOne.isPresent()) {
-            return valueOne;
+            return valueOne.map(f -> f);
         } else {
-            return valueTwo;
+            return valueTwo.map(f -> f);
+        }
+    }
+
+    public static <T extends S, S> S orElse(Optional<T> optional, S otherwise) {
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            return otherwise;
         }
     }
 }

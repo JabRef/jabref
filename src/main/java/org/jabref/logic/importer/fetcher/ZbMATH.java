@@ -15,7 +15,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -67,10 +68,10 @@ public class ZbMATH implements SearchBasedParserFetcher {
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new MoveFieldCleanup("msc2010", FieldName.KEYWORDS).cleanup(entry);
-        new MoveFieldCleanup("fjournal", FieldName.JOURNAL).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.JOURNAL, new RemoveBracesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("msc2010"), StandardField.KEYWORDS).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("fjournal"), StandardField.JOURNAL).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
     }
 
 }

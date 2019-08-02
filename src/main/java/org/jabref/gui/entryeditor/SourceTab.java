@@ -45,7 +45,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -133,7 +133,7 @@ public class SourceTab extends EntryEditorTab {
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
+        new BibEntryWriter(formatter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
@@ -278,19 +278,19 @@ public class SourceTab extends EntryEditorTab {
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
+            for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
-                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
+                if (!newEntry.hasField(fieldName)) {
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                     outOfFocusEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
-            for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
+            for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
                 String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {

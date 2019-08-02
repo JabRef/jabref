@@ -1,7 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Subclass of BibEntry for representing entries referenced in a document that can't
@@ -14,7 +14,7 @@ public class UndefinedBibtexEntry extends BibEntry {
 
     public UndefinedBibtexEntry(String key) {
         this.key = key;
-        setField(FieldName.AUTHOR, OOBibStyle.UNDEFINED_CITATION_MARKER);
+        setField(StandardField.AUTHOR, OOBibStyle.UNDEFINED_CITATION_MARKER);
     }
 
     public String getKey() {

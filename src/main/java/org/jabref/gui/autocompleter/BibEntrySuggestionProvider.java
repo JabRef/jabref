@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
@@ -23,7 +24,7 @@ public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> imp
 
     @Override
     protected Comparator<BibEntry> getComparator() {
-        return new EntryComparator(false, true, BibEntry.KEY_FIELD);
+        return new EntryComparator(false, true, InternalField.KEY_FIELD);
     }
 
     @Override

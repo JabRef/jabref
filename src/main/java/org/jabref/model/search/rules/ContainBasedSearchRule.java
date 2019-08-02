@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
  * Search rule for contain-based search.
@@ -36,7 +37,7 @@ public class ContainBasedSearchRule implements SearchRule {
 
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
-        for (String fieldKey : bibEntry.getFieldNames()) {
+        for (Field fieldKey : bibEntry.getFields()) {
             String formattedFieldContent = bibEntry.getLatexFreeField(fieldKey).get();
             if (!caseSensitive) {
                 formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);

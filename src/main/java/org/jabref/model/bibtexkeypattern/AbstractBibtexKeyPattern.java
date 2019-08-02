@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.EntryType;
+
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an
  * <code>ArrayList</code>). A parent BibtexKeyPattern can be set.
@@ -17,9 +19,9 @@ public abstract class AbstractBibtexKeyPattern {
 
     protected List<String> defaultPattern = new ArrayList<>();
 
-    protected Map<String, List<String>> data = new HashMap<>();
+    protected Map<EntryType, List<String>> data = new HashMap<>();
 
-    public void addBibtexKeyPattern(String type, String pattern) {
+    public void addBibtexKeyPattern(EntryType type, String pattern) {
         data.put(type, AbstractBibtexKeyPattern.split(pattern));
     }
 
@@ -55,9 +57,7 @@ public abstract class AbstractBibtexKeyPattern {
      * @param type a <code>String</code>
      */
     public void removeBibtexKeyPattern(String type) {
-        if (data.containsKey(type)) {
-            data.remove(type);
-        }
+        data.remove(type);
     }
 
     /**
@@ -68,11 +68,11 @@ public abstract class AbstractBibtexKeyPattern {
      * If that fails, we try the parent.<br />
      * If that fails, we return the DEFAULT_LABELPATTERN<br />
      *
-     * @param key a <code>String</code>
+     * @param entryType a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
      */
-    public List<String> getValue(String key) {
-        List<String> result = data.get(key);
+    public List<String> getValue(EntryType entryType) {
+        List<String> result = data.get(entryType);
         //  Test to see if we found anything
         if (result == null) {
             // check default value
@@ -80,7 +80,7 @@ public abstract class AbstractBibtexKeyPattern {
             if (result == null || result.isEmpty()) {
                 // we are the "last" to ask
                 // we don't have anything left
-                return getLastLevelBibtexKeyPattern(key);
+                return getLastLevelBibtexKeyPattern(entryType);
             }
         }
         return result;
@@ -114,8 +114,8 @@ public abstract class AbstractBibtexKeyPattern {
     /**
      * Checks whether this pattern is customized or the default value.
      */
-    public final boolean isDefaultValue(String key) {
-        return data.get(key) == null;
+    public final boolean isDefaultValue(EntryType entryType) {
+        return data.get(entryType) == null;
     }
 
     /**
@@ -136,14 +136,13 @@ public abstract class AbstractBibtexKeyPattern {
         this.defaultPattern = AbstractBibtexKeyPattern.split(bibtexKeyPattern);
     }
 
-    public Set<String> getAllKeys() {
+    public Set<EntryType> getAllKeys() {
         return data.keySet();
     }
 
-    public Map<String, List<String>> getPatterns() {
-        return data.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public Map<EntryType, List<String>> getPatterns() {
+        return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public abstract List<String> getLastLevelBibtexKeyPattern(String key);
+    public abstract List<String> getLastLevelBibtexKeyPattern(EntryType key);
 }

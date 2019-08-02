@@ -37,7 +37,7 @@ public class BibDatabases {
      */
     public static List<BibEntry> purgeEmptyEntries(Collection<BibEntry> entries) {
         return entries.stream()
-                      .filter(entry -> !entry.getFieldNames().isEmpty())
+                      .filter(entry -> !entry.getFields().isEmpty())
                       .collect(Collectors.toList());
     }
 }

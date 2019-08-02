@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
@@ -19,6 +20,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
@@ -52,7 +54,7 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    Map<String, List<String>> getEntryEditorTabList();
+    Map<String, Set<Field>> getEntryEditorTabList();
 
     boolean getEnforceLegalKeys();
 

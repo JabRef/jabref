@@ -15,6 +15,9 @@ import java.util.Optional;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -45,13 +48,13 @@ public class MetaDataParser {
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
-        Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
+        Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         for (Map.Entry<String, String> entry : data.entrySet()) {
             List<String> value = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
-                String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
+                EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
                 continue;
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
@@ -60,7 +63,7 @@ public class MetaDataParser {
                 metaData.setUserFileDirectory(user, getSingleItem(value));
                 continue;
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
+                metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"

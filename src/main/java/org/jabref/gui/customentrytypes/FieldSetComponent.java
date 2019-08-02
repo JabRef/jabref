@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.BibEntryTypes;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;

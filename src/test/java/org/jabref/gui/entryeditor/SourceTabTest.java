@@ -13,6 +13,7 @@ import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
 
@@ -60,7 +61,7 @@ public class SourceTabTest {
     @Test
     void switchingFromSourceTabDoesNotThrowException(FxRobot robot) throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setField("test", "testvalue");
+        entry.setField(new UnknownField("test"), "testvalue");
 
         // Update source editor
         robot.interact(() -> pane.getSelectionModel().select(2));
@@ -71,7 +72,7 @@ public class SourceTabTest {
         // Switch to different tab & update entry
         robot.interact(() -> pane.getSelectionModel().select(1));
         robot.interact(() -> stage.setWidth(600));
-        robot.interact(() -> entry.setField("test", "new value"));
+        robot.interact(() -> entry.setField(new UnknownField("test"), "new value"));
 
         // No exception should be thrown
         robot.interrupt(100);

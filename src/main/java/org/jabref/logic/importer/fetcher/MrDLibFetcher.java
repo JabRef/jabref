@@ -17,7 +17,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -52,7 +52,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<String> title = entry.getLatexFreeField(FieldName.TITLE);
+        Optional<String> title = entry.getLatexFreeField(StandardField.TITLE);
         if (title.isPresent()) {
             String response = makeServerRequest(title.get());
             MrDLibImporter importer = new MrDLibImporter();

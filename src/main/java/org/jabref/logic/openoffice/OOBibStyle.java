@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +29,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -102,42 +105,23 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
-
-    private String name = "";
-
     private final SortedSet<String> journals = new TreeSet<>();
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
-
-    private Layout defaultBibLayout;
-
-    // reference layout mapped from entry type number:
-    private final Map<String, Layout> bibLayout = new HashMap<>();
-
+    // reference layout mapped from entry type:
+    private final Map<EntryType, Layout> bibLayout = new HashMap<>();
     private final Map<String, Object> properties = new HashMap<>();
-
     private final Map<String, Object> citProperties = new HashMap<>();
-
-    private boolean valid;
     private final boolean fromResource;
     private final String path;
-
-    enum BibStyleMode {
-        NONE,
-        LAYOUT,
-        PROPERTIES,
-        CITATION,
-        NAME,
-        JOURNALS
-        }
-
-    private File styleFile;
     private final Charset encoding;
+    private final LayoutFormatterPreferences prefs;
+    private String name = "";
+    private Layout defaultBibLayout;
+    private boolean valid;
+    private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
-    private final LayoutFormatterPreferences prefs;
-
-
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
@@ -148,7 +132,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         fromResource = false;
         path = styleFile.getPath();
     }
-
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
@@ -157,6 +140,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
         fromResource = true;
         path = resourcePath;
+    }
+
+    public Layout getDefaultBibLayout() {
+        return defaultBibLayout;
     }
 
     private void setDefaultProperties() {
@@ -171,8 +158,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
-        citProperties.put(YEAR_FIELD, FieldName.YEAR);
+        citProperties.put(AUTHOR_FIELD, FieldFactory.serializeOrFields(StandardField.AUTHOR, StandardField.EDITOR));
+        citProperties.put(YEAR_FIELD, StandardField.YEAR.getName());
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
         citProperties.put(AUTHOR_SEPARATOR, ", ");
@@ -364,13 +351,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
-            String type = line.substring(0, index);
+            EntryType type = EntryTypeFactory.parse(line.substring(0, index));
             try {
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {
-                    bibLayout.put(type.toLowerCase(Locale.ENGLISH), layout);
+                    bibLayout.put(type, layout);
                 }
 
             } catch (IOException ex) {
@@ -417,8 +404,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    public Layout getReferenceFormat(String type) {
-        Layout l = bibLayout.get(type.toLowerCase(Locale.ENGLISH));
+    public Layout getReferenceFormat(EntryType type) {
+        Layout l = bibLayout.get(type);
         if (l == null) {
             return defaultBibLayout;
         } else {
@@ -709,22 +696,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @param entry    The entry.
      * @param database The database the entry belongs to.
-     * @param field    The field, or succession of fields, to look up. If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup, specify FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR).
+     * @param fields   The field, or succession of fields, to look up. If backup fields are needed, separate
+     *                 field names by /. E.g. to use "author" with "editor" as backup, specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
-    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
+    private String getCitationMarkerField(BibEntry entry, BibDatabase database, String fields) {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        String authorField = getStringCitProperty(AUTHOR_FIELD);
-        String[] fields = field.split(FieldName.FIELD_SEPARATOR);
-        for (String s : fields) {
-
-            Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
+        Set<Field> authorFields = FieldFactory.parseOrFields(getStringCitProperty(AUTHOR_FIELD));
+        for (Field field : FieldFactory.parseOrFields(fields)) {
+            Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
-                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
+                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content.get())) {
                     return "{" + fieldFormatter.format(content.get()) + "}";
                 }
                 return fieldFormatter.format(content.get());
@@ -924,5 +909,14 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         sb.append(yearSep);
         return sb.toString();
+    }
+
+    enum BibStyleMode {
+        NONE,
+        LAYOUT,
+        PROPERTIES,
+        CITATION,
+        NAME,
+        JOURNALS
     }
 }

@@ -5,7 +5,7 @@ import java.util.Collections;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -34,11 +34,11 @@ class MergeReviewIntoCommentActionMigrationTest {
     @Test
     public void reviewField() {
         BibEntry actualEntry = createMinimalBibEntry();
-        actualEntry.setField(FieldName.REVIEW, "My Review");
+        actualEntry.setField(StandardField.REVIEW, "My Review");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
 
         BibEntry expectedEntry = createMinimalBibEntry();
-        expectedEntry.setField(FieldName.COMMENT, "My Review");
+        expectedEntry.setField(StandardField.COMMENT, "My Review");
 
         action.performMigration(actualParserResult);
 
@@ -48,7 +48,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     @Test
     public void commentField() {
         BibEntry entry = createMinimalBibEntry();
-        entry.setField(FieldName.COMMENT, "My Comment");
+        entry.setField(StandardField.COMMENT, "My Comment");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
         action.performMigration(actualParserResult);
@@ -61,11 +61,11 @@ class MergeReviewIntoCommentActionMigrationTest {
         String commentString = "My Review\n\nSecond Paragraph\n\nThird Paragraph";
 
         BibEntry actualEntry = createMinimalBibEntry();
-        actualEntry.setField(FieldName.REVIEW, commentString);
+        actualEntry.setField(StandardField.REVIEW, commentString);
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
 
         BibEntry expectedEntry = createMinimalBibEntry();
-        expectedEntry.setField(FieldName.COMMENT, commentString);
+        expectedEntry.setField(StandardField.COMMENT, commentString);
 
         action.performMigration(actualParserResult);
 
@@ -76,13 +76,13 @@ class MergeReviewIntoCommentActionMigrationTest {
     @Disabled("Re-enable if the MergeReviewIntoCommentMigration.mergeCommentFieldIfPresent() does not block and wait for user input.")
     public void reviewAndCommentField() {
         BibEntry actualEntry = createMinimalBibEntry();
-        actualEntry.setField(FieldName.REVIEW, "My Review");
-        actualEntry.setField(FieldName.COMMENT, "My Comment");
+        actualEntry.setField(StandardField.REVIEW, "My Review");
+        actualEntry.setField(StandardField.COMMENT, "My Comment");
 
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
 
         BibEntry expectedEntry = createMinimalBibEntry();
-        expectedEntry.setField(FieldName.COMMENT, "My Comment\n" + Localization.lang("Review") + ":\nMy Review");
+        expectedEntry.setField(StandardField.COMMENT, "My Comment\n" + Localization.lang("Review") + ":\nMy Review");
 
         action.performMigration(actualParserResult);
 
@@ -92,8 +92,8 @@ class MergeReviewIntoCommentActionMigrationTest {
     private BibEntry createMinimalBibEntry() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Entry1");
-        entry.setField(FieldName.TITLE, "A random entry!");
-        entry.setField(FieldName.AUTHOR, "JabRef DEVELOPERS");
+        entry.setField(StandardField.TITLE, "A random entry!");
+        entry.setField(StandardField.AUTHOR, "JabRef DEVELOPERS");
         return entry;
     }
 }

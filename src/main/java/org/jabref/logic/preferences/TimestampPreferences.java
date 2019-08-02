@@ -3,14 +3,16 @@ package org.jabref.logic.preferences;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.jabref.model.entry.field.Field;
+
 public class TimestampPreferences {
     private final boolean useTimestamps;
     private final boolean useModifiedTimestamp;
-    private final String timestampField;
+    private final Field timestampField;
     private final String timestampFormat;
     private final boolean overwriteTimestamp;
 
-    public TimestampPreferences(boolean useTimestamps, boolean useModifiedTimestamp, String timestampField, String timestampFormat, boolean overwriteTimestamp) {
+    public TimestampPreferences(boolean useTimestamps, boolean useModifiedTimestamp, Field timestampField, String timestampFormat, boolean overwriteTimestamp) {
         this.useTimestamps = useTimestamps;
         this.useModifiedTimestamp = useModifiedTimestamp;
         this.timestampField = timestampField;
@@ -26,7 +28,7 @@ public class TimestampPreferences {
         return useModifiedTimestamp;
     }
 
-    public String getTimestampField() {
+    public Field getTimestampField() {
         return timestampField;
     }
 

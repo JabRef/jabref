@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -144,8 +146,8 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibEntry entry) {
             // special case for searching for entrytype=phdthesis
-            if (fieldPattern.matcher(BibEntry.TYPE_HEADER).matches()) {
-                return matchFieldValue(entry.getType());
+            if (fieldPattern.matcher(InternalField.TYPE_HEADER.getName()).matches()) {
+                return matchFieldValue(entry.getType().getName());
             }
 
             // special case for searching a single keyword
@@ -154,7 +156,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             // specification of fieldsKeys to search is done in the search expression itself
-            Set<String> fieldsKeys = entry.getFieldNames();
+            Set<Field> fieldsKeys = entry.getFields();
 
             // special case for searching allfields=cat and title=dog
             if (!fieldPattern.matcher("anyfield").matches()) {
@@ -162,7 +164,7 @@ public class GrammarBasedSearchRule implements SearchRule {
                 fieldsKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toSet());
             }
 
-            for (String field : fieldsKeys) {
+            for (Field field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getLatexFreeField(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(fieldValue.get())) {
@@ -175,8 +177,8 @@ public class GrammarBasedSearchRule implements SearchRule {
             return fieldsKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
-        private Predicate<String> matchFieldKey() {
-            return s -> fieldPattern.matcher(s).matches();
+        private Predicate<Field> matchFieldKey() {
+            return field -> fieldPattern.matcher(field.getName()).matches();
         }
 
         public boolean matchFieldValue(String content) {

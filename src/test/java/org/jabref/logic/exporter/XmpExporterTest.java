@@ -5,21 +5,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -34,12 +31,7 @@ public class XmpExporterTest {
 
     @BeforeEach
     public void setUp() {
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
-
-        exporter = exporterFactory.getExporterByName("xmp").get();
+        exporter = new XmpExporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
         encoding = StandardCharsets.UTF_8;
@@ -51,10 +43,10 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Alan Turing");
+        entry.setField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
-        String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actual = String.join("\n", Files.readAllLines(file)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
                 "      <dc:creator>\n" +
@@ -79,15 +71,15 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entryTuring = new BibEntry();
-        entryTuring.setField("author", "Alan Turing");
+        entryTuring.setField(StandardField.AUTHOR, "Alan Turing");
 
         BibEntry entryArmbrust = new BibEntry();
-        entryArmbrust.setField("author", "Michael Armbrust");
+        entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCiteKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
-        String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actual = String.join("\n", Files.readAllLines(file)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -131,10 +123,10 @@ public class XmpExporterTest {
         Files.createFile(file);
 
         BibEntry entryTuring = new BibEntry();
-        entryTuring.setField("author", "Alan Turing");
+        entryTuring.setField(StandardField.AUTHOR, "Alan Turing");
 
         BibEntry entryArmbrust = new BibEntry();
-        entryArmbrust.setField("author", "Michael Armbrust");
+        entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
         entryArmbrust.setCiteKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
@@ -143,8 +135,7 @@ public class XmpExporterTest {
         assertEquals(Collections.emptyList(), lines);
 
         Path fileTuring = Paths.get(file.getParent().toString() + "/" + entryTuring.getId() + "_null.xmp");
-        List<String> linesTuring = Files.readAllLines(fileTuring);
-        String actualTuring = Files.readAllLines(fileTuring).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualTuring = String.join("\n", Files.readAllLines(fileTuring)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedTuring = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -165,7 +156,7 @@ public class XmpExporterTest {
         assertEquals(expectedTuring, actualTuring);
 
         Path fileArmbrust = Paths.get(file.getParent().toString() + "/" + entryArmbrust.getId() + "_Armbrust2010.xmp");
-        String actualArmbrust = Files.readAllLines(fileArmbrust).stream().collect(Collectors.joining("\n")); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedArmbrust = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -193,17 +184,17 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author"));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Collections.singletonList(StandardField.AUTHOR));
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Alan Turing");
+        entry.setField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
-        String actual = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
+        String actual = String.join("\n", Files.readAllLines(file));
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
                 "      <dc:format>application/pdf</dc:format>\n" +

@@ -12,7 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

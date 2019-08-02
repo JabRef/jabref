@@ -15,9 +15,13 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -28,18 +32,18 @@ public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    public static FieldEditorFX getForField(final String fieldName,
+    public static FieldEditorFX getForField(final Field field,
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
                                             final JabRefPreferences preferences,
                                             final BibDatabaseContext databaseContext,
-                                            final String entryType,
+                                            final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,
                                             final UndoManager undoManager) {
-        final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
+        final Set<FieldProperty> fieldProperties = field.getProperties();
 
-        final AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
+        final AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());
 
         final FieldCheckers fieldCheckers = new FieldCheckers(
                 databaseContext,
@@ -48,61 +52,59 @@ public class FieldEditors {
                 preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
                 preferences.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
-        final boolean isSingleLine = InternalBibtexFields.isSingleLineField(fieldName);
+        final boolean isSingleLine = FieldFactory.isSingleLineField(field);
 
-        if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
-            if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
+        if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {
+            return new DateEditor(field, DateTimeFormatter.ofPattern(Globals.prefs.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.DATE)) {
+            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
+            return new UrlEditor(field, dialogService, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
+            return new JournalEditor(field, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
+            return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
+        } else if (field == InternalField.OWNER) {
+            return new OwnerEditor(field, preferences, suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
+            return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
+            return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers));
+        } else if (fieldProperties.contains(FieldProperty.MONTH)) {
+            return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers));
+        } else if (fieldProperties.contains(FieldProperty.GENDER)) {
+            return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers));
+        } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {
+            return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
+        } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
+            return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers));
+        } else if (fieldProperties.contains(FieldProperty.TYPE)) {
+            if (entryType.equals(StandardEntryType.Patent)) {
+                return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             } else {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
+                return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             }
-        } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
-        } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return new OwnerEditor(fieldName, preferences, suggestionProvider, fieldCheckers);
-        } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-        } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
-        } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-        } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-        } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-        } else if (fieldExtras.contains(FieldProperty.TYPE)) {
-            if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-            } else {
-                return new OptionEditor<>(new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
-            }
-        } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
-        } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers, isSingleLine);
-        } else if (FieldName.KEYWORDS.equals(fieldName)) {
-            return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
-            return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldExtras.contains(FieldProperty.KEY)) {
-            return new BibtexKeyEditor(fieldName, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
+            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isSingleLine);
+        } else if (StandardField.KEYWORDS.equals(field)) {
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldProperties.contains(FieldProperty.MULTILINE_TEXT)) {
+            return new MultilineEditor(field, suggestionProvider, fieldCheckers, preferences);
+        } else if (field == InternalField.KEY_FIELD) {
+            return new BibtexKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences, isSingleLine);
+        return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isSingleLine);
     }
 
     @SuppressWarnings("unchecked")
-    private static AutoCompleteSuggestionProvider<?> getSuggestionProvider(String fieldName, SuggestionProviders suggestionProviders, MetaData metaData) {
-        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(fieldName);
+    private static AutoCompleteSuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
+        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(field);
 
-        List<String> contentSelectorValues = metaData.getContentSelectorValuesForField(fieldName);
+        List<String> contentSelectorValues = metaData.getContentSelectorValuesForField(field);
         if (!contentSelectorValues.isEmpty()) {
             // Enrich auto completion by content selector values
             try {

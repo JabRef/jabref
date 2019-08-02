@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,12 +67,12 @@ public class EntryLinkListTest {
 
     @Test
     public void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
-        source.setField(FieldName.CROSSREF, "target");
+        source.setField(StandardField.CROSSREF, "target");
         assertSourceCrossrefsTarget(target, source);
     }
 
     private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
-        Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
+        Optional<String> sourceCrossref = source.getField(StandardField.CROSSREF);
         Optional<String> targetCiteKey = target.getCiteKeyOptional();
         assertEquals(sourceCrossref, targetCiteKey);
     }

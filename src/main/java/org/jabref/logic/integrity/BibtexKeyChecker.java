@@ -7,7 +7,8 @@ import java.util.Optional;
 import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -17,9 +18,9 @@ public class BibtexKeyChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> author = entry.getField(FieldName.AUTHOR);
-        Optional<String> title = entry.getField(FieldName.TITLE);
-        Optional<String> year = entry.getField(FieldName.YEAR);
+        Optional<String> author = entry.getField(StandardField.AUTHOR);
+        Optional<String> title = entry.getField(StandardField.TITLE);
+        Optional<String> year = entry.getField(StandardField.YEAR);
         if (!author.isPresent() || !title.isPresent() || !year.isPresent()) {
             return Collections.emptyList();
         }
@@ -27,7 +28,7 @@ public class BibtexKeyChecker implements Checker {
         if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
             String authorTitleYear = entry.getAuthorTitleYear(100);
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("empty BibTeX key") + ": " + authorTitleYear, entry, BibEntry.KEY_FIELD));
+                    Localization.lang("empty BibTeX key") + ": " + authorTitleYear, entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();

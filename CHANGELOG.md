@@ -11,6 +11,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
+- We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
   - Journal/Year/Month in biblatex mode -> Deprecated (if filled)

@@ -19,7 +19,7 @@ plugins {
     id 'com.gradle.build-scan' version '2.3'
     id 'com.install4j.gradle' version '7.0.12'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id "com.simonharrer.modernizer" version '1.6.0-1'
+    id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     id 'net.ltgt.errorprone' version '0.8.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
@@ -169,11 +169,11 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.10.2'
-    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.10.2'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.22'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.23'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
     jython 'org.python:jython-standalone:2.7.1'
 }

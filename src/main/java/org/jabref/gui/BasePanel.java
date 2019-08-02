@@ -92,13 +92,14 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -573,13 +574,13 @@ public class BasePanel extends StackPane {
         }
         JabRefExecutorService.INSTANCE.execute(() -> {
             final BibEntry entry = selectedEntries.get(0);
-            if (!entry.hasField(FieldName.FILE)) {
+            if (!entry.hasField(StandardField.FILE)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                 return;
             }
             FileListTableModel fileListTableModel = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(fileListTableModel::setContent);
+            entry.getField(StandardField.FILE).ifPresent(fileListTableModel::setContent);
             if (fileListTableModel.getRowCount() == 0) {
                 // content in BibTeX field is not readable
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -637,7 +638,7 @@ public class BasePanel extends StackPane {
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
-                output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
+                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getDisplayName()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
@@ -650,11 +651,11 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void editEntryAndFocusField(BibEntry entry, String fieldName) {
+    public void editEntryAndFocusField(BibEntry entry, Field field) {
         showAndEdit(entry);
         Platform.runLater(() -> {
             // Focus field and entry in main table (async to give entry editor time to load)
-            entryEditor.setFocusToField(fieldName);
+            entryEditor.setFocusToField(field);
             clearAndSelect(entry);
         });
     }
@@ -808,7 +809,7 @@ public class BasePanel extends StackPane {
     }
 
     private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = new PersonNameSuggestionProvider(InternalBibtexFields.getPersonNameFields());
+        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields());
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
             searchAutoCompleter.indexEntry(entry);
         }
@@ -1300,11 +1301,11 @@ public class BasePanel extends StackPane {
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
             if (bes.size() == 1) {
-                String field = FieldName.DOI;
-                Optional<String> link = bes.get(0).getField(FieldName.DOI);
-                if (bes.get(0).hasField(FieldName.URL)) {
-                    link = bes.get(0).getField(FieldName.URL);
-                    field = FieldName.URL;
+                Field field = StandardField.DOI;
+                Optional<String> link = bes.get(0).getField(StandardField.DOI);
+                if (bes.get(0).hasField(StandardField.URL)) {
+                    link = bes.get(0).getField(StandardField.URL);
+                    field = StandardField.URL;
                 }
                 if (link.isPresent()) {
                     try {
@@ -1320,9 +1321,9 @@ public class BasePanel extends StackPane {
                     List<LinkedFile> files = bes.get(0).getFiles();
 
                     Optional<LinkedFile> linkedFile = files.stream()
-                                                           .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                           .filter(file -> (StandardField.URL.getName().equalsIgnoreCase(file.getFileType())
+                                                                   || StandardField.PS.getName().equalsIgnoreCase(file.getFileType())
+                                                                   || StandardField.PDF.getName().equalsIgnoreCase(file.getFileType())))
                                                            .findFirst();
 
                     if (linkedFile.isPresent()) {

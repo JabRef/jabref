@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -46,6 +47,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -274,9 +276,8 @@ public class EntryEditor extends BorderPane {
                 entryEditorPreferences.getCustomTabFieldNames(), dialogService));
 
         // General fields from preferences
-        for (Map.Entry<String, List<String>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext,
-                    panel.getSuggestionProviders(), undoManager, dialogService));
+        for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
         }
 
         // Special tabs
@@ -390,13 +391,13 @@ public class EntryEditor extends BorderPane {
         new FetchAndMergeEntry(panel, taskExecutor).fetchAndMerge(entry, fetcher);
     }
 
-    public void setFocusToField(String fieldName) {
+    public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(fieldName)) {
+                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(field)) {
                     FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
                     tabbed.getSelectionModel().select(tab);
-                    fieldsEditorTab.requestFocus(fieldName);
+                    fieldsEditorTab.requestFocus(field);
                 }
             }
         });

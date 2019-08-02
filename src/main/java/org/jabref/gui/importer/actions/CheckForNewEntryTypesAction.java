@@ -7,9 +7,8 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BibEntryType;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -26,17 +25,17 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
     public void performAction(BasePanel panel, ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
-        ImportCustomEntryTypesDialog importCustomEntryTypesDialog = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
-        importCustomEntryTypesDialog.showAndWait();
+        ImportCustomEntryTypesDialog importBibEntryTypesDialog = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
+        importBibEntryTypesDialog.showAndWait();
 
     }
 
-    private List<EntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
+    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
-        return parserResult.getEntryTypes().values().stream()
-                           .filter(type -> (!EntryTypes.getType(type.getName(), mode).isPresent())
-                                           || !EntryTypes.isEqualNameAndFieldBased(type, EntryTypes.getType(type.getName(), mode).get()))
+        return parserResult.getEntryTypes()
+                           .stream()
+                           .filter(type -> Globals.entryTypesManager.isCustomizedType(type, mode))
                            .collect(Collectors.toList());
     }
 

@@ -8,15 +8,16 @@ import java.util.stream.Collectors;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
     private Character keywordDelimiter;
     private Character keywordHierarchicalDelimiter;
-    private String field;
+    private Field field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, String field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
+    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
         super(name, context);
         this.field = field;
         this.keywordDelimiter = keywordDelimiter;
@@ -31,7 +32,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
         return keywordDelimiter;
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 
