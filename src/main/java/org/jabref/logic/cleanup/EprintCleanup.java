@@ -8,7 +8,8 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 /**
@@ -21,27 +22,27 @@ public class EprintCleanup implements CleanupJob {
 
         List<FieldChange> changes = new ArrayList<>();
 
-        for (String field : Arrays.asList(FieldName.URL, FieldName.JOURNAL, FieldName.JOURNALTITLE, FieldName.NOTE)) {
+        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE)) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
-                entry.setField(FieldName.EPRINT, arXivIdentifier.get().getNormalized())
+                entry.setField(StandardField.EPRINT, arXivIdentifier.get().getNormalized())
                      .ifPresent(changes::add);
 
-                entry.setField(FieldName.EPRINTTYPE, "arxiv")
+                entry.setField(StandardField.EPRINTTYPE, "arxiv")
                      .ifPresent(changes::add);
 
                 arXivIdentifier.get().getClassification().ifPresent(classification ->
-                        entry.setField(FieldName.EPRINTCLASS, classification)
+                        entry.setField(StandardField.EPRINTCLASS, classification)
                              .ifPresent(changes::add)
                 );
 
                 entry.clearField(field)
                      .ifPresent(changes::add);
 
-                if (field.equals(FieldName.URL)) {
+                if (field.equals(StandardField.URL)) {
                     // If we clear the URL field, we should also clear the URL-date field
-                    entry.clearField(FieldName.URLDATE)
+                    entry.clearField(StandardField.URLDATE)
                          .ifPresent(changes::add);
                 }
             }

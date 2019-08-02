@@ -16,7 +16,7 @@ import org.jabref.model.auxparser.AuxParser;
 import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +147,7 @@ public class DefaultAuxParser implements AuxParser {
      * Resolves and adds CrossRef entries
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
-        entry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
+        entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
             if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 

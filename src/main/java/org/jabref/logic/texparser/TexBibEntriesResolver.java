@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
 
@@ -45,7 +45,7 @@ public class TexBibEntriesResolver {
      * Find cross references for inserting into the list of new entries.
      */
     private void resolveCrossReferences(TexBibEntriesResolverResult result, BibEntry entry) {
-        entry.getField(FieldName.CROSSREF).ifPresent(crossRef -> {
+        entry.getField(StandardField.CROSSREF).ifPresent(crossRef -> {
             if (!result.checkEntryNewDatabase(crossRef)) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossRef);
 

@@ -9,8 +9,9 @@ import java.util.Objects;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -88,21 +89,21 @@ public class CSLAdapter {
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
-            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
+            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
             HTMLChars latexToHtmlConverter = new HTMLChars();
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
-            for (String key : bibEntry.getFieldMap().keySet()) {
+            for (Field key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
-                            if (FieldName.MONTH.equals(key)) {
+                            if (StandardField.MONTH.equals(key)) {
                                 // Change month from #mon# to mon because CSL does not support the former format
                                 value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
-                            bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
+                            bibTeXEntry.addField(new Key(key.getName()), new DigitStringValue(value));
                         });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);

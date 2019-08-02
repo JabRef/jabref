@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,14 @@ class OpenAccessDoiTest {
 
     @Test
     void findByDOI() throws IOException {
-        entry.setField("doi", "10.1038/nature12373");
+        entry.setField(StandardField.DOI, "10.1038/nature12373");
 
         assertEquals(Optional.of(new URL("https://dash.harvard.edu/bitstream/handle/1/12285462/Nanometer-Scale%20Thermometry.pdf?sequence=1")), finder.findFullText(entry));
     }
 
     @Test
     void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1186/unknown-doi");
+        entry.setField(StandardField.DOI, "10.1186/unknown-doi");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }

@@ -22,9 +22,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -153,21 +151,14 @@ public class JabRefMain extends Application {
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {
-        // Update handling of special fields based on preferences
-        InternalBibtexFields.updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
-        // Update name of the time stamp field based on preferences
-        InternalBibtexFields.updateTimeStampField(Globals.prefs.getTimestampPreferences().getTimestampField());
-        // Update which fields should be treated as numeric, based on preferences:
-        InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
-
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
-        EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                                        preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+        Globals.entryTypesManager.addCustomizedEntryTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader

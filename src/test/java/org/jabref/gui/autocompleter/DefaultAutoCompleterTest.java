@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class DefaultAutoCompleterTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        autoCompleter = new WordSuggestionProvider("field");
+        autoCompleter = new WordSuggestionProvider(StandardField.TITLE);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "testTitle");
+        entry.setField(StandardField.AUTHOR, "testAuthor");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
@@ -63,7 +64,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
+        entry.setField(StandardField.TITLE, "testValue");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
@@ -71,9 +72,9 @@ public class DefaultAutoCompleterTest {
     }
 
     @Test
-    public void completeBeginnigOfValueReturnsValue() {
+    public void completeBeginningOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
+        entry.setField(StandardField.TITLE, "testValue");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
@@ -83,7 +84,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeLowercaseValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
+        entry.setField(StandardField.TITLE, "testValue");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testvalue")));
@@ -93,7 +94,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
+        entry.setField(StandardField.TITLE, "testKey");
         autoCompleter.indexEntry(entry);
 
         assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest((null))));
@@ -102,7 +103,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeEmptyStringReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
+        entry.setField(StandardField.TITLE, "testKey");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("")));
@@ -112,10 +113,10 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
-        entryOne.setField("field", "testValueOne");
+        entryOne.setField(StandardField.TITLE, "testValueOne");
         autoCompleter.indexEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
-        entryTwo.setField("field", "testValueTwo");
+        entryTwo.setField(StandardField.TITLE, "testValueTwo");
         autoCompleter.indexEntry(entryTwo);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
@@ -125,7 +126,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeShortStringReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "val");
+        entry.setField(StandardField.TITLE, "val");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("va")));
@@ -135,7 +136,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeBeginnigOfSecondWordReturnsWord() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "test value");
+        entry.setField(StandardField.TITLE, "test value");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("val")));
@@ -145,7 +146,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completePartOfWordReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "test value");
+        entry.setField(StandardField.TITLE, "test value");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("lue")));

@@ -322,7 +322,7 @@ public class URLDownload {
                     || (status == HttpURLConnection.HTTP_MOVED_PERM)
                     || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("Location");
+                    String newUrl = connection.getHeaderField("location");
                     // open the new connnection again
                     connection = new URLDownload(newUrl).openConnection();
                 }

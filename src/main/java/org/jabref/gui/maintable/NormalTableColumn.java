@@ -1,9 +1,6 @@
 package org.jabref.gui.maintable;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -16,13 +13,14 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 
 public class NormalTableColumn extends MainTableColumn<String> {
 
-    private final List<String> bibtexFields;
+    private final OrFields bibtexFields;
 
     private final boolean isIconColumn;
 
@@ -33,10 +31,10 @@ public class NormalTableColumn extends MainTableColumn<String> {
     private final LayoutFormatter toUnicode = new LatexToUnicodeFormatter();
     private final String columnName;
 
-    public NormalTableColumn(String columnName, List<String> bibtexFields, BibDatabase database) {
+    public NormalTableColumn(String columnName, OrFields bibtexFields, BibDatabase database) {
         super(columnName);
         this.columnName = columnName;
-        this.bibtexFields = Collections.unmodifiableList(bibtexFields);
+        this.bibtexFields = bibtexFields;
         this.isIconColumn = false;
         this.iconLabel = Optional.empty();
         this.database = Optional.of(database);
@@ -48,27 +46,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
      * @return name to be displayed. null if field is empty.
      */
     public String getDisplayName() {
-        if (bibtexFields.isEmpty()) {
-            return null;
-        }
-
-        StringJoiner joiner = new StringJoiner(FieldName.FIELD_SEPARATOR);
-        for (String field : bibtexFields) {
-            joiner.add(field);
-        }
-        return joiner.toString();
-    }
-
-    public List<String> getBibtexFields() {
-        return bibtexFields;
-    }
-
-    public boolean isIconColumn() {
-        return isIconColumn;
-    }
-
-    public boolean isFileFilter() {
-        return false; // Overridden in SpecialMainTableColumns for file filter columns
+        return bibtexFields.getDisplayName();
     }
 
     @Override
@@ -77,7 +55,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             return null;
         }
 
-        ObjectBinding<String>[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
+        ObjectBinding<Field>[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
         return Bindings.createStringBinding(() -> computeText(entry), dependencies);
     }
 
@@ -85,10 +63,10 @@ public class NormalTableColumn extends MainTableColumn<String> {
         boolean isNameColumn = false;
 
         Optional<String> content = Optional.empty();
-        for (String field : bibtexFields) {
+        for (Field field : bibtexFields) {
             content = entry.getResolvedFieldOrAlias(field, database.orElse(null));
             if (content.isPresent()) {
-                isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
+                isNameColumn = field.getProperties().contains(FieldProperty.PERSON_NAMES);
                 break;
             }
         }
@@ -99,7 +77,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
             result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
-        if ((result != null) && !bibtexFields.contains(BibEntry.KEY_FIELD)) {
+        if ((result != null) && !bibtexFields.contains(InternalField.KEY_FIELD)) {
             result = toUnicode.format(result).trim();
         }
         return result;
@@ -131,10 +109,10 @@ public class NormalTableColumn extends MainTableColumn<String> {
 
         Optional<String> resolvedFieldContent = Optional.empty();
         Optional<String> plainFieldContent = Optional.empty();
-        for (String field : bibtexFields) {
+        for (Field field : bibtexFields) {
             // entry type or bibtex key will never be resolved
-            if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)
-                    || BibEntry.KEY_FIELD.equals(field)) {
+            if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)
+                    || InternalField.KEY_FIELD.equals(field)) {
                 return false;
             } else {
                 plainFieldContent = entry.getField(field);

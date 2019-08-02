@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
@@ -70,13 +70,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<String> doi = entry.getField(FieldName.DOI);
+        Optional<String> doi = entry.getField(StandardField.DOI);
         if (doi.isPresent()) {
             return OptionalUtil.toList(performSearchById(doi.get()));
         } else {

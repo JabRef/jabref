@@ -3,13 +3,12 @@ package org.jabref.logic;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
  * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
@@ -37,9 +36,10 @@ public class TypedBibEntry {
     /**
      * Returns true if this entry contains the fields it needs to be
      * complete.
+     * @param entryTypesManager
      */
-    public boolean hasAllRequiredFields() {
-        Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
+    public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
@@ -51,11 +51,6 @@ public class TypedBibEntry {
      * Gets the display name for the type of the entry.
      */
     public String getTypeForDisplay() {
-        Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), mode);
-        if (entryType.isPresent()) {
-            return entryType.get().getName();
-        } else {
-            return StringUtil.capitalizeFirst(entry.getType());
-        }
+        return entry.getType().getDisplayName();
     }
 }

@@ -12,8 +12,10 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
@@ -24,8 +26,8 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
-    public BibtexDatabaseWriter(Writer writer, SavePreferences preferences) {
-        super(writer, preferences);
+    public BibtexDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
+        super(writer, preferences, entryTypesManager);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
             try {
                 String formatted = new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
                         .format(bibtexString.getContent(),
-                                LatexFieldFormatter.BIBTEX_STRING);
+                                InternalField.BIBTEX_STRING);
                 writer.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
@@ -96,10 +98,10 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeEntryTypeDefinition(CustomEntryType customType) throws IOException {
+    protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
         writer.write(OS.NEWLINE);
         writer.write(COMMENT_PREFIX + "{");
-        writer.write(customType.getAsString());
+        writer.write(BibEntryTypesManager.serialize(customType));
         writer.write("}");
         writer.write(OS.NEWLINE);
     }
@@ -128,7 +130,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()), true);
+                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()), entryTypesManager);
         bibtexEntryWriter.write(entry, writer, mode, preferences.isReformatFile());
     }
 }

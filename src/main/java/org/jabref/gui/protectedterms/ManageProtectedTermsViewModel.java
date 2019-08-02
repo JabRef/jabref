@@ -73,7 +73,7 @@ public class ManageProtectedTermsViewModel {
     }
 
     public void edit(ProtectedTermsList file) {
-        Optional<ExternalFileType> termsFileType = OptionalUtil.orElse(
+        Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
                 ExternalFileTypes.getInstance().getExternalFileTypeByExt("terms"),
                 ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt")
         );
