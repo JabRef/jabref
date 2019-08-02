@@ -261,7 +261,7 @@ public class TemplateExporter extends Exporter {
                 if (layouts.containsKey(type)) {
                     layout = layouts.get(type);
                 } else {
-                    try (Reader reader = getReader(lfFileName + '.' + type + LAYOUT_EXTENSION)) {
+                    try (Reader reader = getReader(lfFileName + '.' + type.getName() + LAYOUT_EXTENSION)) {
                         // We try to get a type-specific layout for this entry.
                         layoutHelper = new LayoutHelper(reader, layoutPreferences);
                         layout = layoutHelper.getLayoutFromText();

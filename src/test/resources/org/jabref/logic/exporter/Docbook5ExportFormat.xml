@@ -16,6 +16,19 @@
    <!--TITLE-->
            <citetitle pubwork="book">my paper title</citetitle> 
     
+<!--BOOK booktitle, edition, (pages), publisher-->
+    <biblioset relation="book">
+        
+		
+        <pubdate>2018</pubdate>
+        
+        
+		<publishername></publishername>
+        <address></address>
+        
+	</biblioset>
+    
+    
 <!-- IDENTIFIERS-->
     
     

@@ -76,7 +76,6 @@ public class DocBook5ExporterTest {
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .normalizeWhitespace()
-                                       .ignoreComments()
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }
