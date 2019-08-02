@@ -41,15 +41,12 @@ public class PreviewTabView extends AbstractPreferenceTabView implements Prefere
 
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;
-
     @FXML private Button toRightButton;
     @FXML private Button toLeftButton;
     @FXML private Button sortUpButton;
     @FXML private Button sortDownButton;
-
     @FXML private Label readOnlyLabel;
     @FXML private Button resetDefaultButton;
-
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
 
@@ -91,8 +88,8 @@ public class PreviewTabView extends AbstractPreferenceTabView implements Prefere
     }
 
     public PreviewTabView(JabRefPreferences preferences) {
-        super(preferences);
-        ViewLoader.view(this)
+        this.preferences = preferences;
+                ViewLoader.view(this)
                   .root(this)
                   .load();
     }

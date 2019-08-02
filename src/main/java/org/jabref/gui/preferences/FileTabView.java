@@ -48,16 +48,15 @@ public class FileTabView extends AbstractPreferenceTabView implements Preference
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public FileTabView(JabRefPreferences preferences) {
-        super(preferences);
+        this.preferences = preferences;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
     @Override
-    public String getTabName() {
-        return Localization.lang("File");
-    }
+    public String getTabName() { return Localization.lang("File"); }
 
     public void initialize() {
         FileTabViewModel viewModel = new FileTabViewModel(dialogService, preferences);

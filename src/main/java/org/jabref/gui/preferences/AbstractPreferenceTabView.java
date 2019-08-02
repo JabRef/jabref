@@ -15,13 +15,10 @@ public abstract class AbstractPreferenceTabView extends VBox implements Preferen
 
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected DialogService dialogService;
-    protected final JabRefPreferences preferences;
 
     protected PreferenceTabViewModel viewModel;
 
-    public AbstractPreferenceTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
-    }
+    protected JabRefPreferences preferences;
 
     @Override
     public Node getBuilder() { return this; }

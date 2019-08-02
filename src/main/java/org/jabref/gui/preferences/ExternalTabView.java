@@ -43,17 +43,16 @@ public class ExternalTabView extends AbstractPreferenceTabView implements Prefer
     private final JabRefFrame frame;
 
     public ExternalTabView(JabRefPreferences preferences, JabRefFrame frame) {
-        super(preferences);
+        this.preferences = preferences;
         this.frame = frame;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
     @Override
-    public String getTabName() {
-        return Localization.lang("External programs");
-    }
+    public String getTabName() { return Localization.lang("External programs"); }
 
     public void initialize() {
         ExternalTabViewModel externalTabViewModel = new ExternalTabViewModel(dialogService, preferences, frame);

@@ -20,7 +20,8 @@ public class GroupsTabView extends AbstractPreferenceTabView implements Preferen
     @FXML private TextField keywordSeparator;
 
     public GroupsTabView(JabRefPreferences preferences) {
-        super(preferences);
+        this.preferences = preferences;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();

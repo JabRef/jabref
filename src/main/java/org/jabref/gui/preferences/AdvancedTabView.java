@@ -51,7 +51,8 @@ public class AdvancedTabView extends AbstractPreferenceTabView implements Prefer
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public AdvancedTabView(JabRefPreferences preferences) {
-        super(preferences);
+        this.preferences = preferences;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();

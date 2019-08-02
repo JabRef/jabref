@@ -52,16 +52,15 @@ public class GeneralTabView extends AbstractPreferenceTabView implements Prefere
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTabView(JabRefPreferences preferences) {
-        super(preferences);
+        this.preferences = preferences;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
     @Override
-    public String getTabName() {
-        return Localization.lang("General");
-    }
+    public String getTabName() { return Localization.lang("General"); }
 
     public void initialize() {
         GeneralTabViewModel generalTabViewModel = new GeneralTabViewModel(dialogService, preferences);
@@ -105,7 +104,7 @@ public class GeneralTabView extends AbstractPreferenceTabView implements Prefere
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP), markTimeStampHelp);
 
-         validationVisualizer.setDecoration(new IconValidationDecorator());
+        validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(generalTabViewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat));
     }
 }
