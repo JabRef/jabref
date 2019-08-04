@@ -1,7 +1,6 @@
 package org.jabref.gui.texparser;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -19,7 +18,8 @@ public class ParseTexResultView extends BaseDialog<Void> {
     private final TexParserResult texParserResult;
     private final Path basePath;
     @FXML private ListView<ReferenceViewModel> referenceListView;
-    @FXML private ListView<CitationViewModel> citationListView;
+    @FXML private CitationsDisplay citationsDisplay;
+    private ParseTexResultViewModel viewModel;
 
     public ParseTexResultView(TexParserResult texParserResult, Path basePath) {
         this.texParserResult = texParserResult;
@@ -32,7 +32,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        ParseTexResultViewModel viewModel = new ParseTexResultViewModel(texParserResult);
+        viewModel = new ParseTexResultViewModel(texParserResult);
 
         referenceListView.setItems(viewModel.getReferenceList());
         referenceListView.getSelectionModel().selectFirst();
@@ -40,12 +40,10 @@ public class ParseTexResultView extends BaseDialog<Void> {
                 .withText(ReferenceViewModel::getDisplayText)
                 .install(referenceListView);
 
-        citationListView.setItems(viewModel.getCitationListByReference());
-        new ViewModelListCellFactory<CitationViewModel>()
-                .withGraphic(citation -> citation.getDisplayGraphic(basePath, Optional.of(citationListView.getWidth() - 50)))
-                .install(citationListView);
-
         EasyBind.subscribe(referenceListView.getSelectionModel().selectedItemProperty(),
                 viewModel::activeReferenceChanged);
+
+        citationsDisplay.basePathProperty().set(basePath);
+        citationsDisplay.setItems(viewModel.getCitationListByReference());
     }
 }

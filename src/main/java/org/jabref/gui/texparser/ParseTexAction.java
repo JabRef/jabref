@@ -11,7 +11,6 @@ public class ParseTexAction extends SimpleCommand {
 
     public ParseTexAction(StateManager stateManager) {
         this.stateManager = stateManager;
-
         executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
@@ -19,7 +18,6 @@ public class ParseTexAction extends SimpleCommand {
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(NullPointerException::new);
         ParseTexDialogView dialog = new ParseTexDialogView(database);
-
         dialog.showAndWait();
     }
 }

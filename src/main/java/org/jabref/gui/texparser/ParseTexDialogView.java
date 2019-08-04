@@ -67,25 +67,23 @@ public class ParseTexDialogView extends BaseDialog<Void> {
         fileTreeView.rootProperty().bind(EasyBind.map(viewModel.rootProperty(), fileNode ->
                 new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
+        new ViewModelTreeCellFactory<FileNodeViewModel>()
+                .withText(FileNodeViewModel::getDisplayText)
+                .install(fileTreeView);
+
         EasyBind.subscribe(fileTreeView.rootProperty(), root -> {
             ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
             root.setExpanded(true);
             EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
         });
 
-        new ViewModelTreeCellFactory<FileNodeViewModel>()
-                .withText(FileNodeViewModel::getDisplayText)
-                .install(fileTreeView);
-
         texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
         validationVisualizer.setDecoration(new IconValidationDecorator());
         validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField);
-
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
         searchButton.disableProperty().bind(viewModel.texDirectoryValidation().validProperty().not());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
-
         progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());
     }
 

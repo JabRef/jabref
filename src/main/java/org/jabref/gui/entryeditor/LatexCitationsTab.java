@@ -1,18 +1,22 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,14 +28,16 @@ import org.fxmisc.easybind.EasyBind;
 public class LatexCitationsTab extends EntryEditorTab {
 
     private final LatexCitationsTabViewModel viewModel;
-    private final StackPane searchPane;
+    private final GridPane searchPane;
     private final ProgressIndicator progressIndicator;
+    private final CitationsDisplay citationsDisplay;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                              TaskExecutor taskExecutor, DialogService dialogService) {
         this.viewModel = new LatexCitationsTabViewModel(databaseContext, preferencesService, taskExecutor, dialogService);
-        this.searchPane = new StackPane();
+        this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
+        this.citationsDisplay = new CitationsDisplay();
 
         setText(Localization.lang("LaTeX Citations"));
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
@@ -41,81 +47,79 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private void setSearchPane() {
         progressIndicator.setMaxSize(100, 100);
-        searchPane.getStyleClass().add("related-articles-tab");
+        citationsDisplay.basePathProperty().bindBidirectional(viewModel.directoryProperty());
+        citationsDisplay.setItems(viewModel.getCitationList());
 
+        RowConstraints mainRow = new RowConstraints();
+        mainRow.setVgrow(Priority.ALWAYS);
+
+        RowConstraints bottomRow = new RowConstraints(40);
+        bottomRow.setVgrow(Priority.NEVER);
+
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(100);
+        column.setHalignment(HPos.CENTER);
+
+        searchPane.getColumnConstraints().setAll(column);
+        searchPane.getRowConstraints().setAll(mainRow, bottomRow);
         setContent(searchPane);
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
+            searchPane.getChildren().clear();
             switch (status) {
                 case IN_PROGRESS:
-                    searchPane.getChildren().setAll(progressIndicator);
+                    searchPane.add(progressIndicator, 0, 0);
                     break;
                 case CITATIONS_FOUND:
-                    searchPane.getChildren().setAll(getCitationsPane());
+                    searchPane.add(getCitationsPane(), 0, 0);
                     break;
                 case NO_RESULTS:
-                    searchPane.getChildren().setAll(getNotFoundPane());
+                    searchPane.add(getNotFoundPane(), 0, 0);
                     break;
                 case ERROR:
-                    searchPane.getChildren().setAll(getErrorPane());
+                    searchPane.add(getErrorPane(), 0, 0);
                     break;
             }
+            searchPane.add(getLatexDirectoryBox(), 0, 1);
         });
     }
 
-    private VBox getLatexDirectoryBox() {
-        Text latexDirectoryText = new Text(String.format("%n%n%s: %s", Localization.lang("Current search directory"),
-                viewModel.directoryProperty().get()));
-        latexDirectoryText.setStyle("-fx-font-weight: bold;");
+    private HBox getLatexDirectoryBox() {
+        Text latexDirectoryText = new Text(Localization.lang("Current search directory:"));
+        latexDirectoryText.setStyle("-fx-font-size: 0.9em;-fx-padding: 0;");
+        Text latexDirectoryPath = new Text(viewModel.directoryProperty().get().toString());
+        latexDirectoryPath.setStyle("-fx-font-family: 'Courier New', Courier, monospace;-fx-font-size: 0.9em;-fx-font-weight: bold;");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
+        latexDirectoryButton.setStyle("-fx-border-width: 1;-fx-font-size: 0.85em;-fx-padding: 0.2em;");
+        latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
-
-        return new VBox(15, latexDirectoryText, latexDirectoryButton);
+        HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);
+        latexDirectoryBox.setAlignment(Pos.CENTER);
+        return latexDirectoryBox;
     }
 
-    private ScrollPane getCitationsPane() {
-        Text titleText = new Text(Localization.lang("Citations found"));
-        titleText.getStyleClass().add("recommendation-heading");
-
-        VBox citationsBox = new VBox(20, titleText);
-        citationsBox.getChildren().addAll(viewModel.getCitationList().stream().map(
-                citation -> citation.getDisplayGraphic(viewModel.directoryProperty().get(), Optional.empty())).collect(Collectors.toList()));
-
-        citationsBox.getChildren().add(getLatexDirectoryBox());
-
-        ScrollPane citationsPane = new ScrollPane();
-        citationsPane.setContent(citationsBox);
-
-        return citationsPane;
+    private VBox getCitationsPane() {
+        VBox citationsBox = new VBox(30, citationsDisplay);
+        citationsBox.setStyle("-fx-padding: 0;");
+        return citationsBox;
     }
 
-    private ScrollPane getNotFoundPane() {
-        Text notFoundTitleText = new Text(Localization.lang("No citations found"));
-        notFoundTitleText.getStyleClass().add("recommendation-heading");
-
+    private VBox getNotFoundPane() {
+        Label titleLabel = new Label(Localization.lang("No citations found"));
+        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -jr-theme-text;");
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
-        notFoundText.setStyle("-fx-font-size: 110%;");
-
-        VBox notFoundBox = new VBox(20, notFoundTitleText, notFoundText, getLatexDirectoryBox());
-        ScrollPane notFoundPane = new ScrollPane();
-        notFoundPane.setContent(notFoundBox);
-
-        return notFoundPane;
+        VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
+        notFoundBox.setStyle("-fx-padding: 30 0 0 30;");
+        return notFoundBox;
     }
 
-    private ScrollPane getErrorPane() {
-        Text errorTitleText = new Text(Localization.lang("Error"));
-        errorTitleText.setStyle("-fx-fill: -fx-accent;");
-        errorTitleText.getStyleClass().add("recommendation-heading");
-
+    private VBox getErrorPane() {
+        Label titleLabel = new Label(Localization.lang("Error"));
+        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -fx-accent;");
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
-        errorMessageText.setStyle("-fx-font-family: monospace;-fx-font-size: 120%;");
-
-        VBox errorBox = new VBox(20, errorTitleText, errorMessageText, getLatexDirectoryBox());
-        ScrollPane errorPane = new ScrollPane();
-        errorPane.setContent(errorBox);
-
-        return errorPane;
+        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
+        errorMessageBox.setStyle("-fx-padding: 30 0 0 30;");
+        return errorMessageBox;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.texparser.CitationViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
@@ -29,6 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 import org.jabref.preferences.PreferencesService;
 
@@ -51,11 +52,12 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final ObjectProperty<Path> directory;
-    private final ObservableList<CitationViewModel> citationList;
+    private final ObservableList<Citation> citationList;
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
     private Future<?> searchTask;
     private TexParserResult texParserResult;
+    private BibEntry currentEntry;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
                                       TaskExecutor taskExecutor, DialogService dialogService) {
@@ -63,7 +65,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(null);
+        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+                                                                   .orElseGet(preferencesService::getWorkingDir));
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
@@ -72,6 +75,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     public void init(BibEntry entry) {
         cancelSearch();
 
+        currentEntry = entry;
         Optional<String> citeKey = entry.getCiteKeyOptional();
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
@@ -85,7 +89,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         return directory;
     }
 
-    public ObservableList<CitationViewModel> getCitationList() {
+    public ObservableList<Citation> getCitationList() {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
@@ -100,7 +104,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private void startSearch(String citeKey) {
         searchTask = BackgroundTask.wrap(() -> searchAndParse(citeKey))
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
-                                   .onSuccess(status::set)
+                                   .onSuccess(result -> {
+                                       citationList.setAll(result);
+                                       status.set(citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND);
+                                   })
                                    .onFailure(error -> {
                                        searchError.set(error.getMessage());
                                        status.set(Status.ERROR);
@@ -117,14 +124,14 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    private Status searchAndParse(String citeKey) throws IOException {
+    private Collection<Citation> searchAndParse(String citeKey) throws IOException {
         Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                            .orElseGet(preferencesService::getWorkingDir);
 
         if (texParserResult == null || !newDirectory.equals(directory.get())) {
             directory.set(newDirectory);
 
-            if (Files.notExists(newDirectory)) {
+            if (!newDirectory.toFile().exists()) {
                 throw new IOException(String.format("Current search directory does not exist: %s", newDirectory));
             }
 
@@ -132,9 +139,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             texParserResult = new DefaultTexParser().parse(texFiles);
         }
 
-        citationList.setAll(texParserResult.getCitationsByKey(citeKey).stream().map(CitationViewModel::new).collect(Collectors.toList()));
-
-        return citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND;
+        return texParserResult.getCitationsByKey(citeKey);
     }
 
     private List<Path> searchDirectory(Path directory, List<Path> texFiles) {
@@ -142,7 +147,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.error(String.format("Error searching files: %s", e.getMessage()));
+            LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
             return texFiles;
         }
 
@@ -163,6 +168,8 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
                 databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
+
+        init(currentEntry);
     }
 
     public boolean shouldShow() {

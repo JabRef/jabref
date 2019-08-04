@@ -23,13 +23,11 @@ import org.slf4j.LoggerFactory;
 public class DefaultTexParser implements TexParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTexParser.class);
+    private static final String TEX_EXT = ".tex";
 
     /**
      * It is allowed to add new cite commands for pattern matching.
-     *
-     * <p>Some valid examples: "citep", "[cC]ite", "[cC]ite(author|title|year|t|p)?"
-     *
-     * <p>TODO: Add support for multicite commands.
+     * Some valid examples: "citep", "[cC]ite", and "[cC]ite(author|title|year|t|p)?".
      */
     private static final String[] CITE_COMMANDS = {
             "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
@@ -44,8 +42,6 @@ public class DefaultTexParser implements TexParser {
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP));
-
-    private static final String TEX_EXT = ".tex";
 
     private final TexParserResult texParserResult;
 
@@ -71,11 +67,10 @@ public class DefaultTexParser implements TexParser {
     @Override
     public TexParserResult parse(List<Path> texFiles) {
         texParserResult.addFiles(texFiles);
-
         List<Path> referencedFiles = new ArrayList<>();
 
         for (Path file : texFiles) {
-            if (Files.notExists(file)) {
+            if (!file.toFile().exists()) {
                 LOGGER.error(String.format("File does not exist: %s", file));
                 continue;
             }
@@ -93,7 +88,7 @@ public class DefaultTexParser implements TexParser {
                 LOGGER.error("Parsing has been interrupted");
                 return null;
             } catch (IOException | UncheckedIOException e) {
-                LOGGER.error(String.format("Error searching files: %s", e.getMessage()));
+                LOGGER.error(String.format("%s while parsing files: %s", e.getClass().getName(), e.getMessage()));
             }
         }
 
@@ -126,7 +121,7 @@ public class DefaultTexParser implements TexParser {
         while (includeMatch.find()) {
             String include = includeMatch.group(INCLUDE_GROUP);
 
-            Path inputFile = file.toAbsolutePath().getParent().resolve(
+            Path inputFile = file.getParent().resolve(
                     include.endsWith(TEX_EXT)
                             ? include
                             : String.format("%s%s", include, TEX_EXT));
