@@ -64,7 +64,11 @@ public class Citation {
                 : lineLength - CONTEXT_WIDTH);
         int end = Math.min(lineLength, start + CONTEXT_WIDTH);
 
-        return lineText.substring(start, end);
+        // Add three dots when the string does not contain all the line.
+        return String.format("%s%s%s",
+                (start > 0) ? "... " : "",
+                lineText.substring(start, end).trim(),
+                (end < lineLength) ? " ..." : "");
     }
 
     @Override

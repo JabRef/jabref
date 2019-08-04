@@ -1,7 +1,6 @@
 package org.jabref.gui.texparser;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -12,16 +11,16 @@ import org.jabref.model.texparser.Citation;
 public class ReferenceViewModel {
 
     private final String entry;
-    private final ObservableList<CitationViewModel> citationList;
+    private final ObservableList<Citation> citationList;
 
     public ReferenceViewModel(String entry, Collection<Citation> citationColl) {
         this.entry = entry;
         this.citationList = FXCollections.observableArrayList();
 
-        citationList.setAll(citationColl.stream().map(CitationViewModel::new).collect(Collectors.toList()));
+        citationList.setAll(citationColl);
     }
 
-    public ObservableList<CitationViewModel> getCitationList() {
+    public ObservableList<Citation> getCitationList() {
         return new ReadOnlyListWrapper<>(citationList);
     }
 
