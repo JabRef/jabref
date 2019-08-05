@@ -78,7 +78,7 @@ public class DefaultTexParser implements TexParser {
             try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
                 for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                     // Skip comments and blank lines.
-                    if (line.isEmpty() || line.charAt(0) == '%') {
+                    if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
                         continue;
                     }
                     matchCitation(file, lineNumberReader.getLineNumber(), line);
@@ -121,13 +121,18 @@ public class DefaultTexParser implements TexParser {
         while (includeMatch.find()) {
             String include = includeMatch.group(INCLUDE_GROUP);
 
-            Path inputFile = file.getParent().resolve(
+            Path nestedFile = file.getParent().resolve(
                     include.endsWith(TEX_EXT)
                             ? include
                             : String.format("%s%s", include, TEX_EXT));
 
-            if (!texFiles.contains(inputFile)) {
-                referencedFiles.add(inputFile);
+            if (!nestedFile.toFile().exists()) {
+                LOGGER.error(String.format("Nested file does not exist: %s", nestedFile));
+                continue;
+            }
+
+            if (!texFiles.contains(nestedFile)) {
+                referencedFiles.add(nestedFile);
             }
         }
     }
