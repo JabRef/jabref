@@ -126,12 +126,7 @@ public class DefaultTexParser implements TexParser {
                             ? include
                             : String.format("%s%s", include, TEX_EXT));
 
-            if (!nestedFile.toFile().exists()) {
-                LOGGER.error(String.format("Nested file does not exist: %s", nestedFile));
-                continue;
-            }
-
-            if (!texFiles.contains(nestedFile)) {
+            if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
                 referencedFiles.add(nestedFile);
             }
         }
