@@ -94,7 +94,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.16'
     compile 'org.apache.pdfbox:xmpbox:2.0.16'
 
-    compile group: 'org.apache.tika', name: 'tika-core', version: '1.21'
+    compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.62'
@@ -155,7 +155,7 @@ dependencies {
     errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.0'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
