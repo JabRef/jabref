@@ -40,6 +40,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
                 trackExecute(getActionName(action, command));
             } else {
                 trackExecute(getActionName(action, command) + "From" + source);
+                System.out.println(getActionName(action, command) + "From" + source);
             }
         });
 
@@ -55,15 +56,20 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         if (command.getClass().isAnonymousClass()) {
             return action.getText();
         } else {
-            String ans = command.getClass().getSimpleName();
-            if (ans.contains("OldDatabaseCommandWrapper")) {
-                OldDatabaseCommandWrapper tmp = (OldDatabaseCommandWrapper) command;
-                return tmp.getActions().toString();
-            } else if (ans.contains("EditAction")) {
+            String commandName = command.getClass().getSimpleName();
+            if ((command instanceof OldDatabaseCommandWrapper) || commandName.contains("EditAction")) {
                 return command.toString();
             } else {
-                return command.getClass().getSimpleName();
+                return commandName;
             }
+            //            if (ans.contains("OldDatabaseCommandWrapper")) {
+            //                OldDatabaseCommandWrapper tmp = (OldDatabaseCommandWrapper) command;
+            //                return tmp.getActions().toString();
+            //            } else if (ans.contains("EditAction")) {
+            //                return command.toString();
+            //            } else {
+            //                return command.getClass().getSimpleName();
+            //            }
         }
     }
 

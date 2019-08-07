@@ -51,8 +51,13 @@ public class OldDatabaseCommandWrapper extends CommandBase {
         return 0;
     }
 
-    public Actions getActions() {
-        return this.command;
+//    public Actions getActions() {
+//        return this.command;
+//    }
+
+    @Override
+    public String toString() {
+        return this.command.toString();
     }
 
     @Override

@@ -1242,7 +1242,6 @@ public class JabRefFrame extends BorderPane {
 
         @Override
         public String toString() {
-            // TODO Auto-generated method stub
             return this.command.toString();
         }
 
