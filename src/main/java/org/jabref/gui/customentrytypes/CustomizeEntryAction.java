@@ -1,4 +1,4 @@
-package org.jabref.gui.BibEntryTypes;
+package org.jabref.gui.customentrytypes;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
