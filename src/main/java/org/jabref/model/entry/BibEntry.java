@@ -21,6 +21,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fileformat.bibtexml.Inproceedings;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntryEventSource;
@@ -133,18 +135,25 @@ public class BibEntry implements Cloneable {
             return getCiteKeyOptional();
         }
 
-        Optional<String> result = Optional.empty();
-        // If the entry has a crossref, try to look up the field in the
-        // referred entry: Do not do this for the bibtex key.
-        if (database != null) {
+        Optional<String> result = getFieldOrAlias(field);
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry: Do not do this for the bibtex key.
+        if (!result.isPresent() && (database != null)) {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
-            result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
-        }
-
-        // If this field is not set yet, try to look up the field in the
-        // main entry.
-        if (!result.isPresent()) {
-            result = getFieldOrAlias(field);
+            if (referred.isPresent()) {
+                result = referred.get().getFieldOrAlias(field);
+                if (!result.isPresent() && type.equals(StandardEntryType.InProceedings)) {
+                    if (field == StandardField.BOOKTITLE) {
+                        result = referred.get().getFieldOrAlias(StandardField.TITLE);
+                    }
+                    else if (field == StandardField.BOOKSUBTITLE) {
+                        result = referred.get().getFieldOrAlias(StandardField.SUBTITLE);
+                    }
+                    else if (field == StandardField.BOOKAUTHOR) {
+                        result = referred.get().getFieldOrAlias(StandardField.AUTHOR);
+                    }
+                }
+            }
         }
         return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
