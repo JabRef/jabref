@@ -145,7 +145,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
     compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.12.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.12.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.12.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.12.1'
     compile 'org.apache.logging.log4j:log4j-core:2.12.1'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
