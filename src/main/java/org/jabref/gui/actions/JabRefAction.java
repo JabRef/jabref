@@ -1,11 +1,12 @@
 package org.jabref.gui.actions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.binding.Bindings;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.model.strings.StringUtil;
-
 import de.saxsys.mvvmfx.utils.commands.Command;
 
 /**
@@ -31,16 +32,16 @@ class JabRefAction extends org.controlsfx.control.action.Action {
      * especially for the track execute when the action run the same function but from different source.
      * @param source is a string contains the source, for example "button"
      */
-    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, String source) {
+    public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, Sources source) {
         this(action, keyBindingRepository);
 
         setEventHandler(event -> {
             command.execute();
-            if (StringUtil.isNullOrEmpty(source)) {
+            if (source == null) {
                 trackExecute(getActionName(action, command));
             } else {
-                trackExecute(getActionName(action, command) + "From" + source);
-                System.out.println(getActionName(action, command) + "From" + source);
+                trackUserActionSource(getActionName(action, command), source);
+                System.out.println(getActionName(action, command) + source);
             }
         });
 
@@ -57,24 +58,24 @@ class JabRefAction extends org.controlsfx.control.action.Action {
             return action.getText();
         } else {
             String commandName = command.getClass().getSimpleName();
-            if ((command instanceof OldDatabaseCommandWrapper) || commandName.contains("EditAction")) {
+            if ((command instanceof OldDatabaseCommandWrapper) || (command instanceof OldCommandWrapper) || commandName.contains("EditAction")) {
                 return command.toString();
             } else {
                 return commandName;
             }
-            //            if (ans.contains("OldDatabaseCommandWrapper")) {
-            //                OldDatabaseCommandWrapper tmp = (OldDatabaseCommandWrapper) command;
-            //                return tmp.getActions().toString();
-            //            } else if (ans.contains("EditAction")) {
-            //                return command.toString();
-            //            } else {
-            //                return command.getClass().getSimpleName();
-            //            }
         }
     }
 
     private void trackExecute(String actionName) {
         Globals.getTelemetryClient()
                .ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName));
+    }
+
+    private void trackUserActionSource(String actionName, Sources source) {
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        properties.put("Source", source.toString());
+
+        Globals.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(actionName, properties, measurements));
     }
 }

@@ -74,7 +74,7 @@ public class ActionFactory {
     }
 
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
-        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository, "Menu"), menuItem);
+        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu), menuItem);
         setGraphic(menuItem, action);
 
         // Show tooltips
@@ -105,7 +105,7 @@ public class ActionFactory {
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, "Menu"));
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu));
         checkMenuItem.setSelected(selected);
         setGraphic(checkMenuItem, action);
 
@@ -127,7 +127,7 @@ public class ActionFactory {
     }
 
     public Button createIconButton(Action action, Command command) {
-        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository, "Button"), ActionUtils.ActionTextBehavior.HIDE);
+        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository, Sources.FromButton), ActionUtils.ActionTextBehavior.HIDE);
 
         button.getStyleClass().setAll("icon-button");
 
@@ -140,7 +140,7 @@ public class ActionFactory {
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.configureButton(
-                                    new JabRefAction(action, command, keyBindingRepository, "Button"),
+                                    new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 
