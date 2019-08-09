@@ -17,7 +17,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +66,6 @@ public class DocBook5ExporterTest {
     }
 
     @Test
-    @DisabledOnCIServer("Fails on CI for some reason")
     void testPerformExportForSingleEntry(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
@@ -77,6 +75,7 @@ public class DocBook5ExporterTest {
         Builder test = Input.from(Files.newInputStream(path));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
+                                       .normalizeWhitespace()
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }

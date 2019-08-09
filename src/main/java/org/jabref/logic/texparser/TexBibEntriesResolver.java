@@ -26,7 +26,7 @@ public class TexBibEntriesResolver {
         Set<String> keySet = result.getCitationsKeySet();
 
         for (String key : keySet) {
-            if (!result.checkEntryNewDatabase(key)) {
+            if (result.isNotKeyIntoNewEntries(key)) {
                 Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
                 if (entry.isPresent()) {
@@ -46,7 +46,7 @@ public class TexBibEntriesResolver {
      */
     private void resolveCrossReferences(TexBibEntriesResolverResult result, BibEntry entry) {
         entry.getField(StandardField.CROSSREF).ifPresent(crossRef -> {
-            if (!result.checkEntryNewDatabase(crossRef)) {
+            if (result.isNotKeyIntoNewEntries(crossRef)) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossRef);
 
                 if (refEntry.isPresent()) {

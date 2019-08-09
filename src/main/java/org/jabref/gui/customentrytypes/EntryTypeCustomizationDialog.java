@@ -1,4 +1,4 @@
-package org.jabref.gui.BibEntryTypes;
+package org.jabref.gui.customentrytypes;
 
 import org.jabref.gui.util.BaseDialog;
 
