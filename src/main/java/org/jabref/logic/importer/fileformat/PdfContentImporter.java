@@ -28,6 +28,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -242,7 +243,10 @@ public class PdfContentImporter extends Importer {
         // i points to the current line
         // curString (mostly) contains the current block
         //   the different lines are joined into one and thereby separated by " "
-        lines = firstpageContents.split(lineSeparator);
+
+        String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
+
+        lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
 
         lineIndex = 0; //to prevent array index out of bounds exception on second run we need to reset i to zero
 
@@ -272,7 +276,7 @@ public class PdfContentImporter extends Importer {
         // year is a class variable as the method extractYear() uses it;
         String publisher = null;
 
-        EntryType type = BibtexEntryTypes.INPROCEEDINGS;
+        EntryType type = StandardEntryType.InProceedings;
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
             extractYear();
@@ -465,7 +469,7 @@ public class PdfContentImporter extends Importer {
         // TODO: institution parsing missing
 
         if (author != null) {
-            entry.setField(FieldName.AUTHOR, author);
+            entry.setField(StandardField.AUTHOR, author);
         }
         if (editor != null) {
             entry.setField(StandardField.EDITOR, editor);

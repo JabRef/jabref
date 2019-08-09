@@ -65,7 +65,7 @@ class PdfContentImporterTest {
     @Test
     void testParsingEditorWithoutPagesorSeriesInformation() {
 
-        BibEntry entry = new BibEntry(BiblatexEntryTypes.INPROCEEDINGS);
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
         entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
         entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
         entry.setField(StandardField.PUBLISHER, "Springer");
