@@ -28,9 +28,9 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
@@ -120,7 +120,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
         // 1. Eprint
-        Optional<String> identifier = entry.getField(FieldName.EPRINT);
+        Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
@@ -133,13 +133,13 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         // 2. DOI and other fields
         String query;
 
-        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
+        Optional<String> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
         if (doi.isPresent()) {
             // Search for an entry in the ArXiv which is linked to the doi
             query = "doi:" + doi.get();
         } else {
-            Optional<String> authorQuery = entry.getField(FieldName.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(FieldName.TITLE).map(title -> "ti:" + title);
+            Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + title);
             query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
         }
 
@@ -149,7 +149,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
-            String entryTitle = entry.getField(FieldName.TITLE).orElse("");
+            String entryTitle = entry.getField(StandardField.TITLE).orElse("");
 
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
@@ -405,18 +405,17 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         public BibEntry toBibEntry(Character keywordDelimiter) {
-            BibEntry bibEntry = new BibEntry();
-            bibEntry.setType(BibtexEntryTypes.ARTICLE);
-            bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
-            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
+            BibEntry bibEntry = new BibEntry(StandardEntryType.Article);
+            bibEntry.setField(StandardField.EPRINTTYPE, "arXiv");
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", authorNames));
             bibEntry.addKeywords(categories, keywordDelimiter);
-            getIdString().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
-            title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
-            doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
-            abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
-            getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
-            primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
-            journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
+            getIdString().ifPresent(id -> bibEntry.setField(StandardField.EPRINT, id));
+            title.ifPresent(titleContent -> bibEntry.setField(StandardField.TITLE, titleContent));
+            doi.ifPresent(doiContent -> bibEntry.setField(StandardField.DOI, doiContent));
+            abstractText.ifPresent(abstractContent -> bibEntry.setField(StandardField.ABSTRACT, abstractContent));
+            getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
+            primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
+            journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNALTITLE, journal));
             getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }

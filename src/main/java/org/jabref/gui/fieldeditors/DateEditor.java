@@ -10,6 +10,7 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -18,8 +19,8 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private DateEditorViewModel viewModel;
     @FXML private TemporalAccessorPicker datePicker;
 
-    public DateEditor(String fieldName, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new DateEditorViewModel(fieldName, suggestionProvider, dateFormatter, fieldCheckers);
+    public DateEditor(Field field, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)

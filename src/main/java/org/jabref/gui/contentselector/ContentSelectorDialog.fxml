@@ -16,7 +16,7 @@
             <Label prefHeight="27.0" prefWidth="108.0" text="Field names" />
             <HBox prefHeight="140.0" prefWidth="385.0">
                <children>
-                  <ListView fx:id="fieldNamesListView" prefHeight="140.0" prefWidth="297.0"/>
+                   <ListView fx:id="fieldsListView" prefHeight="140.0" prefWidth="297.0"/>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Button fx:id="addFieldNameButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="%Add" onAction="#addNewFieldName">

@@ -20,9 +20,11 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -168,10 +170,10 @@ public class BracketedPattern {
                 // result the author
                 String authString;
                 if (database != null) {
-                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database)
-                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
+                                      .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 } else {
-                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
                 }
 
                 if (val.startsWith("pure")) {
@@ -184,10 +186,10 @@ public class BracketedPattern {
                     // special feature: A pattern starting with "auth" falls back to the editor
                     if (authString.isEmpty()) {
                         if (database != null) {
-                            authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database)
-                                    .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database)
+                                              .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                         } else {
-                            authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse("");
+                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                         }
                     }
                 }
@@ -235,41 +237,41 @@ public class BracketedPattern {
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""), num);
+                    return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authNofMth(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""),
+                    return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    return authAuthEa(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrshort".equals(val)) {
-                    return authshort(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
@@ -278,32 +280,32 @@ public class BracketedPattern {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("pageprefix".equals(val)) {
-                return pagePrefix(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return pagePrefix(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return lastPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("title".equals(val)) {
-                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("fulltitle".equals(val)) {
-                return entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("");
+                return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("");
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3,
-                        removeSmallWords(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")));
+                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
-                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")),
+                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1,
-                        removeSmallWords(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")));
+                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("camel".equals(val)) {
-                return getCamelizedTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(val)) {
-                String yearString = entry.getResolvedFieldOrAlias(FieldName.YEAR, database).orElse("");
+                String yearString = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).orElse("");
                 if (yearString.isEmpty()) {
                     return yearString;
                     // In press/in preparation/submitted
@@ -315,7 +317,7 @@ public class BracketedPattern {
                     return yearString;
                 }
             } else if ("entrytype".equals(val)) {
-                return entry.getResolvedFieldOrAlias(BibEntry.TYPE_HEADER, database).orElse("");
+                return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse("");
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
@@ -350,7 +352,7 @@ public class BracketedPattern {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
             }
         }
         catch (NullPointerException ex) {
@@ -740,7 +742,7 @@ public class BracketedPattern {
 
         String firstAuthor = tokens[0].split(",")[0];
         StringBuilder authorSB = new StringBuilder();
-        authorSB.append(firstAuthor.substring(0, Math.min(CHARS_OF_FIRST, firstAuthor.length())));
+        authorSB.append(firstAuthor, 0, Math.min(CHARS_OF_FIRST, firstAuthor.length()));
         int i = 1;
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname
@@ -1108,7 +1110,7 @@ public class BracketedPattern {
             }
         }
         tokens.add(token.toString());
-        StringBuilder normalized = new StringBuilder("");
+        StringBuilder normalized = new StringBuilder();
 
         for (int i = 0; i < tokens.size(); i++) {
             if (i > 0) {
@@ -1306,7 +1308,7 @@ public class BracketedPattern {
                 if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
-                if (FieldName.SCHOOL.equalsIgnoreCase(k)) {
+                if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
                 if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
@@ -1343,7 +1345,7 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !FieldName.SCHOOL.equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {

@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,10 +69,10 @@ public class PdfXmpImporterTest {
         assertEquals(1, bibEntries.size());
 
         BibEntry be0 = bibEntries.get(0);
-        assertEquals(Optional.of("how to annotate a pdf"), be0.getField("abstract"));
-        assertEquals(Optional.of("Chris"), be0.getField("author"));
-        assertEquals(Optional.of("pdf, annotation"), be0.getField("keywords"));
-        assertEquals(Optional.of("The best Pdf ever"), be0.getField("title"));
+        assertEquals(Optional.of("how to annotate a pdf"), be0.getField(StandardField.ABSTRACT));
+        assertEquals(Optional.of("Chris"), be0.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("pdf, annotation"), be0.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("The best Pdf ever"), be0.getField(StandardField.TITLE));
     }
 
     @Test

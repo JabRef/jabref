@@ -10,7 +10,6 @@ import javafx.scene.text.Text;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -24,7 +23,7 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
     private final CopyFilesDialogViewModel viewModel;
 
-    public CopyFilesDialogView(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency results) {
+    public CopyFilesDialogView(CopyFilesResultListDependency results) {
         this.setTitle(Localization.lang("Result"));
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK);

@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,7 +56,7 @@ public class XmpExporter extends Exporter {
                     entryFile = Paths.get(file.getParent().toString() + "/" + suffix);
                 }
 
-                this.writeBibToXmp(entryFile, Arrays.asList(entry), encoding);
+                this.writeBibToXmp(entryFile, Collections.singletonList(entry), encoding);
             }
         } else {
             this.writeBibToXmp(file, entries, encoding);

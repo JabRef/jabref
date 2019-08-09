@@ -23,8 +23,9 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -102,19 +103,19 @@ public class RightClickMenu {
 
     private static OldCommandWrapper getOpenUrlCommand(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_URL, panel);
-        command.setExecutable(isFieldSetForSelectedEntry(FieldName.URL, panel) || isFieldSetForSelectedEntry(FieldName.DOI, panel));
+        command.setExecutable(isFieldSetForSelectedEntry(StandardField.URL, panel) || isFieldSetForSelectedEntry(StandardField.DOI, panel));
         return command;
     }
 
     private static OldCommandWrapper getOpenExternalFileCommand(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_EXTERNAL_FILE, panel);
-        command.setExecutable(isFieldSetForSelectedEntry(FieldName.FILE, panel));
+        command.setExecutable(isFieldSetForSelectedEntry(StandardField.FILE, panel));
         return command;
     }
 
     private static OldCommandWrapper getOpenFolderCommand(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_FOLDER, panel);
-        command.setExecutable(isFieldSetForSelectedEntry(FieldName.FILE, panel));
+        command.setExecutable(isFieldSetForSelectedEntry(StandardField.FILE, panel));
         return command;
     }
 
@@ -145,14 +146,14 @@ public class RightClickMenu {
         return copySpecialMenu;
     }
 
-    private static boolean isFieldSetForSelectedEntry(String field, BasePanel panel) {
+    private static boolean isFieldSetForSelectedEntry(Field field, BasePanel panel) {
         return isAnyFieldSetForSelectedEntry(Collections.singletonList(field), panel);
     }
 
-    private static boolean isAnyFieldSetForSelectedEntry(List<String> fields, BasePanel panel) {
+    private static boolean isAnyFieldSetForSelectedEntry(List<Field> fields, BasePanel panel) {
         if (panel.getMainTable().getSelectedEntries().size() == 1) {
             BibEntry entry = panel.getMainTable().getSelectedEntries().get(0);
-            return !Collections.disjoint(fields, entry.getFieldNames());
+            return !Collections.disjoint(fields, entry.getFields());
         }
         return false;
     }

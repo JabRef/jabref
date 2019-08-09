@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -28,7 +29,7 @@ class DoiResolutionTest {
     @Test
     @DisabledOnCIServer("CI server is blocked")
     void findByDOI() throws IOException {
-        entry.setField("doi", "10.1051/0004-6361/201527330");
+        entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330");
 
         assertEquals(
                 Optional.of(new URL("https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
@@ -38,14 +39,14 @@ class DoiResolutionTest {
 
     @Test
     void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
-        entry.setField("doi", "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
+        entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
     void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1186/unknown-doi");
+        entry.setField(StandardField.DOI, "10.1186/unknown-doi");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }

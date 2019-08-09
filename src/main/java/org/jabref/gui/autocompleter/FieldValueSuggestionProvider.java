@@ -3,16 +3,17 @@ package org.jabref.gui.autocompleter;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
  * Stores the full content of one field.
  */
 class FieldValueSuggestionProvider extends StringSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
 
-    private final String fieldName;
+    private final Field field;
 
-    FieldValueSuggestionProvider(String fieldName) {
-        this.fieldName = Objects.requireNonNull(fieldName);
+    FieldValueSuggestionProvider(Field field) {
+        this.field = Objects.requireNonNull(field);
     }
 
     @Override
@@ -21,6 +22,6 @@ class FieldValueSuggestionProvider extends StringSuggestionProvider implements A
             return;
         }
 
-        entry.getField(fieldName).ifPresent(fieldValue -> addPossibleSuggestions(fieldValue.trim()));
+        entry.getField(field).ifPresent(fieldValue -> addPossibleSuggestions(fieldValue.trim()));
     }
 }

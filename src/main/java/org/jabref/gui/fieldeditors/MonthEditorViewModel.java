@@ -9,13 +9,14 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     private BibDatabaseMode databaseMode;
 
-    public MonthEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public MonthEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
         this.databaseMode = databaseMode;
     }
 

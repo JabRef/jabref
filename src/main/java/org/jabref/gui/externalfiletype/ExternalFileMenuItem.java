@@ -35,7 +35,6 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private final BibDatabaseContext databaseContext;
     private Optional<ExternalFileType> fileType;
     private final JabRefFrame frame;
-    private String fieldName;
 
     public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon,
                                 BibDatabaseContext databaseContext, Optional<ExternalFileType> fileType) {
@@ -45,12 +44,6 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         this.databaseContext = databaseContext;
         this.fileType = fileType;
         addActionListener(this);
-    }
-
-    public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon,
-                                BibDatabaseContext databaseContext, String fieldName) {
-        this(frame, name, link, icon, databaseContext, Optional.empty());
-        this.fieldName = fieldName;
     }
 
     @Override
@@ -67,16 +60,11 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         try {
             Optional<ExternalFileType> type = fileType;
             if (!this.fileType.isPresent()) {
-                if (this.fieldName == null) {
-                    // We don't already know the file type, so we try to deduce it from the extension:
-                    Optional<String> extension = FileHelper.getFileExtension(link);
-                    // Now we know the extension, check if it is one we know about:
-                    type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(null));
-                    fileType = type;
-                } else {
-                    JabRefDesktop.openExternalViewer(databaseContext, link, fieldName);
-                    return true;
-                }
+                // We don't already know the file type, so we try to deduce it from the extension:
+                Optional<String> extension = FileHelper.getFileExtension(link);
+                // Now we know the extension, check if it is one we know about:
+                type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(null));
+                fileType = type;
             }
 
             return JabRefDesktop.openExternalFileAnyFormat(databaseContext, link, type);

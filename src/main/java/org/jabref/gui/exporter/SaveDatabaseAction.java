@@ -14,6 +14,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -33,6 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -52,12 +54,14 @@ public class SaveDatabaseAction {
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
+    private final BibEntryTypesManager entryTypesManager;
 
     public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
         this.prefs = prefs;
+        entryTypesManager = Globals.entryTypesManager;
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
@@ -67,7 +71,7 @@ public class SaveDatabaseAction {
                                                .withSaveType(saveType);
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {
                 databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());
@@ -217,7 +221,7 @@ public class SaveDatabaseAction {
             autosaver.registerListener(new AutosaveUIManager(panel));
         }
         if (readyForBackup(context)) {
-            BackupManager.start(context);
+            BackupManager.start(context, entryTypesManager, prefs);
         }
 
         context.getDatabasePath().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile));

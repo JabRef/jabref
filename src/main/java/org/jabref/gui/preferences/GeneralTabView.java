@@ -36,6 +36,7 @@ public class GeneralTabView extends VBox implements PrefsTab {
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox enforceLegalKeys;
+    @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
     @FXML private CheckBox showAdvancedHints;
@@ -55,7 +56,7 @@ public class GeneralTabView extends VBox implements PrefsTab {
 
     private GeneralTabViewModel viewModel;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -79,6 +80,7 @@ public class GeneralTabView extends VBox implements PrefsTab {
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
         enforceLegalKeys.selectedProperty().bindBidirectional(viewModel.enforceLegalKeysProperty());
+        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());

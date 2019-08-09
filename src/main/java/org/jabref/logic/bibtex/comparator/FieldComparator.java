@@ -5,15 +5,16 @@ import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
@@ -28,25 +29,23 @@ public class FieldComparator implements Comparator<BibEntry> {
         NAME, TYPE, YEAR, MONTH, OTHER
     }
 
-    private final String[] field;
-    private final String fieldName;
+    private final OrFields fields;
     private final FieldType fieldType;
     private final boolean isNumeric;
     private final int multiplier;
 
-    public FieldComparator(String field) {
-        this(field, false);
+    public FieldComparator(Field field) {
+        this(new OrFields(field), false);
     }
 
     public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
-        this(sortCriterion.field, sortCriterion.descending);
+        this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 
-    public FieldComparator(String field, boolean descending) {
-        this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(FieldName.FIELD_SEPARATOR);
+    public FieldComparator(OrFields fields, boolean descending) {
+        this.fields = fields;
         fieldType = determineFieldType();
-        isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
+        isNumeric = this.fields.getPrimary().isNumeric();
         multiplier = descending ? -1 : 1;
     }
 
@@ -60,21 +59,21 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (BibEntry.TYPE_HEADER.equals(this.field[0])) {
+        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
             return FieldType.TYPE;
-        } else if (InternalBibtexFields.getFieldProperties(this.field[0]).contains(FieldProperty.PERSON_NAMES)) {
+        } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (FieldName.YEAR.equals(this.field[0])) {
+        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
             return FieldType.YEAR;
-        } else if (FieldName.MONTH.equals(this.field[0])) {
+        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
         }
     }
 
-    private String getField(BibEntry entry) {
-        for (String aField : field) {
+    private String getFieldValue(BibEntry entry) {
+        for (Field aField : fields) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
@@ -90,13 +89,13 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         if (fieldType == FieldType.TYPE) {
             // Sort by type.
-            f1 = e1.getType();
-            f2 = e2.getType();
+            f1 = e1.getType().getDisplayName();
+            f2 = e2.getType().getDisplayName();
         } else {
             // If the field is author or editor, we rearrange names so they are
             // sorted according to last name.
-            f1 = getField(e1);
-            f2 = getField(e2);
+            f1 = getFieldValue(e1);
+            f2 = getFieldValue(e2);
         }
 
         // Catch all cases involving null:
@@ -145,14 +144,5 @@ public class FieldComparator implements Comparator<BibEntry> {
         String ours = f1.toLowerCase(Locale.ENGLISH);
         String theirs = f2.toLowerCase(Locale.ENGLISH);
         return COLLATOR.compare(ours, theirs) * multiplier;
-    }
-
-    /**
-     * Returns the field this Comparator compares by.
-     *
-     * @return The field name.
-     */
-    public String getFieldName() {
-        return fieldName;
     }
 }

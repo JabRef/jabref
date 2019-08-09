@@ -3,6 +3,8 @@ package org.jabref.logic.bibtex;
 import java.util.Collections;
 
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,7 @@ public class FieldContentParserTest {
     public void unifiesLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
         String expected = "I\nunify\nline\nbreaks.".replace("\n", OS.NEWLINE);
-        String processed = parser.format(new StringBuilder(original), "abstract").toString();
+        String processed = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
 
         assertEquals(expected, processed);
     }
@@ -33,8 +35,8 @@ public class FieldContentParserTest {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
         String formatted = original.replace("\n", OS.NEWLINE);
 
-        String abstrakt = parser.format(new StringBuilder(original), "abstract").toString();
-        String review = parser.format(new StringBuilder(original), "review").toString();
+        String abstrakt = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
+        String review = parser.format(new StringBuilder(original), StandardField.REVIEW);
 
         assertEquals(formatted, abstrakt);
         assertEquals(formatted, review);
@@ -45,8 +47,8 @@ public class FieldContentParserTest {
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "I should not include additional whitespaces or tabs.";
 
-        String abstrakt = parser.format(new StringBuilder(original), "title").toString();
-        String any = parser.format(new StringBuilder(original), "anyotherfield").toString();
+        String abstrakt = parser.format(new StringBuilder(original), StandardField.TITLE);
+        String any = parser.format(new StringBuilder(original), new UnknownField("anyotherfield"));
 
         assertEquals(expected, abstrakt);
         assertEquals(expected, any);
