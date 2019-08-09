@@ -3,6 +3,7 @@ package org.jabref.gui.edit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
@@ -27,6 +28,8 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -78,7 +81,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      * @param textToAppend The value to set. A null in this case will simply preserve the current field state.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
+    private static UndoableEdit massAppendField(Collection<BibEntry> entries, Field field, String textToAppend) {
         String newValue = "";
 
         if (textToAppend != null) {
@@ -105,7 +108,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      *                        entries with existing value in the new field.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField,
+    private static UndoableEdit massRenameField(Collection<BibEntry> entries, Field field, Field newField,
                                                 boolean overwriteValues) {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Rename field"));
         for (BibEntry entry : entries) {
@@ -140,7 +143,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
+    private static UndoableEdit massSetField(Collection<BibEntry> entries, Field field, String textToSet,
                                              boolean overwriteValues) {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {
@@ -165,7 +168,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
     private void init() {
         fieldComboBox = new ComboBox<>();
         fieldComboBox.setEditable(true);
-        fieldComboBox.getItems().addAll(database.getDatabase().getAllVisibleFields());
+        fieldComboBox.getItems().addAll(database.getDatabase().getAllVisibleFields().stream().map(Field::getName).collect(Collectors.toSet()));
 
         ToggleGroup toggleGroup = new ToggleGroup();
         clearRadioButton = new RadioButton(Localization.lang("Clear fields"));
@@ -224,15 +227,15 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
             toSet = null;
         }
 
-        String fieldName = fieldComboBox.getValue();
+        Field field = FieldFactory.parseField(fieldComboBox.getValue());
 
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (renameRadioButton.isSelected()) {
-            compoundEdit.addEdit(massRenameField(entries, fieldName, renameTextField.getText(), overwriteCheckBox.isSelected()));
+            compoundEdit.addEdit(massRenameField(entries, field, FieldFactory.parseField(renameTextField.getText()), overwriteCheckBox.isSelected()));
         } else if (appendRadioButton.isSelected()) {
-            compoundEdit.addEdit(massAppendField(entries, fieldName, appendTextField.getText()));
+            compoundEdit.addEdit(massAppendField(entries, field, appendTextField.getText()));
         } else {
-            compoundEdit.addEdit(massSetField(entries, fieldName,
+            compoundEdit.addEdit(massSetField(entries, field,
                     setRadioButton.isSelected() ? toSet : null,
                     overwriteCheckBox.isSelected()));
         }

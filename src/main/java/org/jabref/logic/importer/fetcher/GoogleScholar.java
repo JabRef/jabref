@@ -23,7 +23,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -61,7 +61,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
-        if (!entry.hasField(FieldName.TITLE)) {
+        if (!entry.hasField(StandardField.TITLE)) {
             return pdfLink;
         }
 
@@ -70,7 +70,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             URIBuilder uriBuilder = new URIBuilder(SEARCH_IN_TITLE_URL);
             uriBuilder.addParameter("as_q", "");
             // as_epq as exact phrase
-            uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
+            uriBuilder.addParameter("as_epq", entry.getField(StandardField.TITLE).orElse(null));
             // as_occt field to search in
             uriBuilder.addParameter("as_occt", "title");
 

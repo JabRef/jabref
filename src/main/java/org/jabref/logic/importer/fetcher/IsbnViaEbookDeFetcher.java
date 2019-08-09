@@ -10,7 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -41,13 +41,13 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     public void doPostCleanup(BibEntry entry) {
         // We MUST NOT clean the URL. this is the deal with ebook.de
         // DO NOT add following code:
-        // new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+        // new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
 
         // Fetcher returns page numbers as "30 Seiten" -> remove every non-digit character in the PAGETOTAL field
-        entry.getField(FieldName.PAGETOTAL).ifPresent(pages ->
-                entry.setField(FieldName.PAGETOTAL, pages.replaceAll("[\\D]", "")));
-        new FieldFormatterCleanup(FieldName.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        entry.getField(StandardField.PAGETOTAL).ifPresent(pages ->
+                entry.setField(StandardField.PAGETOTAL, pages.replaceAll("[\\D]", "")));
+        new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
 }

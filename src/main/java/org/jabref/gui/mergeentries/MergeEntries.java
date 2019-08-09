@@ -31,11 +31,11 @@ import javafx.scene.text.TextFlow;
 import org.jabref.Globals;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
-import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
@@ -51,15 +51,15 @@ public class MergeEntries extends BorderPane {
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry"));
-    private final Set<String> identicalFields = new HashSet<>();
-    private final Set<String> differentFields = new HashSet<>();
+    private final Set<Field> identicalFields = new HashSet<>();
+    private final Set<Field> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
-    private final Map<String, TextFlow> leftTextPanes = new HashMap<>();
-    private final Set<String> allFields = new TreeSet<>();
-    private final Map<String, TextFlow> rightTextPanes = new HashMap<>();
-    private final Map<String, List<RadioButton>> radioButtons = new HashMap<>();
+    private final Map<Field, TextFlow> leftTextPanes = new HashMap<>();
+    private final Set<Field> allFields = new TreeSet<>();
+    private final Map<Field, TextFlow> rightTextPanes = new HashMap<>();
+    private final Map<Field, List<RadioButton>> radioButtons = new HashMap<>();
     private Boolean identicalTypes;
     private List<RadioButton> typeRadioButtons;
 
@@ -152,8 +152,8 @@ public class MergeEntries extends BorderPane {
     private void setupFieldRows(GridPane mergePanel) {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
-        for (String field : allFields) {
-            Label label = new Label(new SentenceCaseFormatter().format(field));
+        for (Field field : allFields) {
+            Label label = new Label(field.getDisplayName());
             mergePanel.add(label, 0, row);
             Optional<String> leftString = leftEntry.getField(field);
             Optional<String> rightString = rightEntry.getField(field);
@@ -210,12 +210,12 @@ public class MergeEntries extends BorderPane {
         mergePanel.add(new Label(Localization.lang("Entry type")), 0, 1);
 
         if (leftEntry.getType().equals(rightEntry.getType())) {
-            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType()), 1, 1);
-            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType()), 5, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, 1);
             identicalTypes = true;
         } else {
-            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType()), 1, 1);
-            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType()), 5, 1);
+            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, 1);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, 1);
             identicalTypes = false;
             ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);
@@ -258,16 +258,16 @@ public class MergeEntries extends BorderPane {
     }
 
     private void setupFields() {
-        allFields.addAll(leftEntry.getFieldNames());
-        allFields.addAll(rightEntry.getFieldNames());
+        allFields.addAll(leftEntry.getFields());
+        allFields.addAll(rightEntry.getFields());
 
         // Do not show internal fields
-        Set<String> internalFields = allFields.stream().filter(InternalBibtexFields::isInternalField).collect(Collectors.toSet());
+        Set<Field> internalFields = allFields.stream().filter(FieldFactory::isInternalField).collect(Collectors.toSet());
         allFields.removeAll(internalFields);
     }
 
-    private void updateFieldValues(Collection<String> fields) {
-        for (String field : fields) {
+    private void updateFieldValues(Collection<Field> fields) {
+        for (Field field : fields) {
             String leftString = leftEntry.getField(field).orElse("");
             String rightString = rightEntry.getField(field).orElse("");
             List<Text> leftText = leftString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(leftString));
@@ -320,7 +320,7 @@ public class MergeEntries extends BorderPane {
         }
 
         // Check the potentially different fields
-        for (String field : differentFields) {
+        for (Field field : differentFields) {
             if (!radioButtons.containsKey(field)) {
                 // May happen during initialization -> just ignore
                 continue;

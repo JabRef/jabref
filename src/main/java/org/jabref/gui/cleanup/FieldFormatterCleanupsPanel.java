@@ -1,9 +1,9 @@
 package org.jabref.gui.cleanup;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,8 +29,9 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 
 import org.fxmisc.easybind.EasyBind;
@@ -42,7 +43,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
     private FieldFormatterCleanups fieldFormatterCleanups;
     private ListView<FieldFormatterCleanup> actionsList;
     private ComboBox<Formatter> formattersCombobox;
-    private ComboBox<String> selectFieldCombobox;
+    private ComboBox<Field> selectFieldCombobox;
     private Button addButton;
     private Label descriptionAreaText;
     private Button removeButton;
@@ -161,10 +162,9 @@ public class FieldFormatterCleanupsPanel extends GridPane {
      */
     private GridPane getSelectorPanel() {
         GridPane builder = new GridPane();
-        List<String> fieldNames = InternalBibtexFields.getAllPublicAndInternalFieldNames();
-        fieldNames.add(BibEntry.KEY_FIELD);
-        Collections.sort(fieldNames);
-        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fieldNames));
+        Set<Field> fields = FieldFactory.getCommonFields();
+        fields.add(InternalField.KEY_FIELD);
+        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fields));
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox, 1, 1);
 
@@ -217,8 +217,8 @@ public class FieldFormatterCleanupsPanel extends GridPane {
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
         Formatter selectedFormatter = formattersCombobox.getValue();
-        String fieldKey = selectFieldCombobox.getValue();
-        return new FieldFormatterCleanup(fieldKey, selectedFormatter);
+        Field field = selectFieldCombobox.getValue();
+        return new FieldFormatterCleanup(field, selectedFormatter);
     }
 
     class EnablementStatusListener<T> implements ChangeListener<T> {

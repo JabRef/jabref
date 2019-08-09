@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
@@ -338,16 +339,16 @@ class MSBibEntry {
 
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
-        parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString()).ifPresent(yearAccessed -> {
+        parsedDateAcesseField.flatMap(Date::getYear).map(Object::toString).ifPresent(yearAccessed -> {
             addField(document, rootNode, "Year" + "Accessed", yearAccessed);
         });
 
         parsedDateAcesseField.flatMap(Date::getMonth)
-                .map(accMonth -> accMonth.getTwoDigitNumber()).ifPresent(monthAcessed -> {
+                             .map(Month::getTwoDigitNumber).ifPresent(monthAcessed -> {
                     addField(document, rootNode, "Month" + "Accessed", monthAcessed);
 
                 });
-        parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).ifPresent(dayAccessed -> {
+        parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
             addField(document, rootNode, "Day" + "Accessed", dayAccessed);
         });
 

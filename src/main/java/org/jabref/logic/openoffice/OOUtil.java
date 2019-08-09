@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.layout.Layout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.UnknownField;
 
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
@@ -48,7 +50,7 @@ public class OOUtil {
 
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
-    private static final String UNIQUEFIER_FIELD = "uniq";
+    private static final Field UNIQUEFIER_FIELD = new UnknownField("uniq");
 
     private OOUtil() {
         // Just to hide the public constructor

@@ -11,6 +11,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
+- We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
   - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
@@ -70,7 +72,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We moved the dropdown menu for selecting the push-application from the toolbar into the external application preferences. [#674](https://github.com/JabRef/jabref/issues/674)
 - We removed the alphabetical ordering of the custom tabs and updated the error message when trying to create a general field with a name containing an illegal character. [#5019](https://github.com/JabRef/jabref/issues/5019)
 - We added a context menu to the bib(la)tex-source-editor to copy'n'paste. [#5007](https://github.com/JabRef/jabref/pull/5007)
-- We added a bibliographic references search, for finding references in several LaTeX files. This tool scans directories and shows which entries are used, how many times and where.
+- We added a tool that allows searching for citations in LaTeX files. It scans directories and shows which entries are used, how many times and where.
+- We added a 'LaTeX citations' tab to the entry editor, to search for citations to the active entry in the LaTeX file directory. It can be disabled in the preferences dialog.
 - We added an option in preferences to allow for integers in field "edition" when running database in bibtex mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
 
 

@@ -49,8 +49,9 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -128,7 +129,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     /**
      * Shows a group add/edit dialog.
      *
-     * @param jabrefFrame The parent frame.
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
@@ -313,11 +313,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         // therefore I don't catch anything here
                         if (keywordGroupRegExp.isSelected()) {
                             resultingGroup = new RegexKeywordGroup(groupName, getContext(),
-                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    FieldFactory.parseField(keywordGroupSearchField.getText().trim()), keywordGroupSearchTerm.getText().trim(),
                                     keywordGroupCaseSensitive.isSelected());
                         } else {
                             resultingGroup = new WordKeywordGroup(groupName, getContext(),
-                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    FieldFactory.parseField(keywordGroupSearchField.getText().trim()), keywordGroupSearchTerm.getText().trim(),
                                     keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                         }
                     } else if (searchRadioButton.isSelected()) {
@@ -327,12 +327,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         if (autoGroupKeywordsOption.isSelected()) {
                             resultingGroup = new AutomaticKeywordGroup(
                                     groupName, getContext(),
-                                    autoGroupKeywordsField.getText().trim(),
+                                    FieldFactory.parseField(autoGroupKeywordsField.getText().trim()),
                                     autoGroupKeywordsDeliminator.getText().charAt(0),
                                     autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
                         } else {
                             resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
-                                    autoGroupPersonsField.getText().trim());
+                                    FieldFactory.parseField(autoGroupPersonsField.getText().trim()));
                         }
                     } else if (texRadioButton.isSelected()) {
                         resultingGroup = TexGroup.create(groupName, getContext(),
@@ -379,7 +379,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
-                keywordGroupSearchField.setText(group.getSearchField());
+                keywordGroupSearchField.setText(group.getSearchField().getName());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(false);
@@ -387,7 +387,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == RegexKeywordGroup.class) {
                 RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
-                keywordGroupSearchField.setText(group.getSearchField());
+                keywordGroupSearchField.setText(group.getSearchField().getName());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(true);
@@ -411,10 +411,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
                     autoGroupKeywordsDeliminator.setText(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDeliminator.setText(group.getKeywordHierarchicalDelimiter().toString());
-                    autoGroupKeywordsField.setText(group.getField());
+                    autoGroupKeywordsField.setText(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
-                    autoGroupPersonsField.setText(group.getField());
+                    autoGroupPersonsField.setText(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 texRadioButton.setSelected(true);
@@ -508,7 +508,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
-        autoGroupPersonsField.setText(FieldName.AUTHOR);
+        autoGroupPersonsField.setText(StandardField.AUTHOR.getName());
         return autoPanel;
     }
 

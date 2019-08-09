@@ -11,6 +11,7 @@ import org.jabref.gui.autocompleter.AutoCompletionStrategy;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.field.Field;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
@@ -18,8 +19,8 @@ public class PersonsEditorViewModel extends AbstractEditorViewModel {
 
     private final AutoCompletePreferences preferences;
 
-    public PersonsEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public PersonsEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
         this.preferences = preferences;
     }
 

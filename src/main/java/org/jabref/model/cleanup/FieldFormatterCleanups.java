@@ -10,6 +10,7 @@ import java.util.StringJoiner;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class FieldFormatterCleanups {
 
@@ -90,9 +91,9 @@ public class FieldFormatterCleanups {
 
     private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newline) {
         //first, group all formatters by the field for which they apply
-        Map<String, List<String>> groupedByField = new HashMap<>();
+        Map<Field, List<String>> groupedByField = new HashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
-            String key = cleanup.getField();
+            Field key = cleanup.getField();
 
             // add new list into the hashmap if needed
             if (!groupedByField.containsKey(key)) {
@@ -108,8 +109,8 @@ public class FieldFormatterCleanups {
 
         // convert the contents of the hashmap into the correct serialization
         StringBuilder result = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : groupedByField.entrySet()) {
-            result.append(entry.getKey());
+        for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
+            result.append(entry.getKey().getName());
 
             StringJoiner joiner = new StringJoiner(",", "[", "]" + newline);
             entry.getValue().forEach(joiner::add);

@@ -3,7 +3,7 @@ package org.jabref.logic.citationstyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ public class CitationStyleGeneratorTest {
     @Test
     public void testIgnoreNewLine() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.AUTHOR, "Last, First and\nDoe, Jane");
+        entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
 
         // if the default citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">\n" +
@@ -27,7 +27,7 @@ public class CitationStyleGeneratorTest {
     @Test
     public void testIgnoreCarriageReturnNewLine() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.AUTHOR, "Last, First and\r\nDoe, Jane");
+        entry.setField(StandardField.AUTHOR, "Last, First and\r\nDoe, Jane");
 
         // if the default citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">\n" +

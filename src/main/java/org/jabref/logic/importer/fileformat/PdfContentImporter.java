@@ -23,10 +23,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
@@ -352,7 +352,7 @@ public class PdfContentImporter extends Importer {
 
                 int pos = lower.indexOf("technical");
                 if (pos >= 0) {
-                    type = BibtexEntryTypes.TECHREPORT;
+                    type = StandardEntryType.TechReport;
                     pos = curString.trim().lastIndexOf(' ');
                     if (pos >= 0) {
                         // assumption: last character of curString is NOT ' '
@@ -412,7 +412,7 @@ public class PdfContentImporter extends Importer {
                 if (DOI == null) {
                     pos = curString.indexOf("DOI");
                     if (pos < 0) {
-                        pos = curString.indexOf(FieldName.DOI);
+                        pos = curString.indexOf(StandardField.DOI.getName());
                     }
                     if (pos >= 0) {
                         pos += 3;
@@ -468,40 +468,40 @@ public class PdfContentImporter extends Importer {
             entry.setField(FieldName.AUTHOR, author);
         }
         if (editor != null) {
-            entry.setField(FieldName.EDITOR, editor);
+            entry.setField(StandardField.EDITOR, editor);
         }
         if (abstractT != null) {
-            entry.setField(FieldName.ABSTRACT, abstractT);
+            entry.setField(StandardField.ABSTRACT, abstractT);
         }
         if (!Strings.isNullOrEmpty(keywords)) {
-            entry.setField(FieldName.KEYWORDS, keywords);
+            entry.setField(StandardField.KEYWORDS, keywords);
         }
         if (title != null) {
-            entry.setField(FieldName.TITLE, title);
+            entry.setField(StandardField.TITLE, title);
         }
         if (conference != null) {
-            entry.setField(FieldName.BOOKTITLE, conference);
+            entry.setField(StandardField.BOOKTITLE, conference);
         }
         if (DOI != null) {
-            entry.setField(FieldName.DOI, DOI);
+            entry.setField(StandardField.DOI, DOI);
         }
         if (series != null) {
-            entry.setField(FieldName.SERIES, series);
+            entry.setField(StandardField.SERIES, series);
         }
         if (volume != null) {
-            entry.setField(FieldName.VOLUME, volume);
+            entry.setField(StandardField.VOLUME, volume);
         }
         if (number != null) {
-            entry.setField(FieldName.NUMBER, number);
+            entry.setField(StandardField.NUMBER, number);
         }
         if (pages != null) {
-            entry.setField(FieldName.PAGES, pages);
+            entry.setField(StandardField.PAGES, pages);
         }
         if (year != null) {
-            entry.setField(FieldName.YEAR, year);
+            entry.setField(StandardField.YEAR, year);
         }
         if (publisher != null) {
-            entry.setField(FieldName.PUBLISHER, publisher);
+            entry.setField(StandardField.PUBLISHER, publisher);
         }
         return Optional.of(entry);
     }

@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -54,13 +55,13 @@ class RenamePdfCleanupTest {
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath().toString(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -68,8 +69,8 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
-        entry.setField("title", "test title");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(
+        entry.setField(StandardField.TITLE, "test title");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
                 Arrays.asList(new LinkedFile("", "", ""), new LinkedFile("", path.toAbsolutePath().toString(), ""), new LinkedFile("", "", ""))));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
@@ -78,7 +79,7 @@ class RenamePdfCleanupTest {
         assertEquals(
                 Optional.of(FileFieldWriter.getStringRepresentation(
                         Arrays.asList(new LinkedFile("", "", ""), new LinkedFile("", "Toot - test title.tmp", ""), new LinkedFile("", "", "")))),
-                entry.getField("file"));
+                entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -87,14 +88,14 @@ class RenamePdfCleanupTest {
         Files.createFile(path);
 
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath().toString(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.TITLE, "test title");
 
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
     @Test
@@ -102,13 +103,13 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.TITLE, "test title");
 
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 }

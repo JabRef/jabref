@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -53,10 +54,10 @@ class MoveFilesCleanupTest {
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
-        entry.setField("title", "test title");
-        entry.setField("year", "1989");
+        entry.setField(StandardField.TITLE, "test title");
+        entry.setField(StandardField.YEAR, "1989");
         LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath().toString(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.isBibLocationAsPrimary()).thenReturn(false); //Biblocation as Primary overwrites all other dirs, therefore we set it to false here
@@ -71,7 +72,7 @@ class MoveFilesCleanupTest {
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
         assertEquals(
                 Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "test.pdf", ""))),
-                entry.getField("file"));
+                entry.getField(StandardField.FILE));
         assertFalse(Files.exists(fileBefore));
         assertTrue(Files.exists(fileAfter));
     }
@@ -79,7 +80,7 @@ class MoveFilesCleanupTest {
     @Test
     void movesFileWithMulitpleLinked() throws Exception {
         LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath().toString(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
                 Arrays.asList(new LinkedFile("", "", ""), fileField, new LinkedFile("", "", ""))));
 
         when(filePreferences.getFileDirPattern()).thenReturn("");
@@ -89,7 +90,7 @@ class MoveFilesCleanupTest {
         assertEquals(
                 Optional.of(FileFieldWriter.getStringRepresentation(
                         Arrays.asList(new LinkedFile("", "", ""), new LinkedFile("", "test.pdf", ""), new LinkedFile("", "", "")))),
-                entry.getField("file"));
+                entry.getField(StandardField.FILE));
         assertFalse(Files.exists(fileBefore));
         assertTrue(Files.exists(fileAfter));
     }
@@ -102,7 +103,7 @@ class MoveFilesCleanupTest {
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("test.pdf");
         assertEquals(
                 Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "Misc/test.pdf", ""))),
-                entry.getField("file"));
+                entry.getField(StandardField.FILE));
         assertFalse(Files.exists(fileBefore));
         assertTrue(Files.exists(fileAfter));
     }
@@ -115,7 +116,7 @@ class MoveFilesCleanupTest {
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("1989").resolve("test.pdf");
         assertEquals(
                 Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "Misc/1989/test.pdf", ""))),
-                entry.getField("file"));
+                entry.getField(StandardField.FILE));
         assertFalse(Files.exists(fileBefore));
         assertTrue(Files.exists(fileAfter));
     }

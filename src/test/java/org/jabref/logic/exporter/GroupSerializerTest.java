@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -74,14 +75,14 @@ class GroupSerializerTest {
 
     @Test
     void serializeSingleSimpleKeywordGroup() {
-        WordKeywordGroup group = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
+        WordKeywordGroup group = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "test", false, ',', false);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 KeywordGroup:name;0;keywords;test;0;0;1;;;;"), serialization);
     }
 
     @Test
     void serializeSingleRegexKeywordGroup() {
-        KeywordGroup group = new RegexKeywordGroup("myExplicitGroup", GroupHierarchyType.REFINING, "author", "asdf", false);
+        KeywordGroup group = new RegexKeywordGroup("myExplicitGroup", GroupHierarchyType.REFINING, StandardField.AUTHOR, "asdf", false);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 KeywordGroup:myExplicitGroup;1;author;asdf;0;1;1;;;;"), serialization);
     }
@@ -102,16 +103,16 @@ class GroupSerializerTest {
 
     @Test
     void serializeSingleAutomaticKeywordGroup() {
-        AutomaticGroup group = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "keywords", ',', '>');
+        AutomaticGroup group = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;>;1;;;;"), serialization);
     }
 
     @Test
     void serializeSingleAutomaticPersonGroup() {
-        AutomaticPersonsGroup group = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
+        AutomaticPersonsGroup group = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
-        assertEquals(Collections.singletonList("0 AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;"), serialization);
+        assertEquals(Collections.singletonList("0 AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;"), serialization);
     }
 
     @Test
@@ -146,15 +147,15 @@ class GroupSerializerTest {
                 "1 StaticGroup:ExplicitA;2;1;;;;",
                 "1 StaticGroup:ExplicitGrandParent;0;1;;;;",
                 "2 StaticGroup:ExplicitB;1;1;;;;",
-                "2 KeywordGroup:KeywordParent;0;searchField;searchExpression;1;0;1;;;;",
-                "3 KeywordGroup:KeywordNode;0;searchField;searchExpression;1;0;1;;;;",
+                "2 KeywordGroup:KeywordParent;0;keywords;searchExpression;1;0;1;;;;",
+                "3 KeywordGroup:KeywordNode;0;keywords;searchExpression;1;0;1;;;;",
                 "4 StaticGroup:ExplicitChild;1;1;;;;",
                 "3 SearchGroup:SearchC;2;searchExpression;1;0;1;;;;",
                 "3 StaticGroup:ExplicitC;1;1;;;;",
-                "3 KeywordGroup:KeywordC;0;searchField;searchExpression;1;0;1;;;;",
+                "3 KeywordGroup:KeywordC;0;keywords;searchExpression;1;0;1;;;;",
                 "2 SearchGroup:SearchB;2;searchExpression;1;0;1;;;;",
-                "2 KeywordGroup:KeywordB;0;searchField;searchExpression;1;0;1;;;;",
-                "1 KeywordGroup:KeywordA;0;searchField;searchExpression;1;0;1;;;;"
+                "2 KeywordGroup:KeywordB;0;keywords;searchExpression;1;0;1;;;;",
+                "1 KeywordGroup:KeywordA;0;keywords;searchExpression;1;0;1;;;;"
         );
         assertEquals(expected, groupSerializer.serializeTree(root));
     }

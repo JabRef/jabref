@@ -6,16 +6,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -27,9 +25,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private final Set<String> searchWords;
     private final boolean onlySplitWordsAtSeparator;
 
-    public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
-            String searchExpression, boolean caseSensitive, Character keywordSeparator,
-            boolean onlySplitWordsAtSeparator) {
+    public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
+                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                            boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
@@ -118,11 +116,8 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
     private Set<String> getFieldContentAsWords(BibEntry entry) {
         if (onlySplitWordsAtSeparator) {
-            if (BibEntry.TYPE_HEADER.equals(searchField)) {
-                Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
-                if (entryType.isPresent()) {
-                    return searchWords.stream().filter(sw -> entryType.get().getName().equals(sw)).collect(Collectors.toSet());
-                }
+            if (InternalField.TYPE_HEADER.equals(searchField)) {
+                return searchWords.stream().filter(word -> entry.getType().getName().equalsIgnoreCase(word)).collect(Collectors.toSet());
             }
             return entry.getField(searchField)
                     .map(content -> KeywordList.parse(content, keywordSeparator).toStringList())

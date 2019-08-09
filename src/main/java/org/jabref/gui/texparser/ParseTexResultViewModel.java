@@ -8,7 +8,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexParserResult;
 
-class ParseTexResultViewModel extends AbstractViewModel {
+public class ParseTexResultViewModel extends AbstractViewModel {
 
     private final ObservableList<ReferenceViewModel> referenceList;
     private final ObservableList<Citation> citationList;
@@ -17,9 +17,8 @@ class ParseTexResultViewModel extends AbstractViewModel {
         this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
 
-        texParserResult.getCitations()
-                       .asMap()
-                       .forEach((entry, citations) -> referenceList.add(new ReferenceViewModel(entry, citations)));
+        texParserResult.getCitations().asMap().forEach((entry, citations) ->
+                referenceList.add(new ReferenceViewModel(entry, citations)));
     }
 
     public ObservableList<ReferenceViewModel> getReferenceList() {

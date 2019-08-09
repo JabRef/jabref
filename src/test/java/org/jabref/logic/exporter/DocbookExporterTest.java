@@ -12,6 +12,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
 
 public class DocbookExporterTest {
 
-    public BibDatabaseContext databaseContext = new BibDatabaseContext();;
+    public BibDatabaseContext databaseContext = new BibDatabaseContext();
     public Charset charset = StandardCharsets.UTF_8;
 
     private Exporter exportFormat;
@@ -44,7 +45,7 @@ public class DocbookExporterTest {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Peptidomics of the larval {\\protect{{D}rosophila melanogaster}} central nervous system.");
+        entry.setField(StandardField.TITLE, "Peptidomics of the larval {\\protect{{D}rosophila melanogaster}} central nervous system.");
 
         List<BibEntry> entries = Arrays.asList(entry);
 
@@ -60,7 +61,7 @@ public class DocbookExporterTest {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
-        entry.setField("title", "Insect neuropeptide bursicon homodimers induce innate immune and stress genes during molting by activating the {NF}-$\\kappa$B transcription factor Relish.");
+        entry.setField(StandardField.TITLE, "Insect neuropeptide bursicon homodimers induce innate immune and stress genes during molting by activating the {NF}-$\\kappa$B transcription factor Relish.");
 
         List<BibEntry> entries = Arrays.asList(entry);
 

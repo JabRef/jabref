@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TreeMap;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,7 +24,6 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -31,9 +31,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
@@ -44,10 +45,12 @@ public abstract class BibDatabaseWriter {
     protected final Writer writer;
     protected final SavePreferences preferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
+    protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(Writer writer, SavePreferences preferences) {
+    public BibDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.writer = Objects.requireNonNull(writer);
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
@@ -86,7 +89,7 @@ public abstract class BibDatabaseWriter {
                                                               .map(FieldComparator::new)
                                                               .collect(Collectors.toList());
             comparators.addAll(fieldComparators);
-            comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
+            comparators.add(new FieldComparator(InternalField.KEY_FIELD));
         }
 
         return comparators;
@@ -154,7 +157,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Map<String, EntryType> typesToWrite = new TreeMap<>();
+        Set<BibEntryType> typesToWrite = new HashSet<>();
 
         // Some file formats write something at the start of the file (like the encoding)
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
@@ -180,11 +183,10 @@ public abstract class BibDatabaseWriter {
             // Check if we must write the type definition for this
             // entry, as well. Our criterion is that all non-standard
             // types (*not* all customized standard types) must be written.
-            if (!EntryTypes.getStandardType(entry.getType(), bibDatabaseContext.getMode()).isPresent()) {
+            if (entryTypesManager.isCustomType(entry.getType(), bibDatabaseContext.getMode())) {
                 // If user-defined entry type, then add it
-                // Otherwise (getType returns empty optional) it is a completely unknown entry type, so ignore it
-                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(
-                        entryType -> typesToWrite.put(entryType.getName(), entryType));
+                // Otherwise (enrich returns empty optional) it is a completely unknown entry type, so ignore it
+                entryTypesManager.enrich(entry.getType(), bibDatabaseContext.getMode()).ifPresent(typesToWrite::add);
             }
 
             writeEntry(entry, bibDatabaseContext.getMode());
@@ -290,15 +292,13 @@ public abstract class BibDatabaseWriter {
     protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength)
             throws IOException;
 
-    protected void writeEntryTypeDefinitions(Map<String, EntryType> types) throws IOException {
-        for (EntryType type : types.values()) {
-            if (type instanceof CustomEntryType) {
-                writeEntryTypeDefinition((CustomEntryType) type);
-            }
+    protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
+        for (BibEntryType type : types) {
+            writeEntryTypeDefinition(type);
         }
     }
 
-    protected abstract void writeEntryTypeDefinition(CustomEntryType customType) throws IOException;
+    protected abstract void writeEntryTypeDefinition(BibEntryType customType) throws IOException;
 
     /**
      * Generate keys for all entries that are lacking keys.
