@@ -8,24 +8,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LastFocusedTabPreferencesTest {
+class LastFocusedTabPreferencesTest {
 
     private static String previousValue;
 
     @BeforeAll
-    public static void savePreferenceLastFocus() {
+    static void savePreferenceLastFocus() {
         previousValue = JabRefPreferences.getInstance().get(JabRefPreferences.LAST_FOCUSED);
     }
 
     @AfterAll
-    public static void restorePreferenceLastFocus() {
+    static void restorePreferenceLastFocus() {
         if (previousValue != null) {
             JabRefPreferences.getInstance().put(JabRefPreferences.LAST_FOCUSED, previousValue);
         }
     }
 
     @Test
-    public void testLastFocusedTab() {
+    void testLastFocusedTab() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
         File whatever = new File("whatever");
         prefs.setLastFocusedTab(whatever);
@@ -33,7 +33,7 @@ public class LastFocusedTabPreferencesTest {
     }
 
     @Test
-    public void testLastFocusedTabNull() {
+    void testLastFocusedTabNull() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
         File whatever = new File("whatever");
         prefs.setLastFocusedTab(whatever);
