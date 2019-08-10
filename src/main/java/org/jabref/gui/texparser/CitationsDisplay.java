@@ -5,14 +5,19 @@ import java.nio.file.Path;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.util.Callback;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.texparser.Citation;
 
@@ -22,9 +27,7 @@ public class CitationsDisplay extends ListView<Citation> {
 
     public CitationsDisplay() {
         this.basePath = new SimpleObjectProperty<>(null);
-        new ViewModelListCellFactory<Citation>().withGraphic(this::getDisplayGraphic)
-                                                .withTooltip(Citation::getLineText)
-                                                .install(this);
+        this.setCellFactory(new ListCitationsCellFactory());
     }
 
     public ObjectProperty<Path> basePathProperty() {
@@ -51,5 +54,42 @@ public class CitationsDisplay extends ListView<Citation> {
         HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
 
         return new VBox(contextBox, dataBox);
+    }
+
+    private Tooltip getDisplayTooltip(Citation item) {
+        TextFlow tooltipText = new TextFlow();
+        String lineText = item.getLineText();
+        tooltipText.getChildren().setAll(new Text(lineText.substring(0, item.getColStart())));
+        tooltipText.getChildren().add(TooltipTextUtil.createText(lineText.substring(item.getColStart(), item.getColEnd()), TooltipTextUtil.TextType.BOLD));
+        tooltipText.getChildren().add(new Text(lineText.substring(item.getColEnd())));
+
+        Tooltip tooltip = new Tooltip();
+        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        tooltip.setGraphic(tooltipText);
+        tooltip.setMaxHeight(10);
+        tooltip.maxWidthProperty().bind(this.widthProperty().subtract(85));
+        tooltip.setWrapText(true);
+
+        return tooltip;
+    }
+
+    class ListCitationsCellFactory implements Callback<ListView<Citation>, ListCell<Citation>> {
+        @Override
+        public ListCell<Citation> call(ListView<Citation> param) {
+            return new ListCell<Citation>() {
+                @Override
+                protected void updateItem(Citation item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                        setTooltip(null);
+                    } else {
+                        setGraphic(getDisplayGraphic(item));
+                        setTooltip(getDisplayTooltip(item));
+                    }
+                    getListView().refresh();
+                }
+            };
+        }
     }
 }
