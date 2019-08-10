@@ -1,6 +1,7 @@
 package org.jabref.gui.collab;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +45,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
 
-        Set<Field> allFields = new TreeSet<>();
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
         allFields.addAll(memEntry.getFields());
         allFields.addAll(tmpEntry.getFields());
         allFields.addAll(diskEntry.getFields());
