@@ -42,7 +42,6 @@ class JabRefAction extends org.controlsfx.control.action.Action {
                 trackExecute(getActionName(action, command));
             } else {
                 trackUserActionSource(getActionName(action, command), source);
-                System.out.println(getActionName(action, command) + source);
             }
         });
 
