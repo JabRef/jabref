@@ -48,7 +48,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs.add(new GeneralTabView(prefs));
         preferenceTabs.add(new FileTabView(prefs));
         preferenceTabs.add(new TablePrefsTab(prefs));
-        preferenceTabs.add(new TableColumnsTab(prefs, frame));
+        preferenceTabs.add(new TableColumnsTabView(prefs, frame));
         preferenceTabs.add(new PreviewTabView(prefs));
         preferenceTabs.add(new ExternalTabView(prefs, frame));
         preferenceTabs.add(new GroupsPrefsTab(prefs));
