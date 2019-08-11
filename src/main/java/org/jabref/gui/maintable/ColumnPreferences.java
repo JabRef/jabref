@@ -16,17 +16,21 @@ public class ColumnPreferences {
     private final boolean showEprintColumn;
     private final List<String> normalColumns;
     private final List<SpecialField> specialFieldColumns;
+    private final boolean autoSyncSpecialFieldsToKeyWords;
+    private final boolean serializeSpecialFields;
     private final List<String> extraFileColumns;
     private final Map<String, Double> columnWidths;
     private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
+    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, List<String> extraFileColumns, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
         this.showFileColumn = showFileColumn;
         this.showUrlColumn = showUrlColumn;
         this.preferDoiOverUrl = preferDoiOverUrl;
         this.showEprintColumn = showEprintColumn;
         this.normalColumns = normalColumns;
         this.specialFieldColumns = specialFieldColumns;
+        this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
+        this.serializeSpecialFields = serializeSpecialFields;
         this.extraFileColumns = extraFileColumns;
         this.columnWidths = columnWidths;
         this.columnSortType = columnSortType;
@@ -56,8 +60,20 @@ public class ColumnPreferences {
         return specialFieldColumns;
     }
 
+    public boolean getAutoSyncSpecialFieldsToKeyWords() {
+        return autoSyncSpecialFieldsToKeyWords;
+    }
+
+    public boolean getSerializeSpecialFields() {
+        return serializeSpecialFields;
+    }
+
     public List<String> getNormalColumns() {
         return normalColumns;
+    }
+
+    public Map<String, Double> getColumnWidths() {
+        return columnWidths;
     }
 
     public double getPrefColumnWidth(String columnName) {

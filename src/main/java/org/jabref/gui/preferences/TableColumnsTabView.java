@@ -8,9 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
-import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -31,29 +31,33 @@ import org.controlsfx.control.CheckListView;
 
 public class TableColumnsTabView extends VBox implements PrefsTab {
 
+    @FXML private CheckListView<TableColumnsItemModel> columnsList;
+    @FXML private Button sortUp;
+    @FXML private Button sortDown;
+    @FXML private Button addColumn;
+    @FXML private Button removeColumn;
+    @FXML private Button updateToTable;
 
+    @FXML private CheckBox showFileColumn;
 
-    @FXML private CheckListView<TableColumnsNodeViewModel> columnsList;
-    @FXML public Button sortUp;
-    @FXML public Button sortDown;
-    @FXML public Button addColumn;
-    @FXML public Button removeColumn;
-    @FXML public Button updateToTable;
+    @FXML private CheckBox showUrlColumn;
+    @FXML private RadioButton urlFirst;
+    @FXML private RadioButton doiFirst;
+    @FXML private CheckBox showEprintColumn;
 
-    @FXML public CheckBox enableSpecialFields;
-    @FXML public RadioButton syncKeywords;
-    @FXML public RadioButton writeSpecial;
+    @FXML private CheckBox enableSpecialFields;
+    @FXML private RadioButton syncKeywords;
+    @FXML private RadioButton serializeSpecial;
 
-    @FXML public CheckBox enableIdentifierFields;
-    public RadioButton urlFirst;
-    public RadioButton doiFirst;
-
-    @FXML public CheckBox enableExtraColumns;
+    @FXML private CheckBox enableExtraColumns;
     @FXML private Button enableSpecialFieldsHelp;
 
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
     private final JabRefFrame frame;
+
+    private long lastKeyPressTime;
+    private String listSearchTerm;
 
     private TableColumnsTabViewModel viewModel;
 
@@ -64,37 +68,48 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
         ViewLoader.view(this)
                 .root(this)
                 .load();
+
     }
 
     public void initialize() {
         viewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
 
-        columnsList.itemsProperty().bindBidirectional(viewModel.columnsNamesProperty());
-        columnsList.setCellFactory(checkBoxListView -> new CheckBoxListCell<TableColumnsNodeViewModel>(columnsList::getItemBooleanProperty) {
+        columnsList.itemsProperty().bindBidirectional(viewModel.columnsListProperty());
+        columnsList.setOnKeyTyped(event -> jumpToSearchKey(columnsList, event));
+        columnsList.setCellFactory(checkBoxListView -> new CheckBoxListCell<TableColumnsItemModel>(columnsList::getItemBooleanProperty) {
             @Override
-            public void updateItem(TableColumnsNodeViewModel column, boolean empty) {
-                super.updateItem(column, empty);
-                if (column == null) {
+            public void updateItem(TableColumnsItemModel item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
                     return;
                 }
 
-                if (column.getField() instanceof SpecialField) {
-                    setText(column.getName() + " (" + Localization.lang("Special") + ")");
-                } else if (column.getField() instanceof IEEEField) {
-                    setText(column.getName() + " (" + Localization.lang("IEEE") + ")");
-                } else if (column.getField() instanceof InternalField) {
-                    setText(column.getName() + " (" + Localization.lang("Internal") + ")");
-                } else if (column.getField() instanceof UnknownField) {
-                    setText(column.getName() + " (" + Localization.lang("Custom") + ")");
+                if (item.getField() instanceof SpecialField) {
+                    setText(item.getName() + " (" + Localization.lang("Special") + ")");
+                } else if (item.getField() instanceof IEEEField) {
+                    setText(item.getName() + " (" + Localization.lang("IEEE") + ")");
+                } else if (item.getField() instanceof InternalField) {
+                    setText(item.getName() + " (" + Localization.lang("Internal") + ")");
+                } else if (item.getField() instanceof UnknownField) {
+                    setText(item.getName() + " (" + Localization.lang("Custom") + ")");
+                } else if (item.getField() instanceof TableColumnsTabViewModel.ExtraFileField) {
+                    setText(item.getName() + " (" + Localization.lang("File Type") + ")");
                 } else {
-                    setText(column.getName());
+                    setText(item.getName());
                 }
             }
         });
-        EasyBind.listBind(viewModel.getCheckedColumns(), columnsList.getCheckModel().getCheckedItems());
 
+        viewModel.checkedColumnsModelProperty().setValue(columnsList.getCheckModel());
+
+        showFileColumn.selectedProperty().bindBidirectional(viewModel.fileFieldProperty());
+        showUrlColumn.selectedProperty().bindBidirectional(viewModel.urlFieldEnabledProperty());
+        urlFirst.selectedProperty().bindBidirectional(viewModel.preferUrlProperty());
+        doiFirst.selectedProperty().bindBidirectional(viewModel.preferDoiProperty());
+        showEprintColumn.selectedProperty().bindBidirectional(viewModel.eprintFieldProperty());
         enableSpecialFields.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
-        enableIdentifierFields.selectedProperty().bindBidirectional(viewModel.identifierFieldsEnabledProperty());
+        syncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeyWordsProperty());
+        serializeSpecial.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
         enableExtraColumns.selectedProperty().bindBidirectional(viewModel.extraFieldsEnabledProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
@@ -119,6 +134,25 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
             public void execute() { String ab = "a" + "b"; }
         }, updateToTable);
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
+
+        viewModel.setValues();
+    }
+
+    private void jumpToSearchKey(CheckListView<TableColumnsItemModel> list, KeyEvent keypressed) {
+        if (keypressed.getCharacter() == null) {
+            return;
+        }
+
+        if (System.currentTimeMillis() - lastKeyPressTime < 1000) {
+            listSearchTerm += keypressed.getCharacter().toLowerCase();
+        } else {
+            listSearchTerm = keypressed.getCharacter().toLowerCase();
+        }
+
+        lastKeyPressTime = System.currentTimeMillis();
+
+        list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
+                .findFirst().ifPresent(list::scrollTo);
     }
 
     @Override
