@@ -348,9 +348,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOWCOLUMN_PRINTED = "showPrintedColumn";
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
-    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
+    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
     public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -1935,9 +1934,37 @@ public class JabRefPreferences implements PreferencesService {
                                      getBoolean(ARXIV_COLUMN),
                                      getStringList(COLUMN_NAMES),
                                      createSpecialFieldColumns(),
+                                     getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
+                                     getBoolean(SERIALIZESPECIALFIELDS),
                                      createExtraFileColumns(),
                                      createColumnWidths(),
                                      getMainTableColumnSortTypes());
+    }
+
+    public void storeColumnPreferences(ColumnPreferences newColumnPreferences) {
+        putBoolean(FILE_COLUMN, newColumnPreferences.showFileColumn());
+        putBoolean(URL_COLUMN, newColumnPreferences.showUrlColumn());
+        putBoolean(PREFER_URL_DOI, newColumnPreferences.preferDoiOverUrl());
+        putBoolean(ARXIV_COLUMN, newColumnPreferences.showEprintColumn());
+        putStringList(COLUMN_NAMES,newColumnPreferences.getNormalColumns());
+
+        putBoolean(SPECIALFIELDSENABLED, !newColumnPreferences.getSpecialFieldColumns().isEmpty());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, newColumnPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, newColumnPreferences.getSerializeSpecialFields());
+
+        putBoolean(SHOWCOLUMN_RANKING, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.RANKING));
+        putBoolean(SHOWCOLUMN_PRIORITY, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.PRIORITY));
+        putBoolean(SHOWCOLUMN_QUALITY, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.QUALITY));
+        putBoolean(SHOWCOLUMN_RELEVANCE, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.RELEVANCE));
+        putBoolean(SHOWCOLUMN_PRINTED, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.PRINTED));
+        putBoolean(SHOWCOLUMN_READ, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.READ_STATUS));
+
+        putBoolean(EXTRA_FILE_COLUMNS, !newColumnPreferences.getExtraFileColumns().isEmpty());
+        putStringList(LIST_OF_FILE_COLUMNS, newColumnPreferences.getExtraFileColumns());
+
+        putStringList(COLUMN_WIDTHS, newColumnPreferences.getColumnWidths().values().stream().map(Object::toString).collect(Collectors.toList()));
+
+        setMainTableColumnSortType(newColumnPreferences.getSortTypesForColumns());
     }
 
     public MainTablePreferences getMainTablePreferences() {
