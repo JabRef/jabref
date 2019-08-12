@@ -84,6 +84,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> withTooltip(Callback<T, Tooltip> toTooltip) {
+        this.toTooltip = toTooltip;
+        return this;
+    }
+
     public ViewModelListCellFactory<T> withContextMenu(Callback<T, ContextMenu> toContextMenu) {
         this.toContextMenu = toContextMenu;
         return this;
