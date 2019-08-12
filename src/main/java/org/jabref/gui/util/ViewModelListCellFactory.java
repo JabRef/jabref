@@ -32,7 +32,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
-    private Callback<T, String> toTooltip;
+    private Callback<T, Tooltip> toTooltip;
     private BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent;
     private Callback<T, String> toStyleClass;
     private Callback<T, ContextMenu> toContextMenu;
@@ -58,9 +58,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
             GlyphIcons icon = toIcon.call(viewModel);
             if (icon != null) {
                 return MaterialDesignIconFactory.get().createIcon(icon);
-            } else {
-                return null;
             }
+            return null;
         };
         return this;
     }
@@ -74,8 +73,14 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withTooltip(Callback<T, String> toTooltip) {
-        this.toTooltip = toTooltip;
+    public ViewModelListCellFactory<T> withStringTooltip(Callback<T, String> toStringTooltip) {
+        this.toTooltip = viewModel -> {
+            String tooltipText = toStringTooltip.call(viewModel);
+            if (StringUtil.isNotBlank(tooltipText)) {
+                return new Tooltip(tooltipText);
+            }
+            return null;
+        };
         return this;
     }
 
@@ -89,8 +94,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withOnMouseClickedEvent(
-            BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent) {
+    public ViewModelListCellFactory<T> withOnMouseClickedEvent(BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
         return this;
     }
@@ -163,10 +167,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         getStyleClass().setAll(toStyleClass.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        String tooltipText = toTooltip.call(viewModel);
-                        if (StringUtil.isNotBlank(tooltipText)) {
-                            setTooltip(new Tooltip(tooltipText));
-                        }
+                        setTooltip(toTooltip.call(viewModel));
                     }
                     if (toContextMenu != null) {
                         setContextMenu(toContextMenu.call(viewModel));
