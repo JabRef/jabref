@@ -1,40 +1,42 @@
 package org.jabref.gui.texparser;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.util.Callback;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.TooltipTextUtil;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.texparser.Citation;
 
 public class CitationsDisplay extends ListView<Citation> {
 
-    private ObjectProperty<Path> basePath;
+    private final ObjectProperty<Path> basePath;
 
     public CitationsDisplay() {
         this.basePath = new SimpleObjectProperty<>(null);
-        this.setCellFactory(new ListCitationsCellFactory());
+        new ViewModelListCellFactory<Citation>().withGraphic(this::getDisplayGraphic)
+                                                .withTooltip(this::getDisplayTooltip)
+                                                .install(this);
     }
 
     public ObjectProperty<Path> basePathProperty() {
         return basePath;
     }
 
-    public Node getDisplayGraphic(Citation item) {
+    private Node getDisplayGraphic(Citation item) {
         if (basePath.get() == null) {
             basePath.set(item.getPath().getRoot());
         }
@@ -57,39 +59,35 @@ public class CitationsDisplay extends ListView<Citation> {
     }
 
     private Tooltip getDisplayTooltip(Citation item) {
-        TextFlow tooltipText = new TextFlow();
-        String lineText = item.getLineText();
-        tooltipText.getChildren().setAll(new Text(lineText.substring(0, item.getColStart())));
-        tooltipText.getChildren().add(TooltipTextUtil.createText(lineText.substring(item.getColStart(), item.getColEnd()), TooltipTextUtil.TextType.BOLD));
-        tooltipText.getChildren().add(new Text(lineText.substring(item.getColEnd())));
+        String line = item.getLineText();
+        int start = item.getColStart();
+        int end = item.getColEnd();
+
+        List<Text> texts = new ArrayList<>(3);
+
+        // Text before the citation.
+        if (start > 0) {
+            texts.add(new Text(line.substring(0, start)));
+        }
+
+        // Citation text (highlighted).
+        Text citation = new Text(line.substring(start, end));
+        citation.getStyleClass().setAll("tooltip-text-bold");
+        texts.add(citation);
+
+        // Text after the citation.
+        if (end < line.length()) {
+            texts.add(new Text(line.substring(end)));
+        }
 
         Tooltip tooltip = new Tooltip();
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setGraphic(tooltipText);
+        tooltip.setGraphic(new TextFlow(texts.toArray(new Text[0])));
         tooltip.setMaxHeight(10);
+        tooltip.setMinWidth(200);
         tooltip.maxWidthProperty().bind(this.widthProperty().subtract(85));
         tooltip.setWrapText(true);
 
         return tooltip;
-    }
-
-    class ListCitationsCellFactory implements Callback<ListView<Citation>, ListCell<Citation>> {
-        @Override
-        public ListCell<Citation> call(ListView<Citation> param) {
-            return new ListCell<Citation>() {
-                @Override
-                protected void updateItem(Citation item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setGraphic(null);
-                        setTooltip(null);
-                    } else {
-                        setGraphic(getDisplayGraphic(item));
-                        setTooltip(getDisplayTooltip(item));
-                    }
-                    getListView().refresh();
-                }
-            };
-        }
     }
 }
