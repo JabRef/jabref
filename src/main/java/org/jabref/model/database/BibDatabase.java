@@ -133,7 +133,7 @@ public class BibDatabase {
      * @return set of fieldnames, that are visible
      */
     public Set<Field> getAllVisibleFields() {
-        Set<Field> allFields = new TreeSet<>();
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFields());
         }
