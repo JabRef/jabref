@@ -65,7 +65,7 @@ class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
-   
+
 
     public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.database = Objects.requireNonNull(database);
@@ -77,6 +77,8 @@ class MainTableColumnFactory {
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
+
+
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columns.add(createGroupColumn());
@@ -116,8 +118,11 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
-        column.getStyleClass().add(GROUP_COLUMN);
-        setExactWidth(column, 20);
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
