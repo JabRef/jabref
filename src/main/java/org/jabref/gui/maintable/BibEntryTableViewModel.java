@@ -13,10 +13,11 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -33,21 +34,20 @@ public class BibEntryTableViewModel {
         return entry;
     }
 
-    public Optional<String> getResolvedFieldOrAlias(String field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
         return entry.getResolvedFieldOrAlias(field, database);
     }
 
-    public ObjectBinding<String> getField(String fieldName) {
-        return entry.getFieldBinding(fieldName);
+    public ObjectBinding<String> getField(Field field) {
+        return entry.getFieldBinding(field);
     }
 
     public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
-        return EasyBind.map(getField(field.getFieldName()),
-                value -> field.parse(value).map(SpecialFieldValueViewModel::new));
+        return EasyBind.map(getField(field), value -> field.parseValue(value).map(SpecialFieldValueViewModel::new));
     }
 
     public ObservableValue<List<LinkedFile>> getLinkedFiles() {
-        return EasyBind.map(getField(FieldName.FILE), FileFieldParser::parse);
+        return EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
     }
 
     public ObservableValue<List<AbstractGroup>> getMatchedGroups(BibDatabaseContext database) {

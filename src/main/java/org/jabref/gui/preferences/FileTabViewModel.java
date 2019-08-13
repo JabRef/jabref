@@ -17,7 +17,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
@@ -86,7 +86,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
         alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
 
-        mainFileDirProperty.setValue(preferences.getAsOptional(FieldName.FILE + FilePreferences.DIR_SUFFIX).orElse(""));
+        mainFileDirProperty.setValue(preferences.getAsOptional(StandardField.FILE + FilePreferences.DIR_SUFFIX).orElse(""));
         useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         if (preferences.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) { // Flipped around
             autolinkUseRegexProperty.setValue(true);
@@ -117,7 +117,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
 
-        preferences.put(FieldName.FILE + FilePreferences.DIR_SUFFIX, mainFileDirProperty.getValue());
+        preferences.put(StandardField.FILE + FilePreferences.DIR_SUFFIX, mainFileDirProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
         preferences.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, autolinkUseRegexProperty.getValue());
         preferences.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, autolinkFileExactBibtexProperty.getValue());

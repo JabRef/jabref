@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,19 +41,19 @@ public class DiVATest {
     @Test
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setType("article");
-        entry.setField("author", "Gustafsson, Oscar");
-        entry.setField("institution", "Linköping University, The Institute of Technology");
+        entry.setType(StandardEntryType.Article);
         entry.setCiteKey("Gustafsson260746");
-        entry.setField("journal",
+        entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
+        entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");
+        entry.setField(StandardField.JOURNAL,
                 "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");
-        entry.setField("number", "11");
-        entry.setField("pages", "974--978");
-        entry.setField("title", "Lower bounds for constant multiplication problems");
-        entry.setField("volume", "54");
-        entry.setField("year", "2007");
-        entry.setField("abstract", "Lower bounds for problems related to realizing multiplication by constants with shifts, adders, and subtracters are presented. These lower bounds are straightforwardly calculated and have applications in proving the optimality of solutions obtained by heuristics. ");
-        entry.setField("doi", "10.1109/TCSII.2007.903212");
+        entry.setField(StandardField.NUMBER, "11");
+        entry.setField(StandardField.PAGES, "974--978");
+        entry.setField(StandardField.TITLE, "Lower bounds for constant multiplication problems");
+        entry.setField(StandardField.VOLUME, "54");
+        entry.setField(StandardField.YEAR, "2007");
+        entry.setField(StandardField.ABSTRACT, "Lower bounds for problems related to realizing multiplication by constants with shifts, adders, and subtracters are presented. These lower bounds are straightforwardly calculated and have applications in proving the optimality of solutions obtained by heuristics. ");
+        entry.setField(StandardField.DOI, "10.1109/TCSII.2007.903212");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("diva2:260746"));
     }

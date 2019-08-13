@@ -17,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -32,7 +33,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     @FXML
     private Button removeKeywordButton;
     @FXML
-    private ListView<String> fieldNamesListView;
+    private ListView<Field> fieldsListView;
     @FXML
     private ListView<String> keywordsListView;
     @FXML
@@ -65,10 +66,10 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     }
 
     private void initFieldNameComponents() {
-        initListView(fieldNamesListView, viewModel::getFieldNamesBackingList);
-        viewModel.selectedFieldNameProperty().bind(fieldNamesListView.getSelectionModel().selectedItemProperty());
+        initListView(fieldsListView, viewModel::getFieldNamesBackingList);
+        viewModel.selectedFieldProperty().bind(fieldsListView.getSelectionModel().selectedItemProperty());
         removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());
-        EasyBind.subscribe(viewModel.selectedFieldNameProperty(), viewModel::populateKeywords);
+        EasyBind.subscribe(viewModel.selectedFieldProperty(), viewModel::populateKeywords);
     }
 
     private void initKeywordsComponents() {
@@ -85,30 +86,30 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     @FXML
     private void removeFieldName() {
-        getSelectedFieldName().ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);
+        getSelectedField().ifPresent(viewModel::showRemoveFieldNameConfirmationDialog);
     }
 
     @FXML
     private void addNewKeyword() {
-        getSelectedFieldName().ifPresent(viewModel::showInputKeywordDialog);
+        getSelectedField().ifPresent(viewModel::showInputKeywordDialog);
     }
 
     @FXML
     private void removeKeyword() {
-        Optional<String> fieldName = getSelectedFieldName();
+        Optional<Field> fieldName = getSelectedField();
         Optional<String> keywordToRemove = getSelectedKeyword();
         if (fieldName.isPresent() && keywordToRemove.isPresent()) {
             viewModel.showRemoveKeywordConfirmationDialog(fieldName.get(), keywordToRemove.get());
         }
     }
 
-    private void initListView(ListView<String> listViewToInit, Supplier<ListProperty<String>> backingList) {
+    private <T> void initListView(ListView<T> listViewToInit, Supplier<ListProperty<T>> backingList) {
         listViewToInit.itemsProperty().bind(backingList.get());
         listViewToInit.getSelectionModel().selectFirst();
     }
 
-    private Optional<String> getSelectedFieldName() {
-        return Optional.of(fieldNamesListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
+    private Optional<Field> getSelectedField() {
+        return Optional.of(fieldsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
     }
 
     private Optional<String> getSelectedKeyword() {

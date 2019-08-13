@@ -10,6 +10,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
@@ -20,9 +21,9 @@ public class SaveOrderConfigDisplayView extends GridPane {
     private final SaveOrderConfig config;
 
     @FXML private ToggleGroup saveOrderToggleGroup;
-    @FXML private ComboBox<String> savePriSort;
-    @FXML private ComboBox<String> saveSecSort;
-    @FXML private ComboBox<String> saveTerSort;
+    @FXML private ComboBox<Field> savePriSort;
+    @FXML private ComboBox<Field> saveSecSort;
+    @FXML private ComboBox<Field> saveTerSort;
     @FXML private RadioButton exportInSpecifiedOrder;
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;

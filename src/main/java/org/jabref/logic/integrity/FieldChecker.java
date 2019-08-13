@@ -6,13 +6,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 public class FieldChecker implements IntegrityCheck.Checker {
-    protected final String field;
+    protected final Field field;
     private final ValueChecker checker;
 
-    public FieldChecker(String field, ValueChecker checker) {
+    public FieldChecker(Field field, ValueChecker checker) {
         this.field = field;
         this.checker = Objects.requireNonNull(checker);
     }

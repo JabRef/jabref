@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,12 +38,13 @@ import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
@@ -89,15 +89,15 @@ class MainTableColumnFactory {
         // Add column for DOI/URL
         if (preferences.showUrlColumn()) {
             if (preferences.preferDoiOverUrl()) {
-                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, StandardField.DOI, StandardField.URL));
             } else {
-                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, StandardField.URL, StandardField.DOI));
             }
         }
 
         // Add column for eprints
         if (preferences.showEprintColumn()) {
-            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
+            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, StandardField.EPRINT));
         }
 
         // Add columns for other file types
@@ -152,10 +152,7 @@ class MainTableColumnFactory {
 
         // Read table columns from preferences
         for (String columnName : preferences.getNormalColumns()) {
-            // Stored column name will be used as header
-            // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
-            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            NormalTableColumn column = new NormalTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
+            NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);
@@ -302,24 +299,24 @@ class MainTableColumnFactory {
      * Creates a column for DOIs or URLs.
      * The {@code firstField} is preferred to be shown over {@code secondField}.
      */
-    private TableColumn<BibEntryTableViewModel, String> createUrlOrDoiColumn(JabRefIcon icon, String firstField, String secondField) {
-        TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
+    private TableColumn<BibEntryTableViewModel, Field> createUrlOrDoiColumn(JabRefIcon icon, Field firstField, Field secondField) {
+        TableColumn<BibEntryTableViewModel, Field> column = new TableColumn<>();
         Node headerGraphic = icon.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(StringUtil.capitalizeFirst(firstField) + " / " + StringUtil.capitalizeFirst(secondField)));
+        Tooltip.install(headerGraphic, new Tooltip(firstField.getDisplayName() + " / " + secondField.getDisplayName()));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         // icon is chosen based on field name in cell, so map fields to its names
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
-                new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon)
-                        .withTooltip(this::createIdentifierTooltip)
-                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
-                        .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
+                .withGraphic(cellFactory::getTableIcon)
+                .withTooltip(this::createIdentifierTooltip)
+                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
+                .install(column);
         return column;
     }
 
-    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, String field) {
+    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, Field field) {
         if (event.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -339,31 +336,31 @@ class MainTableColumnFactory {
         event.consume();
     }
 
-    private String createIdentifierTooltip(BibEntryTableViewModel entry, String content) {
-        Optional<String> field = entry.getEntry().getField(content);
-        if (field.isPresent()) {
-            if (FieldName.DOI.equals(content)) {
-                return Localization.lang("Open %0 URL (%1)", "DOI", field.get());
-            } else if (FieldName.URL.equals(content)) {
-                return Localization.lang("Open URL (%0)", field.get());
-            } else if (FieldName.EPRINT.equals(content)) {
-                return Localization.lang("Open %0 URL (%1)", "ArXiv", field.get());
+    private String createIdentifierTooltip(BibEntryTableViewModel entry, Field field) {
+        Optional<String> value = entry.getEntry().getField(field);
+        if (value.isPresent()) {
+            if (StandardField.DOI.equals(field)) {
+                return Localization.lang("Open %0 URL (%1)", "DOI", value.get());
+            } else if (StandardField.URL.equals(field)) {
+                return Localization.lang("Open URL (%0)", value.get());
+            } else if (StandardField.EPRINT.equals(field)) {
+                return Localization.lang("Open %0 URL (%1)", "ArXiv", value.get());
             }
         }
         return null;
     }
 
-    private TableColumn<BibEntryTableViewModel, String> createEprintColumn(JabRefIcon icon, String field) {
-        TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
+    private TableColumn<BibEntryTableViewModel, Field> createEprintColumn(JabRefIcon icon, Field field) {
+        TableColumn<BibEntryTableViewModel, Field> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(field)).map(x -> field));
-                new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon)
-                        .withTooltip(this::createIdentifierTooltip)
-                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
-                        .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
+                .withGraphic(cellFactory::getTableIcon)
+                .withTooltip(this::createIdentifierTooltip)
+                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
+                .install(column);
         return column;
     }
 

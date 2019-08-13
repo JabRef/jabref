@@ -7,7 +7,7 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -24,7 +24,7 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return entry.getField(FieldName.FILE).isPresent();
+        return entry.getField(StandardField.FILE).isPresent();
     }
 
     @Override

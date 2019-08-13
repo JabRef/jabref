@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,9 +45,8 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry();
-        entry.setType("article");
-        entry.setField("author", "harrer");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
@@ -54,9 +54,8 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testCorrectMatchFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry();
-        entry.setType("article");
-        entry.setField("author", "harrer");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", true, true), database).getMatches();
         assertEquals(Collections.singletonList(entry), matches);
@@ -73,9 +72,8 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testCorrectMatchFromDatabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.INCOLLECTION);
-        entry.setField("author", "tonho");
+        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
+        entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
         SearchQuery query = new SearchQuery("tonho", true, true);
@@ -89,9 +87,8 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
-        entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.INCOLLECTION);
-        entry.setField("author", "tonho");
+        entry = new BibEntry(StandardEntryType.InCollection);
+        entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
         SearchQuery query = new SearchQuery("tonho", true, true);
@@ -102,9 +99,8 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromDabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.INCOLLECTION);
-        entry.setField("author", "tonho");
+        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
+        entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
         SearchQuery query = new SearchQuery("asdf", true, true);

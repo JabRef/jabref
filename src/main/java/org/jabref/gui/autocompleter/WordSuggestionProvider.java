@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
  * Stores all words in the given field which are separated by SEPARATING_CHARS.
@@ -12,10 +13,10 @@ public class WordSuggestionProvider extends StringSuggestionProvider implements 
 
     private static final String SEPARATING_CHARS = ";,\n ";
 
-    private final String fieldName;
+    private final Field field;
 
-    public WordSuggestionProvider(String fieldName) {
-        this.fieldName = Objects.requireNonNull(fieldName);
+    public WordSuggestionProvider(Field field) {
+        this.field = Objects.requireNonNull(field);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class WordSuggestionProvider extends StringSuggestionProvider implements 
             return;
         }
 
-        entry.getField(fieldName).ifPresent(fieldValue -> {
+        entry.getField(field).ifPresent(fieldValue -> {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
                 addPossibleSuggestions(tok.nextToken());

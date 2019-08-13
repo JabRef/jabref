@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -63,10 +62,10 @@ public class TexBibEntriesResolverResult {
     }
 
     /**
-     * Check if an entry with the given key is present in the list of new entries.
+     * Check if an entry with the given key is not present in the list of new entries.
      */
-    public boolean checkEntryNewDatabase(String key) {
-        return newEntries.stream().anyMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
+    public boolean isNotKeyIntoNewEntries(String key) {
+        return newEntries.stream().noneMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
     }
 
     /**
@@ -92,25 +91,24 @@ public class TexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", this.getClass().getSimpleName() + "[", "]")
-                .add("texParserResult = " + texParserResult)
-                .add("unresolvedKeys = " + unresolvedKeys)
-                .add("newEntries = " + newEntries)
-                .add("crossRefsCount = " + crossRefsCount)
-                .toString();
+        return String.format("TexBibEntriesResolverResult{texParserResult=%s, unresolvedKeys=%s, newEntries=%s, crossRefsCount=%s}",
+                this.texParserResult,
+                this.unresolvedKeys,
+                this.newEntries,
+                this.crossRefsCount);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) o;
+        TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) obj;
 
         return Objects.equals(texParserResult, that.texParserResult)
                 && Objects.equals(unresolvedKeys, that.unresolvedKeys)

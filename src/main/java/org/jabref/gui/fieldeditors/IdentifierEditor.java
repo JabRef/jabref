@@ -16,7 +16,8 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -29,8 +30,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
-        this.viewModel = new IdentifierEditorViewModel(fieldName, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
+    public IdentifierEditor(Field field, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)
@@ -39,11 +40,11 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchInformationByIdentifierButton.setTooltip(
-                new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(fieldName))));
+                new Tooltip(Localization.lang("Get BibTeX data from %0", field.getDisplayName())));
         lookupIdentifierButton.setTooltip(
-                new Tooltip(Localization.lang("Look up %0", FieldName.getDisplayName(fieldName))));
+                new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
-        if (fieldName.equalsIgnoreCase(FieldName.DOI)) {
+        if (field.equals(StandardField.DOI)) {
             textArea.addToContextMenu(EditorMenus.getDOIMenu(textArea));
         } else {
             textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));

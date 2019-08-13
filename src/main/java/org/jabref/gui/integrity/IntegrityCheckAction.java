@@ -60,7 +60,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                     }
 
                     BibEntry entry = entries.get(i);
-                    result.addAll(check.checkBibtexEntry(entry));
+                    result.addAll(check.checkEntry(entry));
                     updateProgress(i, entries.size());
                 }
 

@@ -5,8 +5,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckListView?>
-
-<DialogPane prefHeight="550.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportCustomEntryTypesDialog">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="550.0" prefWidth="566.0"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="org.jabref.gui.importer.ImportCustomEntryTypesDialog">
    <content>
       <VBox minHeight="-Infinity" prefHeight="113.0" prefWidth="571.0" spacing="1.0">
          <children>

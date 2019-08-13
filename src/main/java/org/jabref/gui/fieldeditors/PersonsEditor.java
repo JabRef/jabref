@@ -9,6 +9,7 @@ import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
@@ -16,12 +17,12 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     private final PersonsEditorViewModel viewModel;
     private final TextInputControl textInput;
 
-    public PersonsEditor(final String fieldName,
+    public PersonsEditor(final Field field,
                          final AutoCompleteSuggestionProvider<?> suggestionProvider,
                          final JabRefPreferences preferences,
                          final FieldCheckers fieldCheckers,
                          final boolean isSingleLine) {
-        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
+        this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
         textInput = isSingleLine
                 ? new EditorTextField()

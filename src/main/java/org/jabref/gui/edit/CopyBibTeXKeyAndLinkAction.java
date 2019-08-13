@@ -12,7 +12,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * This class will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard.
@@ -44,7 +44,7 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
 
             for (BibEntry entry : entriesWithKey) {
                 String key = entry.getCiteKeyOptional().get();
-                String url = entry.getField(FieldName.URL).orElse("");
+                String url = entry.getField(StandardField.URL).orElse("");
                 sb.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
                 sb.append(OS.NEWLINE);
             }

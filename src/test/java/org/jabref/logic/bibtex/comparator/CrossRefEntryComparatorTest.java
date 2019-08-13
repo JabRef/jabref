@@ -1,7 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,9 +32,9 @@ public class CrossRefEntryComparatorTest {
     @Test
     public void isEqualForEntriesWithCrossRef() {
         BibEntry e1 = new BibEntry();
-        e1.setField(FieldName.CROSSREF, "1");
+        e1.setField(StandardField.CROSSREF, "1");
         BibEntry e2 = new BibEntry();
-        e2.setField(FieldName.CROSSREF, "2");
+        e2.setField(StandardField.CROSSREF, "2");
         assertEquals(0, comparator.compare(e1, e2));
     }
 
@@ -42,14 +42,14 @@ public class CrossRefEntryComparatorTest {
     public void isGreaterForEntriesWithoutCrossRef() {
         BibEntry e1 = new BibEntry();
         BibEntry e2 = new BibEntry();
-        e2.setField(FieldName.CROSSREF, "1");
+        e2.setField(StandardField.CROSSREF, "1");
         assertEquals(1, comparator.compare(e1, e2));
     }
 
     @Test
     public void isSmallerForEntriesWithCrossRef() {
         BibEntry e1 = new BibEntry();
-        e1.setField(FieldName.CROSSREF, "1");
+        e1.setField(StandardField.CROSSREF, "1");
         BibEntry e2 = new BibEntry();
         assertEquals(-1, comparator.compare(e1, e2));
     }

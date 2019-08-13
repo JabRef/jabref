@@ -10,6 +10,7 @@ import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -19,8 +20,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
 
-    public JournalEditor(String fieldName, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
+    public JournalEditor(Field field, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new JournalEditorViewModel(field, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)
