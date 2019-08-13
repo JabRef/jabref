@@ -24,7 +24,7 @@ public abstract class AbstractPreferenceTabView extends VBox implements Preferen
     public Node getBuilder() { return this; }
 
     @Override
-    public void setValues() { viewModel.setValues(); }
+    public void setValues() { }
 
     @Override
     public void storeSettings() { viewModel.storeSettings(); }
