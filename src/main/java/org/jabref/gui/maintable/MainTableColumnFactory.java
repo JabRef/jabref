@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -16,7 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -122,28 +123,36 @@ class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
+        column.setStyle("-fx-padding: 0 0 0 0;");
         column.setSortable(true);
         return column;
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        Rectangle rectangle = new Rectangle();
-        rectangle.setWidth(3);
-        rectangle.setHeight(20);
+        Rectangle borderColor = new Rectangle();
+        borderColor.setWidth(5);
+        borderColor.setHeight(20);
+        borderColor.setFill(Color.DARKGRAY);
+        Rectangle groupColor = new Rectangle();
+        groupColor.setWidth(3);
+        groupColor.setHeight(18);
         Color color = matchedGroups.stream()
                                    .flatMap(group -> OptionalUtil.toStream(group.getColor()))
                                    .findFirst()
                                    .orElse(Color.TRANSPARENT);
-        rectangle.setFill(color);
+        groupColor.setFill(color);
+
+        StackPane container = new StackPane();
+        container.setMinWidth(10);
+        container.setAlignment(Pos.CENTER);
+        container.getChildren().addAll(borderColor,groupColor);
 
         String matchedGroupsString = matchedGroups.stream()
                                                   .map(AbstractGroup::getName)
                                                   .collect(Collectors.joining(", "));
         Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
-        Tooltip.install(rectangle, tooltip);
+        Tooltip.install(container, tooltip);
 
-        BorderPane container = new BorderPane();
-        container.setLeft(rectangle);
         return container;
     }
 
