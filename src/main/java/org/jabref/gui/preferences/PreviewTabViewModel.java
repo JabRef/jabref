@@ -53,9 +53,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
 
@@ -99,9 +99,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        availableSelectionModelProperty.setValue(new NoSelectionModel<>());
-        chosenSelectionModelProperty.setValue(new NoSelectionModel<>());
-
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
 
