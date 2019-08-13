@@ -14,7 +14,7 @@ import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -67,7 +67,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         Multimap<String, BibEntry> markings = MultimapBuilder.treeKeys().linkedListValues().build();
 
         for (BibEntry entry : entries) {
-            Optional<String> marking = entry.getField(FieldName.MARKED_INTERNAL);
+            Optional<String> marking = entry.getField(InternalField.MARKED_INTERNAL);
             if (!marking.isPresent()) {
                 continue;
             }
@@ -87,6 +87,6 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
     }
 
     private void clearMarkings(List<BibEntry> entries) {
-        entries.forEach(entry -> entry.clearField(FieldName.MARKED_INTERNAL));
+        entries.forEach(entry -> entry.clearField(InternalField.MARKED_INTERNAL));
     }
 }

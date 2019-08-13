@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
@@ -68,11 +69,11 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService);
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService);
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
@@ -117,8 +118,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             tvStyles.getSelectionModel().select(style);
-            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
-            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
+            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getDefaultBibLayout()));
+            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getDefaultBibLayout()));
         });
     }
 

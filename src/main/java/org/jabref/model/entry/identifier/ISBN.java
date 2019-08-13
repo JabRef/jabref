@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class ISBN implements Identifier {
 
@@ -89,8 +90,8 @@ public class ISBN implements Identifier {
     }
 
     @Override
-    public String getDefaultField() {
-        return FieldName.ISBN;
+    public Field getDefaultField() {
+        return StandardField.ISBN;
     }
 
     @Override

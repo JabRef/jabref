@@ -5,7 +5,8 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -60,8 +61,8 @@ public class MathSciNetId implements Identifier {
     }
 
     @Override
-    public String getDefaultField() {
-        return FieldName.MR_NUMBER;
+    public Field getDefaultField() {
+        return StandardField.MR_NUMBER;
     }
 
     @Override

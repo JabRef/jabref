@@ -6,8 +6,9 @@ import java.util.Objects;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
@@ -18,27 +19,23 @@ import org.jabref.model.entry.InternalBibtexFields;
  */
 public class EntryComparator implements Comparator<BibEntry> {
 
-    private final String sortField;
+    private final Field sortField;
     private final boolean descending;
     private final boolean binary;
-    private final boolean numeric;
     private final Comparator<BibEntry> next;
 
-
-    public EntryComparator(boolean binary, boolean descending, String field, Comparator<BibEntry> next) {
+    public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = descending;
         this.next = next;
-        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
-    public EntryComparator(boolean binary, boolean descending, String field) {
+    public EntryComparator(boolean binary, boolean descending, Field field) {
         this.binary = binary;
         this.sortField = field;
         this.descending = descending;
         this.next = null;
-        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override
@@ -64,19 +61,18 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (InternalBibtexFields.getFieldProperties(sortField).contains(FieldProperty.PERSON_NAMES)) {
+        if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase(Locale.ROOT);
             }
             if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase(Locale.ROOT);
             }
-
-        } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
+        } else if (sortField.equals(InternalField.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType();
             f2 = e2.getType();
-        } else if (numeric) {
+        } else if (sortField.isNumeric()) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);
                 Integer i2 = Integer.parseInt((String) f2);

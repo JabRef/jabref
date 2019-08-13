@@ -45,7 +45,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,19 +72,20 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               JabRefPreferences preferences,
+                               XmpPreferences xmpPreferences,
+                               FilePreferences filePreferences,
                                ExternalFileTypes externalFileTypes) {
 
         this.linkedFile = linkedFile;
-        this.filePreferences = preferences.getFilePreferences();
+        this.filePreferences = filePreferences;
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
-
-        xmpPreferences = preferences.getXMPPreferences();
+        this.xmpPreferences = xmpPreferences;
+        
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }

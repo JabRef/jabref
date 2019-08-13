@@ -12,6 +12,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,8 +42,8 @@ public class HtmlExportFormatTest {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         BibEntry entry = new BibEntry();
-        entry.setField("title", "my paper title");
-        entry.setField("author", "Stefan Kolb");
+        entry.setField(StandardField.TITLE, "my paper title");
+        entry.setField(StandardField.AUTHOR, "Stefan Kolb");
         entry.setCiteKey("mykey");
         entries = Arrays.asList(entry);
     }

@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+
 /**
  * Stores the save order config from MetaData
  * <p>
@@ -45,7 +48,7 @@ public class SaveOrderConfig {
         }
 
         for (int index = 1; index < data.size(); index = index + 2) {
-            sortCriteria.addLast(new SortCriterion(data.get(index), data.get(index + 1)));
+            sortCriteria.addLast(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
         }
     }
 
@@ -117,7 +120,7 @@ public class SaveOrderConfig {
         }
 
         for (SortCriterion sortCriterion : sortCriteria) {
-            res.add(sortCriterion.field);
+            res.add(sortCriterion.field.getName());
             res.add(Boolean.toString(sortCriterion.descending));
         }
 
@@ -126,16 +129,16 @@ public class SaveOrderConfig {
 
     public static class SortCriterion {
 
-        public String field;
+        public Field field;
 
         public boolean descending;
 
-        public SortCriterion(String field, String descending) {
+        public SortCriterion(Field field, String descending) {
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);
         }
 
-        public SortCriterion(String field, boolean descending) {
+        public SortCriterion(Field field, boolean descending) {
             this.field = field;
             this.descending = descending;
         }

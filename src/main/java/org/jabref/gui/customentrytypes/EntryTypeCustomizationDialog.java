@@ -50,7 +50,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         List<String> entryTypes = new ArrayList<>();
-        entryTypes.addAll(EntryTypes.getAllTypes(bibDatabaseMode));
+        entryTypes.addAll(EntryTypeFactory.getAllTypes(bibDatabaseMode));
 
         typeComp = new EntryTypeList(frame.getDialogService(), entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
@@ -145,7 +145,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
         }
         Set<String> requiredFieldsSelectedType = reqLists.get(selectedTypeName);
         if (requiredFieldsSelectedType == null) {
-            Optional<EntryType> type = EntryTypes.getType(selectedTypeName, bibDatabaseMode);
+            Optional<EntryType> type = EntryTypeFactory.getType(selectedTypeName, bibDatabaseMode);
             if (type.isPresent()) {
                 Set<String> req = type.get().getRequiredFields();
 
@@ -214,14 +214,14 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
 
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
-                EntryTypes.removeType(stringListEntry.getKey(), bibDatabaseMode);
+                EntryTypeFactory.removeType(stringListEntry.getKey(), bibDatabaseMode);
 
                 actuallyChangedTypes.add(stringListEntry.getKey().toLowerCase(Locale.ENGLISH));
                 defaulted.remove(stringListEntry.getKey());
                 continue;
             }
 
-            Optional<EntryType> oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseMode);
+            Optional<EntryType> oldType = EntryTypeFactory.getType(stringListEntry.getKey(), bibDatabaseMode);
             if (oldType.isPresent()) {
                 Set<String> oldRequiredFieldsList = oldType.get().getRequiredFieldsFlat();
                 Set<String> oldOptionalFieldsList = oldType.get().getOptionalFields();
@@ -240,11 +240,11 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
             }
 
             if (changesMade) {
-                CustomEntryType customType = biblatexMode ?
-                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList, secondaryOptionalFieldsLists) :
-                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList);
+                BibEntryType customType = biblatexMode ?
+                        new BibEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList, secondaryOptionalFieldsLists) :
+                        new BibEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), requiredFieldsList, optionalFieldsList);
 
-                EntryTypes.addOrModifyCustomEntryType(customType, bibDatabaseMode);
+                EntryTypeFactory.addOrModifyBibEntryType(customType, bibDatabaseMode);
                 actuallyChangedTypes.add(customType.getName().toLowerCase(Locale.ENGLISH));
             }
         }
@@ -255,7 +255,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
         }
 
         Set<String> typesToRemove = new HashSet<>();
-        for (String existingType : EntryTypes.getAllTypes(bibDatabaseMode)) {
+        for (String existingType : EntryTypeFactory.getAllTypes(bibDatabaseMode)) {
             if (!types.contains(existingType)) {
                 typesToRemove.add(existingType);
             }
@@ -268,14 +268,14 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
             }
         }
 
-        CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
+        BibEntryTypesManager.saveBibEntryTypes(Globals.prefs);
     }
 
     private void deleteType(String name) {
-        Optional<EntryType> type = EntryTypes.getType(name, bibDatabaseMode);
+        Optional<EntryType> type = EntryTypeFactory.getType(name, bibDatabaseMode);
 
-        if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
-            if (!EntryTypes.getStandardType(name, bibDatabaseMode).isPresent()) {
+        if (type.isPresent() && (type.get() instanceof BibEntryType)) {
+            if (!EntryTypeFactory.getStandardType(name, bibDatabaseMode).isPresent()) {
 
                 boolean deleteCustomClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Delete custom format") +
                         " '" + StringUtil.capitalizeFirst(name) + '\'',  Localization.lang("All entries of this "
@@ -287,7 +287,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
                     return;
                 }
             }
-            EntryTypes.removeType(name, bibDatabaseMode);
+            EntryTypeFactory.removeType(name, bibDatabaseMode);
             updateEntriesForChangedTypes(Collections.singletonList(name.toLowerCase(Locale.ENGLISH)));
             changed.remove(name);
             reqLists.remove(name);
@@ -305,7 +305,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
                     .filter(entry -> actuallyChangedTypes.contains(entry.getType().toLowerCase(Locale.ENGLISH))).collect(Collectors.toList());
 
             // update all affected entries with new type
-            filtered.forEach(entry -> EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType));
+            filtered.forEach(entry -> EntryTypeFactory.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType));
         }
     }
 
@@ -320,7 +320,7 @@ public class EntryTypeCustomizationDialog extends BaseDialog<Void> {
             }
             defaulted.add(lastSelected);
 
-            Optional<EntryType> type = EntryTypes.getStandardType(lastSelected, bibDatabaseMode);
+            Optional<EntryType> type = EntryTypeFactory.getStandardType(lastSelected, bibDatabaseMode);
             if (type.isPresent()) {
                 Set<String> of = type.get().getOptionalFields();
                 Set<String> req = type.get().getRequiredFields();

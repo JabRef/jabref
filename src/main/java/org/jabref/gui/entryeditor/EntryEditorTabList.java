@@ -1,10 +1,11 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -16,16 +17,15 @@ public final class EntryEditorTabList {
 
     }
 
-    public static Map<String, List<String>> create(JabRefPreferences preferences) {
-        Map<String, List<String>> tabs = new TreeMap<>();
+    public static Map<String, Set<Field>> create(JabRefPreferences preferences) {
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         int i = 0;
         String name;
         if (preferences.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + 0)) {
             // The user has modified from the default values:
             while (preferences.hasKey(JabRefPreferences.CUSTOM_TAB_NAME + i)) {
                 name = preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + i);
-                List<String> entry = Arrays
-                        .asList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i).split(";"));
+                Set<Field> entry = FieldFactory.parseFieldList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + i));
                 tabs.put(name, entry);
                 i++;
             }
@@ -33,8 +33,7 @@ public final class EntryEditorTabList {
             // Nothing set, so we use the default values:
             while (preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
                 name = preferences.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
-                List<String> entry = Arrays
-                        .asList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i).split(";"));
+                Set<Field> entry = FieldFactory.parseFieldList(preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i));
                 tabs.put(name, entry);
                 i++;
             }

@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -28,7 +29,7 @@ class ACSTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void findByDOI() throws IOException {
-        entry.setField("doi", "10.1021/bk-2006-STYG.ch014");
+        entry.setField(StandardField.DOI, "10.1021/bk-2006-STYG.ch014");
 
         assertEquals(
                 Optional.of(new URL("https://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
@@ -39,7 +40,7 @@ class ACSTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
+        entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }

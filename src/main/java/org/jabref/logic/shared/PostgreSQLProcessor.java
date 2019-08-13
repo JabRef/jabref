@@ -62,7 +62,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                                                                                     Statement.RETURN_GENERATED_KEYS)) {
 
-            preparedEntryStatement.setString(1, bibEntry.getType());
+            preparedEntryStatement.setString(1, bibEntry.getType().getName());
             preparedEntryStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {

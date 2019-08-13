@@ -13,7 +13,8 @@ import java.util.prefs.Preferences;
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class PreferencesMigrations {
         upgradeFaultyEncodingStrings(Globals.prefs);
         upgradeLabelPatternToBibtexKeyPattern(Globals.prefs);
         upgradeImportFileAndDirePatterns(Globals.prefs, mainPrefsNode);
-        upgradeStoredCustomEntryTypes(Globals.prefs, mainPrefsNode);
+        upgradeStoredBibEntryTypes(Globals.prefs, mainPrefsNode);
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
@@ -127,18 +128,18 @@ public class PreferencesMigrations {
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
                 prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, FieldName.AUTHOR);
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, FieldName.EDITOR);
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, FieldName.YEAR);
+                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.AUTHOR.getName());
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.EDITOR.getName());
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.YEAR.getName());
                 prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             } else if (prefs.getBoolean("exportInTitleOrder", false)) {
                 // exportInTitleOrder => title, author, editor
                 prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, FieldName.TITLE);
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR);
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, FieldName.EDITOR);
+                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.TITLE.getName());
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.EDITOR.getName());
                 prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
@@ -149,7 +150,7 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    private static void upgradeStoredCustomEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
+    private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
@@ -157,7 +158,7 @@ public class PreferencesMigrations {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
-                CustomEntryTypePreferenceMigration.upgradeStoredCustomEntryTypes(prefs.getDefaultBibDatabaseMode());
+                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getDefaultBibDatabaseMode());
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old custom entry types failed.", ex);
@@ -283,7 +284,7 @@ public class PreferencesMigrations {
         GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
                                                                                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
-            keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
+            keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
     }

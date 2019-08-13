@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mods:modsCollection xmlns="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<mods:modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods>
         <mods:genre>article</mods:genre>
-        <mods:note>a note</mods:note>
-        <mods:note>and another note</mods:note>
+        <mods:abstract>abstract</mods:abstract>
+        <mods:name>
+            <mods:affiliation>an affiliation</mods:affiliation>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family">Don't</mods:namePart>
+            <mods:namePart type="given">know</mods:namePart>
+        </mods:name>
+        <mods:name type="personal">
+            <mods:namePart type="family"> Realy</mods:namePart>
+            <mods:namePart type="given">don't</mods:namePart>
+            <mods:namePart type="given">know</mods:namePart>
+        </mods:name>
+        <mods:identifier type="doi">someDoi</mods:identifier>
         <mods:subject>
             <mods:topic>keyword</mods:topic>
         </mods:subject>
@@ -22,55 +34,43 @@
         <mods:language>
             <mods:languageTerm>en</mods:languageTerm>
         </mods:language>
+        <mods:location>
+            <mods:physicalLocation>somewhere</mods:physicalLocation>
+        </mods:location>
+        <mods:note>a note</mods:note>
+        <mods:note>and another note</mods:note>
+        <mods:identifier type="pmid">123456789</mods:identifier>
         <mods:titleInfo>
             <mods:title>title</mods:title>
         </mods:titleInfo>
-        <mods:name>
-            <mods:affiliation>an affiliation</mods:affiliation>
-        </mods:name>
-        <mods:name type="personal">
-            <mods:namePart type="family">Don't</mods:namePart>
-            <mods:namePart type="given">know</mods:namePart>
-        </mods:name>
-        <mods:name type="personal">
-            <mods:namePart type="family"> Realy</mods:namePart>
-            <mods:namePart type="given">don't</mods:namePart>
-            <mods:namePart type="given">know</mods:namePart>
-        </mods:name>
-        <mods:abstract>abstract</mods:abstract>
-        <mods:identifier type="pmid">123456789</mods:identifier>
         <mods:identifier type="uri">an uri</mods:identifier>
         <mods:location>
             <mods:url>someWebSite</mods:url>
         </mods:location>
-        <mods:location>
-            <mods:physicalLocation>somewhere</mods:physicalLocation>
-        </mods:location>
-        <mods:identifier type="doi">someDoi</mods:identifier>
         <mods:originInfo>
-            <mods:dateIssued keyDate="yes">2000</mods:dateIssued>
-            <mods:edition>2</mods:edition>
-            <mods:dateCaptured keyDate="yes">2000-11-11</mods:dateCaptured>
-            <mods:dateModified keyDate="yes">2000-12-10</mods:dateModified>
             <mods:place>
                 <mods:placeTerm type="text">India</mods:placeTerm>
             </mods:place>
+            <mods:dateCaptured keyDate="yes">2000-11-11</mods:dateCaptured>
             <mods:dateCreated keyDate="yes">2000-11-10</mods:dateCreated>
+            <mods:edition>2</mods:edition>
             <mods:issuance>monographic</mods:issuance>
-            <mods:publisher ns3:type="mods:stringPlusLanguagePlusSupplied">Verlag verlag</mods:publisher>
+            <mods:dateModified keyDate="yes">2000-12-10</mods:dateModified>
+            <mods:publisher xsi:type="mods:stringPlusLanguagePlusSupplied">Verlag verlag</mods:publisher>
+            <mods:dateIssued keyDate="yes">2000</mods:dateIssued>
         </mods:originInfo>
         <mods:relatedItem type="host">
             <mods:titleInfo>
                 <mods:title>Some journal</mods:title>
             </mods:titleInfo>
             <mods:part>
+                <mods:detail type="issue">
+                    <mods:number>10</mods:number>
+                </mods:detail>
                 <mods:extent>
                     <mods:start>67</mods:start>
                     <mods:end>68</mods:end>
                 </mods:extent>
-                <mods:detail type="issue">
-                    <mods:number>10</mods:number>
-                </mods:detail>
                 <mods:detail type="volume">
                     <mods:number>5</mods:number>
                 </mods:detail>

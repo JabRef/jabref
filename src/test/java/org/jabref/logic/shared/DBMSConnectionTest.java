@@ -6,7 +6,6 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -23,7 +22,8 @@ public class DBMSConnectionTest {
         assertNotNull(new DBMSConnection(properties).getConnection());
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(DBMSType.class)
     public void testGetConnectionFail(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
         assertThrows(SQLException.class,
                 () -> new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX", false, "XXXX")).getConnection());

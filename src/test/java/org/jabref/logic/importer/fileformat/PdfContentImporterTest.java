@@ -5,13 +5,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,8 +36,7 @@ class PdfContentImporterTest {
 
     @Test
     void testGetDescription() {
-        assertEquals(
-                     "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
+        assertEquals("PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
                      importer.getDescription());
     }
 
@@ -52,9 +52,9 @@ class PdfContentImporterTest {
         Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(BibtexEntryTypes.INPROCEEDINGS);
-        expected.setField(FieldName.AUTHOR, "1 ");
-        expected.setField(FieldName.TITLE, "Hello World");
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
+        expected.setField(StandardField.AUTHOR, "1 ");
+        expected.setField(StandardField.TITLE, "Hello World");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
@@ -62,4 +62,31 @@ class PdfContentImporterTest {
         assertEquals(Collections.singletonList(expected), resultSecondImport);
     }
 
+    @Test
+    void testParsingEditorWithoutPagesorSeriesInformation() {
+
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
+        entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
+        entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
+        entry.setField(StandardField.PUBLISHER, "Springer");
+        entry.setField(StandardField.TITLE, "Corpus Linguistics – An International Handbook – Lüdeling, Anke, Kytö, Merja (Eds.)");
+
+        String firstPageContents = "Corpus Linguistics – An International Handbook – Lüdeling, Anke,\n" +
+                                   "Kytö, Merja (Eds.)\n" +
+                                   "\n" +
+                                   "Anke Lüdeling, Merja Kytö (Eds.)\n" +
+                                   "\n" +
+                                   "VOLUME 2\n" +
+                                   "\n" +
+                                   "This handbook provides an up-to-date survey of the field of corpus linguistics, a Handbücher zur Sprach- und\n" +
+                                   "field whose methodology has revolutionized much of the empirical work done in Kommunikationswissenschaft / Handbooks\n" +
+                                   "\n" +
+                                   "of Linguistics and Communication Science\n" +
+                                   "most fields of linguistic study over the past decade. (HSK) 29/2\n" +
+                                   "\n" +
+                                   "vii, 578 pages\n" +
+                                   "Corpus linguistics investigates human language by starting out from large\n";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n"));
+    }
 }

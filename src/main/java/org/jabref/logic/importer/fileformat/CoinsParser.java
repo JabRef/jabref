@@ -14,8 +14,9 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * @implNote implemented by reverse-engineering <a href="https://github.com/SeerLabs/CiteSeerX/blob/4df28a98083be2829ec4c56ebbac09eb7772d379/src/java/edu/psu/citeseerx/domain/BiblioTransformer.java#L155-L249">the implementation by CiteSeerX</a>
@@ -37,23 +38,23 @@ public class CoinsParser implements Parser {
         String data = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
         BibEntry entry = new BibEntry();
 
-        appendData(data, entry, DOI, FieldName.DOI);
-        appendData(data, entry, TITLE, FieldName.TITLE);
-        appendData(data, entry, JOURNAL, FieldName.JOURNALTITLE);
-        appendData(data, entry, YEAR, FieldName.YEAR);
-        appendData(data, entry, VOLUME, FieldName.VOLUME);
-        appendData(data, entry, PAGES, FieldName.PAGES);
-        appendData(data, entry, ISSUE, FieldName.ISSUE);
+        appendData(data, entry, DOI, StandardField.DOI);
+        appendData(data, entry, TITLE, StandardField.TITLE);
+        appendData(data, entry, JOURNAL, StandardField.JOURNALTITLE);
+        appendData(data, entry, YEAR, StandardField.YEAR);
+        appendData(data, entry, VOLUME, StandardField.VOLUME);
+        appendData(data, entry, PAGES, StandardField.PAGES);
+        appendData(data, entry, ISSUE, StandardField.ISSUE);
 
         Matcher matcherType = TYPE.matcher(data);
         if (matcherType.find()) {
             switch (matcherType.group(1)) {
                 case "article":
-                    entry.setType(BiblatexEntryTypes.ARTICLE);
+                    entry.setType(StandardEntryType.Article);
                     break;
                 case "unknown":
                 default:
-                    entry.setType(BiblatexEntryTypes.MISC);
+                    entry.setType(StandardEntryType.Misc);
                     break;
             }
         }
@@ -64,15 +65,15 @@ public class CoinsParser implements Parser {
             String author = matcherAuthors.group(1);
             authors.add(author);
         }
-        entry.setField(FieldName.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
 
         return Collections.singletonList(entry);
     }
 
-    private void appendData(String data, BibEntry entry, Pattern pattern, String fieldName) {
+    private void appendData(String data, BibEntry entry, Pattern pattern, Field field) {
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
-            entry.setField(fieldName, matcher.group(1));
+            entry.setField(field, matcher.group(1));
         }
     }
 }

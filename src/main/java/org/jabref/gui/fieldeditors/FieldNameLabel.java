@@ -4,12 +4,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
 
 public class FieldNameLabel extends Label {
 
-    public FieldNameLabel(String fieldName) {
-        super(FieldName.getDisplayName(fieldName));
+    public FieldNameLabel(Field field) {
+        super(field.getDisplayName());
 
         setPadding(new Insets(4, 0, 0, 0));
         setAlignment(Pos.CENTER);

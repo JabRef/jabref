@@ -1,12 +1,22 @@
-#sideMenu {
-    -fx-background-color: -jr-white;
+#preferenceTabList {
+    -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 1;
 }
 
-#sideMenu > .virtual-flow > .clipped-container > .sheet > .list-cell {
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 8 8 8 8;
-    -fx-background: -jr-white;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: -fx-control-inner-background;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
 }
 
 .preferencePaneContainer {
@@ -15,4 +25,48 @@
 
 *:search-highlight {
 	-fx-background-color: -jr-light-red;
+}
+
+.code-area {
+    -fx-padding: 0;
+    -fx-border-width: 1;
+    -fx-background-color: transparent;
+    -fx-border-color: -fx-outer-border;
+}
+
+.code-area .tagmark {
+    -fx-fill: gray;
+}
+
+.code-area .anytag {
+    -fx-fill: crimson;
+}
+
+.code-area .paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.code-area .attribute {
+    -fx-fill: darkviolet;
+}
+
+.code-area .avalue {
+    -fx-fill: black;
+}
+
+.code-area .comment {
+    -fx-fill: teal;
+}
+
+.code-area .highlight-keyword {
+    -fx-text-fill: -jr-purple;
+}
+
+.code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
+.code-area .context-menu .menu-item .label {
+    -fx-padding: 2;
 }

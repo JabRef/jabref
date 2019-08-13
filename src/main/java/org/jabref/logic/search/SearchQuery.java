@@ -3,6 +3,9 @@ package org.jabref.logic.search;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -63,9 +66,9 @@ public class SearchQuery implements SearchMatcher {
 
     public String localize() {
         return String.format("\"%s\" (%s, %s)",
-                getQuery(),
-                getLocalizedCaseSensitiveDescription(),
-                getLocalizedRegularExpressionDescription());
+                             getQuery(),
+                             getLocalizedCaseSensitiveDescription(),
+                             getLocalizedRegularExpressionDescription());
     }
 
     private String getLocalizedCaseSensitiveDescription() {
@@ -116,6 +119,28 @@ public class SearchQuery implements SearchMatcher {
             // Parses the search query for valid words and returns a list these words.
             // For example, "The great Vikinger" will give ["The","great","Vikinger"]
             return (new SentenceAnalyzer(getQuery())).getWords();
+        }
+    }
+
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+    public Optional<Pattern> getPatternForWords() {
+        List<String> words = getSearchWords();
+
+        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+            return Optional.empty();
+        }
+
+        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
+        StringJoiner joiner = new StringJoiner(")|(", "(", ")");
+        for (String word : words) {
+            joiner.add(regularExpression ? word : Pattern.quote(word));
+        }
+        String searchPattern = joiner.toString();
+
+        if (caseSensitive) {
+            return Optional.of(Pattern.compile(searchPattern));
+        } else {
+            return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
         }
     }
 

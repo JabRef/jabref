@@ -16,7 +16,7 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -53,7 +53,7 @@ public class CrossrefFetcherEvaluator {
 
                     @Override
                     public void run() {
-                        Optional<DOI> origDOI = entry.getField(FieldName.DOI).flatMap(DOI::parse);
+                        Optional<DOI> origDOI = entry.getField(StandardField.DOI).flatMap(DOI::parse);
                         if (origDOI.isPresent()) {
                             dois.incrementAndGet();
                             try {

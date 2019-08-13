@@ -15,7 +15,8 @@ import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -166,7 +167,7 @@ public class BibDatabaseContext {
      */
     @Deprecated
     public List<String> getFileDirectories(FilePreferences preferences) {
-        return getFileDirectories(FieldName.FILE, preferences);
+        return getFileDirectories(StandardField.FILE, preferences);
     }
 
     /**
@@ -191,11 +192,11 @@ public class BibDatabaseContext {
      *     <li>BIB file directory</li>
      * </ol>
      *
-     * @param fieldName   The field type
+     * @param field   The field
      * @param preferences The fileDirectory preferences
      * @return The default directory for this field type.
      */
-    public List<String> getFileDirectories(String fieldName, FilePreferences preferences) {
+    public List<String> getFileDirectories(Field field, FilePreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
@@ -207,7 +208,7 @@ public class BibDatabaseContext {
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
+        preferences.getFileDirectory(field).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {

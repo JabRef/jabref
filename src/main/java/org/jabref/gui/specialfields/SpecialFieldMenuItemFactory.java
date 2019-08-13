@@ -11,8 +11,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.OldCommandWrapperForActiveDatabase;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 

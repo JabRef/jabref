@@ -316,7 +316,12 @@ public class IconTheme {
         OWNER(MaterialDesignIcon.ACCOUNT),
         CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
         ARTICLE(MaterialDesignIcon.FILE_DOCUMENT),
-        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT);
+        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT),
+        LATEX_CITATIONS(JabRefMaterialDesignIcon.TEX_STUDIO),
+        LATEX_FILE_DIRECTORY(MaterialDesignIcon.FOLDER_OUTLINE),
+        LATEX_FILE(MaterialDesignIcon.FILE_OUTLINE),
+        LATEX_COMMENT(MaterialDesignIcon.COMMENT_TEXT_OUTLINE),
+        LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING);
 
         private final JabRefIcon icon;
 

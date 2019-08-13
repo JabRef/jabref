@@ -23,7 +23,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -36,11 +36,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
+    private final EntryEditor entryEditor;
     private final DialogService dialogService;
 
-    public RelatedArticlesTab(EntryEditorPreferences preferences, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, DialogService dialogService) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
+        this.entryEditor = entryEditor;
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -63,7 +65,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
                       .onRunning(() -> progress.setVisible(true))
                       .onSuccess(relatedArticles -> {
                           progress.setVisible(false);
-                          root.getChildren().add(getRelatedArticleInfo(relatedArticles));
+                          root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("Error while fetching from Mr. DLib", exception);
+                          progress.setVisible(false);
+                          root.getChildren().add(getErrorInfo());
                       })
                       .executeWith(Globals.TASK_EXECUTOR);
 
@@ -77,18 +84,30 @@ public class RelatedArticlesTab extends EntryEditorTab {
      * @param list List of BibEntries of related articles
      * @return VBox of related article descriptions to be displayed in the Related Articles tab
      */
-    private VBox getRelatedArticleInfo(List<BibEntry> list) {
+    private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
+        ScrollPane scrollPane = new ScrollPane();
+
         VBox vBox = new VBox();
         vBox.setSpacing(20.0);
+
+        String heading = fetcher.getHeading();
+        Text headingText = new Text(heading);
+        headingText.getStyleClass().add("recommendation-heading");
+        String description = fetcher.getDescription();
+        Text descriptionText = new Text(description);
+        descriptionText.getStyleClass().add("recommendation-description");
+        vBox.getChildren().add(headingText);
+        vBox.getChildren().add(descriptionText);
 
         for (BibEntry entry : list) {
             HBox hBox = new HBox();
             hBox.setSpacing(5.0);
+            hBox.getStyleClass().add("recommendation-item");
 
             String title = entry.getTitle().orElse("");
-            String journal = entry.getField(FieldName.JOURNAL).orElse("");
-            String authors = entry.getField(FieldName.AUTHOR).orElse("");
-            String year = entry.getField(FieldName.YEAR).orElse("");
+            String journal = entry.getField(StandardField.JOURNAL).orElse("");
+            String authors = entry.getField(StandardField.AUTHOR).orElse("");
+            String year = entry.getField(StandardField.YEAR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
             Text journalText = new Text(journal);
@@ -96,11 +115,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
             Text authorsText = new Text(authors);
             Text yearText = new Text("(" + year + ")");
             titleLink.setOnAction(event -> {
-                if (entry.getField(FieldName.URL).isPresent()) {
+                if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        JabRefDesktop.openBrowser(entry.getField(FieldName.URL).get());
+                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get());
                     } catch (IOException e) {
-                        LOGGER.error("Error opening the browser to: " + entry.getField(FieldName.URL).get(), e);
+                        LOGGER.error("Error opening the browser to: " + entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
                     }
                 }
@@ -109,7 +128,26 @@ public class RelatedArticlesTab extends EntryEditorTab {
             hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
             vBox.getChildren().add(hBox);
         }
-        return vBox;
+        scrollPane.setContent(vBox);
+        return scrollPane;
+    }
+
+    /**
+     * Gets a ScrollPane to display error info when recommendations fail.
+     * @return ScrollPane to display in place of recommendations
+     */
+    private ScrollPane getErrorInfo() {
+        ScrollPane scrollPane = new ScrollPane();
+
+        VBox vBox = new VBox();
+        vBox.setSpacing(20.0);
+
+        Text descriptionText = new Text(Localization.lang("No recommendations received from Mr. DLib for this entry."));
+        descriptionText.getStyleClass().add("recommendation-description");
+        vBox.getChildren().add(descriptionText);
+        scrollPane.setContent(vBox);
+
+        return scrollPane;
     }
 
     /**
