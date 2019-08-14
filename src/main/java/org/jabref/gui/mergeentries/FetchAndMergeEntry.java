@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -92,8 +93,10 @@ public class FetchAndMergeEntry {
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 
             // Updated the original entry with the new fields
-            Set<Field> jointFields = new TreeSet<>(mergedEntry.get().getFields());
-            Set<Field> originalFields = new TreeSet<>(originalEntry.getFields());
+            Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
+            jointFields.addAll(mergedEntry.get().getFields());
+            Set<Field> originalFields = new TreeSet<>(Comparator.comparing(Field::getName));
+            originalFields.addAll(originalEntry.getFields());
             boolean edited = false;
 
             // entry type

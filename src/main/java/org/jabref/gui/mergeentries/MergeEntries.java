@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,18 +47,18 @@ public class MergeEntries extends BorderPane {
 
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
-            Localization.lang("Left entry"),
-            Localization.lang("Left"),
-            Localization.lang("None"),
-            Localization.lang("Right"),
-            Localization.lang("Right entry"));
+                                                              Localization.lang("Left entry"),
+                                                              Localization.lang("Left"),
+                                                              Localization.lang("None"),
+                                                              Localization.lang("Right"),
+                                                              Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
     private final Map<Field, TextFlow> leftTextPanes = new HashMap<>();
-    private final Set<Field> allFields = new TreeSet<>();
+    private final Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
     private final Map<Field, TextFlow> rightTextPanes = new HashMap<>();
     private final Map<Field, List<RadioButton>> radioButtons = new HashMap<>();
     private Boolean identicalTypes;
@@ -80,7 +81,6 @@ public class MergeEntries extends BorderPane {
         setLeftHeaderText(headingLeft);
         setRightHeaderText(headingRight);
     }
-
 
     /**
      * Constructor taking two entries
@@ -240,8 +240,8 @@ public class MergeEntries extends BorderPane {
     private void fillDiffModes() {
         diffMode.setItems(FXCollections.observableList(Arrays.asList(DiffMode.values())));
         new ViewModelListCellFactory<DiffMode>()
-                .withText(MergeEntries::getDisplayText)
-                .install(diffMode);
+                                                .withText(MergeEntries::getDisplayText)
+                                                .install(diffMode);
         DiffMode diffModePref = Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
                                              .flatMap(DiffMode::parse)
                                              .orElse(DiffMode.WORD);
