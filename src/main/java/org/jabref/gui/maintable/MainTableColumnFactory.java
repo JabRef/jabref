@@ -77,12 +77,8 @@ class MainTableColumnFactory {
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
-
-
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
-
         columns.add(createGroupColumn());
-
         // Add column for linked files
         if (preferences.showFileColumn()) {
             columns.add(createFileColumn());
