@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -129,31 +130,36 @@ class MainTableColumnFactory {
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        Rectangle borderColor = new Rectangle();
-        borderColor.setWidth(5);
-        borderColor.setHeight(20);
-        borderColor.setFill(Color.DARKGRAY);
-        Rectangle groupColor = new Rectangle();
-        groupColor.setWidth(3);
-        groupColor.setHeight(18);
-        Color color = matchedGroups.stream()
-                                   .flatMap(group -> OptionalUtil.toStream(group.getColor()))
-                                   .findFirst()
-                                   .orElse(Color.TRANSPARENT);
-        groupColor.setFill(color);
+        Color groupColor = matchedGroups.stream()
+                .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                .findFirst()
+                .orElse(Color.TRANSPARENT);
 
-        StackPane container = new StackPane();
-        container.setMinWidth(10);
-        container.setAlignment(Pos.CENTER);
-        container.getChildren().addAll(borderColor,groupColor);
+        if (groupColor != Color.TRANSPARENT) {
+            Rectangle border = new Rectangle();
+            border.setWidth(5);
+            border.setHeight(20);
+            border.setFill(Color.DARKGRAY);
 
-        String matchedGroupsString = matchedGroups.stream()
-                                                  .map(AbstractGroup::getName)
-                                                  .collect(Collectors.joining(", "));
-        Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
-        Tooltip.install(container, tooltip);
+            Rectangle groupRectangle = new Rectangle();
+            groupRectangle.setWidth(3);
+            groupRectangle.setHeight(18);
+            groupRectangle.setFill(groupColor);
 
-        return container;
+            StackPane container = new StackPane();
+            container.setMinWidth(10);
+            container.setAlignment(Pos.CENTER);
+
+            container.getChildren().addAll(border,groupRectangle);
+
+            String matchedGroupsString = matchedGroups.stream()
+                    .map(AbstractGroup::getName)
+                    .collect(Collectors.joining(", "));
+            Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
+            Tooltip.install(container, tooltip);
+            return container;
+        }
+        return new Pane();
     }
 
     private List<TableColumn<BibEntryTableViewModel, ?>> createNormalColumns() {
