@@ -1,5 +1,6 @@
 package org.jabref.gui.importer;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -158,6 +159,8 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     private IconTheme.JabRefIcons getIcon(EntryType type) {
         if (StandardEntryType.Book.equals(type)) {
             return IconTheme.JabRefIcons.BOOK;
+        } else if (Arrays.asList(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection).contains(type)) {
+            return IconTheme.JabRefIcons.OPEN_LINK;
         }
         return IconTheme.JabRefIcons.ARTICLE;
     }

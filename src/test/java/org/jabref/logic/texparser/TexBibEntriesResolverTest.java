@@ -1,21 +1,28 @@
 package org.jabref.logic.texparser;
 
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TexBibEntriesResolverTest {
     private final static String DARWIN = "Darwin1888";
@@ -24,15 +31,20 @@ public class TexBibEntriesResolverTest {
     private final static String EINSTEIN_A = "Einstein1920a";
     private final static String EINSTEIN_B = "Einstein1920b";
     private final static String EINSTEIN_C = "Einstein1920c";
-    private final static String EINSTEIN_21 = "Einstein1921";
-    private final static String UNRESOLVED = "UnresolvedKey";
-    private final static String UNKNOWN = "UnknownKey";
 
+    private static FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private static ImportFormatPreferences importFormatPreferences;
     private static BibDatabase database;
+    private static BibDatabase database2;
+    private static BibEntry bibEntry;
 
     @BeforeEach
     private void setUp() {
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+
         database = new BibDatabase();
+        database2 = new BibDatabase();
 
         BibEntry darwin = new BibEntry(StandardEntryType.Book)
                 .withCiteKey(DARWIN)
@@ -58,23 +70,32 @@ public class TexBibEntriesResolverTest {
                 .withField(StandardField.AUTHOR, "Newton, Isaac");
         database.insertEntry(newton);
 
-        BibEntry einsteinA = new BibEntry(StandardEntryType.Book)
+        BibEntry einsteinA = new BibEntry(StandardEntryType.InBook)
                 .withCiteKey(EINSTEIN_A)
-                .withField(StandardField.CROSSREF, "Einstein1920")
+                .withField(StandardField.CROSSREF, EINSTEIN)
                 .withField(StandardField.PAGES, "22--23");
-        database.insertEntry(einsteinA);
+        database2.insertEntry(einsteinA);
 
-        BibEntry einsteinB = new BibEntry(StandardEntryType.Book)
+        BibEntry einsteinB = new BibEntry(StandardEntryType.InBook)
                 .withCiteKey(EINSTEIN_B)
                 .withField(StandardField.CROSSREF, "Einstein1921")
                 .withField(StandardField.PAGES, "22--23");
         database.insertEntry(einsteinB);
 
-        BibEntry einsteinC = new BibEntry(StandardEntryType.Book)
+        BibEntry einsteinC = new BibEntry(StandardEntryType.InBook)
                 .withCiteKey(EINSTEIN_C)
-                .withField(StandardField.CROSSREF, "Einstein1920")
+                .withField(StandardField.CROSSREF, EINSTEIN)
                 .withField(StandardField.PAGES, "25--33");
         database.insertEntry(einsteinC);
+
+        bibEntry = new BibEntry(StandardEntryType.InBook)
+                .withCiteKey(EINSTEIN_A)
+                .withField(StandardField.TITLE, "Relativity: The special and general theory")
+                .withField(StandardField.PUBLISHER, "Penguin")
+                .withField(StandardField.YEAR, "1920")
+                .withField(StandardField.AUTHOR, "Einstein, Albert")
+                .withField(StandardField.CROSSREF, "Einstein1920")
+                .withField(StandardField.PAGES, "22--23");
     }
 
     @Test
@@ -82,11 +103,8 @@ public class TexBibEntriesResolverTest {
         Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
-
-        expectedCrossingResult.insertEntry(database, DARWIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -97,12 +115,8 @@ public class TexBibEntriesResolverTest {
         Path texFile2 = Paths.get(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2));
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
-
-        expectedCrossingResult.insertEntry(database, DARWIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
-        expectedCrossingResult.insertEntry(database, NEWTON);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -112,11 +126,8 @@ public class TexBibEntriesResolverTest {
         Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
-
-        expectedCrossingResult.insertEntry(database, DARWIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -126,12 +137,8 @@ public class TexBibEntriesResolverTest {
         Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
-
-        expectedCrossingResult.insertEntry(database, DARWIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
-        expectedCrossingResult.addUnresolvedKey(UNKNOWN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -141,11 +148,8 @@ public class TexBibEntriesResolverTest {
         Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
-
-        expectedCrossingResult.insertEntry(database, DARWIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }
@@ -155,16 +159,10 @@ public class TexBibEntriesResolverTest {
         Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
         TexParserResult parserResult = new DefaultTexParser().parse(texFile);
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database).resolveKeys(parserResult);
+        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
         TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(parserResult);
 
-        expectedCrossingResult.insertEntry(database, EINSTEIN_B);
-        expectedCrossingResult.insertEntry(database, EINSTEIN_A);
-        expectedCrossingResult.insertEntry(database, EINSTEIN);
-        expectedCrossingResult.insertEntry(database, EINSTEIN_C);
-        expectedCrossingResult.addUnresolvedKey(EINSTEIN_21);
-        expectedCrossingResult.addUnresolvedKey(UNRESOLVED);
-        expectedCrossingResult.increaseCrossRefsCount();
+        expectedCrossingResult.addEntry(bibEntry);
 
         assertEquals(expectedCrossingResult, crossingResult);
     }

@@ -28,7 +28,9 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
+import org.jabref.logic.texparser.TexBibEntriesResolver;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -41,9 +43,11 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParseTexDialogViewModel.class);
     private static final String TEX_EXT = ".tex";
+    private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileMonitor;
     private final StringProperty texDirectory;
     private final FunctionBasedValidator<String> texDirectoryValidator;
     private final ObjectProperty<FileNodeViewModel> root;
@@ -53,10 +57,13 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final BooleanProperty successfulSearch;
 
     public ParseTexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
-                                   TaskExecutor taskExecutor, PreferencesService preferencesService) {
+                                   TaskExecutor taskExecutor, PreferencesService preferencesService,
+                                   FileUpdateMonitor fileMonitor) {
+        this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
+        this.fileMonitor = fileMonitor;
         this.texDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
                                                                     .orElseGet(preferencesService::getWorkingDir)
                                                                     .toAbsolutePath().toString());
@@ -181,10 +188,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        BackgroundTask.wrap(() -> new DefaultTexParser().parse(fileList))
+        BackgroundTask.wrap(() -> new TexBibEntriesResolver(databaseContext.getDatabase(), preferencesService.getImportFormatPreferences(), fileMonitor).resolve(new DefaultTexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseTexResultView(result, Paths.get(texDirectory.get())).showAndWait())
+                      .onSuccess(result -> new ParseTexResultView(result, databaseContext, Paths.get(texDirectory.get())).showAndWait())
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

@@ -18,5 +18,6 @@
             </HBox>
         </VBox>
     </content>
+    <ButtonType fx:id="importButtonType" text="%Import new entries" buttonData="OK_DONE"/>
     <ButtonType fx:constant="CLOSE"/>
 </DialogPane>
