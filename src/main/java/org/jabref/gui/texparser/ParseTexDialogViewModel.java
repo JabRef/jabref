@@ -188,7 +188,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        BackgroundTask.wrap(() -> new TexBibEntriesResolver(databaseContext.getDatabase(), preferencesService.getImportFormatPreferences(), fileMonitor).resolve(new DefaultTexParser().parse(fileList)))
+        TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
+                preferencesService.getImportFormatPreferences(), fileMonitor);
+
+        BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultTexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
                       .onSuccess(result -> new ParseTexResultView(result, databaseContext, Paths.get(texDirectory.get())).showAndWait())

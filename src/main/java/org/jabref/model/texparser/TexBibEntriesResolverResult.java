@@ -12,21 +12,15 @@ import com.google.common.collect.Multimap;
 public class TexBibEntriesResolverResult {
 
     private final TexParserResult texParserResult;
-    private final Set<String> newEntryKeys;
     private final Set<BibEntry> newEntries;
 
     public TexBibEntriesResolverResult(TexParserResult texParserResult) {
         this.texParserResult = texParserResult;
-        this.newEntryKeys = new HashSet<>();
         this.newEntries = new HashSet<>();
     }
 
     public TexParserResult getTexParserResult() {
         return texParserResult;
-    }
-
-    public Set<String> getNewEntryKeys() {
-        return newEntryKeys;
     }
 
     public Set<BibEntry> getNewEntries() {
@@ -35,10 +29,6 @@ public class TexBibEntriesResolverResult {
 
     public void addEntry(BibEntry entry) {
         newEntries.add(entry);
-        entry.getCiteKeyOptional().ifPresent(entryKey -> {
-            newEntryKeys.add(entryKey);
-            newEntries.add(entry);
-        });
     }
 
     /**
@@ -57,9 +47,8 @@ public class TexBibEntriesResolverResult {
 
     @Override
     public String toString() {
-        return String.format("TexBibEntriesResolverResult{texParserResult=%s, newEntryKeys=%s, newEntries=%s}",
+        return String.format("TexBibEntriesResolverResult{texParserResult=%s, newEntries=%s}",
                 this.texParserResult,
-                this.newEntryKeys,
                 this.newEntries);
     }
 
@@ -76,12 +65,11 @@ public class TexBibEntriesResolverResult {
         TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) obj;
 
         return Objects.equals(texParserResult, that.texParserResult)
-                && Objects.equals(newEntryKeys, that.newEntryKeys)
                 && Objects.equals(newEntries, that.newEntries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(texParserResult, newEntryKeys, newEntries);
+        return Objects.hash(texParserResult, newEntries);
     }
 }

@@ -1,6 +1,8 @@
 package org.jabref.gui.texparser;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -22,7 +24,6 @@ public class ParseTexResultViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final ObservableList<ReferenceViewModel> referenceList;
     private final ObservableList<Citation> citationList;
-    private final BooleanProperty close;
     private final BooleanProperty importButtonDisabled;
 
     public ParseTexResultViewModel(TexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext) {
@@ -30,10 +31,10 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         this.databaseContext = databaseContext;
         this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
-        this.close = new SimpleBooleanProperty(false);
 
+        Set<String> newEntryKeys = resolverResult.getNewEntries().stream().map(entry -> entry.getCiteKeyOptional().orElse("")).collect(Collectors.toSet());
         resolverResult.getCitations().asMap().forEach((entry, citations) ->
-                referenceList.add(new ReferenceViewModel(entry, resolverResult.getNewEntryKeys().contains(entry), citations)));
+                referenceList.add(new ReferenceViewModel(entry, newEntryKeys.contains(entry), citations)));
 
         this.importButtonDisabled = new SimpleBooleanProperty(referenceList.stream().noneMatch(ReferenceViewModel::isHighlighted));
     }
@@ -48,10 +49,6 @@ public class ParseTexResultViewModel extends AbstractViewModel {
 
     public BooleanProperty importButtonDisabledProperty() {
         return importButtonDisabled;
-    }
-
-    public BooleanProperty closeProperty() {
-        return close;
     }
 
     /**
@@ -74,7 +71,5 @@ public class ParseTexResultViewModel extends AbstractViewModel {
 
         dialog.setTitle(Localization.lang("Import entries from LaTeX files"));
         dialog.showAndWait();
-
-        close.set(true);
     }
 }

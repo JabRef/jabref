@@ -37,7 +37,10 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(importButtonType, getDialogPane(), event -> viewModel.importButtonClicked());
+        ControlHelper.setAction(importButtonType, getDialogPane(), event -> {
+            viewModel.importButtonClicked();
+            close();
+        });
         Button importButton = (Button) getDialogPane().lookupButton(importButtonType);
         importButton.disableProperty().bind(viewModel.importButtonDisabledProperty());
     }
@@ -63,7 +66,5 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
         citationsDisplay.basePathProperty().set(basePath);
         citationsDisplay.setItems(viewModel.getCitationListByReference());
-
-        EasyBind.subscribe(viewModel.closeProperty(), close -> close());
     }
 }
