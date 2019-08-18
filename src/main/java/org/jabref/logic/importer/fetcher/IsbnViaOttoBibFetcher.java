@@ -1,25 +1,30 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 /**
  * Fetcher for ISBN using https://www.ottobib.com
  */
 public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
+
+    private static final String BASE_URL = "https://www.ottobib.com/isbn/";
 
     public IsbnViaOttoBibFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
@@ -46,38 +51,20 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
         this.ensureThatIsbnIsValid(identifier);
 
-        HttpResponse<String> postResponse;
-
-        String BASE_URL = "https://www.ottobib.com/isbn/" + identifier + "/bibtex";
-
+        Document html;
         try {
-            postResponse = Unirest.post(BASE_URL)
-                    .asString();
-        } catch (UnirestException e) {
-            throw new FetcherException("Could not retrieve data from ottobib.com", e);
+            html = Jsoup.connect(BASE_URL + identifier + "/bibtex").userAgent(URLDownload.USER_AGENT).get();
+        } catch (IOException e) {
+            throw new FetcherException("Could not ", e);
         }
-        if (postResponse.getStatus() != 200) {
-            throw new FetcherException("Error while retrieving data from ottobib.com: " + postResponse.getBody());
-        }
-
-        List<BibEntry> fetchedEntries;
+        Element textArea = html.select("textarea").first();
+        Optional<BibEntry> entry = Optional.empty();
         try {
-            fetchedEntries = getParser().parseEntries(postResponse.getRawBody());
+            entry = BibtexParser.singleFromString(textArea.text(), importFormatPreferences, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
-        if (fetchedEntries.isEmpty()) {
-            return Optional.empty();
-        } else if (fetchedEntries.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                    + ". We will use the first entry.");
-        }
+        return entry;
 
-        BibEntry entry = fetchedEntries.get(0);
-
-        // ottobib does not return an ISBN.
-        entry.setField("isbn", identifier);
-
-        return Optional.of(entry);
     }
 }
