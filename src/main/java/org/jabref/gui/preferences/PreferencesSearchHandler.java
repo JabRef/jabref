@@ -17,12 +17,12 @@ import com.google.common.collect.ArrayListMultimap;
 class PreferencesSearchHandler {
 
     private static PseudoClass labelHighlight = PseudoClass.getPseudoClass("search-highlight");
-    private final List<PrefsTab> preferenceTabs;
-    private final ListProperty<PrefsTab> filteredPreferenceTabs;
-    private final ArrayListMultimap<PrefsTab, Labeled> preferenceTabsLabelNames;
+    private final List<PreferencesTab> preferenceTabs;
+    private final ListProperty<PreferencesTab> filteredPreferenceTabs;
+    private final ArrayListMultimap<PreferencesTab, Labeled> preferenceTabsLabelNames;
     private final ArrayList<Labeled> highlightedLabels = new ArrayList<>();
 
-    PreferencesSearchHandler(List<PrefsTab> preferenceTabs) {
+    PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
         this.preferenceTabsLabelNames = getPrefsTabLabelMap();
         this.filteredPreferenceTabs = new SimpleListProperty<>(FXCollections.observableArrayList(preferenceTabs));
@@ -36,7 +36,7 @@ class PreferencesSearchHandler {
         }
 
         filteredPreferenceTabs.clear();
-        for (PrefsTab tab : preferenceTabsLabelNames.keySet()) {
+        for (PreferencesTab tab : preferenceTabsLabelNames.keySet()) {
             boolean tabContainsLabel = false;
             for (Labeled labeled : preferenceTabsLabelNames.get(tab)) {
                 if (labelContainsText(labeled, text)) {
@@ -69,20 +69,20 @@ class PreferencesSearchHandler {
     }
 
     /*
-     * Traverse all nodes of a PrefsTab and return a
-     * mapping from PrefsTab to all its Labeled type nodes.
+     * Traverse all nodes of a PreferencesTab and return a
+     * mapping from PreferencesTab to all its Labeled type nodes.
      */
-    private ArrayListMultimap<PrefsTab, Labeled> getPrefsTabLabelMap() {
-        ArrayListMultimap<PrefsTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
-        for (PrefsTab prefsTab : preferenceTabs) {
-            Node builder = prefsTab.getBuilder();
+    private ArrayListMultimap<PreferencesTab, Labeled> getPrefsTabLabelMap() {
+        ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
+        for (PreferencesTab preferencesTab : preferenceTabs) {
+            Node builder = preferencesTab.getBuilder();
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
                 for (Node child : parentBuilder.getChildrenUnmodifiable()) {
                     if (child instanceof Labeled) {
                         Labeled labeled = (Labeled) child;
                         if (!labeled.getText().isEmpty()) {
-                            prefsTabLabelMap.put(prefsTab, labeled);
+                            prefsTabLabelMap.put(preferencesTab, labeled);
                         }
                     }
                 }
@@ -91,7 +91,7 @@ class PreferencesSearchHandler {
         return prefsTabLabelMap;
     }
 
-    protected ListProperty<PrefsTab> filteredPreferenceTabsProperty() {
+    protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
 
