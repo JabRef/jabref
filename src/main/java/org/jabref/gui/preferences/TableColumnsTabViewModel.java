@@ -37,12 +37,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     // ToDo: Convert to CheckListView-CheckModel
     private final SimpleBooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldRankingProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldQualityProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldPriorityProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldRelevanceProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldPrintedProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldReadStatusProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty specialFieldsSyncKeyWordsProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
 
@@ -62,9 +56,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.columnPreferences = preferences.getColumnPreferences();
         this.frame = frame;
-
-        // identifierFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> setValues());
-        // extraFileFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> setValues());
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -90,6 +81,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         Set<TableColumnsItemModel> fields = new HashSet<>();
 
         columnsListProperty.getValue().clear();
+
         columnPreferences.getNormalColumns().forEach(
                 item -> columnsListProperty.getValue().add(new TableColumnsItemModel(FieldFactory.parseField(item))));
 
@@ -110,14 +102,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
             insertSpecialColumns();
         }
 
-        // ToDo: convert to CheckListView-CheckModel
-        specialFieldRankingProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.RANKING));
-        specialFieldQualityProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.QUALITY));
-        specialFieldPriorityProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRIORITY));
-        specialFieldRelevanceProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.RELEVANCE));
-        specialFieldPrintedProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRINTED));
-        specialFieldReadStatusProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.READ_STATUS));
-
         // HardCoded Fields
         fileFieldProperty.setValue(columnPreferences.showFileColumn());
         urlFieldEnabledProperty.setValue(columnPreferences.showUrlColumn());
@@ -134,25 +118,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private void insertSpecialColumns() {
         Set<TableColumnsItemModel> fields = new HashSet<>();
-
-        EnumSet.allOf(SpecialField.class).forEach(specialField -> {
-            TableColumnsItemModel column = new TableColumnsItemModel(specialField);
-            fields.add(column);
-
-            /* if (specialField == SpecialField.RANKING && specialFieldRankingProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } else if (specialField == SpecialField.QUALITY && specialFieldQualityProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } else if (specialField == SpecialField.PRIORITY && specialFieldPriorityProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } else if (specialField == SpecialField.RELEVANCE && specialFieldRelevanceProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } else if (specialField == SpecialField.PRINTED && specialFieldPrintedProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } else if (specialField == SpecialField.READ_STATUS && specialFieldReadStatusProperty.getValue()) {
-                checkedColumnsModelProperty.getValue().check(column);
-            } */
-        });
+        EnumSet.allOf(SpecialField.class)
+                .forEach(specialField -> fields.add(new TableColumnsItemModel(specialField)));
 
         insertColumns(fields);
     }
@@ -186,6 +153,43 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         fields.stream()
                 .filter(field -> columnsListProperty.getValue().filtered(item -> item.getName().equals(field.getName())).isEmpty())
                 .forEach(columnsListProperty.getValue()::add);
+    }
+
+    public void setChecks() {
+        /* columnPreferences.getNormalColumns().stream().map(FieldFactory::parseField).forEach(
+                field -> columnsListProperty.stream().filter(item -> item.getField().equals(field))
+                            .forEach(item -> checkedColumnsModelProperty.getValue().check(item))
+                ); */
+
+        List<String> fieldNames = columnPreferences.getNormalColumns();
+        for (TableColumnsItemModel item : columnsListProperty.getValue()) {
+            if (fieldNames.contains(item.getField().getName())) {
+                checkedColumnsModelProperty.getValue().check(item);
+            }
+        }
+        /* columnsListProperty.stream().filter(item -> fieldNames.contains(item.getField().getName()))
+                .forEach(item -> checkedColumnsModelProperty.getValue().check(item)); */
+
+        /* specialFieldRankingProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.RANKING));
+        specialFieldQualityProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.QUALITY));
+        specialFieldPriorityProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRIORITY));
+        specialFieldRelevanceProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.RELEVANCE));
+        specialFieldPrintedProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRINTED));
+        specialFieldReadStatusProperty.setValue(columnPreferences.getSpecialFieldColumns().contains(SpecialField.READ_STATUS)); */
+
+                    /* if (specialField == SpecialField.RANKING && specialFieldRankingProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } else if (specialField == SpecialField.QUALITY && specialFieldQualityProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } else if (specialField == SpecialField.PRIORITY && specialFieldPriorityProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } else if (specialField == SpecialField.RELEVANCE && specialFieldRelevanceProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } else if (specialField == SpecialField.PRINTED && specialFieldPrintedProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } else if (specialField == SpecialField.READ_STATUS && specialFieldReadStatusProperty.getValue()) {
+                checkedColumnsModelProperty.getValue().check(column);
+            } */
     }
 
     @Override

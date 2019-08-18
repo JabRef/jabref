@@ -136,6 +136,7 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
 
         viewModel.setValues();
+        viewModel.setChecks();
     }
 
     private void jumpToSearchKey(CheckListView<TableColumnsItemModel> list, KeyEvent keypressed) {
