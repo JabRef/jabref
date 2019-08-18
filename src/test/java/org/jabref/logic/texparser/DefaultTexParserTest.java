@@ -45,6 +45,10 @@ public class DefaultTexParserTest {
         testMatchCite(UNRESOLVED, "\\parencite[post]{UnresolvedKey}");
         testMatchCite(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}");
         testMatchCite(EINSTEIN_C, "\\citep{Einstein1920c}");
+        testMatchCite(EINSTEIN_C, "\\autocite{Einstein1920c}");
+        testMatchCite(EINSTEIN_C, "\\Autocite{Einstein1920c}");
+        testMatchCite(DARWIN, "\\blockcquote[p. 28]{Darwin1888}{some text}");
+        testMatchCite(DARWIN, "\\textcquote[p. 18]{Darwin1888}{blablabla}");
 
         testNonMatchCite("\\citet21312{123U123n123resolvedKey}");
         testNonMatchCite("\\1cite[pr234e][post]{UnresolvedKey}");
