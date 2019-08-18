@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -16,7 +17,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -65,7 +67,7 @@ class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
-   
+
 
     public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.database = Objects.requireNonNull(database);
@@ -78,9 +80,7 @@ class MainTableColumnFactory {
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
-
         columns.add(createGroupColumn());
-
         // Add column for linked files
         if (preferences.showFileColumn()) {
             columns.add(createFileColumn());
@@ -116,35 +116,51 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
-        column.getStyleClass().add(GROUP_COLUMN);
-        setExactWidth(column, 20);
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
+        column.setStyle("-fx-padding: 0 0 0 0;");
         column.setSortable(true);
         return column;
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        Rectangle rectangle = new Rectangle();
-        rectangle.setWidth(3);
-        rectangle.setHeight(20);
-        Color color = matchedGroups.stream()
-                                   .flatMap(group -> OptionalUtil.toStream(group.getColor()))
-                                   .findFirst()
-                                   .orElse(Color.TRANSPARENT);
-        rectangle.setFill(color);
+        Color groupColor = matchedGroups.stream()
+                .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                .findFirst()
+                .orElse(Color.TRANSPARENT);
 
-        String matchedGroupsString = matchedGroups.stream()
-                                                  .map(AbstractGroup::getName)
-                                                  .collect(Collectors.joining(", "));
-        Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
-        Tooltip.install(rectangle, tooltip);
+        if (groupColor != Color.TRANSPARENT) {
+            Rectangle border = new Rectangle();
+            border.setWidth(5);
+            border.setHeight(20);
+            border.setFill(Color.DARKGRAY);
 
-        BorderPane container = new BorderPane();
-        container.setLeft(rectangle);
-        return container;
+            Rectangle groupRectangle = new Rectangle();
+            groupRectangle.setWidth(3);
+            groupRectangle.setHeight(18);
+            groupRectangle.setFill(groupColor);
+
+            StackPane container = new StackPane();
+            container.setMinWidth(10);
+            container.setAlignment(Pos.CENTER);
+
+            container.getChildren().addAll(border,groupRectangle);
+
+            String matchedGroupsString = matchedGroups.stream()
+                    .map(AbstractGroup::getName)
+                    .collect(Collectors.joining(", "));
+            Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
+            Tooltip.install(container, tooltip);
+            return container;
+        }
+        return new Pane();
     }
 
     private List<TableColumn<BibEntryTableViewModel, ?>> createNormalColumns() {
