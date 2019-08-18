@@ -94,7 +94,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
                 } else if (item.getField() instanceof UnknownField) {
                     setText(item.getName() + " (" + Localization.lang("Custom") + ")");
                 } else if (item.getField() instanceof TableColumnsTabViewModel.ExtraFileField) {
-                    setText(item.getName() + " (" + Localization.lang("File Type") + ")");
+                    setText(item.getName() + " (" + Localization.lang("File type") + ")");
                 } else {
                     setText(item.getName());
                 }

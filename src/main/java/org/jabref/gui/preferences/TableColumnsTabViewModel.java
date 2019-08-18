@@ -129,7 +129,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         if (specialFieldsEnabledProperty.getValue()) {
             List<SpecialField> specialFields = new ArrayList<>(columnPreferences.getSpecialFieldColumns());
             checks.add(specialFields.contains(SpecialField.QUALITY) ? SpecialField.QUALITY.getName() : null);
-            checks.add(specialFields.contains(SpecialField.PRIORITY) ? SpecialField.READ_STATUS.getName() : null);
+            checks.add(specialFields.contains(SpecialField.PRIORITY) ? SpecialField.PRIORITY.getName() : null);
             checks.add(specialFields.contains(SpecialField.RELEVANCE) ? SpecialField.RELEVANCE.getName() : null);
             checks.add(specialFields.contains(SpecialField.PRINTED) ? SpecialField.PRINTED.getName() : null);
             checks.add(specialFields.contains(SpecialField.READ_STATUS) ? SpecialField.READ_STATUS.getName() : null);
@@ -233,11 +233,11 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         );
 
         if (!(columnPreferences.getSpecialFieldColumns().equals(newColumnPreferences.getSpecialFieldColumns()))) {
-            restartWarnings.add(Localization.lang("Special Field Column added/removed"));
+            restartWarnings.add(Localization.lang("Special field column"));
         }
 
         if (columnPreferences.getAutoSyncSpecialFieldsToKeyWords() != newColumnPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
-            restartWarnings.add(Localization.lang("Synchronize SpecialFields to keywords"));
+            restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
         }
 
         if (columnPreferences.getSerializeSpecialFields() != newColumnPreferences.getSerializeSpecialFields()) {

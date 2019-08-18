@@ -17,7 +17,7 @@ public class TableColumnsItemModel {
     private final ReadOnlyBooleanProperty editableProperty;
 
     public TableColumnsItemModel() {
-        this.field = new SimpleObjectProperty<>(new UnknownField(Localization.lang("new Column")));
+        this.field = new SimpleObjectProperty<>(new UnknownField(Localization.lang("New column")));
         this.length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
         this.editableProperty = new SimpleBooleanProperty(true);
     }
