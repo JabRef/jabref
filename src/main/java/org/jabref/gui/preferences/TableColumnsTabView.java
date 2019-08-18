@@ -3,13 +3,11 @@ package org.jabref.gui.preferences;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -29,7 +27,7 @@ import org.jabref.preferences.JabRefPreferences;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
 
-public class TableColumnsTabView extends VBox implements PrefsTab {
+public class TableColumnsTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private CheckListView<TableColumnsItemModel> columnsList;
     @FXML private Button sortUp;
@@ -59,8 +57,6 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
     private long lastKeyPressTime;
     private String listSearchTerm;
 
-    private TableColumnsTabViewModel viewModel;
-
     public TableColumnsTabView(JabRefPreferences preferences, JabRefFrame frame) {
         this.preferences = preferences;
         this.frame = frame;
@@ -68,13 +64,18 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
         ViewLoader.view(this)
                 .root(this)
                 .load();
+    }
 
+    @Override
+    public String getTabName() {
+        return Localization.lang("Entry table columns");
     }
 
     public void initialize() {
-        viewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
+        TableColumnsTabViewModel tableColumnsTabViewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
+        this.viewModel = tableColumnsTabViewModel;
 
-        columnsList.itemsProperty().bindBidirectional(viewModel.columnsListProperty());
+        columnsList.itemsProperty().bindBidirectional(tableColumnsTabViewModel.columnsListProperty());
         columnsList.setOnKeyTyped(event -> jumpToSearchKey(columnsList, event));
         columnsList.setCellFactory(checkBoxListView -> new CheckBoxListCell<TableColumnsItemModel>(columnsList::getItemBooleanProperty) {
             @Override
@@ -100,17 +101,17 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
             }
         });
 
-        viewModel.checkedColumnsModelProperty().setValue(columnsList.getCheckModel());
+        tableColumnsTabViewModel.checkedColumnsModelProperty().setValue(columnsList.getCheckModel());
 
-        showFileColumn.selectedProperty().bindBidirectional(viewModel.fileFieldProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(viewModel.urlFieldEnabledProperty());
-        urlFirst.selectedProperty().bindBidirectional(viewModel.preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(viewModel.preferDoiProperty());
-        showEprintColumn.selectedProperty().bindBidirectional(viewModel.eprintFieldProperty());
-        enableSpecialFields.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
-        syncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeyWordsProperty());
-        serializeSpecial.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
-        enableExtraColumns.selectedProperty().bindBidirectional(viewModel.extraFieldsEnabledProperty());
+        showFileColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showFileColumnProperty());
+        showUrlColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showUrlColumnProperty());
+        urlFirst.selectedProperty().bindBidirectional(tableColumnsTabViewModel.preferUrlProperty());
+        doiFirst.selectedProperty().bindBidirectional(tableColumnsTabViewModel.preferDoiProperty());
+        showEprintColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showEPrintColumnProperty());
+        enableSpecialFields.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsEnabledProperty());
+        syncKeywords.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsSyncKeyWordsProperty());
+        serializeSpecial.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsSerializeProperty());
+        enableExtraColumns.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showExtraFileColumnsProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_UP, new SimpleCommand() {
@@ -134,9 +135,6 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
             public void execute() { String ab = "a" + "b"; }
         }, updateToTable);
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
-
-        viewModel.setValues();
-        viewModel.setChecks();
     }
 
     private void jumpToSearchKey(CheckListView<TableColumnsItemModel> list, KeyEvent keypressed) {
@@ -154,24 +152,5 @@ public class TableColumnsTabView extends VBox implements PrefsTab {
 
         list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
                 .findFirst().ifPresent(list::scrollTo);
-    }
-
-    @Override
-    public Node getBuilder() {
-        return this;
-    }
-
-    @Override
-    public void setValues() { viewModel.setValues(); }
-
-    @Override
-    public void storeSettings() { viewModel.storeSettings(); }
-
-    @Override
-    public boolean validateSettings() { return viewModel.validateSettings(); }
-
-    @Override
-    public String getTabName() {
-        return Localization.lang("Entry table columns");
     }
 }

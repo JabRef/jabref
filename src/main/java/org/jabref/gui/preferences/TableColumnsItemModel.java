@@ -14,24 +14,24 @@ public class TableColumnsItemModel {
 
     private final SimpleObjectProperty<Field> field;
     private final SimpleDoubleProperty length;
-    private final ReadOnlyBooleanProperty editablePropery;
+    private final ReadOnlyBooleanProperty editableProperty;
 
     public TableColumnsItemModel() {
         this.field = new SimpleObjectProperty<>(new UnknownField(Localization.lang("new Column")));
         this.length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
-        this.editablePropery = new SimpleBooleanProperty(true);
+        this.editableProperty = new SimpleBooleanProperty(true);
     }
 
     public TableColumnsItemModel(Field field) {
         this.field = new SimpleObjectProperty<>(field);
         this.length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
-        this.editablePropery = new SimpleBooleanProperty(this.field.get() instanceof UnknownField);
+        this.editableProperty = new SimpleBooleanProperty(this.field.get() instanceof UnknownField);
     }
 
     public TableColumnsItemModel(Field field, double length) {
         this.field = new SimpleObjectProperty<>(field);
         this.length = new SimpleDoubleProperty(length);
-        this.editablePropery = new SimpleBooleanProperty(this.field.get() instanceof UnknownField);
+        this.editableProperty = new SimpleBooleanProperty(this.field.get() instanceof UnknownField);
     }
 
     public Field getField() {
@@ -47,13 +47,21 @@ public class TableColumnsItemModel {
     }
 
     public void setName(String name) {
-        if (editablePropery.get()) {
+        if (editableProperty.get()) {
             field.setValue(new UnknownField(name));
         }
     }
 
-    public ReadOnlyBooleanProperty editablePropery() {
-        return editablePropery;
+    public double getLength() {
+        return length.get();
+    }
+
+    public void setLength(double length) {
+        this.length.set(length);
+    }
+
+    public ReadOnlyBooleanProperty editableProperty() {
+        return editableProperty;
     }
 
 }
