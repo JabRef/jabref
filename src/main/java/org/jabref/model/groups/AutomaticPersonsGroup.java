@@ -8,13 +8,14 @@ import java.util.stream.Collectors;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticPersonsGroup extends AutomaticGroup {
 
-    private String field;
+    private Field field;
 
-    public AutomaticPersonsGroup(String name, GroupHierarchyType context, String field) {
+    public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
         this.field = field;
     }
@@ -55,7 +56,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
                 .collect(Collectors.toSet());
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 }

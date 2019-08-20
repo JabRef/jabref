@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -12,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * Preference tab for file sorting options.
  */
-class ExportSortingPrefsTab extends Pane implements PrefsTab {
+class ExportSortingPrefsTab extends Pane implements PreferencesTab {
 
     private final SaveOrderConfigDisplayView exportOrderPanel;
     private final GridPane builder = new GridPane();
@@ -48,4 +51,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Export sorting");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

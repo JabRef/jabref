@@ -32,29 +32,30 @@ import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+
+import static org.jabref.model.entry.field.StandardField.EPRINT;
+import static org.jabref.model.entry.field.StandardField.ISBN;
 
 public class WebFetchers {
 
     private WebFetchers() {
     }
 
-    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
+    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences preferences) {
         IdBasedFetcher fetcher;
-        switch (field) {
-            case FieldName.DOI:
-                fetcher = new DoiFetcher(preferences);
-                break;
-            case FieldName.ISBN:
-                fetcher = new IsbnFetcher(preferences);
-                break;
-            case FieldName.EPRINT:
-                fetcher = new ArXiv(preferences);
-                break;
-            default:
-                return Optional.empty();
+
+        if (field == StandardField.DOI) {
+            fetcher = new DoiFetcher(preferences);
+        } else if (field == ISBN) {
+            fetcher = new IsbnFetcher(preferences);
+        } else if (field == EPRINT) {
+            fetcher = new ArXiv(preferences);
+        } else {
+            return Optional.empty();
         }
         return Optional.of(fetcher);
     }
@@ -68,10 +69,9 @@ public class WebFetchers {
         }
     }
 
-    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(String fieldName) {
-        switch (fieldName) {
-            case FieldName.DOI:
-                return Optional.of(new CrossRef());
+    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(Field field) {
+        if (field == StandardField.DOI) {
+            return Optional.of(new CrossRef());
         }
         return Optional.empty();
     }

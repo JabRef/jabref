@@ -101,6 +101,7 @@ import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.gui.texparser.ParseTexAction;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -120,9 +121,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
@@ -525,7 +526,7 @@ public class JabRefFrame extends BorderPane {
         pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
 
         HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs, stateManager)),
+                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
@@ -768,6 +769,7 @@ public class JabRefFrame extends BorderPane {
         pushToApplicationsManager.setMenuItem(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
+                factory.createMenuItem(StandardActions.PARSE_TEX, new ParseTexAction(stateManager)),
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
@@ -1004,7 +1006,7 @@ public class JabRefFrame extends BorderPane {
                 autosaver.registerListener(new AutosaveUIManager(basePanel));
             }
 
-            BackupManager.start(context);
+            BackupManager.start(context, Globals.entryTypesManager, prefs);
 
             // Track opening
             trackOpenNewDatabase(basePanel);
@@ -1085,7 +1087,7 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistFile(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return selectedEntry.getField(FieldName.FILE).isPresent();
+            return selectedEntry.getField(StandardField.FILE).isPresent();
         }
         return false;
     }
@@ -1100,7 +1102,7 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return (selectedEntry.getField(FieldName.URL).isPresent() || selectedEntry.getField(FieldName.DOI).isPresent());
+            return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
         }
         return false;
     }

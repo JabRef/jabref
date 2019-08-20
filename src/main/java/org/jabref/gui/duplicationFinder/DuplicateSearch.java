@@ -85,7 +85,7 @@ public class DuplicateSearch extends SimpleCommand {
                 BibEntry first = entries.get(i);
                 BibEntry second = entries.get(j);
 
-                if (DuplicateCheck.isDuplicate(first, second, databaseMode)) {
+                if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(first, second, databaseMode)) {
                     duplicates.add(Arrays.asList(first, second));
                     duplicateCount.getAndIncrement();
                 }

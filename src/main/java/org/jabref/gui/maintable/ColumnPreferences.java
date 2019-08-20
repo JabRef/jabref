@@ -5,11 +5,11 @@ import java.util.Map;
 
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.model.entry.BibtexSingleField;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
 
 public class ColumnPreferences {
 
+    public static final double DEFAULT_FIELD_LENGTH = 100;
     private final boolean showFileColumn;
     private final boolean showUrlColumn;
     private final boolean preferDoiOverUrl;
@@ -61,7 +61,7 @@ public class ColumnPreferences {
     }
 
     public double getPrefColumnWidth(String columnName) {
-        return columnWidths.getOrDefault(columnName, BibtexSingleField.DEFAULT_FIELD_LENGTH);
+        return columnWidths.getOrDefault(columnName, DEFAULT_FIELD_LENGTH);
     }
 
     public Map<String, SortType> getSortTypesForColumns() {

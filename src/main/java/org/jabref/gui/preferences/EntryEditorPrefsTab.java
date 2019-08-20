@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -20,7 +23,7 @@ import org.jabref.preferences.JabRefPreferences;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
-class EntryEditorPrefsTab extends Pane implements PrefsTab {
+class EntryEditorPrefsTab extends Pane implements PreferencesTab {
 
     private final CheckBox autoOpenForm;
     private final CheckBox defSource;
@@ -30,6 +33,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     private final CheckBox autoComplete;
     private final CheckBox recommendations;
     private final CheckBox acceptRecommendations;
+    private final CheckBox latexCitations;
     private final CheckBox validation;
     private final RadioButton autoCompBoth;
     private final RadioButton autoCompFF;
@@ -60,6 +64,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
         acceptRecommendations = new CheckBox(Localization.lang("Accept recommendations from Mr. DLib"));
+        latexCitations = new CheckBox(Localization.lang("Show 'LaTeX Citations' tab"));
         validation = new CheckBox(Localization.lang("Show validation messages"));
 
         // allowed name formats
@@ -96,8 +101,9 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(emacsRebindCtrlF, 1, 6);
         builder.add(recommendations, 1, 7);
         builder.add(acceptRecommendations, 1, 8);
-        builder.add(validation, 1, 9);
-        builder.add(new Label(""), 1, 10);
+        builder.add(latexCitations, 1, 9);
+        builder.add(validation, 1, 10);
+        builder.add(new Label(""), 1, 11);
 
         builder.add(new Separator(), 1, 13);
 
@@ -189,6 +195,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
         acceptRecommendations.setSelected(prefs.getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS));
+        latexCitations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS));
         autoComplete.setSelected(autoCompletePreferences.shouldAutoComplete());
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
 
@@ -235,6 +242,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, recommendations.isSelected());
         prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendations.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS, latexCitations.isSelected());
         prefs.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, validation.isSelected());
         boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
         boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
@@ -300,4 +308,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Entry editor");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

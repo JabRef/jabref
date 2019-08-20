@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.entry.field.Field;
 
 public class JournalsSuggestionProvider extends FieldValueSuggestionProvider {
 
-
-    JournalsSuggestionProvider(String fieldName, AutoCompletePreferences preferences,
+    JournalsSuggestionProvider(Field field, AutoCompletePreferences preferences,
                                JournalAbbreviationLoader abbreviationLoader) {
-        super(fieldName);
+        super(field);
 
         JournalAbbreviationPreferences journalAbbreviationPreferences = preferences.getJournalAbbreviationPreferences();
         List<String> journals = abbreviationLoader.getRepository(journalAbbreviationPreferences)

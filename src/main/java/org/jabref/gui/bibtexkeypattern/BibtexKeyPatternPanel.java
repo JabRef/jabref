@@ -1,7 +1,6 @@
 package org.jabref.gui.bibtexkeypattern;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javafx.scene.Node;
@@ -18,11 +17,11 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -32,7 +31,7 @@ public class BibtexKeyPatternPanel extends Pane {
     protected final TextField defaultPat = new TextField();
 
     // one field for each type
-    private final Map<String, TextField> textFields = new HashMap<>();
+    private final Map<EntryType, TextField> textFields = new HashMap<>();
     private final BasePanel panel;
     private final GridPane gridPane = new GridPane();
 
@@ -41,6 +40,14 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         buildGUI();
+    }
+
+    private static void setValue(TextField tf, EntryType fieldName, AbstractBibtexKeyPattern keyPattern) {
+        if (keyPattern.isDefaultValue(fieldName)) {
+            tf.setText("");
+        } else {
+            tf.setText(keyPattern.getValue(fieldName).get(0));
+        }
     }
 
     private void buildGUI() {
@@ -74,8 +81,8 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(button, 3, rowIndex);
 
         columnIndex = 1;
-        for (EntryType type : EntryTypes.getAllValues(mode)) {
-            Label label1 = new Label(type.getName());
+        for (BibEntryType type : Globals.entryTypesManager.getAllTypes(mode)) {
+            Label label1 = new Label(type.getType().getDisplayName());
             TextField textField = new TextField();
             Button button1 = new Button("Default");
             button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
@@ -84,7 +91,7 @@ public class BibtexKeyPatternPanel extends Pane {
             gridPane.add(textField, 2 + (columnIndex * 3), rowIndex);
             gridPane.add(button1, 3 + (columnIndex * 3), rowIndex);
 
-            textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
+            textFields.put(type.getType(), textField);
 
             if (columnIndex == (columnsNumber - 1)) {
                 columnIndex = 0;
@@ -111,25 +118,6 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
 
-    /**
-     * fill the given LabelPattern by values generated from the text fields
-     */
-    private void fillPatternUsingPanelData(AbstractBibtexKeyPattern keypatterns) {
-        // each entry type
-        for (Map.Entry<String, TextField> entry : textFields.entrySet()) {
-            String text = entry.getValue().getText();
-            if (!text.trim().isEmpty()) {
-                keypatterns.addBibtexKeyPattern(entry.getKey(), text);
-            }
-        }
-
-        // default value
-        String text = defaultPat.getText();
-        if (!text.trim().isEmpty()) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
-            keypatterns.setDefaultValue(text);
-        }
-    }
-
     protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
         GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(Globals.prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         fillPatternUsingPanelData(res);
@@ -143,12 +131,31 @@ public class BibtexKeyPatternPanel extends Pane {
     }
 
     /**
+     * fill the given LabelPattern by values generated from the text fields
+     */
+    private void fillPatternUsingPanelData(AbstractBibtexKeyPattern keypatterns) {
+        // each entry type
+        for (Map.Entry<EntryType, TextField> entry : textFields.entrySet()) {
+            String text = entry.getValue().getText();
+            if (!text.trim().isEmpty()) {
+                keypatterns.addBibtexKeyPattern(entry.getKey(), text);
+            }
+        }
+
+        // default value
+        String text = defaultPat.getText();
+        if (!text.trim().isEmpty()) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
+            keypatterns.setDefaultValue(text);
+        }
+    }
+
+    /**
      * Fills the current values to the text fields
      *
      * @param keyPattern the BibtexKeyPattern to use as initial value
      */
     public void setValues(AbstractBibtexKeyPattern keyPattern) {
-        for (Map.Entry<String, TextField> entry : textFields.entrySet()) {
+        for (Map.Entry<EntryType, TextField> entry : textFields.entrySet()) {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }
 
@@ -156,14 +163,6 @@ public class BibtexKeyPatternPanel extends Pane {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));
-        }
-    }
-
-    private static void setValue(TextField tf, String fieldName, AbstractBibtexKeyPattern keyPattern) {
-        if (keyPattern.isDefaultValue(fieldName)) {
-            tf.setText("");
-        } else {
-            tf.setText(keyPattern.getValue(fieldName).get(0));
         }
     }
 

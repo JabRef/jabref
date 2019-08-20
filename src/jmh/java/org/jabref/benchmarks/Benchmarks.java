@@ -22,6 +22,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
@@ -54,12 +57,12 @@ public class Benchmarks {
         for (int i = 0; i < 1000; i++) {
             BibEntry entry = new BibEntry();
             entry.setCiteKey("id" + i);
-            entry.setField("title", "This is my title " + i);
-            entry.setField("author", "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
-            entry.setField("journal", "Journal Title " + i);
-            entry.setField("keyword", "testkeyword");
-            entry.setField("year", "1" + i);
-            entry.setField("rnd", "2" + randomizer.nextInt());
+            entry.setField(StandardField.TITLE, "This is my title " + i);
+            entry.setField(StandardField.AUTHOR, "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
+            entry.setField(StandardField.JOURNAL, "Journal Title " + i);
+            entry.setField(StandardField.KEYWORDS, "testkeyword");
+            entry.setField(StandardField.YEAR, "1" + i);
+            entry.setField(new UnknownField("rnd"), "2" + randomizer.nextInt());
             database.insertEntry(entry);
         }
 
@@ -72,7 +75,7 @@ public class Benchmarks {
 
     private StringWriter getOutputWriter() throws IOException {
         StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class), new BibEntryTypesManager());
         databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
         return outputWriter;
@@ -128,7 +131,7 @@ public class Benchmarks {
 
     @Benchmark
     public boolean keywordGroupContains() {
-        KeywordGroup group = new WordKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, "keyword", "testkeyword", false, ',', false);
+        KeywordGroup group = new WordKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "testkeyword", false, ',', false);
         return group.containsAll(database.getEntries());
     }
 

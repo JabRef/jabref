@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javafx.collections.FXCollections;
@@ -12,7 +14,7 @@ import javafx.scene.layout.GridPane;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ImportSettingsTab implements PrefsTab {
+public class ImportSettingsTab implements PreferencesTab {
 
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
                                                                           "[bibtexkey] - [title]"};
@@ -82,4 +84,6 @@ public class ImportSettingsTab implements PrefsTab {
         return Localization.lang("Import");
     }
 
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

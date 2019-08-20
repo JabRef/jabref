@@ -2,6 +2,7 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -15,8 +16,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.xmpbox.DateConverter;
@@ -29,6 +34,10 @@ public class DublinCoreExtractor {
 
     private final BibEntry bibEntry;
 
+    /**
+     * @param dcSchema      Metadata in DublinCore format.
+     * @param resolvedEntry The BibEntry object, which is filled during metadata extraction.
+     */
     public DublinCoreExtractor(DublinCoreSchema dcSchema, XmpPreferences xmpPreferences, BibEntry resolvedEntry) {
         this.dcSchema = dcSchema;
         this.xmpPreferences = xmpPreferences;
@@ -38,27 +47,21 @@ public class DublinCoreExtractor {
 
     /**
      * Editor in BibTex - Contributor in DublinCore
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractEditor() {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
-            bibEntry.setField(FieldName.EDITOR, String.join(" and ", contributors));
+            bibEntry.setField(StandardField.EDITOR, String.join(" and ", contributors));
         }
     }
 
     /**
      * Author in BibTex - Creator in DublinCore
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", creators));
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
         }
     }
 
@@ -71,9 +74,6 @@ public class DublinCoreExtractor {
      * the xmp metdata. The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef
      * the month property filled with jan will override this behavior and no data is lost. In the cases, where xmp
      * is written by another service, the assumption is, that the 1st January is not a publication date at all.
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractYearAndMonth() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
@@ -86,12 +86,12 @@ public class DublinCoreExtractor {
                 // Ignored
             }
             if (calender != null) {
-                bibEntry.setField(FieldName.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
+                bibEntry.setField(StandardField.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
                 // not the 1st of January
                 if (!((calender.get(Calendar.MONTH) == 0) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
                     Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
                     if (month.isPresent()) {
-                        bibEntry.setField(FieldName.MONTH, month.get().getShortName());
+                        bibEntry.setField(StandardField.MONTH, month.get().getShortName());
                     }
                 }
             }
@@ -100,40 +100,31 @@ public class DublinCoreExtractor {
 
     /**
      * Abstract in BibTex - Description in DublinCore
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractAbstract() {
         String description = dcSchema.getDescription();
         if (!StringUtil.isNullOrEmpty(description)) {
-            bibEntry.setField(FieldName.ABSTRACT, description);
+            bibEntry.setField(StandardField.ABSTRACT, description);
         }
     }
 
     /**
      * DOI in BibTex - Identifier in DublinCore
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
         if (!StringUtil.isNullOrEmpty(identifier)) {
-            bibEntry.setField(FieldName.DOI, identifier);
+            bibEntry.setField(StandardField.DOI, identifier);
         }
     }
 
     /**
      * Publisher are equivalent in both formats (BibTex and DublinCore)
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractPublisher() {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
-            bibEntry.setField(FieldName.PUBLISHER, String.join(" and ", publishers));
+            bibEntry.setField(StandardField.PUBLISHER, String.join(" and ", publishers));
         }
     }
 
@@ -141,9 +132,6 @@ public class DublinCoreExtractor {
      * This method sets all fields, which are custom in bibtext and therefore supported by jabref, but which are not included in the DublinCore format.
      * <p/>
      * The relation attribute of DublinCore is abused to insert these custom fields.
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractBibTexFields() {
         List<String> relationships = dcSchema.getRelations();
@@ -157,18 +145,16 @@ public class DublinCoreExtractor {
             String temp = s.substring("bibtex/".length());
             int i = temp.indexOf('/');
             if (i != -1) {
-                String key = temp.substring(0, i);
+                Field key = FieldFactory.parseField(temp.substring(0, i));
                 String value = temp.substring(i + 1);
                 bibEntry.setField(key, value);
 
                 // only for month field - override value
                 // workaround, because the date value of the xmp component of pdf box is corrupted
                 // see also DublinCoreExtractor#extractYearAndMonth
-                if ("month".equals(key)) {
+                if (StandardField.MONTH.equals(key)) {
                     Optional<Month> parsedMonth = Month.parse(value);
-                    if (parsedMonth.isPresent()) {
-                        bibEntry.setField(key, parsedMonth.get().getShortName());
-                    }
+                    parsedMonth.ifPresent(month -> bibEntry.setField(key, month.getShortName()));
                 }
             }
 
@@ -182,34 +168,26 @@ public class DublinCoreExtractor {
 
     /**
      * Rights are equivalent in both formats (BibTex and DublinCore)
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractRights() {
         String rights = dcSchema.getRights();
         if (!StringUtil.isNullOrEmpty(rights)) {
-            bibEntry.setField("rights", rights);
+            bibEntry.setField(new UnknownField("rights"), rights);
         }
     }
 
     /**
      * Source is equivalent in both formats (BibTex and DublinCore)
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractSource() {
         String source = dcSchema.getSource();
         if (!StringUtil.isNullOrEmpty(source)) {
-            bibEntry.setField("source", source);
+            bibEntry.setField(new UnknownField("source"), source);
         }
     }
 
     /**
      * Keywords in BibTex - Subjects in DublinCore
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractSubject() {
         List<String> subjects = dcSchema.getSubjects();
@@ -220,29 +198,23 @@ public class DublinCoreExtractor {
 
     /**
      * Title is equivalent in both formats (BibTex and DublinCore)
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractTitle() {
         String title = dcSchema.getTitle();
         if (!StringUtil.isNullOrEmpty(title)) {
-            bibEntry.setField(FieldName.TITLE, title);
+            bibEntry.setField(StandardField.TITLE, title);
         }
     }
 
     /**
      * Type is equivalent in both formats (BibTex and DublinCore)
-     *
-     * @param bibEntry The BibEntry object, which is filled during metadata extraction.
-     * @param dcSchema Metadata in DublinCore format.
      */
     private void extractType() {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
             String type = types.get(0);
             if (!StringUtil.isNullOrEmpty(type)) {
-                bibEntry.setType(type);
+                bibEntry.setType(EntryTypeFactory.parse(type));
             }
         }
     }
@@ -257,7 +229,6 @@ public class DublinCoreExtractor {
      * The BibEntry is build by mapping individual fields in the dublin core
      * (like creator, title, subject) to fields in a bibtex bibEntry.
      *
-     * @param dcSchema The document information from which to build a BibEntry.
      * @return The bibtex bibEntry found in the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
@@ -311,7 +282,7 @@ public class DublinCoreExtractor {
      * Bibtex-Fields used: year, month, Field: 'dc:date'
      */
     private void fillDate() {
-        bibEntry.getFieldOrAlias(FieldName.DATE)
+        bibEntry.getFieldOrAlias(StandardField.DATE)
                 .ifPresent(publicationDate -> dcSchema.addUnqualifiedSequenceValue("date", publicationDate));
     }
 
@@ -366,41 +337,41 @@ public class DublinCoreExtractor {
     /**
      * All others (+ bibtex key) get packaged in the relation attribute
      *
-     * @param key Key of the metadata attribute
+     * @param field Key of the metadata attribute
      * @param value Value of the metadata attribute
      */
-    private void fillCustomField(String key, String value) {
-        dcSchema.addRelation("bibtex/" + key + '/' + value);
+    private void fillCustomField(Field field, String value) {
+        dcSchema.addRelation("bibtex/" + field.getName() + '/' + value);
     }
 
     public void fillDublinCoreSchema() {
-
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
         // Fields for which not to write XMP data later on:
-        Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
+        Set<Field> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
-        for (Entry<String, String> field : bibEntry.getFieldMap().entrySet()) {
-
+        Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
+        fieldValues.addAll(bibEntry.getFieldMap().entrySet());
+        for (Entry<Field, String> field : fieldValues) {
             if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
                 continue;
             }
 
-            if (FieldName.EDITOR.equals(field.getKey())) {
+            if (StandardField.EDITOR.equals(field.getKey())) {
                 this.fillContributor(field.getValue());
-            } else if (FieldName.AUTHOR.equals(field.getKey())) {
+            } else if (StandardField.AUTHOR.equals(field.getKey())) {
                 this.fillCreator(field.getValue());
-            } else if (FieldName.YEAR.equals(field.getKey())) {
+            } else if (StandardField.YEAR.equals(field.getKey())) {
                 this.fillDate();
-            } else if (FieldName.ABSTRACT.equals(field.getKey())) {
+            } else if (StandardField.ABSTRACT.equals(field.getKey())) {
                 this.fillDescription(field.getValue());
-            } else if (FieldName.DOI.equals(field.getKey())) {
+            } else if (StandardField.DOI.equals(field.getKey())) {
                 this.fillIdentifier(field.getValue());
-            } else if (FieldName.PUBLISHER.equals(field.getKey())) {
+            } else if (StandardField.PUBLISHER.equals(field.getKey())) {
                 this.fillPublisher(field.getValue());
-            } else if (FieldName.KEYWORDS.equals(field.getKey())) {
+            } else if (StandardField.KEYWORDS.equals(field.getKey())) {
                 this.fillKeywords(field.getValue());
-            } else if (FieldName.TITLE.equals(field.getKey())) {
+            } else if (StandardField.TITLE.equals(field.getKey())) {
                 this.fillTitle(field.getValue());
             } else {
                 this.fillCustomField(field.getKey(), field.getValue());

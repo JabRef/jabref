@@ -21,43 +21,43 @@ class LocalizationTest {
     void restoreDefaultLocale() {
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
-        Localization.setLanguage(Language.English);
+        Localization.setLanguage(Language.ENGLISH);
     }
 
     @Test
     void testSetKnownLanguage() {
         Locale.setDefault(Locale.CHINA);
-        Localization.setLanguage(Language.English);
+        Localization.setLanguage(Language.ENGLISH);
         assertEquals("en", Locale.getDefault().toString());
     }
 
     @Test
     void testKnownTranslationWithGroups() {
-        Localization.setLanguage(Language.English);
+        Localization.setLanguage(Language.ENGLISH);
         assertEquals("Groups", Localization.lang("Groups"));
     }
 
     @Test
     void testKnownEnglishTranslationOfUndo() {
-        Localization.setLanguage(Language.English);
+        Localization.setLanguage(Language.ENGLISH);
         assertEquals("Undo", Localization.lang("Undo"));
     }
 
     @Test
     void testKnownGermanTranslation() {
-        Localization.setLanguage(Language.German);
+        Localization.setLanguage(Language.GERMAN);
         assertEquals("Zeige Einstellungen", Localization.lang("Show preferences"));
     }
 
     @Test
     void testKnownTranslationWithCountryModifier() {
-        Localization.setLanguage(Language.BrazilianPortuguese);
+        Localization.setLanguage(Language.BRAZILIAN_PORTUGUESE);
         assertEquals("Grupos", Localization.lang("Groups"));
     }
 
     @Test
     void testUnknownTranslation() {
-        Localization.setLanguage(Language.English);
+        Localization.setLanguage(Language.ENGLISH);
         assertEquals("WHATEVER", Localization.lang("WHATEVER"));
     }
 

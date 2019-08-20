@@ -21,6 +21,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -61,6 +62,7 @@ public class Globals {
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
+    public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;

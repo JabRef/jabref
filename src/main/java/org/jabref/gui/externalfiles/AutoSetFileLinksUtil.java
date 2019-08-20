@@ -20,9 +20,9 @@ import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
 
@@ -62,9 +62,9 @@ public class AutoSetFileLinksUtil {
                     // store undo information
                     String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
 
-                    String oldVal = entry.getField(FieldName.FILE).orElse(null);
+                    String oldVal = entry.getField(StandardField.FILE).orElse(null);
 
-                    UndoableFieldChange fieldChange = new UndoableFieldChange(entry, FieldName.FILE, oldVal, newVal);
+                    UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                     ce.addEdit(fieldChange);
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {

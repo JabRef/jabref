@@ -11,6 +11,7 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
@@ -18,12 +19,12 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     private final SimpleEditorViewModel viewModel;
     private final TextInputControl textInput;
 
-    public SimpleEditor(final String fieldName,
+    public SimpleEditor(final Field field,
                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences,
                         final boolean isSingleLine) {
-        this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
+        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers);
 
         textInput = isSingleLine
                 ? new EditorTextField()
@@ -43,12 +44,11 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
-
-    public SimpleEditor(final String fieldName,
+    public SimpleEditor(final Field field,
                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences) {
-        this(fieldName, suggestionProvider, fieldCheckers, preferences, false);
+        this(field, suggestionProvider, fieldCheckers, preferences, false);
     }
 
     @Override
