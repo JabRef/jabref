@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -120,6 +123,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     public boolean validateSettings() {
         return true;
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 
     public void pushToApplicationSettings() {
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();

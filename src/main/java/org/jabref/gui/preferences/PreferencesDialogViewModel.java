@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
@@ -35,7 +36,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final JabRefPreferences prefs;
-    private final ObservableList<PrefsTab> preferenceTabs;
+    private final ObservableList<PreferencesTab> preferenceTabs;
     private final JabRefFrame frame;
 
     public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame) {
@@ -44,26 +45,26 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.prefs = Globals.prefs;
         this.frame = frame;
 
-        preferenceTabs = FXCollections.observableArrayList();
-        preferenceTabs.add(new GeneralTabView(prefs));
-        preferenceTabs.add(new FileTabView(prefs));
-        preferenceTabs.add(new TablePrefsTab(prefs));
-        preferenceTabs.add(new TableColumnsTab(prefs, frame));
-        preferenceTabs.add(new PreviewTabView(prefs));
-        preferenceTabs.add(new ExternalTabView(prefs, frame));
-        preferenceTabs.add(new GroupsPrefsTab(prefs));
-        preferenceTabs.add(new EntryEditorPrefsTab(prefs));
-        preferenceTabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
-        preferenceTabs.add(new ImportSettingsTab(prefs));
-        preferenceTabs.add(new ExportSortingPrefsTab(prefs));
-        preferenceTabs.add(new NameFormatterTab(prefs));
-        preferenceTabs.add(new XmpPrefsTab(prefs));
-        preferenceTabs.add(new NetworkTab(dialogService, prefs));
-        preferenceTabs.add(new AdvancedTab(dialogService, prefs));
-        preferenceTabs.add(new AppearancePrefsTab(dialogService, prefs));
+        preferenceTabs = FXCollections.observableArrayList(
+                new GeneralTabView(prefs),
+                new FileTabView(prefs),
+                new TablePrefsTab(prefs),
+                new TableColumnsTab(prefs, frame),
+                new PreviewTabView(prefs),
+                new ExternalTabView(prefs, frame),
+                new GroupsTabView(prefs),
+                new EntryEditorPrefsTab(prefs),
+                new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()),
+                new ImportSettingsTab(prefs),
+                new ExportSortingPrefsTab(prefs),
+                new NameFormatterTab(prefs),
+                new XmpPrefsTab(prefs),
+                new AdvancedTabView(prefs),
+                new AppearancePrefsTab(dialogService, prefs)
+        );
     }
 
-    public ObservableList<PrefsTab> getPreferenceTabs() {
+    public ObservableList<PreferencesTab> getPreferenceTabs() {
         return new ReadOnlyListWrapper<>(preferenceTabs);
     }
 
@@ -153,7 +154,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      */
 
     public boolean validSettings() {
-        for (PrefsTab tab : preferenceTabs) {
+        for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return false;
             }
@@ -162,16 +163,26 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void storeAllSettings() {
+        List<String> restartWarnings = new ArrayList<>();
+
         // Run validation checks
         if (!validSettings()) {
             return;
         }
 
         // Store settings
-        for (PrefsTab tab : preferenceTabs) {
-            tab.storeSettings(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().storeSettings();
+        for (PreferencesTab tab : preferenceTabs) {
+            tab.storeSettings();
+            restartWarnings.addAll(tab.getRestartWarnings());
         }
         prefs.flush();
+
+        if (!restartWarnings.isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Restart required"),
+                    String.join(",\n", restartWarnings)
+                            + "\n\n"
+                            + Localization.lang("You must restart JabRef for this to come into effect."));
+        }
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
@@ -181,11 +192,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
-     * ToDo: Reword after conversion of all tabs: resetValues()
      */
     public void setValues() {
-        for (PrefsTab prefsTab : preferenceTabs) {
-            prefsTab.setValues(); // ToDo: After conversion of all tabs: prefsTab.getViewModel().setValues();
+        for (PreferencesTab preferencesTab : preferenceTabs) {
+            preferencesTab.setValues();
         }
     }
 }
