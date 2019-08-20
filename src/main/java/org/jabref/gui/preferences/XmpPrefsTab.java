@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ import org.jabref.preferences.JabRefPreferences;
  *
  * Allows the user to enable and configure the XMP privacy filter.
  */
-class XmpPrefsTab extends Pane implements PrefsTab {
+class XmpPrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final GridPane builder = new GridPane();
@@ -148,6 +149,9 @@ class XmpPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("XMP-metadata");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 
     private class XMPPrivacyFilter {
 

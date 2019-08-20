@@ -1,16 +1,12 @@
 package org.jabref.gui.preferences;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -19,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ExternalTabView extends VBox implements PrefsTab {
+public class ExternalTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
@@ -30,21 +26,21 @@ public class ExternalTabView extends VBox implements PrefsTab {
     @FXML private RadioButton useTerminalDefault;
     @FXML private RadioButton useTerminalSpecial;
     @FXML private TextField useTerminalCommand;
+    @FXML private Button useTerminalBrowse;
 
     @FXML private RadioButton usePDFAcrobat;
     @FXML private TextField usePDFAcrobatCommand;
+    @FXML private Button usePDFAcrobatBrowse;
     @FXML private RadioButton usePDFSumatra;
     @FXML private TextField usePDFSumatraCommand;
+    @FXML private Button usePDFSumatraBrowse;
 
     @FXML private RadioButton useFileBrowserDefault;
     @FXML private RadioButton useFileBrowserSpecial;
     @FXML private TextField useFileBrowserSpecialCommand;
+    @FXML private Button useFileBrowserSpecialBrowse;
 
-    @Inject private DialogService dialogService;
-    private final JabRefPreferences preferences;
     private final JabRefFrame frame;
-
-    private ExternalTabViewModel viewModel;
 
     public ExternalTabView(JabRefPreferences preferences, JabRefFrame frame) {
         this.preferences = preferences;
@@ -55,87 +51,71 @@ public class ExternalTabView extends VBox implements PrefsTab {
                   .load();
     }
 
+    @Override
+    public String getTabName() { return Localization.lang("External programs"); }
+
     public void initialize() {
-        viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
+        ExternalTabViewModel externalTabViewModel = new ExternalTabViewModel(dialogService, preferences, frame);
+        this.viewModel = externalTabViewModel;
 
         new ViewModelListCellFactory<PushToApplication>()
-                .withText(application -> application.getApplicationName())
-                .withIcon(application -> application.getIcon())
+                .withText(PushToApplication::getApplicationName)
+                .withIcon(PushToApplication::getIcon)
                 .install(pushToApplicationCombo);
 
-        eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());
-        autoOpenAttachedFolders.selectedProperty().bindBidirectional(viewModel.autoOpenAttachedFoldersProperty());
+        eMailReferenceSubject.textProperty().bindBidirectional(externalTabViewModel.eMailReferenceSubjectProperty());
+        autoOpenAttachedFolders.selectedProperty().bindBidirectional(externalTabViewModel.autoOpenAttachedFoldersProperty());
 
-        pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
-        pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
-        citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
+        pushToApplicationCombo.itemsProperty().bind(externalTabViewModel.pushToApplicationsListProperty());
+        pushToApplicationCombo.valueProperty().bindBidirectional(externalTabViewModel.selectedPushToApplication());
+        citeCommand.textProperty().bindBidirectional(externalTabViewModel.citeCommandProperty());
 
-        useTerminalDefault.selectedProperty().bindBidirectional(viewModel.useTerminalDefaultProperty());
-        useTerminalSpecial.selectedProperty().bindBidirectional(viewModel.useTerminalSpecialProperty());
-        useTerminalCommand.textProperty().bindBidirectional(viewModel.useTerminalCommandProperty());
+        useTerminalDefault.selectedProperty().bindBidirectional(externalTabViewModel.useTerminalDefaultProperty());
+        useTerminalSpecial.selectedProperty().bindBidirectional(externalTabViewModel.useTerminalSpecialProperty());
+        useTerminalCommand.textProperty().bindBidirectional(externalTabViewModel.useTerminalCommandProperty());
+        useTerminalCommand.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
+        useTerminalBrowse.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
 
-        usePDFAcrobat.selectedProperty().bindBidirectional(viewModel.usePDFAcrobatProperty());
-        usePDFAcrobatCommand.textProperty().bindBidirectional(viewModel.usePDFAcrobatCommandProperty());
-        usePDFSumatra.selectedProperty().bindBidirectional(viewModel.usePDFSumatraProperty());
-        usePDFSumatraCommand.textProperty().bindBidirectional(viewModel.usePDFSumatraCommandProperty());
+        usePDFAcrobat.selectedProperty().bindBidirectional(externalTabViewModel.usePDFAcrobatProperty());
+        usePDFAcrobatCommand.textProperty().bindBidirectional(externalTabViewModel.usePDFAcrobatCommandProperty());
+        usePDFAcrobatCommand.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
+        usePDFAcrobatBrowse.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
 
-        useFileBrowserDefault.selectedProperty().bindBidirectional(viewModel.useFileBrowserDefaultProperty());
-        useFileBrowserSpecial.selectedProperty().bindBidirectional(viewModel.useFileBrowserSpecialProperty());
-        useFileBrowserSpecialCommand.textProperty().bindBidirectional(viewModel.useFileBrowserSpecialCommandProperty());
+        usePDFSumatra.selectedProperty().bindBidirectional(externalTabViewModel.usePDFSumatraProperty());
+        usePDFSumatraCommand.textProperty().bindBidirectional(externalTabViewModel.usePDFSumatraCommandProperty());
+        usePDFSumatraCommand.disableProperty().bind(usePDFSumatra.selectedProperty().not());
+        usePDFSumatraBrowse.disableProperty().bind(usePDFSumatra.selectedProperty().not());
+
+        useFileBrowserDefault.selectedProperty().bindBidirectional(externalTabViewModel.useFileBrowserDefaultProperty());
+        useFileBrowserSpecial.selectedProperty().bindBidirectional(externalTabViewModel.useFileBrowserSpecialProperty());
+        useFileBrowserSpecialCommand.textProperty().bindBidirectional(externalTabViewModel.useFileBrowserSpecialCommandProperty());
+        useFileBrowserSpecialCommand.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
+        useFileBrowserSpecialBrowse.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
     }
 
     @FXML
-    void pushToApplicationSettings() {
-        viewModel.pushToApplicationSettings();
-    }
+    void pushToApplicationSettings() { ((ExternalTabViewModel) viewModel).pushToApplicationSettings(); }
 
     @FXML
     void manageExternalFileTypes() {
-        viewModel.manageExternalFileTypes();
+        ((ExternalTabViewModel) viewModel).manageExternalFileTypes();
     }
 
     @FXML
     void useTerminalCommandBrowse() {
-        viewModel.useTerminalCommandBrowse();
+        ((ExternalTabViewModel) viewModel).useTerminalCommandBrowse();
     }
 
     @FXML
     void usePDFAcrobatCommandBrowse() {
-        viewModel.usePDFAcrobatCommandBrowse();
+        ((ExternalTabViewModel) viewModel).usePDFAcrobatCommandBrowse();
     }
 
     @FXML
     void usePDFSumatraCommandBrowse() {
-        viewModel.usePDFSumatraCommandBrowse();
+        ((ExternalTabViewModel) viewModel).usePDFSumatraCommandBrowse();
     }
 
     @FXML
-    void useFileBrowserSpecialCommandBrowse() {
-        viewModel.useFileBrowserSpecialCommandBrowse();
-    }
-
-    @Override
-    public Node getBuilder() {
-        return this;
-    }
-
-    @Override
-    public void setValues() {
-
-    }
-
-    @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return viewModel.validateSettings();
-    }
-
-    @Override
-    public String getTabName() {
-        return Localization.lang("External programs");
-    }
+    void useFileBrowserSpecialCommandBrowse() { ((ExternalTabViewModel) viewModel).useFileBrowserSpecialCommandBrowse(); }
 }

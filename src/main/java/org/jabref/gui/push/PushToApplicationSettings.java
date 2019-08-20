@@ -24,6 +24,8 @@ public class PushToApplicationSettings {
         this.application = (AbstractPushToApplication) application;
         this.dialogService = dialogService;
         settingsPane = new GridPane();
+        settingsPane.setHgap(10.0);
+        settingsPane.setVgap(4.0);
 
         commandLabel = new Label();
         path = new TextField();

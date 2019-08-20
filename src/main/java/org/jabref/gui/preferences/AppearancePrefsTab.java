@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -18,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-class AppearancePrefsTab extends Pane implements PrefsTab {
+class AppearancePrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final CheckBox fontTweaksLAF;
@@ -127,4 +130,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Appearance");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }
