@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.controlsfx.control.IndexedCheckModel;
@@ -83,62 +85,70 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        Set<TableColumnsItemModel> fields = new HashSet<>();
-
-        columnsListProperty.getValue().clear();
-
-        columnPreferences.getNormalColumns().forEach(
-                item -> columnsListProperty.getValue().add(
-                        new TableColumnsItemModel(
-                                FieldFactory.parseField(item),
-                                columnPreferences.getPrefColumnWidth(item)
-                        )));
-
-        // Internal Fields
-        fields.add(new TableColumnsItemModel(InternalField.OWNER));
-        fields.add(new TableColumnsItemModel(InternalField.TIMESTAMP));
-        fields.add(new TableColumnsItemModel(InternalField.GROUPS));
-        fields.add(new TableColumnsItemModel(InternalField.KEY_FIELD));
-        fields.add(new TableColumnsItemModel(InternalField.TYPE_HEADER));
-
-        insertColumns(fields);
-
-        // Special Fields
-        specialFieldsEnabledProperty.setValue(!columnPreferences.getSpecialFieldColumns().isEmpty());
-        specialFieldsSyncKeyWordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(columnPreferences.getSerializeSpecialFields());
-        if (specialFieldsEnabledProperty.getValue()) {
-            insertSpecialColumns();
-        }
-
-        // HardCoded Fields
         showFileColumnProperty.setValue(columnPreferences.showFileColumn());
         showUrlColumnProperty.setValue(columnPreferences.showUrlColumn());
         preferUrlProperty.setValue(!columnPreferences.preferDoiOverUrl());
         preferDoiProperty.setValue(columnPreferences.preferDoiOverUrl());
         showEPrintColumnProperty.setValue(columnPreferences.showEprintColumn());
+        specialFieldsEnabledProperty.setValue(!columnPreferences.getSpecialFieldColumns().isEmpty());
+        specialFieldsSyncKeyWordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        specialFieldsSerializeProperty.setValue(columnPreferences.getSerializeSpecialFields());
         showExtraFileColumnsProperty.setValue(!columnPreferences.getExtraFileColumns().isEmpty());
+
+        fillColumnList();
+    }
+
+    public void fillColumnList() {
+        columnsListProperty.getValue().clear();
+
+        // Stored Fields
+        Set<Field> normalFields = columnPreferences.getNormalColumns().stream()
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toSet());
+
+        normalFields.forEach(field -> columnsListProperty.getValue().add(
+                new TableColumnsItemModel(
+                        field,
+                        columnPreferences.getPrefColumnWidth(field.getName())
+                )));
+
+        // Internal Fields
+        Set<TableColumnsItemModel> internalFields = new HashSet<>();
+        internalFields.add(new TableColumnsItemModel(InternalField.OWNER));
+        internalFields.add(new TableColumnsItemModel(InternalField.TIMESTAMP));
+        internalFields.add(new TableColumnsItemModel(InternalField.GROUPS));
+        internalFields.add(new TableColumnsItemModel(InternalField.KEY_FIELD));
+        internalFields.add(new TableColumnsItemModel(InternalField.TYPE_HEADER));
+        insertColumns(internalFields);
+
+        // Standard Fields
+        insertColumns(EnumSet.allOf(StandardField.class).stream().map(TableColumnsItemModel::new).collect(Collectors.toSet()));
+
+        // Special Fields
+        if (specialFieldsEnabledProperty.getValue()) {
+            insertSpecialColumns();
+        }
+
+        // Extra File Columns
         if (showExtraFileColumnsProperty.getValue()) {
             insertExtraFileColumns();
         }
 
-        insertColumns(EnumSet.allOf(StandardField.class).stream().map(TableColumnsItemModel::new).collect(Collectors.toSet()));
-
         // Checks
-        List<String> checks = new ArrayList<>(columnPreferences.getNormalColumns());
+        List<Field> checks = new ArrayList<>(normalFields);
         if (specialFieldsEnabledProperty.getValue()) {
             List<SpecialField> specialFields = new ArrayList<>(columnPreferences.getSpecialFieldColumns());
-            checks.add(specialFields.contains(SpecialField.QUALITY) ? SpecialField.QUALITY.getName() : null);
-            checks.add(specialFields.contains(SpecialField.PRIORITY) ? SpecialField.PRIORITY.getName() : null);
-            checks.add(specialFields.contains(SpecialField.RELEVANCE) ? SpecialField.RELEVANCE.getName() : null);
-            checks.add(specialFields.contains(SpecialField.PRINTED) ? SpecialField.PRINTED.getName() : null);
-            checks.add(specialFields.contains(SpecialField.READ_STATUS) ? SpecialField.READ_STATUS.getName() : null);
+            checks.add(specialFields.contains(SpecialField.QUALITY) ? SpecialField.QUALITY : null);
+            checks.add(specialFields.contains(SpecialField.PRIORITY) ? SpecialField.PRIORITY : null);
+            checks.add(specialFields.contains(SpecialField.RELEVANCE) ? SpecialField.RELEVANCE : null);
+            checks.add(specialFields.contains(SpecialField.PRINTED) ? SpecialField.PRINTED : null);
+            checks.add(specialFields.contains(SpecialField.READ_STATUS) ? SpecialField.READ_STATUS : null);
         }
         setChecks(checks);
     }
 
     private void insertSpecialColumns() {
-        List<String> backupChecks = getChecks();
+        List<Field> backupChecks = getChecks();
         Set<TableColumnsItemModel> fields = new HashSet<>();
         EnumSet.allOf(SpecialField.class)
                 .forEach(specialField -> fields.add(new TableColumnsItemModel(specialField)));
@@ -148,7 +158,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeSpecialColumns() {
-        List<String> backupChecks = getChecks();
+        List<Field> backupChecks = getChecks();
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
                 .filter(column -> (column.getField() instanceof SpecialField))
                 .collect(Collectors.toList());
@@ -158,7 +168,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        List<String> backupChecks = getChecks();
+        List<Field> backupChecks = getChecks();
         Set<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         Set<TableColumnsItemModel> fileColumns = new HashSet<>();
         fileTypes.stream().map(ExternalFileType::getName)
@@ -169,7 +179,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeExtraFileColumns() {
-        List<String> backupChecks = getChecks();
+        List<Field> backupChecks = getChecks();
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
                 .filter(column -> (column.getField() instanceof ExtraFileField))
                 .collect(Collectors.toList());
@@ -178,26 +188,52 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         setChecks(backupChecks);
     }
 
+    public void insertCustomColumn() {
+        Optional<String> columnName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("New custom column"),
+                Localization.lang("Name") + ":",
+                Localization.lang("untitled")
+        );
+
+        columnName.ifPresent(name -> {
+            if (columnsListProperty.getValue().filtered(item -> item.getName().equals(name)).isEmpty()) {
+                List<Field> backupChecks = getChecks();
+                TableColumnsItemModel newItem = new TableColumnsItemModel(new UnknownField(name));
+                columnsListProperty.add(0, newItem);
+                setChecks(backupChecks);
+            }
+        });
+    }
+
+    public void removeCustomColumn(TableColumnsItemModel column) {
+        if (column != null && (column.getField() instanceof UnknownField)) {
+            List<Field> backupChecks = getChecks();
+            columnsListProperty.remove(column);
+            setChecks(backupChecks);
+        }
+    }
+
     private void insertColumns(Set<TableColumnsItemModel> fields) {
         fields.stream()
-                .filter(field -> columnsListProperty.getValue().filtered(item -> item.getName().equals(field.getName())).isEmpty())
+                .filter(field -> columnsListProperty.getValue()
+                        .filtered(item -> item.getName().equals(field.getName())).isEmpty())
                 .forEach(columnsListProperty.getValue()::add);
     }
 
-    public List<String> getChecks() {
+    public List<Field> getChecks() {
         return checkedColumnsModelProperty.getValue().getCheckedItems().stream()
-                .map(item -> item.getField().getName())
+                .map(TableColumnsItemModel::getField)
                 .collect(Collectors.toList());
     }
 
-    public void setChecks(List<String> fieldNames) {
-        columnsListProperty.stream().filter(item -> fieldNames.contains(item.getField().getName()))
+    public void setChecks(List<Field> fields) {
+        columnsListProperty.stream().filter(item -> fields.contains(item.getField()))
                 .forEach(item -> checkedColumnsModelProperty.getValue().check(item));
     }
 
     @Override
     public void storeSettings() {
-        List<String> normalColumns = getChecks();
+        List<String> normalColumns = getChecks().stream().map(Field::getName).collect(Collectors.toList());
         List<SpecialField> specialFields = new ArrayList<>();
         List<String> deleteNames = new ArrayList<>();
         List<String> extraFileNames = new ArrayList<>();

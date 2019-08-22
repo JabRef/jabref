@@ -1941,30 +1941,30 @@ public class JabRefPreferences implements PreferencesService {
                                      getMainTableColumnSortTypes());
     }
 
-    public void storeColumnPreferences(ColumnPreferences newColumnPreferences) {
-        putBoolean(FILE_COLUMN, newColumnPreferences.showFileColumn());
-        putBoolean(URL_COLUMN, newColumnPreferences.showUrlColumn());
-        putBoolean(PREFER_URL_DOI, newColumnPreferences.preferDoiOverUrl());
-        putBoolean(ARXIV_COLUMN, newColumnPreferences.showEprintColumn());
-        putStringList(COLUMN_NAMES,newColumnPreferences.getNormalColumns());
+    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
+        putBoolean(FILE_COLUMN, columnPreferences.showFileColumn());
+        putBoolean(URL_COLUMN, columnPreferences.showUrlColumn());
+        putBoolean(PREFER_URL_DOI, columnPreferences.preferDoiOverUrl());
+        putBoolean(ARXIV_COLUMN, columnPreferences.showEprintColumn());
+        putStringList(COLUMN_NAMES, columnPreferences.getNormalColumns());
 
-        putBoolean(SPECIALFIELDSENABLED, !newColumnPreferences.getSpecialFieldColumns().isEmpty());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, newColumnPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, newColumnPreferences.getSerializeSpecialFields());
+        putBoolean(SPECIALFIELDSENABLED, !columnPreferences.getSpecialFieldColumns().isEmpty());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, columnPreferences.getSerializeSpecialFields());
 
-        putBoolean(SHOWCOLUMN_RANKING, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.RANKING));
-        putBoolean(SHOWCOLUMN_PRIORITY, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.PRIORITY));
-        putBoolean(SHOWCOLUMN_QUALITY, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.QUALITY));
-        putBoolean(SHOWCOLUMN_RELEVANCE, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.RELEVANCE));
-        putBoolean(SHOWCOLUMN_PRINTED, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.PRINTED));
-        putBoolean(SHOWCOLUMN_READ, newColumnPreferences.getSpecialFieldColumns().contains(SpecialField.READ_STATUS));
+        putBoolean(SHOWCOLUMN_RANKING, columnPreferences.getSpecialFieldColumns().contains(SpecialField.RANKING));
+        putBoolean(SHOWCOLUMN_PRIORITY, columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRIORITY));
+        putBoolean(SHOWCOLUMN_QUALITY, columnPreferences.getSpecialFieldColumns().contains(SpecialField.QUALITY));
+        putBoolean(SHOWCOLUMN_RELEVANCE, columnPreferences.getSpecialFieldColumns().contains(SpecialField.RELEVANCE));
+        putBoolean(SHOWCOLUMN_PRINTED, columnPreferences.getSpecialFieldColumns().contains(SpecialField.PRINTED));
+        putBoolean(SHOWCOLUMN_READ, columnPreferences.getSpecialFieldColumns().contains(SpecialField.READ_STATUS));
 
-        putBoolean(EXTRA_FILE_COLUMNS, !newColumnPreferences.getExtraFileColumns().isEmpty());
-        putStringList(LIST_OF_FILE_COLUMNS, newColumnPreferences.getExtraFileColumns());
+        putBoolean(EXTRA_FILE_COLUMNS, !columnPreferences.getExtraFileColumns().isEmpty());
+        putStringList(LIST_OF_FILE_COLUMNS, columnPreferences.getExtraFileColumns());
 
-        putStringList(COLUMN_WIDTHS, newColumnPreferences.getColumnWidths().values().stream().map(Object::toString).collect(Collectors.toList()));
+        putStringList(COLUMN_WIDTHS, columnPreferences.getColumnWidths().values().stream().map(Object::toString).collect(Collectors.toList()));
 
-        setMainTableColumnSortType(newColumnPreferences.getSortTypesForColumns());
+        setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
     }
 
     public MainTablePreferences getMainTablePreferences() {

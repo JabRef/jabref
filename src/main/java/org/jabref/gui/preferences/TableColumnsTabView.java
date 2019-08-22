@@ -118,22 +118,31 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
             @Override
             public void execute() { String ab = "a" + "b"; }
         }, sortUp);
+
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_DOWN, new SimpleCommand() {
             @Override
             public void execute() { String ab = "a" + "b"; }
         }, sortDown);
+
         actionFactory.configureIconButton(PreferencesActions.COLUMN_ADD, new SimpleCommand() {
             @Override
-            public void execute() { String ab = "a" + "b"; }
+            public void execute() { tableColumnsTabViewModel.insertCustomColumn(); }
         }, addColumn);
+
         actionFactory.configureIconButton(PreferencesActions.COLUMN_REMOVE, new SimpleCommand() {
             @Override
-            public void execute() { String ab = "a" + "b"; }
+            public void execute() {
+                    if (columnsList.getFocusModel() != null && columnsList.getFocusModel().getFocusedIndex() != -1) {
+                        tableColumnsTabViewModel.removeCustomColumn(columnsList.getFocusModel().getFocusedItem());
+                    }
+                }
         }, removeColumn);
+
         actionFactory.configureIconButton(PreferencesActions.COLUMNS_UPDATE, new SimpleCommand() {
             @Override
-            public void execute() { String ab = "a" + "b"; }
+            public void execute() { tableColumnsTabViewModel.fillColumnList(); }
         }, updateToTable);
+
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
     }
 
