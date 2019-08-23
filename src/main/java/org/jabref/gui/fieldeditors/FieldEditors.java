@@ -15,13 +15,13 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -79,7 +79,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
             return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers));
         } else if (fieldProperties.contains(FieldProperty.TYPE)) {
-            if (entryType.equals(StandardEntryType.Patent)) {
+            if (entryType.equals(IEEETranEntryType.Patent)) {
                 return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             } else {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));

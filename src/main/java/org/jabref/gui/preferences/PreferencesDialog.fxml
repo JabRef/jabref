@@ -9,9 +9,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.VBox?>
-
 <?import org.controlsfx.control.textfield.CustomTextField?>
-
 <DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600"
             xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.preferences.PreferencesDialogView">

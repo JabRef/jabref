@@ -3,7 +3,7 @@ package org.jabref.gui.entryeditor;
 import javafx.scene.control.Tab;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 
 public abstract class EntryEditorTab extends Tab {
 

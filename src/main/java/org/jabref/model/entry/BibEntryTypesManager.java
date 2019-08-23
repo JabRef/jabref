@@ -11,11 +11,16 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
 public class BibEntryTypesManager {
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
-    private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypes.ALL.stream(), IEEETranEntryTypes.ALL.stream()).collect(Collectors.toList()));
-    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.ALL);
+    private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream()).collect(Collectors.toList()));
+    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypeDefinitions.ALL);
 
     public BibEntryTypesManager() {
     }
@@ -82,12 +87,12 @@ public class BibEntryTypesManager {
         Collection<BibEntryType> customizedTypes = getAllTypes(mode);
         if (mode == BibDatabaseMode.BIBTEX) {
             return customizedTypes.stream()
-                                  .filter(entryType -> BibtexEntryTypes.ALL.stream().noneMatch(bibtexType -> bibtexType.getType().equals(entryType.getType())))
-                                  .filter(entryType -> IEEETranEntryTypes.ALL.stream().noneMatch(ieeeType -> ieeeType.getType().equals(entryType.getType())))
+                                  .filter(entryType -> BibtexEntryTypeDefinitions.ALL.stream().noneMatch(bibtexType -> bibtexType.getType().equals(entryType.getType())))
+                                  .filter(entryType -> IEEETranEntryTypeDefinitions.ALL.stream().noneMatch(ieeeType -> ieeeType.getType().equals(entryType.getType())))
                                   .collect(Collectors.toList());
         } else {
             return customizedTypes.stream()
-                                  .filter(entryType -> BiblatexEntryTypes.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
+                                  .filter(entryType -> BiblatexEntryTypeDefinitions.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
                                   .collect(Collectors.toList());
         }
     }

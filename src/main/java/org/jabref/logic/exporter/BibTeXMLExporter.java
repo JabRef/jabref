@@ -40,9 +40,10 @@ import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class BibTeXMLExporter extends Exporter {
 
             bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
-            org.jabref.model.entry.EntryType i = bibEntry.getType();
+            EntryType i = bibEntry.getType();
             if (StandardEntryType.Article.equals(i)) {
                 parse(new Article(), bibEntry, entry);
             } else if (StandardEntryType.Book.equals(i)) {
