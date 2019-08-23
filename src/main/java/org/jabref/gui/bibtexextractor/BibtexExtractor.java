@@ -13,47 +13,47 @@ import org.jabref.model.entry.field.StandardField;
 
 public class BibtexExtractor {
 
-    private final static String authorTag = "[author_tag]";
-    private final static String urlTag = "[url_tag]";
-    private final static String yearTag = "[year_tag]";
-    private final static String pagesTag = "[pages_tag]";
-    private final static String titleTag = "[title_tag]";
-    private final static String journalTag = "[journal_tag]";
+    private static final String authorTag = "[author_tag]";
+    private static final String urlTag = "[url_tag]";
+    private static final String yearTag = "[year_tag]";
+    private static final String pagesTag = "[pages_tag]";
+    private static final String titleTag = "[title_tag]";
+    private static final String journalTag = "[journal_tag]";
 
-    private final static String INITIALS_GROUP = "INITIALS";
-    private final static String LASTNAME_GROUP = "LASTNAME";
+    private static final String INITIALS_GROUP = "INITIALS";
+    private static final String LASTNAME_GROUP = "LASTNAME";
 
-    private final ArrayList<String> urls = new ArrayList<>();
-    private final ArrayList<String> authors = new ArrayList<>();
-    private String year = new String();
-    private String pages = new String();
-    private String title = new String();
-    private boolean isArticle = true;
-    private String journalOrPublisher = new String();
-
-    private static final Pattern urlPattern = Pattern.compile(
-                                                              "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
-                                                              "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
-                                                              "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
-                                                              Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-
-    private static final Pattern yearPattern = Pattern.compile(
-                                                               "\\d{4}",
+    private static final Pattern URL_PATTERN = Pattern.compile(
+                                                               "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
+                                                               "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
+                                                               "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
                                                                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    private static final Pattern authorPattern1 = Pattern.compile(
+    private static final Pattern YEAR_PATTERN = Pattern.compile(
+                                                                "\\d{4}",
+                                                                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+    private static final Pattern AUTHOR_PATTERN = Pattern.compile(
                                                                   "(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+),?\\s(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})" +
                                                                   "\\s*(and|,|\\.)*",
                                                                   Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    private static final Pattern authorPattern2 = Pattern.compile(
+    private static final Pattern AUTHOR_PATTERN_2 = Pattern.compile(
                                                                   "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
                                                                   "\\s*(and|,|\\.)*",
                                                                   Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    private static final Pattern pagesPattern = Pattern.compile(
+    private static final Pattern PAGES_PATTERN = Pattern.compile(
                                                                 "(p.)?\\s?\\d+(-\\d+)?",
                                                                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+    private final ArrayList<String> urls = new ArrayList<>();
+    private final ArrayList<String> authors = new ArrayList<>();
+    private String year = "";
+    private String pages = "";
+    private String title = "";
+    private boolean isArticle = true;
+    private String journalOrPublisher = "";
 
     public BibEntry extract(String input) {
         String inputWithoutUrls = findUrls(input);
@@ -82,7 +82,7 @@ public class BibtexExtractor {
     }
 
     private String findUrls(String input) {
-        Matcher matcher = urlPattern.matcher(input);
+        Matcher matcher = URL_PATTERN.matcher(input);
         while (matcher.find()) {
             urls.add(input.substring(matcher.start(1), matcher.end()));
         }
@@ -90,7 +90,7 @@ public class BibtexExtractor {
     }
 
     private String findYear(String input) {
-        Matcher matcher = yearPattern.matcher(input);
+        Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
             String yearCandidate = input.substring(matcher.start(), matcher.end());
             Integer intYearCandidate = Integer.parseInt(yearCandidate);
@@ -103,8 +103,8 @@ public class BibtexExtractor {
     }
 
     private String findAuthors(String input) {
-        String currentInput = findAuthorsByPattern(input, authorPattern1);
-        return findAuthorsByPattern(currentInput, authorPattern2);
+        String currentInput = findAuthorsByPattern(input, AUTHOR_PATTERN);
+        return findAuthorsByPattern(currentInput, AUTHOR_PATTERN_2);
     }
 
     private String findAuthorsByPattern(String input, Pattern pattern) {
@@ -120,7 +120,7 @@ public class BibtexExtractor {
     }
 
     private String findPages(String input) {
-        Matcher matcher = pagesPattern.matcher(input);
+        Matcher matcher = PAGES_PATTERN.matcher(input);
         if (matcher.find()) {
             pages = input.substring(matcher.start(), matcher.end());
         }
