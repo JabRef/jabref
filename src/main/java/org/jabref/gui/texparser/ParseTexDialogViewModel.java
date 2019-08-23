@@ -1,6 +1,7 @@
 package org.jabref.gui.texparser;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -126,8 +127,17 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
                           noFilesFound.set(false);
                           successfulSearch.set(true);
                       })
-                      .onFailure(dialogService::showErrorDialogAndWait)
+                      .onFailure(this::handleFailure)
                       .executeWith(taskExecutor);
+    }
+
+    private void handleFailure(Exception exception) {
+        final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
+        if (permissionProblem) {
+            dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
+        } else {
+            dialogService.showErrorDialogAndWait(exception);
+        }
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {

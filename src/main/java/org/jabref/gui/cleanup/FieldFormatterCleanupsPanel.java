@@ -105,7 +105,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         new ViewModelListCellFactory<FieldFormatterCleanup>()
                 .withText(action -> action.getField() + ": " + action.getFormatter().getName())
-                .withTooltip(action -> action.getFormatter().getDescription())
+                .withStringTooltip(action -> action.getFormatter().getDescription())
                 .install(actionsList);
         add(actionsList, 1, 1, 3, 1);
 
@@ -171,7 +171,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         formattersCombobox = new ComboBox<>(FXCollections.observableArrayList(availableFormatters));
         new ViewModelListCellFactory<Formatter>()
                 .withText(Formatter::getName)
-                .withTooltip(Formatter::getDescription)
+                .withStringTooltip(Formatter::getDescription)
                 .install(formattersCombobox);
         EasyBind.subscribe(formattersCombobox.valueProperty(), e -> updateDescription());
         builder.add(formattersCombobox, 3, 1);

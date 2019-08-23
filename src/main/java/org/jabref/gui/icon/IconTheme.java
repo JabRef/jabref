@@ -290,7 +290,8 @@ public class IconTheme {
         LATEX_FILE_DIRECTORY(MaterialDesignIcon.FOLDER_OUTLINE),
         LATEX_FILE(MaterialDesignIcon.FILE_OUTLINE),
         LATEX_COMMENT(MaterialDesignIcon.COMMENT_TEXT_OUTLINE),
-        LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING);
+        LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING),
+        PASSWORD_REVEALED(MaterialDesignIcon.EYE);
 
         private final JabRefIcon icon;
 

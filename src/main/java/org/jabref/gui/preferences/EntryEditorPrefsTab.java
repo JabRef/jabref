@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -19,7 +22,7 @@ import org.jabref.preferences.JabRefPreferences;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
-class EntryEditorPrefsTab extends Pane implements PrefsTab {
+class EntryEditorPrefsTab extends Pane implements PreferencesTab {
 
     private final CheckBox autoOpenForm;
     private final CheckBox defSource;
@@ -283,4 +286,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Entry editor");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -17,7 +20,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * The Preferences panel for key generation.
  */
-class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab {
+class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final GridPane builder = new GridPane();
@@ -137,4 +140,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     public String getTabName() {
         return Localization.lang("BibTeX key generator");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }
