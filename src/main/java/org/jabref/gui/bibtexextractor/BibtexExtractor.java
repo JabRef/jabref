@@ -13,12 +13,12 @@ import org.jabref.model.entry.field.StandardField;
 
 public class BibtexExtractor {
 
-    private static final String authorTag = "[author_tag]";
-    private static final String urlTag = "[url_tag]";
-    private static final String yearTag = "[year_tag]";
-    private static final String pagesTag = "[pages_tag]";
-    private static final String titleTag = "[title_tag]";
-    private static final String journalTag = "[journal_tag]";
+    private static final String AUTHOR_TAG = "[author_tag]";
+    private static final String URL_TAG = "[url_tag]";
+    private static final String YEAR_TAG = "[year_tag]";
+    private static final String PAGES_TAG = "[pages_tag]";
+    private static final String TITLE_TAG = "[title_tag]";
+    private static final String JOURNAL_TAG = "[journal_tag]";
 
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
@@ -39,13 +39,13 @@ public class BibtexExtractor {
                                                                   Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern AUTHOR_PATTERN_2 = Pattern.compile(
-                                                                  "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
-                                                                  "\\s*(and|,|\\.)*",
-                                                                  Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+                                                                    "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
+                                                                    "\\s*(and|,|\\.)*",
+                                                                    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern PAGES_PATTERN = Pattern.compile(
-                                                                "(p.)?\\s?\\d+(-\\d+)?",
-                                                                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+                                                                 "(p.)?\\s?\\d+(-\\d+)?",
+                                                                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private final ArrayList<String> urls = new ArrayList<>();
     private final ArrayList<String> authors = new ArrayList<>();
@@ -86,7 +86,7 @@ public class BibtexExtractor {
         while (matcher.find()) {
             urls.add(input.substring(matcher.start(1), matcher.end()));
         }
-        return fixSpaces(matcher.replaceAll(urlTag));
+        return fixSpaces(matcher.replaceAll(URL_TAG));
     }
 
     private String findYear(String input) {
@@ -96,7 +96,7 @@ public class BibtexExtractor {
             Integer intYearCandidate = Integer.parseInt(yearCandidate);
             if ((intYearCandidate > 1700) && (intYearCandidate <= Calendar.getInstance().get(Calendar.YEAR))) {
                 year = yearCandidate;
-                return fixSpaces(input.replace(year, yearTag));
+                return fixSpaces(input.replace(year, YEAR_TAG));
             }
         }
         return input;
@@ -112,7 +112,7 @@ public class BibtexExtractor {
         while (matcher.find()) {
             authors.add(GenerateAuthor(matcher.group(LASTNAME_GROUP), matcher.group(INITIALS_GROUP)));
         }
-        return fixSpaces(matcher.replaceAll(authorTag));
+        return fixSpaces(matcher.replaceAll(AUTHOR_TAG));
     }
 
     private String GenerateAuthor(String lastName, String initials) {
@@ -124,7 +124,7 @@ public class BibtexExtractor {
         if (matcher.find()) {
             pages = input.substring(matcher.start(), matcher.end());
         }
-        return fixSpaces(matcher.replaceFirst(pagesTag));
+        return fixSpaces(matcher.replaceFirst(PAGES_TAG));
     }
 
     private String fixSpaces(String input) {
@@ -136,17 +136,17 @@ public class BibtexExtractor {
     private String findParts(String input) {
         ArrayList<String> lastParts = new ArrayList<>();
         String line = input;
-        int afterAuthorsIndex = input.lastIndexOf(authorTag);
+        int afterAuthorsIndex = input.lastIndexOf(AUTHOR_TAG);
         if (afterAuthorsIndex == -1) {
             return input;
         } else {
-            afterAuthorsIndex += authorTag.length();
+            afterAuthorsIndex += AUTHOR_TAG.length();
         }
         int delimiterIndex = input.lastIndexOf("//");
         if (delimiterIndex != -1) {
             lastParts.add(input.substring(afterAuthorsIndex, delimiterIndex)
-                               .replace(yearTag, "")
-                               .replace(pagesTag, ""));
+                               .replace(YEAR_TAG, "")
+                               .replace(PAGES_TAG, ""));
             lastParts.addAll(Arrays.asList(input.substring(delimiterIndex + 2).split(",|\\.")));
         }
 
@@ -162,11 +162,11 @@ public class BibtexExtractor {
         }
         if (nonDigitParts > 0) {
             title = lastParts.get(0);
-            line.replace(title, titleTag);
+            line.replace(title, TITLE_TAG);
         }
         if (nonDigitParts > 1) {
             journalOrPublisher = lastParts.get(1);
-            line.replace(journalOrPublisher, journalTag);
+            line.replace(journalOrPublisher, JOURNAL_TAG);
         }
         if (nonDigitParts > 2) {
             isArticle = false;
