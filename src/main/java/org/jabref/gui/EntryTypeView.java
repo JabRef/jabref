@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -79,7 +80,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
             if (value) {
-                setEntryTypeForReturnAndClose(null);
+                setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
 
@@ -89,7 +90,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         for (BibEntryType entryType : entries) {
             Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
-            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(entryType));
+            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
             pane.getChildren().add(entryButton);
         }
     }
@@ -162,8 +163,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    private void setEntryTypeForReturnAndClose(BibEntryType entryType) {
-        type = entryType.getType();
+    private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
+        type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
         this.close();
     }
