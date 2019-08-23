@@ -1,72 +1,52 @@
 package org.jabref.gui.bibtexextractor;
 
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import org.jabref.Globals;
-import org.jabref.gui.JabRefFrame;
+import javax.inject.Inject;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
+
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.database.BibDatabaseContext;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.airhacks.afterburner.views.ViewLoader;
 
 /**
  * GUI Dialog for the feature "Extract BibTeX from plain text".
  */
 public class ExtractBibtexDialog extends BaseDialog<Void> {
 
-    private final JabRefFrame frame;
-    private TextArea textArea;
-    private Button buttonExtract;
+    @FXML private TextArea input;
+    @FXML private ButtonType extractButtonType;
+    private final Button buttonExtract;
+    private BibtexExtractorViewModel viewModel;
 
-    public ExtractBibtexDialog(JabRefFrame frame) {
-        super();
+    @Inject private StateManager stateManager;
+
+    public ExtractBibtexDialog() {
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
         this.setTitle(Localization.lang("Input text to parse"));
-        this.frame = frame;
-
-       initialize();
-    }
-
-    private void initialize(){
-        textArea = new TextArea();
-        textArea.setWrapText(true);
-        textArea.textProperty()
-                .addListener((observable, oldValue, newValue) -> buttonExtract.setDisable(newValue.isEmpty()));
-
-        VBox container = new VBox(20);
-        container.getChildren().addAll(
-                textArea);
-        container.setPrefWidth(600);
-
-        ButtonType buttonTypeGenerate = new ButtonType(Localization.lang("Extract"), ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().setAll(
-                buttonTypeGenerate,
-                ButtonType.CANCEL
-        );
-
-        buttonExtract = (Button) getDialogPane().lookupButton(buttonTypeGenerate);
+        buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonExtract.setTooltip(new Tooltip((Localization.lang("Starts the extraction of the BibTeX entry"))));
-        buttonExtract.setDisable(true);
-        buttonExtract.setOnAction(e -> startExtraction());
+        buttonExtract.setOnAction(e -> viewModel.startExtraction());
+        buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
 
-        getDialogPane().setContent(container);
     }
 
-    private void startExtraction()
-    {
-        BibtexExtractor extractor = new BibtexExtractor();
-        BibEntry entity = extractor.extract(textArea.getText());
-        trackNewEntry(BiblatexEntryTypes.ARTICLE);
-        frame.getCurrentBasePanel().insertEntry(entity);
+    @FXML
+    private void initialize() {
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        this.viewModel = new BibtexExtractorViewModel(database);
+
+        input.textProperty().bindBidirectional(viewModel.inputTextProperty());
     }
 
-    private void trackNewEntry(EntryType type) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("EntryType", type.getName());
-
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
-    }
 }

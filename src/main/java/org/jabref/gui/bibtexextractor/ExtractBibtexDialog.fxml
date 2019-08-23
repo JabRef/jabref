@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TextArea?>
+
+
+<DialogPane prefHeight="430.0" prefWidth="586.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.bibtexextractor.ExtractBibtexDialog">
+   <content>
+      <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0" />
+   </content>
+   <ButtonType fx:id="extractButtonType" buttonData="OK_DONE" text="%Extract" />
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>
