@@ -101,6 +101,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
             }
         });
 
+        tableColumnsTabViewModel.selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
         tableColumnsTabViewModel.checkedColumnsModelProperty().setValue(columnsList.getCheckModel());
 
         showFileColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showFileColumnProperty());
@@ -116,12 +117,12 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_UP, new SimpleCommand() {
             @Override
-            public void execute() { String ab = "a" + "b"; }
+            public void execute() { tableColumnsTabViewModel.moveColumnUp(); }
         }, sortUp);
 
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_DOWN, new SimpleCommand() {
             @Override
-            public void execute() { String ab = "a" + "b"; }
+            public void execute() { tableColumnsTabViewModel.moveColumnDown(); }
         }, sortDown);
 
         actionFactory.configureIconButton(PreferencesActions.COLUMN_ADD, new SimpleCommand() {

@@ -3,7 +3,6 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +16,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -24,6 +24,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.util.NoCheckModel;
+import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -40,6 +41,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<TableColumnsItemModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<IndexedCheckModel<TableColumnsItemModel>> checkedColumnsModelProperty = new SimpleObjectProperty<>(new NoCheckModel<>());
+    private final ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     private final SimpleBooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty specialFieldsSyncKeyWordsProperty = new SimpleBooleanProperty();
@@ -102,9 +104,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         columnsListProperty.getValue().clear();
 
         // Stored Fields
-        Set<Field> normalFields = columnPreferences.getNormalColumns().stream()
+        List<Field> normalFields = columnPreferences.getNormalColumns().stream()
                 .map(FieldFactory::parseField)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         normalFields.forEach(field -> columnsListProperty.getValue().add(
                 new TableColumnsItemModel(
@@ -113,7 +115,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 )));
 
         // Internal Fields
-        Set<TableColumnsItemModel> internalFields = new HashSet<>();
+        List<TableColumnsItemModel> internalFields = new ArrayList<>();
         internalFields.add(new TableColumnsItemModel(InternalField.OWNER));
         internalFields.add(new TableColumnsItemModel(InternalField.TIMESTAMP));
         internalFields.add(new TableColumnsItemModel(InternalField.GROUPS));
@@ -122,7 +124,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         insertColumns(internalFields);
 
         // Standard Fields
-        insertColumns(EnumSet.allOf(StandardField.class).stream().map(TableColumnsItemModel::new).collect(Collectors.toSet()));
+        insertColumns(EnumSet.allOf(StandardField.class).stream().map(TableColumnsItemModel::new).collect(Collectors.toList()));
 
         // Special Fields
         if (specialFieldsEnabledProperty.getValue()) {
@@ -149,9 +151,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private void insertSpecialColumns() {
         List<Field> backupChecks = getChecks();
-        Set<TableColumnsItemModel> fields = new HashSet<>();
-        EnumSet.allOf(SpecialField.class)
-                .forEach(specialField -> fields.add(new TableColumnsItemModel(specialField)));
+        List<TableColumnsItemModel> fields = new ArrayList<>();
+        EnumSet.allOf(SpecialField.class).forEach(specialField -> fields.add(new TableColumnsItemModel(specialField)));
 
         insertColumns(fields);
         setChecks(backupChecks);
@@ -169,8 +170,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private void insertExtraFileColumns() {
         List<Field> backupChecks = getChecks();
-        Set<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        Set<TableColumnsItemModel> fileColumns = new HashSet<>();
+        List<ExternalFileType> fileTypes = new ArrayList<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection());
+        List<TableColumnsItemModel> fileColumns = new ArrayList<>();
         fileTypes.stream().map(ExternalFileType::getName)
                 .forEach(fileName -> fileColumns.add(new TableColumnsItemModel(new ExtraFileField(fileName))));
 
@@ -213,7 +214,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    private void insertColumns(Set<TableColumnsItemModel> fields) {
+    private void insertColumns(List<TableColumnsItemModel> fields) {
         fields.stream()
                 .filter(field -> columnsListProperty.getValue()
                         .filtered(item -> item.getName().equals(field.getName())).isEmpty())
@@ -229,6 +230,35 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     public void setChecks(List<Field> fields) {
         columnsListProperty.stream().filter(item -> fields.contains(item.getField()))
                 .forEach(item -> checkedColumnsModelProperty.getValue().check(item));
+    }
+
+    public void moveColumnUp() {
+
+        TableColumnsItemModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
+        int row = columnsListProperty.getValue().indexOf(selectedColumn);
+        if (selectedColumn == null || row < 1) {
+            return;
+        }
+
+        List<Field> backupChecks = getChecks();
+        columnsListProperty.remove(selectedColumn);
+        columnsListProperty.add(row - 1, selectedColumn);
+        selectedColumnModelProperty.getValue().clearAndSelect(row - 1);
+        setChecks(backupChecks);
+    }
+
+    public void moveColumnDown() {
+        TableColumnsItemModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
+        int row = columnsListProperty.getValue().indexOf(selectedColumn);
+        if (selectedColumn == null || row > columnsListProperty.getValue().size() - 1) {
+            return;
+        }
+
+        List<Field> backupChecks = getChecks();
+        columnsListProperty.remove(selectedColumn);
+        columnsListProperty.add(row + 1, selectedColumn);
+        selectedColumnModelProperty.getValue().clearAndSelect(row + 1);
+        setChecks(backupChecks);
     }
 
     @Override
@@ -293,7 +323,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<TableColumnsItemModel> columnsListProperty() { return this.columnsListProperty; }
 
-    public ObjectProperty<IndexedCheckModel<TableColumnsItemModel>> checkedColumnsModelProperty() { return this.checkedColumnsModelProperty; }
+    public ObjectProperty<IndexedCheckModel<TableColumnsItemModel>> checkedColumnsModelProperty() {
+        return this.checkedColumnsModelProperty;
+    }
+
+    public ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty() {
+        return selectedColumnModelProperty;
+    }
 
     public SimpleBooleanProperty showFileColumnProperty() { return this.showFileColumnProperty; }
 
