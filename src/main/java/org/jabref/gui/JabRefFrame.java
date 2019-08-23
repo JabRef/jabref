@@ -14,9 +14,6 @@ import java.util.Optional;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -294,9 +291,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                    SwingUtilities.invokeLater(() -> {
                         DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
-                    });
                 }
             }, 60000); // run in one minute
         }
@@ -402,6 +397,8 @@ public class JabRefFrame extends BorderPane {
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
+        // TODO: javafx variant only avaiable in java 9 and updwards
+        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
         for (Window window : Window.getWindows()) {
             window.dispose();
         }
@@ -1063,18 +1060,9 @@ public class JabRefFrame extends BorderPane {
     /**
      * Sets the indeterminate status of the progress bar.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
      */
     public void setProgressBarIndeterminate(final boolean value) {
-        // TODO: Reimplement
-        /*
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setIndeterminate(value);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
-        }
-        */
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
     /**
@@ -1105,10 +1093,6 @@ public class JabRefFrame extends BorderPane {
             return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
         }
         return false;
-    }
-
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message);
     }
 
     /**
@@ -1297,7 +1281,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void decreaseTableFontSize() {
-        int currentSize = GUIGlobals.currentFont.getSize();
+        double currentSize = GUIGlobals.currentFont.getSize();
         if (currentSize < 2) {
             return;
         }

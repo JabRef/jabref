@@ -3,9 +3,6 @@ package org.jabref.gui.specialfields;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.StandardActions;
@@ -26,18 +23,8 @@ public class SpecialFieldValueViewModel {
         return value;
     }
 
-    public Icon getSpecialFieldValueIcon() {
-        return getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
-    }
-
     public Optional<JabRefIcon> getIcon() {
         return getAction().getIcon();
-    }
-
-    public JLabel createSpecialFieldValueLabel() {
-        JLabel label = new JLabel(getSpecialFieldValueIcon());
-        label.setToolTipText(getToolTipText());
-        return label;
     }
 
     public String getMenuString() {

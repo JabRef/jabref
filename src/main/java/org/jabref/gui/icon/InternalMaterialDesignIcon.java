@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.Icon;
-
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -16,13 +14,10 @@ import org.jabref.gui.util.ColorUtil;
 import de.jensd.fx.glyphs.GlyphIcons;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
+
     private final List<GlyphIcons> icons;
     private Optional<Color> color;
     private final String unicode;
-
-    public InternalMaterialDesignIcon(java.awt.Color color, GlyphIcons... icons) {
-        this(ColorUtil.toFX(color), Arrays.asList(icons));
-    }
 
     public InternalMaterialDesignIcon(Color color, GlyphIcons... icons) {
         this(color, Arrays.asList(icons));
@@ -44,16 +39,6 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     }
 
     @Override
-    public Icon getIcon() {
-        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())));
-    }
-
-    @Override
-    public Icon getSmallIcon() {
-        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())));
-    }
-
-    @Override
     public Node getGraphicNode() {
         GlyphIcons icon = icons.get(0);
 
@@ -67,7 +52,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public JabRefIcon disabled() {
-        return new InternalMaterialDesignIcon(ColorUtil.toFX(IconTheme.DEFAULT_DISABLED_COLOR), icons);
+        return new InternalMaterialDesignIcon(IconTheme.DEFAULT_DISABLED_COLOR, icons);
     }
 
     @Override

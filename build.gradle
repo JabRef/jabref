@@ -119,8 +119,6 @@ dependencies {
 
     compile 'org.postgresql:postgresql:42.2.6'
 
-    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-
     compile 'com.google.guava:guava:28.0-jre'
 
     // JavaFX stuff

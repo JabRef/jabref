@@ -1,7 +1,5 @@
 package org.jabref.preferences;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.paint.Color;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -225,6 +224,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
     public static final String FONT_STYLE = "fontStyle";
+
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -600,7 +600,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
-        defaults.put(FONT_STYLE, Font.PLAIN);
+        defaults.put(FONT_STYLE, 0); //for backwards compatibility, is equal to java.awt.Font.PLAIN
         defaults.put(FONT_SIZE, 12);
         // Main table color settings:
         defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
@@ -1128,13 +1128,13 @@ public class JabRefPreferences implements PreferencesService {
     public Color getColor(String key) {
         String value = get(key);
         int[] rgb = getRgb(value);
-        return new Color(rgb[0], rgb[1], rgb[2]);
+        return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
 
     public Color getDefaultColor(String key) {
         String value = (String) defaults.get(key);
         int[] rgb = getRgb(value);
-        return new Color(rgb[0], rgb[1], rgb[2]);
+        return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
 
     /**
@@ -1979,6 +1979,10 @@ public class JabRefPreferences implements PreferencesService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public String getFontFamily() {
+        return get(FONT_FAMILY);
     }
 
     public String setLastPreferencesExportPath() {
