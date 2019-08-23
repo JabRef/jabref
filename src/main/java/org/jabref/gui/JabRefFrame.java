@@ -51,6 +51,7 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
@@ -771,6 +772,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
+                factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(this)),
 
                 new SeparatorMenuItem(),
 
