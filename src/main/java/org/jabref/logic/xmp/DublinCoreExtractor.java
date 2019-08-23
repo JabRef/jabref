@@ -16,12 +16,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.xmpbox.DateConverter;

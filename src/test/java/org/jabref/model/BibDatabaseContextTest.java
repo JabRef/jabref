@@ -4,7 +4,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
-        BibEntry e1 = new BibEntry(StandardEntryType.Electronic);
+        BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
         db.insertEntry(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);

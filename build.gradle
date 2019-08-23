@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '2.4'
+    id 'com.gradle.build-scan' version '2.4.1'
     id 'com.install4j.gradle' version '7.0.12'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
@@ -94,7 +94,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.16'
     compile 'org.apache.pdfbox:xmpbox:2.0.16'
 
-    compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
+    compile group: 'org.apache.tika', name: 'tika-parsers', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.62'
@@ -115,11 +115,9 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile 'mysql:mysql-connector-java:8.0.17'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.3'
 
     compile 'org.postgresql:postgresql:42.2.6'
-
-    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
     compile 'com.google.guava:guava:28.0-jre'
 
@@ -190,8 +188,11 @@ dependencyUpdates {
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
-                selection.reject("Ignore SNAPSHOT releases")
+            boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
             }
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
@@ -200,7 +201,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /0.2.[3,4]/) {
+            if (selection.candidate.version ==~ /0.2.*/) {
                 // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
@@ -433,6 +434,7 @@ modernizer {
 shadowJar {
     transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
     classifier 'fat'
+    zip64 true
 }
 
 /*

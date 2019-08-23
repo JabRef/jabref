@@ -16,7 +16,6 @@ import javafx.scene.layout.Pane;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
-import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -244,28 +243,7 @@ class EntryEditorPrefsTab extends Pane implements PreferencesTab {
         prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendations.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS, latexCitations.isSelected());
         prefs.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, validation.isSelected());
-        boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
-        boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
-        boolean emacsRebindCtrlFChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected();
-        if (emacsModeChanged || emacsRebindCtrlAChanged || emacsRebindCtrlFChanged) {
-            prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, emacsMode.isSelected());
-            prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, emacsRebindCtrlA.isSelected());
-            prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, emacsRebindCtrlF.isSelected());
-            // immediately apply the change
-            if (emacsModeChanged) {
-                if (emacsMode.isSelected()) {
-                    EmacsKeyBindings.load();
-                } else {
-                    EmacsKeyBindings.unload();
-                }
-            } else {
-                // only rebinding of CTRL+a or CTRL+f changed
-                assert emacsMode.isSelected();
-                // we simply reload the emacs mode to activate the CTRL+a/CTRL+f change
-                EmacsKeyBindings.unload();
-                EmacsKeyBindings.load();
-            }
-        }
+
         autoCompletePreferences.setShouldAutoComplete(autoComplete.isSelected());
         autoCompletePreferences.setCompleteNames(autoCompFields.getText());
         if (autoCompBoth.isSelected()) {

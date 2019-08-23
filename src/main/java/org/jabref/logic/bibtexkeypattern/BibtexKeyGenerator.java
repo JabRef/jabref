@@ -12,7 +12,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;

@@ -2,8 +2,6 @@ package org.jabref.gui.externalfiletype;
 
 import java.util.Objects;
 
-import javax.swing.JLabel;
-
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
@@ -14,7 +12,6 @@ import org.jabref.gui.icon.JabRefIcon;
  */
 public class CustomExternalFileType implements ExternalFileType {
 
-    private final JLabel label = new JLabel();
     private String name;
     private String extension;
     private String openWith;
@@ -24,9 +21,7 @@ public class CustomExternalFileType implements ExternalFileType {
 
     public CustomExternalFileType(String name, String extension, String mimeType,
                                   String openWith, String iconName, JabRefIcon icon) {
-        label.setText(null);
         this.name = name;
-        label.setToolTipText(this.name);
         this.extension = extension;
         this.mimeType = mimeType;
         this.openWith = openWith;
@@ -90,7 +85,6 @@ public class CustomExternalFileType implements ExternalFileType {
 
     public void setName(String name) {
         this.name = name;
-        label.setToolTipText(this.name);
     }
 
     @Override
@@ -130,16 +124,6 @@ public class CustomExternalFileType implements ExternalFileType {
     }
 
     /**
-     * Obtain a JLabel instance set with this file type's icon. The same JLabel
-     * is returned from each call of this method.
-     *
-     * @return the label.
-     */
-    public JLabel getIconLabel() {
-        return label;
-    }
-
-    /**
      * Get the string associated with this file type's icon.
      *
      * @return The icon name.
@@ -165,7 +149,6 @@ public class CustomExternalFileType implements ExternalFileType {
     public void setIcon(JabRefIcon icon) {
         Objects.requireNonNull(icon);
         this.icon = icon;
-        label.setIcon(this.icon.getSmallIcon());
     }
 
     @Override

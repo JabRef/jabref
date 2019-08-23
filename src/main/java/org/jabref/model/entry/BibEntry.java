@@ -31,6 +31,8 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
@@ -134,12 +136,24 @@ public class BibEntry implements Cloneable {
         }
 
         Optional<String> result = getFieldOrAlias(field);
-
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if (!result.isPresent() && (database != null)) {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
-            result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
+            if (referred.isPresent()) {
+                result = referred.get().getFieldOrAlias(field);
+                if (!result.isPresent() && type.equals(StandardEntryType.InProceedings)) {
+                    if (field == StandardField.BOOKTITLE) {
+                        result = referred.get().getFieldOrAlias(StandardField.TITLE);
+                    }
+                    else if (field == StandardField.BOOKSUBTITLE) {
+                        result = referred.get().getFieldOrAlias(StandardField.SUBTITLE);
+                    }
+                    else if (field == StandardField.BOOKAUTHOR) {
+                        result = referred.get().getFieldOrAlias(StandardField.AUTHOR);
+                    }
+                }
+            }
         }
         return result.map(resultText -> BibDatabase.getText(resultText, database));
     }

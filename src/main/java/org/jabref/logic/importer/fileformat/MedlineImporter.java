@@ -74,12 +74,12 @@ import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;

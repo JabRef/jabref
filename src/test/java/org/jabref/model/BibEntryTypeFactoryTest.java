@@ -8,15 +8,15 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.IEEETranEntryTypes;
-import org.jabref.model.entry.StandardEntryType;
-import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class BibEntryTypeFactoryTest {
 
-    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("aaaaarticle");
+    private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknownType");
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
     private BibEntryType newCustomType;
     private BibEntryType overwrittenStandardType;
@@ -53,15 +53,15 @@ class BibEntryTypeFactoryTest {
 
     @Test
     void allTypesBibtexAreCorrect() {
-        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BibtexEntryTypes.ALL);
-        defaultTypes.addAll(IEEETranEntryTypes.ALL);
+        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BibtexEntryTypeDefinitions.ALL);
+        defaultTypes.addAll(IEEETranEntryTypeDefinitions.ALL);
 
         assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX));
     }
 
     @Test
     void allTypesBiblatexAreCorrect() {
-        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BiblatexEntryTypes.ALL);
+        TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BiblatexEntryTypeDefinitions.ALL);
         assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX));
     }
 

@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 /*
  * Camel casing of entry type string, unknown entry types gets a leading capital

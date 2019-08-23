@@ -7,10 +7,11 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class MSBibConverter {
 
@@ -54,7 +55,7 @@ public class MSBibConverter {
 
         result.number = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
 
-        if (entry.getType().equals(StandardEntryType.Patent)) {
+        if (entry.getType().equals(IEEETranEntryType.Patent)) {
             result.patentNumber = entry.getLatexFreeField(StandardField.NUMBER).orElse(null);
             result.number = null;
         }
