@@ -144,7 +144,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.0'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.3'
 
     compile 'org.postgresql:postgresql:42.2.6'
 
@@ -223,16 +223,17 @@ dependencyUpdates {
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
-                selection.reject("Ignore SNAPSHOT releases")
-            }
-        }
-        rules.all { ComponentSelection selection ->
-            boolean releaseCandidate = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
+            boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
                 selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
             }
-            if (releaseCandidate) {
-                selection.reject('Ignore Release candidates')
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+        rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /0.2.*/) {
+                // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
+                selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
         rules.withModule("com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin") { ComponentSelection selection ->

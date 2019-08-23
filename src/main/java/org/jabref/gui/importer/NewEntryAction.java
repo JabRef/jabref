@@ -11,7 +11,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;

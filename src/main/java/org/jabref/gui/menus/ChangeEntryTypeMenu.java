@@ -20,9 +20,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.IEEETranEntryTypes;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
 public class ChangeEntryTypeMenu {
 
@@ -63,11 +63,11 @@ public class ChangeEntryTypeMenu {
             populateSubMenu(items, Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
         } else {
             // Default BibTeX
-            populateSubMenu(items, BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(items, BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypeDefinitions.ALL, entry, undoManager);
             items.remove(0); // Remove separator
 
             // IEEETran
-            populateSubMenu(items, "IEEETran", IEEETranEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(items, "IEEETran", IEEETranEntryTypeDefinitions.ALL, entry, undoManager);
 
             // Custom types
             populateSubMenu(items, Localization.lang("Custom"), Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);

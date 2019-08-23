@@ -2,7 +2,7 @@ package org.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 
 public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 

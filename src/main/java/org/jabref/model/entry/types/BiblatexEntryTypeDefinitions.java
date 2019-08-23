@@ -1,8 +1,10 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
@@ -11,7 +13,7 @@ import org.jabref.model.entry.field.StandardField;
  *
  * @see <a href="http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf">biblatex documentation</a>
  */
-public class BiblatexEntryTypes {
+public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Article)
@@ -207,7 +209,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType PATENT = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Patent)
+            .withType(IEEETranEntryType.Patent)
             .withImportantFields(StandardField.HOLDER,
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
                     StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -219,7 +221,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType PERIODICAL = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Periodical)
+            .withType(IEEETranEntryType.Periodical)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.ISSN, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -361,7 +363,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Electronic)
+            .withType(IEEETranEntryType.Electronic)
             .withImportantFields(ONLINE.getPrimaryOptionalFields())
             .withDetailFields(ONLINE.getSecondaryOptionalFields())
             .withRequiredFields(ONLINE.getRequiredFields())

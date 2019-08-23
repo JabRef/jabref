@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
 
 public class BibEntryType implements Comparable<BibEntryType> {
 
@@ -70,7 +71,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    SortedSet<Field> getSecondaryOptionalFields() {
+    public SortedSet<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.DETAIL)
                                   .map(BibField::getField)

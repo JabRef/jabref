@@ -12,9 +12,9 @@ import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.event.TestEventListener;
 
 import org.junit.jupiter.api.BeforeEach;
