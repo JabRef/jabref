@@ -201,7 +201,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /0.2.[3,4]/) {
+            if (selection.candidate.version ==~ /0.2.*/) {
                 // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
