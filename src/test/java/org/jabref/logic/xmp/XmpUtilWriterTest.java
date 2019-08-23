@@ -12,7 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -32,7 +32,7 @@ class XmpUtilWriterTest {
     private XmpPreferences xmpPreferences;
 
     private void initBibEntries() {
-        olly2018 = new BibEntry(BibtexEntryType.Article);
+        olly2018 = new BibEntry(StandardEntryType.Article);
         olly2018.setCiteKey("Olly2018");
         olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
         olly2018.setField(StandardField.TITLE, "Stefan's palace");
@@ -54,7 +54,7 @@ class XmpUtilWriterTest {
         olly2018.setField(StandardField.REVIEW, "review");
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
-        toral2006 = new BibEntry(BibtexEntryType.InProceedings);
+        toral2006 = new BibEntry(StandardEntryType.InProceedings);
         toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
         toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
         toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
@@ -63,7 +63,7 @@ class XmpUtilWriterTest {
         toral2006.setField(InternalField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
-        vapnik2000 = new BibEntry(BibtexEntryType.Book);
+        vapnik2000 = new BibEntry(StandardEntryType.Book);
         vapnik2000.setCiteKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");

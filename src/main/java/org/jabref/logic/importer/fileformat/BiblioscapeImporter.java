@@ -15,8 +15,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -196,37 +196,37 @@ public class BiblioscapeImporter extends Importer {
                     }
                     type[i] = type[i].toLowerCase(Locale.ROOT);
                     if (type[i].contains("article")) {
-                        bibtexType = BibtexEntryType.Article;
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("journal")) {
-                        bibtexType = BibtexEntryType.Article;
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("book section")) {
-                        bibtexType = BibtexEntryType.InBook;
+                        bibtexType = StandardEntryType.InBook;
                     } else if (type[i].contains("book")) {
-                        bibtexType = BibtexEntryType.Book;
+                        bibtexType = StandardEntryType.Book;
                     } else if (type[i].contains("conference")) {
-                        bibtexType = BibtexEntryType.InProceedings;
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("proceedings")) {
-                        bibtexType = BibtexEntryType.InProceedings;
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("report")) {
-                        bibtexType = BibtexEntryType.TechReport;
+                        bibtexType = StandardEntryType.TechReport;
                     } else if (type[i].contains("thesis")
                             && type[i].contains("master")) {
-                        bibtexType = BibtexEntryType.MastersThesis;
+                        bibtexType = StandardEntryType.MastersThesis;
                     } else if (type[i].contains("thesis")) {
-                        bibtexType = BibtexEntryType.PhdThesis;
+                        bibtexType = StandardEntryType.PhdThesis;
                     }
                 }
 
                 // depending on bibtexType, decide where to place the titleRT and
                 // titleTI
-                if (bibtexType.equals(BibtexEntryType.Article)) {
+                if (bibtexType.equals(StandardEntryType.Article)) {
                     if (titleST != null) {
                         hm.put(StandardField.JOURNAL, titleST);
                     }
                     if (titleTI != null) {
                         hm.put(StandardField.TITLE, titleTI);
                     }
-                } else if (bibtexType.equals(BibtexEntryType.InBook)) {
+                } else if (bibtexType.equals(StandardEntryType.InBook)) {
                     if (titleST != null) {
                         hm.put(StandardField.BOOKTITLE, titleST);
                     }

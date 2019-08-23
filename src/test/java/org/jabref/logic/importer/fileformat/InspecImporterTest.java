@@ -13,7 +13,7 @@ import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ public class InspecImporterTest {
 
     @Test
     public void testCompleteBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
-        BibEntry expectedEntry = new BibEntry(BibtexEntryType.Article);
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         expectedEntry.setField(StandardField.TITLE, "The SIS project : software reuse with a natural language approach");
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
         expectedEntry.setField(StandardField.YEAR, "1992");
@@ -78,7 +78,7 @@ public class InspecImporterTest {
                 "\n" +
                 "RT ~ Conference-Paper\n" +
                 "AU ~ Prechelt, Lutz";
-        BibEntry expectedEntry = new BibEntry(BibtexEntryType.InProceedings);
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.InProceedings);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
@@ -93,7 +93,7 @@ public class InspecImporterTest {
                 "\n" +
                 "AU ~ Prechelt, Lutz \n" +
                 "RT ~ Misc";
-        BibEntry expectedEntry = new BibEntry(BibtexEntryType.Misc);
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {

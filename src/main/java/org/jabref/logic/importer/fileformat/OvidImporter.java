@@ -18,9 +18,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Imports an Ovid file.
@@ -207,9 +207,9 @@ public class OvidImporter extends Importer {
             // Set the entrytype properly:
             EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
             h.remove(InternalField.TYPE_HEADER);
-            if (entryType.equals(BibtexEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
+            if (entryType.equals(StandardEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
                 // This means we have an "incollection" entry.
-                entryType = BibtexEntryType.InCollection;
+                entryType = StandardEntryType.InCollection;
                 // Move the "chaptertitle" to just "title":
                 h.put(StandardField.TITLE, h.remove(new UnknownField("chaptertitle")));
             }

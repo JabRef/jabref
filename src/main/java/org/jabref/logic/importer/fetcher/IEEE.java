@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -66,16 +66,16 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         switch (jsonEntry.optString("content_type")) {
             case "Books":
-                entry.setType(BibtexEntryType.Book);
+                entry.setType(StandardEntryType.Book);
                 break;
             case "Conferences":
-                entry.setType(BibtexEntryType.InProceedings);
+                entry.setType(StandardEntryType.InProceedings);
                 break;
             case "Courses":
-                entry.setType(BibtexEntryType.Misc);
+                entry.setType(StandardEntryType.Misc);
                 break;
             default:
-                entry.setType(BibtexEntryType.Article);
+                entry.setType(StandardEntryType.Article);
                 break;
         }
 

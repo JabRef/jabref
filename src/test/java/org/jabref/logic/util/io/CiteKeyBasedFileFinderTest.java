@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class CiteKeyBasedFileFinderTest {
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) throws IOException {
-        entry = new BibEntry(BibtexEntryType.Article);
+        entry = new BibEntry(StandardEntryType.Article);
         entry.setCiteKey("HipKro03");
 
         rootDir = temporaryFolder;

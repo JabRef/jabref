@@ -3,7 +3,7 @@ package org.jabref.logic.cleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class BibtexBiblatexRoundtripTest {
 
     @BeforeEach
     void setUp() {
-        bibtex = new BibEntry(BibtexEntryType.Article);
+        bibtex = new BibEntry(StandardEntryType.Article);
         bibtex.setField(StandardField.AUTHOR, "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.");
         bibtex.setField(StandardField.TITLE, "The hook graphs of the symmetric groups");
         bibtex.setField(StandardField.JOURNAL, "Canadian J. Math.");
@@ -29,7 +29,7 @@ class BibtexBiblatexRoundtripTest {
         bibtex.setField(StandardField.MR_NUMBER, "0062127");
         bibtex.setField(new UnknownField("mrreviewer"), "D. E. Littlewood");
 
-        biblatex = new BibEntry(BibtexEntryType.Article);
+        biblatex = new BibEntry(StandardEntryType.Article);
         biblatex.setField(StandardField.AUTHOR, "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.");
         biblatex.setField(StandardField.TITLE, "The hook graphs of the symmetric groups");
         biblatex.setField(StandardField.JOURNALTITLE, "Canadian J. Math.");

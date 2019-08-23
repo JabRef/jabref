@@ -7,10 +7,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BiblatexEntryType;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.HashBiMap;
 
@@ -86,39 +85,39 @@ public class MSBibMapping {
     public static EntryType getBiblatexEntryType(String msbibType) {
         Map<String, EntryType> entryTypeMapping = new HashMap<>();
 
-        entryTypeMapping.put("Book", BibtexEntryType.Book);
-        entryTypeMapping.put("BookSection", BibtexEntryType.Book);
-        entryTypeMapping.put("JournalArticle", BibtexEntryType.Article);
+        entryTypeMapping.put("Book", StandardEntryType.Book);
+        entryTypeMapping.put("BookSection", StandardEntryType.Book);
+        entryTypeMapping.put("JournalArticle", StandardEntryType.Article);
         entryTypeMapping.put("ArticleInAPeriodical", IEEETranEntryType.Periodical);
-        entryTypeMapping.put("ConferenceProceedings", BibtexEntryType.InProceedings);
-        entryTypeMapping.put("Report", BibtexEntryType.TechReport);
+        entryTypeMapping.put("ConferenceProceedings", StandardEntryType.InProceedings);
+        entryTypeMapping.put("Report", StandardEntryType.TechReport);
         entryTypeMapping.put("Patent", IEEETranEntryType.Patent);
-        entryTypeMapping.put("InternetSite", BiblatexEntryType.Online);
+        entryTypeMapping.put("InternetSite", StandardEntryType.Online);
 
-        return entryTypeMapping.getOrDefault(msbibType, BibtexEntryType.Misc);
+        return entryTypeMapping.getOrDefault(msbibType, StandardEntryType.Misc);
     }
 
     public static MSBibEntryType getMSBibEntryType(EntryType bibtexType) {
         Map<EntryType, MSBibEntryType> entryTypeMapping = new HashMap<>();
 
-        entryTypeMapping.put(BibtexEntryType.Book, MSBibEntryType.Book);
-        entryTypeMapping.put(BibtexEntryType.InBook, MSBibEntryType.BookSection);
-        entryTypeMapping.put(BibtexEntryType.Booklet, MSBibEntryType.BookSection);
-        entryTypeMapping.put(BibtexEntryType.InCollection, MSBibEntryType.BookSection);
-        entryTypeMapping.put(BibtexEntryType.Article, MSBibEntryType.JournalArticle);
-        entryTypeMapping.put(BibtexEntryType.InProceedings, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(BibtexEntryType.Conference, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(BibtexEntryType.Proceedings, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(BibtexEntryType.Collection, MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put(BibtexEntryType.TechReport, MSBibEntryType.Report);
-        entryTypeMapping.put(BibtexEntryType.Manual, MSBibEntryType.Report);
-        entryTypeMapping.put(BibtexEntryType.MastersThesis, MSBibEntryType.Report);
-        entryTypeMapping.put(BibtexEntryType.PhdThesis, MSBibEntryType.Report);
-        entryTypeMapping.put(BibtexEntryType.Unpublished, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Book, MSBibEntryType.Book);
+        entryTypeMapping.put(StandardEntryType.InBook, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.Booklet, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.InCollection, MSBibEntryType.BookSection);
+        entryTypeMapping.put(StandardEntryType.Article, MSBibEntryType.JournalArticle);
+        entryTypeMapping.put(StandardEntryType.InProceedings, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Conference, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Proceedings, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.Collection, MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put(StandardEntryType.TechReport, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Manual, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.MastersThesis, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.PhdThesis, MSBibEntryType.Report);
+        entryTypeMapping.put(StandardEntryType.Unpublished, MSBibEntryType.Report);
         entryTypeMapping.put(IEEETranEntryType.Patent, MSBibEntryType.Patent);
-        entryTypeMapping.put(BibtexEntryType.Misc, MSBibEntryType.Misc);
+        entryTypeMapping.put(StandardEntryType.Misc, MSBibEntryType.Misc);
         entryTypeMapping.put(IEEETranEntryType.Electronic, MSBibEntryType.ElectronicSource);
-        entryTypeMapping.put(BiblatexEntryType.Online, MSBibEntryType.InternetSite);
+        entryTypeMapping.put(StandardEntryType.Online, MSBibEntryType.InternetSite);
 
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }

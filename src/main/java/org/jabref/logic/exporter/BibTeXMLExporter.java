@@ -42,8 +42,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,33 +78,33 @@ public class BibTeXMLExporter extends Exporter {
             bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
             EntryType i = bibEntry.getType();
-            if (BibtexEntryType.Article.equals(i)) {
+            if (StandardEntryType.Article.equals(i)) {
                 parse(new Article(), bibEntry, entry);
-            } else if (BibtexEntryType.Book.equals(i)) {
+            } else if (StandardEntryType.Book.equals(i)) {
                 parse(new Book(), bibEntry, entry);
-            } else if (BibtexEntryType.Booklet.equals(i)) {
+            } else if (StandardEntryType.Booklet.equals(i)) {
                 parse(new Booklet(), bibEntry, entry);
-            } else if (BibtexEntryType.Conference.equals(i)) {
+            } else if (StandardEntryType.Conference.equals(i)) {
                 parse(new Conference(), bibEntry, entry);
-            } else if (BibtexEntryType.InBook.equals(i)) {
+            } else if (StandardEntryType.InBook.equals(i)) {
                 parseInbook(new Inbook(), bibEntry, entry);
-            } else if (BibtexEntryType.InCollection.equals(i)) {
+            } else if (StandardEntryType.InCollection.equals(i)) {
                 parse(new Incollection(), bibEntry, entry);
-            } else if (BibtexEntryType.InProceedings.equals(i)) {
+            } else if (StandardEntryType.InProceedings.equals(i)) {
                 parse(new Inproceedings(), bibEntry, entry);
-            } else if (BibtexEntryType.MastersThesis.equals(i)) {
+            } else if (StandardEntryType.MastersThesis.equals(i)) {
                 parse(new Mastersthesis(), bibEntry, entry);
-            } else if (BibtexEntryType.Manual.equals(i)) {
+            } else if (StandardEntryType.Manual.equals(i)) {
                 parse(new Manual(), bibEntry, entry);
-            } else if (BibtexEntryType.Misc.equals(i)) {
+            } else if (StandardEntryType.Misc.equals(i)) {
                 parse(new Misc(), bibEntry, entry);
-            } else if (BibtexEntryType.PhdThesis.equals(i)) {
+            } else if (StandardEntryType.PhdThesis.equals(i)) {
                 parse(new Phdthesis(), bibEntry, entry);
-            } else if (BibtexEntryType.Proceedings.equals(i)) {
+            } else if (StandardEntryType.Proceedings.equals(i)) {
                 parse(new Proceedings(), bibEntry, entry);
-            } else if (BibtexEntryType.TechReport.equals(i)) {
+            } else if (StandardEntryType.TechReport.equals(i)) {
                 parse(new Techreport(), bibEntry, entry);
-            } else if (BibtexEntryType.Unpublished.equals(i)) {
+            } else if (StandardEntryType.Unpublished.equals(i)) {
                 parse(new Unpublished(), bibEntry, entry);
             } else {
                 LOGGER.warn("unexpected type appeared");

@@ -16,9 +16,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -77,7 +77,7 @@ public class SilverPlatterImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        EntryType type = BibtexEntryType.Misc;
+        EntryType type = StandardEntryType.Misc;
         Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
@@ -156,13 +156,13 @@ public class SilverPlatterImporter extends Importer {
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
                     if ("Monograph".equals(frest)) {
-                        type = BibtexEntryType.Book;
+                        type = StandardEntryType.Book;
                     } else if (frest.startsWith("Dissertation")) {
-                        type = BibtexEntryType.PhdThesis;
+                        type = StandardEntryType.PhdThesis;
                     } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
-                        type = BibtexEntryType.Article;
+                        type = StandardEntryType.Article;
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                        type = BibtexEntryType.InCollection;
+                        type = StandardEntryType.InCollection;
                         // This entry type contains page numbers and booktitle in the
                         // title field.
                         isChapter = true;

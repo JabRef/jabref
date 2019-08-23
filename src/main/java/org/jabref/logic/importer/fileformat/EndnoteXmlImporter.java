@@ -51,9 +51,9 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -160,20 +160,20 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     private static EntryType convertRefNameToType(String refName) {
         switch (refName.toLowerCase().trim()) {
             case "artwork":
-                return BibtexEntryType.Misc;
+                return StandardEntryType.Misc;
             case "generic":
-                return BibtexEntryType.Misc;
+                return StandardEntryType.Misc;
             case "electronic article":
                 return IEEETranEntryType.Electronic;
             case "book section":
-                return BibtexEntryType.InBook;
+                return StandardEntryType.InBook;
             case "book":
-                return BibtexEntryType.Book;
+                return StandardEntryType.Book;
             case "journal article":
-                return BibtexEntryType.Article;
+                return StandardEntryType.Article;
 
             default:
-                return BibtexEntryType.Article;
+                return StandardEntryType.Article;
         }
     }
 
@@ -238,7 +238,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return Optional.ofNullable(record.getRefType())
                        .map(RefType::getName)
                        .map(EndnoteXmlImporter::convertRefNameToType)
-                       .orElse(BibtexEntryType.Article);
+                       .orElse(StandardEntryType.Article);
     }
 
     private List<LinkedFile> getLinkedFiles(Record record) {

@@ -20,7 +20,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -58,11 +58,11 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         String isbn = springerJsonEntry.optString("isbn");
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
-            entry.setType(BibtexEntryType.Article);
+            entry.setType(StandardEntryType.Article);
             nametype = StandardField.JOURNAL;
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType(BibtexEntryType.InCollection);
+            entry.setType(StandardEntryType.InCollection);
             nametype = StandardField.BOOKTITLE;
             entry.setField(StandardField.ISBN, isbn);
         }

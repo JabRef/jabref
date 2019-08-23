@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ public class RfcFetcherTest {
         fetcher = new RfcFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Misc);
+        bibEntry.setType(StandardEntryType.Misc);
         bibEntry.setField(StandardField.SERIES, "Request for Comments");
         bibEntry.setField(StandardField.NUMBER, "1945");
         bibEntry.setField(StandardField.HOWPUBLISHED, "RFC 1945");

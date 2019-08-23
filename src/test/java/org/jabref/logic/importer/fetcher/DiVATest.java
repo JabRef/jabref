@@ -6,7 +6,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ public class DiVATest {
     @Test
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryType.Article);
+        entry.setType(StandardEntryType.Article);
         entry.setCiteKey("Gustafsson260746");
         entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
         entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");

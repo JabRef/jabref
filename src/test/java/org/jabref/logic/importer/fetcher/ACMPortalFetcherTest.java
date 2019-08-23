@@ -8,7 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class ACMPortalFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryType.InProceedings);
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
         expected.setCiteKey("Olsson:2017:RCC:3129790.3129810");
         expected.setField(new UnknownField("acmid"), "3129810");
         expected.setField(StandardField.ADDRESS, "New York, NY, USA");

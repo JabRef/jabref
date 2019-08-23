@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class FieldFormatterCleanupTest {
         fieldMap = new HashMap<>();
         entry = new BibEntry();
 
-        entry.setType(BibtexEntryType.Article);
+        entry.setType(StandardEntryType.Article);
         fieldMap.put(StandardField.TITLE, "JabRef");
         fieldMap.put(StandardField.BOOKTITLE, "JabRefBook");
         fieldMap.put(StandardField.YEAR, "twohundredsixteen");

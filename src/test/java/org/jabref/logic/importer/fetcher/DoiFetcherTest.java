@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ public class DoiFetcherTest {
         fetcher = new DoiFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBurd2011 = new BibEntry();
-        bibEntryBurd2011.setType(BibtexEntryType.Book);
+        bibEntryBurd2011.setType(StandardEntryType.Book);
         bibEntryBurd2011.setCiteKey("Burd_2011");
         bibEntryBurd2011.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
         bibEntryBurd2011.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
@@ -38,7 +38,7 @@ public class DoiFetcherTest {
         bibEntryBurd2011.setField(StandardField.DOI, "10.1002/9781118257517");
 
         bibEntryDecker2007 = new BibEntry();
-        bibEntryDecker2007.setType(BibtexEntryType.InProceedings);
+        bibEntryDecker2007.setType(StandardEntryType.InProceedings);
         bibEntryDecker2007.setCiteKey("Decker_2007");
         bibEntryDecker2007.setField(StandardField.AUTHOR, "Gero Decker and Oliver Kopp and Frank Leymann and Mathias Weske");
         bibEntryDecker2007.setField(StandardField.BOOKTITLE, "{IEEE} International Conference on Web Services ({ICWS} 2007)");

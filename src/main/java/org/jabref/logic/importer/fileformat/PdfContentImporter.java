@@ -26,8 +26,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
@@ -276,7 +276,7 @@ public class PdfContentImporter extends Importer {
         // year is a class variable as the method extractYear() uses it;
         String publisher = null;
 
-        EntryType type = BibtexEntryType.InProceedings;
+        EntryType type = StandardEntryType.InProceedings;
         if (curString.length() > 4) {
             // special case: possibly conference as first line on the page
             extractYear();
@@ -356,7 +356,7 @@ public class PdfContentImporter extends Importer {
 
                 int pos = lower.indexOf("technical");
                 if (pos >= 0) {
-                    type = BibtexEntryType.TechReport;
+                    type = StandardEntryType.TechReport;
                     pos = curString.trim().lastIndexOf(' ');
                     if (pos >= 0) {
                         // assumption: last character of curString is NOT ' '

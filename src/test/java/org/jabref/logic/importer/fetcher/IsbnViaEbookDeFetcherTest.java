@@ -7,7 +7,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @BeforeEach
     public void setUp() {
         bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Book);
+        bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("9780134685991");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
@@ -67,7 +67,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Book);
+        bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("9783662585856");
         bibEntry.setField(StandardField.TITLE, "Fundamentals of Business Process Management");
         bibEntry.setField(StandardField.PUBLISHER, "Springer Berlin Heidelberg");

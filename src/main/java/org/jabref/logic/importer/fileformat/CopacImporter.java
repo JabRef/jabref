@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for COPAC format.
@@ -110,7 +110,7 @@ public class CopacImporter extends Importer {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry(BibtexEntryType.Book);
+            BibEntry b = new BibEntry(StandardEntryType.Book);
 
             String[] lines = entry.split("\n");
 

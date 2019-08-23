@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -33,7 +33,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryType.Article);
+        BibEntry expected = new BibEntry(StandardEntryType.Article);
         expected.setField(StandardField.AUTHOR, "Wei Wang and Yun He and Tong Li and Jiajun Zhu and Jinzhuo Liu");
         expected.setField(StandardField.DOI, "10.1155/2018/5913634");
         expected.setField(StandardField.ISSN, "1875-919X");
@@ -63,7 +63,7 @@ class DOAJFetcherTest {
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = DOAJFetcher.parseBibJSONtoBibtex(jsonObject, ',');
 
-        assertEquals(BibtexEntryType.Article, bibEntry.getType());
+        assertEquals(StandardEntryType.Article, bibEntry.getType());
         assertEquals(Optional.of("VLSI Design"), bibEntry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField(StandardField.DOI));
         assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField(StandardField.AUTHOR));

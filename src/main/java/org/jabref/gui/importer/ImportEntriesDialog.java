@@ -35,8 +35,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -156,7 +156,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     }
 
     private IconTheme.JabRefIcons getIcon(EntryType type) {
-        if (BibtexEntryType.Book.equals(type)) {
+        if (StandardEntryType.Book.equals(type)) {
             return IconTheme.JabRefIcons.BOOK;
         }
         return IconTheme.JabRefIcons.ARTICLE;

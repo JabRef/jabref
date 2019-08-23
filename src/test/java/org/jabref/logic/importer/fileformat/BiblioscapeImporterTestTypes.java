@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,15 +21,15 @@ class BiblioscapeImporterTestTypes {
 
     private static Stream<Arguments> types() {
         return Stream.of(
-                Arguments.of("journal", BibtexEntryType.Article),
-                Arguments.of("book section", BibtexEntryType.InBook),
-                Arguments.of("book", BibtexEntryType.Book),
-                Arguments.of("conference", BibtexEntryType.InProceedings),
-                Arguments.of("proceedings", BibtexEntryType.InProceedings),
-                Arguments.of("report", BibtexEntryType.TechReport),
-                Arguments.of("master thesis", BibtexEntryType.MastersThesis),
-                Arguments.of("thesis", BibtexEntryType.PhdThesis),
-                Arguments.of("master", BibtexEntryType.Misc)
+                Arguments.of("journal", StandardEntryType.Article),
+                Arguments.of("book section", StandardEntryType.InBook),
+                Arguments.of("book", StandardEntryType.Book),
+                Arguments.of("conference", StandardEntryType.InProceedings),
+                Arguments.of("proceedings", StandardEntryType.InProceedings),
+                Arguments.of("report", StandardEntryType.TechReport),
+                Arguments.of("master thesis", StandardEntryType.MastersThesis),
+                Arguments.of("thesis", StandardEntryType.PhdThesis),
+                Arguments.of("master", StandardEntryType.Misc)
         );
     }
 

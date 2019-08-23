@@ -6,7 +6,7 @@ import java.util.List;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
@@ -54,7 +54,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testCorrectMatchFromDatabaseWithArticleTypeEntry() {
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", true, true), database).getMatches();
@@ -72,7 +72,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testCorrectMatchFromDatabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry(BibtexEntryType.InCollection);
+        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
@@ -87,7 +87,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
-        entry = new BibEntry(BibtexEntryType.InCollection);
+        entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
@@ -99,7 +99,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromDabaseWithIncollectionTypeEntry() {
-        BibEntry entry = new BibEntry(BibtexEntryType.InCollection);
+        BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 

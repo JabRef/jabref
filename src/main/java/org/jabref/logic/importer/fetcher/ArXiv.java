@@ -32,7 +32,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -405,7 +405,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         public BibEntry toBibEntry(Character keywordDelimiter) {
-            BibEntry bibEntry = new BibEntry(BibtexEntryType.Article);
+            BibEntry bibEntry = new BibEntry(StandardEntryType.Article);
             bibEntry.setField(StandardField.EPRINTTYPE, "arXiv");
             bibEntry.setField(StandardField.AUTHOR, String.join(" and ", authorNames));
             bibEntry.addKeywords(categories, keywordDelimiter);

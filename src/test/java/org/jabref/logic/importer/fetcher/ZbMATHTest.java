@@ -8,7 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -32,7 +32,7 @@ class ZbMATHTest {
         fetcher = new ZbMATH(importFormatPreferences);
 
         donaldsonEntry = new BibEntry();
-        donaldsonEntry.setType(BibtexEntryType.Article);
+        donaldsonEntry.setType(StandardEntryType.Article);
         donaldsonEntry.setCiteKey("zbMATH03800580");
         donaldsonEntry.setField(StandardField.AUTHOR, "S.K. {Donaldson}");
         donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");

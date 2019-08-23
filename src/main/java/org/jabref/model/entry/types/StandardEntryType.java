@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-public enum BiblatexEntryType implements EntryType {
+public enum StandardEntryType implements EntryType {
     // BibTeX
     Article("Article"),
     Book("Book"),
@@ -40,12 +40,12 @@ public enum BiblatexEntryType implements EntryType {
 
     private final String displayName;
 
-    BiblatexEntryType(String displayName) {
+    StandardEntryType(String displayName) {
         this.displayName = displayName;
     }
 
-    public static Optional<BiblatexEntryType> fromName(String name) {
-        return Arrays.stream(BiblatexEntryType.values())
+    public static Optional<StandardEntryType> fromName(String name) {
+        return Arrays.stream(StandardEntryType.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
     }

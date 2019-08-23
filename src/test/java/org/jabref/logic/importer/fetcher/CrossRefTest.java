@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -118,7 +118,7 @@ public class CrossRefTest {
 
     @Test
     public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "Dominik Wujastyk");
         entry.setField(StandardField.DOI, "10.1023/a:1003473214310");
         entry.setField(StandardField.ISSN, "0019-7246");

@@ -19,7 +19,7 @@ import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ class MedlinePlainImporterTest {
         BibEntry testEntry = entries.get(0);
 
         assertEquals(7, entries.size());
-        assertEquals(BibtexEntryType.Article, testEntry.getType());
+        assertEquals(StandardEntryType.Article, testEntry.getType());
         assertEquals(Optional.empty(), testEntry.getField(StandardField.MONTH));
         assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getField(StandardField.AUTHOR));
         assertEquals(
@@ -94,32 +94,32 @@ class MedlinePlainImporterTest {
                 testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(1);
-        assertEquals(BibtexEntryType.Conference, testEntry.getType());
+        assertEquals(StandardEntryType.Conference, testEntry.getType());
         assertEquals(Optional.of("06"), testEntry.getField(StandardField.MONTH));
         assertEquals(Optional.empty(), testEntry.getField(StandardField.AUTHOR));
         assertEquals(Optional.empty(), testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(2);
-        assertEquals(BibtexEntryType.Book, testEntry.getType());
+        assertEquals(StandardEntryType.Book, testEntry.getType());
         assertEquals(
                 Optional.of(
                         "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle"),
                 testEntry.getField(StandardField.TITLE));
 
         testEntry = entries.get(3);
-        assertEquals(BibtexEntryType.TechReport, testEntry.getType());
+        assertEquals(StandardEntryType.TechReport, testEntry.getType());
         assertTrue(testEntry.getField(StandardField.DOI).isPresent());
 
         testEntry = entries.get(4);
-        assertEquals(BibtexEntryType.InProceedings, testEntry.getType());
+        assertEquals(StandardEntryType.InProceedings, testEntry.getType());
         assertEquals(Optional.of("Inproceedings book title"), testEntry.getField(StandardField.BOOKTITLE));
 
-        BibEntry expectedEntry5 = new BibEntry(BibtexEntryType.Proceedings);
+        BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings);
         expectedEntry5.setField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry5, entries.get(5));
 
         BibEntry expectedEntry6 = new BibEntry();
-        expectedEntry6.setType(BibtexEntryType.Misc);
+        expectedEntry6.setType(StandardEntryType.Misc);
         expectedEntry6.setField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry6, entries.get(6));
     }
@@ -234,7 +234,7 @@ class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(BibtexEntryType.Article);
+            expectedEntry.setType(StandardEntryType.Article);
             expectedEntry.setField(StandardField.KEYWORDS, "Female");
 
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);

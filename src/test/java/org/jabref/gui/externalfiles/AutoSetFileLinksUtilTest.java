@@ -11,7 +11,7 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ public class AutoSetFileLinksUtilTest {
     private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(false, "", true, ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
-    private final BibEntry entry = new BibEntry(BibtexEntryType.Article);
+    private final BibEntry entry = new BibEntry(StandardEntryType.Article);
 
     @BeforeEach
     public void setUp(@TempDir Path folder) throws Exception {

@@ -10,8 +10,8 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class MSBibConverter {
 
@@ -89,13 +89,13 @@ public class MSBibConverter {
             result.thesisType = entry.getLatexFreeField(StandardField.TYPE).get();
 
         } else {
-            if (entry.getType().equals(BibtexEntryType.TechReport)) {
+            if (entry.getType().equals(StandardEntryType.TechReport)) {
                 result.thesisType = "Tech. rep.";
-            } else if (entry.getType().equals(BibtexEntryType.MastersThesis)) {
+            } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {
                 result.thesisType = "Master's thesis";
-            } else if (entry.getType().equals(BibtexEntryType.PhdThesis)) {
+            } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {
                 result.thesisType = "Ph.D. dissertation";
-            } else if (entry.getType().equals(BibtexEntryType.Unpublished)) {
+            } else if (entry.getType().equals(StandardEntryType.Unpublished)) {
                 result.thesisType = "unpublished";
             }
         }

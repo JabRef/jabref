@@ -15,9 +15,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * INSPEC format importer.
@@ -116,9 +116,9 @@ public class InspecImporter extends Importer {
                 } else if ("RT".equals(f3)) {
                     frest = frest.trim();
                     if ("Journal-Paper".equals(frest)) {
-                        type = BibtexEntryType.Article;
+                        type = StandardEntryType.Article;
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
-                        type = BibtexEntryType.InProceedings;
+                        type = StandardEntryType.InProceedings;
                     } else {
                         type = EntryTypeFactory.parse(frest.replace(" ", ""));
                     }

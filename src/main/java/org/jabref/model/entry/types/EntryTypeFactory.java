@@ -42,6 +42,6 @@ public class EntryTypeFactory {
     }
 
     public static EntryType parse(String typeName) {
-        return OptionalUtil.orElse(BibtexEntryType.fromName(typeName), new UnknownEntryType(typeName));
+        return OptionalUtil.orElse(StandardEntryType.fromName(typeName), new UnknownEntryType(typeName));
     }
 }

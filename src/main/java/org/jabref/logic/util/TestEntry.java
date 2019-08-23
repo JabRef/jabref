@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class TestEntry {
 
@@ -13,7 +13,7 @@ public class TestEntry {
 
     public static BibEntry getTestEntry() {
 
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setCiteKey("Smith2016");
         entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(StandardField.EDITOR, "Taylor, Phil");
@@ -42,7 +42,7 @@ public class TestEntry {
     }
 
     public static BibEntry getTestEntryBook() {
-        BibEntry entry = new BibEntry(BibtexEntryType.Book);
+        BibEntry entry = new BibEntry(StandardEntryType.Book);
         entry.setCiteKey("Harrer2018");
         entry.setField(StandardField.AUTHOR, "Simon Harrer and Jörg Lenhard and Linus Dietz");
         entry.setField(StandardField.EDITOR, "Andrea Steward");

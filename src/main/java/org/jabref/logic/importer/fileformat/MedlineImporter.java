@@ -79,7 +79,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
@@ -267,7 +267,7 @@ public class MedlineImporter extends Importer implements Parser {
             putIfValueNotNull(fields, StandardField.PUBSTATE, bookData.getPublicationStatus());
         }
 
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
         bibItems.add(entry);
@@ -414,7 +414,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        BibEntry entry = new BibEntry(BibtexEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
         bibItems.add(entry);

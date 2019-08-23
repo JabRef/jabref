@@ -18,7 +18,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -104,7 +104,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        expectedEntry.setType(BibtexEntryType.Book);
+        expectedEntry.setType(StandardEntryType.Book);
         expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
         expectedEntry.setField(new UnknownField("customField"), "custom value");
         expectedEntry.clearField(StandardField.BOOKTITLE);
@@ -284,7 +284,7 @@ class DBMSProcessorTest {
     }
 
     private BibEntry getBibEntryExample() {
-        BibEntry bibEntry = new BibEntry(BibtexEntryType.InProceedings);
+        BibEntry bibEntry = new BibEntry(StandardEntryType.InProceedings);
         bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L");
         bibEntry.setField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor");
         bibEntry.setField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on");

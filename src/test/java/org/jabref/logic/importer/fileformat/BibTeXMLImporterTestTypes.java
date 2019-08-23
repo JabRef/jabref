@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,19 +25,19 @@ public class BibTeXMLImporterTestTypes {
 
     public static Collection<EntryType> types() {
         return Arrays.asList(
-                BibtexEntryType.Article,
-                BibtexEntryType.Book,
-                BibtexEntryType.Booklet,
-                BibtexEntryType.Conference,
-                BibtexEntryType.InBook,
-                BibtexEntryType.InCollection,
-                BibtexEntryType.InProceedings,
-                BibtexEntryType.Manual,
-                BibtexEntryType.MastersThesis,
-                BibtexEntryType.Misc,
-                BibtexEntryType.PhdThesis,
-                BibtexEntryType.TechReport,
-                BibtexEntryType.Unpublished);
+                StandardEntryType.Article,
+                StandardEntryType.Book,
+                StandardEntryType.Booklet,
+                StandardEntryType.Conference,
+                StandardEntryType.InBook,
+                StandardEntryType.InCollection,
+                StandardEntryType.InProceedings,
+                StandardEntryType.Manual,
+                StandardEntryType.MastersThesis,
+                StandardEntryType.Misc,
+                StandardEntryType.PhdThesis,
+                StandardEntryType.TechReport,
+                StandardEntryType.Unpublished);
     }
 
     @ParameterizedTest

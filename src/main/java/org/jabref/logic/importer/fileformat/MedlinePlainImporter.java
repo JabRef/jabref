@@ -19,8 +19,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -230,24 +230,24 @@ public class MedlinePlainImporter extends Importer {
         String val = value.toLowerCase(Locale.ENGLISH);
         switch (val) {
             case "book":
-                return BibtexEntryType.Book;
+                return StandardEntryType.Book;
             case "journal article":
             case "classical article":
             case "corrected and republished article":
             case "historical article":
             case "introductory journal article":
             case "newspaper article":
-                return BibtexEntryType.Article;
+                return StandardEntryType.Article;
             case "clinical conference":
             case "consensus development conference":
             case "consensus development conference, nih":
-                return BibtexEntryType.Conference;
+                return StandardEntryType.Conference;
             case "technical report":
-                return BibtexEntryType.TechReport;
+                return StandardEntryType.TechReport;
             case "editorial":
-                return BibtexEntryType.InProceedings;
+                return StandardEntryType.InProceedings;
             case "overall":
-                return BibtexEntryType.Proceedings;
+                return StandardEntryType.Proceedings;
             default:
                 return type;
         }
@@ -323,7 +323,7 @@ public class MedlinePlainImporter extends Importer {
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
             hm.put(StandardField.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
-            if (type.equals(BibtexEntryType.InProceedings)) {
+            if (type.equals(StandardEntryType.InProceedings)) {
                 hm.put(StandardField.BOOKTITLE, val);
             } else {
                 hm.put(StandardField.JOURNAL, val);

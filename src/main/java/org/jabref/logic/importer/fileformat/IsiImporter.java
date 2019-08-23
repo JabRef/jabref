@@ -22,8 +22,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -210,12 +210,12 @@ public class IsiImporter extends Importer {
                     } else {
                         PT = value;
                     }
-                    type = BibtexEntryType.Article; // make all of them PT?
+                    type = StandardEntryType.Article; // make all of them PT?
                 } else if ("TY".equals(beg)) {
                     if ("JOUR".equals(value)) {
-                        type = BibtexEntryType.Article;
+                        type = StandardEntryType.Article;
                     } else if ("CONF".equals(value)) {
-                        type = BibtexEntryType.InProceedings;
+                        type = StandardEntryType.InProceedings;
                     }
                 } else if ("JO".equals(beg)) {
                     hm.put(StandardField.BOOKTITLE, value);
@@ -279,9 +279,9 @@ public class IsiImporter extends Importer {
 
                 } else if ("DT".equals(beg)) {
                     if ("Review".equals(value)) {
-                        type = BibtexEntryType.Article; // set "Review" in Note/Comment?
+                        type = StandardEntryType.Article; // set "Review" in Note/Comment?
                     } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(PT)) {
-                        type = BibtexEntryType.Article;
+                        type = StandardEntryType.Article;
                     } else {
                         type = BibEntry.DEFAULT_TYPE;
                     }

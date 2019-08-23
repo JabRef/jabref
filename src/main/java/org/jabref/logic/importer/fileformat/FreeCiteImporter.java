@@ -30,8 +30,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +119,7 @@ public class FreeCiteImporter extends Importer {
 
                     BibEntry e = new BibEntry();
                     // fallback type
-                    EntryType type = BibtexEntryType.InProceedings;
+                    EntryType type = StandardEntryType.InProceedings;
 
                     while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
                             && "citation".equals(parser.getLocalName()))) {
@@ -154,10 +154,10 @@ public class FreeCiteImporter extends Importer {
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
                                 // the drawback is that ctx:context-objects is NOT nested in citation, but a separate element
                                 // we would have to change the whole parser to parse that format.
-                                type = BibtexEntryType.Article;
+                                type = StandardEntryType.Article;
                                 e.setField(field, parser.getElementText());
                             } else if (new UnknownField("tech").equals(field)) {
-                                type = BibtexEntryType.TechReport;
+                                type = StandardEntryType.TechReport;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField(StandardField.NUMBER, parser.getElementText());
                             } else if (StandardField.DOI.equals(field) || StandardField.INSTITUTION.equals(field)

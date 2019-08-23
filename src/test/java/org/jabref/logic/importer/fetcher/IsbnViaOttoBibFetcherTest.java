@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @BeforeEach
     public void setUp() {
         bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Book);
+        bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("bloch2008effective");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison-Wesley");
@@ -66,7 +66,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Book);
+        bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("dumas2018fundamentals");
         bibEntry.setField(StandardField.TITLE, "Fundamentals of business process management");
         bibEntry.setField(StandardField.PUBLISHER, "Springer");
@@ -82,7 +82,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     public void testISBNNotAvaiableOnEbookDeOrChimbori() throws Exception {
         bibEntry = new BibEntry();
-        bibEntry.setType(BibtexEntryType.Book);
+        bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("denis2012les");
         bibEntry.setField(StandardField.TITLE, "Les mots du passé : roman");
         bibEntry.setField(StandardField.PUBLISHER, "Éd. les Nouveaux auteurs");

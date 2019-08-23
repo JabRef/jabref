@@ -24,9 +24,9 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class RisImporter extends Importer {
 
@@ -74,7 +74,7 @@ public class RisImporter extends Importer {
             int datePriority = dateTags.size();
             int tagPriority;
 
-            EntryType type = BibtexEntryType.Misc;
+            EntryType type = StandardEntryType.Misc;
             String author = "";
             String editor = "";
             String startPage = "";
@@ -108,23 +108,23 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         if ("BOOK".equals(value)) {
-                            type = BibtexEntryType.Book;
+                            type = StandardEntryType.Book;
                         } else if ("JOUR".equals(value) || "MGZN".equals(value)) {
-                            type = BibtexEntryType.Article;
+                            type = StandardEntryType.Article;
                         } else if ("THES".equals(value)) {
-                            type = BibtexEntryType.PhdThesis;
+                            type = StandardEntryType.PhdThesis;
                         } else if ("UNPB".equals(value)) {
-                            type = BibtexEntryType.Unpublished;
+                            type = StandardEntryType.Unpublished;
                         } else if ("RPRT".equals(value)) {
-                            type = BibtexEntryType.TechReport;
+                            type = StandardEntryType.TechReport;
                         } else if ("CONF".equals(value)) {
-                            type = BibtexEntryType.InProceedings;
+                            type = StandardEntryType.InProceedings;
                         } else if ("CHAP".equals(value)) {
-                            type = BibtexEntryType.InCollection;
+                            type = StandardEntryType.InCollection;
                         } else if ("PAT".equals(value)) {
                             type = IEEETranEntryType.Patent;
                         } else {
-                            type = BibtexEntryType.Misc;
+                            type = StandardEntryType.Misc;
                         }
                     } else if ("T1".equals(tag) || "TI".equals(tag)) {
                         String oldVal = fields.get(StandardField.TITLE);
@@ -161,7 +161,7 @@ public class RisImporter extends Importer {
                             editor += " and " + value;
                         }
                     } else if ("JA".equals(tag) || "JF".equals(tag)) {
-                        if (type.equals(BibtexEntryType.InProceedings)) {
+                        if (type.equals(StandardEntryType.InProceedings)) {
                             fields.put(StandardField.BOOKTITLE, value);
                         } else {
                             fields.put(StandardField.JOURNAL, value);
@@ -177,7 +177,7 @@ public class RisImporter extends Importer {
                     } else if ("SP".equals(tag)) {
                         startPage = value;
                     } else if ("PB".equals(tag)) {
-                        if (type.equals(BibtexEntryType.PhdThesis)) {
+                        if (type.equals(StandardEntryType.PhdThesis)) {
                             fields.put(StandardField.SCHOOL, value);
                         } else {
                             fields.put(StandardField.PUBLISHER, value);
