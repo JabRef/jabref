@@ -110,11 +110,6 @@ Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
 License: Apache-1.1
 
-Id:      mysql:mysql-connector-java
-Project: MySQL Connector/J
-URL:     http://www.mysql.de/downloads/connector/j/
-License: GPL-2.0 and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
-
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
@@ -194,6 +189,11 @@ Id:      org.jsoup:jsoup
 Project: jsoup
 URL:     https://github.com/jhy/jsoup/
 License: MIT
+
+Id:      org.mariadb.jdbc:mariadb-java-client
+Project: MariaDB Java Client
+URL:     https://mariadb.com/kb/en/library/about-mariadb-connector-j/
+License: LGPL-2.1-or-later
 
 Id:      org.openoffice:juh
 Project: OpenOffice.org
