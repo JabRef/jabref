@@ -17,13 +17,13 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -210,12 +210,12 @@ public class IsiImporter extends Importer {
                     } else {
                         PT = value;
                     }
-                    type = StandardEntryType.Article; // make all of them PT?
+                    type = BibtexEntryType.Article; // make all of them PT?
                 } else if ("TY".equals(beg)) {
                     if ("JOUR".equals(value)) {
-                        type = StandardEntryType.Article;
+                        type = BibtexEntryType.Article;
                     } else if ("CONF".equals(value)) {
-                        type = StandardEntryType.InProceedings;
+                        type = BibtexEntryType.InProceedings;
                     }
                 } else if ("JO".equals(beg)) {
                     hm.put(StandardField.BOOKTITLE, value);
@@ -279,9 +279,9 @@ public class IsiImporter extends Importer {
 
                 } else if ("DT".equals(beg)) {
                     if ("Review".equals(value)) {
-                        type = StandardEntryType.Article; // set "Review" in Note/Comment?
+                        type = BibtexEntryType.Article; // set "Review" in Note/Comment?
                     } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(PT)) {
-                        type = StandardEntryType.Article;
+                        type = BibtexEntryType.Article;
                     } else {
                         type = BibEntry.DEFAULT_TYPE;
                     }

@@ -15,12 +15,12 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -230,24 +230,24 @@ public class MedlinePlainImporter extends Importer {
         String val = value.toLowerCase(Locale.ENGLISH);
         switch (val) {
             case "book":
-                return StandardEntryType.Book;
+                return BibtexEntryType.Book;
             case "journal article":
             case "classical article":
             case "corrected and republished article":
             case "historical article":
             case "introductory journal article":
             case "newspaper article":
-                return StandardEntryType.Article;
+                return BibtexEntryType.Article;
             case "clinical conference":
             case "consensus development conference":
             case "consensus development conference, nih":
-                return StandardEntryType.Conference;
+                return BibtexEntryType.Conference;
             case "technical report":
-                return StandardEntryType.TechReport;
+                return BibtexEntryType.TechReport;
             case "editorial":
-                return StandardEntryType.InProceedings;
+                return BibtexEntryType.InProceedings;
             case "overall":
-                return StandardEntryType.Proceedings;
+                return BibtexEntryType.Proceedings;
             default:
                 return type;
         }
@@ -323,7 +323,7 @@ public class MedlinePlainImporter extends Importer {
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
             hm.put(StandardField.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
-            if (type.equals(StandardEntryType.InProceedings)) {
+            if (type.equals(BibtexEntryType.InProceedings)) {
                 hm.put(StandardField.BOOKTITLE, val);
             } else {
                 hm.put(StandardField.JOURNAL, val);

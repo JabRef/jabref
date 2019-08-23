@@ -14,11 +14,11 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.EntryTypeFactory;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -77,7 +77,7 @@ public class SilverPlatterImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        EntryType type = StandardEntryType.Misc;
+        EntryType type = BibtexEntryType.Misc;
         Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
@@ -156,13 +156,13 @@ public class SilverPlatterImporter extends Importer {
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
                     if ("Monograph".equals(frest)) {
-                        type = StandardEntryType.Book;
+                        type = BibtexEntryType.Book;
                     } else if (frest.startsWith("Dissertation")) {
-                        type = StandardEntryType.PhdThesis;
+                        type = BibtexEntryType.PhdThesis;
                     } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
-                        type = StandardEntryType.Article;
+                        type = BibtexEntryType.Article;
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                        type = StandardEntryType.InCollection;
+                        type = BibtexEntryType.InCollection;
                         // This entry type contains page numbers and booktitle in the
                         // title field.
                         isChapter = true;

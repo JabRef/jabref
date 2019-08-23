@@ -23,7 +23,7 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

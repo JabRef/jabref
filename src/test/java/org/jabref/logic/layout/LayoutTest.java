@@ -9,9 +9,9 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
-import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,21 +47,21 @@ class LayoutTest {
 
     @Test
     void entryTypeForArticle() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "test");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.AUTHOR, "test");
 
         assertEquals("Article", layout("\\bibtextype", entry));
     }
 
     @Test
     void entryTypeForMisc() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc).withField(StandardField.AUTHOR, "test");
+        BibEntry entry = new BibEntry(BibtexEntryType.Misc).withField(StandardField.AUTHOR, "test");
 
         assertEquals("Misc", layout("\\bibtextype", entry));
     }
 
     @Test
     void HTMLChar() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "This\nis\na\ntext");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.AUTHOR, "This\nis\na\ntext");
 
         String actual = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}", entry);
 
@@ -70,7 +70,7 @@ class LayoutTest {
 
     @Test
     void HTMLCharWithDoubleLineBreak() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "This\nis\na\n\ntext");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.AUTHOR, "This\nis\na\n\ntext");
 
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ", entry);
 
@@ -79,7 +79,7 @@ class LayoutTest {
 
     @Test
     void nameFormatter() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Joe Doe and Jane, Moon");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.AUTHOR, "Joe Doe and Jane, Moon");
 
         String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}", entry);
 
@@ -88,7 +88,7 @@ class LayoutTest {
 
     @Test
     void HTMLCharsWithDotlessIAndTiled() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
+        BibEntry entry = new BibEntry(BibtexEntryType.Article)
                 .withField(StandardField.ABSTRACT, "\\~{n} \\~n \\'i \\i \\i");
 
         String layoutText = layout(
@@ -107,7 +107,7 @@ class LayoutTest {
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
                 new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         entry.addFile(new LinkedFile("Test file", "encrypted.pdf", "PDF"));
 
         String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}", entry);
@@ -119,7 +119,7 @@ class LayoutTest {
 
     @Test
     void expandCommandIfTerminatedByMinus() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.EDITION, "2");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.EDITION, "2");
 
         String layoutText = layout("\\edition-th ed.-", entry);
 
@@ -130,7 +130,7 @@ class LayoutTest {
     void customNameFormatter() throws IOException {
         when(layoutFormatterPreferences.getNameFormatterPreferences()).thenReturn(
                 new NameFormatterPreferences(Collections.singletonList("DCA"), Collections.singletonList("1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{l}@@*@*@more")));
-        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
+        BibEntry entry = new BibEntry(BibtexEntryType.Article).withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
 
         String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);
 

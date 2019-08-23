@@ -6,9 +6,9 @@ import java.util.List;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class INSPIREFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.MastersThesis);
+        BibEntry expected = new BibEntry(BibtexEntryType.MastersThesis);
         expected.setCiteKey("Diez:2014ppa");
         expected.setField(StandardField.AUTHOR, "Diez, Tobias");
         expected.setField(StandardField.TITLE, "Slice theorem for Fr\\'echet group actions and covariant symplectic field theory");

@@ -11,8 +11,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class PdfContentImporterTest {
         Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry expected = new BibEntry(BibtexEntryType.InProceedings);
         expected.setField(StandardField.AUTHOR, "1 ");
         expected.setField(StandardField.TITLE, "Hello World");
         expected.setFiles(Collections.singletonList(new LinkedFile("", file.toAbsolutePath(), "PDF")));
@@ -65,7 +65,7 @@ class PdfContentImporterTest {
     @Test
     void testParsingEditorWithoutPagesorSeriesInformation() {
 
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry entry = new BibEntry(BibtexEntryType.InProceedings);
         entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
         entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
         entry.setField(StandardField.PUBLISHER, "Springer");

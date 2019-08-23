@@ -12,10 +12,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -94,7 +94,7 @@ public class GvkParser implements Parser {
         String mak = "";
         String subtitle = "";
 
-        EntryType entryType = StandardEntryType.Book; // Default
+        EntryType entryType = BibtexEntryType.Book; // Default
 
         // Alle relevanten Informationen einsammeln
 
@@ -248,7 +248,7 @@ public class GvkParser implements Parser {
 
                 String st = getSubfield("a", datafield);
                 if ((st != null) && st.contains("Diss")) {
-                    entryType = StandardEntryType.PhdThesis;
+                    entryType = BibtexEntryType.PhdThesis;
                 }
             }
 
@@ -289,12 +289,12 @@ public class GvkParser implements Parser {
                     subtitle = getSubfield("a", datafield);
                 }
 
-                entryType = StandardEntryType.Proceedings;
+                entryType = BibtexEntryType.Proceedings;
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if (entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)) {
-                entryType = StandardEntryType.Book;
+            if (entryType.equals(BibtexEntryType.PhdThesis) && (isbn != null)) {
+                entryType = BibtexEntryType.Book;
             }
 
             //Hilfskategorien zur Entscheidung @article
@@ -343,10 +343,10 @@ public class GvkParser implements Parser {
             entryType = BibEntry.DEFAULT_TYPE;
 
             if (quelle.contains("ISBN")) {
-                entryType = StandardEntryType.InCollection;
+                entryType = BibtexEntryType.InCollection;
             }
             if (quelle.contains("ZDB-ID")) {
-                entryType = StandardEntryType.Article;
+                entryType = BibtexEntryType.Article;
             }
         } else if (mak.isEmpty()) {
             entryType = BibEntry.DEFAULT_TYPE;

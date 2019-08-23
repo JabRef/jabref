@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ public class AstrophysicsDataSystemTest {
         fetcher = new AstrophysicsDataSystem(importFormatPreferences);
 
         diezSliceTheoremEntry = new BibEntry();
-        diezSliceTheoremEntry.setType(StandardEntryType.Article);
+        diezSliceTheoremEntry.setType(BibtexEntryType.Article);
         diezSliceTheoremEntry.setCiteKey("2014arXiv1405.2249D");
         diezSliceTheoremEntry.setField(StandardField.AUTHOR, "Diez, T.");
         diezSliceTheoremEntry.setField(StandardField.TITLE, "Slice theorem for Fr$\\backslash$'echet group actions and covariant symplectic field theory");
@@ -64,7 +64,7 @@ public class AstrophysicsDataSystemTest {
                         + "occurring symmetries.");
 
         famaeyMcGaughEntry = new BibEntry();
-        famaeyMcGaughEntry.setType(StandardEntryType.Article);
+        famaeyMcGaughEntry.setType(BibtexEntryType.Article);
         famaeyMcGaughEntry.setCiteKey("2012LRR....15...10F");
         famaeyMcGaughEntry.setField(StandardField.AUTHOR, "Famaey, B. and McGaugh, S. S.");
         famaeyMcGaughEntry.setField(StandardField.TITLE, "Modified Newtonian Dynamics (MOND): Observational Phenomenology and Relativistic Extensions");
@@ -81,7 +81,7 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField(StandardField.URL, "http://adsabs.harvard.edu/abs/2012LRR....15...10F");
 
         sunWelchEntry = new BibEntry();
-        sunWelchEntry.setType(StandardEntryType.Article);
+        sunWelchEntry.setType(BibtexEntryType.Article);
         sunWelchEntry.setCiteKey("2012NatMa..11...44S");
         sunWelchEntry.setField(StandardField.AUTHOR, "Sun, Y. and Welch, G. C. and Leong, W. L. and Takacs, C. J. and Bazan, G. C. and Heeger, A. J.");
         sunWelchEntry.setField(StandardField.DOI, "10.1038/nmat3160");
@@ -94,7 +94,7 @@ public class AstrophysicsDataSystemTest {
         sunWelchEntry.setField(StandardField.URL, "http://adsabs.harvard.edu/abs/2012NatMa..11...44S");
 
         xiongSunEntry = new BibEntry();
-        xiongSunEntry.setType(StandardEntryType.Article);
+        xiongSunEntry.setType(BibtexEntryType.Article);
         xiongSunEntry.setCiteKey("2007ITGRS..45..879X");
         xiongSunEntry.setField(StandardField.AUTHOR, "Xiong, X. and Sun, J. and Barnes, W. and Salomonson, V. and Esposito, J. and Erives, H. and Guenther, B.");
         xiongSunEntry.setField(StandardField.DOI, "10.1109/TGRS.2006.890567");
@@ -107,7 +107,7 @@ public class AstrophysicsDataSystemTest {
         xiongSunEntry.setField(StandardField.URL, "http://adsabs.harvard.edu/abs/2007ITGRS..45..879X");
 
         ingersollPollardEntry = new BibEntry();
-        ingersollPollardEntry.setType(StandardEntryType.Article);
+        ingersollPollardEntry.setType(BibtexEntryType.Article);
         ingersollPollardEntry.setCiteKey("1982Icar...52...62I");
         ingersollPollardEntry.setField(StandardField.AUTHOR, "Ingersoll, A. P. and Pollard, D.");
         ingersollPollardEntry.setField(StandardField.DOI, "10.1016/0019-1035(82)90169-5");
@@ -121,7 +121,7 @@ public class AstrophysicsDataSystemTest {
         ingersollPollardEntry.setField(StandardField.URL, "http://adsabs.harvard.edu/abs/1982Icar...52...62I");
 
         luceyPaulEntry = new BibEntry();
-        luceyPaulEntry.setType(StandardEntryType.Article);
+        luceyPaulEntry.setType(BibtexEntryType.Article);
         luceyPaulEntry.setCiteKey("2000JGR...10520297L");
         luceyPaulEntry.setField(StandardField.AUTHOR, "Lucey, P. G. and Blewett, D. T. and Jolliff, B. L.");
         luceyPaulEntry.setField(StandardField.DOI, "10.1029/1999JE001117");

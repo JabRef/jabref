@@ -1,54 +1,51 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-public enum StandardEntryType implements EntryType {
+public enum BiblatexEntryType implements EntryType {
+    // BibTeX
     Article("Article"),
     Book("Book"),
-    BookInBook("BookInBook"),
     Booklet("Booklet"),
     Collection("Collection"),
     Conference("Conference"),
-    Electronic("Electronic"),
-    IEEEtranBSTCTL("IEEEtranBSTCTL"),
     InBook("InBook"),
     InCollection("InCollection"),
     InProceedings("InProceedings"),
-    InReference("InReference"),
     Manual("Manual"),
     MastersThesis("MastersThesis"),
     Misc("Misc"),
+    PhdThesis("PhdThesis"),
+    Proceedings("Proceedings"),
+    TechReport("TechReport"),
+    Unpublished("Unpublished"),
+    // Biblatex
+    BookInBook("BookInBook"),
+    InReference("InReference"),
     MvBook("MvBook"),
     MvCollection("MvCollection"),
     MvProceedings("MvProceedings"),
     MvReference("MvReference"),
     Online("Online"),
-    Patent("Patent"),
-    Periodical("Periodical"),
-    PhdThesis("PhdThesis"),
-    Proceedings("Proceedings"),
     Reference("Reference"),
     Report("Report"),
     Set("Set"),
     SuppBook("SuppBook"),
     SuppCollection("SuppCollection"),
     SuppPeriodical("SuppPeriodical"),
-    TechReport("TechReport"),
     Thesis("Thesis"),
-    Unpublished("Unpublished"),
-    WWW("WWW"),
-    Standard("Standard");
+    WWW("WWW");
 
     private final String displayName;
 
-    StandardEntryType(String displayName) {
+    BiblatexEntryType(String displayName) {
         this.displayName = displayName;
     }
 
-    public static Optional<StandardEntryType> fromName(String name) {
-        return Arrays.stream(StandardEntryType.values())
+    public static Optional<BiblatexEntryType> fromName(String name) {
+        return Arrays.stream(BiblatexEntryType.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();
     }

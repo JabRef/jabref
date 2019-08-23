@@ -14,13 +14,13 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.EntryTypeFactory;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 /**
  * Imports an Ovid file.
@@ -207,9 +207,9 @@ public class OvidImporter extends Importer {
             // Set the entrytype properly:
             EntryType entryType = h.containsKey(InternalField.TYPE_HEADER) ? EntryTypeFactory.parse(h.get(InternalField.TYPE_HEADER)) : BibEntry.DEFAULT_TYPE;
             h.remove(InternalField.TYPE_HEADER);
-            if (entryType.equals(StandardEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
+            if (entryType.equals(BibtexEntryType.Book) && h.containsKey(new UnknownField("chaptertitle"))) {
                 // This means we have an "incollection" entry.
-                entryType = StandardEntryType.InCollection;
+                entryType = BibtexEntryType.InCollection;
                 // Move the "chaptertitle" to just "title":
                 h.put(StandardField.TITLE, h.remove(new UnknownField("chaptertitle")));
             }

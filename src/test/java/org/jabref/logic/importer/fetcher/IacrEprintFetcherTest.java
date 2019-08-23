@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +42,7 @@ public class IacrEprintFetcherTest {
         fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         abram2017 = new BibEntry();
-        abram2017.setType(StandardEntryType.Misc);
+        abram2017.setType(BibtexEntryType.Misc);
         abram2017.setCiteKey("cryptoeprint:2017:1118");
         abram2017.setField(StandardField.ABSTRACT, "dummy");
         abram2017.setField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman");
@@ -55,7 +55,7 @@ public class IacrEprintFetcherTest {
         abram2017.setField(StandardField.YEAR, "2017");
 
         beierle2016 = new BibEntry();
-        beierle2016.setType(StandardEntryType.Misc);
+        beierle2016.setType(BibtexEntryType.Misc);
         beierle2016.setCiteKey("cryptoeprint:2016:119");
         beierle2016.setField(StandardField.ABSTRACT, "dummy");
         beierle2016.setField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander");
@@ -68,7 +68,7 @@ public class IacrEprintFetcherTest {
         beierle2016.setField(StandardField.YEAR, "2016");
 
         delgado2017 = new BibEntry();
-        delgado2017.setType(StandardEntryType.Misc);
+        delgado2017.setType(BibtexEntryType.Misc);
         delgado2017.setCiteKey("cryptoeprint:2017:1095");
         delgado2017.setField(StandardField.ABSTRACT, "dummy");
         delgado2017.setField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");

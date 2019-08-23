@@ -14,10 +14,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
-import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -47,7 +47,7 @@ public class BibEntryWriterTest {
     public void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         //set a required field
         entry.setField(StandardField.AUTHOR, "Foo Bar");
         entry.setField(StandardField.JOURNAL, "International Journal of Something");
@@ -91,7 +91,7 @@ public class BibEntryWriterTest {
 
     @Test
     void writeEntryWithFile() throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         LinkedFile file = new LinkedFile("test", "/home/uers/test.pdf", "PDF");
         entry.addFile(file);
 
@@ -263,7 +263,7 @@ public class BibEntryWriterTest {
         BibEntry entry = entries.iterator().next();
 
         // modify entry
-        entry.setType(StandardEntryType.InProceedings);
+        entry.setType(BibtexEntryType.InProceedings);
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -408,7 +408,7 @@ public class BibEntryWriterTest {
     public void doNotWriteEmptyFields() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         entry.setField(StandardField.AUTHOR, "  ");
         entry.setField(StandardField.NOTE, "some note");
 
@@ -427,7 +427,7 @@ public class BibEntryWriterTest {
     public void trimFieldContents() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         entry.setField(StandardField.NOTE, "        some note    \t");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
@@ -445,7 +445,7 @@ public class BibEntryWriterTest {
     public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(BibtexEntryType.Article);
         entry.setField(StandardField.NOTE, "some text with unbalanced { braces");
 
         assertThrows(IOException.class, () -> writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX));

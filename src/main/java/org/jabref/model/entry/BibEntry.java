@@ -31,6 +31,8 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 public class BibEntry implements Cloneable {
 
-    public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+    public static final EntryType DEFAULT_TYPE = BibtexEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
@@ -140,7 +142,7 @@ public class BibEntry implements Cloneable {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
             if (referred.isPresent()) {
                 result = referred.get().getFieldOrAlias(field);
-                if (!result.isPresent() && type.equals(StandardEntryType.InProceedings)) {
+                if (!result.isPresent() && type.equals(BibtexEntryType.InProceedings)) {
                     if (field == StandardField.BOOKTITLE) {
                         result = referred.get().getFieldOrAlias(StandardField.TITLE);
                     }

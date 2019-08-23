@@ -1,10 +1,10 @@
 package org.jabref.logic.bibtex.comparator;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -98,7 +98,7 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldIdentity() throws Exception {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
-        BibEntry equal = new BibEntry(StandardEntryType.Article);
+        BibEntry equal = new BibEntry(BibtexEntryType.Article);
 
         assertEquals(0, comparator.compare(equal, equal));
     }
@@ -106,9 +106,9 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldEquality() throws Exception {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
-        BibEntry equal = new BibEntry(StandardEntryType.Article);
+        BibEntry equal = new BibEntry(BibtexEntryType.Article);
         equal.setId("1");
-        BibEntry equal2 = new BibEntry(StandardEntryType.Article);
+        BibEntry equal2 = new BibEntry(BibtexEntryType.Article);
         equal2.setId("1");
 
         assertEquals(0, comparator.compare(equal, equal2));
@@ -117,8 +117,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerAscending() throws Exception {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
-        BibEntry smaller = new BibEntry(StandardEntryType.Article);
-        BibEntry bigger = new BibEntry(StandardEntryType.Book);
+        BibEntry smaller = new BibEntry(BibtexEntryType.Article);
+        BibEntry bigger = new BibEntry(BibtexEntryType.Book);
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }
@@ -126,8 +126,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerDescending() throws Exception {
         FieldComparator comparator = new FieldComparator(new OrFields(InternalField.TYPE_HEADER), true);
-        BibEntry bigger = new BibEntry(StandardEntryType.Article);
-        BibEntry smaller = new BibEntry(StandardEntryType.Book);
+        BibEntry bigger = new BibEntry(BibtexEntryType.Article);
+        BibEntry smaller = new BibEntry(BibtexEntryType.Book);
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }

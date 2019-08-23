@@ -15,11 +15,11 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -149,22 +149,22 @@ public class EndnoteImporter extends Importer {
                     hm.put(StandardField.TITLE, val);
                 } else if ("0".equals(prefix)) {
                     if (val.indexOf("Journal") == 0) {
-                        type = StandardEntryType.Article;
+                        type = BibtexEntryType.Article;
                     } else if (val.indexOf("Book Section") == 0) {
-                        type = StandardEntryType.InCollection;
+                        type = BibtexEntryType.InCollection;
                     } else if (val.indexOf("Book") == 0) {
-                        type = StandardEntryType.Book;
+                        type = BibtexEntryType.Book;
                     } else if (val.indexOf("Edited Book") == 0) {
-                        type = StandardEntryType.Book;
+                        type = BibtexEntryType.Book;
                         isEditedBook = true;
                     } else if (val.indexOf("Conference") == 0) {
-                        type = StandardEntryType.InProceedings;
+                        type = BibtexEntryType.InProceedings;
                     } else if (val.indexOf("Report") == 0) {
-                        type = StandardEntryType.TechReport;
+                        type = BibtexEntryType.TechReport;
                     } else if (val.indexOf("Review") == 0) {
-                        type = StandardEntryType.Article;
+                        type = BibtexEntryType.Article;
                     } else if (val.indexOf("Thesis") == 0) {
-                        type = StandardEntryType.PhdThesis;
+                        type = BibtexEntryType.PhdThesis;
                     } else {
                         type = BibEntry.DEFAULT_TYPE; //
                     }
@@ -183,16 +183,16 @@ public class EndnoteImporter extends Importer {
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    if (type.equals(StandardEntryType.Article)) {
+                    if (type.equals(BibtexEntryType.Article)) {
                         hm.put(StandardField.JOURNAL, val);
-                    } else if (type.equals(StandardEntryType.Book) || type.equals(StandardEntryType.InBook)) {
+                    } else if (type.equals(BibtexEntryType.Book) || type.equals(BibtexEntryType.InBook)) {
                         hm.put(StandardField.SERIES, val);
                     } else {
                         /* type = inproceedings */
                         hm.put(StandardField.BOOKTITLE, val);
                     }
                 } else if ("I".equals(prefix)) {
-                    if (type.equals(StandardEntryType.PhdThesis)) {
+                    if (type.equals(BibtexEntryType.PhdThesis)) {
                         hm.put(StandardField.SCHOOL, val);
                     } else {
                         hm.put(StandardField.PUBLISHER, val);
@@ -227,10 +227,10 @@ public class EndnoteImporter extends Importer {
                     hm.put(StandardField.ABSTRACT, val);
                 } else if ("9".equals(prefix)) {
                     if (val.indexOf("Ph.D.") == 0) {
-                        type = StandardEntryType.PhdThesis;
+                        type = BibtexEntryType.PhdThesis;
                     }
                     if (val.indexOf("Masters") == 0) {
-                        type = StandardEntryType.MastersThesis;
+                        type = BibtexEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
                     hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,

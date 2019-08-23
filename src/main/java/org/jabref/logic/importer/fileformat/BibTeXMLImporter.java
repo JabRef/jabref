@@ -27,10 +27,10 @@ import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,50 +94,50 @@ public class BibTeXMLImporter extends Importer {
             for (Entry entry : entries) {
                 BibEntry bibEntry = new BibEntry();
                 if (entry.getArticle() != null) {
-                    bibEntry.setType(StandardEntryType.Article);
+                    bibEntry.setType(BibtexEntryType.Article);
                     parse(entry.getArticle(), fields);
                 } else if (entry.getBook() != null) {
-                    bibEntry.setType(StandardEntryType.Book);
+                    bibEntry.setType(BibtexEntryType.Book);
                     parse(entry.getBook(), fields);
                 } else if (entry.getBooklet() != null) {
-                    bibEntry.setType(StandardEntryType.Booklet);
+                    bibEntry.setType(BibtexEntryType.Booklet);
                     parse(entry.getBooklet(), fields);
                 } else if (entry.getConference() != null) {
-                    bibEntry.setType(StandardEntryType.Conference);
+                    bibEntry.setType(BibtexEntryType.Conference);
                     parse(entry.getConference(), fields);
                 } else if (entry.getInbook() != null) {
-                    bibEntry.setType(StandardEntryType.InBook);
+                    bibEntry.setType(BibtexEntryType.InBook);
                     parseInbook(entry.getInbook(), fields);
                 } else if (entry.getIncollection() != null) {
-                    bibEntry.setType(StandardEntryType.InCollection);
+                    bibEntry.setType(BibtexEntryType.InCollection);
                     Incollection incollection = entry.getIncollection();
                     if (incollection.getChapter() != null) {
                         fields.put(StandardField.CHAPTER, String.valueOf(incollection.getChapter()));
                     }
                     parse(incollection, fields);
                 } else if (entry.getInproceedings() != null) {
-                    bibEntry.setType(StandardEntryType.InProceedings);
+                    bibEntry.setType(BibtexEntryType.InProceedings);
                     parse(entry.getInproceedings(), fields);
                 } else if (entry.getManual() != null) {
-                    bibEntry.setType(StandardEntryType.Manual);
+                    bibEntry.setType(BibtexEntryType.Manual);
                     parse(entry.getManual(), fields);
                 } else if (entry.getMastersthesis() != null) {
-                    bibEntry.setType(StandardEntryType.MastersThesis);
+                    bibEntry.setType(BibtexEntryType.MastersThesis);
                     parse(entry.getMastersthesis(), fields);
                 } else if (entry.getMisc() != null) {
-                    bibEntry.setType(StandardEntryType.Misc);
+                    bibEntry.setType(BibtexEntryType.Misc);
                     parse(entry.getMisc(), fields);
                 } else if (entry.getPhdthesis() != null) {
-                    bibEntry.setType(StandardEntryType.PhdThesis);
+                    bibEntry.setType(BibtexEntryType.PhdThesis);
                     parse(entry.getPhdthesis(), fields);
                 } else if (entry.getProceedings() != null) {
-                    bibEntry.setType(StandardEntryType.Proceedings);
+                    bibEntry.setType(BibtexEntryType.Proceedings);
                     parse(entry.getProceedings(), fields);
                 } else if (entry.getTechreport() != null) {
-                    bibEntry.setType(StandardEntryType.TechReport);
+                    bibEntry.setType(BibtexEntryType.TechReport);
                     parse(entry.getTechreport(), fields);
                 } else if (entry.getUnpublished() != null) {
-                    bibEntry.setType(StandardEntryType.Unpublished);
+                    bibEntry.setType(BibtexEntryType.Unpublished);
                     parse(entry.getUnpublished(), fields);
                 }
 

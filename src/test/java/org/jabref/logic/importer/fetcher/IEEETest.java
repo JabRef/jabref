@@ -9,8 +9,8 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -93,7 +93,7 @@ class IEEETest {
 
     @Test
     void searchResultHasNoKeywordTerms() throws FetcherException {
-        BibEntry expected = new BibEntry(StandardEntryType.Article);
+        BibEntry expected = new BibEntry(BibtexEntryType.Article);
 
         expected.setField(StandardField.AUTHOR, "Shatakshi Jha and Ikhlaq Hussain and Bhim Singh and Sukumar Mishra");
         expected.setField(StandardField.DATE, "25 2 2019");
@@ -115,7 +115,7 @@ class IEEETest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry expected = new BibEntry(BibtexEntryType.InProceedings);
         expected.setField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa");
         expected.setField(StandardField.DATE, "14-22 May 2016");
         expected.setField(StandardField.EVENTDATE, "14-22 May 2016");

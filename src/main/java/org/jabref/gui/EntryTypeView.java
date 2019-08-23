@@ -21,10 +21,10 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.IEEETranEntryTypes;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -119,7 +119,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
 
         if (basePanel.getBibDatabaseContext().isBiblatexMode()) {
-            addEntriesToPane(biblatexPane, BiblatexEntryTypes.ALL);
+            addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
 
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
@@ -133,8 +133,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         } else {
             biblatexTitlePane.setVisible(false);
-            addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
-            addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
+            addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
+            addEntriesToPane(ieeetranPane, IEEETranEntryTypeDefinitions.ALL);
 
             List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {

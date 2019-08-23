@@ -13,11 +13,13 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.collect.Streams;
 
 public class BibEntryTypeBuilder {
-    private EntryType type = StandardEntryType.Misc;
+    private EntryType type = BibtexEntryType.Misc;
     private Set<BibField> fields = new HashSet<>();
     private Set<OrFields> requiredFields = new HashSet<>();
 

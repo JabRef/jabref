@@ -1,5 +1,6 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.util.OptionalUtil;
 
 public class EntryTypeFactory {
@@ -33,14 +34,14 @@ public class EntryTypeFactory {
     }
 
     private static boolean isBibtex(EntryType type) {
-        return BibtexEntryTypes.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
+        return BibtexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
     }
 
     private static boolean isBiblatex(EntryType type) {
-        return BiblatexEntryTypes.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
+        return BiblatexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
     }
 
     public static EntryType parse(String typeName) {
-        return OptionalUtil.orElse(StandardEntryType.fromName(typeName), new UnknownEntryType(typeName));
+        return OptionalUtil.orElse(BibtexEntryType.fromName(typeName), new UnknownEntryType(typeName));
     }
 }

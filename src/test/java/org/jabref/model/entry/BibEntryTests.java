@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,27 +32,27 @@ public class BibEntryTests {
     public void setUp() {
         // Default entry for most keyword and some type tests
         keywordEntry = new BibEntry();
-        keywordEntry.setType(StandardEntryType.Article);
+        keywordEntry.setType(BibtexEntryType.Article);
         keywordEntry.setField(StandardField.KEYWORDS, "Foo, Bar");
         keywordEntry.setChanged(false);
 
         // Empty entry for some tests
         emptyEntry = new BibEntry();
-        emptyEntry.setType(StandardEntryType.Article);
+        emptyEntry.setType(BibtexEntryType.Article);
         emptyEntry.setChanged(false);
     }
 
     @Test
     public void testDefaultConstructor() {
         BibEntry entry = new BibEntry();
-        assertEquals(StandardEntryType.Misc, entry.getType());
+        assertEquals(BibtexEntryType.Misc, entry.getType());
         assertNotNull(entry.getId());
         assertFalse(entry.getField(StandardField.AUTHOR).isPresent());
     }
 
     @Test
     public void allFieldsPresentDefault() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
@@ -67,7 +68,7 @@ public class BibEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
@@ -82,13 +83,13 @@ public class BibEntryTests {
 
     @Test
     public void isNullCiteKeyThrowsNPE() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         assertThrows(NullPointerException.class, () -> e.setCiteKey(null));
     }
 
     @Test
     public void isEmptyCiteKey() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         assertFalse(e.hasCiteKey());
 
         e.setCiteKey("");

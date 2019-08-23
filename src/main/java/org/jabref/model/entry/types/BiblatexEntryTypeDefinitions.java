@@ -1,8 +1,10 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
@@ -11,10 +13,10 @@ import org.jabref.model.entry.field.StandardField;
  *
  * @see <a href="http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf">biblatex documentation</a>
  */
-public class BiblatexEntryTypes {
+public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Article)
+            .withType(BiblatexEntryType.Article)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
                     StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
@@ -32,7 +34,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType BOOK = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Book)
+            .withType(BiblatexEntryType.Book)
             .withImportantFields(StandardField.EDITOR,
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
                     StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN,
@@ -51,7 +53,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType MVBOOK = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.MvBook)
+            .withType(BiblatexEntryType.MvBook)
             .withImportantFields(StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION,
                     StandardField.PUBLISHER, StandardField.ISBN, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -66,7 +68,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType INBOOK = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.InBook)
+            .withType(BiblatexEntryType.InBook)
             .withImportantFields(
                     StandardField.BOOKAUTHOR, StandardField.EDITOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
                     StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
@@ -86,21 +88,21 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType BOOKINBOOK = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.BookInBook)
+            .withType(BiblatexEntryType.BookInBook)
             .withImportantFields(INBOOK.getPrimaryOptionalFields())
             .withDetailFields(INBOOK.getSecondaryOptionalFields())
             .withRequiredFields(INBOOK.getRequiredFields())
             .build();
 
     private static final BibEntryType SUPPBOOK = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.SuppBook)
+            .withType(BiblatexEntryType.SuppBook)
             .withImportantFields(INBOOK.getPrimaryOptionalFields())
             .withDetailFields(INBOOK.getSecondaryOptionalFields())
             .withRequiredFields(INBOOK.getRequiredFields())
             .build();
 
     private static final BibEntryType BOOKLET = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Booklet)
+            .withType(BiblatexEntryType.Booklet)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
                     StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -112,7 +114,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType COLLECTION = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Collection)
+            .withType(BiblatexEntryType.Collection)
             .withImportantFields(
                     StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
                     StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION,
@@ -131,7 +133,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType MVCOLLECTION = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.MvCollection)
+            .withType(BiblatexEntryType.MvCollection)
             .withImportantFields(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
                     StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -146,7 +148,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType INCOLLECTION = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.InCollection)
+            .withType(BiblatexEntryType.InCollection)
             .withImportantFields(StandardField.TRANSLATOR, StandardField.SUBTITLE, StandardField.TITLEADDON,
                     StandardField.MAINTITLE, StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
                     StandardField.BOOKTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER,
@@ -165,14 +167,14 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType SUPPCOLLECTION = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.SuppCollection)
+            .withType(BiblatexEntryType.SuppCollection)
             .withImportantFields(INCOLLECTION.getPrimaryOptionalFields())
             .withDetailFields(INCOLLECTION.getSecondaryOptionalFields())
             .withRequiredFields(INCOLLECTION.getRequiredFields())
             .build();
 
     private static final BibEntryType MANUAL = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Manual)
+            .withType(BiblatexEntryType.Manual)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.EDITION, StandardField.PUBLISHER,
                     StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -185,7 +187,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType MISC = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Misc)
+            .withType(BiblatexEntryType.Misc)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -197,7 +199,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType ONLINE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Online)
+            .withType(BiblatexEntryType.Online)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.URLDATE)
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE, StandardField.URL)
@@ -207,7 +209,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType PATENT = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Patent)
+            .withType(IEEETranEntryType.Patent)
             .withImportantFields(StandardField.HOLDER,
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
                     StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -219,7 +221,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType PERIODICAL = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Periodical)
+            .withType(IEEETranEntryType.Periodical)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.ISSUETITLE, StandardField.ISSUESUBTITLE, StandardField.ISSN, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -232,14 +234,14 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType SUPPPERIODICAL = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.SuppPeriodical)
+            .withType(BiblatexEntryType.SuppPeriodical)
             .withImportantFields(ARTICLE.getPrimaryOptionalFields())
             .withDetailFields(ARTICLE.getSecondaryOptionalFields())
             .withRequiredFields(ARTICLE.getRequiredFields())
             .build();
 
     private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Proceedings)
+            .withType(BiblatexEntryType.Proceedings)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
                     StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
@@ -257,7 +259,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType MVPROCEEDINGS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.MvProceedings)
+            .withType(BiblatexEntryType.MvProceedings)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
                     StandardField.MAINTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER, StandardField.ISBN,
@@ -274,7 +276,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType INPROCEEDINGS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.InProceedings)
+            .withType(BiblatexEntryType.InProceedings)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE,
                     StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
                     StandardField.BOOKTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER,
@@ -292,28 +294,28 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType REFERENCE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Reference)
+            .withType(BiblatexEntryType.Reference)
             .withImportantFields(COLLECTION.getPrimaryOptionalFields())
             .withDetailFields(COLLECTION.getSecondaryOptionalFields())
             .withRequiredFields(COLLECTION.getRequiredFields())
             .build();
 
     private static final BibEntryType MVREFERENCE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.MvReference)
+            .withType(BiblatexEntryType.MvReference)
             .withImportantFields(MVCOLLECTION.getPrimaryOptionalFields())
             .withDetailFields(MVCOLLECTION.getSecondaryOptionalFields())
             .withRequiredFields(MVCOLLECTION.getRequiredFields())
             .build();
 
     private static final BibEntryType INREFERENCE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.InReference)
+            .withType(BiblatexEntryType.InReference)
             .withImportantFields(INCOLLECTION.getPrimaryOptionalFields())
             .withDetailFields(INCOLLECTION.getSecondaryOptionalFields())
             .withRequiredFields(INCOLLECTION.getRequiredFields())
             .build();
 
     private static final BibEntryType REPORT = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Report)
+            .withType(BiblatexEntryType.Report)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NUMBER, StandardField.ISRN,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
@@ -327,12 +329,12 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType SET = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Set)
+            .withType(BiblatexEntryType.Set)
             .withRequiredFields(StandardField.ENTRYSET, StandardField.CROSSREF)
             .build();
 
     private static final BibEntryType THESIS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Thesis)
+            .withType(BiblatexEntryType.Thesis)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.CHAPTER,
                     StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
                     StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -344,7 +346,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Unpublished)
+            .withType(BiblatexEntryType.Unpublished)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
                     StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE)
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
@@ -354,21 +356,21 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Conference)
+            .withType(BiblatexEntryType.Conference)
             .withImportantFields(INPROCEEDINGS.getPrimaryOptionalFields())
             .withDetailFields(INPROCEEDINGS.getSecondaryOptionalFields())
             .withRequiredFields(INPROCEEDINGS.getRequiredFields())
             .build();
 
     private static final BibEntryType ELECTRONIC = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.Electronic)
+            .withType(IEEETranEntryType.Electronic)
             .withImportantFields(ONLINE.getPrimaryOptionalFields())
             .withDetailFields(ONLINE.getSecondaryOptionalFields())
             .withRequiredFields(ONLINE.getRequiredFields())
             .build();
 
     private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.MastersThesis)
+            .withType(BiblatexEntryType.MastersThesis)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -380,7 +382,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType PHDTHESIS = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.PhdThesis)
+            .withType(BiblatexEntryType.PhdThesis)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -392,7 +394,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType TECHREPORT = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.TechReport)
+            .withType(BiblatexEntryType.TechReport)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.TYPE, StandardField.NUMBER, StandardField.ISRN,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
@@ -406,7 +408,7 @@ public class BiblatexEntryTypes {
             .build();
 
     private static final BibEntryType WWW = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.WWW)
+            .withType(BiblatexEntryType.WWW)
             .withImportantFields(ONLINE.getPrimaryOptionalFields())
             .withDetailFields(ONLINE.getSecondaryOptionalFields())
             .withRequiredFields(ONLINE.getRequiredFields())

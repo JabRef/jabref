@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 import org.jabref.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.EntryTypeFactory;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.PreferencesService;
 
 public class ImportCustomEntryTypesDialogViewModel {

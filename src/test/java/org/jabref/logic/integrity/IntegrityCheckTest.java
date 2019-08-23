@@ -18,12 +18,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -40,10 +41,10 @@ class IntegrityCheckTest {
 
     @Test
     void testEntryTypeChecks() {
-        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Patent), BibDatabaseMode.BIBTEX));
-        assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Patent), BibDatabaseMode.BIBLATEX)));
-        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", BibtexEntryType.Article), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBTEX));
+        assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", BibtexEntryType.Article), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -239,14 +240,14 @@ class IntegrityCheckTest {
 
     @Test
     void testTypeChecks() {
-        assertCorrect(createContext(StandardField.PAGES, "11--15", StandardEntryType.InProceedings));
-        assertWrong(createContext(StandardField.PAGES, "11--15", StandardEntryType.Proceedings));
+        assertCorrect(createContext(StandardField.PAGES, "11--15", BibtexEntryType.InProceedings));
+        assertWrong(createContext(StandardField.PAGES, "11--15", BibtexEntryType.Proceedings));
     }
 
     @Test
     void testBooktitleChecks() {
-        assertCorrect(createContext(StandardField.BOOKTITLE, "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", StandardEntryType.Proceedings));
-        assertWrong(createContext(StandardField.BOOKTITLE, "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", StandardEntryType.Proceedings));
+        assertCorrect(createContext(StandardField.BOOKTITLE, "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", BibtexEntryType.Proceedings));
+        assertWrong(createContext(StandardField.BOOKTITLE, "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", BibtexEntryType.Proceedings));
     }
 
     @Test

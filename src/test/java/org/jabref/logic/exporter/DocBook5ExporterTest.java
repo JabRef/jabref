@@ -15,8 +15,8 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class DocBook5ExporterTest {
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        BibEntry entry = new BibEntry(StandardEntryType.Book);
+        BibEntry entry = new BibEntry(BibtexEntryType.Book);
         entry.setField(StandardField.TITLE, "my paper title");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez");
         entry.setField(StandardField.ISBN, "1-2-34");

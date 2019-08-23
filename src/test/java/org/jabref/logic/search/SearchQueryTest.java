@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +61,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchingForOpenBraketInBooktitle() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.BOOKTITLE, "Super Conference (SC)");
 
         SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
@@ -70,7 +70,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeywordNotPart() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
@@ -79,7 +79,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeyword() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
@@ -88,7 +88,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFields() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -98,7 +98,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsNotForSpecificField() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -108,7 +108,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsAndSpecificField() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -119,7 +119,7 @@ public class SearchQueryTest {
     @Test
     public void testIsMatch() {
         BibEntry entry = new BibEntry();
-        entry.setType(StandardEntryType.Article);
+        entry.setType(BibtexEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
 
         assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
@@ -180,7 +180,7 @@ public class SearchQueryTest {
     @Test
     public void isMatchedForNormalAndFieldBasedSearchMixed() {
         BibEntry entry = new BibEntry();
-        entry.setType(StandardEntryType.Article);
+        entry.setType(BibtexEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
         entry.setField(StandardField.ABSTRACT, "text");
 

@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ public class TitleFetcherTest {
         fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry();
-        bibEntryBischof2009.setType(StandardEntryType.InProceedings);
+        bibEntryBischof2009.setType(BibtexEntryType.InProceedings);
         bibEntryBischof2009.setCiteKey("Bischof_2009");
         bibEntryBischof2009.setField(StandardField.AUTHOR, "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
         bibEntryBischof2009.setField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");

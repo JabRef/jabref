@@ -10,8 +10,8 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -59,7 +59,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void findSingleEntry() throws FetcherException {
-        entry.setType(StandardEntryType.InProceedings);
+        entry.setType(BibtexEntryType.InProceedings);
         entry.setCiteKey("geiger2013detecting");
         entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
         entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");

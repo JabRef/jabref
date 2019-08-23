@@ -1,8 +1,8 @@
 package org.jabref.model.search.rules;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +44,7 @@ public class ContainBasedSearchRuleTest {
     }
 
     public BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(StandardEntryType.InCollection);
+        BibEntry e = new BibEntry(BibtexEntryType.InCollection);
         e.setField(StandardField.TITLE, "Marine finfish larviculture in Europe");
         e.setCiteKey("shields01");
         e.setField(StandardField.YEAR, "2001");

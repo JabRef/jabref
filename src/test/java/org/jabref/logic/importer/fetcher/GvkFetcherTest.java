@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ public class GvkFetcherTest {
         fetcher = new GvkFetcher();
 
         bibEntryPPN591166003 = new BibEntry();
-        bibEntryPPN591166003.setType(StandardEntryType.Book);
+        bibEntryPPN591166003.setType(BibtexEntryType.Book);
         bibEntryPPN591166003.setField(StandardField.TITLE, "Effective Java");
         bibEntryPPN591166003.setField(StandardField.PUBLISHER, "Addison-Wesley");
         bibEntryPPN591166003.setField(StandardField.YEAR, "2008");
@@ -46,7 +46,7 @@ public class GvkFetcherTest {
         bibEntryPPN591166003.setField(StandardField.SUBTITLE, "[revised and updated for JAVA SE 6]");
 
         bibEntryPPN66391437X = new BibEntry();
-        bibEntryPPN66391437X.setType(StandardEntryType.Book);
+        bibEntryPPN66391437X.setType(BibtexEntryType.Book);
         bibEntryPPN66391437X.setField(StandardField.TITLE, "Effective unit testing");
         bibEntryPPN66391437X.setField(StandardField.PUBLISHER, "Manning");
         bibEntryPPN66391437X.setField(StandardField.YEAR, "2013");

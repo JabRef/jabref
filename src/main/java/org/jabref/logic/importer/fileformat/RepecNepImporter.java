@@ -14,9 +14,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -388,7 +388,7 @@ public class RepecNepImporter extends Importer {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
-                    BibEntry be = new BibEntry(StandardEntryType.TechReport);
+                    BibEntry be = new BibEntry(BibtexEntryType.TechReport);
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be, reader);
                     if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {

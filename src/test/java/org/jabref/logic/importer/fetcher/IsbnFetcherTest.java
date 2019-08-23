@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ class IsbnFetcherTest {
         fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setType(BibtexEntryType.Book);
         bibEntry.setCiteKey("9780134685991");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");

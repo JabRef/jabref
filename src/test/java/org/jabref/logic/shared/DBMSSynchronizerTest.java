@@ -21,10 +21,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -178,7 +178,7 @@ public class DBMSSynchronizerTest {
         BibEntry modifiedBibEntry = getBibEntryExample(1);
         modifiedBibEntry.setField(new UnknownField("custom"), "custom value");
         modifiedBibEntry.clearField(StandardField.TITLE);
-        modifiedBibEntry.setType(StandardEntryType.Article);
+        modifiedBibEntry.setType(BibtexEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
         //testing point
@@ -204,7 +204,7 @@ public class DBMSSynchronizerTest {
 
     private BibEntry getBibEntryExample(int index) {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setType(BibtexEntryType.Book);
         bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J" + index);
         bibEntry.setField(StandardField.TITLE, "The nano processor" + index);
         bibEntry.getSharedBibEntryData().setSharedID(index);

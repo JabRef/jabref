@@ -3,9 +3,9 @@ package org.jabref.logic;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.StandardEntryType;
-import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BibtexEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFieldsFail() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
@@ -35,7 +35,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry(StandardEntryType.Article);
+        BibEntry e = new BibEntry(BibtexEntryType.Article);
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "abc");
         e.setField(StandardField.JOURNAL, "abc");
@@ -55,7 +55,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void getTypeForDisplayReturnsTypeName() {
-        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry e = new BibEntry(BibtexEntryType.InProceedings);
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         assertEquals("InProceedings", typedEntry.getTypeForDisplay());

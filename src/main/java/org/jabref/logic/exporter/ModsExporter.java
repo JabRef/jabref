@@ -47,10 +47,10 @@ import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * TemplateExporter for exporting in MODS XML format.

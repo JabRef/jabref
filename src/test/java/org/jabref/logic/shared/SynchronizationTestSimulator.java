@@ -11,9 +11,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -163,7 +163,7 @@ public class SynchronizationTestSimulator {
     }
 
     private BibEntry getBibEntryExample(int index) {
-        BibEntry bibEntry = new BibEntry(StandardEntryType.InProceedings);
+        BibEntry bibEntry = new BibEntry(BibtexEntryType.InProceedings);
         bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L " + index);
         bibEntry.setField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor " + index);
         bibEntry.setField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " + index);

@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.types.BibtexEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ public class ArXivTest {
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();
-        sliceTheoremPaper.setType(StandardEntryType.Article);
+        sliceTheoremPaper.setType(BibtexEntryType.Article);
         sliceTheoremPaper.setField(StandardField.AUTHOR, "Tobias Diez");
         sliceTheoremPaper.setField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory");
         sliceTheoremPaper.setField(StandardField.DATE, "2014-05-09");
@@ -136,7 +136,7 @@ public class ArXivTest {
     @Test
     public void searchEntryByOldId() throws Exception {
         BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Article);
+        expected.setType(BibtexEntryType.Article);
         expected.setField(StandardField.AUTHOR, "H1 Collaboration");
         expected.setField(StandardField.TITLE, "Multi-Electron Production at High Transverse Momenta in ep Collisions at HERA");
         expected.setField(StandardField.DATE, "2003-07-07");
