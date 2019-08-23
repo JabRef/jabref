@@ -29,7 +29,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.22.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.7'
-    id 'org.beryx.jlink' version '2.10.4'
+    id 'org.beryx.jlink' version '2.14.1'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -644,6 +644,7 @@ jlink {
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
     }
 
+    // This is experimental thing; could replace install4j
     jpackage {
         // Download from https://jdk.java.net/jpackage/ and change path accordingly
         jpackageHome = 'H:\\Downloading\\openjdk-13-jpackage+49_windows-x64_bin\\jdk-13'
