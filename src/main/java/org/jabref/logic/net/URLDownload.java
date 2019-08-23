@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private final URL source;
