@@ -188,8 +188,11 @@ dependencyUpdates {
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
-                selection.reject("Ignore SNAPSHOT releases")
+            boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
             }
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
