@@ -10,10 +10,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
@@ -50,7 +51,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(entriesToImport -> entries.addAll(entriesToImport))
-            .executeWith(taskExecutor);
+                .executeWith(taskExecutor);
     }
 
     public String getMessage() {
@@ -68,31 +69,39 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent()
                 ||
-                DuplicateCheck.containsDuplicate(database.getDatabase(), entry, database.getMode()).isPresent();
+                new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(database.getDatabase(), entry, database.getMode()).isPresent();
     }
 
     public void importEntries(List<BibEntry> entriesToImport) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
-            boolean containsDuplicate = entriesToImport.stream()
-                                                       .anyMatch(this::hasDuplicate);
+            BackgroundTask.wrap(() -> entriesToImport.stream()
+                    .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
+                if (duplicateFound) {
+                    boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                            Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                            Localization.lang("Continue with import"),
+                            Localization.lang("Cancel import"),
+                            Localization.lang("Disable this confirmation dialog"),
+                            optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
 
-            if (containsDuplicate) {
-                boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                        Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                        Localization.lang("Continue with import"),
-                        Localization.lang("Cancel import"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
-
-                if (!continueImport) {
-                    dialogService.notify(Localization.lang("Import canceled"));
-                    return;
+                    if (!continueImport) {
+                        dialogService.notify(Localization.lang("Import canceled"));
+                    } else {
+                        buildImportHandlerThenImportEntries(entriesToImport);
+                    }
+                } else {
+                    buildImportHandlerThenImportEntries(entriesToImport);
                 }
-            }
+            }).executeWith(Globals.TASK_EXECUTOR);
+        } else {
+            buildImportHandlerThenImportEntries(entriesToImport);
         }
 
+    }
+
+    private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
                 dialogService,
                 database,
@@ -104,7 +113,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager);
         importHandler.importEntries(entriesToImport);
-
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
 
@@ -119,7 +127,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
-            if (DuplicateCheck.isDuplicate(entry, othEntry, database.getMode())) {
+            if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(entry, othEntry, database.getMode())) {
                 return Optional.of(othEntry);
             }
         }
@@ -128,7 +136,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public void resolveDuplicate(BibEntry entry) {
         // First, try to find duplicate in the existing library
-        Optional<BibEntry> other = DuplicateCheck.containsDuplicate(database.getDatabase(), entry, database.getMode());
+        Optional<BibEntry> other = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(database.getDatabase(), entry, database.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
                     entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, database);

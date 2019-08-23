@@ -16,9 +16,11 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -46,23 +48,23 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {FieldName.ISSN, FieldName.VOLUME, FieldName.ABSTRACT, FieldName.DOI, FieldName.TITLE, FieldName.NUMBER,
-                FieldName.PUBLISHER};
+        Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,
+                StandardField.PUBLISHER};
 
         BibEntry entry = new BibEntry();
-        String nametype;
+        Field nametype;
 
         // Guess publication type
         String isbn = springerJsonEntry.optString("isbn");
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
-            entry.setType("article");
-            nametype = FieldName.JOURNAL;
+            entry.setType(StandardEntryType.Article);
+            nametype = StandardField.JOURNAL;
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType("incollection");
-            nametype = FieldName.BOOKTITLE;
-            entry.setField(FieldName.ISBN, isbn);
+            entry.setType(StandardEntryType.InCollection);
+            nametype = StandardField.BOOKTITLE;
+            entry.setField(StandardField.ISBN, isbn);
         }
 
         // Authors
@@ -76,15 +78,15 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
+            entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
 
         // Direct accessible fields
-        for (String field : singleFieldStrings) {
-            if (springerJsonEntry.has(field)) {
-                String text = springerJsonEntry.getString(field);
+        for (Field field : singleFieldStrings) {
+            if (springerJsonEntry.has(field.getName())) {
+                String text = springerJsonEntry.getString(field.getName());
                 if (!text.isEmpty()) {
                     entry.setField(field, text);
                 }
@@ -94,10 +96,10 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         // Page numbers
         if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
             if (springerJsonEntry.has("endingPage") && !(springerJsonEntry.getString("endingPage").isEmpty())) {
-                entry.setField(FieldName.PAGES,
+                entry.setField(StandardField.PAGES,
                         springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endingPage"));
             } else {
-                entry.setField(FieldName.PAGES, springerJsonEntry.getString("startingPage"));
+                entry.setField(StandardField.PAGES, springerJsonEntry.getString("startingPage"));
             }
         }
 
@@ -110,7 +112,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         if (springerJsonEntry.has("url")) {
             JSONArray urls = springerJsonEntry.optJSONArray("url");
             if (urls == null) {
-                entry.setField(FieldName.URL, springerJsonEntry.optString("url"));
+                entry.setField(StandardField.URL, springerJsonEntry.optString("url"));
             } else {
                 urls.forEach(data -> {
                     JSONObject url = (JSONObject) data;
@@ -124,17 +126,17 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         // Date
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
-            entry.setField(FieldName.DATE, date); // For biblatex
+            entry.setField(StandardField.DATE, date); // For biblatex
             String[] dateparts = date.split("-");
-            entry.setField(FieldName.YEAR, dateparts[0]);
+            entry.setField(StandardField.YEAR, dateparts[0]);
             Optional<Month> month = Month.getMonthByNumber(Integer.parseInt(dateparts[1]));
             month.ifPresent(entry::setMonth);
         }
 
         // Clean up abstract (often starting with Abstract)
-        entry.getField(FieldName.ABSTRACT).ifPresent(abstractContents -> {
+        entry.getField(StandardField.ABSTRACT).ifPresent(abstractContents -> {
             if (abstractContents.startsWith("Abstract")) {
-                entry.setField(FieldName.ABSTRACT, abstractContents.substring(8));
+                entry.setField(StandardField.ABSTRACT, abstractContents.substring(8));
             }
         });
 

@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -17,7 +17,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -39,12 +40,13 @@ import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
@@ -66,6 +68,7 @@ class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
 
+
     public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.database = Objects.requireNonNull(database);
         this.preferences = Objects.requireNonNull(preferences);
@@ -77,9 +80,7 @@ class MainTableColumnFactory {
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
-
         columns.add(createGroupColumn());
-
         // Add column for linked files
         if (preferences.showFileColumn()) {
             columns.add(createFileColumn());
@@ -88,15 +89,15 @@ class MainTableColumnFactory {
         // Add column for DOI/URL
         if (preferences.showUrlColumn()) {
             if (preferences.preferDoiOverUrl()) {
-                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, StandardField.DOI, StandardField.URL));
             } else {
-                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, StandardField.URL, StandardField.DOI));
             }
         }
 
         // Add column for eprints
         if (preferences.showEprintColumn()) {
-            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
+            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, StandardField.EPRINT));
         }
 
         // Add columns for other file types
@@ -115,35 +116,51 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
-        column.getStyleClass().add(GROUP_COLUMN);
-        setExactWidth(column, 20);
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
+        column.setStyle("-fx-padding: 0 0 0 0;");
         column.setSortable(true);
         return column;
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        Rectangle rectangle = new Rectangle();
-        rectangle.setWidth(3);
-        rectangle.setHeight(20);
-        Color color = matchedGroups.stream()
-                                   .flatMap(group -> OptionalUtil.toStream(group.getColor()))
-                                   .findFirst()
-                                   .orElse(Color.TRANSPARENT);
-        rectangle.setFill(color);
+        Color groupColor = matchedGroups.stream()
+                .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                .findFirst()
+                .orElse(Color.TRANSPARENT);
 
-        String matchedGroupsString = matchedGroups.stream()
-                                                  .map(AbstractGroup::getName)
-                                                  .collect(Collectors.joining(", "));
-        Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
-        Tooltip.install(rectangle, tooltip);
+        if (groupColor != Color.TRANSPARENT) {
+            Rectangle border = new Rectangle();
+            border.setWidth(5);
+            border.setHeight(20);
+            border.setFill(Color.DARKGRAY);
 
-        BorderPane container = new BorderPane();
-        container.setLeft(rectangle);
-        return container;
+            Rectangle groupRectangle = new Rectangle();
+            groupRectangle.setWidth(3);
+            groupRectangle.setHeight(18);
+            groupRectangle.setFill(groupColor);
+
+            StackPane container = new StackPane();
+            container.setMinWidth(10);
+            container.setAlignment(Pos.CENTER);
+
+            container.getChildren().addAll(border,groupRectangle);
+
+            String matchedGroupsString = matchedGroups.stream()
+                    .map(AbstractGroup::getName)
+                    .collect(Collectors.joining(", "));
+            Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
+            Tooltip.install(container, tooltip);
+            return container;
+        }
+        return new Pane();
     }
 
     private List<TableColumn<BibEntryTableViewModel, ?>> createNormalColumns() {
@@ -151,10 +168,7 @@ class MainTableColumnFactory {
 
         // Read table columns from preferences
         for (String columnName : preferences.getNormalColumns()) {
-            // Stored column name will be used as header
-            // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
-            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            NormalTableColumn column = new NormalTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
+            NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);
@@ -264,7 +278,7 @@ class MainTableColumnFactory {
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                             if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
                                 // Only one linked file -> open directly
-                                                                                     LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs);
+                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
                                 linkedFileViewModel.open();
                             }
                         })
@@ -287,7 +301,7 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs);
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
@@ -301,24 +315,24 @@ class MainTableColumnFactory {
      * Creates a column for DOIs or URLs.
      * The {@code firstField} is preferred to be shown over {@code secondField}.
      */
-    private TableColumn<BibEntryTableViewModel, String> createUrlOrDoiColumn(JabRefIcon icon, String firstField, String secondField) {
-        TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
+    private TableColumn<BibEntryTableViewModel, Field> createUrlOrDoiColumn(JabRefIcon icon, Field firstField, Field secondField) {
+        TableColumn<BibEntryTableViewModel, Field> column = new TableColumn<>();
         Node headerGraphic = icon.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(StringUtil.capitalizeFirst(firstField) + " / " + StringUtil.capitalizeFirst(secondField)));
+        Tooltip.install(headerGraphic, new Tooltip(firstField.getDisplayName() + " / " + secondField.getDisplayName()));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         // icon is chosen based on field name in cell, so map fields to its names
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
-                new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon)
-                        .withTooltip(this::createIdentifierTooltip)
-                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
-                        .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
+                .withGraphic(cellFactory::getTableIcon)
+                .withTooltip(this::createIdentifierTooltip)
+                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
+                .install(column);
         return column;
     }
 
-    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, String field) {
+    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, Field field) {
         if (event.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -338,31 +352,31 @@ class MainTableColumnFactory {
         event.consume();
     }
 
-    private String createIdentifierTooltip(BibEntryTableViewModel entry, String content) {
-        Optional<String> field = entry.getEntry().getField(content);
-        if (field.isPresent()) {
-            if (FieldName.DOI.equals(content)) {
-                return Localization.lang("Open %0 URL (%1)", "DOI", field.get());
-            } else if (FieldName.URL.equals(content)) {
-                return Localization.lang("Open URL (%0)", field.get());
-            } else if (FieldName.EPRINT.equals(content)) {
-                return Localization.lang("Open %0 URL (%1)", "ArXiv", field.get());
+    private String createIdentifierTooltip(BibEntryTableViewModel entry, Field field) {
+        Optional<String> value = entry.getEntry().getField(field);
+        if (value.isPresent()) {
+            if (StandardField.DOI.equals(field)) {
+                return Localization.lang("Open %0 URL (%1)", "DOI", value.get());
+            } else if (StandardField.URL.equals(field)) {
+                return Localization.lang("Open URL (%0)", value.get());
+            } else if (StandardField.EPRINT.equals(field)) {
+                return Localization.lang("Open %0 URL (%1)", "ArXiv", value.get());
             }
         }
         return null;
     }
 
-    private TableColumn<BibEntryTableViewModel, String> createEprintColumn(JabRefIcon icon, String field) {
-        TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
+    private TableColumn<BibEntryTableViewModel, Field> createEprintColumn(JabRefIcon icon, Field field) {
+        TableColumn<BibEntryTableViewModel, Field> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(field)).map(x -> field));
-                new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon)
-                        .withTooltip(this::createIdentifierTooltip)
-                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
-                        .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
+                .withGraphic(cellFactory::getTableIcon)
+                .withTooltip(this::createIdentifierTooltip)
+                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
+                .install(column);
         return column;
     }
 

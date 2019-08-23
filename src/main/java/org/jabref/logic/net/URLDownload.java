@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private final URL source;
@@ -322,7 +322,7 @@ public class URLDownload {
                     || (status == HttpURLConnection.HTTP_MOVED_PERM)
                     || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("Location");
+                    String newUrl = connection.getHeaderField("location");
                     // open the new connnection again
                     connection = new URLDownload(newUrl).openConnection();
                 }

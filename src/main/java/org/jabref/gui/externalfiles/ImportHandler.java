@@ -22,7 +22,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.FilePreferences;
@@ -100,7 +100,7 @@ public class ImportHandler {
 
     private BibEntry createEmptyEntryWithLink(Path file) {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, file.getFileName().toString());
+        entry.setField(StandardField.TITLE, file.getFileName().toString());
         linker.addFilesToEntry(entry, Collections.singletonList(file));
         return entry;
     }

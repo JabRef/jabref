@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import org.jabref.JabRefExecutorService;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class FulltextFetchers {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<DOI> doi = clonedEntry.getField(FieldName.DOI).flatMap(DOI::parse);
+        Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (!doi.isPresent()) {
             findDoiForEntry(clonedEntry);
@@ -77,8 +77,8 @@ public class FulltextFetchers {
     private void findDoiForEntry(BibEntry clonedEntry) {
         try {
             WebFetchers.getIdFetcherForIdentifier(DOI.class)
-                    .findIdentifier(clonedEntry)
-                    .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+                       .findIdentifier(clonedEntry)
+                       .ifPresent(e -> clonedEntry.setField(StandardField.DOI, e.getDOI()));
         } catch (FetcherException e) {
             LOGGER.debug("Failed to find DOI", e);
         }

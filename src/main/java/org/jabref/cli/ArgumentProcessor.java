@@ -13,7 +13,9 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.externalfiles.AutoSetLinks;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -42,7 +44,6 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.Defaults;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -389,7 +390,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults));
 
@@ -456,8 +457,8 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                    Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+            Globals.entryTypesManager.addCustomizedEntryTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                    Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
             List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
@@ -496,7 +497,8 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
-            AutoSetLinks.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(parserResult.getDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+            util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
         }
     }
 

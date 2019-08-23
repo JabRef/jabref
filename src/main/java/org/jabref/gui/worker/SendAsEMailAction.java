@@ -46,11 +46,11 @@ public class SendAsEMailAction implements BaseAction {
     @Override
     public void action() {
         BackgroundTask.wrap(this::sendEmail)
-                      .onSuccess(frame::output)
+                      .onSuccess(frame.getDialogService()::notify)
                       .onFailure(e -> {
                           String message = Localization.lang("Error creating email");
                           LOGGER.warn(message, e);
-                          frame.output(message);
+                          frame.getDialogService().notify(message);
                       })
                       .executeWith(Globals.TASK_EXECUTOR);
     }
@@ -73,7 +73,7 @@ public class SendAsEMailAction implements BaseAction {
 
         // write the entries using sw, which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), true);
+                new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : bes) {
             try {

@@ -23,7 +23,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -87,9 +88,9 @@ public class CiteSeer implements SearchBasedParserFetcher {
                 return formatted;
             }
         };
-        new FieldFormatterCleanup(FieldName.INTERNAL_ALL_FIELD, extendedHtmlFormatter).cleanup(entry);
+        new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, extendedHtmlFormatter).cleanup(entry);
 
         // Many titles in the CiteSeer database have all-capital titles, for convenience we convert them to title case
-        new FieldFormatterCleanup(FieldName.TITLE, new TitleCaseFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new TitleCaseFormatter()).cleanup(entry);
     }
 }

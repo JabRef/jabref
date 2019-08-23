@@ -1,54 +1,48 @@
 package org.jabref.gui.collab;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
-class PreambleChangeViewModel extends ChangeViewModel {
+class PreambleChangeViewModel extends DatabaseChangeViewModel {
 
-    private final String mem;
-    private final String disk;
-    private final InfoPane tp = new InfoPane();
-    private final JScrollPane sp = new JScrollPane(tp);
+    private final PreambleDiff change;
 
-    public PreambleChangeViewModel(String mem, PreambleDiff diff) {
+    public PreambleChangeViewModel(PreambleDiff change) {
         super(Localization.lang("Changed preamble"));
-        this.disk = diff.getNewPreamble();
-        this.mem = mem;
+        this.change = change;
+    }
 
-        StringBuilder text = new StringBuilder(34);
-        text.append("<FONT SIZE=3><H2>").append(Localization.lang("Changed preamble")).append("</H2>");
+    @Override
+    public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
+        database.getDatabase().setPreamble(change.getNewPreamble());
+        undoEdit.addEdit(new UndoablePreambleChange(database.getDatabase(), change.getOriginalPreamble(), change.getNewPreamble()));
+    }
 
-        if (StringUtil.isNotBlank(disk)) {
-            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
+    @Override
+    public Node description() {
+        VBox container = new VBox();
+        Label header = new Label(Localization.lang("Changed preamble"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().add(header);
+
+        if (StringUtil.isNotBlank(change.getOriginalPreamble())) {
+            container.getChildren().add(new Label(Localization.lang("Current value") + ": " + change.getOriginalPreamble()));
+        }
+
+        if (StringUtil.isNotBlank(change.getNewPreamble())) {
+            container.getChildren().add(new Label(Localization.lang("Value set externally") + ": " + change.getNewPreamble()));
         } else {
-            text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
+            container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
         }
 
-        if (StringUtil.isNotBlank(mem)) {
-            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
-        }
-
-        tp.setText(text.toString());
-    }
-
-    @Override
-    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        panel.getDatabase().setPreamble(disk);
-        undoEdit.addEdit(new UndoablePreambleChange(panel.getDatabase(), mem, disk));
-        secondary.setPreamble(disk);
-        return true;
-    }
-
-    @Override
-    public JComponent description() {
-        return sp;
+        return container;
     }
 }

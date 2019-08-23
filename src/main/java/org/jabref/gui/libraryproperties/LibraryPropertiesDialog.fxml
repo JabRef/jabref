@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-
 <DialogPane minHeight="-Infinity" prefHeight="784.0" prefWidth="921.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.libraryproperties.LibraryPropertiesDialogView">
     <content>
         <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
@@ -25,6 +24,7 @@
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="-Infinity" prefHeight="50.0" vgrow="ALWAYS" />
@@ -40,10 +40,13 @@
                         <Label text="%User-specific file directory" GridPane.rowIndex="3" />
                         <TextField fx:id="userSpecificFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Button fx:id="browseUserSpefiicFileDir" mnemonicParsing="false" onAction="#browseUserSpecificFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                        <Label text="%LaTex file directory" GridPane.rowIndex="4" />
+                        <TextField fx:id="laTexFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Button fx:id="browseLatexFileDir" mnemonicParsing="false" onAction="#browseLaTexFileDirectory" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                         <Label alignment="TOP_LEFT" styleClass="sectionHeader" text="%Override default file directories" GridPane.columnSpan="3" GridPane.rowIndex="1" />
-                        <Label alignment="TOP_LEFT" styleClass="sectionHeader" text="%Library protection" GridPane.columnSpan="3" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="protect" mnemonicParsing="false" text="%Refuse to save the library before external changes have been reviewed." GridPane.columnSpan="3" GridPane.rowIndex="5" />
-                        <Label styleClass="sectionHeader" text="%Export sort order" GridPane.rowIndex="6" />
+                        <Label alignment="TOP_LEFT" styleClass="sectionHeader" text="%Library protection" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="protect" mnemonicParsing="false" text="%Refuse to save the library before external changes have been reviewed." GridPane.columnSpan="3" GridPane.rowIndex="6" />
+                        <Label styleClass="sectionHeader" text="%Export sort order" GridPane.rowIndex="7" />
                     </children>
                 </GridPane>
             </children>

@@ -7,6 +7,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.model.entry.field.Field;
 
 import com.google.common.collect.BiMap;
 import org.slf4j.Logger;
@@ -19,8 +20,8 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
-    public MapBasedEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public MapBasedEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
     }
 
     protected abstract BiMap<String, T> getItemMap();

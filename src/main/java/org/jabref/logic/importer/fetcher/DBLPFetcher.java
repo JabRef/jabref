@@ -16,7 +16,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -58,7 +58,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     public void doPostCleanup(BibEntry entry) {
         DoiCleanup doiCleaner = new DoiCleanup();
 
-        FieldFormatterCleanup clearTimestampFormatter = new FieldFormatterCleanup(FieldName.TIMESTAMP,
+        FieldFormatterCleanup clearTimestampFormatter = new FieldFormatterCleanup(InternalField.TIMESTAMP,
                 new ClearFormatter());
 
         doiCleaner.cleanup(entry);

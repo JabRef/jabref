@@ -2,6 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -147,7 +149,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
                 // This check should only be performed once on initial database setup.
                 // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
-                if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
+                if (dbmsProcessor.checkForPare3Dot6Integrity()) {
                     throw new DatabaseNotSupportedException();
                 }
             }
@@ -175,7 +177,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         // remove old entries locally
         removeNotSharedEntries(localEntries, idVersionMap.keySet());
-
+        List<Integer> entriesToDrag = new ArrayList<>();
         // compare versions and update local entry if needed
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean match = false;
@@ -189,15 +191,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
-                            for (String field : sharedEntry.get().getFieldNames()) {
+                            for (Field field : sharedEntry.get().getFields()) {
                                 localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
 
-                            Set<String> redundantLocalEntryFields = localEntry.getFieldNames();
-                            redundantLocalEntryFields.removeAll(sharedEntry.get().getFieldNames());
+                            Set<Field> redundantLocalEntryFields = localEntry.getFields();
+                            redundantLocalEntryFields.removeAll(sharedEntry.get().getFields());
 
                             // remove not existing fields
-                            for (String redundantField : redundantLocalEntryFields) {
+                            for (Field redundantField : redundantLocalEntryFields) {
                                 localEntry.clearField(redundantField, EntryEventSource.SHARED);
                             }
                         }
@@ -205,11 +207,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
             }
             if (!match) {
-                Optional<BibEntry> bibEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
-                if (bibEntry.isPresent()) {
-                    bibDatabase.insertEntry(bibEntry.get(), EntryEventSource.SHARED);
-                }
+                entriesToDrag.add(idVersionEntry.getKey());
             }
+        }
+
+        for (BibEntry bibEntry : dbmsProcessor.getSharedEntries(entriesToDrag)) {
+            bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
         }
     }
 
@@ -322,10 +325,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     *  Checks whether the current SQL connection is valid.
-     *  In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     * Checks whether the current SQL connection is valid.
+     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
      *
-     *  @return <code>true</code> if the connection is valid, else <code>false</code>.
+     * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
     public boolean checkCurrentConnection() {
         try {

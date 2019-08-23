@@ -283,7 +283,6 @@ public class IconTheme {
         SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
         WARNING(MaterialDesignIcon.ALERT),
         ERROR(MaterialDesignIcon.ALERT_CIRCLE),
-        OPEN_IN_NEW_WINDOW(MaterialDesignIcon.OPEN_IN_NEW), /*css: open-in-new */
         CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
         REG_EX(MaterialDesignIcon.REGEX), /*css: mdi-regex */
         CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
@@ -291,7 +290,6 @@ public class IconTheme {
         FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
         TWITTER(MaterialDesignIcon.TWITTER), /* css: twitter */
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
-        GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
         DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
@@ -318,7 +316,13 @@ public class IconTheme {
         OWNER(MaterialDesignIcon.ACCOUNT),
         CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
         ARTICLE(MaterialDesignIcon.FILE_DOCUMENT),
-        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT);
+        BOOK(MaterialDesignIcon.BOOK_OPEN_PAGE_VARIANT),
+        LATEX_CITATIONS(JabRefMaterialDesignIcon.TEX_STUDIO),
+        LATEX_FILE_DIRECTORY(MaterialDesignIcon.FOLDER_OUTLINE),
+        LATEX_FILE(MaterialDesignIcon.FILE_OUTLINE),
+        LATEX_COMMENT(MaterialDesignIcon.COMMENT_TEXT_OUTLINE),
+        LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING),
+        PASSWORD_REVEALED(MaterialDesignIcon.EYE);
 
         private final JabRefIcon icon;
 

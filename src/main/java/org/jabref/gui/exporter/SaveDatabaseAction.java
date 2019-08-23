@@ -14,12 +14,12 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -34,6 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -53,12 +54,14 @@ public class SaveDatabaseAction {
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
+    private final BibEntryTypesManager entryTypesManager;
 
     public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
         this.prefs = prefs;
+        entryTypesManager = Globals.entryTypesManager;
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
@@ -68,7 +71,7 @@ public class SaveDatabaseAction {
                                                .withSaveType(saveType);
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {
                 databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());
@@ -84,7 +87,7 @@ public class SaveDatabaseAction {
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
         } catch (IOException ex) {
-            throw new SaveException(ex);
+            throw new SaveException("Problems saving:", ex);
         }
 
         return true;
@@ -138,15 +141,13 @@ public class SaveDatabaseAction {
                 panel.setBaseChanged(false);
                 panel.markExternalChangesAsResolved();
 
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    // Reset title of tab
-                    frame.setTabTitle(panel, panel.getTabTitle(),
-                            panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                    frame.output(Localization.lang("Saved library") + " '"
-                            + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-                    frame.setWindowTitle();
-                    frame.updateAllTabTitles();
-                });
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                                  panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.getDialogService().notify(Localization.lang("Saved library") + " '"
+                             + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
             }
             return success;
         } catch (SaveException ex) {
@@ -161,7 +162,7 @@ public class SaveDatabaseAction {
 
     public boolean save() {
         if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            panel.frame().output(Localization.lang("Saving library") + "...");
+            panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
             panel.setSaving(true);
             return doSave();
         } else {
@@ -214,13 +215,13 @@ public class SaveDatabaseAction {
         save();
 
         // Reinstall AutosaveManager and BackupManager
-        panel.resetChangeMonitor();
+        panel.resetChangeMonitorAndChangePane();
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(panel));
         }
         if (readyForBackup(context)) {
-            BackupManager.start(context);
+            BackupManager.start(context, entryTypesManager, prefs);
         }
 
         context.getDatabasePath().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile));
@@ -243,7 +244,7 @@ public class SaveDatabaseAction {
             try {
                 saveDatabase(path, true, prefs.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
-                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
+                frame.getDialogService().notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
                 frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);

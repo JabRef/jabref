@@ -1,19 +1,21 @@
 package org.jabref.logic.util;
 
+import org.jabref.model.entry.field.Field;
+
 public class UpdateFieldPreferences {
 
     private final boolean useOwner;
     private final boolean useTimeStamp;
     private final boolean overwriteOwner;
     private final boolean overwriteTimeStamp;
-    private final String timeStampField;
+    private final Field timeStampField;
     private final String timeStampFormat;
     private final String defaultOwner;
 
 
     public UpdateFieldPreferences(boolean useOwner, boolean overwriteOwner, String defaultOwner, boolean useTimeStamp,
-            boolean overwriteTimeStamp, String timeStampField,
-            String timeStampFormat) {
+                                  boolean overwriteTimeStamp, Field timeStampField,
+                                  String timeStampFormat) {
         this.useOwner = useOwner;
         this.overwriteOwner = overwriteOwner;
         this.defaultOwner = defaultOwner;
@@ -31,7 +33,7 @@ public class UpdateFieldPreferences {
         return useTimeStamp;
     }
 
-    public String getTimeStampField() {
+    public Field getTimeStampField() {
         return timeStampField;
     }
 

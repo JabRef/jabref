@@ -10,6 +10,7 @@ import org.jabref.Globals;
 import org.jabref.gui.Dialog;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
@@ -19,40 +20,47 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 public class IntegrityCheckAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final JabRefFrame frame;
+    private final StateManager stateManager;
 
-    public IntegrityCheckAction(JabRefFrame frame) {
+    public IntegrityCheckAction(JabRefFrame frame, StateManager stateManager, TaskExecutor taskExecutor) {
         this.frame = frame;
-        this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
         this.dialogService = frame.getDialogService();
+
+        this.executable.bind(needsDatabase(this.stateManager));
     }
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
-        IntegrityCheck check = new IntegrityCheck(databaseContext,
+        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
+                Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
         Task<List<IntegrityMessage>> task = new Task<List<IntegrityMessage>>() {
             @Override
             protected List<IntegrityMessage> call() {
                 List<IntegrityMessage> result = new ArrayList<>();
 
-                ObservableList<BibEntry> entries = databaseContext.getDatabase().getEntries();
+                ObservableList<BibEntry> entries = database.getDatabase().getEntries();
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
                     }
 
                     BibEntry entry = entries.get(i);
-                    result.addAll(check.checkBibtexEntry(entry));
+                    result.addAll(check.checkEntry(entry));
                     updateProgress(i, entries.size());
                 }
 

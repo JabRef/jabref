@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import javax.xml.transform.TransformerException;
 
@@ -25,7 +26,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -44,7 +44,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,23 +65,27 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
     private final LinkedFileHandler linkedFileHandler;
+    private final ExternalFileTypes externalFileTypes;
 
     public LinkedFileViewModel(LinkedFile linkedFile,
                                BibEntry entry,
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               JabRefPreferences preferences) {
+                               XmpPreferences xmpPreferences,
+                               FilePreferences filePreferences,
+                               ExternalFileTypes externalFileTypes) {
 
         this.linkedFile = linkedFile;
-        this.filePreferences = preferences.getFilePreferences();
+        this.filePreferences = filePreferences;
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-
-        xmpPreferences = preferences.getXMPPreferences();
+        this.externalFileTypes = externalFileTypes;
+        this.xmpPreferences = xmpPreferences;
+        
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
@@ -192,7 +196,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void rename() {
+    public void renameToSuggestion() {
+        renameFileToName(linkedFileHandler.getSuggestedFileName());
+    }
+
+    public void askForNameAndRename() {
+        String oldFile = this.linkedFile.getLink();
+        Path oldFilePath = Paths.get(oldFile);
+        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
+        askedFileName.ifPresent(this::renameFileToName);
+    }
+
+    public void renameFileToName(String targetFileName) {
         if (linkedFile.isOnlineLink()) {
             // Cannot rename remote links
             return;
@@ -200,16 +215,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
         if (file.isPresent()) {
-            performRenameWithConflictCheck();
+            performRenameWithConflictCheck(targetFileName);
         } else {
             dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
     }
 
-    private void performRenameWithConflictCheck() {
-        Optional<Path> fileConflictCheck = linkedFileHandler.findExistingFile(linkedFile, entry);
+    private void performRenameWithConflictCheck(String targetFileName) {
+        Optional<Path> fileConflictCheck = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         if (fileConflictCheck.isPresent()) {
-            String targetFileName = linkedFileHandler.getSuggestedFileName();
             boolean confirmOverwrite = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
@@ -231,7 +245,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         try {
-            linkedFileHandler.renameToSuggestedName();
+            linkedFileHandler.renameToName(targetFileName);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
@@ -267,9 +281,40 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
+    /**
+     * Gets the filename for the current linked file and compares it to the new suggested filename.
+     * @return true if the suggested filename is same as current filename.
+     */
+    public boolean isGeneratedNameSameAsOriginal() {
+        Path file = Paths.get(this.linkedFile.getLink());
+        String currentFileName = file.getFileName().toString();
+        String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
+
+        return currentFileName.equals(suggestedFileName);
+    }
+
+    /**
+     * Compares suggested filepath of current linkedFile with existing filepath.
+     * @return true if suggested filepath is same as existing filepath.
+     */
+    public boolean isGeneratedPathSameAsOriginal() {
+        Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
+        return OptionalUtil.equals(newDir, currentDir, equality);
+    }
+
     public void moveToDefaultDirectoryAndRename() {
         moveToDefaultDirectory();
-        rename();
+        renameToSuggestion();
     }
 
     /**
@@ -312,7 +357,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-
         LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
 
         Optional<LinkedFile> editedFile = dialog.showAndWait();
@@ -351,7 +395,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
         }
-
         try {
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
             if (!targetDirectory.isPresent()) {
@@ -360,28 +403,32 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
 
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
-            BackgroundTask<Path> downloadTask = BackgroundTask
-                    .wrap(() -> {
-                        Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                        String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
-                        linkedFile.setFileType(suggestedTypeName);
-
-                        String suggestedName = linkedFileHandler.getSuggestedFileName();
-                        return targetDirectory.get().resolve(suggestedName);
-                    })
-                    .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
-                    .onSuccess(destination -> {
-                        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences));
-                        linkedFile.setLink(newLinkedFile.getLink());
-                        linkedFile.setFileType(newLinkedFile.getFileType());
-                    })
-                    .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
-
+            BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
+            downloadTask.onSuccess(destination -> {
+                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
+                linkedFile.setLink(newLinkedFile.getLink());
+                linkedFile.setFileType(newLinkedFile.getFileType());
+            });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }
+    }
+
+    public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        BackgroundTask<Path> downloadTask = BackgroundTask
+                .wrap(() -> {
+                    Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                    String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                    linkedFile.setFileType(suggestedTypeName);
+
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
+                    return targetDirectory.resolve(suggestedName);
+                })
+                .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
+        return downloadTask;
     }
 
     private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
@@ -399,19 +446,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
-            return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
+            return externalFileTypes.getExternalFileTypeByMimeType(mimeType);
         } else {
             return Optional.empty();
         }
     }
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
-        String extension = DownloadExternalFile.getSuffix(url);
-        if (extension != null) {
-            return ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
-        } else {
-            return Optional.empty();
-        }
+        return URLUtil.getSuffix(url)
+                      .flatMap(extension -> externalFileTypes.getExternalFileTypeByExt(extension));
     }
 
     public LinkedFile getFile() {

@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ public class FreeCiteImporterTest {
         BibEntry bibEntry = bibEntries.get(0);
 
         assertEquals(1, bibEntries.size());
-        assertEquals(bibEntry.getField("author"), Optional.of("O Kopp and D Martin and D Wutke and F Leymann"));
+        assertEquals(bibEntry.getField(StandardField.AUTHOR), Optional.of("O Kopp and D Martin and D Wutke and F Leymann"));
     }
 
     @Test

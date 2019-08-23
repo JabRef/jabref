@@ -1,37 +1,35 @@
 package org.jabref.gui;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
 import org.jabref.preferences.PreferencesService;
 
 public class SaveOrderConfigDisplayViewModel {
 
-    private final ListProperty<String> priSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<String> secSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<String> terSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> priSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> secSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> terSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BooleanProperty savePriDescPropertySelected = new SimpleBooleanProperty();
     private final BooleanProperty saveSecDescPropertySelected = new SimpleBooleanProperty();
     private final BooleanProperty saveTerDescPropertySelected = new SimpleBooleanProperty();
 
-    private final StringProperty savePriSortSelectedValueProperty = new SimpleStringProperty("");
-    private final StringProperty saveSecSortSelectedValueProperty = new SimpleStringProperty("");
-    private final StringProperty saveTerSortSelectedValueProperty = new SimpleStringProperty("");
+    private final ObjectProperty<Field> savePriSortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveSecSortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveTerSortSelectedValueProperty = new SimpleObjectProperty<>(null);
 
     private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
@@ -42,10 +40,7 @@ public class SaveOrderConfigDisplayViewModel {
     public SaveOrderConfigDisplayViewModel(SaveOrderConfig config, PreferencesService prefs) {
         this.prefs = prefs;
 
-        List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
-        fieldNames.add(BibEntry.KEY_FIELD);
-        Collections.sort(fieldNames);
-
+        Set<Field> fieldNames = FieldFactory.getCommonFields();
         priSortFieldsProperty.addAll(fieldNames);
         secSortFieldsProperty.addAll(fieldNames);
         terSortFieldsProperty.addAll(fieldNames);
@@ -53,26 +48,24 @@ public class SaveOrderConfigDisplayViewModel {
         setSaveOrderConfig(config);
     }
 
-    public ListProperty<String> priSortFieldsProperty() {
+    public ListProperty<Field> priSortFieldsProperty() {
         return priSortFieldsProperty;
     }
 
-    public ListProperty<String> secSortFieldsProperty() {
+    public ListProperty<Field> secSortFieldsProperty() {
         return secSortFieldsProperty;
     }
 
-    public ListProperty<String> terSortFieldsProperty() {
+    public ListProperty<Field> terSortFieldsProperty() {
         return terSortFieldsProperty;
     }
 
     public SaveOrderConfig getSaveOrderConfig() {
-        SortCriterion primary = new SortCriterion(getSelectedItemAsLowerCaseTrim(savePriSortSelectedValueProperty), savePriDescPropertySelected.getValue());
-        SortCriterion secondary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveSecSortSelectedValueProperty), saveSecDescPropertySelected.getValue());
-        SortCriterion tertiary = new SortCriterion(getSelectedItemAsLowerCaseTrim(saveTerSortSelectedValueProperty), saveTerDescPropertySelected.getValue());
+        SortCriterion primary = new SortCriterion(savePriSortSelectedValueProperty.get(), savePriDescPropertySelected.getValue());
+        SortCriterion secondary = new SortCriterion(saveSecSortSelectedValueProperty.get(), saveSecDescPropertySelected.getValue());
+        SortCriterion tertiary = new SortCriterion(saveTerSortSelectedValueProperty.get(), saveTerDescPropertySelected.getValue());
 
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(saveInOriginalProperty.getValue(), saveInSpecifiedOrderProperty.getValue(), primary, secondary, tertiary);
-
-        return saveOrderConfig;
+        return new SaveOrderConfig(saveInOriginalProperty.getValue(), saveInSpecifiedOrderProperty.getValue(), primary, secondary, tertiary);
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
@@ -95,10 +88,6 @@ public class SaveOrderConfigDisplayViewModel {
 
     }
 
-    private String getSelectedItemAsLowerCaseTrim(StringProperty string) {
-        return string.getValue().toLowerCase(Locale.ROOT).trim();
-    }
-
     public BooleanProperty savePriDescPropertySelected() {
         return savePriDescPropertySelected;
     }
@@ -111,15 +100,15 @@ public class SaveOrderConfigDisplayViewModel {
         return saveTerDescPropertySelected;
     }
 
-    public StringProperty savePriSortSelectedValueProperty() {
+    public ObjectProperty<Field> savePriSortSelectedValueProperty() {
         return savePriSortSelectedValueProperty;
     }
 
-    public StringProperty saveSecSortSelectedValueProperty() {
+    public ObjectProperty<Field> saveSecSortSelectedValueProperty() {
         return saveSecSortSelectedValueProperty;
     }
 
-    public StringProperty saveTerSortSelectedValueProperty() {
+    public ObjectProperty<Field> saveTerSortSelectedValueProperty() {
         return saveTerSortSelectedValueProperty;
     }
 

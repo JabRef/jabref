@@ -16,10 +16,12 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.net.URLUtil;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -51,13 +53,12 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
      */
     public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, FieldName.MONTH};
+        Field[] singleFields = {StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH};
 
         // Fields that are accessible in the journal part of the BibJson object
-        String[] journalSingleFieldStrings = {FieldName.PUBLISHER, FieldName.NUMBER, FieldName.VOLUME};
+        Field[] journalSingleFields = {StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME};
 
-        BibEntry entry = new BibEntry();
-        entry.setType("article");
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
 
         // Authors
         if (bibJsonEntry.has("author")) {
@@ -70,25 +71,25 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
+            entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
 
         // Direct accessible fields
-        for (String field : singleFieldStrings) {
-            if (bibJsonEntry.has(field)) {
-                entry.setField(field, bibJsonEntry.getString(field));
+        for (Field field : singleFields) {
+            if (bibJsonEntry.has(field.getName())) {
+                entry.setField(field, bibJsonEntry.getString(field.getName()));
             }
         }
 
         // Page numbers
         if (bibJsonEntry.has("start_page")) {
             if (bibJsonEntry.has("end_page")) {
-                entry.setField(FieldName.PAGES,
+                entry.setField(StandardField.PAGES,
                         bibJsonEntry.getString("start_page") + "--" + bibJsonEntry.getString("end_page"));
             } else {
-                entry.setField(FieldName.PAGES, bibJsonEntry.getString("start_page"));
+                entry.setField(StandardField.PAGES, bibJsonEntry.getString("start_page"));
             }
         }
 
@@ -97,14 +98,14 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField(FieldName.JOURNAL, journal.getString("title").trim());
+                entry.setField(StandardField.JOURNAL, journal.getString("title").trim());
             } else {
                 LOGGER.info("No journal title found.");
             }
             // Other journal related fields
-            for (String field : journalSingleFieldStrings) {
-                if (journal.has(field)) {
-                    entry.setField(field, journal.getString(field));
+            for (Field field : journalSingleFields) {
+                if (journal.has(field.getName())) {
+                    entry.setField(field, journal.getString(field.getName()));
                 }
             }
         } else {
@@ -127,11 +128,11 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
             for (int i = 0; i < identifiers.length(); i++) {
                 String type = identifiers.getJSONObject(i).getString("type");
                 if ("doi".equals(type)) {
-                    entry.setField(FieldName.DOI, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(StandardField.DOI, identifiers.getJSONObject(i).getString("id"));
                 } else if ("pissn".equals(type)) {
-                    entry.setField(FieldName.ISSN, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString("id"));
                 } else if ("eissn".equals(type)) {
-                    entry.setField(FieldName.ISSN, identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString("id"));
                 }
             }
         }
@@ -143,7 +144,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
                     if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
-                        entry.setField(FieldName.URL, links.getJSONObject(i).getString("url"));
+                        entry.setField(StandardField.URL, links.getJSONObject(i).getString("url"));
                     }
                 }
             }
@@ -165,10 +166,34 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        URLUtil.addPath(uriBuilder, query);
+        DOAJFetcher.addPath(uriBuilder, query);
         uriBuilder.addParameter("pageSize", "30"); // Number of results
         //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
         return uriBuilder.build().toURL();
+    }
+
+    /**
+     * @implNote slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
+     */
+    public static URIBuilder addPath(URIBuilder base, String subPath) {
+        if (StringUtil.isBlank(subPath) || "/".equals(subPath)) {
+            return base;
+        } else {
+            base.setPath(appendSegmentToPath(base.getPath(), subPath));
+            return base;
+        }
+    }
+
+    private static String appendSegmentToPath(String path, String segment) {
+        if (StringUtil.isBlank(path)) {
+            path = "/";
+        }
+
+        if (path.charAt(path.length() - 1) == '/' || segment.startsWith("/")) {
+            return path + segment;
+        }
+
+        return path + "/" + segment;
     }
 
     @Override

@@ -7,10 +7,10 @@ import java.util.Optional;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * @deprecated the class should be refactored and partly integrated into BibEntry
@@ -31,8 +31,8 @@ public class SpecialFieldsUtils {
     public static List<FieldChange> updateField(SpecialField field, String value, BibEntry entry, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        UpdateField.updateField(entry, field.getFieldName(), value, nullFieldIfValueIsTheSame)
-                .ifPresent(fieldChanges::add);
+        UpdateField.updateField(entry, field, value, nullFieldIfValueIsTheSame)
+                   .ifPresent(fieldChanges::add);
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         if (isKeywordSyncEnabled) {
             fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, keywordDelimiter));
@@ -45,7 +45,7 @@ public class SpecialFieldsUtils {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         KeywordList keyWords = specialField.getKeyWords();
-        Optional<Keyword> newValue = entry.getField(specialField.getFieldName()).map(Keyword::new);
+        Optional<Keyword> newValue = entry.getField(specialField).map(Keyword::new);
         newValue.map(value -> entry.replaceKeywords(keyWords, newValue.get(), keywordDelimiter))
                 .orElseGet(() -> entry.removeKeywords(keyWords, keywordDelimiter))
                 .ifPresent(changeValue -> fieldChanges.add(changeValue));
@@ -78,8 +78,8 @@ public class SpecialFieldsUtils {
             }
         }
 
-        UpdateField.updateNonDisplayableField(entry, field.getFieldName(), newValue.map(Keyword::toString).orElse(null))
-                .ifPresent(fieldChanges::add);
+        UpdateField.updateNonDisplayableField(entry, field, newValue.map(Keyword::toString).orElse(null))
+                   .ifPresent(fieldChanges::add);
         return fieldChanges;
     }
 
@@ -88,7 +88,7 @@ public class SpecialFieldsUtils {
      */
     public static List<FieldChange> syncSpecialFieldsFromKeywords(BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-        if (!entry.hasField(FieldName.KEYWORDS)) {
+        if (!entry.hasField(StandardField.KEYWORDS)) {
             return fieldChanges;
         }
 

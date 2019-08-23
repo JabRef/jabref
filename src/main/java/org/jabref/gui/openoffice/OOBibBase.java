@@ -38,7 +38,7 @@ import org.jabref.logic.openoffice.UndefinedBibtexEntry;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
@@ -119,10 +119,10 @@ class OOBibBase {
     private final boolean atEnd;
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
-    private final FieldComparator authComp = new FieldComparator(FieldName.AUTHOR);
-    private final FieldComparator yearComp = new FieldComparator(FieldName.YEAR);
+    private final FieldComparator authComp = new FieldComparator(StandardField.AUTHOR);
+    private final FieldComparator yearComp = new FieldComparator(StandardField.YEAR);
 
-    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
+    private final FieldComparator titleComp = new FieldComparator(StandardField.TITLE);
     private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
 
     private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
@@ -518,7 +518,8 @@ class OOBibBase {
                     } else {
                         LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
-                        cEntries[j] = new UndefinedBibtexEntry(keys[j]);
+                        throw new BibEntryNotFoundException(names.get(i), Localization
+                                                                                      .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
                     }
                 }
 
@@ -1270,7 +1271,7 @@ class OOBibBase {
                         }
                     }
                 }
-                Collections.sort(entries, new FieldComparator(FieldName.YEAR));
+                Collections.sort(entries, new FieldComparator(StandardField.YEAR));
                 String keyString = String.join(",", entries.stream().map(entry -> entry.getCiteKeyOptional().orElse(""))
                                                            .collect(Collectors.toList()));
                 // Insert bookmark:
@@ -1304,7 +1305,7 @@ class OOBibBase {
                     // Insert a copy of the entry
                     resultDatabase.insertEntry(clonedEntry);
                     // Check if the cloned entry has a crossref field
-                    clonedEntry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
+                    clonedEntry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current library

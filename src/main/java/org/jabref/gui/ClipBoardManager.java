@@ -1,6 +1,8 @@
 package org.jabref.gui;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ClipBoardManager {
-
     public static final DataFormat XML = new DataFormat("application/xml");
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
     private final Clipboard clipboard;
-
     private final ImportFormatReader importFormatReader;
 
     public ClipBoardManager() {
@@ -63,9 +63,8 @@ public class ClipBoardManager {
         String result = clipboard.getString();
         if (result == null) {
             return "";
-        } else {
-            return result;
         }
+        return result;
     }
 
     public void setHtmlContent(String html) {
@@ -82,47 +81,62 @@ public class ClipBoardManager {
 
     public void setContent(List<BibEntry> entries) throws IOException {
         final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
+        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), Globals.entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
         content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
         content.putString(serializedEntries);
         clipboard.setContent(content);
     }
 
-    public List<BibEntry> extractEntries() {
+    public List<BibEntry> extractData() {
         Object entries = clipboard.getContent(DragAndDropDataFormats.ENTRIES);
 
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-        if (entries != null) {
-            // We have determined that the clipboard data is a set of entries (serialized as a string).
-            try {
-                return parser.parseEntries((String) entries);
-            } catch (ParseException ex) {
-                LOGGER.error("Could not paste", ex);
-            }
-        } else {
-            String data = clipboard.getString();
-            if (data != null) {
-                try {
-                    // fetch from doi
-                    Optional<DOI> doi = DOI.parse(data);
-                    if (doi.isPresent()) {
-                        LOGGER.info("Found DOI in clipboard");
-                        Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.get().getDOI());
-                        return OptionalUtil.toList(entry);
-                    } else {
-                        try {
-                            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-                            return unknownFormatImport.parserResult.getDatabase().getEntries();
-                        } catch (ImportException e) {
-                            // import failed and result will be empty
-                        }
-                    }
-                } catch (FetcherException ex) {
-                    LOGGER.error("Error while fetching", ex);
-                }
-            }
+        if (entries == null) {
+            return handleStringData(clipboard.getString());
         }
-        return Collections.emptyList();
+        return handleBibTeXData((String) entries);
+    }
+
+    private List<BibEntry> handleBibTeXData(String entries) {
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        try {
+            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+        } catch (ParseException ex) {
+            LOGGER.error("Could not paste", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> handleStringData(String data) {
+        if (data == null || data.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Optional<DOI> doi = DOI.parse(data);
+        if (doi.isPresent()) {
+            return fetchByDOI(doi.get());
+        }
+
+        return tryImportFormats(data);
+    }
+
+    private List<BibEntry> tryImportFormats(String data) {
+        try {
+            UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
+            return unknownFormatImport.parserResult.getDatabase().getEntries();
+        } catch (ImportException ignored) {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> fetchByDOI(DOI doi) {
+        LOGGER.info("Found DOI in clipboard");
+        try {
+            Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.getDOI());
+            return OptionalUtil.toList(entry);
+        } catch (FetcherException ex) {
+            LOGGER.error("Error while fetching", ex);
+            return Collections.emptyList();
+        }
     }
 }

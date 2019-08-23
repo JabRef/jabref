@@ -1,15 +1,18 @@
 package org.jabref.gui.preferences;
 
-import javafx.geometry.Insets;
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
@@ -18,16 +21,16 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-class AppearancePrefsTab extends Pane implements PrefsTab {
+class AppearancePrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private final CheckBox fontTweaksLAF;
     private final TextField fontSize;
     private final CheckBox overrideFonts;
-    private final VBox container = new VBox();
     private final DialogService dialogService;
     private final RadioButton lightTheme;
     private final RadioButton darkTheme;
+    private final GridPane builder = new GridPane();
 
     /**
      * Customization of appearance parameters.
@@ -37,14 +40,12 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     public AppearancePrefsTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
+        builder.setVgap(8);
 
         overrideFonts = new CheckBox(Localization.lang("Override default font settings"));
         fontSize = new TextField();
         fontSize.setTextFormatter(ControlHelper.getIntegerTextFormatter());
         Label fontSizeLabel = new Label(Localization.lang("Font size:"));
-        HBox fontSizeContainer = new HBox(fontSizeLabel, fontSize);
-        VBox.setMargin(fontSizeContainer, new Insets(0, 0, 0, 35));
-        fontSizeContainer.disableProperty().bind(overrideFonts.selectedProperty().not());
         fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
         ToggleGroup themeGroup = new ToggleGroup();
@@ -60,12 +61,24 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
             darkTheme.setSelected(true);
         }
 
-        container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF, lightTheme, darkTheme);
+        // Font configuration
+        HBox fontBox = new HBox();
+        fontBox.setSpacing(10);
+        fontBox.setAlignment(Pos.CENTER_LEFT);
+        fontBox.getChildren().setAll(overrideFonts, fontSizeLabel, fontSize);
+        builder.add(fontBox, 1, 2);
+
+        // Theme configuration
+        HBox themeBox = new HBox();
+        themeBox.setSpacing(10);
+        themeBox.setAlignment(Pos.CENTER_LEFT);
+        themeBox.getChildren().setAll(lightTheme, darkTheme);
+        builder.add(themeBox, 1, 4);
     }
 
     @Override
     public Node getBuilder() {
-        return container;
+        return builder;
     }
 
     @Override
@@ -117,4 +130,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Appearance");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

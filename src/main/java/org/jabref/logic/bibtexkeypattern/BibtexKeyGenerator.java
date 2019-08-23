@@ -12,6 +12,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
-    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"-#~^':`";
+    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"-#~^:'`ʹ";
     private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"-";
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
@@ -109,7 +110,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             // get the type of entry
-            String entryType = entry.getType();
+            EntryType entryType = entry.getType();
             // Get the arrayList corresponding to the type
             List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
             if (!typeList.isEmpty()) {
@@ -133,6 +134,9 @@ public class BibtexKeyGenerator extends BracketedPattern {
                         label = applyModifiers(label, parts, 1);
                     }
 
+                    // Remove all illegal characters from the label.
+                    label = cleanKey(label, bibtexKeyPatternPreferences.isEnforceLegalKey());
+
                     stringBuilder.append(label);
 
                 } else {
@@ -143,8 +147,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             LOGGER.warn("Cannot make label", e);
         }
 
-        // Remove all illegal characters from the key.
-        key = cleanKey(stringBuilder.toString(), bibtexKeyPatternPreferences.isEnforceLegalKey());
+        key = stringBuilder.toString();
 
         // Remove Regular Expressions while generating Keys
         String regex = bibtexKeyPatternPreferences.getKeyPatternRegex();

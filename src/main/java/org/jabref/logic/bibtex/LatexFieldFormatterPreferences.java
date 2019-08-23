@@ -3,16 +3,17 @@ package org.jabref.logic.bibtex;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.model.entry.field.Field;
+
 public class LatexFieldFormatterPreferences {
 
     private final boolean resolveStringsAllFields;
-    private final List<String> doNotResolveStringsFor;
+    private final List<Field> doNotResolveStringsFor;
     private final int lineLength = 65; // Constant
     private final FieldContentParserPreferences fieldContentParserPreferences;
 
-
-    public LatexFieldFormatterPreferences(boolean resolveStringsAllFields, List<String> doNotResolveStringsFor,
-            FieldContentParserPreferences fieldContentParserPreferences) {
+    public LatexFieldFormatterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
+                                          FieldContentParserPreferences fieldContentParserPreferences) {
         this.resolveStringsAllFields = resolveStringsAllFields;
         this.doNotResolveStringsFor = doNotResolveStringsFor;
         this.fieldContentParserPreferences = fieldContentParserPreferences;
@@ -27,7 +28,7 @@ public class LatexFieldFormatterPreferences {
         return resolveStringsAllFields;
     }
 
-    public List<String> getDoNotResolveStringsFor() {
+    public List<Field> getDoNotResolveStringsFor() {
         return doNotResolveStringsFor;
     }
 

@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BibEntryTest {
 
@@ -29,20 +32,24 @@ public class BibEntryTest {
     }
 
     @Test
-    public void notOverrideReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.setField(BibEntry.ID_FIELD, "somevalue"));
-    }
-
-    @Test
-    public void notClearReservedFields() {
-        assertThrows(IllegalArgumentException.class, () -> entry.clearField(BibEntry.ID_FIELD));
-    }
-
-    @Test
     public void getFieldIsCaseInsensitive() throws Exception {
-        entry.setField("TeSt", "value");
+        entry.setField(new UnknownField("TeSt"), "value");
 
-        assertEquals(Optional.of("value"), entry.getField("tEsT"));
+        assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
+    }
+
+    @Test
+    public void getFieldWorksWithBibFieldAsWell() throws Exception {
+        entry.setField(StandardField.AUTHOR, "value");
+
+        assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField()));
+    }
+
+    @Test
+    public void setFieldWorksWithBibFieldAsWell() throws Exception {
+        entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField(), "value");
+
+        assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -90,7 +97,7 @@ public class BibEntryTest {
     public void testGetEmptyResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry);
@@ -104,7 +111,7 @@ public class BibEntryTest {
     public void testGetSingleResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         entry2.addKeyword("kw", ',');
         database.insertEntry(entry2);
@@ -119,7 +126,7 @@ public class BibEntryTest {
     public void testGetResolvedKeywords() {
         BibDatabase database = new BibDatabase();
         BibEntry entry2 = new BibEntry();
-        entry.setField(FieldName.CROSSREF, "entry2");
+        entry.setField(StandardField.CROSSREF, "entry2");
         entry2.setCiteKey("entry2");
         entry2.addKeyword("kw", ',');
         entry2.addKeyword("kw2", ',');

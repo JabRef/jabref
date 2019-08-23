@@ -10,8 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -24,7 +22,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
@@ -50,20 +49,19 @@ public class JabRefDesktop {
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink,
-                                          String initialFieldName)
+    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, Field initialField)
         throws IOException {
         String link = initialLink;
-        String fieldName = initialFieldName;
-        if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
+        Field field = initialField;
+        if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFilePreferences());
+            List<String> dir = databaseContext.getFileDirectories(field, Globals.prefs.getFilePreferences());
 
             Optional<Path> file = FileHelper.expandFilename(link, dir);
 
             // Check that the file exists:
             if (!file.isPresent() || !Files.exists(file.get())) {
-                throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
+                throw new IOException("File not found (" + field + "): '" + link + "'.");
             }
             link = file.get().toAbsolutePath().toString();
 
@@ -71,32 +69,32 @@ public class JabRefDesktop {
             String[] split = file.get().getFileName().toString().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
-                    fieldName = FieldName.PDF;
+                    field = StandardField.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
                            || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
-                    fieldName = FieldName.PS;
+                    field = StandardField.PS;
                 }
             }
-        } else if (FieldName.DOI.equals(fieldName)) {
+        } else if (StandardField.DOI.equals(field)) {
             openDoi(link);
             return;
-        } else if (FieldName.EPRINT.equals(fieldName)) {
+        } else if (StandardField.EPRINT.equals(field)) {
             link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
             // should be opened in browser
-            fieldName = FieldName.URL;
+            field = StandardField.URL;
         }
 
-        if (FieldName.URL.equals(fieldName)) {
+        if (StandardField.URL.equals(field)) {
             openBrowser(link);
-        } else if (FieldName.PS.equals(fieldName)) {
+        } else if (StandardField.PS.equals(field)) {
             try {
-                NATIVE_DESKTOP.openFile(link, FieldName.PS);
+                NATIVE_DESKTOP.openFile(link, StandardField.PS.getName());
             } catch (IOException e) {
                 LOGGER.error("An error occurred on the command: " + link, e);
             }
-        } else if (FieldName.PDF.equals(fieldName)) {
+        } else if (StandardField.PDF.equals(field)) {
             try {
-                NATIVE_DESKTOP.openFile(link, FieldName.PDF);
+                NATIVE_DESKTOP.openFile(link, StandardField.PDF.getName());
             } catch (IOException e) {
                 LOGGER.error("An error occurred on the command: " + link, e);
             }
@@ -168,7 +166,33 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
-        NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        if (fileLink == null) {
+            return;
+        }
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+        } else {
+            String absolutePath = fileLink.toAbsolutePath().getParent().toString();
+            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            if (!command.isEmpty()) {
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+
+                // replace the placeholder if used
+                command = command.replace("%DIR", absolutePath);
+                String[] subcommands = command.split(" ");
+
+                LOGGER.info("Executing command \"" + command + "\"...");
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error("Open File Browser", exception);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                }
+            }
+        }
     }
 
     /**
@@ -201,12 +225,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(null,
-                                          couldNotOpenBrowser + "\n" + openManually + "\n" +
-                                                copiedToClipboard,
-                                          couldNotOpenBrowser,
-                                          JOptionPane.ERROR_MESSAGE);
+            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
+            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -234,24 +254,19 @@ public class JabRefDesktop {
 
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
+                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
+
                 String[] subcommands = command.split(" ");
 
-                // replace the placeholder if used
-                String commandLoggingText = command.replace("%DIR", absolutePath);
-
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText));
-                LOGGER.info("Executing command \"" + commandLoggingText + "\"...");
+                LOGGER.info("Executing command \"" + command + "\"...");
+                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JOptionPane.showMessageDialog(null,
-                                                  Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
-                                                  Localization.lang("Open console") + " - " + Localization.lang("Error"),
-                                                  JOptionPane.ERROR_MESSAGE);
-                    JabRefGUI.getMainFrame().output(null);
+                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }

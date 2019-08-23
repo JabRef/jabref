@@ -3,9 +3,11 @@ package org.jabref.model.entry.identifier;
 import java.net.URI;
 import java.util.Optional;
 
+import org.jabref.model.entry.field.Field;
+
 public interface Identifier {
 
-    String getDefaultField();
+    Field getDefaultField();
 
     String getNormalized();
 

@@ -10,15 +10,15 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetcher for ISBN trying ebook.de first and then chimbori.com
+ * Fetcher for ISBN trying ebook.de first, chimbori.com and then ottobib
  */
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
@@ -47,12 +47,19 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+        
         // nothing found at ebook.de, try chimbori.com
         if (!bibEntry.isPresent()) {
             LOGGER.debug("No entry found at ebook.de try chimbori.com");
             IsbnViaChimboriFetcher isbnViaChimboriFetcher = new IsbnViaChimboriFetcher(importFormatPreferences);
             bibEntry = isbnViaChimboriFetcher.performSearchById(identifier);
+        }
 
+        //nothing found at ebook.de and chimbori.com, try ottobib
+        if (!bibEntry.isPresent()) {
+            LOGGER.debug("No entry found at ebook.de and chimbori.com try ottobib");
+            IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
+            bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
         }
 
         return bibEntry;
@@ -60,7 +67,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Optional<String> isbn = entry.getField(FieldName.ISBN);
+        Optional<String> isbn = entry.getField(StandardField.ISBN);
         if (isbn.isPresent()) {
             return OptionalUtil.toList(performSearchById(isbn.get()));
         } else {

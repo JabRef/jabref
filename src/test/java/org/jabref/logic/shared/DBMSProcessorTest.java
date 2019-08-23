@@ -15,6 +15,10 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -87,7 +91,7 @@ class DBMSProcessorTest {
             }
         }
 
-        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap();
+        Map<Field, String> expectedFieldMap = expectedEntry.getFieldMap();
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
@@ -100,10 +104,10 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        expectedEntry.setType("book");
-        expectedEntry.setField("author", "Michael J and Hutchings");
-        expectedEntry.setField("customField", "custom value");
-        expectedEntry.clearField("booktitle");
+        expectedEntry.setType(StandardEntryType.Book);
+        expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
+        expectedEntry.setField(new UnknownField("customField"), "custom value");
+        expectedEntry.clearField(StandardField.BOOKTITLE);
 
         dbmsProcessor.updateEntry(expectedEntry);
 
@@ -111,6 +115,24 @@ class DBMSProcessorTest {
                 .getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedEntry, actualEntryOptional.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        BibEntry firstEntry = getBibEntryExample();
+        firstEntry.setId("1");
+        BibEntry secondEntry = getBibEntryExample();
+        secondEntry.setId("2");
+
+        dbmsProcessor.insertEntry(firstEntry);
+        dbmsProcessor.insertEntry(secondEntry);
+
+        List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(Arrays.asList(1, 2));
+
+        assertEquals(firstEntry.getId(), sharedEntriesByIdList.get(0).getId());
+        assertEquals(secondEntry.getId(), sharedEntriesByIdList.get(1).getId());
     }
 
     @ParameterizedTest
@@ -123,7 +145,7 @@ class DBMSProcessorTest {
 
         //simulate older version
         bibEntry.getSharedBibEntryData().setVersion(0);
-        bibEntry.setField("year", "1993");
+        bibEntry.setField(StandardField.YEAR, "1993");
 
         assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(bibEntry));
     }
@@ -254,20 +276,19 @@ class DBMSProcessorTest {
 
     private BibEntry getBibEntryExampleWithEmptyFields() {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setField("author", "Author");
-        bibEntry.setField("title", "");
-        bibEntry.setField("year", "");
+        bibEntry.setField(StandardField.AUTHOR, "Author");
+        bibEntry.setField(StandardField.TITLE, "");
+        bibEntry.setField(StandardField.YEAR, "");
         bibEntry.getSharedBibEntryData().setSharedID(1);
         return bibEntry;
     }
 
     private BibEntry getBibEntryExample() {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setType("inproceedings");
-        bibEntry.setField("author", "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L");
-        bibEntry.setField("title", "The nano processor: a low resource reconfigurable processor");
-        bibEntry.setField("booktitle", "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on");
-        bibEntry.setField("year", "1994");
+        BibEntry bibEntry = new BibEntry(StandardEntryType.InProceedings);
+        bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L");
+        bibEntry.setField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor");
+        bibEntry.setField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on");
+        bibEntry.setField(StandardField.YEAR, "1994");
         bibEntry.setCiteKey("nanoproc1994");
         return bibEntry;
     }

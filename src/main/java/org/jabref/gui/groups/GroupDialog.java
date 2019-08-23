@@ -1,8 +1,10 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -13,6 +15,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -24,6 +27,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -33,16 +37,21 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -53,6 +62,7 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -83,6 +93,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     private final RadioButton independentButton = new RadioButton(Localization.lang("Independent group: When selected, view only this group's entries"));
     private final RadioButton intersectionButton = new RadioButton(Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
     private final RadioButton unionButton = new RadioButton(Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
+    private final DialogService dialogService;
+    private final JabRefPreferences prefs;
+    private final BasePanel basePanel;
 
     // for KeywordGroup
     private final TextField keywordGroupSearchTerm = new TextField();
@@ -105,6 +118,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     // for TexGroup
     private final TextField texGroupFilePath = new TextField();
+    private final Button texGroupBrowseButton = new Button("Browse");
+    private final HBox texGroupHBox = new HBox(10);
 
     // for all types
     private final TextFlow descriptionTextFlow = new TextFlow();
@@ -114,12 +129,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     /**
      * Shows a group add/edit dialog.
      *
-     * @param jabrefFrame The parent frame.
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        this.setTitle(Localization.lang("Edit group"));
+    public GroupDialog(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
+
+        if (editedGroup == null) {
+            this.setTitle(Localization.lang("Add subgroup"));
+        } else {
+            this.setTitle(Localization.lang("Edit group"));
+        }
 
         explicitRadioButton.setSelected(true);
 
@@ -128,8 +147,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         descriptionTextFlow.setMinHeight(180);
         descriptionTextFlow.setPrefHeight(180);
 
+        this.dialogService = dialogService;
+        this.prefs = prefs;
+        this.basePanel = basePanel;
+
         // set default values (overwritten if editedGroup != null)
-        keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
+        keywordGroupSearchField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
 
         // configure elements
         ToggleGroup groupType = new ToggleGroup();
@@ -261,11 +284,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     if (explicitRadioButton.isSelected()) {
                         Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
                         if (groupName.contains(Character.toString(keywordDelimiter))) {
-                            jabrefFrame.showMessage(
-                                    Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                            dialogService.showWarningDialogAndWait(null, Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
                         }
 
-                        Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
+                        Optional<GroupTreeNode> rootGroup = basePanel.getBibDatabaseContext().getMetaData().getGroups();
                         if (rootGroup.isPresent()) {
                             int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
                             boolean warnAboutSameName = false;
@@ -279,8 +301,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                             }
 
                             if (warnAboutSameName) {
-                                jabrefFrame.showMessage(
-                                        Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                                dialogService.showErrorDialogAndWait(Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
                                 return null;
                             }
                         }
@@ -292,11 +313,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         // therefore I don't catch anything here
                         if (keywordGroupRegExp.isSelected()) {
                             resultingGroup = new RegexKeywordGroup(groupName, getContext(),
-                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    FieldFactory.parseField(keywordGroupSearchField.getText().trim()), keywordGroupSearchTerm.getText().trim(),
                                     keywordGroupCaseSensitive.isSelected());
                         } else {
                             resultingGroup = new WordKeywordGroup(groupName, getContext(),
-                                    keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                    FieldFactory.parseField(keywordGroupSearchField.getText().trim()), keywordGroupSearchTerm.getText().trim(),
                                     keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                         }
                     } else if (searchRadioButton.isSelected()) {
@@ -306,16 +327,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         if (autoGroupKeywordsOption.isSelected()) {
                             resultingGroup = new AutomaticKeywordGroup(
                                     groupName, getContext(),
-                                    autoGroupKeywordsField.getText().trim(),
+                                    FieldFactory.parseField(autoGroupKeywordsField.getText().trim()),
                                     autoGroupKeywordsDeliminator.getText().charAt(0),
                                     autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
                         } else {
                             resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
-                                    autoGroupPersonsField.getText().trim());
+                                    FieldFactory.parseField(autoGroupPersonsField.getText().trim()));
                         }
                     } else if (texRadioButton.isSelected()) {
-                        resultingGroup = new TexGroup(groupName, getContext(),
-                                Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
+                        resultingGroup = TexGroup.create(groupName, getContext(),
+                                                      Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor(), basePanel.getBibDatabaseContext().getMetaData());
                     }
 
                     resultingGroup.setColor(colorField.getValue());
@@ -323,12 +344,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     resultingGroup.setIconName(iconField.getText());
                     return resultingGroup;
                 } catch (IllegalArgumentException | IOException exception) {
-                    jabrefFrame.showMessage(exception.getLocalizedMessage());
+                    dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
                     return null;
                 }
             }
             return null;
         });
+
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
+        keywordGroupSearchTerm.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
+        searchGroupSearchExpression.textProperty().addListener((observable, oldValue, newValue) -> updateComponents());
 
         EventHandler<ActionEvent> actionHandler = (ActionEvent e) -> updateComponents();
         nameField.setOnAction(actionHandler);
@@ -354,7 +379,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
-                keywordGroupSearchField.setText(group.getSearchField());
+                keywordGroupSearchField.setText(group.getSearchField().getName());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(false);
@@ -362,7 +387,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == RegexKeywordGroup.class) {
                 RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
-                keywordGroupSearchField.setText(group.getSearchField());
+                keywordGroupSearchField.setText(group.getSearchField().getName());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(true);
@@ -386,10 +411,10 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
                     autoGroupKeywordsDeliminator.setText(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDeliminator.setText(group.getKeywordHierarchicalDelimiter().toString());
-                    autoGroupKeywordsField.setText(group.getField());
+                    autoGroupKeywordsField.setText(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
-                    autoGroupPersonsField.setText(group.getField());
+                    autoGroupPersonsField.setText(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 texRadioButton.setSelected(true);
@@ -399,17 +424,15 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 texGroupFilePath.setText(group.getFilePath().toString());
             }
         }
-
-        setResizable(false);
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
-    public GroupDialog() {
-        this(JabRefGUI.getMainFrame(), null);
+    public GroupDialog(DialogService dialogService) {
+        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, null);
     }
 
-    public GroupDialog(AbstractGroup editedGroup) {
-        this(JabRefGUI.getMainFrame(), editedGroup);
+    public GroupDialog(DialogService dialogService, AbstractGroup editedGroup) {
+        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, editedGroup);
     }
 
     private static String formatRegExException(String regExp, Exception e) {
@@ -442,7 +465,11 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         VBox texPanel = new VBox();
         texPanel.setVisible(false);
         texPanel.getChildren().add(new Label(Localization.lang("Aux file")));
-        texPanel.getChildren().add(texGroupFilePath);
+        texGroupBrowseButton.setOnAction((ActionEvent e) -> openBrowseDialog());
+        texGroupHBox.getChildren().add(texGroupFilePath);
+        texGroupHBox.getChildren().add(texGroupBrowseButton);
+        HBox.setHgrow(texGroupFilePath, Priority.ALWAYS);
+        texPanel.getChildren().add(texGroupHBox);
         return texPanel;
     }
 
@@ -481,7 +508,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
-        autoGroupPersonsField.setText(FieldName.AUTHOR);
+        autoGroupPersonsField.setText(StandardField.AUTHOR.getName());
         return autoPanel;
     }
 
@@ -584,6 +611,28 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             setNameFontItalic(false);
         }
         getDialogPane().lookupButton(ButtonType.OK).setDisable(!okEnabled);
+    }
+
+    private void openBrowseDialog() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+            .addExtensionFilter(StandardFileType.AUX)
+            .withDefaultExtension(StandardFileType.AUX)
+            .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(relativize(file.toAbsolutePath()).toString()));
+    }
+
+    private Path relativize(Path path) {
+        List<Path> fileDirectories = getFileDirectoriesAsPaths();
+        return FileUtil.relativize(path, fileDirectories);
+    }
+
+    private List<Path> getFileDirectoriesAsPaths() {
+        List<Path> fileDirs = new ArrayList<>();
+        MetaData metaData = basePanel.getBibDatabaseContext().getMetaData();
+        metaData.getLaTexFileDirectory(prefs.getFilePreferences().getUser())
+                .ifPresent(laTexFileDirectory -> fileDirs.add(laTexFileDirectory));
+
+        return fileDirs;
     }
 
     private String fromTextFlowToHTMLString(TextFlow textFlow) {

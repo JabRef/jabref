@@ -30,7 +30,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.preferences.JabRefPreferences;
 
-public class NameFormatterTab extends Pane implements PrefsTab {
+public class NameFormatterTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -151,8 +151,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
             }
         });
 
-        Button help = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on Name Formatting"),
-                                                                                    HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getCommand());
+        Button help = factory.createIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER));
         HBox toolbar = new HBox();
         toolbar.getChildren().addAll(addName, addLast, add, delete, help);
         tabPanel.setBottom(toolbar);
@@ -228,4 +227,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Name formatter");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

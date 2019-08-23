@@ -8,6 +8,7 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -19,11 +20,10 @@ public class DuplicationChecker {
     /** use a map instead of a set since I need to know how many of each key is in there */
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-
     /**
      * Checks if there is more than one occurrence of this key
      */
-    public boolean isDuplicateCiteKeyExisting(String citeKey) {
+    private boolean isDuplicateCiteKeyExisting(String citeKey) {
         return getNumberOfKeyOccurrences(citeKey) > 1;
     }
 
@@ -85,7 +85,7 @@ public class DuplicationChecker {
 
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
-        if (fieldChangedEvent.getFieldName().equals(BibEntry.KEY_FIELD)) {
+        if (fieldChangedEvent.getField().equals(InternalField.KEY_FIELD)) {
             removeKeyFromSet(fieldChangedEvent.getOldValue());
             addKeyToSet(fieldChangedEvent.getNewValue());
         }

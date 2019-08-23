@@ -1,14 +1,10 @@
 package org.jabref.gui.preferences;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import javax.swing.AbstractAction;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,17 +36,17 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
 
-class TableColumnsTab extends Pane implements PrefsTab {
+class TableColumnsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-    private final TableView colSetup;
+    private final TableView<TableRow> colSetup;
     private final JabRefFrame frame;
 
     private final CheckBox urlColumn;
@@ -229,8 +225,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         ActionFactory factory = new ActionFactory(prefs.getKeyBindingRepository());
 
-        Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(Localization.lang("Help on special fields"),
-                                                                                          HelpFile.SPECIAL_FIELDS).getCommand());
+        Button helpButton = factory.createIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS));
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
         qualityColumn = new CheckBox(Localization.lang("Show quality"));
@@ -299,7 +294,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         builder.add(tabPanel, 1, 5);
         Button buttonOrder = new Button("Update to current column order");
         buttonOrder.setPrefSize(300, 30);
-        buttonOrder.setOnAction(e -> new UpdateOrderAction());
+        buttonOrder.setOnAction(e -> updateOrderAction());
         builder.add(buttonOrder, 1, 7);
     }
 
@@ -321,6 +316,9 @@ class TableColumnsTab extends Pane implements PrefsTab {
         if (extraFileColumns.isSelected()) {
             List<String> desiredColumns = prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getSelectionModel().getSelectedIndex();
+            if (listSize < 0) {
+                listSize = 0;
+            }
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
                 indicesToSelect[i] = listSize + 1;
@@ -388,12 +386,12 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         public TableRow() {
             name = new SimpleStringProperty("");
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
             this.name = new SimpleStringProperty(name);
-            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
+            length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name, double length) {
@@ -507,7 +505,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
             for (TableRow tr : data) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
-                widths.add(String.valueOf(tr.getLength()));
+                widths.add(String.valueOf(Double.valueOf(tr.getLength()).intValue()));
             }
 
             // Finally, we store the new preferences.
@@ -517,44 +515,36 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
     }
 
-    class UpdateOrderAction extends AbstractAction {
-
-        public UpdateOrderAction() {
-            super(Localization.lang("Update to current column order"));
+    private void updateOrderAction() {
+        BasePanel panel = frame.getCurrentBasePanel();
+        if (panel == null) {
+            return;
         }
+        // idea: sort elements according to value stored in hash, keep
+        // everything not inside hash/mainTable as it was
+        final HashMap<String, Integer> map = new HashMap<>();
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BasePanel panel = frame.getCurrentBasePanel();
-            if (panel == null) {
-                return;
+        // first element (#) not inside data
+        /*
+        for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
+            String name = column.getText();
+            if ((name != null) && !name.isEmpty()) {
+                map.put(name.toLowerCase(Locale.ROOT), i);
             }
-            // idea: sort elements according to value stored in hash, keep
-            // everything not inside hash/mainTable as it was
-            final HashMap<String, Integer> map = new HashMap<>();
-
-            // first element (#) not inside data
-            /*
-            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
-                String name = column.getText();
-                if ((name != null) && !name.isEmpty()) {
-                    map.put(name.toLowerCase(Locale.ROOT), i);
-                }
-            }
-            */
-            Collections.sort(data, (o1, o2) -> {
-                Integer n1 = map.get(o1.getName());
-                Integer n2 = map.get(o2.getName());
-                if ((n1 == null) || (n2 == null)) {
-                    return 0;
-                }
-                return n1.compareTo(n2);
-            });
-
-            colSetup.setItems(data);
-            colSetup.refresh();
-            tableChanged = true;
         }
+        */
+        data.sort((o1, o2) -> {
+            Integer n1 = map.get(o1.getName());
+            Integer n2 = map.get(o2.getName());
+            if ((n1 == null) || (n2 == null)) {
+                return 0;
+            }
+            return n1.compareTo(n2);
+        });
+
+        colSetup.setItems(data);
+        colSetup.refresh();
+        tableChanged = true;
     }
 
     @Override
@@ -566,4 +556,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Entry table columns");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

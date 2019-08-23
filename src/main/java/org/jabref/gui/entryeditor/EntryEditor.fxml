@@ -40,7 +40,14 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
-            <Button fx:id="generateCiteKeyButton" styleClass="narrow"/>
+            <Button styleClass="icon-button,narrow" onAction="#generateCiteKeyButton">
+                <graphic>
+                    <JabRefIconView glyph="MAKE_KEY"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Generate BibTeX key"/>
+                </tooltip>
+            </Button>
             <Button fx:id="fetcherButton" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="REFRESH"/>

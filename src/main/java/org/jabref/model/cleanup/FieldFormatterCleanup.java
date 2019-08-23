@@ -2,33 +2,36 @@ package org.jabref.model.cleanup;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 
 /**
  * Formats a given entry field with the specified formatter.
  */
 public class FieldFormatterCleanup implements CleanupJob {
 
-    private final String field;
+    private final Field field;
     private final Formatter formatter;
 
-    public FieldFormatterCleanup(String field, Formatter formatter) {
+    public FieldFormatterCleanup(Field field, Formatter formatter) {
         this.field = field;
         this.formatter = formatter;
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if (FieldName.INTERNAL_ALL_FIELD.equalsIgnoreCase(field)) {
+        if (InternalField.INTERNAL_ALL_FIELD.equals(field)) {
             return cleanupAllFields(entry);
-        } else if (FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD.equalsIgnoreCase(field)) {
+        } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD.equals(field)) {
             return cleanupAllTextFields(entry);
         } else {
             return cleanupSingleField(field, entry);
@@ -43,7 +46,7 @@ public class FieldFormatterCleanup implements CleanupJob {
      * @param entry the entry to be cleaned up
      * @return a list of changes of the entry
      */
-    private List<FieldChange> cleanupSingleField(String fieldKey, BibEntry entry) {
+    private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
             return new ArrayList<>();
@@ -70,8 +73,8 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        for (String fieldKey : entry.getFieldNames()) {
-            if (!fieldKey.equals(BibEntry.KEY_FIELD)) {
+        for (Field fieldKey : entry.getFields()) {
+            if (!fieldKey.equals(InternalField.KEY_FIELD)) {
                 fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
             }
         }
@@ -81,10 +84,10 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-        Set<String> fields = entry.getFieldNames();
-        fields.removeAll(FieldName.getNotTextFieldNames());
-        for (String fieldKey : fields) {
-            if (!fieldKey.equals(BibEntry.KEY_FIELD)) {
+        Set<Field> fields = new HashSet<>(entry.getFields());
+        fields.removeAll(FieldFactory.getNotTextFieldNames());
+        for (Field fieldKey : fields) {
+            if (!fieldKey.equals(InternalField.KEY_FIELD)) {
                 fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
             }
         }
@@ -92,7 +95,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         return fieldChanges;
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 

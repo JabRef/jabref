@@ -11,8 +11,8 @@ import java.util.Optional;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
      *
      * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
      * @param entry the entry to be cleaned-up

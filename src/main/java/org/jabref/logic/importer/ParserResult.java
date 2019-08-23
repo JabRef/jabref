@@ -5,26 +5,26 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
-    private final Map<String, EntryType> entryTypes;
+    private final Set<BibEntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
     private final List<String> duplicateKeys = new ArrayList<>();
     private BibDatabase database;
-    private MetaData metaData = new MetaData();
+    private MetaData metaData;
     private Path file;
     private boolean invalid;
     private boolean toOpenTab;
@@ -39,10 +39,10 @@ public class ParserResult {
     }
 
     public ParserResult(BibDatabase database) {
-        this(database, new MetaData(), new HashMap<>());
+        this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(BibDatabase database, MetaData metaData, Map<String, EntryType> entryTypes) {
+    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.entryTypes = Objects.requireNonNull(entryTypes);
@@ -90,7 +90,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
-    public Map<String, EntryType> getEntryTypes() {
+    public Set<BibEntryType> getEntryTypes() {
         return entryTypes;
     }
 

@@ -1,17 +1,15 @@
 package org.jabref.gui.push;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
+import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 public class PushToLyxSettings extends PushToApplicationSettings {
 
-    @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(path);
+    public PushToLyxSettings(PushToApplication application, DialogService dialogService) {
+        super(application, dialogService);
+        path.setText(Globals.prefs.get(JabRefPreferences.LYXPIPE));
+        commandLabel.setText(Localization.lang("Path to LyX pipe") + ":");
     }
 }

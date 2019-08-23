@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root prefWidth="650.0" spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.preferences.GeneralTabView">
+    <children>
+        <Label styleClass="titleHeader" text="%General"/>
+        <GridPane hgap="10.0" vgap="4.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+                <ColumnConstraints hgrow="SOMETIMES"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <Label text="%Language"/>
+                <ComboBox fx:id="language" prefWidth="200.0" GridPane.columnIndex="1"/>
+                <Label text="%Default encoding" GridPane.rowIndex="1"/>
+                <ComboBox fx:id="defaultEncoding" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="%Default bibliography mode" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </children>
+        </GridPane>
+        <CheckBox fx:id="inspectionWarningDuplicate" text="%Warn about unresolved duplicates when closing inspection window"/>
+        <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
+        <CheckBox fx:id="enforceLegalKeys" text="%Enforce legal characters in BibTeX keys"/>
+        <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
+        <CheckBox fx:id="memoryStickMode" text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"/>
+        <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef."/>
+        <CheckBox fx:id="showAdvancedHints" text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
+
+        <Label styleClass="sectionHeader" text="%Entry owner"/>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <CheckBox fx:id="markOwner" text="%Mark new entries with owner name"/>
+                <TextField fx:id="markOwnerName" HBox.hgrow="ALWAYS"/>
+                <CheckBox fx:id="markOwnerOverwrite" text="%Overwrite">
+                    <tooltip>
+                        <Tooltip text="%If a pasted or imported entry already has the field set, overwrite."/>
+                    </tooltip>
+                </CheckBox>
+                <Button fx:id="markOwnerHelp" prefWidth="20.0"/>
+            </children>
+        </HBox>
+
+        <Label styleClass="sectionHeader" text="%Time stamp"/>
+        <CheckBox fx:id="markTimestamp" text="%Mark new entries with addition date"/>
+        <HBox spacing="10.0">
+            <children>
+                <GridPane hgap="10.0" vgap="4.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <Label fx:id="markTimeStampFormatLabel" text="%Date format"/>
+                        <TextField fx:id="markTimeStampFormat" prefWidth="200.0" GridPane.columnIndex="1"/>
+                        <CheckBox fx:id="markTimeStampOverwrite" text="%Overwrite" GridPane.columnIndex="2">
+                            <tooltip>
+                                <Tooltip text="%If a pasted or imported entry already has the field set, overwrite."/>
+                            </tooltip>
+                        </CheckBox>
+                        <Button fx:id="markTimeStampHelp" prefWidth="20.0" GridPane.columnIndex="3"/>
+                        <Label fx:id="markTimeStampFieldNameLabel" text="%Field name" GridPane.rowIndex="1"/>
+                        <TextField fx:id="markTimeStampFieldName" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </children>
+                </GridPane>
+            </children>
+        </HBox>
+        <CheckBox fx:id="updateTimeStamp" text="%Update timestamp on modification"/>
+    </children>
+</fx:root>

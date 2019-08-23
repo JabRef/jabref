@@ -15,7 +15,8 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class AbbreviateAction implements BaseAction {
 
     @Override
     public void action() {
+        panel.output(Localization.lang("Abbreviating..."));
         BackgroundTask.wrap(this::abbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
@@ -44,8 +46,6 @@ public class AbbreviateAction implements BaseAction {
     }
 
     private String abbreviate() {
-        panel.output(Localization.lang("Abbreviating..."));
-
         List<BibEntry> entries = panel.getSelectedEntries();
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
@@ -57,7 +57,7 @@ public class AbbreviateAction implements BaseAction {
         // Collect all callables to execute in one collection.
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
-                for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+                for (Field journalField : FieldFactory.getJournalNameFields()) {
                     if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
                         return true;
                     }

@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.fileformat.GvkParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -56,20 +57,11 @@ public class GvkParserTest {
             assertNotNull(entries);
             assertEquals(5, entries.size());
 
-            BibEntry entry = entries.get(0);
-            assertEquals(Optional.empty(), entry.getField("subtitle"));
-
-            entry = entries.get(1);
-            assertEquals(Optional.of("C"), entry.getField("subtitle"));
-
-            entry = entries.get(2);
-            assertEquals(Optional.of("Word"), entry.getField("subtitle"));
-
-            entry = entries.get(3);
-            assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
-
-            entry = entries.get(4);
-            assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
+            assertEquals(Optional.empty(), entries.get(0).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("C"), entries.get(1).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("Word"), entries.get(2).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("Word1 word2"), entries.get(3).getField(StandardField.SUBTITLE));
+            assertEquals(Optional.of("Word1 word2"), entries.get(4).getField(StandardField.SUBTITLE));
         }
     }
 }

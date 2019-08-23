@@ -33,7 +33,7 @@ public class JabRefException extends Exception {
     @Override
     public String getLocalizedMessage() {
         if (localizedMessage == null) {
-            LOGGER.debug("No localized message exception message defined. Falling back to getMessage().");
+            LOGGER.debug("No localized exception message defined. Falling back to getMessage().");
             return getMessage();
         } else {
             return localizedMessage;

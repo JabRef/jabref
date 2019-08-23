@@ -39,7 +39,6 @@ public class DBMSConnection implements DatabaseConnection {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
             LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
-
             throw e;
         }
     }

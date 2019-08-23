@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -20,7 +23,7 @@ import org.jabref.preferences.JabRefPreferences;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
-class EntryEditorPrefsTab extends Pane implements PrefsTab {
+class EntryEditorPrefsTab extends Pane implements PreferencesTab {
 
     private final CheckBox autoOpenForm;
     private final CheckBox defSource;
@@ -30,6 +33,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     private final CheckBox autoComplete;
     private final CheckBox recommendations;
     private final CheckBox acceptRecommendations;
+    private final CheckBox latexCitations;
     private final CheckBox validation;
     private final RadioButton autoCompBoth;
     private final RadioButton autoCompFF;
@@ -50,6 +54,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
+        builder.setVgap(7);
 
         autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
         defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
@@ -59,6 +64,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
         acceptRecommendations = new CheckBox(Localization.lang("Accept recommendations from Mr. DLib"));
+        latexCitations = new CheckBox(Localization.lang("Show 'LaTeX Citations' tab"));
         validation = new CheckBox(Localization.lang("Show validation messages"));
 
         // allowed name formats
@@ -82,10 +88,12 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         // autoCompFields text field:
         autoComplete.setOnAction(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
 
+        // Editor options title
         Label editorOptions = new Label(Localization.lang("Editor options"));
         editorOptions.getStyleClass().add("sectionHeader");
         builder.add(editorOptions, 1, 1);
-        builder.add(new Separator(), 2, 1);
+
+        // Editor options configuration
         builder.add(autoOpenForm,  1, 2);
         builder.add(defSource,  1, 3);
         builder.add(emacsMode, 1, 4);
@@ -93,52 +101,71 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(emacsRebindCtrlF, 1, 6);
         builder.add(recommendations, 1, 7);
         builder.add(acceptRecommendations, 1, 8);
-        builder.add(validation, 1, 9);
-        builder.add(new Label(""), 1, 10);
+        builder.add(latexCitations, 1, 9);
+        builder.add(validation, 1, 10);
+        builder.add(new Label(""), 1, 11);
 
+        builder.add(new Separator(), 1, 13);
+
+        // Autocompletion options title
         Label autocompletionOptions = new Label(Localization.lang("Autocompletion options"));
         autocompletionOptions.getStyleClass().add("sectionHeader");
-        builder.add(autocompletionOptions, 1, 10);
-        builder.add(autoComplete,   1, 11);
+        builder.add(autocompletionOptions, 1, 15);
+        builder.add(autoComplete,   1, 16);
 
         Label useFields = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
-        builder.add(useFields, 1, 12);
-        builder.add(autoCompFields, 2, 12);
-        builder.add(new Label(""), 1, 13);
+        builder.add(useFields, 1, 17);
+        builder.add(autoCompFields, 2, 17);
+        builder.add(new Label(""), 1, 18);
 
+        builder.add(new Separator(), 1, 21);
+
+        // Name format title
         Label nameFormat = new Label(Localization.lang("Name format used for autocompletion"));
         nameFormat.getStyleClass().add("sectionHeader");
+        builder.add(nameFormat, 1, 23);
+
+        // Name format configuration
         final ToggleGroup autocompletionToggleGroup = new ToggleGroup();
-        builder.add(nameFormat, 1, 14);
-        builder.add(autoCompFF, 1, 15);
-        builder.add(autoCompLF,  1, 16);
-        builder.add(autoCompBoth,  1, 17);
+        builder.add(autoCompFF, 1, 24);
+        builder.add(autoCompLF,  1, 25);
+        builder.add(autoCompBoth,  1, 26);
         autoCompFF.setToggleGroup(autocompletionToggleGroup);
         autoCompLF.setToggleGroup(autocompletionToggleGroup);
         autoCompBoth.setToggleGroup(autocompletionToggleGroup);
-        builder.add(new Label(""), 1, 18);
+        builder.add(new Label(""), 1, 27);
 
+        builder.add(new Separator(), 1, 30);
+
+        // Treatement of first names title
         Label treatment = new Label(Localization.lang("Treatment of first names"));
         treatment.getStyleClass().add("sectionHeader");
+        builder.add(treatment, 1, 32);
+
+        // Treatment of first names configuration
         final ToggleGroup treatmentOfFirstNamesToggleGroup = new ToggleGroup();
-        builder.add(treatment, 1, 19);
-        builder.add(firstNameModeAbbr,  1, 20);
-        builder.add(firstNameModeFull, 1, 21);
-        builder.add(firstNameModeBoth,  1, 22);
+        builder.add(firstNameModeAbbr,  1, 33);
+        builder.add(firstNameModeFull, 1, 34);
+        builder.add(firstNameModeBoth,  1, 35);
         firstNameModeAbbr.setToggleGroup(treatmentOfFirstNamesToggleGroup);
         firstNameModeFull.setToggleGroup(treatmentOfFirstNamesToggleGroup);
         firstNameModeBoth.setToggleGroup(treatmentOfFirstNamesToggleGroup);
 
-        final ToggleGroup group = new ToggleGroup();
+        builder.add(new Separator(), 1, 38);
+
+        // Default drag & drop title
         Label linkFileOptions = new Label(Localization.lang("Default drag & drop action"));
         linkFileOptions.getStyleClass().add("sectionHeader");
+        builder.add(linkFileOptions, 1, 40);
+
+        // Default drag & drop configuration
+        final ToggleGroup group = new ToggleGroup();
         copyFile = new RadioButton(Localization.lang("Copy file to default file folder"));
         linkFile = new RadioButton(Localization.lang("Link file (without copying)"));
         renameCopyFile = new RadioButton(Localization.lang("Copy, rename and link file"));
-        builder.add(linkFileOptions, 1, 23);
-        builder.add(copyFile, 1, 24);
-        builder.add(linkFile, 1, 25);
-        builder.add(renameCopyFile, 1, 26);
+        builder.add(copyFile, 1, 41);
+        builder.add(linkFile, 1, 42);
+        builder.add(renameCopyFile, 1, 43);
         copyFile.setToggleGroup(group);
         linkFile.setToggleGroup(group);
         renameCopyFile.setToggleGroup(group);
@@ -168,6 +195,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
         acceptRecommendations.setSelected(prefs.getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS));
+        latexCitations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS));
         autoComplete.setSelected(autoCompletePreferences.shouldAutoComplete());
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
 
@@ -214,6 +242,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, recommendations.isSelected());
         prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendations.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS, latexCitations.isSelected());
         prefs.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, validation.isSelected());
         boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
         boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
@@ -279,4 +308,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Entry editor");
     }
+
+    @Override
+    public List<String> getRestartWarnings() { return new ArrayList<>(); }
 }

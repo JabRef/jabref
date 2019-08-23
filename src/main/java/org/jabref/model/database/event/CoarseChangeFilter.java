@@ -2,6 +2,7 @@ package org.jabref.model.database.event;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -12,7 +13,7 @@ import com.google.common.eventbus.Subscribe;
 public class CoarseChangeFilter {
 
     private final EventBus eventBus = new EventBus();
-    private String lastFieldChanged;
+    private Field lastFieldChanged;
     private final BibDatabaseContext context;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
@@ -29,10 +30,10 @@ public class CoarseChangeFilter {
         } else {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-            boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getFieldName());
+            boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getField());
 
             if (fieldChange.getDelta() > 1 || isEditOnNewField) {
-                lastFieldChanged = fieldChange.getFieldName();
+                lastFieldChanged = fieldChange.getField();
                 eventBus.post(event);
             }
         }

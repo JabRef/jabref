@@ -4,7 +4,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -15,6 +18,9 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
+import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
@@ -34,6 +40,10 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
+    XmpPreferences getXMPPreferences();
+
+    AutoLinkPreferences getAutoLinkPreferences();
+
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
@@ -44,9 +54,9 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    Map<String, List<String>> getEntryEditorTabList();
+    Map<String, Set<Field>> getEntryEditorTabList();
 
-    Boolean getEnforceLegalKeys();
+    boolean getEnforceLegalKeys();
 
     Map<String, String> getCustomTabsNamesAndFields();
 
@@ -72,13 +82,13 @@ public interface PreferencesService {
 
     String getExportWorkingDirectory();
 
+    void setExportWorkingDirectory(String layoutFileDirString);
+
     Charset getDefaultEncoding();
 
     void setDefaultEncoding(Charset encoding);
 
     String getUser();
-
-    void setExportWorkingDirectory(String layoutFileDirString);
 
     SaveOrderConfig loadExportSaveOrder();
 
@@ -87,4 +97,12 @@ public interface PreferencesService {
     boolean shouldWarnAboutDuplicatesForImport();
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
+
+    void saveCustomEntryTypes();
+
+    boolean getAllowIntegerEdition();
+
+    FileDragDropPreferenceType getEntryEditorFileLinkPreference();
+
+    EntryEditorPreferences getEntryEditorPreferences();
 }

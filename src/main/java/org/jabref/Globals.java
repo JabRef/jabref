@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,10 +21,12 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.StandardSystemProperty;
+import com.mashape.unirest.http.Unirest;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
@@ -59,6 +62,7 @@ public class Globals {
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
+    public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
@@ -125,6 +129,9 @@ public class Globals {
 
     public static void stopBackgroundTasks() {
         stopTelemetryClient();
+        try {
+            Unirest.shutdown();
+        } catch (IOException ignore) { }
     }
 
     public static Optional<TelemetryClient> getTelemetryClient() {

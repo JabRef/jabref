@@ -1,7 +1,7 @@
 package org.jabref.gui.customizefields;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -9,6 +9,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -27,10 +29,10 @@ public class CustomizeGeneralFieldsDialogViewModel {
     private void setInitialFieldsText() {
         StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<String, List<String>> tab : preferences.getEntryEditorTabList().entrySet()) {
+        for (Map.Entry<String, Set<Field>> tab : preferences.getEntryEditorTabList().entrySet()) {
             sb.append(tab.getKey());
             sb.append(':');
-            sb.append(String.join(";", tab.getValue()));
+            sb.append(FieldFactory.serializeFieldsList(tab.getValue()));
             sb.append('\n');
         }
         fieldsText.set(sb.toString());
@@ -60,7 +62,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Field names are not allowed to contain white space or the following "
                                                    + "characters")
-                                 + ": # { } ~ , ^ &";
+                                 + ": # { } ( ) ~ , ^ & - \" ' ` ʹ \\";
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }

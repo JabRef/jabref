@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
@@ -22,6 +23,14 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
                 close();
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
                 getDefaultButton().ifPresent(Button::fire);
+            }
+
+            // all buttons in base dialogs react on enter
+            if (event.getCode() == KeyCode.ENTER) {
+                if (event.getTarget() instanceof Button) {
+                    ((Button) event.getTarget()).fire();
+                    event.consume();
+                }
             }
         });
 
