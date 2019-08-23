@@ -70,6 +70,23 @@ public class DefaultTexParserTest {
     }
 
     @Test
+    public void testFileEncoding() throws URISyntaxException {
+        Path texFile = Paths.get(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
+        Path texFile2 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
+        Path texFile3 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
+
+        TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2, texFile3));
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
+        expectedParserResult.addKey("anschließend", texFile, 1, 11, 30, "Danach wir \\cite{anschließend} mittels.");
+        expectedParserResult.addKey("Lässt", texFile2, 1, 4, 16, "Man \\cite{Lässt} auf verweisen.");
+        expectedParserResult.addKey("Läste", texFile3, 1, 13, 25, "Man einfache \\cite{Läste}.");
+
+        assertEquals(expectedParserResult, parserResult);
+    }
+
+    @Test
     public void testSingleFile() throws URISyntaxException {
         Path texFile = Paths.get(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
