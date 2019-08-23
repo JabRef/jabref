@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -13,13 +14,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -78,18 +80,17 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
             if (value) {
-                setEntryTypeForReturnAndClose(null);
+                setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
 
     }
 
-    private void addEntriesToPane(FlowPane pane, Collection<? extends EntryType> entries) {
-
-        for (EntryType entryType : entries) {
-            Button entryButton = new Button(entryType.getName());
+    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
+        for (BibEntryType entryType : entries) {
+            Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
-            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(entryType));
+            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
             pane.getChildren().add(entryButton);
         }
     }
@@ -124,7 +125,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
 
-            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -136,7 +137,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
-            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
                 customTitlePane.setVisible(false);
             } else {
@@ -162,8 +163,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    private void setEntryTypeForReturnAndClose(EntryType entryType) {
-        type = entryType;
+    private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
+        type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
         this.close();
     }

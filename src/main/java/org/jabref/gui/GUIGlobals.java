@@ -1,11 +1,10 @@
 package org.jabref.gui;
 
-import java.awt.Color;
-import java.awt.Font;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -45,20 +44,15 @@ public class GUIGlobals {
      * on Un*x is unavailable.
      */
     public static void init() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
-            EmacsKeyBindings.load();
-        }
-
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
 
         IconTheme.loadFonts();
-        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                                          Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+        GUIGlobals.currentFont = new Font(Globals.prefs.getFontFamily(), Globals.prefs.getDouble(JabRefPreferences.FONT_SIZE));
     }
 
-    public static void setFont(int size) {
-        currentFont = new Font(currentFont.getFamily(), currentFont.getStyle(), size);
+    public static void setFont(double size) {
+        currentFont = new Font(currentFont.getFamily(), size);
         // update preferences
         Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, size);
     }

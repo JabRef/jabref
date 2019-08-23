@@ -38,6 +38,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -52,19 +53,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
+    public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              JabRefPreferences preferences) {
-
-        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
+        this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                   .withTooltip(LinkedFileViewModel::getDescription)
+                   .withStringTooltip(LinkedFileViewModel::getDescription)
                    .withGraphic(LinkedFilesEditor::createFileDisplay)
                    .withContextMenu(this::createContextMenuForFile)
                    .withOnMouseClickedEvent(this::handleItemMouseClick)

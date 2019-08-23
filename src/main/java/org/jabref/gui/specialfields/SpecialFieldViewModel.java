@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.Icon;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
@@ -16,8 +15,8 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
 
 public class SpecialFieldViewModel {
 
@@ -39,10 +38,6 @@ public class SpecialFieldViewModel {
                 // otherwise, another setting does not empty the field
                 field.getValues().size() == 1,
                 getLocalization());
-    }
-
-    public Icon getRepresentingIcon() {
-        return getAction().getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
     }
 
     public JabRefIcon getIcon() {

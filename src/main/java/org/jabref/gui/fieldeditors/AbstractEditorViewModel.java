@@ -16,6 +16,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -24,19 +25,19 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class AbstractEditorViewModel extends AbstractViewModel {
-    protected final String fieldName;
+    protected final Field field;
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
     private final AutoCompleteSuggestionProvider<?> suggestionProvider;
     private final CompositeValidator fieldValidator;
     private ObjectBinding<String> fieldBinding;
 
-    public AbstractEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.fieldName = fieldName;
+    public AbstractEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.field = field;
         this.suggestionProvider = suggestionProvider;
 
         this.fieldValidator = new CompositeValidator();
-        for (ValueChecker checker : fieldCheckers.getForField(fieldName)) {
+        for (ValueChecker checker : fieldCheckers.getForField(field)) {
             FunctionBasedValidator<String> validator = new FunctionBasedValidator<>(text, value ->
                     checker.checkValue(value).map(ValidationMessage::warning).orElse(null));
             fieldValidator.addValidators(validator);
@@ -55,17 +56,17 @@ public class AbstractEditorViewModel extends AbstractViewModel {
         this.entry = entry;
 
         // We need to keep a reference to the binding since it otherwise gets discarded
-        fieldBinding = entry.getFieldBinding(fieldName);
+        fieldBinding = entry.getFieldBinding(field);
 
         BindingsHelper.bindBidirectional(
                 this.textProperty(),
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        String oldValue = entry.getField(fieldName).orElse(null);
-                        entry.setField(fieldName, newValue);
+                        String oldValue = entry.getField(field).orElse(null);
+                        entry.setField(field, newValue);
                         UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
-                        undoManager.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
+                        undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                     }
                 });
     }

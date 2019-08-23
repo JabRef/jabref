@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ public class BibDatabaseContextTest {
     public void getFileDirectoriesWithEmptyDbParent() {
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(Paths.get("biblio.bib").toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
+        List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.toString()),
                 fileDirectories);
     }
@@ -45,7 +46,7 @@ public class BibDatabaseContextTest {
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
+        List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);
     }
@@ -56,7 +57,7 @@ public class BibDatabaseContextTest {
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
+        List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);
     }
@@ -67,7 +68,7 @@ public class BibDatabaseContextTest {
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
+        List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);
     }

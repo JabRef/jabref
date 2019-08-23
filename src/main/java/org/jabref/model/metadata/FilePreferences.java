@@ -6,19 +6,20 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class FilePreferences {
     public static final String DIR_SUFFIX = "Directory";
 
     private final String user;
-    private final Map<String, String> fieldFileDirectories;
+    private final Map<Field, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
 
     public FilePreferences(String user,
-                           Map<String, String> fieldFileDirectories,
+                           Map<Field, String> fieldFileDirectories,
                            boolean bibLocationAsPrimary,
                            String fileNamePattern,
                            String fileDirPattern) {
@@ -33,7 +34,7 @@ public class FilePreferences {
         return user;
     }
 
-    public Optional<Path> getFileDirectory(String field) {
+    public Optional<Path> getFileDirectory(Field field) {
         try {
             String value = fieldFileDirectories.get(field);
             // filter empty paths
@@ -48,7 +49,7 @@ public class FilePreferences {
     }
 
     public Optional<Path> getFileDirectory() {
-        return getFileDirectory(FieldName.FILE);
+        return getFileDirectory(StandardField.FILE);
     }
 
     public boolean isBibLocationAsPrimary() {

@@ -7,6 +7,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class UndoableUnabbreviator {
 
@@ -21,15 +22,15 @@ public class UndoableUnabbreviator {
      * Unabbreviate the journal name of the given entry.
      *
      * @param entry     The entry to be treated.
-     * @param fieldName The field name (e.g. "journal")
+     * @param field The field
      * @param ce        If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean unabbreviate(BibDatabase database, BibEntry entry, String fieldName, CompoundEdit ce) {
-        if (!entry.hasField(fieldName)) {
+    public boolean unabbreviate(BibDatabase database, BibEntry entry, Field field, CompoundEdit ce) {
+        if (!entry.hasField(field)) {
             return false;
         }
-        String text = entry.getField(fieldName).get();
+        String text = entry.getField(field).get();
         String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);
@@ -45,8 +46,8 @@ public class UndoableUnabbreviator {
 
         Abbreviation abbreviation = journalAbbreviationRepository.getAbbreviation(text).get(); // must be here
         String newText = abbreviation.getName();
-        entry.setField(fieldName, newText);
-        ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
+        entry.setField(field, newText);
+        ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
         return true;
     }
 

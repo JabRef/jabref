@@ -23,9 +23,9 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -66,21 +66,21 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         switch (jsonEntry.optString("content_type")) {
             case "Books":
-                entry.setType(BiblatexEntryTypes.BOOK);
+                entry.setType(StandardEntryType.Book);
                 break;
             case "Conferences":
-                entry.setType(BiblatexEntryTypes.INPROCEEDINGS);
+                entry.setType(StandardEntryType.InProceedings);
                 break;
             case "Courses":
-                entry.setType(BiblatexEntryTypes.MISC);
+                entry.setType(StandardEntryType.Misc);
                 break;
             default:
-                entry.setType(BiblatexEntryTypes.ARTICLE);
+                entry.setType(StandardEntryType.Article);
                 break;
         }
 
-        entry.setField(FieldName.ABSTRACT, jsonEntry.optString("abstract"));
-        //entry.setField(FieldName.IEEE_ID, jsonEntry.optString("article_number"));
+        entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
+        //entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
 
         final List<String> authors = new ArrayList<>();
         JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
@@ -88,10 +88,11 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             JSONObject author = (JSONObject) authorPure;
             authors.add(author.optString("full_name"));
         });
-        entry.setField(FieldName.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
-        entry.setField(FieldName.LOCATION, jsonEntry.optString("conference_location"));
-        entry.setField(FieldName.DOI, jsonEntry.optString("doi"));
-        entry.setField(FieldName.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
+        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
+        entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
+        entry.setField(StandardField.YEAR,jsonEntry.optString("publication_year"));
+        entry.setField(StandardField.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
         if (keywordsContainer != null) {
@@ -109,17 +110,17 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             }
         }
 
-        entry.setField(FieldName.ISBN, jsonEntry.optString("isbn"));
-        entry.setField(FieldName.ISSN, jsonEntry.optString("issn"));
-        entry.setField(FieldName.ISSUE, jsonEntry.optString("issue"));
+        entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
+        entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
+        entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
         entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
-        entry.setField(FieldName.JOURNALTITLE, jsonEntry.optString("publication_title"));
-        entry.setField(FieldName.DATE, jsonEntry.optString("publication_date"));
-        entry.setField(FieldName.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
-        entry.setField(FieldName.EVENTDATE, jsonEntry.optString("conference_dates"));
-        entry.setField(FieldName.PUBLISHER, jsonEntry.optString("publisher"));
-        entry.setField(FieldName.TITLE, jsonEntry.optString("title"));
-        entry.setField(FieldName.VOLUME, jsonEntry.optString("volume"));
+        entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
+        entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
+        entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
+        entry.setField(StandardField.EVENTDATE, jsonEntry.optString("conference_dates"));
+        entry.setField(StandardField.PUBLISHER, jsonEntry.optString("publisher"));
+        entry.setField(StandardField.TITLE, jsonEntry.optString("title"));
+        entry.setField(StandardField.VOLUME, jsonEntry.optString("volume"));
 
         return entry;
     }
@@ -131,7 +132,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         String stampString = "";
 
         // Try URL first -- will primarily work for entries from the old IEEE search
-        Optional<String> urlString = entry.getField(FieldName.URL);
+        Optional<String> urlString = entry.getField(StandardField.URL);
         if (urlString.isPresent()) {
 
             Matcher documentUrlMatcher = DOCUMENT_PATTERN.matcher(urlString.get());
@@ -151,7 +152,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
+            Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());

@@ -12,6 +12,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -109,7 +110,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             // get the type of entry
-            String entryType = entry.getType();
+            EntryType entryType = entry.getType();
             // Get the arrayList corresponding to the type
             List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
             if (!typeList.isEmpty()) {

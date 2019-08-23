@@ -3,6 +3,8 @@ package org.jabref.logic.bibtex;
 import java.util.Collections;
 
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,27 +25,33 @@ public class LatexFieldFormatterTests {
 
     @Test
     public void normalizeNewlineInAbstractField() throws Exception {
-        String fieldName = "abstract";
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
 
-        // The newlines are normalized according to the globally configured newline setting in the formatter
         String expected = "{" + "lorem" + OS.NEWLINE + " ipsum lorem ipsum" + OS.NEWLINE
                 + "lorem ipsum "
                 + OS.NEWLINE + "lorem ipsum"
                 + OS.NEWLINE + "test" + "}";
 
-        String result = formatter.format(text, fieldName);
+        String result = formatter.format(text, StandardField.ABSTRACT);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void newlineAtEndOfAbstractFieldIsDeleted() throws Exception {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = formatter.format(text + OS.NEWLINE, StandardField.ABSTRACT);
+        String expected = "{" + text + "}";
 
         assertEquals(expected, result);
     }
 
     @Test
     public void preserveNewlineInAbstractField() throws Exception {
-        String fieldName = "abstract";
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
-        String result = formatter.format(text, fieldName);
+        String result = formatter.format(text, StandardField.ABSTRACT);
         String expected = "{" + text + "}";
 
         assertEquals(expected, result);
@@ -51,12 +59,9 @@ public class LatexFieldFormatterTests {
 
     @Test
     public void preserveMultipleNewlinesInAbstractField() throws Exception {
-        String fieldName = "abstract";
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum"
-                + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
-        String result = formatter.format(text, fieldName);
+        String result = formatter.format(text, StandardField.ABSTRACT);
         String expected = "{" + text + "}";
 
         assertEquals(expected, result);
@@ -64,11 +69,9 @@ public class LatexFieldFormatterTests {
 
     @Test
     public void preserveNewlineInReviewField() throws Exception {
-        String fieldName = "review";
-        // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
-        String result = formatter.format(text, fieldName);
+        String result = formatter.format(text, StandardField.REVIEW);
         String expected = "{" + text + "}";
 
         assertEquals(expected, result);
@@ -79,43 +82,45 @@ public class LatexFieldFormatterTests {
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "{I should not include additional whitespaces or tabs.}";
 
-        String title = formatter.format(original, "title");
-        String any = formatter.format(original, "anyotherfield");
+        String title = formatter.format(original, StandardField.TITLE);
+        String any = formatter.format(original, new UnknownField("anyotherfield"));
 
         assertEquals(expected, title);
         assertEquals(expected, any);
     }
 
+    @Test
     public void reportUnbalancedBracing() throws Exception {
         String unbalanced = "{";
 
-        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, "anyfield"));
+        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, new UnknownField("anyfield")));
     }
 
+    @Test
     public void reportUnbalancedBracingWithEscapedBraces() throws Exception {
         String unbalanced = "{\\}";
 
-        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, "anyfield"));
+        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, new UnknownField("anyfield")));
     }
 
     @Test
     public void tolerateBalancedBrace() throws Exception {
         String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
 
-        assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
+        assertEquals("{" + text + "}", formatter.format(text, new UnknownField("anyfield")));
     }
 
     @Test
     public void tolerateEscapeCharacters() throws Exception {
         String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
 
-        assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
+        assertEquals("{" + text + "}", formatter.format(text, new UnknownField("anyfield")));
     }
 
     @Test
     public void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+        assertEquals("jan #{ - } # feb", formatter.format(text, StandardField.MONTH));
     }
 
     @Test
@@ -124,6 +129,6 @@ public class LatexFieldFormatterTests {
                 false, Collections.emptyList(), new FieldContentParserPreferences());
         LatexFieldFormatter formatter = new LatexFieldFormatter(latexFieldFormatterPreferences);
         String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+        assertEquals("jan #{ - } # feb", formatter.format(text, StandardField.MONTH));
     }
 }

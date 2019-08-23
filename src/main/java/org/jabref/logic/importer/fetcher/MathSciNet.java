@@ -26,7 +26,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -53,7 +54,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
      */
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
-        Optional<String> mrNumberInEntry = entry.getField(FieldName.MR_NUMBER);
+        Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
         if (mrNumberInEntry.isPresent()) {
             // We are lucky and already know the id, so use it instead
             return getURLForID(mrNumberInEntry.get());
@@ -62,10 +63,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
         uriBuilder.addParameter("format", "bibtex");
 
-        entry.getFieldOrAlias(FieldName.TITLE).ifPresent(title -> uriBuilder.addParameter("ti", title));
-        entry.getFieldOrAlias(FieldName.AUTHOR).ifPresent(author -> uriBuilder.addParameter("au", author));
-        entry.getFieldOrAlias(FieldName.JOURNAL).ifPresent(journal -> uriBuilder.addParameter("jrnl", journal));
-        entry.getFieldOrAlias(FieldName.YEAR).ifPresent(year -> uriBuilder.addParameter("year", year));
+        entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("ti", title));
+        entry.getFieldOrAlias(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("au", author));
+        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journal -> uriBuilder.addParameter("jrnl", journal));
+        entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> uriBuilder.addParameter("year", year));
 
         return uriBuilder.build().toURL();
     }
@@ -111,11 +112,11 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new MoveFieldCleanup("fjournal", FieldName.JOURNAL).cleanup(entry);
-        new MoveFieldCleanup("mrclass", FieldName.KEYWORDS).cleanup(entry);
-        new FieldFormatterCleanup("mrreviewer", new ClearFormatter()).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("fjournal"), StandardField.JOURNAL).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("mrclass"), StandardField.KEYWORDS).cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("mrreviewer"), new ClearFormatter()).cleanup(entry);
         new DoiCleanup().cleanup(entry);
-        new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
 
         // Remove comments: MathSciNet prepends a <pre> html tag
         entry.setCommentsBeforeEntry("");

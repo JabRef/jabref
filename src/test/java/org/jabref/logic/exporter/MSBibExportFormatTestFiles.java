@@ -32,11 +32,11 @@ public class MSBibExportFormatTestFiles {
     public BibDatabaseContext databaseContext;
     public Charset charset;
     private Path exportedFile;
-    private MSBibExporter msBibExportFormat;
+    private MSBibExporter exporter;
     private BibtexImporter testImporter;
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
-        //we have to point it to one existing file, otherwise it will return the default class path
+        // we have to point it to one existing file, otherwise it will return the default class path
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString())
@@ -51,7 +51,7 @@ public class MSBibExportFormatTestFiles {
     void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        msBibExportFormat = new MSBibExporter();
+        exporter = new MSBibExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         exportedFile = Files.createFile(path);
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
@@ -68,7 +68,7 @@ public class MSBibExportFormatTestFiles {
                                              .getDatabase()
                                              .getEntries();
 
-        msBibExportFormat.export(databaseContext, exportedFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, charset, entries);
 
         assertEquals(Files.readAllLines(expectedFile), Files.readAllLines(exportedFile));
     }

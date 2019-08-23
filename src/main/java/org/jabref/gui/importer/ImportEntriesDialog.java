@@ -34,7 +34,9 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -129,13 +131,13 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     private Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
-        Label authors = new Label(entry.getFieldOrAliasLatexFree(FieldName.AUTHOR).orElse(""));
+        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
         authors.getStyleClass().add("authors");
-        Label title = new Label(entry.getFieldOrAliasLatexFree(FieldName.TITLE).orElse(""));
+        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
         title.getStyleClass().add("title");
-        Label year = new Label(entry.getFieldOrAliasLatexFree(FieldName.YEAR).orElse(""));
+        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
-        Label journal = new Label(entry.getFieldOrAliasLatexFree(FieldName.JOURNAL).orElse(""));
+        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
         journal.getStyleClass().add("journal");
 
         VBox entryContainer = new VBox(
@@ -143,7 +145,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                 new HBox(5, year, journal),
                 authors
         );
-        entry.getFieldOrAliasLatexFree(FieldName.ABSTRACT).ifPresent(summaryText -> {
+        entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
             TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
             summary.getStyleClass().add("summary");
             entryContainer.getChildren().add(summary);
@@ -153,13 +155,11 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         return entryContainer;
     }
 
-    private IconTheme.JabRefIcons getIcon(String type) {
-        switch (type.toLowerCase()) {
-            case "book":
-                return IconTheme.JabRefIcons.BOOK;
-            default:
-                return IconTheme.JabRefIcons.ARTICLE;
+    private IconTheme.JabRefIcons getIcon(EntryType type) {
+        if (StandardEntryType.Book.equals(type)) {
+            return IconTheme.JabRefIcons.BOOK;
         }
+        return IconTheme.JabRefIcons.ARTICLE;
     }
 
     public void unselectAll() {

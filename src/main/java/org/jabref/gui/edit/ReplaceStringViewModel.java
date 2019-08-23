@@ -1,6 +1,7 @@
 package org.jabref.gui.edit;
 
 import java.util.Objects;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -13,12 +14,14 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class ReplaceStringViewModel extends AbstractViewModel {
     private boolean allFieldReplace;
     private String findString;
     private String replaceString;
-    private String[] fieldStrings;
+    private Set<Field> fields;
     private BasePanel panel;
 
     private StringProperty findStringProperty = new SimpleStringProperty();
@@ -36,7 +39,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     public int replace() {
         findString = findStringProperty.getValue();
         replaceString = replaceStringProperty.getValue();
-        fieldStrings = fieldStringProperty.getValue().split(";");
+        fields = FieldFactory.parseFieldList(fieldStringProperty.getValue());
         boolean selOnly = selectOnlyProperty.getValue();
         allFieldReplace = allFieldReplaceProperty.getValue();
 
@@ -61,22 +64,22 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private int replaceItem(BibEntry entry, NamedCompound compound) {
         int counter = 0;
         if (this.allFieldReplace) {
-            for (String fieldName : entry.getFieldNames()) {
-                counter += replaceField(entry, fieldName, compound);
+            for (Field field : entry.getFields()) {
+                counter += replaceField(entry, field, compound);
             }
         } else {
-            for (String espFieldName : fieldStrings) {
-                counter += replaceField(entry, espFieldName, compound);
+            for (Field espField : fields) {
+                counter += replaceField(entry, espField, compound);
             }
         }
         return counter;
     }
 
-    private int replaceField(BibEntry entry, String fieldName, NamedCompound compound) {
-        if (!entry.hasField(fieldName)) {
+    private int replaceField(BibEntry entry, Field field, NamedCompound compound) {
+        if (!entry.hasField(field)) {
             return 0;
         }
-        String txt = entry.getField(fieldName).get();
+        String txt = entry.getField(field).get();
         StringBuilder stringBuilder = new StringBuilder();
         int ind;
         int piv = 0;
@@ -90,8 +93,8 @@ public class ReplaceStringViewModel extends AbstractViewModel {
         }
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
-        entry.setField(fieldName, newStr);
-        compound.addEdit(new UndoableFieldChange(entry, fieldName, txt, newStr));
+        entry.setField(field, newStr);
+        compound.addEdit(new UndoableFieldChange(entry, field, txt, newStr));
         return counter;
     }
 

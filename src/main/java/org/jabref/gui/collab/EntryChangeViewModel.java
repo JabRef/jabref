@@ -1,6 +1,7 @@
 package org.jabref.gui.collab;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +45,12 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
 
-        Set<String> allFields = new TreeSet<>();
-        allFields.addAll(memEntry.getFieldNames());
-        allFields.addAll(tmpEntry.getFieldNames());
-        allFields.addAll(diskEntry.getFieldNames());
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        allFields.addAll(memEntry.getFields());
+        allFields.addAll(tmpEntry.getFields());
+        allFields.addAll(diskEntry.getFields());
 
-        for (String field : allFields) {
+        for (Field field : allFields) {
             Optional<String> mem = memEntry.getField(field);
             Optional<String> tmp = tmpEntry.getField(field);
             Optional<String> disk = diskEntry.getField(field);
@@ -94,13 +96,13 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
         private final BibEntry entry;
         private final BibEntry tmpEntry;
-        private final String field;
+        private final Field field;
         private final String inMem;
         private final String onTmp;
         private final String onDisk;
 
-        public FieldChangeViewModel(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
-            super(field);
+        public FieldChangeViewModel(Field field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
+            super(field.getName());
             entry = memEntry;
             this.tmpEntry = tmpEntry;
             this.field = field;

@@ -118,8 +118,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             tvStyles.getSelectionModel().select(style);
-            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
-            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat("default")));
+            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getDefaultBibLayout()));
+            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getDefaultBibLayout()));
         });
     }
 

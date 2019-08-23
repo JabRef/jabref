@@ -11,6 +11,7 @@ import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 
 public class BibtexkeyDeviationChecker implements Checker {
 
@@ -36,7 +37,7 @@ public class BibtexkeyDeviationChecker implements Checker {
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("BibTeX key deviates from generated key"), entry, BibEntry.KEY_FIELD));
+                    Localization.lang("BibTeX key deviates from generated key"), entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();

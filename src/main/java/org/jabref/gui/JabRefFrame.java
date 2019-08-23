@@ -14,9 +14,6 @@ import java.util.Optional;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -121,9 +118,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
@@ -292,9 +289,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                    SwingUtilities.invokeLater(() -> {
                         DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
-                    });
                 }
             }, 60000); // run in one minute
         }
@@ -400,6 +395,8 @@ public class JabRefFrame extends BorderPane {
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
+        // TODO: javafx variant only avaiable in java 9 and updwards
+        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
         for (Window window : Window.getWindows()) {
             window.dispose();
         }
@@ -524,7 +521,8 @@ public class JabRefFrame extends BorderPane {
         pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
 
         HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE, dialogService, Globals.prefs, stateManager)),
+                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
+                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
@@ -1004,7 +1002,7 @@ public class JabRefFrame extends BorderPane {
                 autosaver.registerListener(new AutosaveUIManager(basePanel));
             }
 
-            BackupManager.start(context);
+            BackupManager.start(context, Globals.entryTypesManager, prefs);
 
             // Track opening
             trackOpenNewDatabase(basePanel);
@@ -1061,18 +1059,9 @@ public class JabRefFrame extends BorderPane {
     /**
      * Sets the indeterminate status of the progress bar.
      * <p>
-     * If not called on the event dispatch thread, this method uses SwingUtilities.invokeLater() to do the actual
-     * operation on the EDT.
      */
     public void setProgressBarIndeterminate(final boolean value) {
-        // TODO: Reimplement
-        /*
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setIndeterminate(value);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
-        }
-        */
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
     /**
@@ -1085,7 +1074,7 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistFile(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return selectedEntry.getField(FieldName.FILE).isPresent();
+            return selectedEntry.getField(StandardField.FILE).isPresent();
         }
         return false;
     }
@@ -1100,13 +1089,9 @@ public class JabRefFrame extends BorderPane {
     private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
         if (selectEntryList.size() == 1) {
             BibEntry selectedEntry = selectEntryList.get(0);
-            return (selectedEntry.getField(FieldName.URL).isPresent() || selectedEntry.getField(FieldName.DOI).isPresent());
+            return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
         }
         return false;
-    }
-
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message);
     }
 
     /**
@@ -1295,7 +1280,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void decreaseTableFontSize() {
-        int currentSize = GUIGlobals.currentFont.getSize();
+        double currentSize = GUIGlobals.currentFont.getSize();
         if (currentSize < 2) {
             return;
         }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
+import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,7 @@ class WebFetchersTest {
         // Remove special ISBN fetcher since we don't want to expose them to the user
         expected.remove(IsbnViaChimboriFetcher.class);
         expected.remove(IsbnViaEbookDeFetcher.class);
+        expected.remove(IsbnViaOttoBibFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 

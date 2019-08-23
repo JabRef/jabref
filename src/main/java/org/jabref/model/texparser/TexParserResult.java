@@ -3,10 +3,12 @@ package org.jabref.model.texparser;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
+
+import org.jabref.model.entry.BibEntry;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -50,6 +52,13 @@ public class TexParserResult {
     }
 
     /**
+     * Return a collection of citations using a BibEntry as reference.
+     */
+    public Collection<Citation> getCitationsByKey(BibEntry entry) {
+        return entry.getCiteKeyOptional().map(this::getCitationsByKey).orElse(Collections.emptyList());
+    }
+
+    /**
      * Add a list of files to fileList or nestedFiles, depending on whether this is the first list.
      */
     public void addFiles(List<Path> texFiles) {
@@ -70,24 +79,23 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-                .add("fileList = " + fileList)
-                .add("nestedFiles = " + nestedFiles)
-                .add("citations = " + citations)
-                .toString();
+        return String.format("TexParserResult{fileList=%s, nestedFiles=%s, citations=%s}",
+                this.fileList,
+                this.nestedFiles,
+                this.citations);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        TexParserResult that = (TexParserResult) o;
+        TexParserResult that = (TexParserResult) obj;
 
         return Objects.equals(fileList, that.fileList)
                 && Objects.equals(nestedFiles, that.nestedFiles)

@@ -78,7 +78,6 @@ public class Localization {
         }
         locale = langLocale;
         Locale.setDefault(locale);
-        javax.swing.JComponent.setDefaultLocale(locale);
 
         try {
             createResourceBundles(locale);
