@@ -598,7 +598,7 @@ jlink {
 
     addOptions("--bind-services")
 
-    // TODO: Remove the following as soon as the dependencies are update
+    // TODO: Remove the following as soon as the dependencies are fixed (upstream)
     // forceMerge is usually needed when some non-modular artifacts in the dependency graph use code that was previously part of the JDK
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
