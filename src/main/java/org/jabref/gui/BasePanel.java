@@ -53,7 +53,6 @@ import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preview.CitationStyleToClipboardWorker;
-import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -122,7 +121,6 @@ public class BasePanel extends StackPane {
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, BaseAction> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-    private final PreviewPanel preview;
     private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
@@ -179,8 +177,6 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
-
-        this.preview = new PreviewPanel(getBibDatabaseContext(), this, dialogService, externalFileTypes, Globals.getKeyPrefs(), preferences.getPreviewPreferences());
     }
 
     @Subscribe
@@ -262,8 +258,6 @@ public class BasePanel extends StackPane {
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, this::copy);
-
-        actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
         actions.put(Actions.CUT, this::cut);
 
@@ -357,16 +351,6 @@ public class BasePanel extends StackPane {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
-
-        actions.put(Actions.TOGGLE_PREVIEW, () -> {
-            PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
-            boolean enabled = !previewPreferences.isPreviewPanelEnabled();
-            PreviewPreferences newPreviewPreferences = previewPreferences.getBuilder()
-                                                                         .withPreviewPanelEnabled(enabled)
-                                                                         .build();
-            Globals.prefs.storePreviewPreferences(newPreviewPreferences);
-            setPreviewActive(enabled);
-        });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
@@ -679,7 +663,6 @@ public class BasePanel extends StackPane {
                                                          .stream()
                                                          .findFirst()
                                                          .ifPresent(entry -> {
-                                                             preview.setEntry(entry);
                                                              entryEditor.setEntry(entry);
                                                          }));
 
@@ -816,9 +799,7 @@ public class BasePanel extends StackPane {
     }
 
     private void adjustSplitter() {
-        if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            splitPane.setDividerPositions(Globals.prefs.getPreviewPreferences().getPreviewPanelDividerPosition().doubleValue());
-        } else if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == BasePanelMode.SHOWING_EDITOR) {
             splitPane.setDividerPositions(preferences.getEntryEditorDividerPosition());
         }
     }
@@ -844,17 +825,11 @@ public class BasePanel extends StackPane {
     }
 
     private void showBottomPane(BasePanelMode newMode) {
-        Node pane;
-        switch (newMode) {
-            case SHOWING_PREVIEW:
-                pane = preview;
-                break;
-            case SHOWING_EDITOR:
-                pane = entryEditor;
-                break;
-            default:
-                throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
+        if (newMode != BasePanelMode.SHOWING_EDITOR) {
+            throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
         }
+        Node pane = entryEditor;
+
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
         } else {
@@ -867,23 +842,6 @@ public class BasePanel extends StackPane {
     private void showAndEdit() {
         if (!mainTable.getSelectedEntries().isEmpty()) {
             showAndEdit(mainTable.getSelectedEntries().get(0));
-        }
-    }
-
-    /**
-     * Sets the given preview panel as the bottom component in the split panel. Updates the mode to SHOWING_PREVIEW.
-     *
-     * @param entry The entry to show in the preview.
-     */
-    private void showPreview(BibEntry entry) {
-        showBottomPane(BasePanelMode.SHOWING_PREVIEW);
-
-        preview.setEntry(entry);
-    }
-
-    private void showPreview() {
-        if (!mainTable.getSelectedEntries().isEmpty()) {
-            showPreview(mainTable.getSelectedEntries().get(0));
         }
     }
 
@@ -901,8 +859,7 @@ public class BasePanel extends StackPane {
                                                              .withPreviewCyclePosition(newPosition)
                                                              .build();
         Globals.prefs.storePreviewPreferences(previewPreferences);
-
-        preview.updateLayout(previewPreferences);
+        entryEditor.updatePreviewInTabs(previewPreferences);
     }
 
     /**
@@ -910,7 +867,7 @@ public class BasePanel extends StackPane {
      */
     public void closeBottomPane() {
         mode = BasePanelMode.SHOWING_NOTHING;
-        splitPane.getItems().removeAll(entryEditor, preview);
+        splitPane.getItems().remove(entryEditor);
     }
 
     /**
@@ -932,23 +889,17 @@ public class BasePanel extends StackPane {
     /**
      * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which
      * takes care of the rest.
-     *
-     * @param editor The entry editor to close.
      */
-    public void entryEditorClosing(EntryEditor editor) {
-        if (Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()) {
-            showPreview(editor.getEntry());
-        } else {
-            closeBottomPane();
-        }
+    public void entryEditorClosing() {
+        closeBottomPane();
         mainTable.requestFocus();
     }
 
     /**
-     * Closes the entry editor or preview panel if it is showing the given entry.
+     * Closes the entry editor if it is showing the given entry.
      */
-    public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry)) || ((mode == BasePanelMode.SHOWING_PREVIEW))) {
+    private void ensureNotShowingBottomPanel(BibEntry entry) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -996,7 +947,7 @@ public class BasePanel extends StackPane {
         return bibDatabaseContext.getDatabase();
     }
 
-    public boolean showDeleteConfirmationDialog(int numberOfEntries) {
+    private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
@@ -1029,13 +980,7 @@ public class BasePanel extends StackPane {
             return;
         }
 
-        if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                                 .getBuilder()
-                                                                 .withPreviewPanelDividerPosition(position)
-                                                                 .build();
-            Globals.prefs.storePreviewPreferences(previewPreferences);
-        } else if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }
     }
@@ -1091,14 +1036,6 @@ public class BasePanel extends StackPane {
 
     public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    private void setPreviewActive(boolean enabled) {
-        if (enabled) {
-            showPreview();
-        } else {
-            preview.close();
-        }
     }
 
     public CountingUndoManager getUndoManager() {
@@ -1351,15 +1288,6 @@ public class BasePanel extends StackPane {
             }
 
             markChangedOrUnChanged();
-        }
-    }
-
-    private class PrintPreviewAction implements BaseAction {
-
-        @Override
-        public void action() {
-            showPreview();
-            preview.print();
         }
     }
 }
