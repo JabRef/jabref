@@ -56,15 +56,15 @@ public class FindFullTextAction extends SimpleCommand {
 
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Look up full text documents"),
-                    Localization.lang(
-                            "You are about to look up full text documents for %0 entries.",
-                            String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel"));
+                                                                                  Localization.lang("Look up full text documents"),
+                                                                                  Localization.lang(
+                                                                                                    "You are about to look up full text documents for %0 entries.",
+                                                                                                    String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                                                                                                                                    + Localization.lang("JabRef will send at least one request per entry to a publisher.")
+                                                                                                                                    + "\n"
+                                                                                                                                    + Localization.lang("Do you still want to continue?"),
+                                                                                  Localization.lang("Look up full text documents"),
+                                                                                  Localization.lang("Cancel"));
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
@@ -72,22 +72,25 @@ public class FindFullTextAction extends SimpleCommand {
             }
         }
 
-       Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+
             @Override
             protected Map<BibEntry, Optional<URL>> call() {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-                util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
+                List<BibEntry> changed = util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
 
-                for (BibEntry entry : basePanel.getSelectedEntries()) {
-                    List<LinkedFile> fileList = entry.getFiles();
-                    if (fileList.isEmpty()) {
+                for (BibEntry entry : changed) {
+                    if (entry.getFiles().isEmpty()) {
                         FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
                         downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    } else {
+                        downloads.put(entry, Optional.empty());
                     }
                     updateProgress(++count, basePanel.getSelectedEntries().size());
                 }
+
                 return downloads;
             }
         };
@@ -95,9 +98,9 @@ public class FindFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
 
         dialogService.showProgressDialogAndWait(
-                Localization.lang("Look up full text documents"),
-                Localization.lang("Looking for full text document..."),
-                findFullTextsTask);
+                                                Localization.lang("Look up full text documents"),
+                                                Localization.lang("Looking for full text document..."),
+                                                findFullTextsTask);
 
         Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
@@ -112,16 +115,19 @@ public class FindFullTextAction extends SimpleCommand {
                 if (!dir.isPresent()) {
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"));
+                                                         Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                                                                                   + " -> " + Localization.lang("File"));
                     return;
                 }
                 //Download and link full text
                 addLinkedFileFromURL(result.get(), entry, dir.get());
 
+            } else if (!result.isPresent() && !entry.getFiles().isEmpty()) {
+                dialogService.notify(Localization.lang("Full text document found already on disk for entry %0", entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                       entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
         }
     }
@@ -140,25 +146,25 @@ public class FindFullTextAction extends SimpleCommand {
         if (!entry.getFiles().contains(newLinkedFile)) {
 
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                    newLinkedFile,
-                    entry,
-                    basePanel.getBibDatabaseContext(),
-                    Globals.TASK_EXECUTOR,
-                    dialogService,
-                    JabRefPreferences.getInstance().getXMPPreferences(),
-                    JabRefPreferences.getInstance().getFilePreferences(), 
-                    ExternalFileTypes.getInstance());
+                                                                     newLinkedFile,
+                                                                     entry,
+                                                                     basePanel.getBibDatabaseContext(),
+                                                                     Globals.TASK_EXECUTOR,
+                                                                     dialogService,
+                                                                     JabRefPreferences.getInstance().getXMPPreferences(),
+                                                                     JabRefPreferences.getInstance().getFilePreferences(),
+                                                                     ExternalFileTypes.getInstance());
 
             try {
                 URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
                 BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
-                            destination,
-                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
+                                                                                    destination,
+                                                                                    basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                           entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 });
                 Globals.TASK_EXECUTOR.execute(downloadTask);
             } catch (MalformedURLException exception) {
@@ -166,7 +172,7 @@ public class FindFullTextAction extends SimpleCommand {
             }
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
-                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                   entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
     }
 }
