@@ -1,6 +1,6 @@
 package org.jabref.model.entry.types;
 
-public interface EntryType {
+public interface EntryType<T extends Enum<T>> {
 
     /**
      * Returns the tag name of the entry type.
@@ -10,4 +10,6 @@ public interface EntryType {
     String getName();
 
     String getDisplayName();
+
+
 }

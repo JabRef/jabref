@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-public enum IEEETranEntryType implements EntryType {
+public enum IEEETranEntryType implements EntryType<IEEETranEntryType> {
     IEEEtranBSTCTL("IEEEtranBSTCTL"),
     Electronic("Electronic"),
     Patent("Patent"),
