@@ -48,4 +48,9 @@ public class OldCommandWrapper extends CommandBase {
     public void setExecutable(boolean executable) {
         this.executable.bind(BindingsHelper.constantOf(executable));
     }
+
+    @Override
+    public String toString() {
+        return this.command.toString();
+    }
 }
