@@ -12,10 +12,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;

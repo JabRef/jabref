@@ -3,12 +3,13 @@ package org.jabref.logic.msbib;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.HashBiMap;
 
@@ -87,10 +88,10 @@ public class MSBibMapping {
         entryTypeMapping.put("Book", StandardEntryType.Book);
         entryTypeMapping.put("BookSection", StandardEntryType.Book);
         entryTypeMapping.put("JournalArticle", StandardEntryType.Article);
-        entryTypeMapping.put("ArticleInAPeriodical", StandardEntryType.Periodical);
+        entryTypeMapping.put("ArticleInAPeriodical", IEEETranEntryType.Periodical);
         entryTypeMapping.put("ConferenceProceedings", StandardEntryType.InProceedings);
         entryTypeMapping.put("Report", StandardEntryType.TechReport);
-        entryTypeMapping.put("Patent", StandardEntryType.Patent);
+        entryTypeMapping.put("Patent", IEEETranEntryType.Patent);
         entryTypeMapping.put("InternetSite", StandardEntryType.Online);
 
         return entryTypeMapping.getOrDefault(msbibType, StandardEntryType.Misc);
@@ -113,9 +114,9 @@ public class MSBibMapping {
         entryTypeMapping.put(StandardEntryType.MastersThesis, MSBibEntryType.Report);
         entryTypeMapping.put(StandardEntryType.PhdThesis, MSBibEntryType.Report);
         entryTypeMapping.put(StandardEntryType.Unpublished, MSBibEntryType.Report);
-        entryTypeMapping.put(StandardEntryType.Patent, MSBibEntryType.Patent);
+        entryTypeMapping.put(IEEETranEntryType.Patent, MSBibEntryType.Patent);
         entryTypeMapping.put(StandardEntryType.Misc, MSBibEntryType.Misc);
-        entryTypeMapping.put(StandardEntryType.Electronic, MSBibEntryType.ElectronicSource);
+        entryTypeMapping.put(IEEETranEntryType.Electronic, MSBibEntryType.ElectronicSource);
         entryTypeMapping.put(StandardEntryType.Online, MSBibEntryType.InternetSite);
 
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);

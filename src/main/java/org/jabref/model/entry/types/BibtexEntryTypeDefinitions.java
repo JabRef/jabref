@@ -1,9 +1,10 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.model.entry.field.IEEEField;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
@@ -13,7 +14,7 @@ import org.jabref.model.entry.field.StandardField;
  * Article, Book, Booklet, Conference, Inbook, Incollection, Inproceedings,
  * Manual, Mastersthesis, Misc, Phdthesis, Proceedings, Techreport, Unpublished
  */
-public class BibtexEntryTypes {
+public class BibtexEntryTypeDefinitions {
     /**
      * An article from a journal or magazine.
      * <p>
@@ -176,20 +177,9 @@ public class BibtexEntryTypes {
             .withImportantFields(StandardField.MONTH, StandardField.YEAR)
             .build();
 
-    /**
-     * This type is used by the IEEEtran.bst to control the appearance of the bibliography
-     */
-    private static final BibEntryType IEEETRANBSTCTL = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.IEEEtranBSTCTL)
-            .withDetailFields(IEEEField.CTLUSE_ARTICLE_NUMBER, IEEEField.CTLUSE_PAPER, IEEEField.CTLUSE_FORCED_ETAL,
-                    IEEEField.CTLUSE_URL, IEEEField.CTLMAX_NAMES_FORCED_ETAL, IEEEField.CTLNAMES_SHOW_ETAL,
-                    IEEEField.CTLUSE_ALT_SPACING, IEEEField.CTLALT_STRETCH_FACTOR, IEEEField.CTLDASH_REPEATED_NAMES,
-                    IEEEField.CTLNAME_FORMAT_STRING, IEEEField.CTLNAME_LATEX_CMD, IEEEField.CTLNAME_URL_PREFIX)
-            .build();
-
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
-            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC, IEEETRANBSTCTL);
+            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
 
-    private BibtexEntryTypes() {
+    private BibtexEntryTypeDefinitions() {
     }
 }

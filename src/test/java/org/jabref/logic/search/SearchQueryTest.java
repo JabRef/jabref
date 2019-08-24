@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -122,7 +122,7 @@ public class SearchQueryTest {
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
 
-        assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
+        assertFalse(new SearchQuery("BiblatexEntryType", true, true).isMatch(entry));
         assertTrue(new SearchQuery("asdf", true, true).isMatch(entry));
         assertTrue(new SearchQuery("author=asdf", true, true).isMatch(entry));
     }

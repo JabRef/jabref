@@ -22,7 +22,7 @@ import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 public class BibtexKeyPatternPanel extends Pane {

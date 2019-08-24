@@ -1,4 +1,4 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class UnknownEntryType implements EntryType {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         UnknownEntryType that = (UnknownEntryType) o;

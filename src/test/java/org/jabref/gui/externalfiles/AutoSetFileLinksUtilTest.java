@@ -11,7 +11,7 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;

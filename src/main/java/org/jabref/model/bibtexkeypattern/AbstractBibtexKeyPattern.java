@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an

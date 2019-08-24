@@ -94,7 +94,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (preferences.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             selectedBiblatexModeProperty.setValue(BibDatabaseMode.BIBLATEX);
         } else {
-            selectedBiblatexModeProperty.setValue(BibDatabaseMode.BIBLATEX);
+            selectedBiblatexModeProperty.setValue(BibDatabaseMode.BIBTEX);
         }
 
         inspectionWarningDuplicateProperty.setValue(preferences.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
