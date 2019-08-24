@@ -93,7 +93,7 @@ public class BibtexExtractor {
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
             String yearCandidate = input.substring(matcher.start(), matcher.end());
-            Integer intYearCandidate = Integer.parseInt(yearCandidate);
+            int intYearCandidate = Integer.parseInt(yearCandidate);
             if ((intYearCandidate > 1700) && (intYearCandidate <= Calendar.getInstance().get(Calendar.YEAR))) {
                 year = yearCandidate;
                 return fixSpaces(input.replace(year, YEAR_TAG));
