@@ -3,6 +3,7 @@ package org.jabref.model.entry.types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntryType;
@@ -50,7 +51,6 @@ public class EntryTypeFactory {
         List<EntryType> types = new ArrayList<>(Arrays.<EntryType> asList(StandardEntryType.values()));
         types.addAll(Arrays.<EntryType> asList(IEEETranEntryType.values()));
 
-        return types.stream().filter(type -> type.getName().equals(typeName)).findFirst().orElse(new UnknownEntryType(typeName));
-
+        return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
     }
 }
