@@ -352,9 +352,6 @@ public class BasePanel extends StackPane {
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
-        actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
-
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
