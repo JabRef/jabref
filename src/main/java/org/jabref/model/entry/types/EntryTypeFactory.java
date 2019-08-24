@@ -1,7 +1,12 @@
 package org.jabref.model.entry.types;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.util.OptionalUtil;
 
 public class EntryTypeFactory {
 
@@ -22,10 +27,10 @@ public class EntryTypeFactory {
         } else if ((type1 == null) || (type2 == null)) {
             return false;
         } else {
-            return type1.getType().equals(type2.getType())
-                    && type1.getRequiredFields().equals(type2.getRequiredFields())
-                    && type1.getOptionalFields().equals(type2.getOptionalFields())
-                    && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
+            return Objects.equals(type1.getType(), type2.getType())
+                   && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
+                   && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
+                   && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
         }
     }
 
@@ -42,6 +47,10 @@ public class EntryTypeFactory {
     }
 
     public static EntryType parse(String typeName) {
-        return OptionalUtil.orElse(StandardEntryType.fromName(typeName), new UnknownEntryType(typeName));
+
+        List<EntryType> types = new ArrayList<>(Arrays.<EntryType> asList(StandardEntryType.values()));
+        types.addAll(Arrays.<EntryType> asList(IEEETranEntryType.values()));
+
+        return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
     }
 }

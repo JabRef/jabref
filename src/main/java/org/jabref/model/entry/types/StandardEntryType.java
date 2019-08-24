@@ -1,8 +1,6 @@
 package org.jabref.model.entry.types;
 
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.Optional;
 
 public enum StandardEntryType implements EntryType {
     // BibTeX
@@ -42,12 +40,6 @@ public enum StandardEntryType implements EntryType {
 
     StandardEntryType(String displayName) {
         this.displayName = displayName;
-    }
-
-    public static Optional<StandardEntryType> fromName(String name) {
-        return Arrays.stream(StandardEntryType.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
     }
 
     @Override

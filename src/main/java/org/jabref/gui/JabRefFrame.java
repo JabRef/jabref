@@ -52,6 +52,7 @@ import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
+import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
@@ -772,6 +773,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
+                factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1240,7 +1242,7 @@ public class JabRefFrame extends BorderPane {
                             textInput.cut();
                             break;
                         case PASTE:
-                            textInput.paste();
+                            // handled by FX in TextInputControl#paste
                             break;
                         default:
                             throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
@@ -1255,7 +1257,7 @@ public class JabRefFrame extends BorderPane {
                             getCurrentBasePanel().cut();
                             break;
                         case PASTE:
-                            getCurrentBasePanel().paste();
+                            // handled by FX in TextInputControl#paste
                             break;
                         default:
                             throw new IllegalStateException("Only cut/copy/paste supported but got " + command);

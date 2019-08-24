@@ -100,6 +100,35 @@ class LayoutTest {
                 layoutText);
     }
 
+    @Test
+    public void beginConditionals() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Author");
+
+        // || (OR)
+        String layoutText = layout("\\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author}", entry);
+
+        assertEquals("Author", layoutText);
+
+        // && (AND)
+        layoutText = layout("\\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author}", entry);
+
+        assertEquals("", layoutText);
+
+        // ! (NOT)
+        layoutText = layout("\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}", entry);
+
+        assertEquals("(no year)", layoutText);
+
+        // combined (!a&&b)
+        layoutText = layout(
+                "\\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{!editor&&author}" +
+                "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
+
+        assertEquals("Author", layoutText);
+
+    }
+
     /**
      * Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
      */
