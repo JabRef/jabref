@@ -24,9 +24,9 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;

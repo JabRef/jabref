@@ -21,10 +21,10 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.http.client.utils.URIBuilder;

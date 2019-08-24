@@ -20,12 +20,13 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class RisImporter extends Importer {
 
@@ -121,7 +122,7 @@ public class RisImporter extends Importer {
                         } else if ("CHAP".equals(value)) {
                             type = StandardEntryType.InCollection;
                         } else if ("PAT".equals(value)) {
-                            type = StandardEntryType.Patent;
+                            type = IEEETranEntryType.Patent;
                         } else {
                             type = StandardEntryType.Misc;
                         }

@@ -251,6 +251,7 @@ class LayoutEntry {
 
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
+        boolean negated = false;
         if (type == LayoutHelper.IS_GROUP_START) {
             field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text), database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
@@ -258,8 +259,9 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(part), database);
-                if (!field.isPresent()) {
+                negated = part.startsWith("!");
+                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
+                if (!(field.isPresent() ^ negated)) {
                     break;
                 }
             }
@@ -268,14 +270,15 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(part), database);
-                if (field.isPresent()) {
+                negated = part.startsWith("!");
+                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
+                if (field.isPresent() ^ negated) {
                     break;
                 }
             }
         }
 
-        if ((!field.isPresent()) || ((type == LayoutHelper.IS_GROUP_START)
+        if ((!(field.isPresent() ^ negated)) || ((type == LayoutHelper.IS_GROUP_START)
                 && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
         } else {

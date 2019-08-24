@@ -9,9 +9,9 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
-import org.jabref.model.entry.UnknownEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,6 +98,35 @@ class LayoutTest {
         assertEquals(
                 "<font face=\"arial\"><BR><BR><b>Abstract: </b> &ntilde; &ntilde; &iacute; &imath; &imath;</font>",
                 layoutText);
+    }
+
+    @Test
+    public void beginConditionals() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Author");
+
+        // || (OR)
+        String layoutText = layout("\\begin{editor||author}\\format[HTMLChars]{\\author}\\end{editor||author}", entry);
+
+        assertEquals("Author", layoutText);
+
+        // && (AND)
+        layoutText = layout("\\begin{editor&&author}\\format[HTMLChars]{\\author}\\end{editor&&author}", entry);
+
+        assertEquals("", layoutText);
+
+        // ! (NOT)
+        layoutText = layout("\\begin{!year}\\format[HTMLChars]{(no year)}\\end{!year}", entry);
+
+        assertEquals("(no year)", layoutText);
+
+        // combined (!a&&b)
+        layoutText = layout(
+                "\\begin{!editor&&author}\\format[HTMLChars]{\\author}\\end{!editor&&author}" +
+                "\\begin{editor&&!author}\\format[HTMLChars]{\\editor} (eds.)\\end{editor&&!author}", entry);
+
+        assertEquals("Author", layoutText);
+
     }
 
     /**

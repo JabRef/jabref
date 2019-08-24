@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 
