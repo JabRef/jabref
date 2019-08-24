@@ -2,6 +2,7 @@ package org.jabref.logic.texparser;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
@@ -27,8 +28,8 @@ public class DefaultTexParser implements TexParser {
     private static final String TEX_EXT = ".tex";
 
     /**
-     * It is allowed to add new cite commands for pattern matching.
-     * Some valid examples: "citep", "[cC]ite", and "[cC]ite(author|title|year|t|p)?".
+     * It is allowed to add new cite commands for pattern matching. Some valid examples: "citep", "[cC]ite", and
+     * "[cC]ite(author|title|year|t|p)?".
      */
     private static final String[] CITE_COMMANDS = {
             "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
@@ -76,7 +77,9 @@ public class DefaultTexParser implements TexParser {
                 continue;
             }
 
-            try (LineNumberReader lineNumberReader = new LineNumberReader(new CharsetDetector().setText(Files.readAllBytes(file)).detect().getReader())) {
+            try (
+                    Reader reader = new CharsetDetector().setText(Files.readAllBytes(file)).detect().getReader();
+                    LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
                 for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                     // Skip comments and blank lines.
                     if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
@@ -86,15 +89,19 @@ public class DefaultTexParser implements TexParser {
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 }
             } catch (ClosedChannelException e) {
-                LOGGER.error("Parsing has been interrupted");
-                return null;
+                // User changed the underlying LaTeX file
+                // We ignore this error and just continue with parsing
+                LOGGER.info("Parsing has been interrupted");
             } catch (IOException | UncheckedIOException e) {
-                LOGGER.error("Error while parsing file {}", file, e);
+                // Some weired error during reading
+                // We ignore this error and just continue with parsing
+                LOGGER.info("Error while parsing file {}", file, e);
             }
         }
 
         // Parse all files referenced by TEX files, recursively.
         if (!referencedFiles.isEmpty()) {
+            // modifies class variable texParserResult
             parse(referencedFiles);
         }
 
