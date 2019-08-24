@@ -806,7 +806,6 @@ public class JabRefFrame extends BorderPane {
 
                     new SeparatorMenuItem(),
 
-                    factory.createCheckMenuItem(StandardActions.TOGGLE_PREVIEW, new OldDatabaseCommandWrapper(Actions.TOGGLE_PREVIEW, this, stateManager), Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()),
                     factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, stateManager)),
                     factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, stateManager)),
 
