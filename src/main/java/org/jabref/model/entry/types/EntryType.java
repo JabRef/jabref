@@ -11,5 +11,4 @@ public interface EntryType<T extends Enum<T>> {
 
     String getDisplayName();
 
-
 }

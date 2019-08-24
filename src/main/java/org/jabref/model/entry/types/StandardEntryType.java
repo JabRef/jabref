@@ -42,7 +42,6 @@ public enum StandardEntryType implements EntryType<StandardEntryType> {
         this.displayName = displayName;
     }
 
-
     @Override
     public String getName() {
         return displayName.toLowerCase(Locale.ENGLISH);
