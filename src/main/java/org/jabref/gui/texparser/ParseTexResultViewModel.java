@@ -1,6 +1,8 @@
 package org.jabref.gui.texparser;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,8 +35,10 @@ public class ParseTexResultViewModel extends AbstractViewModel {
         this.citationList = FXCollections.observableArrayList();
 
         Set<String> newEntryKeys = resolverResult.getNewEntries().stream().map(entry -> entry.getCiteKeyOptional().orElse("")).collect(Collectors.toSet());
-        resolverResult.getCitations().asMap().forEach((entry, citations) ->
-                referenceList.add(new ReferenceViewModel(entry, newEntryKeys.contains(entry), citations)));
+        for (Map.Entry<String, Collection<Citation>> entry : resolverResult.getCitations().asMap().entrySet()) {
+            String key = entry.getKey();
+            referenceList.add(new ReferenceViewModel(key, newEntryKeys.contains(key), entry.getValue()));
+        }
 
         this.importButtonDisabled = new SimpleBooleanProperty(referenceList.stream().noneMatch(ReferenceViewModel::isHighlighted));
     }

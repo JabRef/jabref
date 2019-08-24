@@ -114,8 +114,9 @@ public class DefaultTexParser implements TexParser {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
-                  .forEach(key -> texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+            for (String key : citeMatch.group(CITE_GROUP).split(",")) {
+                texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+            }
         }
     }
 
@@ -126,12 +127,17 @@ public class DefaultTexParser implements TexParser {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
-            Arrays.stream(bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(","))
-                  .map(bibString -> file.toAbsolutePath().getParent().resolve(bibString.endsWith(BIB_EXT)
-                          ? bibString
-                          : String.format("%s%s", bibString, BIB_EXT)))
-                  .filter(bibFile -> bibFile.toFile().exists())
-                  .forEach(bibFile -> texParserResult.addBibFile(file, bibFile));
+            for (String bibString : bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(",")) {
+                bibString = bibString.trim();
+                Path bibFile = file.getParent().resolve(
+                        bibString.endsWith(BIB_EXT)
+                                ? bibString
+                                : String.format("%s%s", bibString, BIB_EXT));
+
+                if (bibFile.toFile().exists()) {
+                    texParserResult.addBibFile(file, bibFile);
+                }
+            }
         }
     }
 
