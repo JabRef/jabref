@@ -40,7 +40,7 @@ import org.jabref.model.entry.field.Field;
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-
+    public PreviewPanel previewPanel;
     protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
@@ -50,7 +50,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private GridPane gridPane;
-    public PreviewPanel previewPanel;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         this.isCompressed = compressed;

@@ -89,7 +89,7 @@ public class EntryEditor extends BorderPane {
     @Inject private StateManager stateManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private CountingUndoManager undoManager;
-    public final List<EntryEditorTab> entryEditorTabs = new LinkedList<>();
+    private final List<EntryEditorTab> entryEditorTabs = new LinkedList<>();
 
     public EntryEditor(BasePanel panel, ExternalFileTypes externalFileTypes) {
         this.panel = panel;
