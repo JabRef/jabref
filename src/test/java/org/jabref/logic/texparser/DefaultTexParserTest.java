@@ -70,7 +70,46 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void testFileEncoding() throws URISyntaxException {
+    public void testFileEncodingUtf8() throws URISyntaxException {
+        Path texFile = Paths.get(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
+
+        TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.getFileList().add(texFile);
+        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+
+        assertEquals(expectedParserResult, parserResult);
+    }
+
+    @Test
+    public void testFileEncodingIso88591() throws URISyntaxException {
+        Path texFile = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
+
+        TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.getFileList().add(texFile);
+        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+
+        assertEquals(expectedParserResult, parserResult);
+    }
+
+    @Test
+    public void testFileEncodingIso885915() throws URISyntaxException {
+        Path texFile = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
+
+        TexParserResult parserResult = new DefaultTexParser().parse(texFile);
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.getFileList().add(texFile);
+        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+
+        assertEquals(expectedParserResult, parserResult);
+    }
+
+    @Test
+    public void testFileEncodingForThreeFiles() throws URISyntaxException {
         Path texFile = Paths.get(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
         Path texFile2 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
         Path texFile3 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
@@ -79,9 +118,9 @@ public class DefaultTexParserTest {
         TexParserResult expectedParserResult = new TexParserResult();
 
         expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
-        expectedParserResult.addKey("anschließend", texFile, 1, 11, 30, "Danach wir \\cite{anschließend} mittels.");
-        expectedParserResult.addKey("Lässt", texFile2, 1, 4, 16, "Man \\cite{Lässt} auf verweisen.");
-        expectedParserResult.addKey("Läste", texFile3, 1, 13, 25, "Man einfache \\cite{Läste}.");
+        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        expectedParserResult.addKey("anykey", texFile2, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        expectedParserResult.addKey("anykey", texFile3, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
 
         assertEquals(expectedParserResult, parserResult);
     }

@@ -77,6 +77,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         currentEntry = entry;
         Optional<String> citeKey = entry.getCiteKeyOptional();
+
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
         } else {
