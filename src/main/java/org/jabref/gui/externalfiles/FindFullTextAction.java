@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -70,14 +72,20 @@ public class FindFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+       Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
             @Override
             protected Map<BibEntry, Optional<URL>> call() {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+                util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
+
                 for (BibEntry entry : basePanel.getSelectedEntries()) {
-                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-                    downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    List<LinkedFile> fileList = entry.getFiles();
+                    if (fileList.isEmpty()) {
+                        FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                        downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    }
                     updateProgress(++count, basePanel.getSelectedEntries().size());
                 }
                 return downloads;
