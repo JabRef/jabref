@@ -228,12 +228,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setChecks(List<Field> fields) {
-        columnsListProperty.stream().filter(item -> fields.contains(item.getField()))
-                .forEach(item -> checkedColumnsModelProperty.getValue().check(item));
+        checkedColumnsModelProperty.getValue().clearChecks();
+        fields.stream().forEach(field -> columnsListProperty.getValue().stream()
+                .filter(column -> column.getField().equals(field))
+                .findAny().ifPresent(item -> checkedColumnsModelProperty.getValue().check(item)));
     }
 
     public void moveColumnUp() {
-
         TableColumnsItemModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
         int row = columnsListProperty.getValue().indexOf(selectedColumn);
         if (selectedColumn == null || row < 1) {
@@ -311,6 +312,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         }
 
         preferences.storeColumnPreferences(newColumnPreferences);
+        frame.getBasePanelList().forEach(panel -> panel.getMainTable().updateColumns(newColumnPreferences));
     }
 
     @Override

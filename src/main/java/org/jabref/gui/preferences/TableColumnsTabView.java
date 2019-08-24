@@ -147,12 +147,23 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
     }
 
+    /**
+     * Sets the focus of a CheckListView to the first entry matching the search term build up by
+     * the pressed character. As the columnListView in TableColumnsTabView is not sorted alphabetically
+     * the use of this is small.
+     *
+     * @param list The list in which to search.
+     * @param keypressed The KeyEvent of the pressed key.
+     */
+
     private void jumpToSearchKey(CheckListView<TableColumnsItemModel> list, KeyEvent keypressed) {
+        final int LIST_SEARCH_RESET_TIME = 1000;
+
         if (keypressed.getCharacter() == null) {
             return;
         }
 
-        if (System.currentTimeMillis() - lastKeyPressTime < 1000) {
+        if (System.currentTimeMillis() - lastKeyPressTime < LIST_SEARCH_RESET_TIME) {
             listSearchTerm += keypressed.getCharacter().toLowerCase();
         } else {
             listSearchTerm = keypressed.getCharacter().toLowerCase();
