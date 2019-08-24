@@ -9,6 +9,7 @@ This log lists the architectural decisions for JabRef.
 - [ADR-0002](0002-use-slf4j-for-logging.md) - Use slf4j together with log4j2 for logging
 - [ADR-0003](0003-use-gradle-as-build-tool.md) - Use Gradle as build tool
 - [ADR-0004](0004-use-mariadb-connector.md) - Use MariaDB Connector
+- [ADR-0005](0005-fully-support-utf8-only-for-latex-files.md) - Fully Support UTF-8 Only For LaTeX Files
 
 <!-- adrlogstop -->
 
