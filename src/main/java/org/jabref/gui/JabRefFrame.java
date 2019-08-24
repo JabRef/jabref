@@ -1228,6 +1228,11 @@ public class JabRefFrame extends BorderPane {
         }
 
         @Override
+        public String toString() {
+            return this.command.toString();
+        }
+
+        @Override
         public void execute() {
             Node focusOwner = mainStage.getScene().getFocusOwner();
             if (focusOwner != null) {
