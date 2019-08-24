@@ -9,14 +9,13 @@ import javafx.beans.property.StringProperty;
 import org.jabref.Globals;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class BibtexExtractorViewModel {
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
     private final BibDatabaseContext bibdatabaseContext;
-
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext) {
         this.bibdatabaseContext = bibdatabaseContext;
@@ -32,7 +31,6 @@ public class BibtexExtractorViewModel {
         BibEntry entity = extractor.extract(inputTextProperty.getValue());
         this.bibdatabaseContext.getDatabase().insertEntry(entity);
         trackNewEntry(StandardEntryType.Article);
-
     }
 
     private void trackNewEntry(EntryType type) {

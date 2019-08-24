@@ -7,9 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class BibtexExtractor {
 
@@ -24,28 +24,28 @@ public class BibtexExtractor {
     private static final String LASTNAME_GROUP = "LASTNAME";
 
     private static final Pattern URL_PATTERN = Pattern.compile(
-                                                               "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
-                                                               "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
-                                                               "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
-                                                               Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
+                    "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
+                    "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern YEAR_PATTERN = Pattern.compile(
-                                                                "\\d{4}",
-                                                                Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            "\\d{4}",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern AUTHOR_PATTERN = Pattern.compile(
-                                                                  "(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+),?\\s(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})" +
-                                                                  "\\s*(and|,|\\.)*",
-                                                                  Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            "(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+),?\\s(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})" +
+                    "\\s*(and|,|\\.)*",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern AUTHOR_PATTERN_2 = Pattern.compile(
-                                                                    "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
-                                                                    "\\s*(and|,|\\.)*",
-                                                                    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
+                    "\\s*(and|,|\\.)*",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern PAGES_PATTERN = Pattern.compile(
-                                                                 "(p.)?\\s?\\d+(-\\d+)?",
-                                                                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            "(p.)?\\s?\\d+(-\\d+)?",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private final ArrayList<String> urls = new ArrayList<>();
     private final ArrayList<String> authors = new ArrayList<>();
@@ -148,9 +148,7 @@ public class BibtexExtractor {
                                .replace(YEAR_TAG, "")
                                .replace(PAGES_TAG, ""));
             lastParts.addAll(Arrays.asList(input.substring(delimiterIndex + 2).split(",|\\.")));
-        }
-
-        else {
+        } else {
             lastParts.addAll(Arrays.asList(input.substring(afterAuthorsIndex).split(",|\\.")));
         }
         int nonDigitParts = 0;
