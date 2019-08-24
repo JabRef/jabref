@@ -22,7 +22,7 @@ public class DiffHighlighting {
 
     public static List<Text> generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
-        List<Text> result = stringList.stream().map(DiffHighlighting::forUnchanged).collect(Collectors.toList());
+        List<Text> result = stringList.stream().map(text -> forUnchanged(text + separator)).collect(Collectors.toList());
         List<AbstractDelta<String>> deltaList;
         try {
             deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
