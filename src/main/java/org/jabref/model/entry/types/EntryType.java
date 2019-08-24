@@ -1,6 +1,6 @@
 package org.jabref.model.entry.types;
 
-public interface EntryType<T extends Enum<T>> {
+public interface EntryType {
 
     /**
      * Returns the tag name of the entry type.

@@ -2,7 +2,7 @@ package org.jabref.model.entry.types;
 
 import java.util.Locale;
 
-public enum StandardEntryType implements EntryType<StandardEntryType> {
+public enum StandardEntryType implements EntryType {
     // BibTeX
     Article("Article"),
     Book("Book"),
