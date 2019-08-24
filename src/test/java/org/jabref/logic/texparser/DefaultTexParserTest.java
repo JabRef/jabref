@@ -43,6 +43,10 @@ public class DefaultTexParserTest {
         testMatchCite(UNRESOLVED, "\\parencite[post]{UnresolvedKey}");
         testMatchCite(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}");
         testMatchCite(EINSTEIN_C, "\\citep{Einstein1920c}");
+        testMatchCite(EINSTEIN_C, "\\autocite{Einstein1920c}");
+        testMatchCite(EINSTEIN_C, "\\Autocite{Einstein1920c}");
+        testMatchCite(DARWIN, "\\blockcquote[p. 28]{Darwin1888}{some text}");
+        testMatchCite(DARWIN, "\\textcquote[p. 18]{Darwin1888}{blablabla}");
 
         testNonMatchCite("\\citet21312{123U123n123resolvedKey}");
         testNonMatchCite("\\1cite[pr234e][post]{UnresolvedKey}");
@@ -61,6 +65,23 @@ public class DefaultTexParserTest {
         expectedParserResult.addKey(EINSTEIN_A, Paths.get(""), 1, 26, 47, citeString);
 
         assertEquals(expectedParserResult, texParserResult);
+    }
+
+    @Test
+    public void testFileEncoding() throws URISyntaxException {
+        Path texFile = Paths.get(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
+        Path texFile2 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
+        Path texFile3 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
+
+        TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2, texFile3));
+        TexParserResult expectedParserResult = new TexParserResult();
+
+        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
+        expectedParserResult.addKey("anschließend", texFile, 1, 11, 30, "Danach wir \\cite{anschließend} mittels.");
+        expectedParserResult.addKey("Lässt", texFile2, 1, 4, 16, "Man \\cite{Lässt} auf verweisen.");
+        expectedParserResult.addKey("Läste", texFile3, 1, 13, 25, "Man einfache \\cite{Läste}.");
+
+        assertEquals(expectedParserResult, parserResult);
     }
 
     @Test

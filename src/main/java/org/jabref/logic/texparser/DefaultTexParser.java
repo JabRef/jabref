@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
 
+import org.apache.tika.parser.txt.CharsetDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +33,12 @@ public class DefaultTexParser implements TexParser {
      */
     private static final String[] CITE_COMMANDS = {
             "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
-            "([aA]|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
-            "footcitetext"
+            "([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
+            "footcitetext", "(block|text)cquote"
     };
     private static final String CITE_GROUP = "key";
     private static final Pattern CITE_PATTERN = Pattern.compile(
-            String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}",
+            String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?",
                     String.join("|", CITE_COMMANDS), CITE_GROUP));
 
     private static final String BIBLIOGRAPHY_GROUP = "bib";
@@ -80,7 +81,7 @@ public class DefaultTexParser implements TexParser {
                 continue;
             }
 
-            try (LineNumberReader lineNumberReader = new LineNumberReader(Files.newBufferedReader(file))) {
+            try (LineNumberReader lineNumberReader = new LineNumberReader(new CharsetDetector().setText(Files.readAllBytes(file)).detect().getReader())) {
                 for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                     // Skip comments and blank lines.
                     if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
@@ -94,7 +95,7 @@ public class DefaultTexParser implements TexParser {
                 LOGGER.error("Parsing has been interrupted");
                 return null;
             } catch (IOException | UncheckedIOException e) {
-                LOGGER.error(String.format("%s while parsing files: %s", e.getClass().getName(), e.getMessage()));
+                LOGGER.error("Error while parsing file {}", file, e);
             }
         }
 
@@ -113,8 +114,8 @@ public class DefaultTexParser implements TexParser {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            Arrays.stream(citeMatch.group(CITE_GROUP).split(",")).forEach(key ->
-                    texParserResult.addKey(key, file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+            Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
+                  .forEach(key -> texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line));
         }
     }
 

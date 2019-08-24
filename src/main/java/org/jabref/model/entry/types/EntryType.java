@@ -1,4 +1,4 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.types;
 
 public interface EntryType {
 
@@ -10,4 +10,5 @@ public interface EntryType {
     String getName();
 
     String getDisplayName();
+
 }

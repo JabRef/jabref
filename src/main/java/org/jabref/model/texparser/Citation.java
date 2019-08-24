@@ -8,7 +8,7 @@ public class Citation {
     /**
      * The total number of characters that are shown around a cite (cite width included).
      */
-    private static final int CONTEXT_WIDTH = 200;
+    private static final int CONTEXT_WIDTH = 300;
 
     private final Path path;
     private final int line;
@@ -66,9 +66,9 @@ public class Citation {
 
         // Add three dots when the string does not contain all the line.
         return String.format("%s%s%s",
-                (start > 0) ? "... " : "",
+                (start > 0) ? "..." : "",
                 lineText.substring(start, end).trim(),
-                (end < lineLength) ? " ..." : "");
+                (end < lineLength) ? "..." : "");
     }
 
     @Override

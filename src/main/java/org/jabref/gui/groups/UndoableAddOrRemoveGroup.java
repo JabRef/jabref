@@ -50,7 +50,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
             GroupTreeNodeViewModel editedNode, int editType) {
         m_groupsRootHandle = groupsRoot;
         m_editType = editType;
-        m_subtreeRootChildCount = editedNode.getChildCount();
+        m_subtreeRootChildCount = editedNode.getChildren().size();
         // storing a backup of the whole subtree is not required when children
         // are kept
         m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? editedNode.getNode()

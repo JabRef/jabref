@@ -65,7 +65,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                   .withTooltip(LinkedFileViewModel::getDescription)
+                   .withStringTooltip(LinkedFileViewModel::getDescription)
                    .withGraphic(LinkedFilesEditor::createFileDisplay)
                    .withContextMenu(this::createContextMenuForFile)
                    .withOnMouseClickedEvent(this::handleItemMouseClick)

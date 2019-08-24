@@ -24,9 +24,9 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.StandardEntryType;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -91,6 +91,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
+        entry.setField(StandardField.YEAR,jsonEntry.optString("publication_year"));
         entry.setField(StandardField.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");

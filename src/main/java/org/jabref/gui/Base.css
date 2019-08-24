@@ -1015,6 +1015,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-warn;
 }
 
+.warning-message {
+    -fx-fill: -jr-error;
+    -fx-text-fill: -jr-error;
+}
+
 .error-icon {
     -fx-text-fill: -jr-error;
     -fx-fill: -jr-error;

@@ -13,8 +13,8 @@ import java.util.prefs.Preferences;
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.entry.EntryTypeFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
