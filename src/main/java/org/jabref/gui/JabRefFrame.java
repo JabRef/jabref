@@ -1240,7 +1240,7 @@ public class JabRefFrame extends BorderPane {
                             textInput.cut();
                             break;
                         case PASTE:
-                            textInput.paste();
+                            // handled by FX in TextInputControl#paste
                             break;
                         default:
                             throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
@@ -1255,7 +1255,7 @@ public class JabRefFrame extends BorderPane {
                             getCurrentBasePanel().cut();
                             break;
                         case PASTE:
-                            getCurrentBasePanel().paste();
+                            // handled by FX in TextInputControl#paste
                             break;
                         default:
                             throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
