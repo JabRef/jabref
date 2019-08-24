@@ -10,4 +10,5 @@ public interface EntryType {
     String getName();
 
     String getDisplayName();
+
 }
