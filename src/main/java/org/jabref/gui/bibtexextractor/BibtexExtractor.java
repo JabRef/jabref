@@ -3,6 +3,7 @@ package org.jabref.gui.bibtexextractor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,8 +18,6 @@ public class BibtexExtractor {
     private static final String URL_TAG = "[url_tag]";
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
-    private static final String TITLE_TAG = "[title_tag]";
-    private static final String JOURNAL_TAG = "[journal_tag]";
 
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
@@ -47,8 +46,8 @@ public class BibtexExtractor {
             "(p.)?\\s?\\d+(-\\d+)?",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    private final ArrayList<String> urls = new ArrayList<>();
-    private final ArrayList<String> authors = new ArrayList<>();
+    private final List<String> urls = new ArrayList<>();
+    private final List<String> authors = new ArrayList<>();
     private String year = "";
     private String pages = "";
     private String title = "";
@@ -60,8 +59,8 @@ public class BibtexExtractor {
         String inputWithoutAuthors = findAuthors(inputWithoutUrls);
         String inputWithoutYear = findYear(inputWithoutAuthors);
         String inputWithoutPages = findPages(inputWithoutYear);
-        String nonparsed = findParts(inputWithoutPages);
-        return generateEntity(nonparsed);
+        String nonParsed = findParts(inputWithoutPages);
+        return generateEntity(nonParsed);
     }
 
     private BibEntry generateEntity(String input) {
@@ -135,7 +134,6 @@ public class BibtexExtractor {
 
     private String findParts(String input) {
         ArrayList<String> lastParts = new ArrayList<>();
-        String line = input;
         int afterAuthorsIndex = input.lastIndexOf(AUTHOR_TAG);
         if (afterAuthorsIndex == -1) {
             return input;
@@ -160,15 +158,13 @@ public class BibtexExtractor {
         }
         if (nonDigitParts > 0) {
             title = lastParts.get(0);
-            line.replace(title, TITLE_TAG);
         }
         if (nonDigitParts > 1) {
             journalOrPublisher = lastParts.get(1);
-            line.replace(journalOrPublisher, JOURNAL_TAG);
         }
         if (nonDigitParts > 2) {
             isArticle = false;
         }
-        return fixSpaces(line);
+        return fixSpaces(input);
     }
 }
