@@ -38,14 +38,6 @@ class TablePrefsTab extends Pane implements PreferencesTab {
      */
     public TablePrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-        /**
-         * Added Bibtexkey to combobox.
-         *
-         * [ 1540646 ] default sort order: bibtexkey
-         *
-         * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
-         */
-
         autoResizeMode = new CheckBox(Localization.lang("Fit table horizontally on screen"));
         namesAsIs = new RadioButton(Localization.lang("Show names unchanged"));
         namesFf = new RadioButton(Localization.lang("Show 'Firstname Lastname'"));

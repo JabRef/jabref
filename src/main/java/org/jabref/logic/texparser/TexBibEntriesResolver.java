@@ -1,61 +1,68 @@
 package org.jabref.logic.texparser;
 
-import java.util.Optional;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.util.FileUpdateMonitor;
 
 public class TexBibEntriesResolver {
 
     private final BibDatabase masterDatabase;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
+        this.importFormatPreferences = importFormatPreferences;
+        this.fileMonitor = fileMonitor;
     }
 
     /**
-     * Look for BibTeX entries within the reference database for all keys inside of the TEX files.
-     * Insert these data in the list of new entries.
+     * Resolve all BibTeX entries and check if they are in the given database.
      */
-    public TexBibEntriesResolverResult resolveKeys(TexParserResult texParserResult) {
-        TexBibEntriesResolverResult result = new TexBibEntriesResolverResult(texParserResult);
-        Set<String> keySet = result.getCitationsKeySet();
+    public TexBibEntriesResolverResult resolve(TexParserResult texParserResult) {
+        TexBibEntriesResolverResult resolverResult = new TexBibEntriesResolverResult(texParserResult);
 
-        for (String key : keySet) {
-            if (result.isNotKeyIntoNewEntries(key)) {
-                Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
+        // Preload databases from BIB files.
+        Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
+                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, fileMonitor).getDatabase()));
 
-                if (entry.isPresent()) {
-                    result.insertEntry(entry.get());
-                    resolveCrossReferences(result, entry.get());
-                } else {
-                    result.addUnresolvedKey(key);
-                }
-            }
-        }
+        // Get all pairs Entry<String entryKey, Citation>.
+        Stream<Map.Entry<String, Citation>> citationsStream = texParserResult.getCitations().entries().stream().distinct();
 
-        return result;
+        Set<BibEntry> newEntries = citationsStream.flatMap(mapEntry -> apply(mapEntry, texParserResult, bibDatabases)).collect(Collectors.toSet());
+
+        // Add all new entries to the newEntries set.
+        resolverResult.getNewEntries().addAll(newEntries);
+
+        return resolverResult;
     }
 
-    /**
-     * Find cross references for inserting into the list of new entries.
-     */
-    private void resolveCrossReferences(TexBibEntriesResolverResult result, BibEntry entry) {
-        entry.getField(StandardField.CROSSREF).ifPresent(crossRef -> {
-            if (result.isNotKeyIntoNewEntries(crossRef)) {
-                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossRef);
+    private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, TexParserResult texParserResult, Map<Path, BibDatabase> bibDatabases) {
+        return texParserResult.getBibFiles().get(mapEntry.getValue().getPath()).stream().distinct().flatMap(bibFile ->
+                // Get a specific entry from an entryKey and a BIB file.
+                bibDatabases.get(bibFile).getEntriesByKey(mapEntry.getKey()).stream().distinct()
+                            // Check if there is already an entry with the same key in the given database.
+                            .filter(entry -> !entry.equals(masterDatabase.getEntryByKey(entry.getCiteKeyOptional().orElse("")).orElse(new BibEntry())))
+                            // Add cross-referencing data to the entry (fill empty fields).
+                            .map(entry -> addCrossReferencingData(entry, bibFile, bibDatabases)));
+    }
 
-                if (refEntry.isPresent()) {
-                    result.insertEntry(refEntry.get());
-                    result.increaseCrossRefsCount();
-                } else {
-                    result.addUnresolvedKey(crossRef);
-                }
-            }
-        });
+    private BibEntry addCrossReferencingData(BibEntry entry, Path bibFile, Map<Path, BibDatabase> bibDatabases) {
+        bibDatabases.get(bibFile).getReferencedEntry(entry).ifPresent(refEntry ->
+                refEntry.getFields().forEach(field -> entry.getFieldMap().putIfAbsent(field, refEntry.getFieldOrAlias(field).orElse(""))));
+
+        return entry;
     }
 }
