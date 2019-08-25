@@ -22,31 +22,31 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.xmlunit.builder.Input;
-import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
-import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
 public class MSBibExportFormatTestFiles {
 
     private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    private Path tempFile;
+    private Path exportedFile;
     private MSBibExporter exporter;
     private BibtexImporter testImporter;
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
-        //we have to point it to one existing file, otherwise it will return the default class path
+        // we have to point it to one existing file, otherwise it will return the default class path
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
-        System.out.println(resourceDir);
         try (Stream<Path> stream = Files.list(resourceDir)) {
-            return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                         .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
+            return stream.map(n -> n.getFileName().toString())
+                         .filter(n -> n.endsWith(".bib"))
+                         .filter(n -> n.startsWith("MsBib"))
+                         .collect(Collectors.toList())
+                         .stream();
         }
     }
 
@@ -56,25 +56,32 @@ public class MSBibExportFormatTestFiles {
         charset = StandardCharsets.UTF_8;
         exporter = new MSBibExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
-        tempFile = Files.createFile(path);
+        exportedFile = Files.createFile(path);
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index} file={0}")
     @MethodSource("fileNames")
     void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
+        Path expectedFile = resourceDir.resolve(xmlFileName);
         Path importFile = resourceDir.resolve(filename);
 
-        List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
+        List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8)
+                                             .getDatabase()
                                              .getEntries();
 
-        exporter.export(databaseContext, tempFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(tempFile));
+        String expected = String.join("\n", Files.readAllLines(expectedFile));
+        String actual = String.join("\n", Files.readAllLines(exportedFile));
 
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        // The order of elements changes from Windows to Travis environment somehow
+        // The order does not really matter, so we ignore it.
+        // Source: https://stackoverflow.com/a/16540679/873282
+        assertThat(expected, isSimilarTo(actual)
+                .ignoreWhitespace()
+                .normalizeWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
     }
 }

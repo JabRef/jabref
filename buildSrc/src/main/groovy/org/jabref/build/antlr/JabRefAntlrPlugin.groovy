@@ -6,7 +6,7 @@ import org.gradle.api.Project
 /**
  * Configures the project for use with ANTLR 3 or 4.
  */
-class AntlrPlugin implements Plugin<Project> {
+class JabRefAntlrPlugin implements Plugin<Project> {
 
     public static final def ANTLR3_CONFIGURATION_NAME = "antlr3"
     public static final def ANTLR4_CONFIGURATION_NAME = "antlr4"

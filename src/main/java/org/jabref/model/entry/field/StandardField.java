@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public enum StandardField implements Field {
 
-    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
+    ABSTRACT("abstract"),
     ADDENDUM("addendum"),
     ADDRESS("address"),
     AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
@@ -28,7 +28,7 @@ public enum StandardField implements Field {
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
-    COMMENT("comment", FieldProperty.MULTILINE_TEXT),
+    COMMENT("comment"),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),

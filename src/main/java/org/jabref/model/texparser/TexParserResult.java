@@ -17,13 +17,15 @@ public class TexParserResult {
 
     private final List<Path> fileList;
     private final List<Path> nestedFiles;
-
+    private final Multimap<Path, Path> bibFiles;
+  
     // BibTeXKey --> set of citations
     private final Multimap<String, Citation> citations;
 
     public TexParserResult() {
         this.fileList = new ArrayList<>();
         this.nestedFiles = new ArrayList<>();
+        this.bibFiles = HashMultimap.create();
         this.citations = HashMultimap.create();
     }
 
@@ -33,6 +35,10 @@ public class TexParserResult {
 
     public List<Path> getNestedFiles() {
         return nestedFiles;
+    }
+
+    public Multimap<Path, Path> getBibFiles() {
+        return bibFiles;
     }
 
     public Multimap<String, Citation> getCitations() {
@@ -72,6 +78,13 @@ public class TexParserResult {
     }
 
     /**
+     * Add a bibliography file to the BIB files set.
+     */
+    public void addBibFile(Path file, Path bibFile) {
+        bibFiles.put(file, bibFile);
+    }
+
+    /**
      * Add a citation to the citations multimap.
      */
     public void addKey(String key, Path file, int lineNumber, int start, int end, String line) {
@@ -81,9 +94,10 @@ public class TexParserResult {
 
     @Override
     public String toString() {
-        return String.format("TexParserResult{fileList=%s, nestedFiles=%s, citations=%s}",
+        return String.format("TexParserResult{fileList=%s, nestedFiles=%s, bibFiles=%s, citations=%s}",
                 this.fileList,
                 this.nestedFiles,
+                this.bibFiles,
                 this.citations);
     }
 
@@ -101,11 +115,12 @@ public class TexParserResult {
 
         return Objects.equals(fileList, that.fileList)
                 && Objects.equals(nestedFiles, that.nestedFiles)
+                && Objects.equals(bibFiles, that.bibFiles)
                 && Objects.equals(citations, that.citations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileList, nestedFiles, citations);
+        return Objects.hash(fileList, nestedFiles, bibFiles, citations);
     }
 }

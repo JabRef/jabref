@@ -48,7 +48,7 @@ class RegExpBasedFileFinder implements FileFinder {
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
                                         Character keywordDelimiter) {
         Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
-        StringBuffer expandedStringBuffer = new StringBuffer();
+        StringBuilder expandedStringBuffer = new StringBuilder();
         while (matcher.find()) {
             String replacement = BracketedPattern.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
             matcher.appendReplacement(expandedStringBuffer, replacement);
@@ -129,7 +129,7 @@ class RegExpBasedFileFinder implements FileFinder {
 
         // Escape handling...
         Matcher m = ESCAPE_PATTERN.matcher(fileName);
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         while (m.find()) {
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));
         }
