@@ -37,6 +37,10 @@ If not, a developer key for the JabRef project for the full version is available
 
 You can find a IntelliJ Codestyle configuration file in the folder `config`
 
+In case there are errors at the Gradle sync (and that there is no play button at the tests), fix the reference JDK.
+The current JDK is most probably JDK 8 (and not JDK 11).
+Hints are given at <https://stackoverflow.com/a/54507226/873282>.
+
 #### Eclipse
 
 Please install [EclEmma](http://eclemma.org/) for code coverage.
