@@ -94,7 +94,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.16'
     compile 'org.apache.pdfbox:xmpbox:2.0.16'
 
-    compile group: 'org.apache.tika', name: 'tika-parsers', version: '1.22'
+    compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.62'
@@ -120,6 +120,7 @@ dependencies {
     compile 'org.postgresql:postgresql:42.2.6'
 
     compile 'com.google.guava:guava:28.0-jre'
+
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-commons:8.15'

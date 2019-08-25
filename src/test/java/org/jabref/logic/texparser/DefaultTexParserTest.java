@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultTexParserTest {
+
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
     private final static String NEWTON = "Newton1999";
@@ -90,7 +91,9 @@ public class DefaultTexParserTest {
         TexParserResult expectedParserResult = new TexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
+        expectedParserResult
+                .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
 
         assertEquals(expectedParserResult, parserResult);
     }
@@ -103,7 +106,9 @@ public class DefaultTexParserTest {
         TexParserResult expectedParserResult = new TexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
+        expectedParserResult
+                .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
 
         assertEquals(expectedParserResult, parserResult);
     }
@@ -114,13 +119,17 @@ public class DefaultTexParserTest {
         Path texFile2 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
         Path texFile3 = Paths.get(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
 
-        TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2, texFile3));
+        TexParserResult parserResult = new DefaultTexParser()
+                .parse(Arrays.asList(texFile, texFile2, texFile3));
         TexParserResult expectedParserResult = new TexParserResult();
 
         expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2, texFile3));
-        expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
-        expectedParserResult.addKey("anykey", texFile2, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
-        expectedParserResult.addKey("anykey", texFile3, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        expectedParserResult
+                .addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
+        expectedParserResult
+                .addKey("anykey", texFile2, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
+        expectedParserResult
+                .addKey("anykey", texFile3, 1, 32, 45, "Danach wir anschlie�end mittels \\cite{anykey}.");
 
         assertEquals(expectedParserResult, parserResult);
     }
