@@ -1,30 +1,35 @@
 --add-modules
     // Make junit4 module visible (only required for last remaining parameterized tests)
     junit
+
 --add-modules
     // Add junit5 module dependency
     org.junit.jupiter.api
+--add-reads
+    // Make junit5 module visible
+    org.jabref=org.junit.jupiter.api
+
 --add-modules
     // Add junit5 testfx module dependency
     org.testfx.junit5
 --add-reads
-    // Make junit5 module visible
-    org.jabref=org.junit.jupiter.api
+    // Make testfx module visible
+    org.jabref=org.testfx.junit5
+
 --add-modules
     //  Add junit5 module dependency
     org.junit.jupiter.params
 --add-reads
     // Make junit5 module visible
     org.jabref=org.junit.jupiter.params
---add-reads
-    // Make testfx module visible
-    org.jabref=org.testfx.junit5
+
 --add-modules
     //  Add junit5 module dependency
     org.junit.platform.commons
 --add-reads
     // Make junit5 module visible
     org.jabref=org.junit.platform.commons
+
 --add-opens
      javafx.base/com.sun.javafx.beans=net.bytebuddy
 --add-opens
