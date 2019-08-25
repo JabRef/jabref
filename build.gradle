@@ -120,9 +120,7 @@ dependencies {
     compile 'org.postgresql:postgresql:42.2.6'
 
     compile 'com.google.guava:guava:28.0-jre'
-	implementation  'com.google.code.gson:gson:2.8.5'
-	compile 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.15'
-	compile 'org.glassfish.tyrus.ext:tyrus-extension-deflate:1.15'
+
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-commons:8.15'
