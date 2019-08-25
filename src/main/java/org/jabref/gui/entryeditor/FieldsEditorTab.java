@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
@@ -18,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -27,21 +27,20 @@ import javafx.scene.layout.RowConstraints;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.StandardField;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-
+    public PreviewPanel previewPanel;
     protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
@@ -100,7 +99,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
-        columnExpand.setPercentWidth(60);
+        columnExpand.setHgrow(Priority.ALWAYS);
 
         ColumnConstraints columnDoNotContract = new ColumnConstraints();
         columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
@@ -157,27 +156,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    private String getPrompt(Field field) {
-        Set<FieldProperty> fieldProperties = field.getProperties();
-        if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
-        } else if (fieldProperties.contains(FieldProperty.DOI)) {
-            return "10.ORGANISATION/ID";
-        } else if (fieldProperties.contains(FieldProperty.DATE)) {
-            return "YYYY-MM-DD";
-        }
-
-        if (StandardField.YEAR.equals(field)) {
-            return "YYYY";
-        } else if (StandardField.MONTH.equals(field)) {
-            return "MM or #mmm#";
-        } else if (StandardField.URL.equals(field)) {
-            return "https://";
-        }
-
-        return "";
-    }
-
     /**
      * Focuses the given field.
      */
@@ -211,6 +189,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         initPanel();
         setupPanel(entry, isCompressed, suggestionProviders, undoManager);
 
+        previewPanel.setEntry(entry);
+
         Platform.runLater(() -> {
             // Restore focus to field (run this async so that editor is already initialized correctly)
             selectedFieldName.ifPresent(this::requestFocus);
@@ -228,6 +208,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
+            previewPanel = new PreviewPanel(databaseContext, null, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -236,7 +218,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(true);
 
-            setContent(scrollPane);
+            SplitPane container = new SplitPane(scrollPane, previewPanel);
+
+            setContent(container);
         }
     }
 }

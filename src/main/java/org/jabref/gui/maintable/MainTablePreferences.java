@@ -14,7 +14,6 @@ public class MainTablePreferences {
     }
 
     public boolean resizeColumnsToFit() {
-
         return resizeColumnsToFit;
     }
 }
