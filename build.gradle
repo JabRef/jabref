@@ -129,6 +129,7 @@ dependencies {
     compile 'commons-cli:commons-cli:1.4'
 
     // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
+    // See https://bugs.documentfoundation.org/show_bug.cgi?id=117331#c8 for background information
     // Use the task bundleLibreOffice to update the bundled jar
     //compile "org.libreoffice:juh:6.2.3"
     //compile "org.libreoffice:jurt:6.2.3"
