@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 This project **does not** adhere to [Semantic Versioning](http://semver.org/).
 This file tries to follow the conventions proposed by [keepachangelog.com](http://keepachangelog.com/).
@@ -8,9 +9,10 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [5.0-alpha] 2019-08-25
+## [5.0-alpha] – 2019-08-25
 
 ### Changed
+
 - All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
@@ -81,6 +83,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 ### Fixed
+
 - We fixed an issue where JabRef died silently for the user without enough inotify instances [#4874](https://github.com/JabRef/jabref/issues/4847)
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
@@ -137,6 +140,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the "Search for unlinked local files" would throw an exception when parsing the content of a PDF-file with missing "series" information [#5128](https://github.com/JabRef/jabref/issues/5128)
 
 ### Removed
+
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
 - The number column was removed.
 - We removed the global search feature.
@@ -157,5 +161,5 @@ The changelog of JabRef 4.x is available at the [v4.x branch](https://github.com
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.0-beta...HEAD
-[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-beta
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.0-alpha...HEAD
+[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
