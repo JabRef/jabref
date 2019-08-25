@@ -139,7 +139,13 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
+    // TODO: Move somewhere more appropriate and make user-configurable
     public static boolean isSingleLineField(final Field field) {
-        return !field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
+        if (field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT)) {
+            return false;
+        }
+
+        // Treat unknown fields as multi-line fields
+        return !(field instanceof UnknownField);
     }
 }
