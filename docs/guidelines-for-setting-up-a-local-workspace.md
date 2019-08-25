@@ -1,7 +1,7 @@
 ## Prerequisites
 
-* Java Development Kit 11 with JavaFX development.
-  We recommend Liberica JDK at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
+> Java Development Kit 11 with JavaFX development.
+> We recommend Liberica JDK at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
 
  See https://github.com/JabRef/jabref/issues/2594 for the ongoing development.
 
