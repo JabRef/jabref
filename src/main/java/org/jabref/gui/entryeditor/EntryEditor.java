@@ -50,6 +50,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PreviewPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -88,6 +89,7 @@ public class EntryEditor extends BorderPane {
     @Inject private StateManager stateManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private CountingUndoManager undoManager;
+    private final List<EntryEditorTab> entryEditorTabs = new LinkedList<>();
 
     public EntryEditor(BasePanel panel, ExternalFileTypes externalFileTypes) {
         this.panel = panel;
@@ -235,7 +237,7 @@ public class EntryEditor extends BorderPane {
 
     @FXML
     public void close() {
-        panel.entryEditorClosing(EntryEditor.this);
+        panel.entryEditorClosing();
     }
 
     @FXML
@@ -261,40 +263,39 @@ public class EntryEditor extends BorderPane {
     }
 
     private List<EntryEditorTab> createTabs() {
-        List<EntryEditorTab> tabs = new LinkedList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
-        tabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager,
+        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager,
                 entryEditorPreferences.getCustomTabFieldNames(), dialogService));
 
         // General fields from preferences
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
         }
 
         // Special tabs
-        tabs.add(new MathSciNetTab());
-        tabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
-        tabs.add(new RelatedArticlesTab(this, entryEditorPreferences, dialogService));
+        entryEditorTabs.add(new MathSciNetTab());
+        entryEditorTabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
+        entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, dialogService));
 
         // Source tab
         sourceTab = new SourceTab(databaseContext, undoManager,
                 entryEditorPreferences.getLatexFieldFormatterPreferences(),
                 entryEditorPreferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager);
-        tabs.add(sourceTab);
+        entryEditorTabs.add(sourceTab);
 
         // LaTeX citations tab
-        tabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
+        entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
-        return tabs;
+        return entryEditorTabs;
     }
 
     private void recalculateVisibleTabs() {
@@ -401,5 +402,13 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
+    }
+
+    public void updatePreviewInTabs(PreviewPreferences previewPreferences) {
+        for (Tab tab : this.entryEditorTabs) {
+            if (tab instanceof FieldsEditorTab) {
+                ((FieldsEditorTab) tab).previewPanel.updateLayout(previewPreferences);
+            }
+        }
     }
 }

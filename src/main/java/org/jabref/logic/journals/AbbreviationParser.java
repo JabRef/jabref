@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -39,7 +38,8 @@ public class AbbreviationParser {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
-        try (FileReader reader = new FileReader(Objects.requireNonNull(file))) {
+        try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
+             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(StandardCharsets.UTF_8))) {
             readJournalList(reader);
         } catch (FileNotFoundException e) {
             throw e;

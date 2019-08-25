@@ -77,6 +77,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         );
     }
 
+    @Override
     public void setValues() {
         openLastStartupProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
         backupOldFileProperty.setValue(preferences.getBoolean(JabRefPreferences.BACKUP));
@@ -88,7 +89,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
         alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
 
-        mainFileDirProperty.setValue(preferences.getAsOptional(StandardField.FILE + FilePreferences.DIR_SUFFIX).orElse(""));
+        mainFileDirProperty.setValue(preferences.getAsOptional(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX).orElse(""));
         useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         if (preferences.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) { // Flipped around
             autolinkUseRegexProperty.setValue(true);
@@ -104,6 +105,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
 
+    @Override
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BACKUP, backupOldFileProperty.getValue());
@@ -119,7 +121,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
 
-        preferences.put(StandardField.FILE + FilePreferences.DIR_SUFFIX, mainFileDirProperty.getValue());
+        preferences.put(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX, mainFileDirProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
         preferences.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, autolinkUseRegexProperty.getValue());
         preferences.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, autolinkFileExactBibtexProperty.getValue());
@@ -133,6 +135,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return mainFileDirValidator.getValidationStatus();
     }
 
+    @Override
     public boolean validateSettings() {
         ValidationStatus status = mainFileDirValidationStatus();
         if (!status.isValid()) {
