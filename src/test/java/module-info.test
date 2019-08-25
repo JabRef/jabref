@@ -6,7 +6,7 @@
     org.junit.jupiter.api
 --add-modules
     // Add junit5 testfx module dependency
-    org.testfx.junit
+    org.testfx.framework.junit5
 --add-reads
     // Make junit5 module visible
     org.jabref=org.junit.jupiter.api
@@ -18,7 +18,7 @@
     org.jabref=org.junit.jupiter.params
 --add-reads
     // Make testfx module visible
-    org.jabref=org.testfx.junit
+    org.jabref=org.testfx.framework.junit5
 --add-modules
     //  Add junit5 module dependency
     org.junit.platform.commons
