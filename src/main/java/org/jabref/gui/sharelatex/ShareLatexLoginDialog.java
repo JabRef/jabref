@@ -1,29 +1,31 @@
 package org.jabref.gui.sharelatex;
 
+import javafx.scene.control.Alert.AlertType;
+
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
-import org.jabref.gui.FXDialogService;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.SharelatexConnectionProperties;
 
-public class ShareLatexLoginDialogController extends AbstractController<ShareLatexLoginDialogViewModel> {
+public class ShareLatexLoginDialog extends BaseDialog<Void> {
 
     @FXML private TextField tbAddress;
     @FXML private TextField tbUsername;
     @FXML private PasswordField tbPassword;
     @FXML private Button btnLogin;
     @Inject private ShareLatexManager manager;
+
 
     private SharelatexConnectionProperties props;
 
@@ -34,7 +36,6 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
 
     @FXML
     private void closeDialog() {
-        getStage().close();
     }
 
     @FXML
@@ -64,10 +65,17 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
 
             }
         } catch (Exception e) {
-            DialogService dlg = new FXDialogService();
+
             dlg.showErrorDialogAndWait(e);
 
         }
 
     }
+
+        FXDialog sharelatexProjectDialog = new FXDialog(AlertType.INFORMATION, "Sharelatex Project Dialog");
+        sharelatexProjectDialog.setDialogPane((DialogPane) this.getView());
+        sharelatexProjectDialog.setResizable(true);
+        sharelatexProjectDialog.show();
+    }
+
 }
