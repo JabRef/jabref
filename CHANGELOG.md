@@ -8,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [v5.0-beta] 2019-08-25
+## [5.0-alpha] 2019-08-25
 
 ### Changed
 - All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
@@ -158,4 +158,4 @@ The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v5.0-beta...HEAD
-[v5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-beta...v4.3
+[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-beta

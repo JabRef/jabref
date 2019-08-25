@@ -43,7 +43,7 @@ apply plugin: org.jabref.build.localization.LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = "5.0-dev"
+version = "5.0-alpha"
 project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
