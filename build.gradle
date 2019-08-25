@@ -155,8 +155,9 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
 
-    compile "org.glassfish.tyrus.bundles:tyrus-standalone-client:1.13.1"
-    compile "org.glassfish.tyrus.ext:tyrus-extension-deflate:1.13.1"
+    implementation  'com.google.code.gson:gson:2.8.5'
+	compile 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.15'
+	compile 'org.glassfish.tyrus.ext:tyrus-extension-deflate:1.15'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
