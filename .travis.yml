@@ -1,6 +1,5 @@
 language: java
 jdk:
-  - oraclejdk11
   - openjdk11
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
