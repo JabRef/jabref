@@ -1,9 +1,9 @@
 ## Prerequisites:
 
-* Java Development Kit 8 ([Download JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp) - or execute `choco install jdk8` when using [chocolatey](https://chocolatey.org/)).
-  Versions 9 and higher are currently not supported.
-  See https://github.com/JabRef/jabref/issues/2594 for the ongoing development.
+* Java Development Kit 11 with JavaFX development.
+  We recommend Liberica JDK at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
 
+ See https://github.com/JabRef/jabref/issues/2594 for the ongoing development.
 
 An indication that `JAVA_HOME` is not correctly set or no JDK is installed is following error message:
 
@@ -17,25 +17,28 @@ Execution failed for task ':compileJava'.
 > java.lang.ExceptionInInitializerError (no error message)
 ```
 
-
-
 ### Ensure you have a Java SDK installed
+
 * In the command line (terminal in Linux, cmd in Windows) run `javac -version`
 * If `javac` is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
 
 ### GitHub account
+
 If you do not have a GitHub account, create it at https://github.com.
 
 ### Get an IDE in place
+
 We suggest [Eclipse](https://eclipse.org/) or [IntelliJ](https://www.jetbrains.com/idea/).
 
 #### IntelliJ
+
 The community edition should be enough.
 If not, a developer key for the JabRef project for the full version is available upon request.
 
 You can find a IntelliJ Codestyle configuration file in the folder `config`
 
 #### Eclipse
+
 Please install [EclEmma](http://eclemma.org/) for code coverage.
 
 In Ubuntu Linux, you can follow one of these guidelines to Install Eclipse:
@@ -46,11 +49,14 @@ In Ubuntu Linux, you can follow one of these guidelines to Install Eclipse:
 In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
 ### Get git in place
+
 * In Debian-based distros: `sudo apt-get install git`
 * In Windows: Go to http://git-scm.com/download/win download and install it. For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/).
 
 ## Get the code
+
 ### Fork JabRef into your GitHub account
+
 1. Log into your GitHub account
 2. Go to https://github.com/JabRef/jabref 
 3. Create a fork by clicking at fork button on the right top corner
@@ -61,7 +67,6 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * In command line go to a folder you want to place the source code locally (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters.
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Update submodules: `git submodule update --init`
-
 
 ### Generating additional source codes and getting dependencies using Gradle:
 (not required for IntelliJ)
@@ -75,6 +80,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 4. `./gradlew tasks` shows many other runnable tasks.  
 
 ### Set-up Eclipse
+
 * Open Eclipse
 * To Import your JabRef project go to menu File --> Import
 
