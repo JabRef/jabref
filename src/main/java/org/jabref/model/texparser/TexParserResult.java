@@ -18,6 +18,8 @@ public class TexParserResult {
     private final List<Path> fileList;
     private final List<Path> nestedFiles;
     private final Multimap<Path, Path> bibFiles;
+  
+    // BibTeXKey --> set of citations
     private final Multimap<String, Citation> citations;
 
     public TexParserResult() {

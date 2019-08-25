@@ -896,6 +896,7 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
     }
 
+    @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
         return new EntryEditorPreferences(getEntryEditorTabList(),
                                           getLatexFieldFormatterPreferences(),
@@ -1589,7 +1590,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                Collections.singletonList(get(StandardField.FILE + FilePreferences.DIR_SUFFIX)),
+                                       Collections.singletonList(get(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX)),
                                        fileDirForDatabase);
     }
 
@@ -2034,6 +2035,7 @@ public class JabRefPreferences implements PreferencesService {
         return map;
     }
 
+    @Override
     public FileDragDropPreferenceType getEntryEditorFileLinkPreference() {
         return FileDragDropPreferenceType.valueOf(get(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE));
     }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,18 +42,17 @@ public class FieldFormatterCleanupsPanel extends GridPane {
 
     private static final String DESCRIPTION = Localization.lang("Description") + ": ";
     private final CheckBox cleanupEnabled;
+    private final FieldFormatterCleanups defaultFormatters;
+    private final List<Formatter> availableFormatters;
     private FieldFormatterCleanups fieldFormatterCleanups;
     private ListView<FieldFormatterCleanup> actionsList;
     private ComboBox<Formatter> formattersCombobox;
-    private ComboBox<Field> selectFieldCombobox;
+    private ComboBox<String> selectFieldCombobox;
     private Button addButton;
     private Label descriptionAreaText;
     private Button removeButton;
     private Button resetButton;
     private Button recommendButton;
-
-    private final FieldFormatterCleanups defaultFormatters;
-    private final List<Formatter> availableFormatters;
     private ObservableList<FieldFormatterCleanup> actions;
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
@@ -104,7 +105,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         actionsList = new ListView<>(actions);
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         new ViewModelListCellFactory<FieldFormatterCleanup>()
-                .withText(action -> action.getField() + ": " + action.getFormatter().getName())
+                .withText(action -> action.getField().getDisplayName() + ": " + action.getFormatter().getName())
                 .withStringTooltip(action -> action.getFormatter().getDescription())
                 .install(actionsList);
         add(actionsList, 1, 1, 3, 1);
@@ -164,7 +165,8 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         GridPane builder = new GridPane();
         Set<Field> fields = FieldFactory.getCommonFields();
         fields.add(InternalField.KEY_FIELD);
-        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fields));
+        Set<String> fieldsString = fields.stream().map(Field::getDisplayName).sorted().collect(Collectors.toCollection(TreeSet::new));
+        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fieldsString));
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox, 1, 1);
 
@@ -217,7 +219,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
         Formatter selectedFormatter = formattersCombobox.getValue();
-        Field field = selectFieldCombobox.getValue();
+        Field field = FieldFactory.parseField(selectFieldCombobox.getSelectionModel().getSelectedItem());
         return new FieldFormatterCleanup(field, selectedFormatter);
     }
 
@@ -242,5 +244,4 @@ public class FieldFormatterCleanupsPanel extends GridPane {
             setStatus(cleanupEnabled.isSelected());
         }
     }
-
 }

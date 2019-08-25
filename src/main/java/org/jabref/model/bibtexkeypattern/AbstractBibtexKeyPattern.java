@@ -52,15 +52,6 @@ public abstract class AbstractBibtexKeyPattern {
     }
 
     /**
-     * Remove a Bibtex key pattern from the BibtexKeyPattern.
-     *
-     * @param type a <code>String</code>
-     */
-    public void removeBibtexKeyPattern(String type) {
-        data.remove(type);
-    }
-
-    /**
      * Gets an object for a desired key from this BibtexKeyPattern or one of it's
      * parents (in the case of DatabaseBibtexKeyPattern). This method first tries to obtain the object from this
      * BibtexKeyPattern via the <code>get</code> method of <code>Hashtable</code>.
