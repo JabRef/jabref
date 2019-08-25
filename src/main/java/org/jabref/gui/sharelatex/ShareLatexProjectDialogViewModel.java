@@ -15,7 +15,6 @@ import javafx.collections.FXCollections;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.shared.MergeSharedEntryDialog;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -83,12 +82,14 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
                     Optional<BibEntry> entryFromLocalDatabase = stateManager.getActiveDatabase().get().getDatabase().getEntryByKey(identifedEntry.getCiteKey());
 
                     if (entryFromSharelatex.isPresent() && entryFromLocalDatabase.isPresent()) {
-                        MergeSharedEntryDialog dlg = new MergeSharedEntryDialog(JabRefGUI.getMainFrame(),
+
+                        /*MergeSharedEntryDialog dlg = new MergeSharedEntryDialog(JabRefGUI.getMainFrame(),
                                 entryFromLocalDatabase.get(),
                                 entryFromSharelatex.get(),
                                 stateManager.getActiveDatabase().get().getMode());
                         dlg.setMetaData(stateManager.getActiveDatabase().get().getMetaData());
                         dlg.showMergeDialog();
+                        */
                         //TODO: After merge we probably need to send the new content to the server
                     }
 

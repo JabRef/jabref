@@ -18,14 +18,14 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.SharelatexConnectionProperties;
 
-public class ShareLatexLoginDialog extends BaseDialog<Void> {
+public class ShareLatexLoginDialogView extends BaseDialog<Void> {
 
     @FXML private TextField tbAddress;
     @FXML private TextField tbUsername;
     @FXML private PasswordField tbPassword;
     @FXML private Button btnLogin;
     @Inject private ShareLatexManager manager;
-    @Inject DialogService dialogService
+    @Inject DialogService dialogService;
 
 
     private SharelatexConnectionProperties props;
@@ -68,16 +68,17 @@ public class ShareLatexLoginDialog extends BaseDialog<Void> {
             }
         } catch (Exception e) {
 
-            dlg.showErrorDialogAndWait(e);
+            dialogService.showErrorDialogAndWait(e);
 
         }
 
     }
-
+    /*
         FXDialog sharelatexProjectDialog = new FXDialog(AlertType.INFORMATION, "Sharelatex Project Dialog");
         sharelatexProjectDialog.setDialogPane((DialogPane) this.getView());
         sharelatexProjectDialog.setResizable(true);
         sharelatexProjectDialog.show();
-    }
+        */
+
 
 }

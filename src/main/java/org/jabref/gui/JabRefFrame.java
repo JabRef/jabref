@@ -1331,4 +1331,10 @@ public class JabRefFrame extends BorderPane {
             */
         }
     }
+
+    //TODO: FIXME
+    public Object getSynchronizeWithSharelatexAction() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
