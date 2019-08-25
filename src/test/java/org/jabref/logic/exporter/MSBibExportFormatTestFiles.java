@@ -22,9 +22,12 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
 public class MSBibExportFormatTestFiles {
 
@@ -70,6 +73,15 @@ public class MSBibExportFormatTestFiles {
 
         exporter.export(databaseContext, exportedFile, charset, entries);
 
-        assertEquals(Files.readAllLines(expectedFile), Files.readAllLines(exportedFile));
+        String expected = String.join("\n", Files.readAllLines(expectedFile));
+        String actual = String.join("\n", Files.readAllLines(exportedFile));
+
+        // The order of elements changes from Windows to Travis environment somehow
+        // The order does not really matter, so we ignore it.
+        // Source: https://stackoverflow.com/a/16540679/873282
+        assertThat(expected, isSimilarTo(actual)
+                .ignoreWhitespace()
+                .normalizeWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
     }
 }
