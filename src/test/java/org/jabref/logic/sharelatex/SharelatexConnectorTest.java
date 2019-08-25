@@ -1,12 +1,17 @@
 package org.jabref.logic.sharelatex;
 
+import java.net.URISyntaxException;
+
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.database.BibDatabaseContext;
+
 public class SharelatexConnectorTest {
 
     //Czrently
-    /*SharelatexConnector connector = new SharelatexConnector();
-    connector.connectToServer("http://192.168.1.248", "joe@example.com", "test");
+    SharelatexConnector connector = new SharelatexConnector();
+    connector.connectToServer("http://overleaf.com","developers@jabref.org","jabref");
     connector.getProjects();
-    //   connector.uploadFile("591188ed98ba55690073c29e",Paths.get("X:\\Users\\CS\\Documents\\_JABREFTEMP\\aaaaaaaaaaaaaa.bib"));
+    // connector.uploadFile("591188ed98ba55690073c29e",Paths.get("X:\\Users\\CS\\Documents\\_JABREFTEMP\\aaaaaaaaaaaaaa.bib"));
     //   connector.uploadFileWithWebClient("591188ed98ba55690073c29e",
     //         Paths.get("X:\\Users\\CS\\Documents\\_JABREFTEMP\\aaaaaaaaaaaaaa.bib"));
 
@@ -21,6 +26,6 @@ public class SharelatexConnectorTest {
         }
 
     });
-    }
-    */
+
+
 }

@@ -159,6 +159,8 @@ dependencies {
     implementation  'com.google.code.gson:gson:2.8.5'
 	compile 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.15'
 	compile 'org.glassfish.tyrus.ext:tyrus-extension-deflate:1.15'
+	compile "org.bitbucket.cowwoc.diff-match-patch:diff-match-patch:1.0"
+
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
