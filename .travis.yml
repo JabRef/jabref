@@ -32,6 +32,7 @@ matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
+      - env: TEST_SUITE=guiTest
       - env: TEST_SUITE=codecov
       - env: DEPENDENCY_UPDATES=check
 
