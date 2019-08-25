@@ -1,4 +1,7 @@
 language: java
+jdk:
+  - oraclejdk11
+  - openjdk11
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
@@ -17,7 +20,7 @@ env:
   global:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
-    - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=check
     - TEST_SUITE=checkstyle
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
@@ -29,6 +32,7 @@ matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
+      - env: TEST_SUITE=guiTest
       - env: TEST_SUITE=codecov
       - env: DEPENDENCY_UPDATES=check
 

@@ -380,9 +380,8 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
-
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         while (mcr.find()) {
             String replaceStr = mcr.group();
             mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
@@ -696,7 +695,7 @@ public class StringUtil {
     public static String capitalizeFirst(String toCapitalize) {
         if (toCapitalize.length() > 1) {
             return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)
-                    + toCapitalize.substring(1, toCapitalize.length()).toLowerCase(Locale.ROOT);
+                    + toCapitalize.substring(1).toLowerCase(Locale.ROOT);
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }

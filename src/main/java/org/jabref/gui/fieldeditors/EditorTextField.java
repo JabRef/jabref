@@ -6,17 +6,15 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
+//import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
-public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
+// TODO: TextFieldSkin changed in Java 9
+public class EditorTextField extends javafx.scene.control.TextField implements Initializable, ContextMenuAddable {
 
     public EditorTextField() {
         this("");
@@ -31,35 +29,35 @@ public class EditorTextField extends TextField implements Initializable, Context
 
         // Should behave as a normal text field with respect to TAB behaviour
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.TAB) {
-                TextFieldSkin skin = (TextFieldSkin) getSkin();
-                if (event.isShiftDown()) {
-                    // Shift + Tab > previous text area
-                    skin.getBehavior().traversePrevious();
-                } else {
-                    if (event.isControlDown()) {
-                        // Ctrl + Tab > insert tab
-                        skin.getBehavior().callAction("InsertTab");
-                    } else {
-                        // Tab > next text area
-                        skin.getBehavior().traverseNext();
-                    }
-                }
-                event.consume();
-            }
+//            if (event.getCode() == KeyCode.TAB) {
+//                TextFieldSkin skin = (TextFieldSkin) getSkin();
+//                if (event.isShiftDown()) {
+//                    // Shift + Tab > previous text area
+//                    skin.getBehavior().traversePrevious();
+//                } else {
+//                    if (event.isControlDown()) {
+//                        // Ctrl + Tab > insert tab
+//                        skin.getBehavior().callAction("InsertTab");
+//                    } else {
+//                        // Tab > next text area
+//                        skin.getBehavior().traverseNext();
+//                    }
+//                }
+//                event.consume();
+//            }
         });
     }
 
     @Override
     public void addToContextMenu(final Supplier<List<MenuItem>> items) {
-        TextFieldSkin customContextSkin = new TextFieldSkin(this) {
-            @Override
-            public void populateContextMenu(ContextMenu contextMenu) {
-                super.populateContextMenu(contextMenu);
-                contextMenu.getItems().addAll(0, items.get());
-            }
-        };
-        setSkin(customContextSkin);
+//        TextFieldSkin customContextSkin = new TextFieldSkin(this) {
+//            @Override
+//            public void populateContextMenu(ContextMenu contextMenu) {
+//                super.populateContextMenu(contextMenu);
+//                contextMenu.getItems().addAll(0, items.get());
+//            }
+//        };
+//        setSkin(customContextSkin);
     }
 
     @Override

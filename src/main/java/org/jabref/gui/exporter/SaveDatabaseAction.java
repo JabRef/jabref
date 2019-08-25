@@ -14,7 +14,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -56,12 +55,12 @@ public class SaveDatabaseAction {
     private final JabRefPreferences prefs;
     private final BibEntryTypesManager entryTypesManager;
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs) {
+    public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
         this.prefs = prefs;
-        entryTypesManager = Globals.entryTypesManager;
+        this.entryTypesManager = entryTypesManager;
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {

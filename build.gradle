@@ -1,5 +1,8 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.jabref.build.antlr.JabRefAntlrPlugin
+import org.jabref.build.localization.LocalizationPlugin
+import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
@@ -16,13 +19,17 @@ buildscript {
 }
 
 plugins {
+    id 'application'
     id 'com.gradle.build-scan' version '2.4.1'
-    id 'com.install4j.gradle' version '7.0.12'
+    id 'com.install4j.gradle' version '8.0.1'
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     id 'net.ltgt.errorprone' version '0.8.1'
     id 'com.github.ben-manes.versions' version '0.22.0'
+    id 'org.javamodularity.moduleplugin' version '1.5.0'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.beryx.jlink' version '2.14.1'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -36,23 +43,32 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
-apply plugin: org.jabref.build.antlr.AntlrPlugin
-apply plugin: org.jabref.build.xjc.XjcPlugin
-apply plugin: org.jabref.build.localization.LocalizationPlugin
+apply plugin: JabRefAntlrPlugin
+apply plugin: XjcPlugin
+apply plugin: LocalizationPlugin
 
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0-alpha"
 project.ext.threeDotVersion = "5.0.0.0"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-mainClassName = "org.jabref.JabRefMain"
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
+sourceCompatibility = 11
+targetCompatibility = 11
+mainClassName = "org.jabref.JabRefLauncher"
+
+// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
+// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
+patchModules.config = [
+        "test=fastparse_2.12-1.0.0.jar",
+        "test2=fastparse-utils_2.12-1.0.0.jar",
+        "test3=sourcecode_2.12-0.1.4.jar"
+]
+
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
-ext.allowJava9 = false
+ext.allowJava9 = true
 
 sourceSets {
     main {
@@ -84,6 +100,17 @@ repositories {
 
 configurations {
     errorprone
+    libreoffice
+
+    // TODO: Workaround for "ResolutionException: Modules java.annotation and jsr305 export package javax.annotation to module httpcore.nio"
+    compile {
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
 dependencies {
@@ -101,10 +128,12 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
 
-    compile "org.libreoffice:juh:6.2.3"
-    compile "org.libreoffice:jurt:6.2.3"
-    compile "org.libreoffice:ridl:6.2.3"
-    compile "org.libreoffice:unoil:6.2.3"
+    // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
+    // Use the task bundleLibreOffice to update the bundled jar
+    //compile "org.libreoffice:juh:6.2.3"
+    //compile "org.libreoffice:jurt:6.2.3"
+    //compile "org.libreoffice:ridl:6.2.3"
+    //compile "org.libreoffice:unoil:6.2.3"
 
     compile 'io.github.java-diff-utils:java-diff-utils:4.0'
     compile 'info.debatty:java-string-similarity:1.2.1'
@@ -121,21 +150,19 @@ dependencies {
 
     compile 'com.google.guava:guava:28.0-jre'
 
+    compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     // JavaFX stuff
-    compile 'de.jensd:fontawesomefx-commons:8.15'
-    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.saxsys:mvvmfx-validation:1.8.0'
+    compile 'de.jensd:fontawesomefx-commons:11.0'
+    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
+    compile 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
     compile 'org.fxmisc.richtext:richtextfx:0.10.1'
-    compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
-    compile 'com.jfoenix:jfoenix:8.0.9'
-
-    // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.16-SNAPSHOT'
+    compile 'com.jfoenix:jfoenix:9.0.9'
+    compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -149,28 +176,35 @@ dependencies {
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
+    compile 'com.sun.activation:javax.activation:1.2.0'
 
-    errorproneJavac 'com.google.errorprone:javac:1.8.0-u20'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.6'
+
+    errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
 
+    testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.1'
 
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.9.13'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.12.1'
     testCompile 'org.mockito:mockito-core:3.0.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.24.1'
+    //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.11.0'
+    testCompile 'com.tngtech.archunit:archunit-junit5-api:0.10.2'
+    //testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.11.0'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
-    testCompile "org.testfx:testfx-core:4.0.+"
-    testCompile "org.testfx:testfx-junit5:4.0.+"
+    testCompile "org.testfx:testfx-core:4.0.15-alpha"
+    testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.23'
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
@@ -178,7 +212,7 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = '0.8.1'
+    toolVersion = '0.8.3'
 }
 
 dependencyUpdates {
@@ -196,11 +230,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
-        rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /0.2.*/) {
                 // Reject version higher than 2.0.2. see https://github.com/JabRef/jabref/pull/3781
@@ -212,24 +241,9 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Version 4.X breaks the release process.")
             }
         }
-        rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.*/) {
-                selection.reject("Cannot be upgraded to version 2")
-            }
-        }
-        rules.withModule("com.jfoenix:jfoenix") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
-        rules.withModule("com.google.errorprone:javac") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /1.9.*/ || selection.candidate.version ==~ /9.*/) {
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
-            }
-        }
-        rules.withModule("com.sun.xml.bind:jaxb-xjc") { ComponentSelection selection ->
-            if (!(selection.candidate.version ==~ /2.2.4.*/) || selection.candidate.version ==~ /2.[3-9].*/) {
-                selection.reject("Cannot be updated to 2.2.5 or higher.")
+        rules.withModule("com.google.errorprone:error_prone_core") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.3.3/) {
+                selection.reject("Does not work due to bug https://github.com/google/error-prone/issues/1240")
             }
         }
     }
@@ -347,6 +361,51 @@ tasks.withType(JavaCompile) {
 compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
+
+    moduleOptions {
+        // TODO: Remove access to internal api
+        addExports = [
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+        ]
+    }
+}
+
+run {
+    // TODO: Remove access to internal api
+    jvmArgs '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
+            '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
+            '--add-opens', 'org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref',
+            // Not sure why we need to restate the controlfx exports
+            // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
+            "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
+            "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
+            "--add-exports", "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
+            "--add-exports", "javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
+            "--add-exports", "javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
+            "--add-exports", "javafx.web/com.sun.webkit=org.controlsfx.controls",
+            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
+            "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
+            "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls"
+
+    // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
+    // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
+    moduleOptions {
+        addExports = [
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+        ]
+
+        addOpens = [
+                'javafx.controls/javafx.scene.control' : 'org.jabref',
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref'
+        ]
+    }
 }
 
 javadoc {
@@ -422,7 +481,8 @@ jacocoTestReport {
 
 // Code quality tasks
 checkstyle {
-
+    // will only run when called explicitly from the command line
+    sourceSets = []
 }
 
 modernizer {
@@ -529,6 +589,67 @@ task snapJar(dependsOn: "releaseJar", type: Delete) {
     delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
 }
 
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'JabRefMain'
+    }
+
+    addOptions("--bind-services")
+
+    // TODO: Remove the following as soon as the dependencies are fixed (upstream)
+    // forceMerge is usually needed when some non-modular artifacts in the dependency graph use code that was previously part of the JDK
+    // but it was removed in the newer releases.
+    // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
+    // (because the artifact was published when this code was still available in the JDK).
+    forceMerge "javafx"
+    forceMerge "controlsfx", "bcprov", "jaxb", "javax", "istack", "stax", "log4j"
+
+    // TODO: Remove the following correction to the merged module
+    // The module descriptor automatically generated by the plugin for the merged module contained some invalid entries.
+    // Execute ./gradlew suggestMergedModuleInfo and include the incorrect directives here.
+    mergedModule {
+        requires 'java.logging'
+        requires 'jdk.xml.dom'
+        requires 'java.sql'
+        requires 'java.rmi'
+        requires 'java.xml'
+        requires 'com.sun.xml.txw2'
+        requires 'java.desktop'
+        requires 'java.security.jgss'
+        requires 'jdk.jsobject'
+        requires 'jdk.unsupported'
+        requires 'java.management'
+        requires 'java.naming'
+        requires 'jdk.unsupported.desktop'
+        requires 'java.security.sasl'
+        requires 'java.scripting'
+        requires 'java.datatransfer'
+        requires 'java.compiler'
+        requires 'java.transaction.xa'
+        requires 'com.sun.xml.fastinfoset'
+        requires 'org.slf4j'
+        uses 'com.airhacks.afterburner.injection.PresenterFactory'
+        uses 'org.controlsfx.glyphfont.GlyphFont'
+        uses 'com.airhacks.afterburner.views.ResourceLocator'
+        provides 'java.sql.Driver' with 'org.postgresql.Driver'
+        provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
+        provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl'
+        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider'
+        provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
+        provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider', 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
+    }
+
+    // This is experimental thing; could replace install4j
+    jpackage {
+        // Download from https://jdk.java.net/jpackage/ and change path accordingly
+        jpackageHome = 'H:\\Downloading\\openjdk-13-jpackage+49_windows-x64_bin\\jdk-13'
+    }
+}
+
 jmh {
     warmupIterations = 5
     iterations = 10
@@ -549,4 +670,15 @@ task downloadDependencies {
             }
         }
     }
+}
+
+task bundleLibreOffice(type: Jar) {
+    from configurations.libreoffice.collect { zipTree it }
+
+    manifest {
+        attributes 'Automatic-Module-Name': 'org.jabref.thirdparty.libreoffice'
+    }
+
+    destinationDir = file('lib')
+    archiveName = 'libreoffice.jar'
 }

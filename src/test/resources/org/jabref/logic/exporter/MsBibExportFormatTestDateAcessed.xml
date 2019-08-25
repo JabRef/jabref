@@ -1,27 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:Year>2012</b:Year>
-<b:BIBTEX_Entry>article</b:BIBTEX_Entry>
-<b:SourceType>JournalArticle</b:SourceType>
-<b:Accessed>2015-12-12</b:Accessed>
-<b:Title>Test</b:Title>
-<b:Tag>Testa</b:Tag>
-<b:YearAccessed>2015</b:YearAccessed>
-<b:MonthAccessed>12</b:MonthAccessed>
-<b:DayAccessed>12</b:DayAccessed>
-<b:Author>
-<b:Author>
-<b:NameList>
-<b:Person>
-<b:Last>Sam</b:Last>
-</b:Person>
-<b:Person>
-<b:Last>jason</b:Last>
-</b:Person>
-</b:NameList>
-</b:Author>
-</b:Author>
-<b:JournalName>Test</b:JournalName>
-</b:Source>
+    <b:Source>
+        <b:Year>2012</b:Year>
+        <b:BIBTEX_Entry>article</b:BIBTEX_Entry>
+        <b:SourceType>JournalArticle</b:SourceType>
+        <b:Accessed>2015-12-12</b:Accessed>
+        <b:Title>Test</b:Title>
+        <b:Tag>Testa</b:Tag>
+        <b:YearAccessed>2015</b:YearAccessed>
+        <b:MonthAccessed>12</b:MonthAccessed>
+        <b:DayAccessed>12</b:DayAccessed>
+        <b:Author>
+            <b:Author>
+                <b:NameList>
+                    <b:Person>
+                        <b:Last>Sam</b:Last>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>jason</b:Last>
+                    </b:Person>
+                </b:NameList>
+            </b:Author>
+        </b:Author>
+        <b:JournalName>Test</b:JournalName>
+    </b:Source>
 </b:Sources>
