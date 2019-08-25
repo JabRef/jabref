@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
  * Search rule for regex-based search.
@@ -48,7 +49,7 @@ public class RegexBasedSearchRule implements SearchRule {
             return false;
         }
 
-        for (String field : bibEntry.getFieldNames()) {
+        for (Field field : bibEntry.getFields()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
                 String fieldContentNoBrackets = bibEntry.getLatexFreeField(field).get();

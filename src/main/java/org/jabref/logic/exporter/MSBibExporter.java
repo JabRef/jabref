@@ -16,7 +16,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.msbib.MSBibDatabase;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 class MSBibExporter extends Exporter {
 
     public MSBibExporter() {
-        super("MSBib", FileType.MSBIB.getDescription(), FileType.MSBIB);
+        super("MSBib", "MS Office 2007", StandardFileType.XML);
     }
 
     @Override
@@ -38,11 +38,11 @@ class MSBibExporter extends Exporter {
         if (entries.isEmpty()) {
             return;
         }
-        // forcing to use UTF8 output format for some problems with xml export in other encodings
-        SaveSession session = new FileSaveSession(StandardCharsets.UTF_8, false);
+
         MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
-        try (VerifyingWriter ps = session.getWriter()) {
+        // forcing to use UTF8 output format for some problems with xml export in other encodings
+        try (AtomicFileWriter ps = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             try {
                 DOMSource source = new DOMSource(msBibDatabase.getDomForExport());
                 StreamResult result = new StreamResult(ps);
@@ -52,7 +52,6 @@ class MSBibExporter extends Exporter {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new SaveException(e);
             }
-            session.finalize(file);
         } catch (IOException ex) {
             throw new SaveException(ex);
         }

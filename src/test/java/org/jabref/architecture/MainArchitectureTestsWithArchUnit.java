@@ -1,20 +1,51 @@
 package org.jabref.architecture;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.junit.ArchUnitRunner;
-import com.tngtech.archunit.lang.ArchRule;
-import org.junit.runner.RunWith;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-@RunWith(ArchUnitRunner.class)
 @AnalyzeClasses(packages = "org.jabref")
 public class MainArchitectureTestsWithArchUnit {
 
     @ArchTest
-    public static final ArchRule doNotUseApacheCommonsLang3 =
-            noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
-            .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3");
+    public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
+        noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
+                   .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
+                   .check(classes);
+    }
 
+    @ArchTest
+    public static void doNotUseSwing(JavaClasses classes) {
+        // This checks for all all Swing packages, but not the UndoManager
+        noClasses().should().accessClassesThat().resideInAnyPackage("javax.swing",
+                "javax.swing.border..",
+                "javax.swing.colorchooser..",
+                "javax.swing.event..",
+                "javax.swing.filechooser..",
+                "javax.swing.plaf..",
+                "javax.swing.table..",
+                "javax.swing.text..",
+                "javax.swing.tree.."
+        ).check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUseJGoodies(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies..").check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUseGlazedLists(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
+    }
+    
+    //"Currently disabled as there is no alternative for the rest of classes who need awt"
+    @ArchIgnore
+    @ArchTest
+    public static void doNotUseJavaAWT(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("java.awt..").check(classes);
+    }
 }

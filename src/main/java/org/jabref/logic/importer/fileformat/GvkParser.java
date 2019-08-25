@@ -12,7 +12,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -91,7 +94,7 @@ public class GvkParser implements Parser {
         String mak = "";
         String subtitle = "";
 
-        String entryType = "book"; // Default
+        EntryType entryType = StandardEntryType.Book; // Default
 
         // Alle relevanten Informationen einsammeln
 
@@ -245,7 +248,7 @@ public class GvkParser implements Parser {
 
                 String st = getSubfield("a", datafield);
                 if ((st != null) && st.contains("Diss")) {
-                    entryType = "phdthesis";
+                    entryType = StandardEntryType.PhdThesis;
                 }
             }
 
@@ -286,12 +289,12 @@ public class GvkParser implements Parser {
                     subtitle = getSubfield("a", datafield);
                 }
 
-                entryType = "proceedings";
+                entryType = StandardEntryType.Proceedings;
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if ("phdthesis".equals(entryType) && (isbn != null)) {
-                entryType = "book";
+            if (entryType.equals(StandardEntryType.PhdThesis) && (isbn != null)) {
+                entryType = StandardEntryType.Book;
             }
 
             //Hilfskategorien zur Entscheidung @article
@@ -340,10 +343,10 @@ public class GvkParser implements Parser {
             entryType = BibEntry.DEFAULT_TYPE;
 
             if (quelle.contains("ISBN")) {
-                entryType = "incollection";
+                entryType = StandardEntryType.InCollection;
             }
             if (quelle.contains("ZDB-ID")) {
-                entryType = "article";
+                entryType = StandardEntryType.Article;
             }
         } else if (mak.isEmpty()) {
             entryType = BibEntry.DEFAULT_TYPE;
@@ -364,13 +367,13 @@ public class GvkParser implements Parser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField(FieldName.AUTHOR, author);
+            result.setField(StandardField.AUTHOR, author);
         }
         if (editor != null) {
-            result.setField(FieldName.EDITOR, editor);
+            result.setField(StandardField.EDITOR, editor);
         }
         if (title != null) {
-            result.setField(FieldName.TITLE, title);
+            result.setField(StandardField.TITLE, title);
         }
         if (!Strings.isNullOrEmpty(subtitle)) {
             // ensure that first letter is an upper case letter
@@ -381,58 +384,58 @@ public class GvkParser implements Parser {
             if (subtitle.length() > 1) {
                 newSubtitle.append(subtitle.substring(1));
             }
-            result.setField(FieldName.SUBTITLE, newSubtitle.toString());
+            result.setField(StandardField.SUBTITLE, newSubtitle.toString());
         }
         if (publisher != null) {
-            result.setField(FieldName.PUBLISHER, publisher);
+            result.setField(StandardField.PUBLISHER, publisher);
         }
         if (year != null) {
-            result.setField(FieldName.YEAR, year);
+            result.setField(StandardField.YEAR, year);
         }
         if (address != null) {
-            result.setField(FieldName.ADDRESS, address);
+            result.setField(StandardField.ADDRESS, address);
         }
         if (series != null) {
-            result.setField(FieldName.SERIES, series);
+            result.setField(StandardField.SERIES, series);
         }
         if (edition != null) {
-            result.setField(FieldName.EDITION, edition);
+            result.setField(StandardField.EDITION, edition);
         }
         if (isbn != null) {
-            result.setField(FieldName.ISBN, isbn);
+            result.setField(StandardField.ISBN, isbn);
         }
         if (issn != null) {
-            result.setField(FieldName.ISSN, issn);
+            result.setField(StandardField.ISSN, issn);
         }
         if (number != null) {
-            result.setField(FieldName.NUMBER, number);
+            result.setField(StandardField.NUMBER, number);
         }
         if (pagetotal != null) {
-            result.setField(FieldName.PAGETOTAL, pagetotal);
+            result.setField(StandardField.PAGETOTAL, pagetotal);
         }
         if (pages != null) {
-            result.setField(FieldName.PAGES, pages);
+            result.setField(StandardField.PAGES, pages);
         }
         if (volume != null) {
-            result.setField(FieldName.VOLUME, volume);
+            result.setField(StandardField.VOLUME, volume);
         }
         if (journal != null) {
-            result.setField(FieldName.JOURNAL, journal);
+            result.setField(StandardField.JOURNAL, journal);
         }
         if (ppn != null) {
-            result.setField("ppn_GVK", ppn);
+            result.setField(new UnknownField("ppn_GVK"), ppn);
         }
         if (url != null) {
-            result.setField(FieldName.URL, url);
+            result.setField(StandardField.URL, url);
         }
         if (note != null) {
-            result.setField(FieldName.NOTE, note);
+            result.setField(StandardField.NOTE, note);
         }
 
         if ("article".equals(entryType) && (journal != null)) {
-            result.setField(FieldName.JOURNAL, journal);
+            result.setField(StandardField.JOURNAL, journal);
         } else if ("incollection".equals(entryType) && (booktitle != null)) {
-            result.setField(FieldName.BOOKTITLE, booktitle);
+            result.setField(StandardField.BOOKTITLE, booktitle);
         }
 
         return result;

@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class RISImporterTestFiles {
+class RISImporterTestFiles {
 
     private static final String FILE_ENDING = ".ris";
 
@@ -18,13 +18,13 @@ public class RISImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
+    void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new RisImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
+    void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new RisImporter(), fileName, FILE_ENDING);
     }
 }

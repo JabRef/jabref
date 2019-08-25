@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -26,6 +26,8 @@ public class XmpUtilReader {
     private static final String END_TAG = "</rdf:Description>";
 
     private XmpUtilReader() {
+        //See: https://pdfbox.apache.org/2.0/getting-started.html
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); //To get higher rendering speed on java 8 oder 9 for images
     }
 
     /**
@@ -94,10 +96,7 @@ public class XmpUtilReader {
             }
         }
 
-        // return empty list, if no metadata was found
-        if (result.isEmpty()) {
-            return Collections.emptyList();
-        }
+        result.forEach(entry -> entry.addFile(new LinkedFile("", path.toAbsolutePath().toString(), "PDF")));
         return result;
     }
 

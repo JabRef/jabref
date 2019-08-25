@@ -20,5 +20,4 @@ public class LocalizationKeyParamsTest {
     public void testTooManyParams() {
         assertThrows(IllegalStateException.class, () -> new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"));
     }
-
 }

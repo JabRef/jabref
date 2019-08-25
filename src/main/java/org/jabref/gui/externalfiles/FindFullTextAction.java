@@ -1,27 +1,28 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
+import javafx.concurrent.Task;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,101 +30,135 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction extends AbstractWorker {
+public class FindFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
-
-    private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
+    // The minimum number of selected entries to ask the user for confirmation
+    private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
-    private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+    private final DialogService dialogService;
 
     public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
+        this.dialogService = basePanel.frame().getDialogService();
     }
 
     @Override
-    public void init() throws Exception {
+    public void execute() {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
             LOGGER.debug("No entry selected for fulltext download.");
         }
-    }
 
-    @Override
-    public void run() {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
-            String[] options = new String[] {Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(basePanel.frame(),
+            boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Look up full text documents"),
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
                             + Localization.lang("JabRef will send at least one request per entry to a publisher.")
                             + "\n"
                             + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-            if (answer != JOptionPane.OK_OPTION) {
+                    Localization.lang("Look up full text documents"),
+                    Localization.lang("Cancel"));
+
+            if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
                 return;
             }
         }
-        for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fft.findFullTextPDF(entry), entry);
+
+        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+            @Override
+            protected Map<BibEntry, Optional<URL>> call() {
+                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
+                int count = 0;
+                for (BibEntry entry : basePanel.getSelectedEntries()) {
+                    FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+                    downloads.put(entry, fetchers.findFullTextPDF(entry));
+                    updateProgress(++count, basePanel.getSelectedEntries().size());
+                }
+                return downloads;
+            }
+        };
+
+        findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
+
+        dialogService.showProgressDialogAndWait(
+                Localization.lang("Look up full text documents"),
+                Localization.lang("Looking for full text document..."),
+                findFullTextsTask);
+
+        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
+    }
+
+    private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads) {
+        for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
+            BibEntry entry = download.getKey();
+            Optional<URL> result = download.getValue();
+            if (result.isPresent()) {
+                Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFilePreferences());
+
+                if (!dir.isPresent()) {
+
+                    dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
+                            Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                    + " -> " + Localization.lang("File"));
+                    return;
+                }
+                //Download and link full text
+                addLinkedFileFromURL(result.get(), entry, dir.get());
+
+            } else {
+                dialogService.notify(Localization.lang("No full text document found for entry %0.",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            }
         }
     }
 
-    @Override
-    public void update() {
-        List<Optional<URL>> remove = new ArrayList<>();
-        for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
-            BibEntry entry = download.getValue();
-            Optional<URL> result = download.getKey();
-            if (result.isPresent()) {
-                Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+    /**
+     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
+     * from the findFullTexts map and then downloads the file into the given targetDirectory
+     *
+     * @param url   the url "key"
+     * @param entry the entry "value"
+     * @param targetDirectory the target directory for the downloaded file
+     */
+    private void addLinkedFileFromURL(URL url, BibEntry entry, Path targetDirectory) {
+        LinkedFile newLinkedFile = new LinkedFile(url, "");
 
-                if (!dir.isPresent()) {
-                    JOptionPane.showMessageDialog(basePanel.frame(),
-                            Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"),
-                            Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
-                        basePanel.getBibDatabaseContext(), entry);
-                try {
-                    def.download(result.get(), file -> {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            Optional<FieldChange> fieldChange = entry.addFile(file);
-                            if (fieldChange.isPresent()) {
-                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                                basePanel.getUndoManager().addEdit(edit);
-                                basePanel.markBaseChanged();
-                            }
-                        });
+        if (!entry.getFiles().contains(newLinkedFile)) {
 
-                    });
-                } catch (IOException e) {
-                    LOGGER.warn("Problem downloading file", e);
-                }
-                basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-            } else {
-                String title = Localization.lang("Full text document download failed");
-                String message = Localization.lang("Full text document download failed for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
+            LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                    newLinkedFile,
+                    entry,
+                    basePanel.getBibDatabaseContext(),
+                    Globals.TASK_EXECUTOR,
+                    dialogService,
+                    JabRefPreferences.getInstance().getXMPPreferences(),
+                    JabRefPreferences.getInstance().getFilePreferences(), 
+                    ExternalFileTypes.getInstance());
 
-                basePanel.output(message);
-                JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
+            try {
+                URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
+                BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
+                downloadTask.onSuccess(destination -> {
+                    LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
+                            destination,
+                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
+                    entry.addFile(downloadedFile);
+                    dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                });
+                Globals.TASK_EXECUTOR.execute(downloadTask);
+            } catch (MalformedURLException exception) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
             }
-            remove.add(result);
-        }
-        for (Optional<URL> result : remove) {
-            downloads.remove(result);
+        } else {
+            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
+                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
     }
 }

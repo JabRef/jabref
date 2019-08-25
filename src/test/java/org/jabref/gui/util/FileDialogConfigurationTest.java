@@ -1,30 +1,26 @@
 package org.jabref.gui.util;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileDialogConfigurationTest {
-
-    @Rule public TemporaryFolder folder = new TemporaryFolder();
+class FileDialogConfigurationTest {
 
     @Test
-    public void testWithValidDirectoryString() throws IOException {
-        String tempFolder = folder.newFolder().toString();
+    void testWithValidDirectoryString(@TempDir Path folder) {
+        String tempFolder = folder.toAbsolutePath().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
@@ -33,9 +29,7 @@ public class FileDialogConfigurationTest {
     }
 
     @Test
-    public void testWithValidDirectoryPath() throws IOException {
-        Path tempFolder = folder.newFolder().toPath();
-
+    void testWithValidDirectoryPath(@TempDir Path tempFolder) {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 
@@ -43,60 +37,42 @@ public class FileDialogConfigurationTest {
     }
 
     @Test
-    public void testWithNullStringDirectory() {
-        String tempFolder = null;
+    void testWithNullStringDirectory() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(tempFolder).build();
+                .withInitialDirectory((String) null).build();
 
-        assertEquals(Optional.ofNullable(tempFolder), fileDialogConfiguration.getInitialDirectory());
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
-    public void testWithNullPathDirectory() {
-        Path tempFolder = null;
+    void testWithNullPathDirectory() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(tempFolder).build();
+                .withInitialDirectory((Path) null).build();
 
-        assertEquals(Optional.ofNullable(tempFolder), fileDialogConfiguration.getInitialDirectory());
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
-    public void testWithNonExistingDirectoryAndParentNull() {
+    void testWithNonExistingDirectoryAndParentNull() {
         String tempFolder = "workingDirectory";
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 
-        assertEquals(Optional.ofNullable(null), fileDialogConfiguration.getInitialDirectory());
+        assertEquals(Optional.empty(), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test
-    public void testSingleExtension() {
+    void testSingleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withDefaultExtension(FileType.BIBTEX_DB).build();
+                .withDefaultExtension(StandardFileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(FileType.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
-    @Test
-    public void testMultipleExtension() {
-        EnumSet<FileType> extensions = EnumSet.allOf(FileType.class);
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilters(extensions).build();
-
-        List<FileChooser.ExtensionFilter> extensionFilters = extensions.stream().map(this::toFilter)
-                .collect(Collectors.toList());
-
-        //We use size here as we otherwise would compare object references, as extension filters does not override equals
-        assertEquals(extensionFilters.size(), fileDialogConfiguration.getExtensionFilters().size());
-
-    }
-
-    private FileChooser.ExtensionFilter toFilter(FileType extension) {
-        return new FileChooser.ExtensionFilter(extension.getDescription(),
+    private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
+        return new FileChooser.ExtensionFilter(description,
                 extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
-
 }

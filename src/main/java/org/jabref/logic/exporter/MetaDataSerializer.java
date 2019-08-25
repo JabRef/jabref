@@ -11,6 +11,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
@@ -43,9 +44,11 @@ public class MetaDataSerializer {
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
+        metaData.getLaTexFileDirectories().forEach((user, path) -> stringyMetaData
+                .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
 
         for (ContentSelector selector: metaData.getContentSelectorList()) {
-                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
+            stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
 
         }
 
@@ -97,11 +100,11 @@ public class MetaDataSerializer {
     private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
         AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
-        for (String key : citeKeyPattern.getAllKeys()) {
+        for (EntryType key : citeKeyPattern.getAllKeys()) {
             if (!citeKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(citeKeyPattern.getValue(key).get(0));
-                String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
+                String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }

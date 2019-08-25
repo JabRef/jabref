@@ -2,6 +2,8 @@ package org.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
+import org.jabref.model.entry.types.EntryType;
+
 public class GlobalBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
     private List<String> defaultBibtexKeyPattern;
@@ -15,7 +17,7 @@ public class GlobalBibtexKeyPattern extends AbstractBibtexKeyPattern {
     }
 
     @Override
-    public List<String> getLastLevelBibtexKeyPattern(String key) {
+    public List<String> getLastLevelBibtexKeyPattern(EntryType entryType) {
         return defaultBibtexKeyPattern;
     }
 }

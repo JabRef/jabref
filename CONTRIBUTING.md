@@ -1,12 +1,15 @@
+After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+
 ## Understanding the basics
-We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
-Be sure to create a **separate branch** for each improvement you implement.
-Take a look at GitHub's excellent [help documentation] for a detailed explanation and the explanation of [Feature Branch Workflow](https://de.atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
+    1. Fork the JabRef into your GitHub account.
+    2. Clone your forked repository on your local machine.
+3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
+4. Do your work on the **new branch - not the master branch.** Refer to our [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) if you have questions about your implementation.
+5. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
 
-We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
-
-In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
-We should also be online at [gitter](https://gitter.im/JabRef/jabref).
+In case you have any questions, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email. We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
 
 ## Formal requirements for a pull request
@@ -118,5 +121,4 @@ You can add the prefix `[WIP]` to indicate that the pull request is not yet comp
 
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
-[good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[help documentation]: https://help.github.com/articles/about-pull-requests/
+[good commit message]: https://github.com/joelparkerhenderson/git_commit_message

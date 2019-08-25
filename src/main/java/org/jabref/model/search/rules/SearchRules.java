@@ -1,8 +1,11 @@
 package org.jabref.model.search.rules;
 
-import org.jabref.model.strings.StringUtil;
+import java.util.regex.Pattern;
 
 public class SearchRules {
+
+
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
 
     private SearchRules() {
     }
@@ -11,7 +14,7 @@ public class SearchRules {
      * Returns the appropriate search rule that fits best to the given parameter.
      */
     public static SearchRule getSearchRuleByQuery(String query, boolean caseSensitive, boolean regex) {
-        if (StringUtil.isBlank(query)) {
+        if (isSimpleQuery(query)) {
             return new ContainBasedSearchRule(caseSensitive);
         }
 
@@ -23,6 +26,10 @@ public class SearchRules {
         } else {
             return getSearchRule(caseSensitive, regex);
         }
+    }
+
+    private static boolean isSimpleQuery(String query) {
+        return SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
     private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {

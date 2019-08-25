@@ -1,15 +1,17 @@
 package org.jabref.logic.search;
 
+import java.util.Optional;
+import java.util.regex.Pattern;
+
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 public class SearchQueryTest {
 
@@ -21,15 +23,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -44,7 +46,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearchFullEntryLastCharMissing() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, "systematic revie");
+        entry.setField(StandardField.TITLE, "systematic revie");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
         assertFalse(searchQuery.isMatch(entry));
     }
@@ -52,15 +54,15 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearchFullEntry() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, "systematic review");
+        entry.setField(StandardField.TITLE, "systematic review");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
 
     @Test
     public void testSearchingForOpenBraketInBooktitle() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField(FieldName.BOOKTITLE, "Super Conference (SC)");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.BOOKTITLE, "Super Conference (SC)");
 
         SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
         assertTrue(searchQuery.isMatch(e));
@@ -68,8 +70,8 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeywordNotPart() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField("keywords", "banana, pineapple, orange");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
         assertFalse(searchQuery.isMatch(e));
@@ -77,8 +79,8 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeyword() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField("keywords", "banana, pineapple, orange");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
         assertTrue(searchQuery.isMatch(e));
@@ -86,9 +88,9 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFields() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField("title", "Fruity features");
-        e.setField("keywords", "banana, pineapple, orange");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.TITLE, "Fruity features");
+        e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anyfield==\"fruity features\"", false, false);
         assertTrue(searchQuery.isMatch(e));
@@ -96,9 +98,9 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsNotForSpecificField() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField("title", "Fruity features");
-        e.setField("keywords", "banana, pineapple, orange");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.TITLE, "Fruity features");
+        e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords!=banana", false, false);
         assertFalse(searchQuery.isMatch(e));
@@ -106,9 +108,9 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsAndSpecificField() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
-        e.setField("title", "Fruity features");
-        e.setField("keywords", "banana, pineapple, orange");
+        BibEntry e = new BibEntry(StandardEntryType.InProceedings);
+        e.setField(StandardField.TITLE, "Fruity features");
+        e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords=apple", false, false);
         assertTrue(searchQuery.isMatch(e));
@@ -117,10 +119,10 @@ public class SearchQueryTest {
     @Test
     public void testIsMatch() {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
-        entry.setField("author", "asdf");
+        entry.setType(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "asdf");
 
-        assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
+        assertFalse(new SearchQuery("BiblatexEntryType", true, true).isMatch(entry));
         assertTrue(new SearchQuery("asdf", true, true).isMatch(entry));
         assertTrue(new SearchQuery("author=asdf", true, true).isMatch(entry));
     }
@@ -178,12 +180,27 @@ public class SearchQueryTest {
     @Test
     public void isMatchedForNormalAndFieldBasedSearchMixed() {
         BibEntry entry = new BibEntry();
-        entry.setType(BibtexEntryTypes.ARTICLE);
-        entry.setField("author", "asdf");
-        entry.setField("abstract", "text");
+        entry.setType(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "asdf");
+        entry.setField(StandardField.ABSTRACT, "text");
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
-
     }
 
+    @Test
+    public void testSimpleTerm() {
+        String query = "progress";
+
+        SearchQuery result = new SearchQuery(query, false, false);
+        assertFalse(result.isGrammarBasedSearch());
+    }
+
+    @Test
+    public void testGetPattern() {
+        String query = "progress";
+        SearchQuery result = new SearchQuery(query, false, false);
+        Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
+        //We can't directly compare the pattern objects
+        assertEquals(Optional.of(pattern.toString()), result.getPatternForWords().map(Pattern::toString));
+    }
 }

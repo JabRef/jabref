@@ -6,17 +6,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.FieldContentParser;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -30,12 +32,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.CustomEntryType;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -58,19 +62,19 @@ import org.slf4j.LoggerFactory;
  * Can be used stand-alone.
  */
 public class BibtexParser implements Parser {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
+
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
     private BibDatabase database;
-    private Map<String, EntryType> entryTypes;
+    private Set<BibEntryType> entryTypes;
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
-    private MetaDataParser metaDataParser;
+    private final MetaDataParser metaDataParser;
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -110,10 +114,6 @@ public class BibtexParser implements Parser {
         }
     }
 
-    public List<BibEntry> parseEntries(String bibtexString) throws ParseException {
-        return parseEntries(new StringReader(bibtexString));
-    }
-
     public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
         return parseEntries(bibtexString).stream().findFirst();
     }
@@ -149,7 +149,7 @@ public class BibtexParser implements Parser {
 
     private void initializeParserResult() {
         database = new BibDatabase();
-        entryTypes = new HashMap<>(); // To store custom entry types parsed.
+        entryTypes = new HashSet<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
@@ -215,7 +215,17 @@ public class BibtexParser implements Parser {
 
         parseRemainingContent();
 
+        checkEpilog();
+
         return parserResult;
+    }
+
+    private void checkEpilog() {
+        // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
+        // regex looks for something like 'identifier = blabla ,'
+        if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
+            parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+        }
     }
 
     private void parseRemainingContent() {
@@ -285,13 +295,13 @@ public class BibtexParser implements Parser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0, Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length()))
-                .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
+        } else if (comment.substring(0, Math.min(comment.length(), BibEntryTypesManager.ENTRYTYPE_FLAG.length()))
+                          .equals(BibEntryTypesManager.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            Optional<CustomEntryType> typ = CustomEntryType.parse(comment);
+            Optional<BibEntryType> typ = BibEntryTypesManager.parse(comment);
             if (typ.isPresent()) {
-                entryTypes.put(typ.get().getName(), typ.get());
+                entryTypes.add(typ.get());
             } else {
                 parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
             }
@@ -492,7 +502,7 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         LOGGER.debug("Now the contents");
         consume('=');
-        String content = parseFieldContent(name);
+        String content = parseFieldContent(FieldFactory.parseField(name));
         LOGGER.debug("Now I'm going to consume a }");
         consume('}', ')');
         // Consume new line which signals end of entry
@@ -509,7 +519,8 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        BibEntry result = new BibEntry(entryType);
+        BibEntry result = new BibEntry(EntryTypeFactory.parse(entryType));
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();
@@ -548,35 +559,35 @@ public class BibtexParser implements Parser {
     }
 
     private void parseField(BibEntry entry) throws IOException {
-        String key = parseTextToken().toLowerCase(Locale.ROOT);
+        Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
 
         skipWhitespace();
         consume('=');
-        String content = parseFieldContent(key);
+        String content = parseFieldContent(field);
         if (!content.isEmpty()) {
-            if (entry.hasField(key)) {
+            if (entry.hasField(field)) {
                 // The following hack enables the parser to deal with multiple
                 // author or
                 // editor lines, stringing them together instead of getting just
                 // one of them.
                 // Multiple author or editor lines are not allowed by the bibtex
                 // format, but
-                // at least one online database exports bibtex like that, making
+                // at least one online database exports bibtex likes to do that, making
                 // it inconvenient
                 // for users if JabRef did not accept it.
-                if (InternalBibtexFields.getFieldProperties(key).contains(FieldProperty.PERSON_NAMES)) {
-                    entry.setField(key, entry.getField(key).get() + " and " + content);
-                } else if (FieldName.KEYWORDS.equals(key)) {
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    entry.setField(field, entry.getField(field).get() + " and " + content);
+                } else if (StandardField.KEYWORDS.equals(field)) {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {
-                entry.setField(key, content);
+                entry.setField(field, content);
             }
         }
     }
 
-    private String parseFieldContent(String key) throws IOException {
+    private String parseFieldContent(Field field) throws IOException {
         skipWhitespace();
         StringBuilder value = new StringBuilder();
         int character;
@@ -588,13 +599,13 @@ public class BibtexParser implements Parser {
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
-                value.append(fieldContentParser.format(text, key));
+                value.append(fieldContentParser.format(text, field));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside of a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
-                value.append(fieldContentParser.format(text, key));
+                value.append(fieldContentParser.format(text, field));
 
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
@@ -695,21 +706,21 @@ public class BibtexParser implements Parser {
                     }
 
                     // Finished, now reverse newKey and remove whitespaces:
-                    parserResult.addWarning(
-                            Localization.lang("Line %0: Found corrupted BibTeX key.", String.valueOf(line)));
                     key = newKey.reverse();
+                    parserResult.addWarning(
+                            Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
                 }
             }
             break;
 
         case ',':
-            parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (contains whitespaces).",
-                    String.valueOf(line)));
+            parserResult.addWarning(
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
             break;
 
         case '\n':
             parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key (comma missing).", String.valueOf(line)));
+                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
             break;
 
         default:

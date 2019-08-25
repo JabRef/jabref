@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +27,19 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
 
+    /**
+     *
+     */
     public static <V> V runInJavaFXThread(Callable<V> callable) {
+        if (Platform.isFxApplicationThread()) {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                LOGGER.error("Problem executing call", e);
+                return null;
+            }
+        }
+
         FutureTask<V> task = new FutureTask<>(callable);
 
         Platform.runLater(task);
@@ -46,8 +59,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
      * @throws NullPointerException if {@code action} is {@code null}
      */
     public static void runAndWaitInJavaFXThread(Runnable action) {
-        if (action == null)
-            throw new NullPointerException("action");
+        Objects.requireNonNull(action);
 
         // Run synchronously on JavaFX thread
         if (Platform.isFxApplicationThread()) {
@@ -77,8 +89,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> Future<?> execute(BackgroundTask<V> task) {
-        return EXECUTOR.submit(getJavaFXTask(task));
+    public <V> Future<V> execute(BackgroundTask<V> task) {
+        return execute(getJavaFXTask(task));
+    }
+
+    @Override
+    public <V> Future<V> execute(Task<V> task) {
+        EXECUTOR.submit(task);
+        return task;
     }
 
     @Override
@@ -91,6 +109,12 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
             {
                 EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+                EasyBind.subscribe(task.messageProperty(), this::updateMessage);
+                EasyBind.subscribe(task.isCanceledProperty(), cancelled -> {
+                    if (cancelled) {
+                        cancel();
+                    }
+                });
             }
 
             @Override

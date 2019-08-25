@@ -5,7 +5,8 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,14 @@ public class TitleFetcherTest {
         fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry();
-        bibEntryBischof2009.setType(BiblatexEntryTypes.INPROCEEDINGS);
-        bibEntryBischof2009.setField("bibtexkey", "Bischof_2009");
-        bibEntryBischof2009.setField("author", "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
-        bibEntryBischof2009.setField("booktitle", "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");
-        bibEntryBischof2009.setField("publisher", "{IEEE}");
-        bibEntryBischof2009.setField("title", "{BPELscript}: A Simplified Script Syntax for {WS}-{BPEL} 2.0");
-        bibEntryBischof2009.setField("year", "2009");
-        bibEntryBischof2009.setField("doi", "10.1109/seaa.2009.21");
+        bibEntryBischof2009.setType(StandardEntryType.InProceedings);
+        bibEntryBischof2009.setCiteKey("Bischof_2009");
+        bibEntryBischof2009.setField(StandardField.AUTHOR, "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
+        bibEntryBischof2009.setField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");
+        bibEntryBischof2009.setField(StandardField.PUBLISHER, "{IEEE}");
+        bibEntryBischof2009.setField(StandardField.TITLE, "{BPELscript}: A Simplified Script Syntax for {WS}-{BPEL} 2.0");
+        bibEntryBischof2009.setField(StandardField.YEAR, "2009");
+        bibEntryBischof2009.setField(StandardField.DOI, "10.1109/seaa.2009.21");
     }
 
     @Test
@@ -43,7 +44,7 @@ public class TitleFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("TitleToBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("TitleToBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
@@ -63,5 +64,4 @@ public class TitleFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
         assertEquals(Optional.empty(), fetchedEntry);
     }
-
 }

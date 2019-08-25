@@ -11,7 +11,6 @@ public class RemotePreferencesTest {
 
     private RemotePreferences preferences;
 
-
     @BeforeEach
     public void setUp() {
         preferences = new RemotePreferences(1000, true);
@@ -48,5 +47,4 @@ public class RemotePreferencesTest {
     public void testIsDifferentPortFalse() {
         assertFalse(preferences.isDifferentPort(1000));
     }
-
 }

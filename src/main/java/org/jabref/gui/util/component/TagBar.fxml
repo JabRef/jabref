@@ -2,7 +2,8 @@
 
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112" styleClass="tagBar">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112" styleClass="tagBar"
+         fx:controller="org.jabref.gui.util.component.TagBar">
     <HBox fx:id="tagList"/>
     <TextField fx:id="inputTextField" onAction="#addTextAsNewTag" HBox.hgrow="ALWAYS" prefHeight="Infinity"/>
 </fx:root>

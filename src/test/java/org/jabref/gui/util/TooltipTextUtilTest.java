@@ -12,10 +12,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author jpf
- * @created 11/21/17
- */
 public class TooltipTextUtilTest {
 
     @Test

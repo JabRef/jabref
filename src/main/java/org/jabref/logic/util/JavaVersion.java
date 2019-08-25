@@ -64,7 +64,9 @@ public class JavaVersion {
         while (scannerRunningVersion.hasNextInt() && scannerRequiredVersion.hasNextInt()) {
             final int running = scannerRunningVersion.nextInt();
             final int required = scannerRequiredVersion.nextInt();
-            if (running == required) continue;
+            if (running == required) {
+                continue;
+            }
             return running >= required;
         }
         return true;

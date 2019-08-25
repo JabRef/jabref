@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class SpringerLink implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
-    private static final String API_URL = "http://api.springer.com/meta/v1/json";
+    private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
     private static final String CONTENT_HOST = "link.springer.com";
 
@@ -36,7 +36,7 @@ public class SpringerLink implements FulltextFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isPresent()) {
             // Available in catalog?
@@ -58,5 +58,10 @@ public class SpringerLink implements FulltextFetcher {
             }
         }
         return pdfLink;
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
     }
 }

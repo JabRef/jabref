@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,7 +16,9 @@ import java.util.regex.Pattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -264,7 +266,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
             }
-            VM.this.execute(context.getBibtexEntry().getType(), context);
+            VM.this.execute(context.getBibtexEntry().getType().getName(), context);
         });
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));
@@ -575,7 +577,7 @@ public class VM implements Warn {
                 throw new VMException("type$ need a context.");
             }
 
-            stack.push(context.getBibtexEntry().getType());
+            stack.push(context.getBibtexEntry().getType().getName());
         });
 
         /**
@@ -852,9 +854,8 @@ public class VM implements Warn {
 
         // Create entries
         entries = new ArrayList<>(bibtex.size());
-        ListIterator<BstEntry> listIter = entries.listIterator();
         for (BibEntry entry : bibtex) {
-            listIter.add(new BstEntry(entry));
+            entries.add(new BstEntry(entry));
         }
 
         // Go
@@ -909,19 +910,18 @@ public class VM implements Warn {
      * We use null for the missing entry designator.
      */
     private void read() {
-
         for (BstEntry e : entries) {
-
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey()).orElse(null);
+                Field field = FieldFactory.parseField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(field).orElse(null);
 
                 mEntry.setValue(fieldValue);
             }
         }
 
         for (BstEntry e : entries) {
-            if (!e.getFields().containsKey(FieldName.CROSSREF)) {
-                e.getFields().put(FieldName.CROSSREF, null);
+            if (!e.getFields().containsKey(StandardField.CROSSREF.getName())) {
+                e.getFields().put(StandardField.CROSSREF.getName(), null);
             }
         }
     }
@@ -935,8 +935,6 @@ public class VM implements Warn {
      * override any definition you define using this command. If you want to
      * define a string the user can't touch, use the FUNCTION command, which has
      * a compatible syntax.
-     *
-     * @param child
      */
     private void macro(Tree child) {
         String name = child.getChild(0).getText();
@@ -959,8 +957,7 @@ public class VM implements Warn {
         }
     }
 
-
-    /*
+    /**
      * Declares the fields and entry variables. It has three arguments, each a
      * (possibly empty) list of variable names. The three lists are of: fields,
      * integer entry variables, and string entry variables. There is an
@@ -1027,8 +1024,7 @@ public class VM implements Warn {
      * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
      */
     private void sort() {
-        Collections.sort(entries, (o1, o2) -> (o1.localStrings.get("sort.key$"))
-                .compareTo(o2.localStrings.get("sort.key$")));
+        entries.sort(Comparator.comparing(o -> (o.localStrings.get("sort.key$"))));
     }
 
     private void executeInContext(Object o, BstEntry context) {

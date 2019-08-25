@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
@@ -17,28 +16,25 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefCLI {
 
+    private static final int WIDTH = 100; // Number of characters per line
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
     private List<String> leftOver;
 
-
     public JabRefCLI(String[] args) {
-
         Options options = getOptions();
-
         try {
             this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = Arrays.asList(cl.getArgs());
+            this.leftOver = cl.getArgList();
         } catch (ParseException e) {
             LOGGER.warn("Problem parsing arguments", e);
-
             this.printUsage();
             throw new RuntimeException();
         }
     }
 
     public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile: %s[,%s]",
+        return String.format("[%s]searchTerm,outputFile:%s[,%s]",
                 Localization.lang("field"),
                 Localization.lang("file"),
                 Localization.lang("exportFormat"));
@@ -96,6 +92,14 @@ public class JabRefCLI {
         return cl.getOptionValue("output");
     }
 
+    public boolean isBibtexImport() {
+        return cl.hasOption("importBibtex");
+    }
+
+    public String getBibtexImport() {
+        return cl.getOptionValue("importBibtex");
+    }
+
     public boolean isFileImport() {
         return cl.hasOption("import");
     }
@@ -140,105 +144,97 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
-    public boolean isXmpFacilities() {
-        return cl.hasOption("readAndWriteXmpMetadata");
+    public boolean isGenerateBibtexKeys() {
+        return cl.hasOption("generateBibtexKeys");
     }
 
-    public boolean isGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
-
-    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks"); }
+    public boolean isAutomaticallySetFileLinks() {
+        return cl.hasOption("automaticallySetFileLinks");
+    }
 
     private Options getOptions() {
         Options options = new Options();
 
         // boolean options
-        options.addOption("v", "version", false, Localization.lang("Display version"));
-        options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options."));
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
+        options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options"));
+        options.addOption("asfl", "automaticallySetFileLinks", false, Localization.lang("Automatically set file links"));
+        options.addOption("g", "generateBibtexKeys", false, Localization.lang("Regenerate all keys for the entries in a BibTeX file"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
+        options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
         // The "-console" option is handled by the install4j launcher
-        options.addOption(null, "console", false, Localization.lang("Show console output (only necessary when the launcher is used)"));
+        options.addOption(null, "console", false, Localization.lang("Show console output (only when the launcher is used)"));
 
         options.addOption(Option.builder("i").
                 longOpt("import").
-                desc(String.format("%s: %s[,import format]", Localization.lang("Import file"),
-                        Localization.lang("filename"))).
+                desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib")).
                 hasArg().
-                argName("FILE").build());
-
-        options.addOption(Option.builder("o").
-                longOpt("output").
-                desc(String.format("%s: %s[,export format]", Localization.lang("Output or export file"),
-                        Localization.lang("filename"))).
-                hasArg().
-                argName("FILE").
-                build());
-
-        options.addOption(Option.builder("x").
-                longOpt("prexp").
-                desc(Localization.lang("Export preferences to file")).
-                hasArg().
-                argName("FILE").
-                build());
-
-        options.addOption(Option.builder("p").
-                longOpt("primp").
-                desc(Localization.lang("Import preferences from file")).
-                hasArg().
-                argName("FILE").
-                build());
-        options.addOption(Option.builder("d").
-                longOpt("prdef").
-                desc(Localization.lang("Reset preferences (key1,key2,... or 'all')")).
-                hasArg().
-                argName("FILE").
-                build());
-
-        options.addOption(Option.builder("a").
-                longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Sublibrary from AUX"),
-                        Localization.lang("file"),
-                        Localization.lang("new"))).
-                hasArg().
-                argName("FILE").
+                argName("FILE[,FORMAT]").
                 build());
 
         options.addOption(Option.builder().
                 longOpt("importToOpen").
-                desc(Localization.lang("Import to open tab")).
+                desc(Localization.lang("Same as --import, but will be imported to the opened tab")).
                 hasArg().
-                argName("FILE").
+                argName("FILE[,FORMAT]").
                 build());
 
-        options.addOption(Option.builder("f").
-                longOpt("fetch").
-                desc(Localization.lang("Run fetcher, e.g. \"--fetch=Medline:cancer\"")).
+        options.addOption(Option.builder("ib").
+                longOpt("importBibtex").
+                desc(String.format("%s: '%s'", Localization.lang("Import BibTeX"), "-ib @article{entry}")).
                 hasArg().
-                argName("FILE").
+                argName("BIBTEXT_STRING").
+                build());
+
+        options.addOption(Option.builder("o").
+                longOpt("output").
+                desc(String.format("%s: '%s'", Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html")).
+                hasArg().
+                argName("FILE[,FORMAT]").
                 build());
 
         options.addOption(Option.builder("m").
                 longOpt("exportMatches").
-                desc(JabRefCLI.getExportMatchesSyntax()).
+                desc(String.format("%s: '%s'", Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html")).
                 hasArg().
-                argName("FILE").
+                argName("QUERY,FILE[,FORMAT]").
                 build());
 
-        options.addOption(Option.builder("g").
-                longOpt("generateBibtexKeys").
-                desc(Localization.lang("Regenerate all keys for the entries in a BibTeX file"))
-                .build());
-
-        options.addOption(Option.builder("asfl").
-                longOpt("automaticallySetFileLinks").
-                desc(Localization.lang("Automatically set file links")).
+        options.addOption(Option.builder("f").
+                longOpt("fetch").
+                desc(String.format("%s: '%s'", Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer")).
+                hasArg().
+                argName("FETCHER:QUERY").
                 build());
 
-        options.addOption(Option.builder("xmp").
-                longOpt("readAndWriteXmpMetadata").
-                desc("Read and write xmp metadata from/to pdf files").
+        options.addOption(Option.builder("a").
+                longOpt("aux").
+                desc(String.format("%s: '%s'", Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib")).
+                hasArg().
+                argName("FILE[.aux],FILE[.bib] FILE").
+                build());
+
+        options.addOption(Option.builder("x").
+                longOpt("prexp").
+                desc(String.format("%s: '%s'", Localization.lang("Export preferences to a file"), "-x prefs.xml")).
+                hasArg().
+                argName("[FILE]").
+                build());
+
+        options.addOption(Option.builder("p").
+                longOpt("primp").
+                desc(String.format("%s: '%s'", Localization.lang("Import preferences from a file"), "-p prefs.xml")).
+                hasArg().
+                argName("[FILE]").
+                build());
+
+        options.addOption(Option.builder("d").
+                longOpt("prdef").
+                desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all")).
+                hasArg().
+                argName("KEY1[,KEY2][,KEYn] | all").
                 build());
 
         return options;
@@ -260,7 +256,7 @@ public class JabRefCLI {
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
+        formatter.printHelp(WIDTH, "jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
     }
 
     private String getVersionInfo() {

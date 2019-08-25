@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -8,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,15 +17,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
@@ -35,57 +28,53 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@RunWith(Parameterized.class)
 public class BibTeXMLExporterTestFiles {
 
+    private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public File tempFile;
+    public Path tempFile;
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
-    @Parameter
-    public String filename;
-    public Path resourceDir;
+    public static Stream<String> fileNames() throws IOException, URISyntaxException {
+        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException, URISyntaxException {
-        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLExporterTestFiles.class.getResource("").toURI()))) {
+        try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList());
+                         .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        resourceDir = Paths.get(BibTeXMLExporterTestFiles.class.getResource("").toURI());
+    @BeforeEach
+    public void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExporter();
-        tempFile = testFolder.newFile();
+        Files.createFile(testFolder.resolve("ARandomlyNamedFile.tmp"));
+        tempFile = testFolder.resolve("ARandomlyNamedFile.tmp");
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @Test
-    public final void testPerformExport() throws IOException, SaveException {
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public final void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
-        String tempFilename = tempFile.getCanonicalPath();
+        String tempFilePath = tempFile.toAbsolutePath().toString();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                             .getEntries();
 
-        bibtexmlExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
+        bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
 
-        Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        assertThat(test, CompareMatcher.isSimilarTo(control)
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }

@@ -1,10 +1,8 @@
 package org.jabref.logic.importer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
@@ -27,102 +25,108 @@ import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(Parameterized.class)
 public class ImporterTest {
 
-    @Parameter public Importer format;
-
-    @Test(expected = NullPointerException.class)
-    public void isRecognizedFormatWithNullForBufferedReaderThrowsException() throws IOException {
-        format.isRecognizedFormat((BufferedReader) null);
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void isRecognizedFormatWithNullForStringThrowsException() throws IOException {
-        format.isRecognizedFormat((String) null);
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void importDatabaseWithNullForBufferedReaderThrowsException() throws IOException {
-        format.importDatabase((BufferedReader) null);
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void importDatabaseWithNullForStringThrowsException() throws IOException {
-        format.importDatabase((String) null);
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void importDatabaseWithNullForStringThrowsException(Importer format) {
+        assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
-    @Test
-    public void getFormatterNameDoesNotReturnNull() {
-        Assert.assertNotNull(format.getName());
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getFormatterNameDoesNotReturnNull(Importer format) {
+        assertNotNull(format.getName());
     }
 
-    @Test
-    public void getFileTypeDoesNotReturnNull() {
-        Assert.assertNotNull(format.getFileType());
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getFileTypeDoesNotReturnNull(Importer format) {
+        assertNotNull(format.getFileType());
     }
 
-    @Test
-    public void getIdDoesNotReturnNull() {
-        Assert.assertNotNull(format.getId());
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getIdDoesNotReturnNull(Importer format) {
+        assertNotNull(format.getId());
     }
 
-    @Test
-    public void getIdDoesNotContainWhitespace() {
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getIdDoesNotContainWhitespace(Importer format) {
         Pattern whitespacePattern = Pattern.compile("\\s");
-        Assert.assertFalse(whitespacePattern.matcher(format.getId()).find());
+        assertFalse(whitespacePattern.matcher(format.getId()).find());
     }
 
-    @Test
-    public void getIdStripsSpecialCharactersAndConvertsToLowercase() {
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
         Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
-        Assert.assertEquals("testimporter", importer.getId());
+        assertEquals("testimporter", importer.getId());
     }
 
-    @Test
-    public void getDescriptionDoesNotReturnNull() {
-        Assert.assertNotNull(format.getDescription());
+    @ParameterizedTest
+    @MethodSource("instancesToTest")
+    public void getDescriptionDoesNotReturnNull(Importer format) {
+        assertNotNull(format.getDescription());
     }
 
-    @Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> instancesToTest() {
+    public static Stream<Importer> instancesToTest() {
         // all classes implementing {@link Importer}
         // sorted alphabetically
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
-        return Arrays.asList(
-                new Object[]{new BiblioscapeImporter()},
-                new Object[]{new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())},
-                new Object[]{new BibTeXMLImporter()},
-                new Object[]{new CopacImporter()},
-                new Object[]{new EndnoteImporter(importFormatPreferences)},
-                new Object[]{new FreeCiteImporter(importFormatPreferences)},
-                new Object[]{new InspecImporter()},
-                new Object[]{new IsiImporter()},
-                new Object[]{new MedlineImporter()},
-                new Object[]{new MedlinePlainImporter()},
-                new Object[]{new ModsImporter()},
-                new Object[]{new MsBibImporter()},
-                new Object[]{new OvidImporter()},
-                new Object[]{new PdfContentImporter(importFormatPreferences)},
-                new Object[]{new PdfXmpImporter(xmpPreferences)},
-                new Object[]{new RepecNepImporter(importFormatPreferences)},
-                new Object[]{new RisImporter()},
-                new Object[]{new SilverPlatterImporter()}
+        return Stream.of(
+                new BiblioscapeImporter(),
+                new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
+                new BibTeXMLImporter(),
+                new CopacImporter(),
+                new EndnoteImporter(importFormatPreferences),
+                new FreeCiteImporter(importFormatPreferences),
+                new InspecImporter(),
+                new IsiImporter(),
+                new MedlineImporter(),
+                new MedlinePlainImporter(),
+                new ModsImporter(importFormatPreferences),
+                new MsBibImporter(),
+                new OvidImporter(),
+                new PdfContentImporter(importFormatPreferences),
+                new PdfXmpImporter(xmpPreferences),
+                new RepecNepImporter(importFormatPreferences),
+                new RisImporter(),
+                new SilverPlatterImporter()
         );
         // @formatter:on
     }

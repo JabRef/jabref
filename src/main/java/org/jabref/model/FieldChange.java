@@ -3,19 +3,19 @@ package org.jabref.model;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
- *
+ * This class is used in the instance of a field being modified, removed or added.
  */
 public class FieldChange {
 
     private final BibEntry entry;
-    private final String field;
+    private final Field field;
     private final String oldValue;
     private final String newValue;
 
-
-    public FieldChange(BibEntry entry, String field, String oldValue, String newValue) {
+    public FieldChange(BibEntry entry, Field field, String oldValue, String newValue) {
         this.entry = entry;
         this.field = field;
         this.oldValue = oldValue;
@@ -26,7 +26,7 @@ public class FieldChange {
         return this.entry;
     }
 
-    public String getField() {
+    public Field getField() {
         return this.field;
     }
 
@@ -72,13 +72,10 @@ public class FieldChange {
                 return false;
             }
             if (oldValue == null) {
-                if (other.oldValue != null) {
-                    return false;
-                }
-            } else if (!oldValue.equals(other.oldValue)) {
-                return false;
+                return other.oldValue == null;
+            } else {
+                return oldValue.equals(other.oldValue);
             }
-            return true;
         }
         return false;
     }

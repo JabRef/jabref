@@ -1,15 +1,17 @@
 package org.jabref.logic.net;
 
+import org.jabref.gui.fieldeditors.URLUtil;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class URLUtilTest {
+class URLUtilTest {
 
     @Test
-    public void cleanGoogleSearchURL() throws Exception {
+    void cleanGoogleSearchURL() throws Exception {
         // empty text
         assertEquals("", URLUtil.cleanGoogleSearchURL(""));
         assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));
@@ -61,14 +63,15 @@ public class URLUtilTest {
     }
 
     @Test
-    public void isURLshouldAcceptValidURL() {
+    void isURLshouldAcceptValidURL() {
         assertTrue(URLUtil.isURL("http://www.google.com"));
         assertTrue(URLUtil.isURL("https://www.google.com"));
     }
 
     @Test
-    public void isURLshouldRejectInvalidURL() {
+    void isURLshouldRejectInvalidURL() {
         assertFalse(URLUtil.isURL("www.google.com"));
         assertFalse(URLUtil.isURL("google.com"));
     }
+
 }

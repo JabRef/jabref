@@ -2,7 +2,8 @@
 
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.util.component.TemporalAccessorPicker?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.DateEditor">
     <TemporalAccessorPicker fx:id="datePicker" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="Infinity"
                             maxWidth="Infinity"/>
 </fx:root>

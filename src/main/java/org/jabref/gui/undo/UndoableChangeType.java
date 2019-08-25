@@ -3,21 +3,23 @@ package org.jabref.gui.undo;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
 /**
  * This class represents the change of type for an entry.
  */
 public class UndoableChangeType extends AbstractUndoableJabRefEdit {
-    private final String oldType;
-    private final String newType;
+    private final EntryType oldType;
+    private final EntryType newType;
     private final BibEntry entry;
 
     public UndoableChangeType(FieldChange change) {
-        this(change.getEntry(), change.getOldValue(), change.getNewValue());
+        this(change.getEntry(), EntryTypeFactory.parse(change.getOldValue()), EntryTypeFactory.parse(change.getNewValue()));
     }
 
-    public UndoableChangeType(BibEntry entry, String oldType, String newType) {
+    public UndoableChangeType(BibEntry entry, EntryType oldType, EntryType newType) {
         this.oldType = oldType;
         this.newType = newType;
         this.entry = entry;
@@ -27,8 +29,8 @@ public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     public String getPresentationName() {
         return Localization.lang("change type of entry %0 from %1 to %2",
                 StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
-                StringUtil.boldHTML(oldType, Localization.lang("undefined")),
-                StringUtil.boldHTML(newType));
+                StringUtil.boldHTML(oldType.getDisplayName(), Localization.lang("undefined")),
+                StringUtil.boldHTML(newType.getDisplayName()));
     }
 
     @Override

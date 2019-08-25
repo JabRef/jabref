@@ -8,21 +8,26 @@ import java.util.stream.Collectors;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticPersonsGroup extends AutomaticGroup {
 
-    private String field;
+    private Field field;
 
-    public AutomaticPersonsGroup(String name, GroupHierarchyType context, String field) {
+    public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
         this.field = field;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AutomaticPersonsGroup that = (AutomaticPersonsGroup) o;
         return Objects.equals(field, that.field);
     }
@@ -34,7 +39,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticPersonsGroup(this.name, this.context, this.field);
+        return new AutomaticPersonsGroup(this.name.getValue(), this.context, this.field);
     }
 
     @Override
@@ -51,7 +56,7 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
                 .collect(Collectors.toSet());
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 }

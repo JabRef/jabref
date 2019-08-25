@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -28,11 +29,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.jsoup.helper.StringUtil;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (http://www.adsabs.harvard.edu/)
@@ -86,7 +88,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         uriBuilder.addParameter("db_key", "PRE");
 
         // Add title search
-        entry.getFieldOrAlias(FieldName.TITLE).ifPresent(title -> {
+        entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> {
             uriBuilder.addParameter("ttl_logic", "OR");
             uriBuilder.addParameter("title", title);
             uriBuilder.addParameter("ttl_syn", "YES"); // Synonym replacement
@@ -95,7 +97,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         });
 
         // Add author search
-        entry.getFieldOrAlias(FieldName.AUTHOR).ifPresent(author -> {
+        entry.getFieldOrAlias(StandardField.AUTHOR).ifPresent(author -> {
             uriBuilder.addParameter("aut_logic", "OR");
             uriBuilder.addParameter("author", author);
             uriBuilder.addParameter("aut_syn", "YES"); // Synonym replacement
@@ -115,8 +117,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ADS;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ADS);
     }
 
     @Override
@@ -153,15 +155,15 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(FieldName.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
 
         // Remove ADS note
-        new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
-        new MoveFieldCleanup("adsurl", FieldName.URL).cleanup(entry);
+        new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }

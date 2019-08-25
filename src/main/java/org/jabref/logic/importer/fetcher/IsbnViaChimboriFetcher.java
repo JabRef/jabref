@@ -10,11 +10,12 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.jsoup.helper.StringUtil;
 
 /**
  * Fetcher for ISBN using https://bibtex.chimbori.com/, which in turn uses Amazon's API.
@@ -74,7 +75,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         BibEntry entry = fetchedEntries.get(0);
 
         // chimbori does not return an ISBN. Thus, we add the one searched for
-        entry.setField("isbn", identifier);
+        entry.setField(StandardField.ISBN, identifier);
 
         doPostCleanup(entry);
 
@@ -85,7 +86,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
     public void doPostCleanup(BibEntry entry) {
         // We MUST NOT clean the URL. this is the deal with @manastungare - see https://github.com/JabRef/jabref/issues/684#issuecomment-266541507
         // DO NOT add following code:
-        // new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+        // new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
 
 }

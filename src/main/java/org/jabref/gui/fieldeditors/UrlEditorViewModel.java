@@ -10,7 +10,7 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLUtil;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 import org.fxmisc.easybind.EasyBind;
@@ -19,8 +19,8 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
     private DialogService dialogService;
     private BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
-    public UrlEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public UrlEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
         this.dialogService = dialogService;
 
         validUrlIsNotPresent.bind(

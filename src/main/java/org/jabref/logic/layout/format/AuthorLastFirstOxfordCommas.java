@@ -10,10 +10,6 @@ import org.jabref.model.entry.AuthorList;
  * <li>Individual authors are separated by commas.</li>
  * <li>The 'and' of a list of three or more authors is preceeded by a comma
  * (Oxford comma)</li>
- *
- * @author mkovtun
- * @author Christopher Oezbek <oezi@oezi.de>
- *
  */
 public class AuthorLastFirstOxfordCommas implements LayoutFormatter {
 

@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,31 +31,31 @@ public class GvkFetcherTest {
         fetcher = new GvkFetcher();
 
         bibEntryPPN591166003 = new BibEntry();
-        bibEntryPPN591166003.setType(BiblatexEntryTypes.BOOK);
-        bibEntryPPN591166003.setField("title", "Effective Java");
-        bibEntryPPN591166003.setField("publisher", "Addison-Wesley");
-        bibEntryPPN591166003.setField("year", "2008");
-        bibEntryPPN591166003.setField("author", "Joshua Bloch");
-        bibEntryPPN591166003.setField("series", "The @Java series");
-        bibEntryPPN591166003.setField("address", "Upper Saddle River, NJ [u.a.]");
-        bibEntryPPN591166003.setField("edition", "2. ed., 5. print.");
-        bibEntryPPN591166003.setField("note", "Literaturverz. S. 321 - 325");
-        bibEntryPPN591166003.setField("isbn", "9780321356680");
-        bibEntryPPN591166003.setField("pagetotal", "XXI, 346");
-        bibEntryPPN591166003.setField("ppn_gvk", "591166003");
-        bibEntryPPN591166003.setField("subtitle", "[revised and updated for JAVA SE 6]");
+        bibEntryPPN591166003.setType(StandardEntryType.Book);
+        bibEntryPPN591166003.setField(StandardField.TITLE, "Effective Java");
+        bibEntryPPN591166003.setField(StandardField.PUBLISHER, "Addison-Wesley");
+        bibEntryPPN591166003.setField(StandardField.YEAR, "2008");
+        bibEntryPPN591166003.setField(StandardField.AUTHOR, "Joshua Bloch");
+        bibEntryPPN591166003.setField(StandardField.SERIES, "The @Java series");
+        bibEntryPPN591166003.setField(StandardField.ADDRESS, "Upper Saddle River, NJ [u.a.]");
+        bibEntryPPN591166003.setField(StandardField.EDITION, "2. ed., 5. print.");
+        bibEntryPPN591166003.setField(StandardField.NOTE, "Literaturverz. S. 321 - 325");
+        bibEntryPPN591166003.setField(StandardField.ISBN, "9780321356680");
+        bibEntryPPN591166003.setField(StandardField.PAGETOTAL, "XXI, 346");
+        bibEntryPPN591166003.setField(new UnknownField("ppn_gvk"), "591166003");
+        bibEntryPPN591166003.setField(StandardField.SUBTITLE, "[revised and updated for JAVA SE 6]");
 
         bibEntryPPN66391437X = new BibEntry();
-        bibEntryPPN66391437X.setType(BiblatexEntryTypes.BOOK);
-        bibEntryPPN66391437X.setField("title", "Effective unit testing");
-        bibEntryPPN66391437X.setField("publisher", "Manning");
-        bibEntryPPN66391437X.setField("year", "2013");
-        bibEntryPPN66391437X.setField("author", "Lasse Koskela");
-        bibEntryPPN66391437X.setField("address", "Shelter Island, NY");
-        bibEntryPPN66391437X.setField("isbn", "9781935182573");
-        bibEntryPPN66391437X.setField("pagetotal", "XXIV, 223");
-        bibEntryPPN66391437X.setField("ppn_gvk", "66391437X");
-        bibEntryPPN66391437X.setField("subtitle", "A guide for Java developers");
+        bibEntryPPN66391437X.setType(StandardEntryType.Book);
+        bibEntryPPN66391437X.setField(StandardField.TITLE, "Effective unit testing");
+        bibEntryPPN66391437X.setField(StandardField.PUBLISHER, "Manning");
+        bibEntryPPN66391437X.setField(StandardField.YEAR, "2013");
+        bibEntryPPN66391437X.setField(StandardField.AUTHOR, "Lasse Koskela");
+        bibEntryPPN66391437X.setField(StandardField.ADDRESS, "Shelter Island, NY");
+        bibEntryPPN66391437X.setField(StandardField.ISBN, "9781935182573");
+        bibEntryPPN66391437X.setField(StandardField.PAGETOTAL, "XXIV, 223");
+        bibEntryPPN66391437X.setField(new UnknownField("ppn_gvk"), "66391437X");
+        bibEntryPPN66391437X.setField(StandardField.SUBTITLE, "A guide for Java developers");
     }
 
     @Test
@@ -63,7 +65,7 @@ public class GvkFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("GVK", fetcher.getHelpPage().getPageName());
+        assertEquals("GVK", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package org.jabref.model.metadata;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,8 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -31,7 +33,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = "file" + FilePreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -40,8 +42,9 @@ public class MetaData {
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
     private final EventBus eventBus = new EventBus();
-    private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
+    private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
@@ -50,8 +53,8 @@ public class MetaData {
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
-    private ContentSelectors contentSelectors = new ContentSelectors();
-    private Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private final ContentSelectors contentSelectors = new ContentSelectors();
+    private final Map<String, List<String>> unkownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
     /**
@@ -109,16 +112,16 @@ public class MetaData {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
-        Map<String, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
+        Map<EntryType, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(List<String> defaultValue, Map<String, List<String>> nonDefaultPatterns) {
+    public void setCiteKeyPattern(List<String> defaultValue, Map<EntryType, List<String>> nonDefaultPatterns) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
         // Set new value if it is not a default value
-        for (Map.Entry<String, List<String>> pattern : nonDefaultPatterns.entrySet()) {
+        for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
             citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
         }
 
@@ -167,13 +170,13 @@ public class MetaData {
         postChange();
     }
 
-    public void clearContentSelectors(String fieldName) {
-        contentSelectors.removeSelector(fieldName);
+    public void clearContentSelectors(Field field) {
+        contentSelectors.removeSelector(field);
         postChange();
     }
 
-    public List<String> getContentSelectorValuesForField(String fieldName) {
-        return contentSelectors.getSelectorValuesForField(fieldName);
+    public List<String> getContentSelectorValuesForField(Field field) {
+        return contentSelectors.getSelectorValuesForField(field);
     }
 
     public Optional<String> getDefaultFileDirectory() {
@@ -206,6 +209,20 @@ public class MetaData {
 
     public void clearUserFileDirectory(String user) {
         userFileDirectory.remove(user);
+        postChange();
+    }
+
+    public Optional<Path> getLaTexFileDirectory(String user) {
+        return Optional.ofNullable(laTexFileDirectory.get(user));
+    }
+
+    public void setLaTexFileDirectory(String user, Path path) {
+        laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        postChange();
+    }
+
+    public void clearLaTexFileDirectory(String user) {
+        laTexFileDirectory.remove(user);
         postChange();
     }
 
@@ -285,6 +302,10 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
+    public Map<String, Path> getLaTexFileDirectories() {
+        return Collections.unmodifiableMap(laTexFileDirectory);
+    }
+
     public Map<String, List<String>> getUnknownMetaData() {
         return Collections.unmodifiableMap(unkownMetaData);
     }
@@ -310,6 +331,7 @@ public class MetaData {
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
+               && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)

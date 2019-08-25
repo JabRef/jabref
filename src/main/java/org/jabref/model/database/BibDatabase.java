@@ -25,12 +25,13 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
@@ -42,13 +43,14 @@ import org.slf4j.LoggerFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
      * State attributes
      */
-    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
-    private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
+    private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
     /**
      * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
      */
@@ -66,6 +68,11 @@ public class BibDatabase {
     public BibDatabase() {
         this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
+    }
+
+    public BibDatabase(List<BibEntry> entries) {
+        this();
+        insertEntries(entries);
     }
 
     /**
@@ -125,13 +132,13 @@ public class BibDatabase {
      *
      * @return set of fieldnames, that are visible
      */
-    public Set<String> getAllVisibleFields() {
-        Set<String> allFields = new TreeSet<>();
+    public Set<Field> getAllVisibleFields() {
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
         for (BibEntry e : getEntries()) {
-            allFields.addAll(e.getFieldNames());
+            allFields.addAll(e.getFields());
         }
-        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
-                .collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
+                        .collect(Collectors.toSet());
     }
 
     /**
@@ -226,7 +233,6 @@ public class BibDatabase {
         entries.addAll(newEntries);
     }
 
-
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
@@ -288,6 +294,16 @@ public class BibDatabase {
     }
 
     /**
+     * Replaces the existing lists of BibTexString with the given one
+     * No Duplicate checks are performed
+     * @param stringsToAdd The collection of strings to set
+     */
+    public void setStrings(Collection<BibtexString> stringsToAdd) {
+        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
+        bibtexStrings = strs;
+    }
+
+    /**
      * Removes the string with the given id.
      */
     public void removeString(String id) {
@@ -318,15 +334,10 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the string with the given name.
+     * Returns the string with the given name/label
      */
     public Optional<BibtexString> getStringByName(String name) {
-        for (BibtexString string : getStringValues()) {
-            if (string.getName().equals(name)) {
-                return Optional.of(string);
-            }
-        }
-        return Optional.empty();
+        return getStringValues().stream().filter(string -> string.getName().equals(name)).findFirst();
     }
 
     /**
@@ -356,12 +367,7 @@ public class BibDatabase {
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (BibtexString value : bibtexStrings.values()) {
-            if (value.getName().equals(label)) {
-                return true;
-            }
-        }
-        return false;
+        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /**
@@ -442,7 +448,7 @@ public class BibDatabase {
             resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (Map.Entry<String, String> field : resultingEntry.getFieldMap().entrySet()) {
+        for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {
             resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));
         }
         return resultingEntry;
@@ -505,7 +511,7 @@ public class BibDatabase {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
-                    newRes.append(res.substring(piv, next));
+                    newRes.append(res, piv, next);
                 }
                 int stringEnd = res.indexOf('#', next + 1);
                 if (stringEnd >= 0) {
@@ -517,7 +523,7 @@ public class BibDatabase {
                     if (resolved == null) {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
-                        newRes.append(res.substring(next, stringEnd + 1));
+                        newRes.append(res, next, stringEnd + 1);
                     } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:
@@ -583,7 +589,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
-        return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByKey);
     }
 
     public Optional<String> getSharedDatabaseID() {
@@ -615,5 +621,4 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
-
 }

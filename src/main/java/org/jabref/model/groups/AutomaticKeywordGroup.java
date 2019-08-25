@@ -8,15 +8,16 @@ import java.util.stream.Collectors;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
     private Character keywordDelimiter;
     private Character keywordHierarchicalDelimiter;
-    private String field;
+    private Field field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, String field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
+    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
         super(name, context);
         this.field = field;
         this.keywordDelimiter = keywordDelimiter;
@@ -31,19 +32,23 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
         return keywordDelimiter;
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
+        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
         return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
                 Objects.equals(field, that.field);

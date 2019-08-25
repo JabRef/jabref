@@ -7,10 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -22,9 +25,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private final Set<String> searchWords;
     private final boolean onlySplitWordsAtSeparator;
 
-    public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
-            String searchExpression, boolean caseSensitive, Character keywordSeparator,
-            boolean onlySplitWordsAtSeparator) {
+    public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
+                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                            boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
@@ -51,11 +54,11 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> add(List<BibEntry> entriesToAdd) {
+    public List<FieldChange> add(Collection<BibEntry> entriesToAdd) {
         Objects.requireNonNull(entriesToAdd);
 
         List<FieldChange> changes = new ArrayList<>();
-        for (BibEntry entry : entriesToAdd) {
+        for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
                 KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
@@ -71,7 +74,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     public List<FieldChange> remove(List<BibEntry> entriesToRemove) {
         Objects.requireNonNull(entriesToRemove);
         List<FieldChange> changes = new ArrayList<>();
-        for (BibEntry entry : entriesToRemove) {
+        for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
                 String oldContent = entry.getField(searchField).orElse("");
                 KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
@@ -113,6 +116,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
     private Set<String> getFieldContentAsWords(BibEntry entry) {
         if (onlySplitWordsAtSeparator) {
+            if (InternalField.TYPE_HEADER.equals(searchField)) {
+                return searchWords.stream().filter(word -> entry.getType().getName().equalsIgnoreCase(word)).collect(Collectors.toSet());
+            }
             return entry.getField(searchField)
                     .map(content -> KeywordList.parse(content, keywordSeparator).toStringList())
                     .orElse(Collections.emptySet());

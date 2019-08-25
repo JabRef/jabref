@@ -2,13 +2,7 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * @author $author$
- * @version $Revision: 2268 $
- */
 public class CreateBibORDFAuthors implements LayoutFormatter {
-
-    //~ Methods ////////////////////////////////////////////////////////////////
 
     @Override
     public String format(String fieldText) {
@@ -39,11 +33,6 @@ public class CreateBibORDFAuthors implements LayoutFormatter {
         return sb.toString();
     }
 
-    /**
-     * @param sb
-     * @param author
-     * @param position
-     */
     private static void singleAuthor(StringBuilder sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");

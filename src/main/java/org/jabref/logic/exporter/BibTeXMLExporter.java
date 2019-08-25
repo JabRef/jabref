@@ -37,9 +37,13 @@ import org.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
 import org.jabref.logic.importer.fileformat.bibtexml.Proceedings;
 import org.jabref.logic.importer.fileformat.bibtexml.Techreport;
 import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +59,7 @@ public class BibTeXMLExporter extends Exporter {
     private JAXBContext context;
 
     public BibTeXMLExporter() {
-        super("bibtexml", FileType.BIBTEXML_XML_ONLY.getDescription(), FileType.BIBTEXML_XML_ONLY);
+        super("bibtexml", "BibTexXML", StandardFileType.XML);
     }
 
     @Override
@@ -73,53 +77,37 @@ public class BibTeXMLExporter extends Exporter {
 
             bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
-            String type = bibEntry.getType().toLowerCase(ENGLISH);
-            switch (type) {
-                case "article":
-                    parse(new Article(), bibEntry, entry);
-                    break;
-                case "book":
-                    parse(new Book(), bibEntry, entry);
-                    break;
-                case "booklet":
-                    parse(new Booklet(), bibEntry, entry);
-                    break;
-                case "conference":
-                    parse(new Conference(), bibEntry, entry);
-                    break;
-                case "inbook":
-                    parseInbook(new Inbook(), bibEntry, entry);
-                    break;
-                case "incollection":
-                    parse(new Incollection(), bibEntry, entry);
-                    break;
-                case "inproceedings":
-                    parse(new Inproceedings(), bibEntry, entry);
-                    break;
-                case "mastersthesis":
-                    parse(new Mastersthesis(), bibEntry, entry);
-                    break;
-                case "manual":
-                    parse(new Manual(), bibEntry, entry);
-                    break;
-                case "misc":
-                    parse(new Misc(), bibEntry, entry);
-                    break;
-                case "phdthesis":
-                    parse(new Phdthesis(), bibEntry, entry);
-                    break;
-                case "proceedings":
-                    parse(new Proceedings(), bibEntry, entry);
-                    break;
-                case "techreport":
-                    parse(new Techreport(), bibEntry, entry);
-                    break;
-                case "unpublished":
-                    parse(new Unpublished(), bibEntry, entry);
-                    break;
-                default:
-                    LOGGER.warn("unexpected type appeared");
-                    break;
+            EntryType i = bibEntry.getType();
+            if (StandardEntryType.Article.equals(i)) {
+                parse(new Article(), bibEntry, entry);
+            } else if (StandardEntryType.Book.equals(i)) {
+                parse(new Book(), bibEntry, entry);
+            } else if (StandardEntryType.Booklet.equals(i)) {
+                parse(new Booklet(), bibEntry, entry);
+            } else if (StandardEntryType.Conference.equals(i)) {
+                parse(new Conference(), bibEntry, entry);
+            } else if (StandardEntryType.InBook.equals(i)) {
+                parseInbook(new Inbook(), bibEntry, entry);
+            } else if (StandardEntryType.InCollection.equals(i)) {
+                parse(new Incollection(), bibEntry, entry);
+            } else if (StandardEntryType.InProceedings.equals(i)) {
+                parse(new Inproceedings(), bibEntry, entry);
+            } else if (StandardEntryType.MastersThesis.equals(i)) {
+                parse(new Mastersthesis(), bibEntry, entry);
+            } else if (StandardEntryType.Manual.equals(i)) {
+                parse(new Manual(), bibEntry, entry);
+            } else if (StandardEntryType.Misc.equals(i)) {
+                parse(new Misc(), bibEntry, entry);
+            } else if (StandardEntryType.PhdThesis.equals(i)) {
+                parse(new Phdthesis(), bibEntry, entry);
+            } else if (StandardEntryType.Proceedings.equals(i)) {
+                parse(new Proceedings(), bibEntry, entry);
+            } else if (StandardEntryType.TechReport.equals(i)) {
+                parse(new Techreport(), bibEntry, entry);
+            } else if (StandardEntryType.Unpublished.equals(i)) {
+                parse(new Unpublished(), bibEntry, entry);
+            } else {
+                LOGGER.warn("unexpected type appeared");
             }
             file.getEntry().add(entry);
         }
@@ -141,16 +129,16 @@ public class BibTeXMLExporter extends Exporter {
     }
 
     /**
-     * Contains same logic as the {@link parse()} method, but inbook needs a special treatment, because
+     * Contains same logic as the {@link #parse(Object, BibEntry, Entry)} method, but inbook needs a special treatment, because
      * the contents of inbook are stored in a List of JAXBElements. So we first need to create
      * a JAXBElement for every field and then add it to the content list.
      */
     private void parseInbook(Inbook inbook, BibEntry bibEntry, Entry entry) {
-        Map<String, String> fieldMap = bibEntry.getFieldMap();
-        for (Map.Entry<String, String> entryField : fieldMap.entrySet()) {
+        Map<Field, String> fieldMap = bibEntry.getFieldMap();
+        for (Map.Entry<Field, String> entryField : fieldMap.entrySet()) {
             String value = entryField.getValue();
-            String key = entryField.getKey();
-            if ("year".equals(key)) {
+            Field key = entryField.getKey();
+            if (StandardField.YEAR.equals(key)) {
                 XMLGregorianCalendar calendar;
                 try {
                     calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
@@ -161,12 +149,12 @@ public class BibTeXMLExporter extends Exporter {
                 } catch (DatatypeConfigurationException e) {
                     LOGGER.error("A configuration error occured");
                 }
-            } else if ("number".equals(key)) {
+            } else if (StandardField.NUMBER.equals(key)) {
                 JAXBElement<BigInteger> number = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, "number"),
                         BigInteger.class, new BigInteger(value));
                 inbook.getContent().add(number);
             } else {
-                JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key), String.class,
+                JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key.getName()), String.class,
                         value);
                 inbook.getContent().add(element);
             }
@@ -192,33 +180,37 @@ public class BibTeXMLExporter extends Exporter {
      */
     private <T> void parse(T entryType, BibEntry bibEntry, Entry entry) {
         List<Method> declaredSetMethods = getListOfSetMethods(entryType);
-        Map<String, String> fieldMap = bibEntry.getFieldMap();
-        for (Map.Entry<String, String> entryField : fieldMap.entrySet()) {
+        for (Map.Entry<Field, String> entryField : bibEntry.getFieldMap().entrySet()) {
+            Field key = entryField.getKey();
             String value = entryField.getValue();
-            String key = entryField.getKey();
             for (Method method : declaredSetMethods) {
                 String methodNameWithoutSet = method.getName().replace("set", "").toLowerCase(ENGLISH);
+                if (!methodNameWithoutSet.equals(key.getName())) {
+                    continue;
+                }
+
                 try {
-
-                    if ("year".equals(key) && key.equals(methodNameWithoutSet)) {
+                    if (StandardField.YEAR.equals(key)) {
                         try {
-
-                            XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
-                                    .newXMLGregorianCalendar(value);
+                            XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
                             method.invoke(entryType, calendar);
                         } catch (DatatypeConfigurationException e) {
                             LOGGER.error("A configuration error occured");
                         }
                         break;
-                    } else if ("number".equals(key) && key.equals(methodNameWithoutSet)) {
-                        method.invoke(entryType, new BigInteger(value));
+                    } else if (StandardField.NUMBER.equals(key)) {
+                        try {
+                            method.invoke(entryType, new BigInteger(value));
+                        } catch (NumberFormatException exception) {
+                            LOGGER.warn("The value %s of the 'number' field is not an integer and thus is ignored for the export", value);
+                        }
                         break;
-                    } else if (key.equals(methodNameWithoutSet)) {
+                    } else {
                         method.invoke(entryType, value);
                         break;
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    LOGGER.error("Could not invoke method", e);
+                    LOGGER.error("Could not invoke method " + method.getName(), e);
                 }
             }
 

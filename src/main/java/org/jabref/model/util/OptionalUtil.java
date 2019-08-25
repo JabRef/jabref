@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -17,6 +18,18 @@ public class OptionalUtil {
             return Collections.singletonList(value.get());
         } else {
             return Collections.emptyList();
+        }
+    }
+
+    public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
+        if (!left.isPresent()) {
+            return !right.isPresent();
+        } else {
+            if (right.isPresent()) {
+                return equality.test(left.get(), right.get());
+            } else {
+                return false;
+            }
         }
     }
 
@@ -48,11 +61,31 @@ public class OptionalUtil {
         return value.isPresent() && check.test(value.get());
     }
 
+    public static <T> Boolean isPresentAndTrue(Optional<Boolean> value) {
+        return value.isPresent() && value.get();
+    }
+
     public static <T, S, R> Optional<R> combine(Optional<T> valueOne, Optional<S> valueTwo, BiFunction<T, S, R> combine) {
         if (valueOne.isPresent() && valueTwo.isPresent()) {
             return Optional.ofNullable(combine.apply(valueOne.get(), valueTwo.get()));
         } else {
             return Optional.empty();
+        }
+    }
+
+    public static <T> Optional<T> orElse(Optional<? extends T> valueOne, Optional<? extends T> valueTwo) {
+        if (valueOne.isPresent()) {
+            return valueOne.map(f -> f);
+        } else {
+            return valueTwo.map(f -> f);
+        }
+    }
+
+    public static <T extends S, S> S orElse(Optional<T> optional, S otherwise) {
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            return otherwise;
         }
     }
 }

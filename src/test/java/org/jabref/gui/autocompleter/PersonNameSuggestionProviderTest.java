@@ -6,6 +6,8 @@ import java.util.Collections;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,20 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PersonNameSuggestionProviderTest {
 
-    private static final Author vassilisKostakos = new Author("Vassilis", "V.", "", "Kostakos", "");
+    private final Author vassilisKostakos = new Author("Vassilis", "V.", "", "Kostakos", "");
     private PersonNameSuggestionProvider autoCompleter;
     private BibEntry entry;
 
+    @Test
     public void initAutoCompleterWithNullFieldThrowsException() {
-        assertThrows(NullPointerException.class, () -> new PersonNameSuggestionProvider((String) null));
+        assertThrows(NullPointerException.class, () -> new PersonNameSuggestionProvider((Field) null));
     }
 
     @BeforeEach
     public void setUp() throws Exception {
-        autoCompleter = new PersonNameSuggestionProvider("field");
+        autoCompleter = new PersonNameSuggestionProvider(StandardField.AUTHOR);
 
         entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
+        entry.setField(StandardField.AUTHOR, "Vassilis Kostakos");
     }
 
     @Test
@@ -58,7 +61,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "testTitle");
+        entry.setField(StandardField.TITLE, "testTitle");
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("test")));
@@ -106,7 +109,7 @@ public class PersonNameSuggestionProviderTest {
     public void completeReturnsMultipleResults() {
         autoCompleter.indexEntry(entry);
         BibEntry entryTwo = new BibEntry();
-        entryTwo.setField("field", "Kosta");
+        entryTwo.setField(StandardField.AUTHOR, "Kosta");
         autoCompleter.indexEntry(entryTwo);
         Author authorTwo = new Author("", "", "", "Kosta", "");
 
@@ -133,7 +136,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeBeginningOfFirstNameReturnsNameWithJr() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "Reagle, Jr., Joseph M.");
+        entry.setField(StandardField.AUTHOR, "Reagle, Jr., Joseph M.");
         autoCompleter.indexEntry(entry);
         Author author = new Author("Joseph M.", "J. M.", "", "Reagle", "Jr.");
 
@@ -144,7 +147,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeBeginningOfFirstNameReturnsNameWithVon() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "Eric von Hippel");
+        entry.setField(StandardField.AUTHOR, "Eric von Hippel");
         autoCompleter.indexEntry(entry);
         Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
@@ -155,7 +158,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeBeginningOfLastNameReturnsNameWithUmlauts() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "Honig Bär");
+        entry.setField(StandardField.AUTHOR, "Honig Bär");
         autoCompleter.indexEntry(entry);
         Author author = new Author("Honig", "H.", "", "Bär", "");
 
@@ -166,7 +169,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeVonReturnsName() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "Eric von Hippel");
+        entry.setField(StandardField.AUTHOR, "Eric von Hippel");
         autoCompleter.indexEntry(entry);
         Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
@@ -177,7 +180,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeBeginningOfFullNameReturnsName() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
+        entry.setField(StandardField.AUTHOR, "Vassilis Kostakos");
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Kostakos, Va")));

@@ -29,5 +29,4 @@ public class SentenceCaseFormatterTest {
     public void formatExample() {
         assertEquals("I have {Aa} dream", formatter.format(formatter.getExampleInput()));
     }
-
 }

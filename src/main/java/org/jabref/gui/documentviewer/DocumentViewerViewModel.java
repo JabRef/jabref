@@ -24,15 +24,20 @@ import org.jabref.model.entry.LinkedFile;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
 
-    private StateManager stateManager;
-    private ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
-    private ListProperty<LinkedFile> files = new SimpleListProperty<>();
-    private BooleanProperty liveMode = new SimpleBooleanProperty();
-    private ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
-    private IntegerProperty maxPages = new SimpleIntegerProperty();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
+
+    private final StateManager stateManager;
+    private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
+    private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
+    private final BooleanProperty liveMode = new SimpleBooleanProperty();
+    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
+    private final IntegerProperty maxPages = new SimpleIntegerProperty();
+
 
     public DocumentViewerViewModel(StateManager stateManager) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -46,7 +51,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
         this.liveMode.addListener((observable, oldValue, newValue) -> {
             // Switch to currently selected entry if mode is changed to live
-            if (oldValue != newValue && newValue) {
+            if ((oldValue != newValue) && newValue) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
@@ -100,15 +105,15 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         try {
             currentDocument.set(new PdfDocumentViewModel(PDDocument.load(path.toFile())));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not set Document Viewer", e);
         }
     }
 
     public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase().ifPresent(database ->
-                    file.findIn(database, Globals.prefs.getFileDirectoryPreferences())
-                            .ifPresent(this::setCurrentDocument));
+                    file.findIn(database, Globals.prefs.getFilePreferences())
+                        .ifPresent(this::setCurrentDocument));
         }
     }
 

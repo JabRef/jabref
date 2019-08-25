@@ -4,27 +4,25 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.MergeDialog;
 import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableInsertString;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,6 +35,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -46,14 +45,14 @@ public class AppendDatabaseAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
-    private final JabRefFrame frame;
     private final BasePanel panel;
 
     private final List<Path> filesToOpen = new ArrayList<>();
+    private final DialogService dialogService;
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
-        this.frame = frame;
         this.panel = panel;
+        dialogService = frame.getDialogService();
     }
 
     private static void mergeFromBibtex(BasePanel panel, ParserResult parserResult, boolean importEntries,
@@ -78,7 +77,7 @@ public class AppendDatabaseAction implements BaseAction {
                 database.insertEntry(entry);
                 appendedEntries.add(entry);
                 originalEntries.add(originalEntry);
-                ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                ce.addEdit(new UndoableInsertEntry(database, entry));
             }
         }
 
@@ -86,7 +85,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibtexString bs : fromDatabase.getStringValues()) {
                 if (!database.hasStringLabel(bs.getName())) {
                     database.addString(bs);
-                    ce.addEdit(new UndoableInsertString(panel, database, bs));
+                    ce.addEdit(new UndoableInsertString(database, bs));
                 }
             }
         }
@@ -146,51 +145,45 @@ public class AppendDatabaseAction implements BaseAction {
     @Override
     public void action() {
         filesToOpen.clear();
-        final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
-        dialog.setLocationRelativeTo(panel);
-        dialog.setVisible(true);
-        if (dialog.isOkPressed()) {
-
+        final AppendDatabaseDialog dialog = new AppendDatabaseDialog();
+        Optional<Boolean> response = dialog.showAndWait();
+        if (OptionalUtil.isPresentAndTrue(response)) {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(FileType.BIBTEX_DB)
+                    .withDefaultExtension(StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService dialogService = new FXDialogService();
 
-            List<Path> chosen = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+            List<Path> chosen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
             if (chosen.isEmpty()) {
                 return;
             }
             filesToOpen.addAll(chosen);
 
-            // Run the actual open in a thread to prevent the program
-            // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(
-                    () -> openIt(dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()));
+            if (filesToOpen.isEmpty()) {
+                return;
+            }
+
+            for (Path file : filesToOpen) {
+                // Run the actual open in a thread to prevent the program locking until the file is loaded.
+                BackgroundTask.wrap(() -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
+                              .onSuccess(fileName -> dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'"))
+                              .onFailure(exception -> {
+                                  LOGGER.warn("Could not open database", exception);
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);})
+                              .executeWith(Globals.TASK_EXECUTOR);;
+            }
         }
     }
 
-    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups,
-                        boolean importSelectorWords) {
-        if (filesToOpen.isEmpty()) {
-            return;
-        }
-        for (Path file : filesToOpen) {
-            try {
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
-                // Should this be done _after_ we know it was successfully opened?
-                ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
-                        Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
-                        importSelectorWords);
-                panel.output(Localization.lang("Imported from library") + " '" + file + "'");
-            } catch (IOException | KeyCollisionException ex) {
-                LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    private String openIt(Path file, boolean importEntries, boolean importStrings, boolean importGroups,
+                        boolean importSelectorWords) throws IOException, KeyCollisionException {
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
+            // Should this be done _after_ we know it was successfully opened?
+            ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+            AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
+                    importSelectorWords);
+            return file.toString();
     }
 
 }

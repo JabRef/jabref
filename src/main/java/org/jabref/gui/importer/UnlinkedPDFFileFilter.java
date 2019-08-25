@@ -17,10 +17,6 @@ import org.jabref.model.entry.BibEntry;
  * This {@link FileFilter} sits on top of another {@link FileFilter}
  * -implementation, which it first consults. Only if this major filefilter
  * has accepted a file, this implementation will verify on that file.
- *
- * @author Nosh&Dan
- * @version 12.11.2008 | 02:00:15
- *
  */
 public class UnlinkedPDFFileFilter implements FileFilter {
 
@@ -30,7 +26,7 @@ public class UnlinkedPDFFileFilter implements FileFilter {
 
     public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext) {
         this.fileFilter = fileFilter;
-        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFilePreferences());
     }
 
     @Override

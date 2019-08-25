@@ -18,8 +18,6 @@ import org.jabref.logic.layout.LayoutFormatter;
  * Example result:
  *    "Phys. Rev. Lett." instead of "Physical Review Letters"
  *
- * @author  Meigel
- *
  */
 public class JournalAbbreviator implements LayoutFormatter {
 

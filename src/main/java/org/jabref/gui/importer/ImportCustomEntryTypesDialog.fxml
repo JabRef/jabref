@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.CheckListView?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="550.0" prefWidth="566.0"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="org.jabref.gui.importer.ImportCustomEntryTypesDialog">
+   <content>
+      <VBox minHeight="-Infinity" prefHeight="113.0" prefWidth="571.0" spacing="1.0">
+         <children>
+            <Label text="%Custom entry types found in file" />
+            <Label text="%Select all customized types to be stored in local preferences:" />
+            <Label text="%Currently unknown:" />
+            <CheckListView fx:id="unknownEntryTypesCheckList" />
+            <VBox fx:id="boxDifferentCustomization">
+               <children>
+                  <Label text="%Different customization, current settings will be overwritten" />
+                  <CheckListView fx:id="differentCustomizationCheckList" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </content>
+    <buttonTypes>
+        <ButtonType fx:constant="CANCEL" />
+        <ButtonType fx:constant="OK" />
+    </buttonTypes>
+</DialogPane>

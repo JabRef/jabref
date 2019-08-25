@@ -6,14 +6,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
-
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
@@ -38,12 +34,8 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, MaterialDesignIcon> toIcon, Callback<S, Paint> toColor) {
-        this.toGraphic = viewModel -> {
-            Text graphic = MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
-            graphic.setFill(toColor.call(viewModel));
-            return graphic;
-        };
+    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, JabRefIcon> toIcon) {
+        this.toGraphic = viewModel -> toIcon.call(viewModel).getGraphicNode();
         return this;
     }
 
@@ -91,5 +83,9 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
                 }
             }
         };
+    }
+
+    public void install(TreeTableColumn<S, T> column) {
+        column.setCellFactory(this);
     }
 }

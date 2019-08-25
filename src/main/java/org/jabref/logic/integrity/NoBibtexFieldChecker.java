@@ -7,36 +7,36 @@ import java.util.stream.Collectors;
 import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 
 /**
  * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
  */
 public class NoBibtexFieldChecker implements Checker {
 
-    private List<String> getAllBiblatexOnlyFields() {
-        Set<String> allBibtexFields = BibtexEntryTypes.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
-        return BiblatexEntryTypes.ALL.stream()
-                .flatMap(type -> type.getAllFields().stream())
-                .filter(fieldName -> !allBibtexFields.contains(fieldName))
-                // these fields are displayed by JabRef as default
-                .filter(fieldName -> !InternalBibtexFields.DEFAULT_GENERAL_FIELDS.contains(fieldName))
-                .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
-                .filter(fieldName -> !fieldName.equals(FieldName.REVIEW))
-                .sorted()
-                .collect(Collectors.toList());
+    private Set<Field> getAllBiblatexOnlyFields() {
+        Set<BibField> allBibtexFields = BibtexEntryTypeDefinitions.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
+        return BiblatexEntryTypeDefinitions.ALL.stream()
+                                               .flatMap(type -> type.getAllFields().stream())
+                                               .filter(field -> !allBibtexFields.contains(field))
+                                               .map(BibField::getField)
+                                               // these fields are displayed by JabRef as default
+                                               .filter(field -> !field.equals(StandardField.ABSTRACT))
+                                               .filter(field -> !field.equals(StandardField.COMMENT))
+                                               .filter(field -> !field.equals(StandardField.DOI))
+                                               .filter(field -> !field.equals(StandardField.URL))
+                                               .collect(Collectors.toSet());
     }
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        // non-static initalization of ALL_BIBLATEX_ONLY_FIELDS as the user can customize the entry types during runtime
-        final List<String> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
-        return entry.getFieldNames().stream()
-                .filter(name ->  allBiblatexOnlyFields.contains(name))
-                .map(name -> new IntegrityMessage(Localization.lang("biblatex field only"), entry, name)).collect(Collectors.toList());
+        final Set<Field> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
+        return entry.getFields().stream()
+                    .filter(allBiblatexOnlyFields::contains)
+                    .map(name -> new IntegrityMessage(Localization.lang("biblatex field only"), entry, name)).collect(Collectors.toList());
     }
-
 }

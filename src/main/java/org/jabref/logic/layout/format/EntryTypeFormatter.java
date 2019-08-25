@@ -1,9 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 /*
  * Camel casing of entry type string, unknown entry types gets a leading capital
@@ -18,9 +16,6 @@ public class EntryTypeFormatter implements LayoutFormatter {
      */
     @Override
     public String format(String entryType) {
-        BibEntry entry = new BibEntry();
-        entry.setType(entryType);
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
-        return typedEntry.getTypeForDisplay();
+        return EntryTypeFactory.parse(entryType).getDisplayName();
     }
 }

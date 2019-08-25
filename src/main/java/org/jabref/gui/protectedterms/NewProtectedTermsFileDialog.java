@@ -1,125 +1,60 @@
 package org.jabref.gui.protectedterms;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.nio.file.Path;
-import java.util.Optional;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 
-public class NewProtectedTermsFileDialog extends JabRefDialog {
+    private final TextField newFile = new TextField();
+    private final DialogService dialogService;
 
-    private final JTextField newFile = new JTextField();
-    private final JTextField newDescription = new JTextField();
-    private final JCheckBox enabled = new JCheckBox(Localization.lang("Enabled"));
-    private boolean addOKPressed;
-    private final ProtectedTermsLoader loader;
-    private JFrame parent;
+    public NewProtectedTermsFileDialog(ProtectedTermsLoader termsLoader, DialogService dialogService) {
+        this.dialogService = dialogService;
 
-    public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
-        super(parent, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
-        this.loader = loader;
-        setupDialog();
-        setLocationRelativeTo(parent);
-    }
-
-    public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
-        super(mainFrame, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
-        parent = mainFrame;
-        this.loader = loader;
-        setupDialog();
-        setLocationRelativeTo(mainFrame);
-    }
-
-    private void setupDialog() {
-        JButton browse = new JButton(Localization.lang("Browse"));
+        this.setTitle(Localization.lang("New protected terms file"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.TERMS)
-                .withDefaultExtension(FileType.TERMS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
+                .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
 
-        browse.addActionListener(e -> {
-            Optional<Path> file = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
-            file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
+        Button browse = new Button(Localization.lang("Browse"));
+        browse.setOnAction(event -> {
+            this.dialogService.showFileSaveDialog(fileDialogConfiguration)
+                              .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString()));
         });
 
-        // Build content panel
-        FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:100dlu:grow, 4dlu, pref", "p, 4dlu, p, 4dlu, p"));
-        builder.add(Localization.lang("Description")).xy(1, 1);
-        builder.add(newDescription).xyw(3, 1, 3);
-        builder.add(Localization.lang("File")).xy(1, 3);
-        builder.add(newFile).xy(3, 3);
-        builder.add(browse).xy(5, 3);
-        builder.add(enabled).xyw(1, 5, 5);
-        enabled.setSelected(true);
-        builder.padding("10dlu, 10dlu, 10dlu, 10dlu");
-        getContentPane().add(builder.build(), BorderLayout.CENTER);
+        TextField newDescription = new TextField();
+        VBox container = new VBox(10,
+                new VBox(5, new Label(Localization.lang("Description")), newDescription),
+                new VBox(5, new Label(Localization.lang("File")), new HBox(10, newFile, browse))
+        );
+        getDialogPane().setContent(container);
 
-        // Buttons
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton addOKButton = new JButton(Localization.lang("OK"));
-        JButton addCancelButton = new JButton(Localization.lang("Cancel"));
-        bb.addGlue();
-        bb.addButton(addOKButton);
-        bb.addButton(addCancelButton);
-        bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        addOKButton.addActionListener(e -> {
-            addOKPressed = true;
-            loader.addNewProtectedTermsList(newDescription.getText(), newFile.getText(),
-                    enabled.isSelected());
-            dispose();
-        });
+        getDialogPane().getButtonTypes().setAll(
+                ButtonType.OK,
+                ButtonType.CANCEL
+        );
 
-        Action cancelAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addOKPressed = false;
-                dispose();
+        setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                termsLoader.addNewProtectedTermsList(newDescription.getText(), newFile.getText(), true);
             }
-        };
-        addCancelButton.addActionListener(cancelAction);
-
-        // Key bindings:
-        bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        bb.getPanel().getActionMap().put("close", cancelAction);
-        pack();
+            return null;
+        });
     }
-
-    public boolean isOKPressed() {
-        return addOKPressed;
-    }
-
 }

@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -9,10 +8,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
-
-import org.jsoup.helper.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
@@ -41,7 +40,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
      *
      * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
      * @param entry the entry to be cleaned-up
@@ -56,7 +55,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try (InputStream stream = new BufferedInputStream(getURLForQuery(query).openStream())) {
+        try (InputStream stream = new URLDownload(getURLForQuery(query)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
@@ -66,8 +65,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("An I/O exception occurred", e);
+            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
+            throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }

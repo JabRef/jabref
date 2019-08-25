@@ -22,6 +22,9 @@ import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -38,14 +41,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class DBMSSynchronizerTest {
 
+    @Parameter
+    public DBMSType dbmsType;
     private DBMSSynchronizer dbmsSynchronizer;
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
     private GlobalBibtexKeyPattern pattern;
 
-    @Parameter
-    public DBMSType dbmsType;
+    @Parameters(name = "Test with {0} database system")
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        return TestManager.getDBMSTypeTestParameter();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
@@ -63,12 +70,6 @@ public class DBMSSynchronizerTest {
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-
-    }
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
@@ -92,14 +93,13 @@ public class DBMSSynchronizerTest {
         expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
-        expectedEntry.setField("author", "Brad L and Gilson");
-        expectedEntry.setField("title", "The micro multiplexer", EntryEventSource.SHARED);
+        expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
+        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntryEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
-        assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
-        assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
-
+        assertEquals(expectedEntry.getField(StandardField.AUTHOR), actualEntries.get(0).getField(StandardField.AUTHOR));
+        assertEquals("The nano processor1", actualEntries.get(0).getField(StandardField.TITLE).get());
     }
 
     @Test
@@ -176,9 +176,9 @@ public class DBMSSynchronizerTest {
         assertEquals(1, bibDatabase.getEntries().size());
 
         BibEntry modifiedBibEntry = getBibEntryExample(1);
-        modifiedBibEntry.setField("custom", "custom value");
-        modifiedBibEntry.clearField("title");
-        modifiedBibEntry.setType("article");
+        modifiedBibEntry.setField(new UnknownField("custom"), "custom value");
+        modifiedBibEntry.clearField(StandardField.TITLE);
+        modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
         //testing point
@@ -194,20 +194,19 @@ public class DBMSSynchronizerTest {
 
         MetaData testMetaData = new MetaData();
         testMetaData.setSaveActions(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("author", new LowerCaseFormatter()))));
+                Collections.singletonList(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();
 
-        assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
-
+        assertEquals("wirthlin, michael j1", bibEntry.getField(StandardField.AUTHOR).get());
     }
 
     private BibEntry getBibEntryExample(int index) {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setType("book");
-        bibEntry.setField("author", "Wirthlin, Michael J" + index);
-        bibEntry.setField("title", "The nano processor" + index);
+        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J" + index);
+        bibEntry.setField(StandardField.TITLE, "The nano processor" + index);
         bibEntry.getSharedBibEntryData().setSharedID(index);
         return bibEntry;
     }
@@ -216,5 +215,4 @@ public class DBMSSynchronizerTest {
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
-
 }

@@ -8,47 +8,54 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.FilePreferences;
 
 public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
+    private final FilePreferences filePreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final boolean enforceLegalKey;
+    private final boolean allowIntegerEdition;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-                          FileDirectoryPreferences fileDirectoryPreferences,
+                          FilePreferences filePreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
-                          boolean enforceLegalKey) {
+                          boolean enforceLegalKey,
+                          boolean allowIntegerEdition) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
+        this.filePreferences = Objects.requireNonNull(filePreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.enforceLegalKey = enforceLegalKey;
+        this.allowIntegerEdition = allowIntegerEdition;
     }
 
-    public List<IntegrityMessage> checkBibtexDatabase() {
+    public List<IntegrityMessage> checkDatabase() {
         List<IntegrityMessage> result = new ArrayList<>();
 
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-            result.addAll(checkBibtexEntry(entry));
+            result.addAll(checkEntry(entry));
         }
 
         return result;
     }
 
-    private List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
+    public List<IntegrityMessage> checkEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {
             return result;
         }
 
-        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, fileDirectoryPreferences, journalAbbreviationRepository, enforceLegalKey);
+        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext,
+                                                        filePreferences,
+                                                        journalAbbreviationRepository,
+                                                        enforceLegalKey,
+                                                        allowIntegerEdition);
         for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }
@@ -58,9 +65,9 @@ public class IntegrityCheck {
             result.addAll(new ASCIICharacterChecker().check(entry));
             result.addAll(new NoBibtexFieldChecker().check(entry));
             result.addAll(new BibTeXEntryTypeChecker().check(entry));
-            result.addAll(new JournalInAbbreviationListChecker(FieldName.JOURNAL, journalAbbreviationRepository).check(entry));
+            result.addAll(new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository).check(entry));
         } else {
-            result.addAll(new JournalInAbbreviationListChecker(FieldName.JOURNALTITLE, journalAbbreviationRepository).check(entry));
+            result.addAll(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository).check(entry));
         }
 
         result.addAll(new BibtexKeyChecker().check(entry));

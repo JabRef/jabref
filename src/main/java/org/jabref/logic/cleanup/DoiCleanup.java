@@ -10,7 +10,9 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 
 /**
@@ -21,7 +23,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private static final List<String> FIELDS = Arrays.asList(FieldName.NOTE, FieldName.URL, "ee");
+    private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, new UnknownField("ee"));
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -29,40 +31,35 @@ public class DoiCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
-        if (entry.hasField(FieldName.DOI)) {
-            String doiFieldValue = entry.getField(FieldName.DOI).orElse(null);
+        if (entry.hasField(StandardField.DOI)) {
+            String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
 
             Optional<DOI> doi = DOI.parse(doiFieldValue);
 
             if (doi.isPresent()) {
                 String newValue = doi.get().getDOI();
                 if (!doiFieldValue.equals(newValue)) {
-                    entry.setField(FieldName.DOI, newValue);
+                    entry.setField(StandardField.DOI, newValue);
 
-                    FieldChange change = new FieldChange(entry, FieldName.DOI, doiFieldValue, newValue);
+                    FieldChange change = new FieldChange(entry, StandardField.DOI, doiFieldValue, newValue);
                     changes.add(change);
                 }
 
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
-                for (String field : FIELDS) {
+                for (Field field : FIELDS) {
                     entry.getField(field).flatMap(DOI::parse)
                             .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-            for (String field : FIELDS) {
+            for (Field field : FIELDS) {
                 Optional<DOI> doi = entry.getField(field).flatMap(DOI::parse);
 
                 if (doi.isPresent()) {
-                    // update Doi
-                    String oldValue = entry.getField(FieldName.DOI).orElse(null);
-                    String newValue = doi.get().getDOI();
-
-                    entry.setField(FieldName.DOI, newValue);
-
-                    FieldChange change = new FieldChange(entry, FieldName.DOI, oldValue, newValue);
-                    changes.add(change);
+                    // Update Doi
+                    Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.get().getDOI());
+                    change.ifPresent(changes::add);
 
                     removeFieldValue(entry, field, changes);
                 }
@@ -72,7 +69,7 @@ public class DoiCleanup implements CleanupJob {
         return changes;
     }
 
-    private void removeFieldValue(BibEntry entry, String field, List<FieldChange> changes) {
+    private void removeFieldValue(BibEntry entry, Field field, List<FieldChange> changes) {
         CleanupJob eraser = new FieldFormatterCleanup(field, new ClearFormatter());
         changes.addAll(eraser.cleanup(entry));
     }

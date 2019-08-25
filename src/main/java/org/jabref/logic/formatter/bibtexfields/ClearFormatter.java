@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class ClearFormatter implements Formatter {
+public class ClearFormatter extends Formatter {
 
     @Override
     public String getName() {

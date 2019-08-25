@@ -1,165 +1,158 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
-import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.logic.l10n.Localization;
 
-public abstract class SidePaneComponent extends JPanel {
+public abstract class SidePaneComponent {
 
-    protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+    private final SidePaneManager manager;
+    private final ToggleCommand toggleCommand;
+    private final JabRefIcon icon;
+    private final String title;
+    private Node contentNode;
 
-    protected final SidePaneManager manager;
-
-    protected BasePanel panel;
-
-
-    public SidePaneComponent(SidePaneManager manager, Icon icon, String title) {
-        super(new BorderLayout());
+    public SidePaneComponent(SidePaneManager manager, JabRefIcon icon, String title) {
         this.manager = manager;
+        this.icon = icon;
+        this.title = title;
+        this.toggleCommand = new ToggleCommand(this);
 
-        setBorder(BorderFactory.createEmptyBorder());
-
-        close.setMargin(new Insets(0, 0, 0, 0));
-        close.setBorder(null);
-        close.addActionListener(e -> hideAway());
-
-        JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-        up.setMargin(new Insets(0, 0, 0, 0));
-        up.setBorder(null);
-        up.addActionListener(e -> moveUp());
-
-        JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
-        down.setMargin(new Insets(0, 0, 0, 0));
-        down.setBorder(null);
-        down.addActionListener(e -> moveDown());
-
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.add(new JLabel(icon), BorderLayout.WEST);
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setOpaque(true);
-        titleLabel.setForeground(new Color(79, 95, 143));
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
-
-        JToolBar toolbar = new OSXCompatibleToolbar();
-        toolbar.add(up);
-        toolbar.add(down);
-        toolbar.add(close);
-        toolbar.setOpaque(false);
-        toolbar.setFloatable(false);
-
-        titlePanel.add(toolbar, BorderLayout.EAST);
-
-
-        this.add(titlePanel, BorderLayout.NORTH);
     }
 
-    public void setContentContainer(JPanel panel) {
-        this.add(panel, BorderLayout.CENTER);
+    protected void hide() {
+        manager.hide(this.getType());
     }
 
-    private void hideAway() {
-        manager.hideComponent(this);
+    protected void show() {
+        manager.show(this.getType());
     }
 
-    private void moveUp() {
+    protected void moveUp() {
         manager.moveUp(this);
     }
 
-    private void moveDown() {
+    protected void moveDown() {
         manager.moveDown(this);
-    }
-
-    public void setActiveBasePanel(BasePanel panel) {
-        this.panel = panel;
-    }
-
-    public BasePanel getActiveBasePanel() {
-        return panel;
     }
 
     /**
      * Override this method if the component needs to make any changes before it can close.
      */
-    public void componentClosing() {
-        // Nothing right now
+    public void beforeClosing() {
+        // Nothing to do by default
     }
 
     /**
-     * Override this method if the component needs to do any actions when opening.
+     * Override this method if the component needs to do any actions after it is shown.
      */
-    public void componentOpening() {
-        // Nothing right now
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
+    public void afterOpening() {
+        // Nothing to do by default
     }
 
     /**
-     * Specifies how to distribute extra vertical space between side pane components.
-     * 0: fixed height, 1: fill the remaining space
+     * Specifies how to this side pane component behaves if there is additional vertical space.
      */
-    public abstract int getRescalingWeight();
+    public abstract Priority getResizePolicy();
 
     /**
-     * @return the action which toggles this {@link SidePaneComponent}
+     * @return the command which toggles this {@link SidePaneComponent}
      */
-    public abstract ToggleAction getToggleAction();
+    public ToggleCommand getToggleCommand() {
+        return toggleCommand;
+    }
 
-    public class ToggleAction extends MnemonicAwareAction {
+    /**
+     * @return the action to toggle this {@link SidePaneComponent}
+     */
+    public abstract Action getToggleAction();
 
-        public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon) {
-            super(icon.getIcon());
-            putValue(Action.NAME, text);
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, description);
+    /**
+     * @return the content of this component
+     */
+    public final Node getContentPane() {
+        if (contentNode == null) {
+            contentNode = createContentPane();
         }
 
-        public ToggleAction(String text, String description, KeyStroke key, Icon icon) {
-            super(icon);
-            putValue(Action.NAME, text);
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, description);
+        return contentNode;
+    }
+
+    /**
+     * @return the header pane for this component
+     */
+    public final Node getHeader() {
+        Button close = IconTheme.JabRefIcons.CLOSE.asButton();
+        close.setTooltip(new Tooltip(Localization.lang("Hide panel")));
+        close.setOnAction(event -> hide());
+
+        Button up = IconTheme.JabRefIcons.UP.asButton();
+        up.setTooltip(new Tooltip(Localization.lang("Move panel up")));
+        up.setOnAction(event -> moveUp());
+
+        Button down = IconTheme.JabRefIcons.DOWN.asButton();
+        down.setTooltip(new Tooltip(Localization.lang("Move panel down")));
+        down.setOnAction(event -> moveDown());
+
+        final HBox buttonContainer = new HBox();
+        buttonContainer.getChildren().addAll(up, down);
+        buttonContainer.getChildren().addAll(getAdditionalHeaderButtons());
+        buttonContainer.getChildren().add(close);
+
+        BorderPane graphic = new BorderPane();
+        graphic.setCenter(icon.getGraphicNode());
+
+        final Label label = new Label(title);
+        BorderPane container = new BorderPane();
+        container.setCenter(label);
+        container.setRight(buttonContainer);
+        container.getStyleClass().add("sidePaneComponentHeader");
+
+        return container;
+    }
+
+    protected List<Node> getAdditionalHeaderButtons() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Create the content of this component
+     *
+     * @implNote The {@link SidePaneManager} always creates an instance of every side component (e.g., to get the toggle action)
+     * but we only want to create the content view if the component is shown to save resources.
+     * This is the reason for the lazy loading.
+     */
+    protected abstract Node createContentPane();
+
+    /**
+     * @return the type of this component
+     */
+    public abstract SidePaneType getType();
+
+    public class ToggleCommand extends SimpleCommand {
+
+        private final SidePaneComponent component;
+
+        public ToggleCommand(SidePaneComponent component) {
+            this.component = component;
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!manager.hasComponent(SidePaneComponent.this.getClass())) {
-                manager.register(SidePaneComponent.this);
-            }
-
-            // if clicked by mouse just toggle
-            if ((e.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-                manager.toggle(SidePaneComponent.this.getClass());
-            } else {
-                manager.toggleThreeWay(SidePaneComponent.this.getClass());
-            }
-            putValue(Action.SELECTED_KEY, manager.isComponentVisible(SidePaneComponent.this.getClass()));
+        public void execute() {
+            manager.toggle(component.getType());
         }
-
-        public void setSelected(boolean selected) {
-            putValue(Action.SELECTED_KEY, selected);
-        }
-
-        public boolean isSelected() {
-            return Boolean.TRUE.equals(getValue(Action.SELECTED_KEY));
-        }
-
     }
-
 }

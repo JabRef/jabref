@@ -2,14 +2,14 @@ package org.jabref.logic.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
-import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
+import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -43,12 +43,6 @@ public class OpenDatabase {
         }
 
         try {
-            if (!FileBasedLock.waitForFileLock(file.toPath())) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
-                        + "File is locked by another JabRef instance.");
-                return new ParserResult();
-            }
-
             ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
             pr.setFile(file);
             if (pr.hasWarnings()) {
@@ -69,7 +63,7 @@ public class OpenDatabase {
      * Opens a new database.
      */
     public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
-            throws IOException {
+        throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
                 importFormatPreferences.getEncoding());
 
@@ -86,7 +80,10 @@ public class OpenDatabase {
     }
 
     private static void performLoadDatabaseMigrations(ParserResult parserResult) {
-        List<PostOpenMigration> postOpenMigrations = Collections.singletonList(new ConvertLegacyExplicitGroups());
+        List<PostOpenMigration> postOpenMigrations = Arrays.asList(
+                new ConvertLegacyExplicitGroups(),
+                new ConvertMarkingToGroups()
+        );
 
         for (PostOpenMigration migration : postOpenMigrations) {
             migration.performMigration(parserResult);

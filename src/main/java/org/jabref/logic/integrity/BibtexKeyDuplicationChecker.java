@@ -8,7 +8,7 @@ import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 public class BibtexKeyDuplicationChecker implements Checker {
 
@@ -23,7 +23,7 @@ public class BibtexKeyDuplicationChecker implements Checker {
         boolean isDuplicate = database.getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
         if (isDuplicate) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("Duplicate BibTeX key"), entry, FieldName.KEY));
+                    new IntegrityMessage(Localization.lang("Duplicate BibTeX key"), entry, StandardField.KEY));
         }
         return Collections.emptyList();
     }

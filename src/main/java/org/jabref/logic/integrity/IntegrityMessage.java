@@ -3,23 +3,24 @@ package org.jabref.logic.integrity;
 import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public final class IntegrityMessage implements Cloneable {
 
     private final BibEntry entry;
 
-    private final String fieldName;
+    private final Field field;
     private final String message;
 
-    public IntegrityMessage(String message, BibEntry entry, String fieldName) {
+    public IntegrityMessage(String message, BibEntry entry, Field field) {
         this.message = message;
         this.entry = entry;
-        this.fieldName = fieldName;
+        this.field = field;
     }
 
     @Override
     public String toString() {
-        return "[" + getEntry().getCiteKeyOptional().orElse("") + "] in " + getFieldName() + ": " + getMessage();
+        return "[" + getEntry().getCiteKeyOptional().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
     }
 
     public String getMessage() {
@@ -30,28 +31,31 @@ public final class IntegrityMessage implements Cloneable {
         return entry;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public Field getField() {
+        return field;
     }
 
     @Override
     public Object clone() {
-        return new IntegrityMessage(message, entry, fieldName);
+        return new IntegrityMessage(message, entry, field);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         IntegrityMessage that = (IntegrityMessage) o;
         return Objects.equals(entry, that.entry) &&
-                Objects.equals(fieldName, that.fieldName) &&
+                Objects.equals(field, that.field) &&
                 Objects.equals(message, that.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entry, fieldName, message);
+        return Objects.hash(entry, field, message);
     }
-
 }

@@ -1,10 +1,10 @@
 package org.jabref.model.database;
 
-import java.util.Locale;
 import java.util.stream.Stream;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 public class BibDatabaseModeDetection {
 
@@ -24,10 +24,10 @@ public class BibDatabaseModeDetection {
      * @return the inferred database type
      */
     public static BibDatabaseMode inferMode(BibDatabase database) {
-        final Stream<String> entryTypes = database.getEntries().stream().map(BibEntry::getType);
+        final Stream<EntryType> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 
         // type-based check
-        if (entryTypes.anyMatch(type -> EntryTypes.isExclusiveBiblatex(type.toLowerCase(Locale.ENGLISH)))) {
+        if (entryTypes.anyMatch(EntryTypeFactory::isExclusiveBiblatex)) {
             return BibDatabaseMode.BIBLATEX;
         } else {
             // field-based check

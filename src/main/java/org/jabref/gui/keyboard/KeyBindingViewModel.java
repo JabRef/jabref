@@ -9,7 +9,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 
 import com.google.common.base.CaseFormat;
 
@@ -79,7 +80,7 @@ public class KeyBindingViewModel {
     }
 
     public boolean isCategory() {
-        return (keyBinding == null) ? true : false;
+        return keyBinding == null;
     }
 
     /**
@@ -134,7 +135,7 @@ public class KeyBindingViewModel {
         }
     }
 
-    public Optional<IconTheme.JabRefIcon> getIcon() {
-        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcon.CLEANUP_ENTRIES);
+    public Optional<JabRefIcon> getIcon() {
+        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
     }
 }

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -20,7 +20,7 @@ import org.json.JSONObject;
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
  *
- * @implSpec API is documented at https://oadoi.org/api/v2
+ * @implSpec API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
     private static String API_URL = "https://api.oadoi.org/v2/";
@@ -29,8 +29,8 @@ public class OpenAccessDoi implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry.getField(FieldName.DOI)
-                .flatMap(DOI::parse);
+        Optional<DOI> doi = entry.getField(StandardField.DOI)
+                                 .flatMap(DOI::parse);
         if (doi.isPresent()) {
             try {
                 return findFullText(doi.get());
@@ -40,6 +40,11 @@ public class OpenAccessDoi implements FulltextFetcher {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {

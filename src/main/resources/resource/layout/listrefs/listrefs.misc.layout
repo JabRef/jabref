@@ -1,14 +1,14 @@
 <tr id="\format{\bibtexkey}" class="entry">
 	<td>\begin{author}\format[Authors(LastFirst,InitialsNoSpace,NoPunc),HTMLChars]{\author}\end{author} (\year), <i>"\format[HTMLChars]{\title}"</i>\begin{howpublished}, \howpublished\end{howpublished}. \begin{month}\format[HTMLChars]{\month}, \year.\end{month}
-	<p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>]\end{abstract}\begin{review} [<a href="javascript:toggleInfo('\format{\bibtexkey}','review')">Review</a>] \end{review} [<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]\begin{doi} [<a href="\format[DOICheck]{\doi}" target="_blank">DOI</a>]\end{doi}\begin{url} [<a href="\format{\url}" target="_blank">URL</a>]\end{url}</p>
+	<p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>]\end{abstract}\begin{comment} [<a href="javascript:toggleInfo('\format{\bibtexkey}','comment')">Comment</a>] \end{comment} [<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]\begin{doi} [<a href="\format[DOICheck]{\doi}" target="_blank">DOI</a>]\end{doi}\begin{url} [<a href="\format{\url}" target="_blank">URL</a>]\end{url}</p>
 	</td>
 </tr>\begin{abstract}
 <tr id="abs_\format{\bibtexkey}" class="abstract noshow">
 	<td><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
-</tr>\end{abstract}\begin{review}
-<tr id="rev_\format{\bibtexkey}" class="review noshow">
-	<td><b>Review</b>: \format[HTMLChars]{\review}</td>
-</tr>\end{review}
+</tr>\end{abstract}\begin{comment}
+<tr id="rev_\format{\bibtexkey}" class="comment noshow">
+	<td><b>Comment</b>: \format[HTMLChars]{\comment}</td>
+</tr>\end{comment}
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
 <td><b>BibTeX</b>:
 <pre>

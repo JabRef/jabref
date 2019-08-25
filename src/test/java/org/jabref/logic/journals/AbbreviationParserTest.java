@@ -10,6 +10,6 @@ public class AbbreviationParserTest {
     public void testReadJournalListFromResource() {
         AbbreviationParser ap = new AbbreviationParser();
         ap.readJournalListFromResource("/journals/journalList.txt");
-         assertFalse(ap.getAbbreviations().isEmpty());
+        assertFalse(ap.getAbbreviations().isEmpty());
     }
 }

@@ -2,8 +2,6 @@ package org.jabref.logic.layout;
 
 /**
  * String and integer value.
- *
- * @author     wegnerj
  */
 public class StringInt implements java.io.Serializable {
 

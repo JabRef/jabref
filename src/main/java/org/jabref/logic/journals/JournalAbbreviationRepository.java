@@ -7,15 +7,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationRepository.class);
     private final Set<Abbreviation> abbreviations = new HashSet<>(16000); // We have over 15.000 abbreviations in the built-in lists
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
@@ -31,18 +27,28 @@ public class JournalAbbreviationRepository {
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
-        return name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
+        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+        boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
+        return isAbbreviated && !isExpanded;
     }
 
     public int size() {
         return abbreviations.size();
     }
 
+    /**
+     * Returns true if the given journal name is contained in the list either in its full form (e.g Physical Review
+     * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
+     */
     public boolean isKnownName(String journalName) {
         return abbreviations.stream().anyMatch(abbreviation -> isMatched(journalName.trim(), abbreviation));
     }
 
+    /**
+     * Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
+     * i.e. journals whose abbreviation is the same as the full name are not considered
+     */
     public boolean isAbbreviatedName(String journalName) {
         return abbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journalName.trim(), abbreviation));
     }

@@ -15,14 +15,15 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.bibtex.InvalidFieldValueException;
+import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -48,10 +49,12 @@ public class BackupManager {
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
     private final CoarseChangeFilter changeFilter;
+    private final BibEntryTypesManager entryTypesManager;
 
-    private BackupManager(BibDatabaseContext bibDatabaseContext) {
+    private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.preferences = JabRefPreferences.getInstance();
+        this.entryTypesManager = entryTypesManager;
+        this.preferences = preferences;
         BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
 
@@ -68,9 +71,11 @@ public class BackupManager {
      * As long as no database file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+     * @param entryTypesManager
+     * @param preferences
      */
-    public static BackupManager start(BibDatabaseContext bibDatabaseContext) {
-        BackupManager backupManager = new BackupManager(bibDatabaseContext);
+    public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
+        BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask();
         runningInstances.add(backupManager);
         return backupManager;
@@ -118,12 +123,25 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding
+            SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
                     (charset).withMakeBackup(false);
-            new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
-                    (backupPath);
-        } catch (SaveException e) {
-            LOGGER.error("Error while saving file.", e);
+            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
+                    .saveDatabase(bibDatabaseContext);
+        } catch (IOException e) {
+            logIfCritical(backupPath, e);
+        }
+    }
+
+    private void logIfCritical(Path backupPath, IOException e) {
+        Throwable innermostCause = e;
+        while (innermostCause.getCause() != null) {
+            innermostCause = innermostCause.getCause();
+        }
+        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
+
+        // do not print errors in field values into the log during autosave
+        if (!isErrorInField) {
+            LOGGER.error("Error while saving to file" + backupPath, e);
         }
     }
 

@@ -4,14 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.xmp.XmpPreferences;
 
 public class ExporterFactory {
 
@@ -28,44 +27,42 @@ public class ExporterFactory {
         this.exporters = Objects.requireNonNull(exporters);
     }
 
-    public static ExporterFactory create(Map<String, TemplateExporter> customFormats,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+    public static ExporterFactory create(List<TemplateExporter> customFormats,
+                                         LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
 
         // Initialize build-in exporters
-        exporters.add(new TemplateExporter("html", "html", null, FileType.HTML, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("simplehtml", "simplehtml", null, FileType.SIMPLE_HTML, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("docbook", "docbook", null, FileType.DOCBOOK, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("din1505", "din1505winword", "din1505", FileType.DIN_1505, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("bibordf", "bibordf", null, FileType.BIBORDF, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("tablerefs", "tablerefs", "tablerefs", FileType.HTML_TABLE, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("listrefs", "listrefs", "listrefs", FileType.HTML_LIST, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", FileType.HTML_TABLE_WITH_ABSTRACT, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("harvard", "harvard", "harvard", FileType.HARVARD_RTF, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("iso690rtf", "iso690RTF", "iso690rtf", FileType.ISO_690_RTF, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("iso690txt", "iso690", "iso690txt", FileType.ISO_690_TXT, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("endnote", "EndNote", "endnote", FileType.ENDNOTE_TXT, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("oocsv", "openoffice-csv", "openoffice", FileType.OO_LO, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("ris", "ris", "ris", FileType.RIS, layoutPreferences, savePreferences, true).withEncoding(StandardCharsets.UTF_8));
-        exporters.add(new TemplateExporter("misq", "misq", "misq", FileType.MIS_QUARTERLY, layoutPreferences, savePreferences));
+
+        // Initialize build-in exporters
+        exporters.add(new TemplateExporter("HTML", "html", "html", null, StandardFileType.HTML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, StandardFileType.HTML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("DocBook 5.1", "docbook5", "docbook5", null, StandardFileType.XML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("DocBook 4", "docbook4", "docbook4", null, StandardFileType.XML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("DIN 1505", "din1505", "din1505winword", "din1505", StandardFileType.RTF, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("BibO RDF", "bibordf", "bibordf", null, StandardFileType.RDF, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", StandardFileType.HTML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter(Localization.lang("HTML list"), "listrefs", "listrefs", "listrefs", StandardFileType.HTML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter(Localization.lang("HTML table (with Abstract & BibTeX)"), "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", StandardFileType.HTML, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("Harvard RTF", "harvard", "harvard", "harvard", StandardFileType.RDF, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("ISO 690 RTF", "iso690rtf", "iso690RTF", "iso690rtf", StandardFileType.RTF, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("ISO 690", "iso690txt", "iso690", "iso690txt", StandardFileType.TXT, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("Endnote", "endnote", "EndNote", "endnote", StandardFileType.TXT, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("OpenOffice/LibreOffice CSV", "oocsv", "openoffice-csv", "openoffice", StandardFileType.CSV, layoutPreferences, savePreferences));
+        exporters.add(new TemplateExporter("RIS", "ris", "ris", "ris", StandardFileType.RIS, layoutPreferences, savePreferences).withEncoding(StandardCharsets.UTF_8));
+        exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, savePreferences));
         exporters.add(new BibTeXMLExporter());
         exporters.add(new OpenOfficeDocumentCreator());
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
+        exporters.add(new XmpExporter(xmpPreferences));
+        exporters.add(new XmpPdfExporter(xmpPreferences));
 
         // Now add custom export formats
-        exporters.addAll(customFormats.values());
+        exporters.addAll(customFormats);
 
         return new ExporterFactory(exporters);
-    }
-
-    public static ExporterFactory create(JabRefPreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        Map<String, TemplateExporter> customFormats = preferences.customExports.getCustomExportFormats(preferences, abbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(preferences);
-        return create(customFormats, layoutPreferences, savePreferences);
     }
 
     /**

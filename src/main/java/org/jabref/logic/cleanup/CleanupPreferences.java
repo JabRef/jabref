@@ -1,37 +1,23 @@
 package org.jabref.logic.cleanup;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 
 public class CleanupPreferences {
 
-    private final String fileNamePattern;
-    private final String fileDirPattern;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
+    private final FilePreferences filePreferences;
 
-
-    public CleanupPreferences(String fileNamePattern, String fileDirPattern,
-            LayoutFormatterPreferences layoutFormatterPreferences, FileDirectoryPreferences fileDirectoryPreferences) {
-        this.fileNamePattern = fileNamePattern;
-        this.fileDirPattern = fileDirPattern;
+    public CleanupPreferences(LayoutFormatterPreferences layoutFormatterPreferences, FilePreferences filePreferences) {
         this.layoutFormatterPreferences = layoutFormatterPreferences;
-        this.fileDirectoryPreferences = fileDirectoryPreferences;
-    }
-
-    public String getFileNamePattern() {
-        return fileNamePattern;
-    }
-
-    public String getFileDirPattern() {
-        return fileDirPattern;
+        this.filePreferences = filePreferences;
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return layoutFormatterPreferences;
     }
 
-    public FileDirectoryPreferences getFileDirectoryPreferences() {
-        return fileDirectoryPreferences;
+    public FilePreferences getFilePreferences() {
+        return filePreferences;
     }
 }

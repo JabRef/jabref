@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,42 +23,40 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class BibTeXMLImporterTestTypes {
 
-    public static Collection<String> types() {
-        return Arrays.asList(new String[]{
-                "article",
-                "book",
-                "booklet",
-                "conference",
-                "inbook",
-                "incollection",
-                "inproceedings",
-                "manual",
-                "mastersthesis",
-                "misc",
-                "phdthesis",
-                "techreport",
-                "unpublished"
-        });
+    public static Collection<EntryType> types() {
+        return Arrays.asList(
+                StandardEntryType.Article,
+                StandardEntryType.Book,
+                StandardEntryType.Booklet,
+                StandardEntryType.Conference,
+                StandardEntryType.InBook,
+                StandardEntryType.InCollection,
+                StandardEntryType.InProceedings,
+                StandardEntryType.Manual,
+                StandardEntryType.MastersThesis,
+                StandardEntryType.Misc,
+                StandardEntryType.PhdThesis,
+                StandardEntryType.TechReport,
+                StandardEntryType.Unpublished);
     }
-
 
     @ParameterizedTest
     @MethodSource("types")
-    public void importConvertsToCorrectBibType(String type) throws IOException {
+    public void importConvertsToCorrectBibType(EntryType type) throws IOException {
         String bibteXMLInput = "<?xml version=\"1.0\" ?>\n" + "<bibtex:file xmlns:bibtex=\"http://bibtexml.sf.net/\">\n"
-                + "<bibtex:entry>\n" + "<bibtex:" + type + ">\n"
+                + "<bibtex:entry>\n" + "<bibtex:" + type.getName() + ">\n"
                 + "<bibtex:author>Max Mustermann</bibtex:author>\n" + "<bibtex:keywords>java</bibtex:keywords>\n"
                 + "<bibtex:title>Java tricks</bibtex:title>\n" + "<bibtex:year>2016</bibtex:year>\n" + "</bibtex:"
-                + type + ">\n" + "</bibtex:entry>\n" + "</bibtex:file>";
+                + type.getName() + ">\n" + "</bibtex:entry>\n" + "</bibtex:file>";
 
         List<BibEntry> bibEntries = new BibTeXMLImporter().importDatabase(new BufferedReader(new StringReader(bibteXMLInput)))
-                .getDatabase().getEntries();
+                                                          .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Max Mustermann");
-        entry.setField("keywords", "java");
-        entry.setField("title", "Java tricks");
-        entry.setField("year", "2016");
+        entry.setField(StandardField.AUTHOR, "Max Mustermann");
+        entry.setField(StandardField.KEYWORDS, "java");
+        entry.setField(StandardField.TITLE, "Java tricks");
+        entry.setField(StandardField.YEAR, "2016");
         entry.setType(type);
 
         Assertions.assertEquals(Collections.singletonList(entry), bibEntries);

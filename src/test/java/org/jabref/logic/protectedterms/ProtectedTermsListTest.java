@@ -1,30 +1,29 @@
 package org.jabref.logic.protectedterms;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProtectedTermsListTest {
 
     private ProtectedTermsList internalList;
     private ProtectedTermsList externalList;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    @Before
-    public void setUp() throws IOException {
-        String tempFileName = temporaryFolder.newFile().getAbsolutePath();
+    @BeforeEach
+    public void setUp(@TempDir Path temporaryFolder) throws IOException {
+        Path path = temporaryFolder.resolve("ThisIsARandomlyNamedFile");
+        Files.createFile(path);
+        String tempFileName = path.toString();
 
         internalList = new ProtectedTermsList("Name", new ArrayList<>(Arrays.asList("AAA", "BBB")), "location", true);
         externalList = new ProtectedTermsList("Namely", new ArrayList<>(Arrays.asList("AAA", "BBB")), tempFileName);
@@ -98,5 +97,4 @@ public class ProtectedTermsListTest {
         externalList.addProtectedTerm("CCC");
         assertTrue(externalList.getTermList().contains("CCC"));
     }
-
 }

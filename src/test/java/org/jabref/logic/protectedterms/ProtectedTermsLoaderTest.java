@@ -2,8 +2,8 @@ package org.jabref.logic.protectedterms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,33 +12,26 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-public class ProtectedTermsLoaderTest {
+class ProtectedTermsLoaderTest {
 
     private ProtectedTermsLoader loader;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         loader = new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
-
     }
 
     @Test
-    public void testGetProtectedTerms() throws URISyntaxException {
+    void testGetProtectedTerms() throws URISyntaxException {
         List<ProtectedTermsList> backupList = new ArrayList<>(loader.getProtectedTermsLists());
 
         for (ProtectedTermsList list : backupList) {
@@ -47,16 +40,16 @@ public class ProtectedTermsLoaderTest {
         assertTrue(loader.getProtectedTermsLists().isEmpty());
         String filename = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile().getPath();
+                               .toFile().getPath();
         loader.addProtectedTermsListFromFile(filename, true);
         assertEquals(Arrays.asList("Einstein"), loader.getProtectedTerms());
     }
 
     @Test
-    public void testAddProtectedTermsListFromFile() throws URISyntaxException {
+    void testAddProtectedTermsListFromFile() throws URISyntaxException {
         String filename = Paths
                 .get(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                        .toURI())
+                                               .toURI())
                 .toFile().getPath();
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), loader.getProtectedTermsLists().size());
         loader.addProtectedTermsListFromFile(filename, false);
@@ -64,75 +57,75 @@ public class ProtectedTermsLoaderTest {
     }
 
     @Test
-    public void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException, FileNotFoundException {
+    void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals("Term list", list.getDescription());
     }
 
     @Test
-    public void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException, FileNotFoundException {
+    void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
         assertFalse(list.isEnabled());
     }
 
     @Test
-    public void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException, FileNotFoundException {
+    void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertTrue(list.isEnabled());
     }
 
     @Test
-    public void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException, FileNotFoundException {
+    void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
-                .toFile();
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertFalse(list.isInternalList());
     }
 
     @Test
-    public void testReadProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
+    void testReadProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
             throws URISyntaxException, FileNotFoundException {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/unnamedterms.terms")
-                        .toURI())
-                .toFile();
+                                          .toURI())
+                         .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals(Localization.lang("The text after the last line starting with # will be used"),
                 list.getDescription());
     }
 
     @Test
-    public void testNewListsAreIncluded() {
+    void testNewListsAreIncluded() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(),
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
     }
 
     @Test
-    public void testNewListsAreEnabled() {
+    void testNewListsAreEnabled() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(),
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
         for (ProtectedTermsList list : localLoader.getProtectedTermsLists()) {
             assertTrue(list.isEnabled());
         }
     }
 
     @Test
-    public void testInitalizedAllInternalDisabled() {
+    void testInitalizedAllInternalDisabled() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -143,7 +136,7 @@ public class ProtectedTermsLoaderTest {
     }
 
     @Test
-    public void testUnknownExternalFileWillNotLoad() {
+    void testUnknownExternalFileWillNotLoad() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
@@ -153,7 +146,7 @@ public class ProtectedTermsLoaderTest {
     }
 
     @Test
-    public void testAllDisabledNoWords() {
+    void testAllDisabledNoWords() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
@@ -162,7 +155,7 @@ public class ProtectedTermsLoaderTest {
     }
 
     @Test
-    public void testDoNotLoadTheSameInternalListTwice() {
+    void testDoNotLoadTheSameInternalListTwice() {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
@@ -171,56 +164,56 @@ public class ProtectedTermsLoaderTest {
     }
 
     @Test
-    public void testAddNewTermListAddsList() throws IOException {
+    void testAddNewTermListAddsList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
-        localLoader.addNewProtectedTermsList("My new list", temporaryFolder.newFile().getAbsolutePath());
+        localLoader.addNewProtectedTermsList("My new list", tempDir.toFile().getAbsolutePath());
         assertEquals(ProtectedTermsLoader.getInternalLists().size() + 1, localLoader.getProtectedTermsLists().size());
     }
 
     @Test
-    public void testAddNewTermListNewListInList() throws IOException {
+    void testAddNewTermListNewListInList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
         ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                temporaryFolder.newFile().getAbsolutePath());
+                tempDir.toFile().getAbsolutePath());
         assertTrue(localLoader.getProtectedTermsLists().contains(newList));
     }
 
     @Test
-    public void testRemoveTermList() throws IOException {
+    void testRemoveTermList(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
-        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", temporaryFolder.newFile().getAbsolutePath());
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", tempDir.toFile().getAbsolutePath());
         assertTrue(localLoader.removeProtectedTermsList(newList));
     }
 
     @Test
-    public void testRemoveTermListReduceTheCount() throws IOException {
+    void testRemoveTermListReduceTheCount(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
         ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                temporaryFolder.newFile().getAbsolutePath());
+                tempDir.toFile().getAbsolutePath());
         localLoader.removeProtectedTermsList(newList);
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
     }
 
     @Test
-    public void testAddNewTermListSetsCorrectDescription() throws IOException {
+    void testAddNewTermListSetsCorrectDescription(@TempDir Path tempDir) {
 
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
         ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                temporaryFolder.newFile().getAbsolutePath());
+                tempDir.toFile().getAbsolutePath());
         assertEquals("My new list", newList.getDescription());
     }
 }

@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class ISBN implements Identifier {
 
@@ -31,10 +32,7 @@ public class ISBN implements Identifier {
 
     public boolean isValidFormat() {
         Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);
-        if (isbnMatcher.matches()) {
-            return true;
-        }
-        return false;
+        return isbnMatcher.matches();
     }
 
     public boolean isValidChecksum() {
@@ -92,8 +90,8 @@ public class ISBN implements Identifier {
     }
 
     @Override
-    public String getDefaultField() {
-        return FieldName.ISBN;
+    public Field getDefaultField() {
+        return StandardField.ISBN;
     }
 
     @Override
@@ -104,7 +102,7 @@ public class ISBN implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.worldcat.org/isbn/" + isbnString));
+            return Optional.of(new URI("https://www.worldcat.org/isbn/" + isbnString));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

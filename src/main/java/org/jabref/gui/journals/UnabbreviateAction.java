@@ -4,36 +4,35 @@ import java.util.List;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 /**
  * Converts journal abbreviations back to full name for all selected entries.
  */
-public class UnabbreviateAction extends AbstractWorker {
+public class UnabbreviateAction implements BaseAction {
 
     private final BasePanel panel;
-    private String message = "";
-
 
     public UnabbreviateAction(BasePanel panel) {
         this.panel = panel;
     }
 
     @Override
-    public void init() {
+    public void action() {
         panel.output(Localization.lang("Unabbreviating..."));
+        BackgroundTask.wrap(this::unabbreviate)
+                      .onSuccess(panel::output)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
-    @Override
-    public void run() {
-        List<BibEntry> entries = panel.getSelectedEntries();
-        if (entries == null) {
-            return;
-        }
+    private String unabbreviate() {
+        List<BibEntry> entries = panel.getSelectedEntries(); // never null
 
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationLoader
                 .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
@@ -41,7 +40,7 @@ public class UnabbreviateAction extends AbstractWorker {
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
-            for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+            for (Field journalField : FieldFactory.getJournalNameFields()) {
                 if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, journalField, ce)) {
                     count++;
                 }
@@ -51,14 +50,9 @@ public class UnabbreviateAction extends AbstractWorker {
             ce.end();
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
-            message = Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
+            return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
         } else {
-            message = Localization.lang("No journal names could be unabbreviated.");
+            return Localization.lang("No journal names could be unabbreviated.");
         }
-    }
-
-    @Override
-    public void update() {
-        panel.output(message);
     }
 }

@@ -1,7 +1,8 @@
 package org.jabref.logic.integrity;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,148 +18,152 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
-public class IntegrityCheckTest {
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+class IntegrityCheckTest {
 
     @Test
-    public void testEntryTypeChecks() {
-        assertCorrect(withMode(createContext("title", "sometitle", "article"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("title", "sometitle", "patent"), BibDatabaseMode.BIBTEX));
-        assertCorrect((withMode(createContext("title", "sometitle", "patent"), BibDatabaseMode.BIBLATEX)));
-        assertCorrect(withMode(createContext("title", "sometitle", "article"), BibDatabaseMode.BIBLATEX));
+    void testEntryTypeChecks() {
+        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBTEX));
+        assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testUrlChecks() {
-        assertCorrect(createContext("url", "http://www.google.com"));
-        assertCorrect(createContext("url", "file://c:/asdf/asdf"));
-        assertCorrect(createContext("url", "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
+    void testUrlChecks() {
+        assertCorrect(createContext(StandardField.URL, "http://www.google.com"));
+        assertCorrect(createContext(StandardField.URL, "file://c:/asdf/asdf"));
+        assertCorrect(createContext(StandardField.URL, "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
 
-        assertWrong(createContext("url", "www.google.com"));
-        assertWrong(createContext("url", "google.com"));
-        assertWrong(createContext("url", "c:/asdf/asdf"));
+        assertWrong(createContext(StandardField.URL, "www.google.com"));
+        assertWrong(createContext(StandardField.URL, "google.com"));
+        assertWrong(createContext(StandardField.URL, "c:/asdf/asdf"));
     }
 
     @Test
-    public void testYearChecks() {
-        assertCorrect(createContext("year", "2014"));
-        assertCorrect(createContext("year", "1986"));
-        assertCorrect(createContext("year", "around 1986"));
-        assertCorrect(createContext("year", "(around 1986)"));
-        assertCorrect(createContext("year", "1986,"));
-        assertCorrect(createContext("year", "1986}%"));
-        assertCorrect(createContext("year", "1986(){},.;!?<>%&$"));
-        assertWrong(createContext("year", "abc"));
-        assertWrong(createContext("year", "86"));
-        assertWrong(createContext("year", "204"));
-        assertWrong(createContext("year", "1986a"));
-        assertWrong(createContext("year", "(1986a)"));
-        assertWrong(createContext("year", "1986a,"));
-        assertWrong(createContext("year", "1986}a%"));
-        assertWrong(createContext("year", "1986a(){},.;!?<>%&$"));
+    void testYearChecks() {
+        assertCorrect(createContext(StandardField.YEAR, "2014"));
+        assertCorrect(createContext(StandardField.YEAR, "1986"));
+        assertCorrect(createContext(StandardField.YEAR, "around 1986"));
+        assertCorrect(createContext(StandardField.YEAR, "(around 1986)"));
+        assertCorrect(createContext(StandardField.YEAR, "1986,"));
+        assertCorrect(createContext(StandardField.YEAR, "1986}%"));
+        assertCorrect(createContext(StandardField.YEAR, "1986(){},.;!?<>%&$"));
+        assertWrong(createContext(StandardField.YEAR, "abc"));
+        assertWrong(createContext(StandardField.YEAR, "86"));
+        assertWrong(createContext(StandardField.YEAR, "204"));
+        assertWrong(createContext(StandardField.YEAR, "1986a"));
+        assertWrong(createContext(StandardField.YEAR, "(1986a)"));
+        assertWrong(createContext(StandardField.YEAR, "1986a,"));
+        assertWrong(createContext(StandardField.YEAR, "1986}a%"));
+        assertWrong(createContext(StandardField.YEAR, "1986a(){},.;!?<>%&$"));
     }
 
     @Test
-    public void testEditionChecks() {
-        assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
+    void testEditionChecks() {
+        assertCorrect(withMode(createContext(StandardField.EDITION, "Second"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "Third"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.EDITION, "second"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX), true);
+        assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "10"), BibDatabaseMode.BIBLATEX));
         assertCorrect(
-                withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+                withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "Edition 2000"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBLATEX));
+        assertWrong(createContext(StandardField.EDITION, "1"));
     }
 
     @Test
-    public void testNoteChecks() {
-        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("note", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("note", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    void testNoteChecks() {
+        assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.NOTE, "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.NOTE, "\\url{someurl}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.NOTE, "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testHowpublishedChecks() {
-        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("howpublished", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    void testHowpublishedChecks() {
+        assertCorrect(withMode(createContext(StandardField.HOWPUBLISHED, "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.HOWPUBLISHED, "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.HOWPUBLISHED, "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.HOWPUBLISHED, "\\url{someurl}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.HOWPUBLISHED, "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.HOWPUBLISHED, "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testMonthChecks() {
-        assertCorrect(withMode(createContext("month", "#mar#"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("month", "#dec#"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("month", "#bla#"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("month", "Dec"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("month", "December"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("month", "10"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("month", "1"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("month", "10"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("month", "#jan#"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("month", "jan"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("month", "january"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("month", "January"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBLATEX));
+    void testMonthChecks() {
+        assertCorrect(withMode(createContext(StandardField.MONTH, "#mar#"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.MONTH, "#dec#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "#bla#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "Dec"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "December"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "Lorem"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "10"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.MONTH, "1"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.MONTH, "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.MONTH, "#jan#"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "jan"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "january"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "January"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.MONTH, "Lorem"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testJournaltitleChecks() {
-        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
+    void testJournaltitleChecks() {
+        assertWrong(withMode(createContext(StandardField.JOURNALTITLE, "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.JOURNAL, "A journal"), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    public void testBibtexkeyChecks() {
-        final BibDatabaseContext correctContext = createContext("bibtexkey", "Knuth2014");
-        correctContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        correctContext.getDatabase().getEntries().get(0).setField("year","2014");
+    void testBibtexkeyChecks() {
+        final BibDatabaseContext correctContext = createContext(InternalField.KEY_FIELD, "Knuth2014");
+        correctContext.getDatabase().getEntries().get(0).setField(StandardField.AUTHOR, "Knuth");
+        correctContext.getDatabase().getEntries().get(0).setField(StandardField.YEAR, "2014");
         assertCorrect(correctContext);
 
-        final BibDatabaseContext wrongContext = createContext("bibtexkey", "Knuth2014a");
-        wrongContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        wrongContext.getDatabase().getEntries().get(0).setField("year","2014");
+        final BibDatabaseContext wrongContext = createContext(InternalField.KEY_FIELD, "Knuth2014a");
+        wrongContext.getDatabase().getEntries().get(0).setField(StandardField.AUTHOR, "Knuth");
+        wrongContext.getDatabase().getEntries().get(0).setField(StandardField.YEAR, "2014");
         assertWrong(wrongContext);
     }
 
     @Test
-    public void testBracketChecks() {
-        assertCorrect(createContext("title", "x"));
-        assertCorrect(createContext("title", "{x}"));
-        assertCorrect(createContext("title", "{x}x{}x{{}}"));
-        assertWrong(createContext("title", "{x}x{}}x{{}}"));
-        assertWrong(createContext("title", "}"));
-        assertWrong(createContext("title", "{"));
+    void testBracketChecks() {
+        assertCorrect(createContext(StandardField.TITLE, "x"));
+        assertCorrect(createContext(StandardField.TITLE, "{x}"));
+        assertCorrect(createContext(StandardField.TITLE, "{x}x{}x{{}}"));
+        assertWrong(createContext(StandardField.TITLE, "{x}x{}}x{{}}"));
+        assertWrong(createContext(StandardField.TITLE, "}"));
+        assertWrong(createContext(StandardField.TITLE, "{"));
     }
 
     @Test
-    public void testAuthorNameChecks() {
-        for (String field : InternalBibtexFields.getPersonNameFields()) {
+    void testAuthorNameChecks() {
+        for (Field field : FieldFactory.getPersonNameFields()) {
             // getPersonNameFields returns fields that are available in biblatex only
             // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
@@ -174,27 +179,27 @@ public class IntegrityCheckTest {
     }
 
     @Test
-    public void testTitleChecks() {
-        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBTEX));
-        assertWrong(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+    void testTitleChecks() {
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {T}itle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{This is a Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
 
-        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {T}itle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{This is a Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testAbbreviationChecks() {
-        for (String field : Arrays.asList("booktitle", "journal")) {
+    void testAbbreviationChecks() {
+        for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
             assertCorrect(createContext(field, "IEEE Software"));
             assertCorrect(createContext(field, ""));
             assertWrong(createContext(field, "IEEE SW"));
@@ -202,134 +207,136 @@ public class IntegrityCheckTest {
     }
 
     @Test
-    public void testJournalIsKnownInAbbreviationList() {
-        assertCorrect(createContext("journal", "IEEE Software"));
-        assertWrong(createContext("journal", "IEEE Whocares"));
+    void testJournalIsKnownInAbbreviationList() {
+        assertCorrect(createContext(StandardField.JOURNAL, "IEEE Software"));
+        assertWrong(createContext(StandardField.JOURNAL, "IEEE Whocares"));
     }
 
     @Test
-    public void testFileChecks() {
+    void testFileChecks() {
         MetaData metaData = mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
-        assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
-        assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));
-        assertWrong(createContext("file", ":asflakjfwofja:PDF", metaData));
+        assertCorrect(createContext(StandardField.FILE, ":build.gradle:gradle", metaData));
+        assertCorrect(createContext(StandardField.FILE, "description:build.gradle:gradle", metaData));
+        assertWrong(createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData));
     }
 
     @Test
-    public void fileCheckFindsFilesRelativeToBibFile() throws IOException {
-        File bibFile = testFolder.newFile("lit.bib");
-        testFolder.newFile("file.pdf");
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
+        Path bibFile = testFolder.resolve("lit.bib");
+        Files.createFile(bibFile);
+        Path pdfFile = testFolder.resolve("file.pdf");
+        Files.createFile(pdfFile);
 
-        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
         databaseContext.setDatabaseFile(bibFile);
 
         assertCorrect(databaseContext);
     }
 
     @Test
-    public void testTypeChecks() {
-        assertCorrect(createContext("pages", "11--15", "inproceedings"));
-        assertWrong(createContext("pages", "11--15", "proceedings"));
+    void testTypeChecks() {
+        assertCorrect(createContext(StandardField.PAGES, "11--15", StandardEntryType.InProceedings));
+        assertWrong(createContext(StandardField.PAGES, "11--15", StandardEntryType.Proceedings));
     }
 
     @Test
-    public void testBooktitleChecks() {
-        assertCorrect(createContext("booktitle", "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", "proceedings"));
-        assertWrong(createContext("booktitle", "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", "proceedings"));
+    void testBooktitleChecks() {
+        assertCorrect(createContext(StandardField.BOOKTITLE, "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", StandardEntryType.Proceedings));
+        assertWrong(createContext(StandardField.BOOKTITLE, "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", StandardEntryType.Proceedings));
     }
 
     @Test
-    public void testPageNumbersChecks() {
-        assertCorrect(createContext("pages", "1--2"));
-        assertCorrect(createContext("pages", "12"));
-        assertWrong(createContext("pages", "1-2"));
-        assertCorrect(createContext("pages", "1,2,3"));
-        assertCorrect(createContext("pages", "43+"));
-        assertWrong(createContext("pages", "1 2"));
-        assertWrong(createContext("pages", "{1}-{2}"));
-        assertCorrect(createContext("pages", "7,41,73--97"));
-        assertCorrect(createContext("pages", "7,41--42,73"));
-        assertCorrect(createContext("pages", "7--11,41--43,73"));
-        assertCorrect(createContext("pages", "7+,41--43,73"));
+    void testPageNumbersChecks() {
+        assertCorrect(createContext(StandardField.PAGES, "1--2"));
+        assertCorrect(createContext(StandardField.PAGES, "12"));
+        assertWrong(createContext(StandardField.PAGES, "1-2"));
+        assertCorrect(createContext(StandardField.PAGES, "1,2,3"));
+        assertCorrect(createContext(StandardField.PAGES, "43+"));
+        assertWrong(createContext(StandardField.PAGES, "1 2"));
+        assertWrong(createContext(StandardField.PAGES, "{1}-{2}"));
+        assertCorrect(createContext(StandardField.PAGES, "7,41,73--97"));
+        assertCorrect(createContext(StandardField.PAGES, "7,41--42,73"));
+        assertCorrect(createContext(StandardField.PAGES, "7--11,41--43,73"));
+        assertCorrect(createContext(StandardField.PAGES, "7+,41--43,73"));
     }
 
     @Test
-    public void testBiblatexPageNumbersChecks() {
-        assertCorrect(withMode(createContext("pages", "1--2"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "12"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "1-2"), BibDatabaseMode.BIBLATEX)); // only diff to bibtex
-        assertCorrect(withMode(createContext("pages", "1,2,3"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "43+"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("pages", "1 2"), BibDatabaseMode.BIBLATEX));
-        assertWrong(withMode(createContext("pages", "{1}-{2}"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "7,41,73--97"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "7,41--42,73"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "7--11,41--43,73"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("pages", "7+,41--43,73"), BibDatabaseMode.BIBLATEX));
+    void testBiblatexPageNumbersChecks() {
+        assertCorrect(withMode(createContext(StandardField.PAGES, "1--2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "12"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "1-2"), BibDatabaseMode.BIBLATEX)); // only diff to bibtex
+        assertCorrect(withMode(createContext(StandardField.PAGES, "1,2,3"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "43+"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.PAGES, "1 2"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext(StandardField.PAGES, "{1}-{2}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "7,41,73--97"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "7,41--42,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "7--11,41--43,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.PAGES, "7+,41--43,73"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    public void testBibStringChecks() {
-        assertCorrect(createContext("title", "Not a single hash mark"));
-        assertCorrect(createContext("month", "#jan#"));
-        assertCorrect(createContext("author", "#einstein# and #newton#"));
-        assertWrong(createContext("month", "#jan"));
-        assertWrong(createContext("author", "#einstein# #amp; #newton#"));
+    void testBibStringChecks() {
+        assertCorrect(createContext(StandardField.TITLE, "Not a single hash mark"));
+        assertCorrect(createContext(StandardField.MONTH, "#jan#"));
+        assertCorrect(createContext(StandardField.AUTHOR, "#einstein# and #newton#"));
+        assertWrong(createContext(StandardField.MONTH, "#jan"));
+        assertWrong(createContext(StandardField.AUTHOR, "#einstein# #amp; #newton#"));
     }
 
     @Test
-    public void testHTMLCharacterChecks() {
-        assertCorrect(createContext("title", "Not a single {HTML} character"));
-        assertCorrect(createContext("month", "#jan#"));
-        assertCorrect(createContext("author", "A. Einstein and I. Newton"));
-        assertCorrect(createContext("url", "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
-        assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
-        assertWrong(createContext("author", "Lenhard, J&#227;rg"));
-        assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
+    void testHTMLCharacterChecks() {
+        assertCorrect(createContext(StandardField.TITLE, "Not a single {HTML} character"));
+        assertCorrect(createContext(StandardField.MONTH, "#jan#"));
+        assertCorrect(createContext(StandardField.AUTHOR, "A. Einstein and I. Newton"));
+        assertCorrect(createContext(StandardField.URL, "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
+        assertWrong(createContext(StandardField.AUTHOR, "Lenhard, J&ouml;rg"));
+        assertWrong(createContext(StandardField.AUTHOR, "Lenhard, J&#227;rg"));
+        assertWrong(createContext(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
     }
 
     @Test
-    public void testISSNChecks() {
-        assertCorrect(createContext("issn", "0020-7217"));
-        assertCorrect(createContext("issn", "1687-6180"));
-        assertCorrect(createContext("issn", "2434-561x"));
-        assertWrong(createContext("issn", "Some other stuff"));
-        assertWrong(createContext("issn", "0020-7218"));
+    void testISSNChecks() {
+        assertCorrect(createContext(StandardField.ISSN, "0020-7217"));
+        assertCorrect(createContext(StandardField.ISSN, "1687-6180"));
+        assertCorrect(createContext(StandardField.ISSN, "2434-561x"));
+        assertWrong(createContext(StandardField.ISSN, "Some other stuff"));
+        assertWrong(createContext(StandardField.ISSN, "0020-7218"));
     }
 
     @Test
-    public void testISBNChecks() {
-        assertCorrect(createContext("isbn", "0-201-53082-1"));
-        assertCorrect(createContext("isbn", "0-9752298-0-X"));
-        assertCorrect(createContext("isbn", "978-0-306-40615-7"));
-        assertWrong(createContext("isbn", "Some other stuff"));
-        assertWrong(createContext("isbn", "0-201-53082-2"));
-        assertWrong(createContext("isbn", "978-0-306-40615-8"));
+    void testISBNChecks() {
+        assertCorrect(createContext(StandardField.ISBN, "0-201-53082-1"));
+        assertCorrect(createContext(StandardField.ISBN, "0-9752298-0-X"));
+        assertCorrect(createContext(StandardField.ISBN, "978-0-306-40615-7"));
+        assertWrong(createContext(StandardField.ISBN, "Some other stuff"));
+        assertWrong(createContext(StandardField.ISBN, "0-201-53082-2"));
+        assertWrong(createContext(StandardField.ISBN, "978-0-306-40615-8"));
     }
 
     @Test
-    public void testDOIChecks() {
-        assertCorrect(createContext("doi", "10.1023/A:1022883727209"));
-        assertCorrect(createContext("doi", "10.17487/rfc1436"));
-        assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
-        assertWrong(createContext("doi", "asdf"));
+    void testDOIChecks() {
+        assertCorrect(createContext(StandardField.DOI, "10.1023/A:1022883727209"));
+        assertCorrect(createContext(StandardField.DOI, "10.17487/rfc1436"));
+        assertCorrect(createContext(StandardField.DOI, "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
+        assertWrong(createContext(StandardField.DOI, "asdf"));
     }
 
     @Test
-    public void testEntryIsUnchangedAfterChecks() {
+    void testEntryIsUnchangedAfterChecks() {
         BibEntry entry = new BibEntry();
 
         // populate with all known fields
-        for (String fieldName : InternalBibtexFields.getAllPublicAndInternalFieldNames()) {
-            entry.setField(fieldName, UUID.randomUUID().toString());
+        for (Field field : FieldFactory.getCommonFields()) {
+            entry.setField(field, UUID.randomUUID().toString());
         }
         // add a random field
-        entry.setField(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entry.setField(StandardField.EPRINT, UUID.randomUUID().toString());
 
         // duplicate entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
@@ -339,22 +346,22 @@ public class IntegrityCheckTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
 
         new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
-                .checkBibtexDatabase();
+                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                .checkDatabase();
 
         assertEquals(clonedEntry, entry);
     }
 
     @Test
-    public void testASCIIChecks() {
-        assertCorrect(createContext("title", "Only ascii characters!'@12"));
-        assertWrong(createContext("month", "Umlauts are nöt ällowed"));
-        assertWrong(createContext("author", "Some unicode ⊕"));
+    void testASCIIChecks() {
+        assertCorrect(createContext(StandardField.TITLE, "Only ascii characters!'@12"));
+        assertWrong(createContext(StandardField.MONTH, "Umlauts are nöt ällowed"));
+        assertWrong(createContext(StandardField.AUTHOR, "Some unicode ⊕"));
     }
 
-    private BibDatabaseContext createContext(String field, String value, String type) {
+    private BibDatabaseContext createContext(Field field, String value, EntryType type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         entry.setType(type);
@@ -363,7 +370,7 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
-    private BibDatabaseContext createContext(String field, String value, MetaData metaData) {
+    private BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
@@ -371,25 +378,35 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 
-    private BibDatabaseContext createContext(String field, String value) {
+    private BibDatabaseContext createContext(Field field, String value) {
         return createContext(field, value, new MetaData());
     }
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
-                .checkBibtexDatabase();
-        assertFalse(messages.toString(), messages.isEmpty());
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                .checkDatabase();
+        assertNotEquals(Collections.emptyList(), messages);
     }
 
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FileDirectoryPreferences.class),
+                mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true
-        ).checkBibtexDatabase();
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
+        ).checkDatabase();
+        assertEquals(Collections.emptyList(), messages);
+    }
+
+    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                allowIntegerEdition
+        ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -409,5 +426,4 @@ public class IntegrityCheckTest {
         context.setMode(mode);
         return context;
     }
-
 }

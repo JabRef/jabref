@@ -1,5 +1,9 @@
 package org.jabref.model.util;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +14,16 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.FilePreferences;
+
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.parser.AutoDetectParser;
 
 public class FileHelper {
 
@@ -31,12 +44,37 @@ public class FileHelper {
      * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
+        Metadata metadata = new Metadata();
+        metadata.add(Metadata.RESOURCE_NAME_KEY, fileName);
+
+        if (isUrl(fileName)) {
+            try (InputStream is = new URL(fileName).openStream()) {
+                return detectExtension(is, metadata);
+            } catch (IOException | MimeTypeException e) {
+                return Optional.empty();
+            }
+        }
+
         int dotPosition = fileName.lastIndexOf('.');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
             return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
-        } else {
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<String> detectExtension(InputStream is, Metadata metaData) throws IOException, MimeTypeException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        AutoDetectParser parser = new AutoDetectParser();
+        Detector detector = parser.getDetector();
+        MediaType mediaType = detector.detect(bis, metaData);
+        MimeType mimeType = TikaConfig.getDefaultConfig().getMimeRepository().forName(mediaType.toString());
+        String extension = mimeType.getExtension();
+
+        if (extension.isEmpty()) {
             return Optional.empty();
         }
+
+        return Optional.of(extension.substring(1));
     }
 
     /**
@@ -52,13 +90,11 @@ public class FileHelper {
      * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<Path> expandFilename(final BibDatabaseContext databaseContext, String name,
-            FileDirectoryPreferences fileDirectoryPreferences) {
-        Optional<String> extension = getFileExtension(name);
+    public static Optional<Path> expandFilename(final BibDatabaseContext databaseContext, String name, FilePreferences filePreferences) {
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
+        List<String> directories = databaseContext.getFileDirectories(StandardField.FILE, filePreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
+        List<String> fileDir = databaseContext.getFileDirectories(filePreferences);
 
         List<String> searchDirectories = new ArrayList<>();
         for (String dir : directories) {
@@ -128,5 +164,27 @@ public class FileHelper {
         } else {
             return Optional.empty();
         }
+    }
+
+    private static boolean isUrl(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static Path relativize(Path path, List<Path> fileDirectories) {
+        if (!path.isAbsolute()) {
+            return path;
+        }
+
+        for (Path directory : fileDirectories) {
+            if (path.startsWith(directory)) {
+                return directory.relativize(path);
+            }
+        }
+        return path;
     }
 }

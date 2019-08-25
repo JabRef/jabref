@@ -47,12 +47,13 @@ import org.jabref.logic.importer.fileformat.endnote.Urls;
 import org.jabref.logic.importer.fileformat.endnote.Volume;
 import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.importer.fileformat.endnote.Year;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryType;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -80,8 +81,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ENDNOTE_XML;
+    public StandardFileType getFileType() {
+        return StandardFileType.XML;
     }
 
     @Override
@@ -156,23 +157,23 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
     }
 
-    private static BiblatexEntryType convertRefNameToType(String refName) {
+    private static EntryType convertRefNameToType(String refName) {
         switch (refName.toLowerCase().trim()) {
             case "artwork":
-                return BiblatexEntryTypes.MISC;
+                return StandardEntryType.Misc;
             case "generic":
-                return BiblatexEntryTypes.MISC;
-            case "electronic rticle":
-                return BiblatexEntryTypes.ELECTRONIC;
+                return StandardEntryType.Misc;
+            case "electronic article":
+                return IEEETranEntryType.Electronic;
             case "book section":
-                return BiblatexEntryTypes.INBOOK;
+                return StandardEntryType.InBook;
             case "book":
-                return BiblatexEntryTypes.BOOK;
+                return StandardEntryType.Book;
             case "journal article":
-                return BiblatexEntryTypes.ARTICLE;
+                return StandardEntryType.Article;
 
             default:
-                return BiblatexEntryTypes.ARTICLE;
+                return StandardEntryType.Article;
         }
     }
 
@@ -181,63 +182,63 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
         entry.setType(getType(record));
         Optional.ofNullable(getAuthors(record))
-                .ifPresent(value -> entry.setField(FieldName.AUTHOR, value));
+                .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getTitle)
                 .map(Title::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.TITLE, clean(value)));
+                .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getSecondaryTitle)
                 .map(SecondaryTitle::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.JOURNAL, clean(value)));
+                .ifPresent(value -> entry.setField(StandardField.JOURNAL, clean(value)));
         Optional.ofNullable(record.getPages())
                 .map(Pages::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.PAGES, value));
+                .ifPresent(value -> entry.setField(StandardField.PAGES, value));
         Optional.ofNullable(record.getNumber())
                 .map(Number::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.NUMBER, value));
+                .ifPresent(value -> entry.setField(StandardField.NUMBER, value));
         Optional.ofNullable(record.getVolume())
                 .map(Volume::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.VOLUME, value));
+                .ifPresent(value -> entry.setField(StandardField.VOLUME, value));
         Optional.ofNullable(record.getDates())
                 .map(Dates::getYear)
                 .map(Year::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.YEAR, value));
+                .ifPresent(value -> entry.setField(StandardField.YEAR, value));
         Optional.ofNullable(record.getNotes())
                 .map(Notes::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.NOTE, value.trim()));
+                .ifPresent(value -> entry.setField(StandardField.NOTE, value.trim()));
         getUrl(record)
-                .ifPresent(value -> entry.setField(FieldName.URL, value));
+                .ifPresent(value -> entry.setField(StandardField.URL, value));
         entry.putKeywords(getKeywords(record), preferences.getKeywordSeparator());
         Optional.ofNullable(record.getAbstract())
                 .map(Abstract::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.ABSTRACT, value.trim()));
+                .ifPresent(value -> entry.setField(StandardField.ABSTRACT, value.trim()));
         entry.setFiles(getLinkedFiles(record));
         Optional.ofNullable(record.getIsbn())
                 .map(Isbn::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(value -> entry.setField(FieldName.ISBN, clean(value)));
+                .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
         Optional.ofNullable(record.getElectronicResourceNum())
                 .map(ElectronicResourceNum::getStyle)
                 .map(Style::getvalue)
-                .ifPresent(doi -> entry.setField(FieldName.DOI, doi.trim()));
+                .ifPresent(doi -> entry.setField(StandardField.DOI, doi.trim()));
 
         return entry;
     }
 
-    private BiblatexEntryType getType(Record record) {
+    private EntryType getType(Record record) {
         return Optional.ofNullable(record.getRefType())
                        .map(RefType::getName)
                        .map(EndnoteXmlImporter::convertRefNameToType)
-                       .orElse(BiblatexEntryTypes.ARTICLE);
+                       .orElse(StandardEntryType.Article);
     }
 
     private List<LinkedFile> getLinkedFiles(Record record) {

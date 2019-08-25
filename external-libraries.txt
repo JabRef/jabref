@@ -33,37 +33,22 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 Id:      com.airhacks:afterburner.fx
 Project: afterburner.fx
 URL:     https://github.com/AdamBien/afterburner.fx
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
 License: Apple License
 
-Id:      com.github.bkromhout:java-diff-utils
-Project: java-diff-utils
-URL:     https://github.com/bkromhout/java-diff-utils
-License: Apache-2.0
-
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
-License: BSD
-
-Id:      com.jgoodies:jgoodies-common
-Project: JGoodies Common
-URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD
-
-Id:      com.jgoodies:jgoodies-forms
-Project: JGoodies Forms
-URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD
+License: BSD-3-Clause
 
 Id:      com.mashape.unirest
 Project: Unirest for Java
@@ -79,6 +64,11 @@ Id:      com.microsoft.azure:applicationinsights-logging-log4j2
 Project: Application Insights SDK for Java
 URL:     https://github.com/Microsoft/ApplicationInsights-Java
 License: MIT
+
+Id:      com.sibvisions.external.jvxfx:DnDTabPane
+Project: Drag'n'Drop TabPane
+URL:     https://github.com/sibvisions/javafx.DndTabPane
+License: EPL-1.0
 
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
@@ -115,10 +105,10 @@ Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
 License: MIT
 
-Id:      mysql:mysql-connector-java
-Project: MySQL Connector/J
-URL:     http://www.mysql.de/downloads/connector/j/
-License: GPL-2.0 and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
+Id:      io.github.java-diff-utils:java-diff-utils
+Project: java-diff-utils
+URL:     https://github.com/java-diff-utils/java-diff-utils
+License: Apache-1.1
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
@@ -127,13 +117,13 @@ License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL
 
 Id:      org.antlr:antlr
 Project: ANTLR 3
-URL:     http://www.antlr.org/
-License: BSD
+URL:     http://www.antlr3.org/
+License: BSD-3-Clause
 
 Id:      org.antlr:antlr4
 Project: ANTLR 4
 URL:     http://www.antlr.org/
-License: BSD
+License: BSD-3-Clause
 
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang
@@ -210,6 +200,11 @@ Project: jsoup
 URL:     https://github.com/jhy/jsoup/
 License: MIT
 
+Id:      org.mariadb.jdbc:mariadb-java-client
+Project: MariaDB Java Client
+URL:     https://mariadb.com/kb/en/library/about-mariadb-connector-j/
+License: LGPL-2.1-or-later
+
 Id:      org.openoffice:juh
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
@@ -233,17 +228,11 @@ License: Apache-2.0
 Id:      org.xmlunit:xmlunit-core
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.xmlunit:xmlunit-matchers
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
-License: Apache 2.0
-
-Id:      spin
-Path:    lib/spin.jar
-Project: Spin
-URL:     http://spin.sourceforge.net/
-License: LGPL-2.1+
+License: Apache-2.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

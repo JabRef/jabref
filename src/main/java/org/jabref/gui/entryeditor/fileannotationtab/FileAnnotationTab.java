@@ -1,12 +1,15 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
@@ -21,11 +24,14 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return entry.getField(FieldName.FILE).isPresent();
+        return entry.getField(StandardField.FILE).isPresent();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setContent(new FileAnnotationTabView(entry, fileAnnotationCache).getView());
+        Parent content = ViewLoader.view(new FileAnnotationTabView(entry, fileAnnotationCache))
+                                   .load()
+                                   .getView();
+        setContent(content);
     }
 }

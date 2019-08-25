@@ -18,10 +18,10 @@ env:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
     - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=checkstyle
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
-    - TEST_SUITE=checkstyle
     - TEST_SUITE=codecov
     - DEPENDENCY_UPDATES=check
 
@@ -47,10 +47,10 @@ before_script:
 script:
   # --scan enables the Gradle build scan, which can be used to investigate the time each action consumes
   # For more information see https://gradle.com/scans/get-started
-  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
+  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS -x checkstyleJmh -x checkstyleMain -x checkstyleTest --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
-  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
+  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport; bash <(curl -s https://codecov.io/bash); fi
   - if [ "$DEPENDENCY_UPDATES" == "check" ]; then ./gradlew -q checkOutdatedDependencies; fi
 
 after_failure:
@@ -60,6 +60,7 @@ after_failure:
 branches:
   only:
     - master
+    - maintable-beta
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
@@ -70,3 +71,4 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+

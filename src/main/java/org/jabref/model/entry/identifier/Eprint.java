@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @see https://arxiv.org/hypertex/bibstyles/
  */
 public class Eprint implements Identifier {
-    public static final URI RESOLVER = URI.create("http://arxiv.org");
+    public static final URI RESOLVER = URI.create("https://arxiv.org");
     private static final Logger LOGGER = LoggerFactory.getLogger(Eprint.class);
 
     // Regex
@@ -132,8 +133,8 @@ public class Eprint implements Identifier {
     }
 
     @Override
-    public String getDefaultField() {
-        return FieldName.EPRINT;
+    public Field getDefaultField() {
+        return StandardField.EPRINT;
     }
 
     @Override

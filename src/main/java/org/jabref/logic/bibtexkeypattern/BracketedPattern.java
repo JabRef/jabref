@@ -20,9 +20,11 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -35,7 +37,6 @@ import org.slf4j.LoggerFactory;
  * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
  */
 public class BracketedPattern {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
@@ -65,17 +66,48 @@ public class BracketedPattern {
         return expand(bibentry, null_database);
     }
 
+    /**
+     * Expands the current pattern using the given bibentry and database. ";" is used as keyword delimiter.
+     *
+     * @param bibentry The bibentry to expand.
+     * @param database The database to use for string-lookups and cross-refs. May be null.
+     *
+     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+     */
     public String expand(BibEntry bibentry, BibDatabase database) {
+        Objects.requireNonNull(bibentry);
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
 
+    /**
+     * Expands the current pattern using the given bibentry, keyword delimiter, and database.
+     *
+     * @param bibentry The bibentry to expand.
+     * @param keywordDelimiter The keyword delimiter to use.
+     * @param database The database to use for string-lookups and cross-refs. May be null.
+     *
+     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+     */
     public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         Objects.requireNonNull(bibentry);
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        return expandBrackets(pattern, keywordDelimiter, entry, database, false);
+    }
+
+    /**
+     * Expands a pattern
+     *
+     * @param pattern The pattern to expand
+     * @param keywordDelimiter The keyword delimiter to use
+     * @param entry The bibentry to use for expansion
+     * @param database The database for field resolving. May be null.
+     * @return The expanded pattern. Not null.
+     */
+    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database, boolean isEnforceLegalKey) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
@@ -96,10 +128,10 @@ public class BracketedPattern {
                     // check whether there is a modifier on the end such as
                     // ":lower":
                     if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(entry, token, keywordDelimiter, database));
+                        sb.append(getFieldValue(entry, token, keywordDelimiter, database, isEnforceLegalKey));
                     } else {
                         // apply modifiers:
-                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database, isEnforceLegalKey);
                         sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                     // Fetch and discard the closing ']'
@@ -120,41 +152,45 @@ public class BracketedPattern {
         return sb.toString();
     }
 
-    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
+    /**
+     * Evaluates the given pattern ("value") to the given bibentry and database
+     *
+     * @param entry The entry to get the field value from
+     * @param value A pattern string (such as auth, pureauth, authorLast)
+     * @param keywordDelimiter The de
+     * @param database The database to use for field resolving. May be null.
+     *
+     * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
+     */
+    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database, boolean isEnforceLegalKey) {
+
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
-
-                /*
-                 * For label code "auth...": if there is no author, but there
-                 * are editor(s) (e.g. for an Edited Book), use the editor(s)
-                 * instead. (saw27@mrao.cam.ac.uk). This is what most people
-                 * want, but in case somebody really needs a field which expands
-                 * to nothing if there is no author (e.g. someone who uses both
-                 * "auth" and "ed" in the same label), we provide an alternative
-                 * form "pureauth..." which does not do this fallback
-                 * substitution of editor.
-                 */
+                // result the author
                 String authString;
                 if (database != null) {
-                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database)
-                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
+                                      .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 } else {
-                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
                 }
 
                 if (val.startsWith("pure")) {
-                    // remove the "pure" prefix so the remaining
-                    // code in this section functions correctly
+                    // "pure" is used in the context of authors to resolve to authors only and not fallback to editors
+                    // The other functionality of the pattern "ForeIni", ... is the same
+                    // Thus, remove the "pure" prefix so the remaining code in this section functions correctly
+                    //
                     val = val.substring(4);
-                }
-
-                if (authString.isEmpty()) {
-                    if (database != null) {
-                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database)
-                                .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
-                    } else {
-                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse("");
+                } else {
+                    // special feature: A pattern starting with "auth" falls back to the editor
+                    if (authString.isEmpty()) {
+                        if (database != null) {
+                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database)
+                                              .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                        } else {
+                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
+                        }
                     }
                 }
 
@@ -194,55 +230,48 @@ public class BracketedPattern {
                     return authNofMth(authString, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
                 } else if (val.matches("auth\\d+")) {
-                    // authN. First N chars of the first author's last
-                    // name.
-
-                    String fa = firstAuthor(authString);
                     int num = Integer.parseInt(val.substring(4));
-                    if (num > fa.length()) {
-                        num = fa.length();
-                    }
-                    return fa.substring(0, num);
+                    return authN(authString, num, isEnforceLegalKey);
                 } else if (val.matches("authors\\d+")) {
                     return nAuthors(authString, Integer.parseInt(val.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""), num);
+                    return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authNofMth(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""),
+                    return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    return authAuthEa(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrshort".equals(val)) {
-                    return authshort(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
+                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
@@ -251,31 +280,32 @@ public class BracketedPattern {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("pageprefix".equals(val)) {
-                return pagePrefix(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return pagePrefix(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
+                return lastPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("title".equals(val)) {
-                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("fulltitle".equals(val)) {
-                return entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("");
+                return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("");
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return getTitleWords(3,
+                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
-                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")),
+                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1,
-                        removeSmallWords(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")));
+                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("camel".equals(val)) {
-                return getCamelizedTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(val)) {
-                String yearString = entry.getResolvedFieldOrAlias(FieldName.YEAR, database).orElse("");
+                String yearString = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).orElse("");
                 if (yearString.isEmpty()) {
                     return yearString;
                     // In press/in preparation/submitted
@@ -287,7 +317,7 @@ public class BracketedPattern {
                     return yearString;
                 }
             } else if ("entrytype".equals(val)) {
-                return entry.getResolvedFieldOrAlias(BibEntry.TYPE_HEADER, database).orElse("");
+                return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse("");
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
@@ -322,7 +352,7 @@ public class BracketedPattern {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return entry.getResolvedFieldOrAlias(val, database).orElse("");
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
             }
         }
         catch (NullPointerException ex) {
@@ -712,7 +742,7 @@ public class BracketedPattern {
 
         String firstAuthor = tokens[0].split(",")[0];
         StringBuilder authorSB = new StringBuilder();
-        authorSB.append(firstAuthor.substring(0, Math.min(CHARS_OF_FIRST, firstAuthor.length())));
+        authorSB.append(firstAuthor, 0, Math.min(CHARS_OF_FIRST, firstAuthor.length()));
         int i = 1;
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname
@@ -807,6 +837,18 @@ public class BracketedPattern {
         } else {
             return lastName.substring(0, n);
         }
+    }
+
+    /**
+     * First N chars of the first author's last name.
+     */
+    public static String authN(String authString, int num, boolean isEnforceLegalKey) {
+        authString = BibtexKeyGenerator.removeUnwantedCharacters(authString, isEnforceLegalKey);
+        String fa = firstAuthor(authString);
+        if (num > fa.length()) {
+            num = fa.length();
+        }
+        return fa.substring(0, num);
     }
 
     /**
@@ -997,6 +1039,7 @@ public class BracketedPattern {
     /**
      * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
      * as well as escaped colons and parentheses.
+     *
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
@@ -1067,7 +1110,7 @@ public class BracketedPattern {
             }
         }
         tokens.add(token.toString());
-        StringBuilder normalized = new StringBuilder("");
+        StringBuilder normalized = new StringBuilder();
 
         for (int i = 0; i < tokens.size(); i++) {
             if (i > 0) {
@@ -1265,7 +1308,7 @@ public class BracketedPattern {
                 if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
-                if (FieldName.SCHOOL.equalsIgnoreCase(k)) {
+                if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
                 if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
@@ -1302,7 +1345,7 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !FieldName.SCHOOL.equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {

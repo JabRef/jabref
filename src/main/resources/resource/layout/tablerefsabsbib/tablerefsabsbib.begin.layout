@@ -24,7 +24,7 @@
 
 // Search settings
 var searchAbstract = true;	// search in abstract
-var searchReview = true;	// search in review
+var searchComment = true;	// search in comment
 
 var noSquiggles = true; 	// ignore diacritics when searching
 var searchRegExp = false; 	// enable RegExp searches
@@ -65,7 +65,7 @@ function loadTableData() {
 	searchTable = document.getElementById('qs_table');
 	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-	// split all rows into entryRows and infoRows (e.g. abstract, review, bibtex)
+	// split all rows into entryRows and infoRows (e.g. abstract, comment, bibtex)
 	entryRows = new Array(); infoRows = new Array(); absRows = new Array(); revRows = new Array();
 
 	// get data from each row
@@ -81,11 +81,11 @@ function loadTableData() {
 			j ++;
 		} else {
 			infoRows[k++] = allRows[i];
-			// check for abstract/review
+			// check for abstract/comment
 			if (allRows[i].className.match(/abstract/)) {
 				absRows.push(allRows[i]);
 				absRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
-			} else if (allRows[i].className.match(/review/)) {
+			} else if (allRows[i].className.match(/comment/)) {
 				revRows.push(allRows[i]);
 				revRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
 			}
@@ -141,7 +141,7 @@ function quickSearch(){
 				if(searchAbstract && absRowsData[i]!=undefined) {
 					if (absRowsData[i].search(textRegExp) != -1){ found=true; } 
 				}
-				if(searchReview && revRowsData[i]!=undefined) {
+				if(searchComment && revRowsData[i]!=undefined) {
 					if (revRowsData[i].search(textRegExp) != -1){ found=true; } 
 				}
 			}
@@ -217,8 +217,8 @@ function toggleInfo(articleid,info) {
 	
 	if (abs && info == 'abstract') {
 		abs.className.indexOf('noshow') == -1?abs.className = 'abstract noshow':abs.className = 'abstract show';
-	} else if (rev && info == 'review') {
-		rev.className.indexOf('noshow') == -1?rev.className = 'review noshow':rev.className = 'review show';
+	} else if (rev && info == 'comment') {
+		rev.className.indexOf('noshow') == -1?rev.className = 'comment noshow':rev.className = 'comment show';
 	} else if (bib && info == 'bibtex') {
 		bib.className.indexOf('noshow') == -1?bib.className = 'bibtex noshow':bib.className = 'bibtex show';
 	} else { 
@@ -240,12 +240,12 @@ function toggleInfo(articleid,info) {
 		}
 	}
 	
-	// When there's a combination of abstract/review/bibtex showing, need to add class for correct styling
+	// When there's a combination of abstract/comment/bibtex showing, need to add class for correct styling
 	if(absshow) {
 		(revshow||bibshow)?abs.className = 'abstract nextshow':abs.className = 'abstract';
 	} 
 	if (revshow) {
-		bibshow?rev.className = 'review nextshow': rev.className = 'review';
+		bibshow?rev.className = 'comment nextshow': rev.className = 'comment';
 	}	
 	
 }
@@ -305,7 +305,7 @@ function updateSetting(obj){
 	   redoQS();
 	   break;
 	 case "opt_searchRev":
-	   searchReview=!searchReview;
+	   searchComment=!searchComment;
 	   redoQS();
 	   break;
 	 case "opt_useRegExp":
@@ -322,7 +322,7 @@ function updateSetting(obj){
 
 function initPreferences(){
 	if(searchAbstract){document.getElementById("opt_searchAbs").checked = true;}
-	if(searchReview){document.getElementById("opt_searchRev").checked = true;}
+	if(searchComment){document.getElementById("opt_searchRev").checked = true;}
 	if(noSquiggles){document.getElementById("opt_noAccents").checked = true;}
 	if(searchRegExp){document.getElementById("opt_useRegExp").checked = true;}
 	
@@ -377,7 +377,7 @@ td a:hover  { text-decoration: underline; }
 
 tr.noshow { display: none;}
 tr.highlight td { background-color: #EFEFEF; border-top: 2px #2E2E2E solid; font-weight: bold; }
-tr.abstract td, tr.review td, tr.bibtex td { background-color: #EFEFEF; text-align: justify; border-bottom: 2px #2E2E2E solid; }
+tr.abstract td, tr.comment td, tr.bibtex td { background-color: #EFEFEF; text-align: justify; border-bottom: 2px #2E2E2E solid; }
 tr.nextshow td { border-bottom: 1px gray solid; }
 
 tr.bibtex pre { width: 100%; overflow: auto; white-space: pre-wrap;}
@@ -398,7 +398,7 @@ p.infolinks { margin: 0.3em 0em 0em 0em; padding: 0px; }
 <div id="settings" class="hidden">
 <ul>
 <li><input type="checkbox" class="search_setting" id="opt_searchAbs" onchange="updateSetting(this)"><label for="opt_searchAbs"> include abstract</label></li>
-<li><input type="checkbox" class="search_setting" id="opt_searchRev" onchange="updateSetting(this)"><label for="opt_searchRev"> include review</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_searchRev" onchange="updateSetting(this)"><label for="opt_searchRev"> include comment</label></li>
 <li><input type="checkbox" class="search_setting" id="opt_useRegExp" onchange="updateSetting(this)"><label for="opt_useRegExp"> use RegExp</label></li>
 <li><input type="checkbox" class="search_setting" id="opt_noAccents" onchange="updateSetting(this)"><label for="opt_noAccents"> ignore accents</label></li>
 </ul>

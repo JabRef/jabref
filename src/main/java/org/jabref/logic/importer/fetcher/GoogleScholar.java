@@ -23,7 +23,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
+ *
+ * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
  */
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
@@ -59,38 +61,53 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
-        if (!entry.hasField(FieldName.TITLE)) {
+        if (!entry.hasField(StandardField.TITLE)) {
             return pdfLink;
         }
 
         try {
+            // title search
             URIBuilder uriBuilder = new URIBuilder(SEARCH_IN_TITLE_URL);
             uriBuilder.addParameter("as_q", "");
-            uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
+            // as_epq as exact phrase
+            uriBuilder.addParameter("as_epq", entry.getField(StandardField.TITLE).orElse(null));
+            // as_occt field to search in
             uriBuilder.addParameter("as_occt", "title");
 
-            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(URLDownload.USER_AGENT).get();
-            // Check results for PDF link
-            // TODO: link always on first result or none?
-            for (int i = 0; i < NUM_RESULTS; i++) {
-                Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
-
-                if (link.first() != null) {
-                    String target = link.first().attr("href");
-                    // link present?
-                    if (!"".equals(target) && new URLDownload(target).isPdf()) {
-                        // TODO: check title inside pdf + length?
-                        // TODO: report error function needed?! query -> result
-                        LOGGER.info("Fulltext PDF found @ Google: " + target);
-                        pdfLink = Optional.of(new URL(target));
-                        break;
-                    }
-                }
-            }
+            pdfLink = search(uriBuilder.toString());
         } catch (URISyntaxException e) {
             throw new FetcherException("Building URI failed.", e);
         }
 
+        return pdfLink;
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
+
+    private Optional<URL> search(String url) throws IOException {
+        Optional<URL> pdfLink = Optional.empty();
+
+        Document doc = Jsoup.connect(url).userAgent(URLDownload.USER_AGENT).get();
+        // Check results for PDF link
+        // TODO: link always on first result or none?
+        for (int i = 0; i < NUM_RESULTS; i++) {
+            Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
+
+            if (link.first() != null) {
+                String target = link.first().attr("href");
+                // link present?
+                if (!target.isEmpty() && new URLDownload(target).isPdf()) {
+                    // TODO: check title inside pdf + length?
+                    // TODO: report error function needed?! query -> result
+                    LOGGER.info("Fulltext PDF found @ Google: " + target);
+                    pdfLink = Optional.of(new URL(target));
+                    break;
+                }
+            }
+        }
         return pdfLink;
     }
 
@@ -100,8 +117,8 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_GOOGLE_SCHOLAR;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_GOOGLE_SCHOLAR);
     }
 
     @Override

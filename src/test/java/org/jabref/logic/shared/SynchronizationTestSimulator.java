@@ -11,6 +11,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -29,15 +32,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class SynchronizationTestSimulator {
 
-    private BibDatabaseContext clientContextA;
-    private BibDatabaseContext clientContextB;
-
-    private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
-
-    private DBMSConnection dbmsConnection;
-
     @Parameter
     public DBMSType dbmsType;
+    private BibDatabaseContext clientContextA;
+    private BibDatabaseContext clientContextB;
+    private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
+    private DBMSConnection dbmsConnection;
+
+    @Parameters(name = "Test with {0} database system")
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        return TestManager.getDBMSTypeTestParameter();
+    }
 
     @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
@@ -55,11 +60,6 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
-    }
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
@@ -80,9 +80,9 @@ public class SynchronizationTestSimulator {
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
         //client A changes the entry
-        bibEntry.setField("custom", "custom value");
+        bibEntry.setField(new UnknownField("custom"), "custom value");
         //client B pulls the changes
-        bibEntry.clearField("author");
+        bibEntry.clearField(StandardField.AUTHOR);
 
         clientContextB.getDBMSSynchronizer().pullChanges();
 
@@ -129,7 +129,7 @@ public class SynchronizationTestSimulator {
         assertNull(eventListenerB.getSharedEntryNotPresentEvent());
         //client B tries to update the entry
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
-        bibEntryOfClientB.setField("year", "2009");
+        bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
         assertNotNull(eventListenerB.getSharedEntryNotPresentEvent());
@@ -145,7 +145,7 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         //A now increases the version number
-        bibEntryOfClientA.setField("year", "2001");
+        bibEntryOfClientA.setField(StandardField.YEAR, "2001");
 
         // B does nothing here, so there is no event occurrence
         // B now tries to update the entry
@@ -155,7 +155,7 @@ public class SynchronizationTestSimulator {
 
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         //B also tries to change something
-        bibEntryOfClientB.setField("year", "2016");
+        bibEntryOfClientB.setField(StandardField.YEAR, "2016");
 
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
@@ -163,12 +163,11 @@ public class SynchronizationTestSimulator {
     }
 
     private BibEntry getBibEntryExample(int index) {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setType("inproceedings");
-        bibEntry.setField("author", "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L " + index);
-        bibEntry.setField("title", "The nano processor: a low resource reconfigurable processor " + index);
-        bibEntry.setField("booktitle", "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " + index);
-        bibEntry.setField("year", "199" + index);
+        BibEntry bibEntry = new BibEntry(StandardEntryType.InProceedings);
+        bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L " + index);
+        bibEntry.setField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor " + index);
+        bibEntry.setField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " + index);
+        bibEntry.setField(StandardField.YEAR, "199" + index);
         bibEntry.setCiteKey("nanoproc199" + index);
         return bibEntry;
     }
