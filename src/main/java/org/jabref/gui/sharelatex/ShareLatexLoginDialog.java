@@ -25,9 +25,11 @@ public class ShareLatexLoginDialog extends BaseDialog<Void> {
     @FXML private PasswordField tbPassword;
     @FXML private Button btnLogin;
     @Inject private ShareLatexManager manager;
+    @Inject DialogService dialogService
 
 
     private SharelatexConnectionProperties props;
+    private ShareLatexLoginDialogViewModel viewModel;
 
     @FXML
     private void initialize() {
