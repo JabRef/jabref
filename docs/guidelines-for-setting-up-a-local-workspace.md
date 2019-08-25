@@ -1,4 +1,4 @@
-## Prerequisites:
+## Prerequisites
 
 * Java Development Kit 11 with JavaFX development.
   We recommend Liberica JDK at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
@@ -72,15 +72,18 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Update submodules: `git submodule update --init`
 
-### Generating additional source codes and getting dependencies using Gradle:
+### Generating additional source codes and getting dependencies using Gradle
+
 (not required for IntelliJ)
 
 1. Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
 2. Execute the following steps from the git-bash:
-  - Run `./gradlew assemble` 
-  - If you use Eclipse: Additionally run `./gradlew eclipse` 
-  - If you use IntelliJ: No further setup is required
-3. In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
+
+    * Run `./gradlew assemble`
+    * If you use Eclipse: Additionally run `./gradlew eclipse`
+    * If you use IntelliJ: No further setup is required
+
+3. In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
 4. `./gradlew tasks` shows many other runnable tasks.  
 
 ### Set-up Eclipse
@@ -104,5 +107,11 @@ After that steps, please follow these:
 2. Go to File > Settings > Editor > Code Style, choose a code style (or create a new one) 
 3. Click on the settings wheel (next to the scheme chooser), then Import scheme and choose "CheckStyle Configuration". Select the CheckStyle configuration file `config\checkstyle\checkstyle.xml`. Click OK and restart IntelliJ.
 4. Go to File > Settings > Checkstyle and import the above CheckStyle configuration file. Activate it.
+
+In case IntelliJ cannot compile the sources, tell IntelliJ to use Gradle for compiling and testing:
+
+![IntelliJ Gradle Config](intellij-gradle-config.png)
+
+## Final comments
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books: . In the latter case, please read [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
