@@ -485,13 +485,11 @@ checkstyle {
     sourceSets = []
 }
 
-/*
 modernizer {
     // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
     // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
     failOnViolations = false
 }
-*/
 
 // Release tasks
 shadowJar {
