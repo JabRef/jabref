@@ -1,6 +1,6 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.sharelatex.ShareLatexLoginDialog;
+import org.jabref.gui.sharelatex.ShareLatexLoginDialogView;
 
 public class SynchronizeWithShareLatexAction extends SimpleCommand {
 
@@ -10,7 +10,7 @@ public class SynchronizeWithShareLatexAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new ShareLatexLoginDialog().show();
+        new ShareLatexLoginDialogView().show();
 
     }
 }

@@ -76,9 +76,9 @@ public class WebSocketClientWrapper {
 
             ClientEndpointConfig.Configurator configurator = new MyCustomClientEndpointConfigurator(serverOrigin, cookies);
             final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
-                    .extensions(Arrays.asList(new PerMessageDeflateExtension()))
-                    .configurator(configurator)
-                    .build();
+                                                                         .extensions(Arrays.asList(new PerMessageDeflateExtension()))
+                                                                         .configurator(configurator)
+                                                                         .build();
             final CountDownLatch messageLatch = new CountDownLatch(1);
 
             ClientManager client = ClientManager.createClient();
@@ -94,7 +94,7 @@ public class WebSocketClientWrapper {
                     final int i = counter.incrementAndGet();
                     if (i <= 3) {
                         LOGGER.debug(
-                                "### Reconnecting... (reconnect count: " + i + ")", exception);
+                                     "### Reconnecting... (reconnect count: " + i + ")", exception);
                         return true;
                     } else {
                         messageLatch.countDown();
@@ -150,7 +150,7 @@ public class WebSocketClientWrapper {
     public void joinProject(String projectId) throws IOException {
         incrementCommandCounter();
         String text = "5:" + commandCounter + "+::{\"name\":\"joinProject\",\"args\":[{\"project_id\":\"" + projectId
-                + "\"}]}";
+                      + "\"}]}";
         session.getBasicRemote().sendText(text);
     }
 
@@ -203,7 +203,7 @@ public class WebSocketClientWrapper {
                 Thread.currentThread().interrupt();
                 LOGGER.debug("Exception in taking from queue", e);
             }
-        });
+        }, "ListenToShareLatexTask");
 
     }
 

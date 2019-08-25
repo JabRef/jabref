@@ -1,17 +1,14 @@
 package org.jabref.gui.sharelatex;
 
-import javafx.scene.control.Alert.AlertType;
-
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.util.BaseDialog;
@@ -26,7 +23,6 @@ public class ShareLatexLoginDialogView extends BaseDialog<Void> {
     @FXML private Button btnLogin;
     @Inject private ShareLatexManager manager;
     @Inject DialogService dialogService;
-
 
     private SharelatexConnectionProperties props;
     private ShareLatexLoginDialogViewModel viewModel;
@@ -63,7 +59,6 @@ public class ShareLatexLoginDialogView extends BaseDialog<Void> {
                 ShareLatexProjectDialogView dlgprojects = new ShareLatexProjectDialogView();
                 dlgprojects.show();
                 closeDialog();
-                JabRefGUI.getMainFrame().getSynchronizeWithSharelatexAction().setEnabled(false);
 
             }
         } catch (Exception e) {
@@ -79,6 +74,5 @@ public class ShareLatexLoginDialogView extends BaseDialog<Void> {
         sharelatexProjectDialog.setResizable(true);
         sharelatexProjectDialog.show();
         */
-
 
 }

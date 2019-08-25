@@ -36,7 +36,7 @@ public class ShareLatexProjectDialogView extends BaseDialog<Void> {
 
     private ShareLatexProjectDialogViewModel viewModel;
 
-    @Inject private DefaultFileUpdateMonitor fileMonitor ;
+    @Inject private DefaultFileUpdateMonitor fileMonitor;
 
     @FXML
     private void initialize() {
@@ -76,21 +76,10 @@ public class ShareLatexProjectDialogView extends BaseDialog<Void> {
             manager.startWebSocketHandler(projectID, database, preferences.getImportFormatPreferences(), fileMonitor);
         }
 
-        getStage().close();
-
     }
 
     @FXML
     private void cancelAndClose() {
-        getStage().close();
     }
 
-    @Override
-    /* public void show() {
-        FXDialog sharelatexProjectDialog = new FXDialog(AlertType.INFORMATION, "Choose Project");
-        sharelatexProjectDialog.setDialogPane((DialogPane) this.getView());
-        sharelatexProjectDialog.setResizable(true);
-        sharelatexProjectDialog.show();
-    }
-    */
 }

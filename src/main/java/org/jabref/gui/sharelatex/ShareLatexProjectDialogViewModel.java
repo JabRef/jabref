@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -36,7 +35,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final ShareLatexManager manager;
     private final SimpleListProperty<ShareLatexProjectViewModel> projects = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
+                                                                                                     FXCollections.observableArrayList());
     private final ImportFormatPreferences prefs;
 
     private final FileUpdateMonitor fileMonitor;
