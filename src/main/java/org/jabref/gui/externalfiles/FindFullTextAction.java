@@ -86,6 +86,8 @@ public class FindFullTextAction extends SimpleCommand {
                     if (entry.getFiles().isEmpty()) {
                         downloads.put(entry, fetchers.findFullTextPDF(entry));
                     } else {
+                        //we need to add the entry with an empty url. The real download only happens later if the url is not empty.
+                        //empty url and file field indicates that we already have the file
                         downloads.put(entry, Optional.empty());
                     }
                     updateProgress(++count, basePanel.getSelectedEntries().size());
@@ -122,11 +124,11 @@ public class FindFullTextAction extends SimpleCommand {
                 addLinkedFileFromURL(result.get(), entry, dir.get());
 
             } else if (!result.isPresent() && !entry.getFiles().isEmpty()) {
-                dialogService.notify(Localization.lang("Full text document found already on disk for entry %0. Not downloaded again.", entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-
+                dialogService.notify(Localization.lang("Full text document found already on disk for entry %0. Not downloaded again.",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                                                       entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
         }
     }
