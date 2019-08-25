@@ -38,6 +38,15 @@ If not, a developer key for the JabRef project for the full version is available
 You can find a IntelliJ Codestyle configuration file in the folder `config`
 
 In case there are errors at the Gradle sync (and that there is no play button at the tests), fix the reference JDK.
+
+##### JabRef 5.x
+
+Please use a JDK with JavaFX support.
+We recommend the LibericaJDK as it works out of the box.
+See <https://bell-sw.com/>.
+
+##### JabRef 4.x
+
 The current JDK is most probably JDK 8 (and not JDK 11).
 Hints are given at <https://stackoverflow.com/a/54507226/873282>.
 
@@ -98,6 +107,58 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 5. Choose JabRefMain as the main class to be executed
 
 ### Set-up your IDE (IntelliJ)
+
+#### JabRef 5.x
+
+In IntelliJ, execute following steps:
+
+1. Open `build.gradle` as project
+2. Do not enable automatic sync if asked
+3. Ensure that Projekt SDK is Java 11
+
+    1. Right click on project -> Module Settings 
+    2. Platform Settings -> SDK
+
+3. Ensure that each module has Java 11
+
+  1. File | Settings | Build, Execution, Deployment | Compiler | Java Compiler 
+  2.  All Modules have to have "Target bytecode version" as 11.
+
+3. Ensure that <s>IntelliJ</s>Gradle is used as execution service
+
+  1. File | Settings | Build, Execution, Deployment | Build Tools | Gradle
+  1. Build and run using: <s>IntelliJ IDEA</s>Gradle
+  1. Run tests using: <s>IntelliJ IDEA</s>Gradle
+
+4. **Stop here**
+4. Open Module Settings (right click on the project root)
+5. Select Project Settings --> Libraries
+6. Add all *.jars from lib/ directory **one by one**: Make it available to all projects (multiselection is possible)
+<!--
+- afterburner.fx.jar -> no replacement required
+- customjfx.jar -> no replacement required
+-->
+8. Remove all starting with `com.lihaoyi` <!-- fastparse+fastparse-utils+sourcecode -->
+<!-- libreoffice.jar -> Remove all libeoffice (if exists) -->
+9. Remove all com.google.errorprone
+9. Remove all org.checkerframework
+9. Remove all jsr305 <!-- com.google.code.findbugs:jsr305 -->
+9. Enable impl.org.controlsfx.skin being visible:
+
+    1. See <https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001797820/comments/360000274319>
+    2. Add `--add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-exports javafx.controls/javafx.scene.control=org.jabref --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref` as option to JabRef.main
+    3. Ensure that you click the "Apply" button. You have to select the black area below the input field to enable the Apply button.
+
+9. Execute Build/Rebuild Project
+9. Start the UI
+
+  1. Run org.jabref.JabRefMain:main
+  1. Ensure that "Use classpath of module JabRef.main" is selected
+
+9. Currently does not start. We are working on it.
+9. Apply workaround to have Gradle as execution environment
+
+#### JabRef 4.x
 
 See <https://youtu.be/FeQpygT0314>. This ensures that `src/main/gen` is present.
 
