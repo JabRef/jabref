@@ -1,10 +1,13 @@
 package org.jabref.logic.texparser;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.channels.ClosedChannelException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +20,6 @@ import java.util.regex.Pattern;
 import org.jabref.model.texparser.TexParser;
 import org.jabref.model.texparser.TexParserResult;
 
-import org.apache.tika.parser.txt.CharsetDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +84,8 @@ public class DefaultTexParser implements TexParser {
             }
 
             try (
-                    Reader reader = new CharsetDetector().setText(Files.readAllBytes(file)).detect().getReader();
+                    InputStream inputStream = Files.newInputStream(file);
+                    Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                     LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
                 for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
                     // Skip comments and blank lines.
