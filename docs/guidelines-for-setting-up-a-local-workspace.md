@@ -1,9 +1,10 @@
 ## Prerequisites
 
 > Java Development Kit 11 with JavaFX development.
-> We recommend Liberica JDK at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
 
- See https://github.com/JabRef/jabref/issues/2594 for the ongoing development.
+We recommend Liberica JDK 11 LTS at <https://bell-sw.com/pages/java-11.0.3/>, because it includes JavaFX.
+There is a long way to go regarding good Java 11 code.
+See https://github.com/JabRef/jabref/issues/5226 for current issues.
 
 An indication that `JAVA_HOME` is not correctly set or no JDK is installed is following error message:
 
@@ -16,6 +17,10 @@ FAILURE: Build failed with an exception.
 Execution failed for task ':compileJava'.
 > java.lang.ExceptionInInitializerError (no error message)
 ```
+
+Another indication is following output
+
+    java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 
 ### Ensure you have a Java SDK installed
 
