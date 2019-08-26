@@ -5,9 +5,13 @@ import javax.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.util.StringConverter;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -16,8 +20,13 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
@@ -25,15 +34,17 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.controlsfx.control.CheckListView;
 
 public class TableColumnsTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
-    @FXML private CheckListView<TableColumnsItemModel> columnsList;
+    @FXML private TableView<TableColumnsItemModel> columnsList;
+    @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
+    @FXML private TableColumn<TableColumnsItemModel, Field> actionsColumn;
+    @FXML private ComboBox<Field> addText;
     @FXML private Button sortUp;
     @FXML private Button sortDown;
     @FXML private Button addColumn;
-    @FXML private Button removeColumn;
+
     @FXML private Button updateToTable;
 
     @FXML private CheckBox showFileColumn;
@@ -54,9 +65,6 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
     private final JabRefPreferences preferences;
     private final JabRefFrame frame;
 
-    private long lastKeyPressTime;
-    private String listSearchTerm;
-
     public TableColumnsTabView(JabRefPreferences preferences, JabRefFrame frame) {
         this.preferences = preferences;
         this.frame = frame;
@@ -75,103 +83,126 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         TableColumnsTabViewModel tableColumnsTabViewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
         this.viewModel = tableColumnsTabViewModel;
 
-        columnsList.itemsProperty().bindBidirectional(tableColumnsTabViewModel.columnsListProperty());
-        columnsList.setOnKeyTyped(event -> jumpToSearchKey(columnsList, event));
-        columnsList.setCellFactory(checkBoxListView -> new CheckBoxListCell<TableColumnsItemModel>(columnsList::getItemBooleanProperty) {
-            @Override
-            public void updateItem(TableColumnsItemModel item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null) {
-                    return;
-                }
+        setUpTable();
+        setUpBindings();
+        setUpButtons();
+    }
 
-                if (item.getField() instanceof SpecialField) {
-                    setText(item.getName() + " (" + Localization.lang("Special") + ")");
-                } else if (item.getField() instanceof IEEEField) {
-                    setText(item.getName() + " (" + Localization.lang("IEEE") + ")");
-                } else if (item.getField() instanceof InternalField) {
-                    setText(item.getName() + " (" + Localization.lang("Internal") + ")");
-                } else if (item.getField() instanceof UnknownField) {
-                    setText(item.getName() + " (" + Localization.lang("Custom") + ")");
-                } else if (item.getField() instanceof TableColumnsTabViewModel.ExtraFileField) {
-                    setText(item.getName() + " (" + Localization.lang("File type") + ")");
-                } else {
-                    setText(item.getName());
-                }
+    private void setUpTable() {
+        columnsList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getSelectionModel().getSelectedItem());
             }
         });
 
-        tableColumnsTabViewModel.selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
-        tableColumnsTabViewModel.checkedColumnsModelProperty().setValue(columnsList.getCheckModel());
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
+        nameColumn.setCellFactory(cellData -> new TableCell<>() {
+            @Override
+            public void updateItem(Field item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
+                    setText("");
+                } else {
+                    setText(getFieldName(item));
+                }
+            }
 
-        showFileColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showFileColumnProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showUrlColumnProperty());
-        urlFirst.selectedProperty().bindBidirectional(tableColumnsTabViewModel.preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(tableColumnsTabViewModel.preferDoiProperty());
-        showEprintColumn.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showEPrintColumnProperty());
-        enableSpecialFields.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsEnabledProperty());
-        syncKeywords.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsSyncKeyWordsProperty());
-        serializeSpecial.selectedProperty().bindBidirectional(tableColumnsTabViewModel.specialFieldsSerializeProperty());
-        enableExtraColumns.selectedProperty().bindBidirectional(tableColumnsTabViewModel.showExtraFileColumnsProperty());
+            private String getString() {
+                return getItem() == null ? "" : getItem().getName();
+            }
+        });
+        nameColumn.setSortable(false);
+        nameColumn.setReorderable(false);
 
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
+        new ValueTableCellFactory<TableColumnsItemModel, Field>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent(item -> {
+                    return evt -> {
+                        ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getFocusModel().getFocusedItem());
+                    };
+                })
+                .install(actionsColumn);
+
+        actionsColumn.setSortable(false);
+        actionsColumn.setReorderable(false);
+
+        columnsList.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).columnsListProperty());
+        ((TableColumnsTabViewModel) viewModel).selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
+
+        addText.setEditable(true);
+        new ViewModelListCellFactory<Field>()
+                .withText(this::getFieldName)
+                .install(addText);
+        addText.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).selectableFieldProperty());
+        addText.valueProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).addFieldProperty());
+        addText.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Field object) {
+                if (object != null) {
+                    return object.getName();
+                } else {
+                    return "";
+                }
+            }
+
+            @Override
+            public Field fromString(String string) {
+                return FieldFactory.parseField(string);
+            }
+        });
+    }
+
+    private String getFieldName(Field field) {
+        if (field instanceof SpecialField) {
+            return field.getName() + " (" + Localization.lang("Special") + ")";
+        } else if (field instanceof IEEEField) {
+            return field.getName() + " (" + Localization.lang("IEEE") + ")";
+        } else if (field instanceof InternalField) {
+            return field.getName() + " (" + Localization.lang("Internal") + ")";
+        } else if (field instanceof UnknownField) {
+            return field.getName() + " (" + Localization.lang("Custom") + ")";
+        } else if (field instanceof TableColumnsTabViewModel.ExtraFileField) {
+            return field.getName() + " (" + Localization.lang("File type") + ")";
+        } else {
+            return field.getName();
+        }
+    }
+
+    private void setUpBindings() {
+        showFileColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showFileColumnProperty());
+        showUrlColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showUrlColumnProperty());
+        urlFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferUrlProperty());
+        doiFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferDoiProperty());
+        showEprintColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showEPrintColumnProperty());
+        enableSpecialFields.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsEnabledProperty());
+        syncKeywords.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSyncKeyWordsProperty());
+        serializeSpecial.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSerializeProperty());
+        enableExtraColumns.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showExtraFileColumnsProperty());
+    }
+
+    private void setUpButtons() {
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_UP, new SimpleCommand() {
             @Override
-            public void execute() { tableColumnsTabViewModel.moveColumnUp(); }
+            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
         }, sortUp);
 
         actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_DOWN, new SimpleCommand() {
             @Override
-            public void execute() { tableColumnsTabViewModel.moveColumnDown(); }
+            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
         }, sortDown);
 
         actionFactory.configureIconButton(PreferencesActions.COLUMN_ADD, new SimpleCommand() {
             @Override
-            public void execute() { tableColumnsTabViewModel.insertCustomColumn(); }
+            public void execute() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
         }, addColumn);
-
-        actionFactory.configureIconButton(PreferencesActions.COLUMN_REMOVE, new SimpleCommand() {
-            @Override
-            public void execute() {
-                    if (columnsList.getFocusModel() != null && columnsList.getFocusModel().getFocusedIndex() != -1) {
-                        tableColumnsTabViewModel.removeCustomColumn(columnsList.getFocusModel().getFocusedItem());
-                    }
-                }
-        }, removeColumn);
 
         actionFactory.configureIconButton(PreferencesActions.COLUMNS_UPDATE, new SimpleCommand() {
             @Override
-            public void execute() { tableColumnsTabViewModel.fillColumnList(); }
+            public void execute() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
         }, updateToTable);
 
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
-    }
-
-    /**
-     * Sets the focus of a CheckListView to the first entry matching the search term build up by
-     * the pressed character. As the columnListView in TableColumnsTabView is not sorted alphabetically
-     * the use of this is small.
-     *
-     * @param list The list in which to search.
-     * @param keypressed The KeyEvent of the pressed key.
-     */
-
-    private void jumpToSearchKey(CheckListView<TableColumnsItemModel> list, KeyEvent keypressed) {
-        final int LIST_SEARCH_RESET_TIME = 1000;
-
-        if (keypressed.getCharacter() == null) {
-            return;
-        }
-
-        if (System.currentTimeMillis() - lastKeyPressTime < LIST_SEARCH_RESET_TIME) {
-            listSearchTerm += keypressed.getCharacter().toLowerCase();
-        } else {
-            listSearchTerm = keypressed.getCharacter().toLowerCase();
-        }
-
-        lastKeyPressTime = System.currentTimeMillis();
-
-        list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
-                .findFirst().ifPresent(list::scrollTo);
     }
 }

@@ -12,7 +12,7 @@ public enum PreferencesActions implements Action {
     COLUMN_SORT_UP(Localization.lang("Sort up"), Localization.lang("Sort column one step upwards"), IconTheme.JabRefIcons.UP),
     COLUMN_SORT_DOWN(Localization.lang("Sort down"), Localization.lang("Sort column one step downwards"), IconTheme.JabRefIcons.DOWN),
     COLUMN_ADD(Localization.lang("Add"), Localization.lang("Add custom column"), IconTheme.JabRefIcons.ADD_NOBOX),
-    COLUMN_REMOVE(Localization.lang("Remove"), Localization.lang("Remove selected custom column"), IconTheme.JabRefIcons.REMOVE_NOBOX),
+    COLUMN_REMOVE(Localization.lang("Remove"), Localization.lang("Remove this column"), IconTheme.JabRefIcons.REMOVE_NOBOX),
     COLUMNS_UPDATE(Localization.lang("Update"), Localization.lang("Update to current column order"), IconTheme.JabRefIcons.REFRESH);
 
     private final String text;
