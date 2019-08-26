@@ -5,7 +5,15 @@ update_configs:
   - package_manager: "java:gradle"
     directory: "/"
     update_schedule: "weekly"
-    
+    automerged_updates:
+      - match:
+         dependency_type: "all"
+         update_type: "semver:minor"
+            
   - package_manager: "submodules"
     directory: "/"
     update_schedule: "weekly"
+    automerged_updates:
+      - match:
+         dependency_type: "all"
+         update_type: "all"
