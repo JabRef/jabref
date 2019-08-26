@@ -22,13 +22,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// Need to run on JavaFX thread since we are parsing FXML files
+@ExtendWith(ApplicationExtension.class)
 class LocalizationConsistencyTest {
 
     @Test
@@ -163,7 +167,7 @@ class LocalizationConsistencyTest {
         try {
             Locale locale = Language.convertToSupportedLocale(language).get();
             Locale.setDefault(locale);
-            ResourceBundle messages = ResourceBundle.getBundle(Localization.RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+            ResourceBundle messages = ResourceBundle.getBundle(Localization.RESOURCE_PREFIX, locale);
             assertNotNull(messages);
         } finally {
             Locale.setDefault(oldLocale);

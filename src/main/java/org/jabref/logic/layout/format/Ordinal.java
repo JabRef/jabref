@@ -19,7 +19,7 @@ public class Ordinal implements LayoutFormatter {
             return null;
         }
         Matcher m = NUMBER_PATTERN.matcher(fieldText);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String result = m.group(1);
             int value = Integer.parseInt(result);

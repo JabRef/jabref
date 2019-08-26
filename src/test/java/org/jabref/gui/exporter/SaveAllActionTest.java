@@ -12,8 +12,8 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -32,7 +32,7 @@ public class SaveAllActionTest {
     private Optional<Path> databasePath = Optional.of(Paths.get("C:\\Users\\John_Doe\\Jabref"));
     private SaveAllAction saveAllAction;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(firstPanel.getBibDatabaseContext()).thenReturn(bibDatabaseContext);
         when(secondPanel.getBibDatabaseContext()).thenReturn(bibDatabaseContext);

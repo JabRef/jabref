@@ -134,12 +134,18 @@ public class FieldFactory {
      * separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP));
+        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }
 
+    // TODO: Move somewhere more appropriate and make user-configurable
     public static boolean isSingleLineField(final Field field) {
-        return !field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
+        if (field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT)) {
+            return false;
+        }
+
+        // Treat unknown fields as multi-line fields
+        return !(field instanceof UnknownField);
     }
 }

@@ -45,7 +45,7 @@ public class DocbookExporterTest {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "Peptidomics of the larval {\\protect{{D}rosophila melanogaster}} central nervous system.");
+        entry.setField(StandardField.TITLE, "Peptidomics of the larval {{{D}rosophila melanogaster}} central nervous system.");
 
         List<BibEntry> entries = Arrays.asList(entry);
 

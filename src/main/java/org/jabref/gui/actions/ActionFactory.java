@@ -15,7 +15,7 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
-import com.sun.javafx.scene.control.skin.ContextMenuContent;
+import com.sun.javafx.scene.control.ContextMenuContent;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
 import org.fxmisc.easybind.EasyBind;
@@ -56,7 +56,7 @@ public class ActionFactory {
      * should not be used since it's marked as deprecated.
      */
     private static Label getAssociatedNode(MenuItem menuItem) {
-        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.impl_styleableGetNode();
+        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.getStyleableNode();
 
         if (container == null) {
             return null;
@@ -74,7 +74,7 @@ public class ActionFactory {
     }
 
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
-        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
+        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu), menuItem);
         setGraphic(menuItem, action);
 
         // Show tooltips
@@ -105,7 +105,7 @@ public class ActionFactory {
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu));
         checkMenuItem.setSelected(selected);
         setGraphic(checkMenuItem, action);
 
@@ -127,7 +127,7 @@ public class ActionFactory {
     }
 
     public Button createIconButton(Action action, Command command) {
-        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
+        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository, Sources.FromButton), ActionUtils.ActionTextBehavior.HIDE);
 
         button.getStyleClass().setAll("icon-button");
 
@@ -140,7 +140,7 @@ public class ActionFactory {
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.configureButton(
-                new JabRefAction(action, command, keyBindingRepository),
+                                    new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 

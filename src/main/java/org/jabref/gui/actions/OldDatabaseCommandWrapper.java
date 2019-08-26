@@ -52,6 +52,11 @@ public class OldDatabaseCommandWrapper extends CommandBase {
     }
 
     @Override
+    public String toString() {
+        return this.command.toString();
+    }
+
+    @Override
     public ReadOnlyDoubleProperty progressProperty() {
         return null;
     }

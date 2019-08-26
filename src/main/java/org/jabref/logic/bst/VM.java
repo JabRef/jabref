@@ -775,7 +775,7 @@ public class VM implements Warn {
         Matcher m = ADD_PERIOD_PATTERN.matcher(s);
 
         if (m.find()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             m.appendReplacement(sb, m.group(1));
             sb.append('.');
             String group2 = m.group(2);

@@ -2,8 +2,6 @@ package org.jabref.logic.citationstyle;
 
 import java.util.Objects;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +26,6 @@ public class CitationStyleCache {
     public CitationStyleCache(BibDatabaseContext database) {
         citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
             @Override
-            @ParametersAreNonnullByDefault
             public String load(BibEntry entry) {
                 if (citationStyle != null) {
                     return citationStyle.generatePreview(entry, database.getDatabase());

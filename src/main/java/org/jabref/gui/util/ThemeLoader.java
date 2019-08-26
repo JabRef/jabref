@@ -106,7 +106,7 @@ public class ThemeLoader {
                     });
                 }
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.error("Could not watch css file for changes " + cssFile, e);
         }
     }

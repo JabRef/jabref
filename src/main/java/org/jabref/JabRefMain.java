@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
+import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -25,6 +26,7 @@ import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,19 +63,26 @@ public class JabRefMain extends Application {
 
             applyPreferences(preferences);
 
-            // Process arguments
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+            try {
+                // Process arguments
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+                // Check for running JabRef
+                if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                    Platform.exit();
+                    return;
+                }
 
-            // Check for running JabRef
-            if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                // If not, start GUI
+                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+            } catch (ParseException e) {
+                LOGGER.error("Problem parsing arguments", e);
+
+                JabRefCLI.printUsage();
                 Platform.exit();
-                return;
             }
-
-            // If not, start GUI
-            new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
+            Platform.exit();
         }
     }
   
