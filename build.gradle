@@ -185,9 +185,11 @@ dependencies {
     compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
     compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.6'
+    compile ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
+        exclude module: 'fastparse_2.12'
+    }
 
-    errorprone 'com.google.errorprone:error_prone_core:2.3.2'
+    //errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
