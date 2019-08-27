@@ -66,7 +66,7 @@ public class Localization {
     public static void setLanguage(Language language) {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
-        if (!knownLanguage.isPresent()) {
+        if (knownLanguage.isEmpty()) {
             LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
             setLanguage(Language.ENGLISH);
             return;
