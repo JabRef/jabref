@@ -252,6 +252,7 @@ public class IconTheme {
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         CONNECT_DB(MaterialDesignIcon.CLOUD_UPLOAD), /*cloud-upload*/
         SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
+        CHECK(MaterialDesignIcon.CHECK) /*css: check */,
         WARNING(MaterialDesignIcon.ALERT),
         ERROR(MaterialDesignIcon.ALERT_CIRCLE),
         CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
@@ -293,7 +294,8 @@ public class IconTheme {
         LATEX_FILE(MaterialDesignIcon.FILE_OUTLINE),
         LATEX_COMMENT(MaterialDesignIcon.COMMENT_TEXT_OUTLINE),
         LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING),
-        PASSWORD_REVEALED(MaterialDesignIcon.EYE);
+        PASSWORD_REVEALED(MaterialDesignIcon.EYE),
+        ALL_ENTRIES_GROUP_DEFAULT_ICON(MaterialDesignIcon.DATABASE);
 
         private final JabRefIcon icon;
 
