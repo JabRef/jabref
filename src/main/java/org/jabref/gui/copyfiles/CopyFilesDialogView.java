@@ -7,13 +7,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.icon.JabRefMaterialDesignIconFactory;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class CopyFilesDialogView extends BaseDialog<Void> {
 
@@ -48,7 +48,7 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         colFile.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, String>().withText(item -> item).withTooltip(item -> item));
         colStatus.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, MaterialDesignIcon>().withGraphic(item -> {
 
-            Text icon = MaterialDesignIconFactory.get().createIcon(item);
+            Text icon = JabRefMaterialDesignIconFactory.get().createIcon(item);
             if (item == MaterialDesignIcon.CHECK) {
                 icon.setFill(Color.GREEN);
             }

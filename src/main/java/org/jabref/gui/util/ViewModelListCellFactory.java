@@ -18,10 +18,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import org.jabref.gui.icon.JabRefMaterialDesignIconFactory;
 import org.jabref.model.strings.StringUtil;
 
 import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 /**
  * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
@@ -57,7 +57,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         this.toGraphic = viewModel -> {
             GlyphIcons icon = toIcon.call(viewModel);
             if (icon != null) {
-                return MaterialDesignIconFactory.get().createIcon(icon);
+                return JabRefMaterialDesignIconFactory.get().createIcon(icon);
             }
             return null;
         };
@@ -66,7 +66,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
     public ViewModelListCellFactory<T> withIcon(Callback<T, GlyphIcons> toIcon, Callback<T, Paint> toColor) {
         this.toGraphic = viewModel -> {
-            Text graphic = MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
+            Text graphic = JabRefMaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
             graphic.setFill(toColor.call(viewModel));
             return graphic;
         };
