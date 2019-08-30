@@ -228,10 +228,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 columnPreferences.getSortTypesForColumns()
         );
 
-        if (columnPreferences.getSpecialFieldsEnabled() != newColumnPreferences.getSpecialFieldsEnabled()) {
-            restartWarnings.add(Localization.lang("Special field column"));
-        }
-
         if (columnPreferences.getAutoSyncSpecialFieldsToKeyWords() != newColumnPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
             restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
         }
