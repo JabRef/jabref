@@ -40,26 +40,21 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
     @FXML private TableView<TableColumnsItemModel> columnsList;
     @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
     @FXML private TableColumn<TableColumnsItemModel, Field> actionsColumn;
-    @FXML private ComboBox<Field> addText;
-    @FXML private Button sortUp;
-    @FXML private Button sortDown;
+    @FXML private ComboBox<Field> addColumnName;
+    @FXML private Button reloadTableColumns;
+    @FXML private Button sortColumnUp;
+    @FXML private Button sortColumnDown;
     @FXML private Button addColumn;
-
-    @FXML private Button updateToTable;
-
     @FXML private CheckBox showFileColumn;
-
     @FXML private CheckBox showUrlColumn;
     @FXML private RadioButton urlFirst;
     @FXML private RadioButton doiFirst;
-    @FXML private CheckBox showEprintColumn;
-
-    @FXML private CheckBox enableSpecialFields;
-    @FXML private RadioButton syncKeywords;
-    @FXML private RadioButton serializeSpecial;
-
-    @FXML private CheckBox enableExtraColumns;
-    @FXML private Button enableSpecialFieldsHelp;
+    @FXML private CheckBox showEPrintColumn;
+    @FXML private CheckBox specialFieldsEnable;
+    @FXML private Button specialFieldsHelp;
+    @FXML private RadioButton specialFieldsSyncKeywords;
+    @FXML private RadioButton specialFieldsSerialize;
+    @FXML private CheckBox extraFileColumnsEnable;
 
     @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -80,21 +75,16 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
     }
 
     public void initialize() {
-        TableColumnsTabViewModel tableColumnsTabViewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
-        this.viewModel = tableColumnsTabViewModel;
+        this.viewModel = new TableColumnsTabViewModel(dialogService, preferences, frame);
 
-        setUpTable();
-        setUpBindings();
-        setUpButtons();
+        setupTable();
+        setupBindings();
+        setupIconButtons();
     }
 
-    private void setUpTable() {
-        columnsList.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.DELETE) {
-                ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getSelectionModel().getSelectedItem());
-            }
-        });
-
+    private void setupTable() {
+        nameColumn.setSortable(false);
+        nameColumn.setReorderable(false);
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
         nameColumn.setCellFactory(cellData -> new TableCell<>() {
             @Override
@@ -111,32 +101,33 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
                 return getItem() == null ? "" : getItem().getName();
             }
         });
-        nameColumn.setSortable(false);
-        nameColumn.setReorderable(false);
-
-        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        new ValueTableCellFactory<TableColumnsItemModel, Field>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> {
-                    return evt -> {
-                        ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getFocusModel().getFocusedItem());
-                    };
-                })
-                .install(actionsColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
+        new ValueTableCellFactory<TableColumnsItemModel, Field>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent(item -> evt -> {
+                    ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getFocusModel().getFocusedItem());
+                })
+                .install(actionsColumn);
+
+        ((TableColumnsTabViewModel) viewModel).selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
+        columnsList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getSelectionModel().getSelectedItem());
+            }
+        });
 
         columnsList.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).columnsListProperty());
-        ((TableColumnsTabViewModel) viewModel).selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
 
-        addText.setEditable(true);
+        addColumnName.setEditable(true);
         new ViewModelListCellFactory<Field>()
                 .withText(this::getFieldName)
-                .install(addText);
-        addText.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).selectableFieldProperty());
-        addText.valueProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).addFieldProperty());
-        addText.setConverter(new StringConverter<>() {
+                .install(addColumnName);
+        addColumnName.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).availableColumnsProperty());
+        addColumnName.valueProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).addColumnProperty());
+        addColumnName.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field object) {
                 if (object != null) {
@@ -153,6 +144,44 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         });
     }
 
+    private void setupBindings() {
+        showFileColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showFileColumnProperty());
+        showUrlColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showUrlColumnProperty());
+        urlFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferUrlProperty());
+        doiFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferDoiProperty());
+        showEPrintColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showEPrintColumnProperty());
+        specialFieldsEnable.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsEnabledProperty());
+        specialFieldsSyncKeywords.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSyncKeyWordsProperty());
+        specialFieldsSerialize.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSerializeProperty());
+        extraFileColumnsEnable.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showExtraFileColumnsProperty());
+    }
+
+    private void setupIconButtons() {
+        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+
+        actionFactory.configureIconButton(StandardActions.COLUMN_SORT_UP, new SimpleCommand() {
+            @Override
+            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
+        }, sortColumnUp);
+
+        actionFactory.configureIconButton(StandardActions.COLUMN_SORT_DOWN, new SimpleCommand() {
+            @Override
+            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
+        }, sortColumnDown);
+
+        actionFactory.configureIconButton(StandardActions.COLUMN_ADD, new SimpleCommand() {
+            @Override
+            public void execute() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
+        }, addColumn);
+
+        actionFactory.configureIconButton(StandardActions.COLUMNS_UPDATE, new SimpleCommand() {
+            @Override
+            public void execute() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
+        }, reloadTableColumns);
+
+        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), specialFieldsHelp);
+    }
+
     private String getFieldName(Field field) {
         if (field instanceof SpecialField) {
             return field.getName() + " (" + Localization.lang("Special") + ")";
@@ -167,42 +196,5 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         } else {
             return field.getName();
         }
-    }
-
-    private void setUpBindings() {
-        showFileColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showFileColumnProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showUrlColumnProperty());
-        urlFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferDoiProperty());
-        showEprintColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showEPrintColumnProperty());
-        enableSpecialFields.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsEnabledProperty());
-        syncKeywords.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSyncKeyWordsProperty());
-        serializeSpecial.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSerializeProperty());
-        enableExtraColumns.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showExtraFileColumnsProperty());
-    }
-
-    private void setUpButtons() {
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_UP, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
-        }, sortUp);
-
-        actionFactory.configureIconButton(PreferencesActions.COLUMN_SORT_DOWN, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
-        }, sortDown);
-
-        actionFactory.configureIconButton(PreferencesActions.COLUMN_ADD, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
-        }, addColumn);
-
-        actionFactory.configureIconButton(PreferencesActions.COLUMNS_UPDATE, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
-        }, updateToTable);
-
-        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), enableSpecialFieldsHelp);
     }
 }

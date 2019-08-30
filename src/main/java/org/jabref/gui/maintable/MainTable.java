@@ -27,7 +27,6 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
@@ -63,8 +62,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
-    private final DialogService dialogService;
-
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
@@ -73,7 +70,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
-        this.dialogService = frame.getDialogService();
 
         importHandler = new ImportHandler(
                 frame.getDialogService(), database, externalFileTypes,
@@ -84,7 +80,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 undoManager,
                 Globals.stateManager);
 
-        this.getColumns().addAll(new MainTableColumnFactory(database,preferences.getColumnPreferences(),externalFileTypes,undoManager,dialogService).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {

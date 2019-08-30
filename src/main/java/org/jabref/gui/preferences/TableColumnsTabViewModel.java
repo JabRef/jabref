@@ -37,20 +37,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<TableColumnsItemModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
-
-    private final ListProperty<Field> selectableFieldProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final SimpleObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
-
+    private final ListProperty<Field> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleObjectProperty<Field> addColumnProperty = new SimpleObjectProperty<>();
     private final SimpleBooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldsSyncKeyWordsProperty = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
-
     private final SimpleBooleanProperty showFileColumnProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty showUrlColumnProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty preferUrlProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty preferDoiProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
-
     private final SimpleBooleanProperty showExtraFileColumnsProperty = new SimpleBooleanProperty();
 
     private List<String> restartWarnings = new ArrayList<>();
@@ -68,9 +64,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                insertSpecialColumns();
+                insertSpecialfieldColumns();
             } else {
-                removeSpecialColumns();
+                removeSpecialfieldColumns();
             }
         });
 
@@ -91,30 +87,26 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         preferDoiProperty.setValue(columnPreferences.preferDoiOverUrl());
         showEPrintColumnProperty.setValue(columnPreferences.showEprintColumn());
         specialFieldsEnabledProperty.setValue(!columnPreferences.getSpecialFieldColumns().isEmpty());
-        specialFieldsSyncKeyWordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        specialFieldsSyncKeywordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
         specialFieldsSerializeProperty.setValue(columnPreferences.getSerializeSpecialFields());
         showExtraFileColumnsProperty.setValue(!columnPreferences.getExtraFileColumns().isEmpty());
 
         fillColumnList();
 
-        // Internal Fields
         List<Field> internalFields = new ArrayList<>();
         internalFields.add(InternalField.OWNER);
         internalFields.add(InternalField.TIMESTAMP);
         internalFields.add(InternalField.GROUPS);
         internalFields.add(InternalField.KEY_FIELD);
         internalFields.add(InternalField.TYPE_HEADER);
-        internalFields.forEach(item -> selectableFieldProperty.getValue().add(0, item));
+        internalFields.forEach(item -> availableColumnsProperty.getValue().add(0, item));
 
-        // Special Fields
         if (specialFieldsEnabledProperty.getValue()) {
-            insertSpecialColumns();
+            insertSpecialfieldColumns();
         }
 
-        // Standard Fields
-        EnumSet.allOf(StandardField.class).forEach(item -> selectableFieldProperty.getValue().add(0, item));
+        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
 
-        // Extra File Columns
         if (showExtraFileColumnsProperty.getValue()) {
             insertExtraFileColumns();
         }
@@ -134,22 +126,22 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 )));
     }
 
-    private void insertSpecialColumns() {
+    private void insertSpecialfieldColumns() {
         List<Field> fields = new ArrayList<>(EnumSet.allOf(SpecialField.class));
-        fields.forEach(item -> selectableFieldProperty.getValue().add(0, item));
+        fields.forEach(item -> availableColumnsProperty.getValue().add(0, item));
     }
 
-    private void removeSpecialColumns() {
+    private void removeSpecialfieldColumns() {
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
                                                                  .filter(column -> (column.getField() instanceof SpecialField))
                                                                  .collect(Collectors.toList());
         columnsListProperty.getValue().removeAll(columns);
 
-        List<Field> fields = selectableFieldProperty.getValue().stream()
-                .filter(field -> (field instanceof SpecialField))
-                .collect(Collectors.toList());
+        List<Field> fields = availableColumnsProperty.getValue().stream()
+                                                     .filter(field -> (field instanceof SpecialField))
+                                                     .collect(Collectors.toList());
 
-        selectableFieldProperty.getValue().removeAll(fields);
+        availableColumnsProperty.getValue().removeAll(fields);
     }
 
     private void insertExtraFileColumns() {
@@ -158,7 +150,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         fileTypes.stream().map(ExternalFileType::getName)
                 .forEach(fileName -> fileColumns.add(new ExtraFileField(fileName)));
 
-        fileColumns.forEach(item -> selectableFieldProperty.getValue().add(0, item));
+        fileColumns.forEach(item -> availableColumnsProperty.getValue().add(0, item));
     }
 
     private void removeExtraFileColumns() {
@@ -167,20 +159,20 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                                                                  .collect(Collectors.toList());
         columnsListProperty.getValue().removeAll(columns);
 
-        List<Field> fields = selectableFieldProperty.getValue().stream()
-                                                    .filter(field -> (field instanceof ExtraFileField))
-                                                    .collect(Collectors.toList());
-        selectableFieldProperty.getValue().removeAll(fields);
+        List<Field> fields = availableColumnsProperty.getValue().stream()
+                                                     .filter(field -> (field instanceof ExtraFileField))
+                                                     .collect(Collectors.toList());
+        availableColumnsProperty.getValue().removeAll(fields);
     }
 
     public void insertColumnInList() {
-        if (addFieldProperty.getValue() == null) {
+        if (addColumnProperty.getValue() == null) {
             return;
         }
 
-        if (columnsListProperty.getValue().stream().filter(item -> item.getField().equals(addFieldProperty.getValue())).findAny().isEmpty()) {
-            columnsListProperty.add(new TableColumnsItemModel(addFieldProperty.getValue()));
-            addFieldProperty.setValue(null);
+        if (columnsListProperty.getValue().stream().filter(item -> item.getField().equals(addColumnProperty.getValue())).findAny().isEmpty()) {
+            columnsListProperty.add(new TableColumnsItemModel(addColumnProperty.getValue()));
+            addColumnProperty.setValue(null);
         }
     }
 
@@ -242,7 +234,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 showEPrintColumnProperty.getValue(),
                 normalColumns,
                 specialFields,
-                specialFieldsSyncKeyWordsProperty.getValue(),
+                specialFieldsSyncKeywordsProperty.getValue(),
                 specialFieldsSerializeProperty.getValue(),
                 extraFileNames,
                 columnWidths,
@@ -276,9 +268,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty() { return selectedColumnModelProperty; }
 
-    public ListProperty<Field> selectableFieldProperty() { return this.selectableFieldProperty; }
+    public ListProperty<Field> availableColumnsProperty() { return this.availableColumnsProperty; }
 
-    public ObjectProperty<Field> addFieldProperty() { return this.addFieldProperty; }
+    public ObjectProperty<Field> addColumnProperty() { return this.addColumnProperty; }
 
     public BooleanProperty showFileColumnProperty() { return this.showFileColumnProperty; }
 
@@ -290,7 +282,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty specialFieldsEnabledProperty() { return this.specialFieldsEnabledProperty; }
 
-    public BooleanProperty specialFieldsSyncKeyWordsProperty() { return this.specialFieldsSyncKeyWordsProperty; }
+    public BooleanProperty specialFieldsSyncKeyWordsProperty() { return this.specialFieldsSyncKeywordsProperty; }
 
     public BooleanProperty specialFieldsSerializeProperty() { return this.specialFieldsSerializeProperty; }
 
