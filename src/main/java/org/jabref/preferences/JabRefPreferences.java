@@ -1963,7 +1963,9 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXTRA_FILE_COLUMNS, !columnPreferences.getExtraFileColumns().isEmpty());
         putStringList(LIST_OF_FILE_COLUMNS, columnPreferences.getExtraFileColumns());
 
-        putStringList(COLUMN_WIDTHS, columnPreferences.getColumnWidths().values().stream().map(Object::toString).collect(Collectors.toList()));
+        List<String> columnWidthsInOrder = new ArrayList<>();
+        columnPreferences.getNormalColumns().forEach(name -> columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(name).toString()));
+        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
         setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
     }

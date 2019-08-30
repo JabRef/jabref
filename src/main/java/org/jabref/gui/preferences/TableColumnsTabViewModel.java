@@ -123,7 +123,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
 
-        // Stored Fields
         List<Field> normalFields = columnPreferences.getNormalColumns().stream()
                 .map(FieldFactory::parseField)
                 .collect(Collectors.toList());
@@ -231,9 +230,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                     deleteNames.add(fieldName);
                 }
         });
-
         normalColumns.removeAll(deleteNames);
 
+        // for each single one, to get stored or default value
         normalColumns.forEach(field -> columnWidths.put(field,columnPreferences.getPrefColumnWidth(field)));
 
         ColumnPreferences newColumnPreferences = new ColumnPreferences(
@@ -263,7 +262,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         }
 
         preferences.storeColumnPreferences(newColumnPreferences);
-        frame.getBasePanelList().forEach(panel -> panel.getMainTable().updateColumns(newColumnPreferences));
     }
 
     @Override

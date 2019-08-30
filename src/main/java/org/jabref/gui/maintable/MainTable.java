@@ -64,8 +64,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
     private final DialogService dialogService;
-    private final ExternalFileTypes externalFileTypes;
-    private MainTablePreferences preferences;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
@@ -76,8 +74,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
         this.dialogService = frame.getDialogService();
-        this.externalFileTypes = externalFileTypes;
-        this.preferences = preferences;
 
         importHandler = new ImportHandler(
                 frame.getDialogService(), database, externalFileTypes,
@@ -88,7 +84,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 undoManager,
                 Globals.stateManager);
 
-        updateColumns(preferences.getColumnPreferences());
+        this.getColumns().addAll(new MainTableColumnFactory(database,preferences.getColumnPreferences(),externalFileTypes,undoManager,dialogService).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -135,18 +131,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
-    }
-
-    public void updateColumns(ColumnPreferences columnPreferences) {
-        this.preferences = new MainTablePreferences(columnPreferences, preferences.resizeColumnsToFit());
-        this.getColumns().clear();
-        this.getColumns().addAll(new MainTableColumnFactory(
-                database,
-                columnPreferences,
-                externalFileTypes,
-                undoManager,
-                dialogService)
-                .createColumns());
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
