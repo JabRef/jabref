@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -103,11 +104,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         internalFields.add(InternalField.TYPE_HEADER);
         internalFields.forEach(item -> availableColumnsProperty.getValue().add(0, item));
 
+        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
+
+        availableColumnsProperty.sort(Comparator.comparing(Field::getName));
+
         if (specialFieldsEnabledProperty.getValue()) {
             insertSpecialFieldColumns();
         }
-
-        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
 
         if (extraFileColumnsEnabledProperty.getValue()) {
             insertExtraFileColumns();
@@ -152,7 +155,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         fileTypes.stream().map(ExternalFileType::getName)
                 .forEach(fileName -> fileColumns.add(new ExtraFileField(fileName)));
 
-        fileColumns.forEach(item -> availableColumnsProperty.getValue().add(0, item));
+        fileColumns.forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
