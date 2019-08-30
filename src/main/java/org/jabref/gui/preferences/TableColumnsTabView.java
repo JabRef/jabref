@@ -27,10 +27,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.IEEEField;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -93,7 +89,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
                 if (item == null) {
                     setText("");
                 } else {
-                    setText(getFieldName(item));
+                    setText(((TableColumnsTabViewModel) viewModel).getFieldDisplayName(item));
                 }
             }
 
@@ -123,7 +119,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
 
         addColumnName.setEditable(true);
         new ViewModelListCellFactory<Field>()
-                .withText(this::getFieldName)
+                .withText(field -> ((TableColumnsTabViewModel) viewModel).getFieldDisplayName(field))
                 .install(addColumnName);
         addColumnName.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).addColumnProperty());
@@ -180,21 +176,5 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         }, reloadTableColumns);
 
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), specialFieldsHelp);
-    }
-
-    private String getFieldName(Field field) {
-        if (field instanceof SpecialField) {
-            return field.getName() + " (" + Localization.lang("Special") + ")";
-        } else if (field instanceof IEEEField) {
-            return field.getName() + " (" + Localization.lang("IEEE") + ")";
-        } else if (field instanceof InternalField) {
-            return field.getName() + " (" + Localization.lang("Internal") + ")";
-        } else if (field instanceof UnknownField) {
-            return field.getName() + " (" + Localization.lang("Custom") + ")";
-        } else if (field instanceof TableColumnsTabViewModel.ExtraFileField) {
-            return field.getName() + " (" + Localization.lang("File type") + ")";
-        } else {
-            return field.getName();
-        }
     }
 }

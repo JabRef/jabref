@@ -28,9 +28,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
@@ -239,6 +241,22 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         }
 
         preferences.storeColumnPreferences(newColumnPreferences);
+    }
+
+    public String getFieldDisplayName(Field field) {
+        if (field instanceof SpecialField) {
+            return field.getName() + " (" + Localization.lang("Special") + ")";
+        } else if (field instanceof IEEEField) {
+            return field.getName() + " (" + Localization.lang("IEEE") + ")";
+        } else if (field instanceof InternalField) {
+            return field.getName() + " (" + Localization.lang("Internal") + ")";
+        } else if (field instanceof UnknownField) {
+            return field.getName() + " (" + Localization.lang("Custom") + ")";
+        } else if (field instanceof TableColumnsTabViewModel.ExtraFileField) {
+            return field.getName() + " (" + Localization.lang("File type") + ")";
+        } else {
+            return field.getName();
+        }
     }
 
     @Override
