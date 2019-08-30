@@ -23,7 +23,8 @@ snap/.snapcraft/
 ui/
 
 # IntelliJ IDEA
-.idea/
+.idea/*
+!.idea/runConfigurations/
 *.ipr
 *.iml
 
