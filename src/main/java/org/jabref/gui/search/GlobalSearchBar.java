@@ -250,6 +250,7 @@ public class GlobalSearchBar extends HBox {
     @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {
+            // TODO: reflective access, should be removed
             Field privatePopup = AutoCompletionBinding.class.getDeclaredField("autoCompletionPopup");
             privatePopup.setAccessible(true);
             return (AutoCompletePopup<T>) privatePopup.get(autoCompletionBinding);

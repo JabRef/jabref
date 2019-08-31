@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.UnknownField;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XParagraphCursor;
@@ -67,9 +66,9 @@ public class OOUtil {
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
-            Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
+                                                            Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
                     throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
-                    WrappedTargetException, IllegalArgumentException {
+            WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
         Optional<String> oldUniqVal = entry.getField(UNIQUEFIER_FIELD);

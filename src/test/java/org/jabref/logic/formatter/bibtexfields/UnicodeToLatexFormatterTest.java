@@ -5,30 +5,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
-public class UnicodeToLatexFormatterTest {
+class UnicodeToLatexFormatterTest {
 
     private UnicodeToLatexFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new UnicodeToLatexFormatter();
     }
 
     @Test
-    public void formatWithoutUnicodeCharactersReturnsSameString() {
+    void formatWithoutUnicodeCharactersReturnsSameString() {
         assertEquals("abc", formatter.format("abc"));
     }
 
     @Test
-    public void formatMultipleUnicodeCharacters() {
+    void formatMultipleUnicodeCharacters() {
         assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("\u00E5\u00E4\u00F6"));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("M{\\\"{o}}nch", formatter.format(formatter.getExampleInput()));
     }
 }

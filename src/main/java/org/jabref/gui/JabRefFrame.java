@@ -126,8 +126,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,8 +168,8 @@ public class JabRefFrame extends BorderPane {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
-        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
-        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+        tabbedPane = new TabPane();
+        tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
         initLayout();
 
@@ -696,41 +694,17 @@ public class JabRefFrame extends BorderPane {
         );
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            boolean menuItemAdded = false;
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (menuItemAdded) {
-                edit.getItems().add(new SeparatorMenuItem());
-            }
+            edit.getItems().addAll(
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager),
+                    new SeparatorMenuItem()
+            );
         }
+
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
@@ -1121,7 +1095,7 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
                     // Saved, now exit.
                     return true;

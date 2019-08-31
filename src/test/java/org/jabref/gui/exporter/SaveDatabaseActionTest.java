@@ -10,12 +10,13 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -37,13 +38,13 @@ class SaveDatabaseActionTest {
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(basePanel.frame()).thenReturn(jabRefFrame);
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(new SaveDatabaseAction(basePanel, preferences));
+        saveDatabaseAction = spy(new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test

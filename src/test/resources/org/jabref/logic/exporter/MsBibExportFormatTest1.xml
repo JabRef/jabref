@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:BIBTEX_Price>10</b:BIBTEX_Price>
-<b:BIBTEX_Series>ser</b:BIBTEX_Series>
-<b:BIBTEX_Entry>unpublished</b:BIBTEX_Entry>
-<b:SourceType>Report</b:SourceType>
-<b:Reporter>rep</b:Reporter>
-<b:Accessed>12.10.2015</b:Accessed>
-<b:Court>court</b:Court>
-<b:RecordingNumber>record</b:RecordingNumber>
-<b:Station>stat</b:Station>
-<b:Theater>th</b:Theater>
-<b:PeriodicalTitle>peri</b:PeriodicalTitle>
-<b:Type>type</b:Type>
-<b:Department>Gymnasium Unterrieden</b:Department>
-<b:Distributor>dist</b:Distributor>
-<b:ShortTitle>Turing</b:ShortTitle>
-<b:Medium>med</b:Medium>
-<b:ProductionCompany>produktion</b:ProductionCompany>
-<b:BIBTEX_Paper>paper</b:BIBTEX_Paper>
-<b:CaseNumber>case</b:CaseNumber>
-<b:Broadcaster>broad</b:Broadcaster>
-<b:NumberVolumes>10</b:NumberVolumes>
-<b:AbbreviatedCaseNumber>abb</b:AbbreviatedCaseNumber>
-<b:BIBTEX_Size>1000</b:BIBTEX_Size>
-<b:MonthAccessed>10</b:MonthAccessed>
-<b:DayAccessed>12</b:DayAccessed>
-<b:YearAccessed>2015</b:YearAccessed>
-<b:Day>5</b:Day>
-<b:Author/>
-<b:ThesisType>unpublished</b:ThesisType>
-</b:Source>
+    <b:Source>
+        <b:BIBTEX_Price>10</b:BIBTEX_Price>
+        <b:BIBTEX_Series>ser</b:BIBTEX_Series>
+        <b:BIBTEX_Entry>unpublished</b:BIBTEX_Entry>
+        <b:SourceType>Report</b:SourceType>
+        <b:Reporter>rep</b:Reporter>
+        <b:Accessed>12.10.2015</b:Accessed>
+        <b:Court>court</b:Court>
+        <b:RecordingNumber>record</b:RecordingNumber>
+        <b:Station>stat</b:Station>
+        <b:Theater>th</b:Theater>
+        <b:PeriodicalTitle>peri</b:PeriodicalTitle>
+        <b:Type>type</b:Type>
+        <b:Department>Gymnasium Unterrieden</b:Department>
+        <b:Distributor>dist</b:Distributor>
+        <b:ShortTitle>Turing</b:ShortTitle>
+        <b:Medium>med</b:Medium>
+        <b:ProductionCompany>produktion</b:ProductionCompany>
+        <b:BIBTEX_Paper>paper</b:BIBTEX_Paper>
+        <b:CaseNumber>case</b:CaseNumber>
+        <b:Broadcaster>broad</b:Broadcaster>
+        <b:NumberVolumes>10</b:NumberVolumes>
+        <b:AbbreviatedCaseNumber>abb</b:AbbreviatedCaseNumber>
+        <b:Day>5</b:Day>
+        <b:BIBTEX_Size>1000</b:BIBTEX_Size>
+        <b:YearAccessed>2015</b:YearAccessed>
+        <b:MonthAccessed>10</b:MonthAccessed>
+        <b:DayAccessed>12</b:DayAccessed>
+        <b:Author/>
+        <b:ThesisType>unpublished</b:ThesisType>
+    </b:Source>
 </b:Sources>

@@ -1,6 +1,5 @@
 package org.jabref.logic.l10n;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -67,7 +66,7 @@ public class Localization {
     public static void setLanguage(Language language) {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
-        if (!knownLanguage.isPresent()) {
+        if (knownLanguage.isEmpty()) {
             LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
             setLanguage(Language.ENGLISH);
             return;
@@ -110,7 +109,7 @@ public class Localization {
      * @param locale Localization to use.
      */
     private static void createResourceBundles(Locale locale) {
-        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale);
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         localizedMessages = new LocalizationBundle(createLookupMap(messages));
     }

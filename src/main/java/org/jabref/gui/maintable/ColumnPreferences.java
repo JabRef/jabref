@@ -5,33 +5,31 @@ import java.util.Map;
 
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.model.entry.field.SpecialField;
-
 public class ColumnPreferences {
 
     public static final double DEFAULT_FIELD_LENGTH = 100;
     private final boolean showFileColumn;
     private final boolean showUrlColumn;
     private final boolean preferDoiOverUrl;
-    private final boolean showEprintColumn;
-    private final List<String> normalColumns;
-    private final List<SpecialField> specialFieldColumns;
+    private final boolean showEPrintColumn;
+    private final List<String> columnNames;
+    private final boolean specialFieldsEnabled;
     private final boolean autoSyncSpecialFieldsToKeyWords;
     private final boolean serializeSpecialFields;
-    private final List<String> extraFileColumns;
+    private final boolean extraFileColumnsEnabled;
     private final Map<String, Double> columnWidths;
     private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, List<String> extraFileColumns, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
+    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEPrintColumn, List<String> columnNames, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
         this.showFileColumn = showFileColumn;
         this.showUrlColumn = showUrlColumn;
         this.preferDoiOverUrl = preferDoiOverUrl;
-        this.showEprintColumn = showEprintColumn;
-        this.normalColumns = normalColumns;
-        this.specialFieldColumns = specialFieldColumns;
+        this.showEPrintColumn = showEPrintColumn;
+        this.columnNames = columnNames;
+        this.specialFieldsEnabled = specialFieldsEnabled;
         this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
         this.serializeSpecialFields = serializeSpecialFields;
-        this.extraFileColumns = extraFileColumns;
+        this.extraFileColumnsEnabled = extraFileColumnsEnabled;
         this.columnWidths = columnWidths;
         this.columnSortType = columnSortType;
     }
@@ -49,16 +47,10 @@ public class ColumnPreferences {
     }
 
     public boolean showEprintColumn() {
-        return showEprintColumn;
+        return showEPrintColumn;
     }
 
-    public List<String> getExtraFileColumns() {
-        return extraFileColumns;
-    }
-
-    public List<SpecialField> getSpecialFieldColumns() {
-        return specialFieldColumns;
-    }
+    public boolean getSpecialFieldsEnabled() { return specialFieldsEnabled; }
 
     public boolean getAutoSyncSpecialFieldsToKeyWords() {
         return autoSyncSpecialFieldsToKeyWords;
@@ -68,8 +60,10 @@ public class ColumnPreferences {
         return serializeSpecialFields;
     }
 
-    public List<String> getNormalColumns() {
-        return normalColumns;
+    public boolean getExtraFileColumnsEnabled() { return extraFileColumnsEnabled; }
+
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 
     public Map<String, Double> getColumnWidths() {

@@ -11,11 +11,13 @@ eclipseJdt.doLast {
     f.append('encoding/<project>=UTF-8')
 }
 eclipse {
+//add libraries to module path: https://github.com/eclipse/buildship/issues/620#issuecomment-390469550
  classpath {
         file {
             whenMerged {
-                def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
-                jre.accessRules.add(new AccessRule('accessible', '**/javafx/**'))
+                entries.findAll {
+                    it.kind == 'src' || it.kind == 'lib'
+                }.each { it.entryAttributes['module'] = 'true' }
             }
         }
     }
