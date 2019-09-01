@@ -88,6 +88,8 @@ public enum StandardActions implements Action {
     PARSE_TEX(Localization.lang("Search for Citations in LaTeX Files"), IconTheme.JabRefIcons.LATEX_CITATIONS),
     NEW_SUB_LIBRARY_FROM_AUX(Localization.lang("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary") + Localization.lang("This feature generates a new library based on which entries are needed in an existing LaTeX document."), IconTheme.JabRefIcons.NEW),
     WRITE_XMP(Localization.lang("Write XMP-metadata to PDFs"), Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_XMP),
+    XMP_FILTER_ADD(Localization.lang("Add"), Localization.lang("Add field to filter list"), IconTheme.JabRefIcons.ADD_NOBOX),
+    NAME_FORMATTER_ADD(Localization.lang("Add"), Localization.lang("Add formatter to list"), IconTheme.JabRefIcons.ADD_NOBOX),
     OPEN_FOLDER(Localization.lang("Open folder"), Localization.lang("Open folder"), KeyBinding.OPEN_FOLDER),
     OPEN_FILE(Localization.lang("Open file"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
