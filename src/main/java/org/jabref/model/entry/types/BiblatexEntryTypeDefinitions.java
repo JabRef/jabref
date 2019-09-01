@@ -351,8 +351,8 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE)
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
             .withDetailFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
-                    StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.PUBSTATE,
-                    StandardField.URL, StandardField.URLDATE)
+                    StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.EVENTTITLE,
+                    StandardField.EVENTDATE,StandardField.VENUE, StandardField.URL, StandardField.URLDATE)
             .build();
 
     private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
