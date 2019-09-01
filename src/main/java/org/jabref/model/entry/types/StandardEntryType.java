@@ -35,7 +35,8 @@ public enum StandardEntryType implements EntryType {
     SuppPeriodical("SuppPeriodical"),
     Thesis("Thesis"),
     WWW("WWW"),
-    Software("Software");
+    Software("Software"),
+    DATESET("DataSet");
 
 
 

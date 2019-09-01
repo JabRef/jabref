@@ -177,8 +177,14 @@ public class BibtexEntryTypeDefinitions {
             .withImportantFields(StandardField.MONTH, StandardField.YEAR)
             .build();
 
+
     private static final BibEntryType SOFTWARE = new BibEntryTypeBuilder()
             .withType(StandardEntryType.Software)
+            .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.HOWPUBLISHED, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)
+            .build();
+
+    private static final BibEntryType DATESET = new BibEntryTypeBuilder()
+            .withType(StandardEntryType.DATESET)
             .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.HOWPUBLISHED, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)
             .build();
 
@@ -186,7 +192,7 @@ public class BibtexEntryTypeDefinitions {
 
 
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
-            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC, SOFTWARE);
+            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC, SOFTWARE, DATESET );
 
     private BibtexEntryTypeDefinitions() {
     }
