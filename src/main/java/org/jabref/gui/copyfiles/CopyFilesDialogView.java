@@ -5,20 +5,19 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class CopyFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TableView<CopyFilesResultItemViewModel> tvResult;
-    @FXML private TableColumn<CopyFilesResultItemViewModel, MaterialDesignIcon> colStatus;
+    @FXML private TableColumn<CopyFilesResultItemViewModel, JabRefIcon> colStatus;
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colMessage;
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
     private final CopyFilesDialogViewModel viewModel;
@@ -46,16 +45,14 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
         colFile.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, String>().withText(item -> item).withTooltip(item -> item));
-        colStatus.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, MaterialDesignIcon>().withGraphic(item -> {
-
-            Text icon = MaterialDesignIconFactory.get().createIcon(item);
-            if (item == MaterialDesignIcon.CHECK) {
-                icon.setFill(Color.GREEN);
+        colStatus.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, JabRefIcon>().withGraphic(item -> {
+            if (item == IconTheme.JabRefIcons.CHECK) {
+                item = item.withColor(Color.GREEN);
             }
-            if (item == MaterialDesignIcon.ALERT) {
-                icon.setFill(Color.RED);
+            if (item == IconTheme.JabRefIcons.WARNING) {
+                item = item.withColor(Color.RED);
             }
-            return icon;
+            return item.getGraphicNode();
         }));
 
         tvResult.setItems(viewModel.copyFilesResultListProperty());
