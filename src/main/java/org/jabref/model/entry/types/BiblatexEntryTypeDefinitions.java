@@ -432,7 +432,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
-            .withDetailFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
+            .withDetailFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.EDITION, StandardField.HOWPUBLISHED,
                     StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.LOCATION,
                     StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
