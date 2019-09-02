@@ -164,7 +164,7 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.10.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.2'
     compile group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     compile 'com.jfoenix:jfoenix:9.0.9'
     compile 'org.controlsfx:controlsfx:11.0.0'
