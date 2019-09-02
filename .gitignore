@@ -351,4 +351,4 @@ lib/ojdbc.jar
 !/buildSrc/src/main/groovy/org/jabref/build
 
 # do not ignore JabRef icons (they are ignored by the macos setting above)
-!gui/icon/**/*
+!src/main/java/org/jabref/gui/icon
