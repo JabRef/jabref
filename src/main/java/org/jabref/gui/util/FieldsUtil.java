@@ -15,17 +15,17 @@ public class FieldsUtil {
 
     public static String getNameWithType(Field field) {
         if (field instanceof SpecialField) {
-            return field.getName() + " (" + Localization.lang("Special") + ")";
+            return field.getDisplayName() + " (" + Localization.lang("Special") + ")";
         } else if (field instanceof IEEEField) {
-            return field.getName() + " (" + Localization.lang("IEEE") + ")";
+            return field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";
         } else if (field instanceof InternalField) {
-            return field.getName() + " (" + Localization.lang("Internal") + ")";
+            return field.getDisplayName() + " (" + Localization.lang("Internal") + ")";
         } else if (field instanceof UnknownField) {
-            return field.getName() + " (" + Localization.lang("Custom") + ")";
+            return field.getDisplayName() + " (" + Localization.lang("Custom") + ")";
         } else if (field instanceof ExtraFilePseudoField) {
-            return field.getName() + " (" + Localization.lang("File type") + ")";
+            return field.getDisplayName() + " (" + Localization.lang("File type") + ")";
         } else {
-            return field.getName();
+            return field.getDisplayName();
         }
     }
 

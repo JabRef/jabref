@@ -45,26 +45,15 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        // First we remove all rows with empty names.
-        int i = 0;
-        while (i < formatterListProperty.getValue().size()) {
-            if (formatterListProperty.getValue().get(i).getName().isEmpty()) {
-                formatterListProperty.getValue().remove(i);
-            } else {
-                i++;
-            }
-        }
-        // Then we make lists
+        formatterListProperty.removeIf(formatter -> formatter.getName().isEmpty());
 
         List<String> names = new ArrayList<>(formatterListProperty.size());
         List<String> formats = new ArrayList<>(formatterListProperty.size());
-
-        for (NameFormatterItemModel formatter : formatterListProperty) {
-            names.add(formatter.getName());
-            formats.add(formatter.getFormat());
+        for (NameFormatterItemModel formatterListItem : formatterListProperty) {
+            names.add(formatterListItem.getName());
+            formats.add(formatterListItem.getFormat());
         }
 
-        // Finally, we store the new preferences.
         preferences.putStringList(JabRefPreferences.NAME_FORMATER_KEY, names);
         preferences.putStringList(JabRefPreferences.NAME_FORMATTER_VALUE, formats);
     }

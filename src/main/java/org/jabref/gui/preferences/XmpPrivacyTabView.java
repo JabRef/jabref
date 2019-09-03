@@ -5,17 +5,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
 
-import org.jabref.Globals;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -31,9 +27,9 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class XmpPrivacyTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
     @FXML private CheckBox enableXmpFilter;
-    @FXML private TableView<XmpPrivacyItemModel> filterList;
-    @FXML private TableColumn<XmpPrivacyItemModel, Field> fieldColumn;
-    @FXML private TableColumn<XmpPrivacyItemModel, Field> actionsColumn;
+    @FXML private TableView<Field> filterList;
+    @FXML private TableColumn<Field, Field> fieldColumn;
+    @FXML private TableColumn<Field, Field> actionsColumn;
     @FXML private ComboBox<Field> addFieldName;
     @FXML private Button addField;
 
@@ -61,27 +57,15 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
 
         fieldColumn.setSortable(true);
         fieldColumn.setReorderable(false);
-        fieldColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        fieldColumn.setCellFactory(cellData -> new TableCell<>() {
-            @Override
-            public void updateItem(Field item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null) {
-                    setText("");
-                } else {
-                    setText(FieldsUtil.getNameWithType(item));
-                }
-            }
-
-            private String getString() {
-                return getItem() == null ? "" : getItem().getName();
-            }
-        });
+        fieldColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
+        new ValueTableCellFactory<Field, Field>()
+                .withText(FieldsUtil::getNameWithType)
+                .install(fieldColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        new ValueTableCellFactory<XmpPrivacyItemModel, Field>()
+        actionsColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
+        new ValueTableCellFactory<Field, Field>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(item -> Localization.lang("Remove") + " " + item.getName())
                 .withOnMouseClickedEvent(item -> evt -> {
@@ -107,7 +91,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
             @Override
             public String toString(Field object) {
                 if (object != null) {
-                    return object.getName();
+                    return object.getDisplayName();
                 } else {
                     return "";
                 }
@@ -121,11 +105,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(xmpPrivacyTabViewModel.xmpFilterListValidationStatus(), filterList));
-
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.XMP_FILTER_ADD, new SimpleCommand() {
-            @Override
-            public void execute() { xmpPrivacyTabViewModel.addField(); }
-        }, addField);
     }
+
+    public void addField() { ((XmpPrivacyTabViewModel) viewModel).addField(); }
 }

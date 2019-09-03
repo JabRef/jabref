@@ -25,9 +25,9 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty xmpFilterEnabledProperty = new SimpleBooleanProperty();
-    private final ListProperty<XmpPrivacyItemModel> xmpFilterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> xmpFilterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<Field> addFieldNameProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -54,9 +54,9 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
         xmpFilterEnabledProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER));
 
         xmpFilterListProperty.clear();
-        List<XmpPrivacyItemModel> xmpExclusions = preferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS)
-                .stream().map(name -> new XmpPrivacyItemModel(FieldFactory.parseField(name))).collect(Collectors.toList());
-        xmpFilterListProperty.addAll(xmpExclusions);
+        List<Field> xmpFilters = preferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS)
+                .stream().map(FieldFactory::parseField).collect(Collectors.toList());
+        xmpFilterListProperty.addAll(xmpFilters);
 
         availableFieldsProperty.clear();
         availableFieldsProperty.addAll(FieldFactory.getCommonFields());
@@ -66,23 +66,22 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, xmpFilterEnabledProperty.getValue());
         preferences.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, xmpFilterListProperty.getValue().stream()
-                        .map(XmpPrivacyItemModel::getField)
                         .map(Field::getName)
                         .collect(Collectors.toList()));
     }
 
     public void addField() {
-        if (addFieldNameProperty.getValue() == null) {
+        if (addFieldProperty.getValue() == null) {
             return;
         }
 
-        if (xmpFilterListProperty.getValue().stream().filter(item -> item.getField().equals(addFieldNameProperty.getValue())).findAny().isEmpty()) {
-            xmpFilterListProperty.add(new XmpPrivacyItemModel(addFieldNameProperty.getValue()));
-            addFieldNameProperty.setValue(null);
+        if (xmpFilterListProperty.getValue().stream().filter(item -> item.equals(addFieldProperty.getValue())).findAny().isEmpty()) {
+            xmpFilterListProperty.add(addFieldProperty.getValue());
+            addFieldProperty.setValue(null);
         }
     }
 
-    public void removeFilter(XmpPrivacyItemModel filter) {
+    public void removeFilter(Field filter) {
         xmpFilterListProperty.remove(filter);
     }
 
@@ -106,10 +105,10 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty xmpFilterEnabledProperty() { return xmpFilterEnabledProperty; }
 
-    public ListProperty<XmpPrivacyItemModel> filterListProperty() { return xmpFilterListProperty; }
+    public ListProperty<Field> filterListProperty() { return xmpFilterListProperty; }
 
     public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
 
-    public ObjectProperty<Field> addFieldNameProperty() { return addFieldNameProperty; }
+    public ObjectProperty<Field> addFieldNameProperty() { return addFieldProperty; }
 
 }

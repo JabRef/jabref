@@ -11,7 +11,6 @@ import javafx.scene.input.KeyCode;
 
 import org.jabref.Globals;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -31,7 +30,6 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
     @FXML private TextField addFormatterName;
     @FXML private TextField addFormatterString;
     @FXML private Button formatterHelp;
-    @FXML private Button addFormatter;
 
     public NameFormatterTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -56,9 +54,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         formatterNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterNameColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())
-                            .setName(event.getNewValue());
+                    event.getRowValue().setName(event.getNewValue());
                 });
 
         formatterStringColumn.setSortable(true);
@@ -67,9 +63,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         formatterStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterStringColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getTableView().getItems().get(
-                            event.getTablePosition().getRow())
-                            .setFormat(event.getNewValue());
+                    event.getRowValue().setFormat(event.getNewValue());
                 });
 
         actionsColumn.setSortable(false);
@@ -96,10 +90,10 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER), formatterHelp);
-        actionFactory.configureIconButton(StandardActions.NAME_FORMATTER_ADD, new SimpleCommand() {
-            @Override
-            public void execute() { nameFormatterTabViewModel.addFormatter(); }
-        }, addFormatter);
+    }
+
+    public void addFormatter() {
+        ((NameFormatterTabViewModel) viewModel).addFormatter();
     }
 
 }
