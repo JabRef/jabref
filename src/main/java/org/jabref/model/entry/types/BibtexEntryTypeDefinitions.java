@@ -177,7 +177,6 @@ public class BibtexEntryTypeDefinitions {
             .withImportantFields(StandardField.MONTH, StandardField.YEAR)
             .build();
 
-
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
             INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
 
