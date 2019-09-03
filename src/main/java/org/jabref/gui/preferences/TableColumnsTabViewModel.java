@@ -87,6 +87,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Entry table columns"),
                         Localization.lang("Columns"),
                         Localization.lang("List must not be empty."))));
+
+        setValues();
     }
 
     @Override
@@ -128,8 +130,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         columnsListProperty.getValue().clear();
 
         List<Field> normalFields = columnPreferences.getColumnNames().stream()
-                                                    .map(FieldFactory::parseField)
-                                                    .collect(Collectors.toList());
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toList());
 
         normalFields.forEach(field -> columnsListProperty.getValue().add(
                 new TableColumnsItemModel(
@@ -145,13 +147,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private void removeSpecialFieldColumns() {
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
-                                                                 .filter(column -> (column.getField() instanceof SpecialField))
-                                                                 .collect(Collectors.toList());
+                .filter(column -> (column.getField() instanceof SpecialField))
+                .collect(Collectors.toList());
         columnsListProperty.getValue().removeAll(columns);
 
         List<Field> fields = availableColumnsProperty.getValue().stream()
-                                                     .filter(field -> (field instanceof SpecialField))
-                                                     .collect(Collectors.toList());
+                .filter(field -> (field instanceof SpecialField))
+                .collect(Collectors.toList());
 
         availableColumnsProperty.getValue().removeAll(fields);
     }
@@ -167,13 +169,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private void removeExtraFileColumns() {
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
-                                                                 .filter(column -> (column.getField() instanceof FieldsUtil.ExtraFilePseudoField))
-                                                                 .collect(Collectors.toList());
+                .filter(column -> (column.getField() instanceof FieldsUtil.ExtraFilePseudoField))
+                .collect(Collectors.toList());
         columnsListProperty.getValue().removeAll(columns);
 
         List<Field> fields = availableColumnsProperty.getValue().stream()
-                                                     .filter(field -> (field instanceof FieldsUtil.ExtraFilePseudoField))
-                                                     .collect(Collectors.toList());
+                .filter(field -> (field instanceof FieldsUtil.ExtraFilePseudoField))
+                .collect(Collectors.toList());
         availableColumnsProperty.getValue().removeAll(fields);
     }
 
