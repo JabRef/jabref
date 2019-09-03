@@ -49,7 +49,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTabView(prefs),
                 new FileTabView(prefs),
                 new TablePrefsTab(prefs),
-                new TableColumnsTabView(prefs, frame),
+                new TableColumnsTabView(prefs),
                 new PreviewTabView(prefs),
                 new ExternalTabView(prefs, frame),
                 new GroupsTabView(prefs),

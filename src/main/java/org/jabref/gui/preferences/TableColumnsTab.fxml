@@ -18,80 +18,62 @@
         <ToggleGroup fx:id="specialFieldsStoreMode"/>
         <ToggleGroup fx:id="urlDoiShownFirst"/>
     </fx:define>
-    <children>
-        <Label styleClass="titleHeader" text="%Entry table"/>
-        <Label styleClass="sectionHeader" text="%Columns"/>
-        <HBox spacing="4.0">
-            <children>
-                <VBox spacing="4.0" HBox.hgrow="SOMETIMES">
-                    <children>
-                        <TableView fx:id="columnsList" editable="true" prefHeight="300.0" prefWidth="220.0">
-                            <columns>
-                                <TableColumn fx:id="nameColumn" prefWidth="160.0" text="Name"/>
-                                <TableColumn fx:id="actionsColumn" maxWidth="40.0" minWidth="40.0" resizable="false"/>
-                            </columns>
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                            </columnResizePolicy>
-                        </TableView>
-                        <ComboBox fx:id="addColumnName" editable="true" maxWidth="Infinity"/>
-                    </children>
-                </VBox>
-                <VBox alignment="CENTER">
-                    <children>
-                        <Button fx:id="reloadTableColumns" prefHeight="20.0" prefWidth="20.0"/>
-                        <VBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
-                            <children>
-                                <Button fx:id="sortColumnUp" prefHeight="20.0" prefWidth="20.0"/>
-                                <Button fx:id="sortColumnDown" prefHeight="20.0" prefWidth="20.0"/>
-                            </children>
-                        </VBox>
-                        <Button fx:id="addColumn" prefHeight="20.0" prefWidth="20.0"/>
-                    </children>
-                </VBox>
-                <VBox spacing="10.0">
-                    <children>
-                        <CheckBox fx:id="showFileColumn" text="%Show file column"/>
-                        <CheckBox fx:id="showUrlColumn" text="%Show URL/DOI column"/>
-                        <VBox spacing="10.0">
-                            <children>
-                                <RadioButton fx:id="urlFirst" text="%Show URL first" toggleGroup="$urlDoiShownFirst"/>
-                                <RadioButton fx:id="doiFirst" text="%Show DOI first" toggleGroup="$urlDoiShownFirst"/>
-                            </children>
-                            <padding>
-                                <Insets left="20.0"/>
-                            </padding>
-                        </VBox>
-                        <CheckBox fx:id="showEPrintColumn" text="%Show ArXiv column"/>
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
-                                <CheckBox fx:id="specialFieldsEnable" text="%Enable special fields"/>
-                                <Button fx:id="specialFieldsHelp" prefWidth="20.0"/>
-                            </children>
-                            <padding>
-                                <Insets bottom="-5.0"/>
-                            </padding>
-                        </HBox>
-                        <VBox spacing="10.0">
-                            <children>
-                                <RadioButton fx:id="specialFieldsSyncKeywords"
-                                             text="%Synchronize with keywords"
-                                             toggleGroup="$specialFieldsStoreMode"/>
-                                <RadioButton fx:id="specialFieldsSerialize"
-                                             text="%Write values of special fields as separate fields to BibTeX"
-                                             toggleGroup="$specialFieldsStoreMode"/>
-                            </children>
-                            <padding>
-                                <Insets left="20.0"/>
-                            </padding>
-                        </VBox>
-                        <CheckBox fx:id="extraFileColumnsEnable" text="%Show extra columns"/>
-                    </children>
-                    <padding>
-                        <Insets left="20.0"/>
-                    </padding>
-                </VBox>
-            </children>
-        </HBox>
-    </children>
+    <Label styleClass="titleHeader" text="%Entry table"/>
+    <Label styleClass="sectionHeader" text="%Columns"/>
+    <HBox spacing="4.0">
+        <VBox spacing="4.0" HBox.hgrow="SOMETIMES">
+            <TableView fx:id="columnsList" editable="true" prefHeight="300.0" prefWidth="220.0">
+                <columns>
+                    <TableColumn fx:id="nameColumn" prefWidth="160.0" text="Name"/>
+                    <TableColumn fx:id="actionsColumn" maxWidth="40.0" minWidth="40.0" resizable="false"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+            <ComboBox fx:id="addColumnName" editable="true" maxWidth="Infinity"/>
+        </VBox>
+        <VBox alignment="CENTER">
+            <Button fx:id="reloadTableColumns" prefHeight="20.0" prefWidth="20.0"/>
+            <VBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
+                <Button fx:id="sortColumnUp" prefHeight="20.0" prefWidth="20.0"/>
+                <Button fx:id="sortColumnDown" prefHeight="20.0" prefWidth="20.0"/>
+            </VBox>
+            <Button fx:id="addColumn" prefHeight="20.0" prefWidth="20.0"/>
+        </VBox>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets left="20.0"/>
+            </padding>
+            <CheckBox fx:id="showFileColumn" text="%Show file column"/>
+            <CheckBox fx:id="showUrlColumn" text="%Show URL/DOI column"/>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets left="20.0"/>
+                </padding>
+                <RadioButton fx:id="urlFirst" text="%Show URL first" toggleGroup="$urlDoiShownFirst"/>
+                <RadioButton fx:id="doiFirst" text="%Show DOI first" toggleGroup="$urlDoiShownFirst"/>
+            </VBox>
+            <CheckBox fx:id="showEPrintColumn" text="%Show ArXiv column"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <padding>
+                    <Insets bottom="-5.0"/>
+                </padding>
+                <CheckBox fx:id="specialFieldsEnable" text="%Enable special fields"/>
+                <Button fx:id="specialFieldsHelp" prefWidth="20.0"/>
+            </HBox>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets left="20.0"/>
+                </padding>
+                <RadioButton fx:id="specialFieldsSyncKeywords"
+                             text="%Synchronize with keywords"
+                             toggleGroup="$specialFieldsStoreMode"/>
+                <RadioButton fx:id="specialFieldsSerialize"
+                             text="%Write values of special fields as separate fields to BibTeX"
+                             toggleGroup="$specialFieldsStoreMode"/>
+            </VBox>
+            <CheckBox fx:id="extraFileColumnsEnable" text="%Show extra columns"/>
+        </VBox>
+    </HBox>
 </fx:root>

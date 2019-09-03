@@ -1,12 +1,10 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -20,21 +18,22 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
@@ -52,18 +51,18 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final SimpleBooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
+    private FunctionBasedValidator columnsNotEmptyValidator;
+
     private List<String> restartWarnings = new ArrayList<>();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final ColumnPreferences columnPreferences;
-    private final JabRefFrame frame;
 
-    public TableColumnsTabViewModel(DialogService dialogService, JabRefPreferences preferences, JabRefFrame frame) {
+    public TableColumnsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.columnPreferences = preferences.getColumnPreferences();
-        this.frame = frame;
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -80,6 +79,14 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 removeExtraFileColumns();
             }
         });
+
+        columnsNotEmptyValidator = new FunctionBasedValidator<>(
+                columnsListProperty,
+                list -> list.size() > 0,
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("Entry table columns"),
+                        Localization.lang("Columns"),
+                        Localization.lang("List must not be empty."))));
     }
 
     @Override
@@ -153,19 +160,19 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         List<ExternalFileType> fileTypes = new ArrayList<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection());
         List<Field> fileColumns = new ArrayList<>();
         fileTypes.stream().map(ExternalFileType::getName)
-                .forEach(fileName -> fileColumns.add(new ExtraFileField(fileName)));
+                .forEach(fileName -> fileColumns.add(new FieldsUtil.ExtraFilePseudoField(fileName)));
 
         fileColumns.forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
         List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
-                                                                 .filter(column -> (column.getField() instanceof ExtraFileField))
+                                                                 .filter(column -> (column.getField() instanceof FieldsUtil.ExtraFilePseudoField))
                                                                  .collect(Collectors.toList());
         columnsListProperty.getValue().removeAll(columns);
 
         List<Field> fields = availableColumnsProperty.getValue().stream()
-                                                     .filter(field -> (field instanceof ExtraFileField))
+                                                     .filter(field -> (field instanceof FieldsUtil.ExtraFilePseudoField))
                                                      .collect(Collectors.toList());
         availableColumnsProperty.getValue().removeAll(fields);
     }
@@ -242,24 +249,19 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         preferences.storeColumnPreferences(newColumnPreferences);
     }
 
-    public String getFieldDisplayName(Field field) {
-        if (field instanceof SpecialField) {
-            return field.getName() + " (" + Localization.lang("Special") + ")";
-        } else if (field instanceof IEEEField) {
-            return field.getName() + " (" + Localization.lang("IEEE") + ")";
-        } else if (field instanceof InternalField) {
-            return field.getName() + " (" + Localization.lang("Internal") + ")";
-        } else if (field instanceof UnknownField) {
-            return field.getName() + " (" + Localization.lang("Custom") + ")";
-        } else if (field instanceof TableColumnsTabViewModel.ExtraFileField) {
-            return field.getName() + " (" + Localization.lang("File type") + ")";
-        } else {
-            return field.getName();
-        }
+    ValidationStatus columnsListValidationStatus() {
+        return columnsNotEmptyValidator.getValidationStatus();
     }
 
     @Override
-    public boolean validateSettings() { return true; } // should contain at least one column
+    public boolean validateSettings() {
+        ValidationStatus status = columnsListValidationStatus();
+        if (!status.isValid() && status.getHighestMessage().isPresent()) {
+            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public List<String> getRestartWarnings() {
@@ -292,27 +294,4 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty extraFileColumnsEnabledProperty() { return this.extraFileColumnsEnabledProperty; }
 
-    public class ExtraFileField implements Field {
-
-        String name;
-
-        ExtraFileField(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Set<FieldProperty> getProperties() {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public boolean isStandardField() {
-            return false;
-        }
-    }
 }

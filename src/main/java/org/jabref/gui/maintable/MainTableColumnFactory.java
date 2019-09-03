@@ -31,9 +31,9 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.TableColumnsTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
@@ -102,7 +102,7 @@ class MainTableColumnFactory {
         List<Field> columnFields = new ArrayList<>();
         preferences.getColumnNames().forEach(fieldName -> columnFields.add(FieldFactory.parseField(fieldName)));
         for (Field field : columnFields) {
-            if (field instanceof TableColumnsTabViewModel.ExtraFileField) {
+            if (field instanceof FieldsUtil.ExtraFilePseudoField) {
                 columns.add(createExtraFileColumn(field.getName()));
             } else if (field instanceof SpecialField) {
                 columns.add(createSpecialFieldColumn((SpecialField) field));
