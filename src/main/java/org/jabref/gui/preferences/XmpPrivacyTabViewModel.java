@@ -16,35 +16,47 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.IEEEField;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty xmpFilterEnabledProperty = new SimpleBooleanProperty();
-    private final ListProperty<XmpPrivacyItemModel> filterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<XmpPrivacyItemModel> xmpFilterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Field> addFieldNameProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
+    private FunctionBasedValidator xmpFilterListValidator;
+
     XmpPrivacyTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+
+        xmpFilterListValidator = new FunctionBasedValidator<>(
+                xmpFilterListProperty,
+                input -> input.size() > 0,
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("xmp-metadata"),
+                        Localization.lang("Filter List"),
+                        Localization.lang("List must not be empty."))));
+
+        setValues();
     }
 
     @Override
     public void setValues() {
         xmpFilterEnabledProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER));
 
-        filterListProperty.clear();
+        xmpFilterListProperty.clear();
         List<XmpPrivacyItemModel> xmpExclusions = preferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS)
                 .stream().map(name -> new XmpPrivacyItemModel(FieldFactory.parseField(name))).collect(Collectors.toList());
-        filterListProperty.addAll(xmpExclusions);
+        xmpFilterListProperty.addAll(xmpExclusions);
 
         availableFieldsProperty.clear();
         availableFieldsProperty.addAll(FieldFactory.getCommonFields());
@@ -53,7 +65,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, xmpFilterEnabledProperty.getValue());
-        preferences.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, filterListProperty.getValue().stream()
+        preferences.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, xmpFilterListProperty.getValue().stream()
                         .map(XmpPrivacyItemModel::getField)
                         .map(Field::getName)
                         .collect(Collectors.toList()));
@@ -64,18 +76,28 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        if (filterListProperty.getValue().stream().filter(item -> item.getField().equals(addFieldNameProperty.getValue())).findAny().isEmpty()) {
-            filterListProperty.add(new XmpPrivacyItemModel(addFieldNameProperty.getValue()));
+        if (xmpFilterListProperty.getValue().stream().filter(item -> item.getField().equals(addFieldNameProperty.getValue())).findAny().isEmpty()) {
+            xmpFilterListProperty.add(new XmpPrivacyItemModel(addFieldNameProperty.getValue()));
             addFieldNameProperty.setValue(null);
         }
     }
 
     public void removeFilter(XmpPrivacyItemModel filter) {
-        filterListProperty.remove(filter);
+        xmpFilterListProperty.remove(filter);
+    }
+
+    public ValidationStatus xmpFilterListValidationStatus() {
+        return xmpFilterListValidator.getValidationStatus();
     }
 
     @Override
     public boolean validateSettings() {
+        ValidationStatus validationStatus = xmpFilterListValidationStatus();
+        if (xmpFilterEnabledProperty.getValue() && !validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
+            return false;
+        }
         return true;
     }
 
@@ -84,23 +106,10 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty xmpFilterEnabledProperty() { return xmpFilterEnabledProperty; }
 
-    public ListProperty<XmpPrivacyItemModel> filterListProperty() { return filterListProperty; }
+    public ListProperty<XmpPrivacyItemModel> filterListProperty() { return xmpFilterListProperty; }
 
     public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
 
     public ObjectProperty<Field> addFieldNameProperty() { return addFieldNameProperty; }
 
-    public String getFieldDisplayName(Field field) {
-        if (field instanceof SpecialField) {
-            return field.getName() + " (" + Localization.lang("Special") + ")";
-        } else if (field instanceof IEEEField) {
-            return field.getName() + " (" + Localization.lang("IEEE") + ")";
-        } else if (field instanceof InternalField) {
-            return field.getName() + " (" + Localization.lang("Internal") + ")";
-        } else if (field instanceof UnknownField) {
-            return field.getName() + " (" + Localization.lang("Custom") + ")";
-        } else {
-            return field.getName();
-        }
-    }
 }

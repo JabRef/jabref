@@ -41,6 +41,9 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
                 .load();
     }
 
+    @Override
+    public String getTabName() { return Localization.lang("Name formatter"); }
+
     public void initialize () {
         NameFormatterTabViewModel nameFormatterTabViewModel = new NameFormatterTabViewModel(dialogService, preferences);
         this.viewModel = nameFormatterTabViewModel;
@@ -99,6 +102,4 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         }, addFormatter);
     }
 
-    @Override
-    public String getTabName() { return Localization.lang("Name formatter"); }
 }

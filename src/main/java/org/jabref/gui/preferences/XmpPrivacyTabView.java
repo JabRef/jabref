@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -15,6 +16,8 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +26,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class XmpPrivacyTabView extends AbstractPreferenceTabView implements PreferencesTab {
 
@@ -33,6 +37,8 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
     @FXML private ComboBox<Field> addFieldName;
     @FXML private Button addField;
 
+    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+
     public XmpPrivacyTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
@@ -40,6 +46,9 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
                 .root(this)
                 .load();
     }
+
+    @Override
+    public String getTabName() { return Localization.lang("XMP-metadata"); }
 
     public void initialize () {
         XmpPrivacyTabViewModel xmpPrivacyTabViewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
@@ -60,7 +69,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
                 if (item == null) {
                     setText("");
                 } else {
-                    setText(xmpPrivacyTabViewModel.getFieldDisplayName(item));
+                    setText(FieldsUtil.getNameWithType(item));
                 }
             }
 
@@ -90,7 +99,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
 
         addFieldName.setEditable(true);
         new ViewModelListCellFactory<Field>()
-                .withText(xmpPrivacyTabViewModel::getFieldDisplayName)
+                .withText(FieldsUtil::getNameWithType)
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(xmpPrivacyTabViewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(xmpPrivacyTabViewModel.addFieldNameProperty());
@@ -109,13 +118,14 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
                 return FieldFactory.parseField(string);
             }
         });
+
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> validationVisualizer.initVisualization(xmpPrivacyTabViewModel.xmpFilterListValidationStatus(), filterList));
+
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.XMP_FILTER_ADD, new SimpleCommand() {
             @Override
             public void execute() { xmpPrivacyTabViewModel.addField(); }
         }, addField);
     }
-
-    @Override
-    public String getTabName() { return Localization.lang("XMP-metadata"); }
 }

@@ -25,6 +25,7 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
     NameFormatterTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        setValues();
     }
 
     @Override
