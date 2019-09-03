@@ -41,7 +41,12 @@ class MainArchitectureTestsWithArchUnit {
     public static void doNotUseGlazedLists(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
     }
-    
+
+    @ArchTest
+    public static void doNotUseGlyphsDirectly(JavaClasses classes) {
+        noClasses().that().resideOutsideOfPackage("org.jabref.gui.icon").should().accessClassesThat().resideInAnyPackage("de.jensd.fx.glyphs", "de.jensd.fx.glyphs.materialdesignicons").check(classes);
+    }
+
     //"Currently disabled as there is no alternative for the rest of classes who need awt"
     @ArchIgnore
     @ArchTest
