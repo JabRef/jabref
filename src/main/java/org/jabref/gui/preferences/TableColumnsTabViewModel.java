@@ -36,6 +36,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<TableColumnsItemModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -51,6 +55,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final SimpleBooleanProperty preferDoiProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
     private final SimpleBooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
+
+    private FunctionBasedValidator columnsNotEmptyValidator;
 
     private List<String> restartWarnings = new ArrayList<>();
 
@@ -80,6 +86,14 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 removeExtraFileColumns();
             }
         });
+
+        columnsNotEmptyValidator = new FunctionBasedValidator<>(
+                columnsListProperty,
+                list -> list.size() > 0,
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("Entry table columns"),
+                        Localization.lang("Columns"),
+                        Localization.lang("List must not be empty."))));
     }
 
     @Override
@@ -258,8 +272,19 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    ValidationStatus columnsListValidationStatus() {
+        return columnsNotEmptyValidator.getValidationStatus();
+    }
+
     @Override
-    public boolean validateSettings() { return true; } // should contain at least one column
+    public boolean validateSettings() {
+        ValidationStatus status = columnsListValidationStatus();
+        if (!status.isValid() && status.getHighestMessage().isPresent()) {
+            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public List<String> getRestartWarnings() {
