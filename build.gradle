@@ -409,7 +409,11 @@ run {
             "--add-exports", "javafx.web/com.sun.webkit=org.controlsfx.controls",
             "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
             "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
-            "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls"
+            "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+            "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
+            "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
+            "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
+            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix"
 
     // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
     // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
