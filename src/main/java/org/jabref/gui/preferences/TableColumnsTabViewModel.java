@@ -129,54 +129,31 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
 
-        List<Field> normalFields = columnPreferences.getColumnNames().stream()
+        columnPreferences.getColumnNames().stream()
                 .map(FieldFactory::parseField)
-                .collect(Collectors.toList());
-
-        normalFields.forEach(field -> columnsListProperty.getValue().add(
-                new TableColumnsItemModel(
-                        field,
-                        columnPreferences.getPrefColumnWidth(field.getName())
-                )));
+                .map(field -> new TableColumnsItemModel(field, columnPreferences.getPrefColumnWidth(field.getName())))
+                .forEach(columnsListProperty.getValue()::add);
     }
 
     private void insertSpecialFieldColumns() {
-        List<Field> fields = new ArrayList<>(EnumSet.allOf(SpecialField.class));
-        fields.forEach(item -> availableColumnsProperty.getValue().add(0, item));
+        EnumSet.allOf(SpecialField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
     }
 
     private void removeSpecialFieldColumns() {
-        List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
-                .filter(column -> (column.getField() instanceof SpecialField))
-                .collect(Collectors.toList());
-        columnsListProperty.getValue().removeAll(columns);
-
-        List<Field> fields = availableColumnsProperty.getValue().stream()
-                .filter(field -> (field instanceof SpecialField))
-                .collect(Collectors.toList());
-
-        availableColumnsProperty.getValue().removeAll(fields);
+        columnsListProperty.getValue().removeIf(column -> column.getField() instanceof SpecialField);
+        availableColumnsProperty.getValue().removeIf(field -> field instanceof SpecialField);
     }
 
     private void insertExtraFileColumns() {
-        List<ExternalFileType> fileTypes = new ArrayList<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection());
-        List<Field> fileColumns = new ArrayList<>();
-        fileTypes.stream().map(ExternalFileType::getName)
-                .forEach(fileName -> fileColumns.add(new FieldsUtil.ExtraFilePseudoField(fileName)));
-
-        fileColumns.forEach(item -> availableColumnsProperty.getValue().add(item));
+        ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream()
+                .map(ExternalFileType::getName)
+                .map(FieldsUtil.ExtraFilePseudoField::new)
+                .forEach(availableColumnsProperty::add);
     }
 
     private void removeExtraFileColumns() {
-        List<TableColumnsItemModel> columns = columnsListProperty.getValue().stream()
-                .filter(column -> (column.getField() instanceof FieldsUtil.ExtraFilePseudoField))
-                .collect(Collectors.toList());
-        columnsListProperty.getValue().removeAll(columns);
-
-        List<Field> fields = availableColumnsProperty.getValue().stream()
-                .filter(field -> (field instanceof FieldsUtil.ExtraFilePseudoField))
-                .collect(Collectors.toList());
-        availableColumnsProperty.getValue().removeAll(fields);
+        columnsListProperty.getValue().removeIf(column -> column.getField() instanceof FieldsUtil.ExtraFilePseudoField);
+        availableColumnsProperty.getValue().removeIf(field -> field instanceof FieldsUtil.ExtraFilePseudoField);
     }
 
     public void insertColumnInList() {
