@@ -57,6 +57,7 @@ Hints are given at <https://stackoverflow.com/a/54507226/873282>.
 
 #### Eclipse
 
+To successfully develop with JabRef in Eclipse install eclipse version `2019-06` or newer.
 Please install [EclEmma](http://eclemma.org/) for code coverage.
 
 In Ubuntu Linux, you can follow one of these guidelines to Install Eclipse:
@@ -102,14 +103,9 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 ### Set-up Eclipse
 
-* Open Eclipse
-* To Import your JabRef project go to menu File --> Import
+For Eclipse please follow the steps listed here:
+[Setting up Eclipse for JabRef 5.x with JDK 11](https://github.com/JabRef/jabref/wiki/JabRef-5,x-in-Eclipse-with-JDK-11)
 
-1. Choose General --> Existing projects in the workspace and "next"
-2. For "select root directory", browse until the root folder of your jabref just cloned from your repo (e.g., `/home/user/<YOU>/jabref`)
-3. Click on "Finish" and voilá!
-4. In Eclipse, right click on the project and choose Refresh workspace and then choose Run as --> Java application (Forget about the existing errors)
-5. Choose JabRefMain as the main class to be executed
 
 ### Set-up your IDE (IntelliJ)
 
