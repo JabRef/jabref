@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -111,11 +110,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         internalFields.add(InternalField.GROUPS);
         internalFields.add(InternalField.KEY_FIELD);
         internalFields.add(InternalField.TYPE_HEADER);
-        internalFields.forEach(item -> availableColumnsProperty.getValue().add(0, item));
+        internalFields.forEach(item -> availableColumnsProperty.getValue().add(item));
 
-        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
-
-        availableColumnsProperty.sort(Comparator.comparing(Field::getName));
+        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(item));
 
         if (specialFieldsEnabledProperty.getValue()) {
             insertSpecialFieldColumns();
