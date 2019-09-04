@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 
@@ -50,8 +49,9 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
 
         formatterNameColumn.setSortable(true);
         formatterNameColumn.setReorderable(false);
-        formatterNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        formatterNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         formatterNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        formatterNameColumn.setEditable(true);
         formatterNameColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
                     event.getRowValue().setName(event.getNewValue());
@@ -59,8 +59,9 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
 
         formatterStringColumn.setSortable(true);
         formatterStringColumn.setReorderable(false);
-        formatterStringColumn.setCellValueFactory(new PropertyValueFactory<>("format"));
+        formatterStringColumn.setCellValueFactory(cellData -> cellData.getValue().formatProperty());
         formatterStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        formatterStringColumn.setEditable(true);
         formatterStringColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
                     event.getRowValue().setFormat(event.getNewValue());
@@ -68,7 +69,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<NameFormatterItemModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove") + " " + name)

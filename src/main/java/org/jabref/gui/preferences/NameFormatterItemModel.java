@@ -6,8 +6,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.logic.layout.format.NameFormatter;
 
 public class NameFormatterItemModel {
-    private final StringProperty name;
-    private final StringProperty format;
+    private final StringProperty name = new SimpleStringProperty("");
+    private final StringProperty format = new SimpleStringProperty("");
 
     NameFormatterItemModel() { this(""); }
 
@@ -16,8 +16,8 @@ public class NameFormatterItemModel {
     }
 
     NameFormatterItemModel(String name, String format) {
-        this.name = new SimpleStringProperty(name);
-        this.format = new SimpleStringProperty(format);
+        this.name.setValue(name);
+        this.format.setValue(format);
     }
 
     public void setName(String name) {
@@ -28,6 +28,8 @@ public class NameFormatterItemModel {
         return name.getValue();
     }
 
+    public StringProperty nameProperty() { return name; }
+
     public void setFormat(String format) {
         this.format.setValue(format);
     }
@@ -35,6 +37,8 @@ public class NameFormatterItemModel {
     public String getFormat() {
         return format.getValue();
     }
+
+    public StringProperty formatProperty() { return format; }
 
     @Override
     public String toString() { return "[" + name.getValue() + "," + format.getValue() + "]"; }
