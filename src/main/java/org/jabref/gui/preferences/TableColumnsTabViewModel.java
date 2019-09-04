@@ -3,9 +3,9 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -40,16 +40,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<TableColumnsItemModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<Field> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final SimpleObjectProperty<Field> addColumnProperty = new SimpleObjectProperty<>();
-    private final SimpleBooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty showFileColumnProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty showUrlColumnProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty preferUrlProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty preferDoiProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
-    private final SimpleBooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<Field> addColumnProperty = new SimpleObjectProperty<>();
+    private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
+    private final BooleanProperty showFileColumnProperty = new SimpleBooleanProperty();
+    private final BooleanProperty showUrlColumnProperty = new SimpleBooleanProperty();
+    private final BooleanProperty preferUrlProperty = new SimpleBooleanProperty();
+    private final BooleanProperty preferDoiProperty = new SimpleBooleanProperty();
+    private final BooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
+    private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
     private FunctionBasedValidator columnsNotEmptyValidator;
 
@@ -131,7 +131,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         columnPreferences.getColumnNames().stream()
                 .map(FieldFactory::parseField)
-                .map(field -> new TableColumnsItemModel(field, columnPreferences.getPrefColumnWidth(field.getName())))
+                .map(field -> new TableColumnsItemModel(field, columnPreferences.getColumnWidth(field.getName())))
                 .forEach(columnsListProperty.getValue()::add);
     }
 
@@ -197,11 +197,12 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        List<String> columnNames = columnsListProperty.stream().map(item -> item.getField().getName()).collect(Collectors.toList());
-        Map<String,Double> columnWidths = new TreeMap<>();
+        List<String> columnNames = columnsListProperty.stream()
+                .map(item -> item.getField().getName()).collect(Collectors.toList());
 
-        // for each single one, to get stored or default value
-        columnNames.forEach(field -> columnWidths.put(field,columnPreferences.getPrefColumnWidth(field)));
+        // for each column get either actual width or - if it does not exist - default value
+        Map<String,Double> columnWidths = new HashMap<>();
+        columnNames.forEach(field -> columnWidths.put(field,columnPreferences.getColumnWidth(field)));
 
         ColumnPreferences newColumnPreferences = new ColumnPreferences(
                 showFileColumnProperty.getValue(),

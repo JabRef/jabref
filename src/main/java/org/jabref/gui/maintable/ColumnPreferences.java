@@ -70,7 +70,7 @@ public class ColumnPreferences {
         return columnWidths;
     }
 
-    public double getPrefColumnWidth(String columnName) {
+    public double getColumnWidth(String columnName) {
         return columnWidths.getOrDefault(columnName, DEFAULT_FIELD_LENGTH);
     }
 

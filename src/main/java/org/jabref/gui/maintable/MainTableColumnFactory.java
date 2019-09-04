@@ -99,17 +99,15 @@ class MainTableColumnFactory {
             columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, StandardField.EPRINT));
         }
 
-        List<Field> columnFields = new ArrayList<>();
-        preferences.getColumnNames().forEach(fieldName -> columnFields.add(FieldFactory.parseField(fieldName)));
-        for (Field field : columnFields) {
-            if (field instanceof FieldsUtil.ExtraFilePseudoField) {
-                columns.add(createExtraFileColumn(field.getName()));
-            } else if (field instanceof SpecialField) {
-                columns.add(createSpecialFieldColumn((SpecialField) field));
-            } else {
-                columns.add(createNormalColumn(field));
-            }
-        }
+        preferences.getColumnNames().stream().map(FieldFactory::parseField).forEach(field -> {
+                    if (field instanceof FieldsUtil.ExtraFilePseudoField) {
+                        columns.add(createExtraFileColumn(field.getName()));
+                    } else if (field instanceof SpecialField) {
+                        columns.add(createSpecialFieldColumn((SpecialField) field));
+                    } else {
+                        columns.add(createNormalColumn(field));
+                    }
+                });
 
         return columns;
     }
@@ -170,7 +168,7 @@ class MainTableColumnFactory {
                     .withText(text -> text)
                     .install(column);
             column.setSortable(true);
-            column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
+            column.setPrefWidth(preferences.getColumnWidth(columnName));
         return column;
     }
 
