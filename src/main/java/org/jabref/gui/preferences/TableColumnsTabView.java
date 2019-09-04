@@ -1,22 +1,17 @@
 package org.jabref.gui.preferences;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -39,10 +34,6 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
     @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
     @FXML private TableColumn<TableColumnsItemModel, Field> actionsColumn;
     @FXML private ComboBox<Field> addColumnName;
-    @FXML private Button reloadTableColumns;
-    @FXML private Button sortColumnUp;
-    @FXML private Button sortColumnDown;
-    @FXML private Button addColumn;
     @FXML private CheckBox showFileColumn;
     @FXML private CheckBox showUrlColumn;
     @FXML private RadioButton urlFirst;
@@ -56,7 +47,6 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
 
     private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    @Inject private DialogService dialogService;
     private final JabRefPreferences preferences;
 
     public TableColumnsTabView(JabRefPreferences preferences) {
@@ -77,34 +67,23 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
 
         setupTable();
         setupBindings();
-        setupIconButtons();
+
+        ActionFactory actionFactory = new ActionFactory(preferences.getKeyBindingRepository());
+        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), specialFieldsHelp);
     }
 
     private void setupTable() {
         nameColumn.setSortable(false);
         nameColumn.setReorderable(false);
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        nameColumn.setCellFactory(cellData -> new TableCell<>() {
-            @Override
-            public void updateItem(Field item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null) {
-                    setText("");
-                } else {
-                    setText(FieldsUtil.getNameWithType(item));
-                }
-            }
-
-            private String getString() {
-                return getItem() == null ? "" : getItem().getName();
-            }
-        });
+        new ValueTableCellFactory<TableColumnsItemModel, Field>().withText(FieldsUtil::getNameWithType).install(nameColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
         new ValueTableCellFactory<TableColumnsItemModel, Field>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove column") + " " + name.getDisplayName())
                 .withOnMouseClickedEvent(item -> evt ->
                         ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
@@ -155,29 +134,12 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
         extraFileColumnsEnable.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).extraFileColumnsEnabledProperty());
     }
 
-    private void setupIconButtons() {
-        ActionFactory actionFactory = new ActionFactory(preferences.getKeyBindingRepository());
+    public void updateToCurrentColumnOrder() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
 
-        actionFactory.configureIconButton(StandardActions.COLUMN_SORT_UP, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
-        }, sortColumnUp);
+    public void sortColumnUp() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
 
-        actionFactory.configureIconButton(StandardActions.COLUMN_SORT_DOWN, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
-        }, sortColumnDown);
+    public void sortColumnDown() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
 
-        actionFactory.configureIconButton(StandardActions.COLUMN_ADD, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
-        }, addColumn);
+    public void addColumn() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
 
-        actionFactory.configureIconButton(StandardActions.COLUMNS_UPDATE, new SimpleCommand() {
-            @Override
-            public void execute() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
-        }, reloadTableColumns);
-
-        actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), specialFieldsHelp);
-    }
 }

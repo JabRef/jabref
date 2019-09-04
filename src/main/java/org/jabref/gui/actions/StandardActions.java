@@ -139,13 +139,6 @@ public enum StandardActions implements Action {
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), KeyBinding.AUTOMATICALLY_LINK_FILES),
     EXTRACT_BIBTEX(Localization.lang("Extract BibTeX from plain text")),
 
-    // Preferences / MainTable
-    COLUMN_SORT_UP(Localization.lang("Sort up"), Localization.lang("Sort column one step upwards"), IconTheme.JabRefIcons.UP),
-    COLUMN_SORT_DOWN(Localization.lang("Sort down"), Localization.lang("Sort column one step downwards"), IconTheme.JabRefIcons.DOWN),
-    COLUMN_ADD(Localization.lang("Add"), Localization.lang("Add custom column"), IconTheme.JabRefIcons.ADD_NOBOX),
-    COLUMN_REMOVE(Localization.lang("Remove"), Localization.lang("Remove this column"), IconTheme.JabRefIcons.REMOVE_NOBOX),
-    COLUMNS_UPDATE(Localization.lang("Update"), Localization.lang("Update to current column order"), IconTheme.JabRefIcons.REFRESH),
-
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_KEY_PATTERNS(Localization.lang("Help on key patterns"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_REGEX_SEARCH(Localization.lang("Help on regular expression search"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),

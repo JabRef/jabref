@@ -2,13 +2,16 @@ package org.jabref.gui.preferences;
 
 import java.util.Objects;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -17,10 +20,10 @@ import org.jabref.model.entry.field.UnknownField;
 
 public class TableColumnsItemModel {
 
-    private final SimpleObjectProperty<Field> field;
+    private final ObjectProperty<Field> field;
     private final StringProperty name = new SimpleStringProperty("");
-    private final SimpleDoubleProperty length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
-    private final SimpleBooleanProperty editableProperty = new SimpleBooleanProperty(true);
+    private final DoubleProperty length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
+    private final BooleanProperty editableProperty = new SimpleBooleanProperty(true);
 
     public TableColumnsItemModel() {
         this.field = new SimpleObjectProperty<>(new UnknownField(Localization.lang("New column")));
@@ -45,7 +48,7 @@ public class TableColumnsItemModel {
         return field.get();
     }
 
-    public SimpleObjectProperty fieldProperty() { return this.field; }
+    public ObservableValue<Field> fieldProperty() { return this.field; }
 
     public void setName(String name) {
         if (editableProperty.get()) {
