@@ -52,5 +52,4 @@ public class FieldsUtil {
             return false;
         }
     }
-
 }

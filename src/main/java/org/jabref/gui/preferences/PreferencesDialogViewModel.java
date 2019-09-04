@@ -57,8 +57,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()),
                 new ImportSettingsTab(prefs),
                 new ExportSortingPrefsTab(prefs),
-                new NameFormatterTab(prefs),
-                new XmpPrefsTab(prefs),
+                new NameFormatterTabView(prefs),
+                new XmpPrivacyTabView(prefs),
                 new AdvancedTabView(prefs),
                 new AppearancePrefsTab(dialogService, prefs)
         );
