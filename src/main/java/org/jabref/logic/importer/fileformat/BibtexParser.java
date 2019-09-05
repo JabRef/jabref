@@ -614,7 +614,11 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
                 }
-                value.append('#').append(textToken).append('#');
+                if (field != StandardField.MONTH) {
+                    value.append('#').append(textToken).append('#');
+                } else {
+                    value.append(textToken);
+                }
             }
             skipWhitespace();
         }
