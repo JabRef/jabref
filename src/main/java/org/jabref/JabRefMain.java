@@ -48,7 +48,7 @@ public class JabRefMain extends Application {
     public void start(Stage mainStage) throws Exception {
         try {
             // Fail on unsupported Java versions
-           // ensureCorrectJavaVersion();
+            ensureCorrectJavaVersion();
             FallbackExceptionHandler.installExceptionHandler();
 
             // Init preferences
