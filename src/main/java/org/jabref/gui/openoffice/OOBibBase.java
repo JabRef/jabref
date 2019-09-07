@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -131,7 +132,7 @@ class OOBibBase {
 
     private final DialogService dialogService;
 
-    public OOBibBase(String pathToOO, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException {
+    public OOBibBase(String pathToOO, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
 
         this.dialogService = dialogService;
 
@@ -147,7 +148,9 @@ class OOBibBase {
         yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
 
         this.atEnd = atEnd;
-        xDesktop = simpleBootstrap(pathToOO);
+ 
+            xDesktop = simpleBootstrap(pathToOO);
+        
 
     }
 
@@ -237,26 +240,12 @@ class OOBibBase {
 
     private XDesktop simpleBootstrap(String pathToExecutable)
         throws IllegalAccessException, InvocationTargetException, BootstrapException,
-        CreationException, IOException {
+        CreationException, IOException, ClassNotFoundException {
 
-        ClassLoader loader = ClassLoader.getSystemClassLoader();
-        if (loader instanceof URLClassLoader) {
-            URLClassLoader cl = (URLClassLoader) loader;
-            Class<URLClassLoader> sysclass = URLClassLoader.class;
-            try {
-                Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-                method.setAccessible(true);
-                method.invoke(cl, new File(pathToExecutable).toURI().toURL());
-            } catch (SecurityException | NoSuchMethodException | MalformedURLException t) {
-                LOGGER.error("Error, could not add URL to system classloader", t);
-                cl.close();
-                throw new IOException("Error, could not add URL to system classloader", t);
-            }
-        } else {
-            LOGGER.error("Error occured, URLClassLoader expected but " + loader.getClass()
-                         + " received. Could not continue.");
-        }
-
+    
+        URL[] urls = { Paths.get(pathToExecutable).toUri().toURL()};
+        Class<?> clazz = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new URLClassLoader(urls));
+        
         //Get the office component context:
         XComponentContext xContext = Bootstrap.bootstrap();
         //Get the office service manager:

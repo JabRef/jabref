@@ -137,21 +137,8 @@ public class OpenOfficePanel {
         initPanel();
     }
 
-    private static void addURL(List<URL> jarList) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<URLClassLoader> sysclass = URLClassLoader.class;
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
-            for (URL anU : jarList) {
-                method.invoke(sysloader, anU);
-            }
-        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
-                 InvocationTargetException e) {
-            LOGGER.error("Could not add URL to system classloader", e);
-            sysloader.close();
-            throw new IOException("Error, could not add URL to system classloader", e);
-        }
+    private static void addURL(List<URL> jarList) throws IOException, ClassNotFoundException {
+        Class<?> clazz = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new URLClassLoader( jarList.toArray(new URL[0]) ));
     }
 
     public Node getContent() {
@@ -453,12 +440,18 @@ public class OpenOfficePanel {
         for (Optional<Path> jarPath : filePaths) {
             jarURLs.add((jarPath.get().toUri().toURL()));
         }
-        addURL(jarURLs);
+    
+        try {
+            addURL(jarURLs);
+        } catch (ClassNotFoundException e) {
+          LOGGER.error("lo error",e);
+        }
     }
 
     private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
-        BootstrapException, CreationException {
+        BootstrapException, CreationException, ClassNotFoundException {
         // Connect
+        
         return new OOBibBase(ooPrefs.getExecutablePath(), true, dialogService);
     }
 
