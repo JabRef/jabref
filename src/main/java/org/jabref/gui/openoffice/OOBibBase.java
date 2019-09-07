@@ -1,12 +1,8 @@
 package org.jabref.gui.openoffice;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +28,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
+import org.jabref.logic.openoffice.ChildFirstClassLoader;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
@@ -132,7 +129,7 @@ class OOBibBase {
 
     private final DialogService dialogService;
 
-    public OOBibBase(String pathToOO, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
+    public OOBibBase(List<URL> jarUrls, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
 
         this.dialogService = dialogService;
 
@@ -149,9 +146,7 @@ class OOBibBase {
 
         this.atEnd = atEnd;
  
-            xDesktop = simpleBootstrap(pathToOO);
-        
-
+        xDesktop = simpleBootstrap(jarUrls);
     }
 
     public boolean isConnectedToDocument() {
@@ -238,14 +233,14 @@ class OOBibBase {
         return result;
     }
 
-    private XDesktop simpleBootstrap(String pathToExecutable)
+    private XDesktop simpleBootstrap(List<URL> jarUrls)
         throws IllegalAccessException, InvocationTargetException, BootstrapException,
         CreationException, IOException, ClassNotFoundException {
 
     
-        URL[] urls = { Paths.get(pathToExecutable).toUri().toURL()};
-        Class<?> clazz = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new URLClassLoader(urls));
-        
+        URL[] urls = jarUrls.toArray(new URL[3]);
+        Class<?> clazz  = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new ChildFirstClassLoader(urls, null));
+       
         //Get the office component context:
         XComponentContext xContext = Bootstrap.bootstrap();
         //Get the office service manager:
