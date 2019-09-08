@@ -27,6 +27,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.uithreadaware.UiThreadListDecorator;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -43,7 +44,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
-    private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
+    private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(new UiThreadListDecorator<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables)));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
