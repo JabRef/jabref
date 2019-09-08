@@ -106,8 +106,7 @@ public enum Month {
      * Parses a month having the string in German standard form such as
      * "Oktober" or in German short form such as "Okt"
      *
-     * @param value,
-     *            a String that represents a month in German form
+     * @param value a String that represents a month in German form
      * @return the corresponding month instance, empty if input is not in German
      *         form
      */

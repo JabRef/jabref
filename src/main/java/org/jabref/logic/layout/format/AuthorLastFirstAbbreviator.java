@@ -16,11 +16,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
      */
     @Override
     public String format(String fieldText) {
-
-        /**
-         * This formatter is a duplicate of AuthorAbbreviator, so we simply
-         * call that one.
-         */
+        // This formatter is a duplicate of AuthorAbbreviator, so we simply call that one.
         return new AuthorAbbreviator().format(fieldText);
 
     }

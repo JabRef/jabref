@@ -51,7 +51,6 @@ public class Eprint implements Identifier {
      * @param eprint the Eprint identifier string
      * @throws NullPointerException if eprint is null
      * @throws IllegalArgumentException if eprint does not include a valid Eprint identifier
-     * @return an instance of the Eprint class
      */
     public Eprint(String eprint) {
         Objects.requireNonNull(eprint);

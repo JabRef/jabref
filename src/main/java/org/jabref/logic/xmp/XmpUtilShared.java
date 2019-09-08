@@ -42,7 +42,7 @@ public class XmpUtilShared {
      * Caution: This method is as expensive as it is reading the actual metadata
      * itself from the PDF.
      *
-     * @param inputStream The inputStream to read the PDF from.
+     * @param path the path to the PDF.
      * @return whether a BibEntry was found in the given PDF.
      */
     public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
