@@ -55,7 +55,7 @@ project.ext.threeDotVersion = "5.0.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
 sourceCompatibility = 11
 targetCompatibility = 11
-mainClassName = "org.jabref.JabRefLauncher"
+mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names
