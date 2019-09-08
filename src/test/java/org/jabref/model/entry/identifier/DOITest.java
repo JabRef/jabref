@@ -19,8 +19,18 @@ public class DOITest {
     }
 
     @Test
+    public void acceptPlainShortDoi() {
+        assertEquals("10/gf4gqc", new DOI("10/gf4gqc").getDOI());
+    }
+
+    @Test
     public void ignoreLeadingAndTrailingWhitespaces() {
         assertEquals("10.1006/jmbi.1998.2354", new DOI("  10.1006/jmbi.1998.2354 ").getDOI());
+    }
+
+    @Test
+    public void ignoreLeadingAndTrailingWhitespacesInShortDoi() {
+        assertEquals("10/gf4gqc", new DOI("   10/gf4gqc ").getDOI());
     }
 
     @Test
@@ -29,9 +39,19 @@ public class DOITest {
     }
 
     @Test
+    public void rejectEmbeddedShortDoi() {
+        assertThrows(IllegalArgumentException.class, () -> new DOI("other stuff 10/gf4gqc end"));
+    }
+
+    @Test
     public void rejectInvalidDirectoryIndicator() {
         // wrong directory indicator
         assertThrows(IllegalArgumentException.class, () -> new DOI("12.1006/jmbi.1998.2354 end"));
+    }
+
+    @Test
+    public void rejectInvalidDirectoryIndicatorInShortDoi() {
+        assertThrows(IllegalArgumentException.class, () -> new DOI("20/abcd"));
     }
 
     @Test
@@ -46,9 +66,19 @@ public class DOITest {
     }
 
     @Test
+    public void rejectMissingDividerInShortDoi() {
+        assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
+    }
+
+    @Test
     public void acceptDoiPrefix() {
         // Doi prefix
         assertEquals("10.1006/jmbi.1998.2354", new DOI("doi:10.1006/jmbi.1998.2354").getDOI());
+    }
+
+    @Test
+    public void acceptDoiPrefixInShortDoi() {
+        assertEquals("10/gf4gqc", new DOI("doi:10/gf4gqc").getDOI());
     }
 
     @Test
@@ -58,6 +88,15 @@ public class DOITest {
         assertEquals("10.123/456", new DOI("http://doi.org/urn:doi:10.123/456").getDOI());
         // : is also allowed as divider, will be replaced by RESOLVER
         assertEquals("10.123:456ABC/zyz", new DOI("http://doi.org/urn:doi:10.123:456ABC%2Fzyz").getDOI());
+    }
+
+    @Test
+    public void acceptURNPrefixInShortDoi() {
+        assertEquals("10/gf4gqc", new DOI("urn:10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("urn:doi:10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://doi.org/urn:doi:10/gf4gqc").getDOI());
+        // : is also allowed as divider, will be replaced by RESOLVER
+        assertEquals("10:gf4gqc", new DOI("http://doi.org/urn:doi:10:gf4gqc").getDOI());
     }
 
     @Test
@@ -85,6 +124,27 @@ public class DOITest {
                 new DOI("http://dx.doi.org/10.4108/ICST.COLLABORATECOM2009.8275").getDOI());
         assertEquals("10.1109/MIC.2012.43",
                 new DOI("http://doi.ieeecomputersociety.org/10.1109/MIC.2012.43").getDOI());
+    }
+
+    @Test
+    public void acceptURLShortDoi() {
+        // http
+        assertEquals("10/gf4gqc", new DOI("http://doi.org/10/gf4gqc").getDOI());
+        // https
+        assertEquals("10/gf4gqc", new DOI("https://doi.org/10/gf4gqc").getDOI());
+        // https with % divider
+        assertEquals("10/gf4gqc", new DOI("https://dx.doi.org/10%2Fgf4gqc").getDOI());
+        // other domains
+        assertEquals("10/gf4gqc", new DOI("http://doi.acm.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://doi.acm.net/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://doi.acm.com/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://doi.acm.de/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://dx.doi.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://dx.doi.net/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://dx.doi.com/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://dx.doi.de/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://dx.doi.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("http://doi.ieeecomputersociety.org/10/gf4gqc").getDOI());
     }
 
     @Test
@@ -134,9 +194,19 @@ public class DOITest {
     }
 
     @Test
+    public void constructCorrectURLForShortDoi() {
+        assertEquals("https://doi.org/10/gf4gqc", new DOI("10/gf4gqc").getURIAsASCIIString());
+    }
+
+    @Test
     public void findDoiInsideArbitraryText() {
         assertEquals("10.1006/jmbi.1998.2354",
                 DOI.findInText("other stuff 10.1006/jmbi.1998.2354 end").get().getDOI());
+    }
+
+    @Test
+    public void findShortDoiInsideArbitraryText() {
+        assertEquals("10/gf4gqc", DOI.findInText("other stuff 10/gf4gqc end").get().getDOI());
     }
 
     @Test
@@ -148,5 +218,21 @@ public class DOITest {
     public void parseDOIWithWhiteSpace() {
         String doiWithSpace = "https : / / doi.org / 10 .1109 /V LHCC.20 04.20";
         assertEquals("https://doi.org/10.1109/VLHCC.2004.20", DOI.parse(doiWithSpace).get().getURIAsASCIIString());
+    }
+
+    @Test
+    public void parseShortDOIWithWhiteSpace() {
+        String shortDoiWithSpace = "https : / / doi.org / 10 / gf4gqc";
+        assertEquals("https://doi.org/10/gf4gqc", DOI.parse(shortDoiWithSpace).get().getURIAsASCIIString());
+    }
+
+    @Test
+    public void isShortDoiShouldReturnTrueWhenItIsShortDoi() {
+        assertEquals(true, new DOI("10/abcde").isShortDoi());
+    }
+
+    @Test
+    public void isShortDoiShouldReturnFalseWhenItIsDoi() {
+        assertEquals(false, new DOI("10.1006/jmbi.1998.2354").isShortDoi());
     }
 }

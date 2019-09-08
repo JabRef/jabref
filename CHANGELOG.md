@@ -13,6 +13,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+- We added a short DOI field formatter which shortens DOI to more human readable form. [koppor#343](https://github.com/koppor/jabref/issues/343)
+
 ### Fixed
 
 ### Removed
