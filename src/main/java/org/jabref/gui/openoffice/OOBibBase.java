@@ -239,10 +239,18 @@ class OOBibBase {
 
     
         URL[] urls = jarUrls.toArray(new URL[3]);
-        Class<?> clazz  = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new ChildFirstClassLoader(urls, null));
-       
+        Class<Bootstrap> clazz  = (Class<Bootstrap>) Class.forName("com.sun.star.comp.helper.Bootstrap", true, new ChildFirstClassLoader(urls, null));
+        Bootstrap boot =  null;
+        try {
+             boot = clazz.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | java.lang.IllegalArgumentException | NoSuchMethodException | SecurityException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
+    
         //Get the office component context:
-        XComponentContext xContext = Bootstrap.bootstrap();
+        XComponentContext xContext = boot.bootstrap();
         //Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         //Create the desktop, which is the root frame of the
