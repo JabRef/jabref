@@ -11,17 +11,39 @@ eclipseJdt.doLast {
     f.append('encoding/<project>=UTF-8')
 }
 eclipse {
-//add libraries to module path: https://github.com/eclipse/buildship/issues/620#issuecomment-390469550
- classpath {
+    project {
+        natures 'org.eclipse.buildship.core.gradleprojectnature'
+    }
+
+    classpath {
         file {
             whenMerged {
-                entries.findAll {
-                    it.kind == 'src' || it.kind == 'lib'
-                }.each { it.entryAttributes['module'] = 'true' }
+                entries.findAll { isModule(it) }.each { //(1)
+                    it.entryAttributes['module'] = 'true'
+                }
+
+                entries.findAll { isSource(it) && isTestScope(it) }.each {
+                    it.entryAttributes['test'] = 'true'
+                }
+
+                entries.findAll { isLibrary(it) && isTestScope(it) }.each {
+                    it.entryAttributes['test'] = 'true'
+                }
             }
         }
+
+        defaultOutputDir = file('build')
+        downloadSources = true
+        downloadJavadoc = true
     }
 }
+
+boolean isLibrary(entry) { return entry.properties.kind.equals('lib') }
+boolean isTestScope(entry) { return entry.entryAttributes.get('gradle_used_by_scope').equals('test'); }
+boolean isModule(entry) { isLibrary(entry) && !isTestScope(entry); }
+boolean isSource(entry) { return entry.properties.kind.equals('src'); }
+
+
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282
 

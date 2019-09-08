@@ -33,6 +33,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
@@ -81,12 +82,11 @@ class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
         columns.add(createGroupColumn());
-        // Add column for linked files
+
         if (preferences.showFileColumn()) {
             columns.add(createFileColumn());
         }
 
-        // Add column for DOI/URL
         if (preferences.showUrlColumn()) {
             if (preferences.preferDoiOverUrl()) {
                 columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, StandardField.DOI, StandardField.URL));
@@ -95,21 +95,19 @@ class MainTableColumnFactory {
             }
         }
 
-        // Add column for eprints
         if (preferences.showEprintColumn()) {
             columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, StandardField.EPRINT));
         }
 
-        // Add columns for other file types
-        columns.addAll(preferences.getExtraFileColumns().stream().map(this::createExtraFileColumn).collect(Collectors.toList()));
-
-        // Add 'normal' bibtex fields as configured in the preferences
-        columns.addAll(createNormalColumns());
-
-        // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences
-        for (SpecialField field : preferences.getSpecialFieldColumns()) {
-            columns.add(createSpecialFieldColumn((field)));
-        }
+        preferences.getColumnNames().stream().map(FieldFactory::parseField).forEach(field -> {
+                    if (field instanceof FieldsUtil.ExtraFilePseudoField) {
+                        columns.add(createExtraFileColumn(field.getName()));
+                    } else if (field instanceof SpecialField) {
+                        columns.add(createSpecialFieldColumn((SpecialField) field));
+                    } else {
+                        columns.add(createNormalColumn(field));
+                    }
+                });
 
         return columns;
     }
@@ -163,20 +161,15 @@ class MainTableColumnFactory {
         return new Pane();
     }
 
-    private List<TableColumn<BibEntryTableViewModel, ?>> createNormalColumns() {
-        List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
-
-        // Read table columns from preferences
-        for (String columnName : preferences.getNormalColumns()) {
-            NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
+    private TableColumn<BibEntryTableViewModel, ?> createNormalColumn(Field field) {
+        String columnName = field.getName();
+        NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);
             column.setSortable(true);
-            column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
-            columns.add(column);
-        }
-        return columns;
+            column.setPrefWidth(preferences.getColumnWidth(columnName));
+        return column;
     }
 
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {

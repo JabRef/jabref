@@ -694,41 +694,17 @@ public class JabRefFrame extends BorderPane {
         );
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            boolean menuItemAdded = false;
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager));
-                menuItemAdded = true;
-            }
-
-            if (menuItemAdded) {
-                edit.getItems().add(new SeparatorMenuItem());
-            }
+            edit.getItems().addAll(
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager),
+                    new SeparatorMenuItem()
+            );
         }
+
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),

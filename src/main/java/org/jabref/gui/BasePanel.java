@@ -121,12 +121,12 @@ public class BasePanel extends StackPane {
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, BaseAction> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-    private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
     private MainTable mainTable;
+    private BasePanelPreferences preferences;
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
@@ -727,6 +727,8 @@ public class BasePanel extends StackPane {
     }
 
     public void setupMainPanel() {
+        preferences = BasePanelPreferences.from(Globals.prefs);
+
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
