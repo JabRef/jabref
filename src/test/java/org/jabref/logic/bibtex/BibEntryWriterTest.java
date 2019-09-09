@@ -358,7 +358,7 @@ public class BibEntryWriterTest {
         // modify month field
         Set<Field> fields = entry.getFields();
         assertTrue(fields.contains(StandardField.MONTH));
-        assertEquals("#mar#", entry.getField(StandardField.MONTH).get());
+        assertEquals("mar", entry.getField(StandardField.MONTH).get());
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();

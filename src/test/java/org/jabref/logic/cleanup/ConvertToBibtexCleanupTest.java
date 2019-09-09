@@ -27,7 +27,7 @@ public class ConvertToBibtexCleanupTest {
 
         assertEquals(Optional.empty(), entry.getField(StandardField.DATE));
         assertEquals(Optional.of("2011"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("#jan#"), entry.getField(StandardField.MONTH));
+        assertEquals(Optional.of("jan"), entry.getField(StandardField.MONTH));
     }
 
     @Test

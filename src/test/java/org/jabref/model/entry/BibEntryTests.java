@@ -117,7 +117,7 @@ public class BibEntryTests {
     @Test
     public void getFieldOrAliasDateWithYearAbbreviatedMonth() {
         emptyEntry.setField(StandardField.YEAR, "2003");
-        emptyEntry.setField(StandardField.MONTH, "#mar#");
+        emptyEntry.setField(StandardField.MONTH, "mar");
         assertEquals(Optional.of("2003-03"), emptyEntry.getFieldOrAlias(StandardField.DATE));
     }
 
@@ -161,13 +161,13 @@ public class BibEntryTests {
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMM() {
         emptyEntry.setField(StandardField.DATE, "2003-03");
-        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
+        assertEquals(Optional.of("mar"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMMDD() {
         emptyEntry.setField(StandardField.DATE, "2003-03-30");
-        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
+        assertEquals(Optional.of("mar"), emptyEntry.getFieldOrAlias(StandardField.MONTH));
     }
 
     @Test
