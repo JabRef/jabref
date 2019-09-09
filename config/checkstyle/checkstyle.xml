@@ -8,16 +8,30 @@
         <property name="header" value=""/>
     </module>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/suppressions.xml"/>
+    </module>
+
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
     <module name="TreeWalker">
+        <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
+        <module name="InvalidJavadocPosition"/>
+        <module name="JavadocMethod">
+            <property name="allowUndeclaredRTE" value="true"/>
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingThrowsTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
+            <property name="validateThrows" value="true"/>
+        </module>
 
+        <!-- Checks for imports: https://checkstyle.org/config_import.html -->
         <module name="UnusedImports"/>
-
         <module name="RedundantImport"/>
-
         <module name="AvoidStarImport"/>
-
         <module name="IllegalImport"/>
-
         <module name="ImportOrder">
             <property name="groups" value="java,javax,javafx,org.jabref,*"/>
             <property name="ordered" value="true"/>
@@ -26,17 +40,18 @@
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
 
+        <!-- Checks for common coding problems: https://checkstyle.org/config_coding.html -->
+        <module name="DeclarationOrder"/>
+
+        <!-- Checks for whitespace: https://checkstyle.org/config_whitespace.html -->
         <module name="EmptyLineSeparator">
             <property name="tokens"
                       value="IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF"/>
             <property name="allowMultipleEmptyLines" value="false"/>
             <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
         </module>
-
-        <module name="DeclarationOrder"/>
-
-        <!-- RCULRY causes issues if classes are nested within arrays, therefore not activated -->
         <module name="WhitespaceAround">
+            <!-- RCULRY causes issues if classes are nested within arrays, therefore not activated -->
             <property name="tokens"
                       value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV,
                       DIV_ASSIGN, DO_WHILE, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE,
@@ -46,18 +61,12 @@
                       SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, LITERAL_ASSERT, TYPE_EXTENSION_AND"/>
         </module>
 
+        <!-- Checks for Naming Conventions: https://checkstyle.org/config_naming.html -->
         <module name="ConstantName">
             <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
         </module>
-            
+
+        <!-- Checks for blocks: https://checkstyle.org/config_blocks.html -->
         <module name="NeedBraces"/>
-    </module>
-
-    <module name="SuppressionFilter">
-        <property name="file" value="${config_loc}/suppressions.xml"/>
-    </module>
-
-    <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
 </module>

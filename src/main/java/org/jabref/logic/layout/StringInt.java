@@ -19,8 +19,6 @@ public class StringInt implements java.io.Serializable {
     /**
      *  Constructor for the StringInt object
      *
-     * @param  _s  Description of the Parameter
-     * @param  _i  Description of the Parameter
      */
     public StringInt(final String s, final int i) {
         this.s = s;

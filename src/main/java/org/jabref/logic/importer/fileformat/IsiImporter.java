@@ -75,7 +75,7 @@ public class IsiImporter extends Importer {
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
 
-            /**
+            /*
              * The following line gives false positives for RIS files, so it
              * should not be uncommented. The hypen is a characteristic of the
              * RIS format.
