@@ -35,6 +35,8 @@ plugins {
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
 
+// show stacktrace on error
+gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -225,7 +227,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.24'
-    xjc 'com.sun.xml.bind:jaxb-xjc:2.3.2'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
 
