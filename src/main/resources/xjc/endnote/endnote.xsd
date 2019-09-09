@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="xml">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="records"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="records">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="record"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="record">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="database"/>
+                <xs:element minOccurs="0" ref="source-app"/>
+                <xs:element minOccurs="0" ref="rec-number"/>
+                <xs:element minOccurs="0" ref="ref-type"/>
+                <xs:element minOccurs="0" ref="contributors"/>
+                <xs:element minOccurs="0" ref="auth-address"/>
+                <xs:element minOccurs="0" ref="auth-affiliaton"/>
+                <xs:element minOccurs="0" ref="titles"/>
+                <xs:element minOccurs="0" ref="periodical"/>
+                <xs:element minOccurs="0" ref="pages"/>
+                <xs:element minOccurs="0" ref="volume"/>
+                <xs:element minOccurs="0" ref="number"/>
+                <xs:element minOccurs="0" ref="issue"/>
+                <xs:element minOccurs="0" ref="secondary-volume"/>
+                <xs:element minOccurs="0" ref="secondary-issue"/>
+                <xs:element minOccurs="0" ref="num-vols"/>
+                <xs:element minOccurs="0" ref="edition"/>
+                <xs:element minOccurs="0" ref="section"/>
+                <xs:element minOccurs="0" ref="reprint-edition"/>
+                <xs:element minOccurs="0" ref="reprint-status"/>
+                <xs:element minOccurs="0" ref="keywords"/>
+                <xs:element minOccurs="0" ref="dates"/>
+                <xs:element minOccurs="0" ref="pub-location"/>
+                <xs:element minOccurs="0" ref="publisher"/>
+                <xs:element minOccurs="0" ref="orig-pub"/>
+                <xs:element minOccurs="0" ref="isbn"/>
+                <xs:element minOccurs="0" ref="accession-num"/>
+                <xs:element minOccurs="0" ref="call-num"/>
+                <xs:element minOccurs="0" ref="report-id"/>
+                <xs:element minOccurs="0" ref="coden"/>
+                <xs:element minOccurs="0" ref="electronic-resource-num"/>
+                <xs:element minOccurs="0" ref="abstract"/>
+                <xs:element minOccurs="0" ref="label"/>
+                <xs:element minOccurs="0" ref="image"/>
+                <xs:element minOccurs="0" ref="caption"/>
+                <xs:element minOccurs="0" ref="notes"/>
+                <xs:element minOccurs="0" ref="research-notes"/>
+                <xs:element minOccurs="0" ref="work-type"/>
+                <xs:element minOccurs="0" ref="reviewed-item"/>
+                <xs:element minOccurs="0" ref="availability"/>
+                <xs:element minOccurs="0" ref="remote-source"/>
+                <xs:element minOccurs="0" ref="meeting-place"/>
+                <xs:element minOccurs="0" ref="work-location"/>
+                <xs:element minOccurs="0" ref="work-extent"/>
+                <xs:element minOccurs="0" ref="pack-method"/>
+                <xs:element minOccurs="0" ref="size"/>
+                <xs:element minOccurs="0" ref="repro-ratio"/>
+                <xs:element minOccurs="0" ref="remote-database-name"/>
+                <xs:element minOccurs="0" ref="remote-database-provider"/>
+                <xs:element minOccurs="0" ref="language"/>
+                <xs:element minOccurs="0" ref="urls"/>
+                <xs:element minOccurs="0" ref="access-date"/>
+                <xs:element minOccurs="0" ref="modified-date"/>
+                <xs:element minOccurs="0" ref="custom1"/>
+                <xs:element minOccurs="0" ref="custom2"/>
+                <xs:element minOccurs="0" ref="custom3"/>
+                <xs:element minOccurs="0" ref="custom4"/>
+                <xs:element minOccurs="0" ref="custom5"/>
+                <xs:element minOccurs="0" ref="custom6"/>
+                <xs:element minOccurs="0" ref="custom7"/>
+                <xs:element minOccurs="0" ref="misc1"/>
+                <xs:element minOccurs="0" ref="misc2"/>
+                <xs:element minOccurs="0" ref="misc3"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="database">
+        <xs:complexType mixed="true">
+            <xs:attribute name="name"/>
+            <xs:attribute name="path"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="source-app">
+        <xs:complexType mixed="true">
+            <xs:attribute name="name"/>
+            <xs:attribute name="version"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rec-number" type="xs:string"/>
+    <xs:element name="ref-type">
+        <xs:complexType mixed="true">
+            <xs:attribute name="name" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- Author information -->
+    <xs:element name="contributors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="authors"/>
+                <xs:element minOccurs="0" ref="secondary-authors"/>
+                <xs:element minOccurs="0" ref="tertiary-authors"/>
+                <xs:element minOccurs="0" ref="subsidiary-authors"/>
+                <xs:element minOccurs="0" ref="translated-authors"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="authors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="secondary-authors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tertiary-authors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="subsidiary-authors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="translated-authors">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="author">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+            <xs:attribute name="corp-name"/>
+            <xs:attribute name="first-name"/>
+            <xs:attribute name="initials"/>
+            <xs:attribute name="last-name"/>
+            <xs:attribute name="middle-initial"/>
+            <xs:attribute name="role"/>
+            <xs:attribute name="salutation"/>
+            <xs:attribute name="suffix"/>
+            <xs:attribute name="title"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="auth-address">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="auth-affiliaton">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Title information -->
+    <xs:element name="titles">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="title"/>
+                <xs:element minOccurs="0" ref="secondary-title"/>
+                <xs:element minOccurs="0" ref="tertiary-title"/>
+                <xs:element minOccurs="0" ref="alt-title"/>
+                <xs:element minOccurs="0" ref="short-title"/>
+                <xs:element minOccurs="0" ref="translated-title"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="secondary-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tertiary-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="alt-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="short-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="translated-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Periodical information -->
+    <xs:element name="periodical">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="full-title"/>
+                <xs:element minOccurs="0" ref="abbr-1"/>
+                <xs:element minOccurs="0" ref="abbr-2"/>
+                <xs:element minOccurs="0" ref="abbr-3"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="full-title">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="abbr-1">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="abbr-2">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="abbr-3">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Page range information -->
+    <xs:element name="pages">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+            <xs:attribute name="end"/>
+            <xs:attribute name="start"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- Volume, issue, and edition information -->
+    <xs:element name="volume">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="number">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="issue">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="secondary-volume">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="secondary-issue">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="num-vols">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="edition">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="section">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reprint-edition">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reprint-status">
+        <xs:complexType>
+            <xs:attribute name="date"/>
+            <xs:attribute name="status" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="in-file"/>
+                        <xs:enumeration value="no-file"/>
+                        <xs:enumeration value="on-request"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!-- Keywords -->
+    <xs:element name="keywords">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="keyword"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="keyword">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Date information -->
+    <xs:element name="dates">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="year"/>
+                <xs:element minOccurs="0" ref="pub-dates"/>
+                <xs:element minOccurs="0" ref="copyright-dates"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="year">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+            <xs:attribute name="day"/>
+            <xs:attribute name="julian"/>
+            <xs:attribute name="month"/>
+            <xs:attribute name="year"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pub-dates">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="date"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="copyright-dates">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="date"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="date">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+            <xs:attribute name="day"/>
+            <xs:attribute name="julian"/>
+            <xs:attribute name="month"/>
+            <xs:attribute name="year"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- Publisher information -->
+    <xs:element name="pub-location">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="publisher">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="orig-pub">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Identifying numbers -->
+    <xs:element name="isbn">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="accession-num">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="call-num">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="report-id">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="coden">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="electronic-resource-num">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Abstract, notes, images, etc. -->
+    <xs:element name="abstract">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="label">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="image">
+        <xs:complexType mixed="true">
+            <xs:attribute name="file"/>
+            <xs:attribute name="name"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="caption">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="notes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="research-notes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Other detailed information on item -->
+    <xs:element name="work-type">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reviewed-item">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="availability">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="remote-source">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="meeting-place">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="work-location">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="work-extent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pack-method">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="size">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="repro-ratio">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="remote-database-name">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="remote-database-provider">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="language">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- URL information -->
+    <xs:element name="urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="web-urls"/>
+                <xs:element minOccurs="0" ref="pdf-urls"/>
+                <xs:element minOccurs="0" ref="text-urls"/>
+                <xs:element minOccurs="0" ref="related-urls"/>
+                <xs:element minOccurs="0" ref="image-urls"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="web-urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pdf-urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text-urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="related-urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="image-urls">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="url">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+            <xs:attribute name="has-ut">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ppv-app"/>
+            <xs:attribute name="ppv-ref">
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ppv-ut"/>
+        </xs:complexType>
+    </xs:element>
+    <!-- Information about record -->
+    <xs:element name="access-date">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="modified-date">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Custom and miscellaneous fields -->
+    <xs:element name="custom1">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom2">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom3">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom4">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom5">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom6">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="custom7">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="misc1">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="misc2">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="misc3">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" ref="style"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- Styled text handling -->
+    <xs:element name="style">
+        <xs:complexType mixed="true">
+            <xs:attribute name="color"/>
+            <xs:attribute name="face" default="normal"/>
+            <xs:attribute name="font" default="default"/>
+            <xs:attribute name="size"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

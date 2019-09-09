@@ -35,6 +35,8 @@ plugins {
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
 
+// show stacktrace on error
+gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -225,7 +227,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.24'
-    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
 
@@ -351,10 +353,9 @@ task generateEndnoteSource(type: XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/RSXML.dtd"
+    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-    arguments = '-dtd'
 }
 
 task generateModsSource(type: XjcTask) {
