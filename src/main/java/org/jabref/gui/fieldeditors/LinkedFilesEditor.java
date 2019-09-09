@@ -34,6 +34,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.uithreadaware.UiThreadListDecorator;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,6 +52,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
+    private final UiThreadListDecorator<LinkedFileViewModel> decoratedModelList;
 
     public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
@@ -74,7 +76,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         listView.setCellFactory(cellFactory);
 
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
+        decoratedModelList = new UiThreadListDecorator<>(viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
         setUpKeyBindings();
     }
 
