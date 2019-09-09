@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.util.uithreadaware.UiThreadStringProperty;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -16,6 +17,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     private final PersonsEditorViewModel viewModel;
     private final TextInputControl textInput;
+    private final UiThreadStringProperty decoratedStringProperty;
 
     public PersonsEditor(final Field field,
                          final AutoCompleteSuggestionProvider<?> suggestionProvider,
@@ -28,7 +30,8 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
                 ? new EditorTextField()
                 : new EditorTextArea();
 
-        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
+        textInput.textProperty().bindBidirectional(decoratedStringProperty);
         ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getNameMenu(textInput));
         this.getChildren().add(textInput);
 

@@ -9,11 +9,11 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-public class UiThreadListDecorator<E> implements ObservableList<E> {
+public class UiThreadObservableList<E> implements ObservableList<E> {
 
     private final ObservableList<E> delegate;
 
-    public UiThreadListDecorator(ObservableList<E> delegate) {
+    public UiThreadObservableList(ObservableList<E> delegate) {
         this.delegate = delegate;
     }
 
