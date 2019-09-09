@@ -48,7 +48,6 @@ class CrossrefTest {
         db = new BibDatabase(Arrays.asList(parent, child));
     }
 
-
     @ParameterizedTest
     @EnumSource(value = StandardField.class, names = {"IDS", "XREF", "ENTRYSET", "RELATED", "SORTKEY"})
     void forbiddenFields(StandardField field) {
@@ -83,7 +82,6 @@ class CrossrefTest {
                 Arguments.of(StandardEntryType.Book, StandardEntryType.SuppBook)
         );
     }
-
 
     @ParameterizedTest
     @MethodSource("mainTitleInheritanceSource")
@@ -121,7 +119,6 @@ class CrossrefTest {
         );
     }
 
-
     @ParameterizedTest
     @MethodSource("bookTitleInheritanceSource")
     void bookTitleInheritance(EntryType parentType, EntryType childType) {
@@ -154,7 +151,6 @@ class CrossrefTest {
         );
     }
 
-
     @ParameterizedTest
     @MethodSource("journalTitleInheritanceSource")
     void journalTitleInheritance(EntryType parentType, EntryType childType) {
@@ -177,7 +173,6 @@ class CrossrefTest {
                 Arguments.of(IEEETranEntryType.Periodical, StandardEntryType.SuppPeriodical)
         );
     }
-
 
     @ParameterizedTest
     @MethodSource("noTitleInheritanceSource")
@@ -213,7 +208,6 @@ class CrossrefTest {
                 Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings)
         );
     }
-
 
     @ParameterizedTest
     @MethodSource("sameNameInheritance")
