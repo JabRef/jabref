@@ -353,10 +353,9 @@ task generateEndnoteSource(type: XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/RSXML.dtd"
+    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-    arguments = '-dtd'
 }
 
 task generateModsSource(type: XjcTask) {
