@@ -607,7 +607,7 @@ public class MedlineImporter extends Importer implements Parser {
             if (pubDate.getMonth() != null) {
                 Optional<Month> month = Month.parse(pubDate.getMonth());
                 if (month.isPresent()) {
-                    fields.put(StandardField.MONTH, month.get().getShortName());
+                    fields.put(StandardField.MONTH, month.get().getJabRefFormat());
                 }
             } else if (pubDate.getSeason() != null) {
                 fields.put(new UnknownField("season"), pubDate.getSeason());

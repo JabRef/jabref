@@ -175,7 +175,7 @@ public enum Month {
      * @return Month in JabRef format
      */
     public String getJabRefFormat() {
-        return String.format("#%s#", shortName);
+        return String.format("%s", shortName);
     }
 
     /**
