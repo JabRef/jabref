@@ -26,6 +26,14 @@ apps:
       - opengl
       - network-bind
       - removable-media
+      - gnome-3-28-1804
+
+plugs:
+  gnome-3-28-1804:
+    interface: content
+    target: gnome-platform
+    default-provider: gnome-3-28-1804:gnome-3-28-1804
+    content: gnome-3-28-1804
 
 parts:
   jabref:
@@ -38,3 +46,14 @@ parts:
       - x11-utils
     gradle-options: [snapJar, -xtest]
     gradle-output-dir: 'build/releases'
+  desktop-gnome-platform:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - build-essential
+      - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
