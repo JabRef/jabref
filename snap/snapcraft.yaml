@@ -38,4 +38,4 @@ parts:
       - x11-utils
     gradle-options: [snapJar, -xtest]
     gradle-output-dir: 'build/releases'
-    after: [desktop-gtk2]
+    after: [desktop-gtk3]
