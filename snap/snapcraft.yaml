@@ -7,10 +7,10 @@ description: JabRef is an open source bibliography reference manager. The native
 
 grade: devel
 confinement: strict
+base: core18
 
 architectures:
   - build-on: amd64
-  - build-on: i386
 
 apps:
   jabref:
@@ -33,7 +33,7 @@ parts:
     source: .
     source-type: git
     stage-packages:
-      - openjdk-8-jre
+      - openjdk-11-jre
       - openjfx
       - x11-utils
     gradle-options: [snapJar, -xtest]
