@@ -238,8 +238,8 @@ public class GroupTreeView {
                             row.pseudoClassStateChanged(dragOverTop, true);
                             break;
                     }
+                    event.consume();
                 }
-                event.consume();
             });
             row.setOnDragExited(event -> {
                 removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
@@ -281,7 +281,7 @@ public class GroupTreeView {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem<GroupNodeViewModel>::getValue).collect(Collectors.toList());
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }

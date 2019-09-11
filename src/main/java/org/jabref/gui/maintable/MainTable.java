@@ -246,8 +246,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
             event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
         }
-        event.consume(); //need to consume it here to stop the DnDTabPane from getting the event
-
+        event.consume();
     }
 
     private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {

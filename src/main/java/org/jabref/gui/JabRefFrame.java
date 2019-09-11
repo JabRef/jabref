@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -35,7 +34,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -175,23 +173,36 @@ public class JabRefFrame extends BorderPane {
 
         initKeyBindings();
 
-        tabbedPane.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+        Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
+        dndIndicator.getStyleClass().add("drop");
+        this.setOnDragOver(event -> {
+            if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
+                event.acceptTransferModes(TransferMode.ANY);
+                if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                    tabbedPane.getTabs().add(dndIndicator);
+                }
+            } else {
+                tabbedPane.getTabs().remove(dndIndicator);
             }
+            event.consume();
         });
 
-        tabbedPane.setOnDragDropped(event -> {
+        this.setOnDragExited(event -> {
+            tabbedPane.getTabs().remove(dndIndicator);
+        });
+
+        this.setOnDragDropped(event -> {
+            tabbedPane.getTabs().remove(dndIndicator);
+
             boolean success = false;
 
-            if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
-                success = true;
-
-                for (Path file : files) {
+            List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
+            if (!bibFiles.isEmpty()) {
+                for (Path file : bibFiles) {
                     ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
                     addParserResult(pr, true);
                 }
+                success = true;
             }
 
             event.setDropCompleted(success);
