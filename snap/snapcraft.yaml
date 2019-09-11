@@ -14,9 +14,11 @@ architectures:
 
 apps:
   jabref:
-    command: desktop-launch java -jar $SNAP/jar/JabRef-$SNAP_VERSION.jar
+    command: desktop-launch $SNAP/jabref/bin/JabRefMain
     environment:
       _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
+      XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
+      GSETTINGS_SCHEMA_DIR: $SNAP/share/glib-2.0/schemas
     plugs:
       - desktop
       - desktop-legacy
@@ -34,18 +36,27 @@ plugs:
     target: gnome-platform
     default-provider: gnome-3-28-1804:gnome-3-28-1804
     content: gnome-3-28-1804
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes:gtk-3-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes:icon-themes
+
 
 parts:
   jabref:
-    plugin: gradle
+    plugin: x_gradle
     source: .
     source-type: git
     stage-packages:
       - openjdk-11-jre
       - openjfx
       - x11-utils
-    gradle-options: [snapJar, -xtest]
-    gradle-output-dir: 'build/releases'
+    gradle-options: [jlink, -xtest]
+    gradle-output-dir: 'build/image'
   desktop-gnome-platform:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-subdir: gtk

@@ -10,6 +10,9 @@ status.md
 # Install4J
 install4j6/
 
+# Python
+__pycache__/
+
 # Snap
 parts/
 stage/
