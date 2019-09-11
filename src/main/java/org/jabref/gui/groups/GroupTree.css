@@ -49,8 +49,9 @@
 
 .tree-table-row-cell:dragOver-center {
     -fx-border-color: -jr-drag-target;
-    -fx-border-width: 2 2 2 2;
-    -fx-padding: -2 -2 -2 -2;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
 }
 
 .tree-table-row-cell:dragOver-top {

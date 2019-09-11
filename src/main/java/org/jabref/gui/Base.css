@@ -96,6 +96,7 @@
 
     /* For drag and drop actions */
     -jr-drag-target: -jr-purple;
+    -jr-drag-target-hover: derive(-jr-purple, 80%);
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -494,6 +495,7 @@
 
 .tab-pane > .tab-header-area > .headers-region > .tab.drop {
     -fx-border-color: -jr-drag-target;
+    -fx-background-color: -jr-drag-target-hover;
     -fx-border-width: 3 1 1 1;
 }
 

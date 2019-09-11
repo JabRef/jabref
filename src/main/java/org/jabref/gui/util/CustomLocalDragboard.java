@@ -16,6 +16,8 @@ import org.jabref.model.entry.BibEntry;
  */
 public class CustomLocalDragboard {
 
+    @SuppressWarnings("unchecked") private static final Class<List<BibEntry>> BIB_ENTRIES = (Class<List<BibEntry>>) (Class<?>) List.class;
+
     private final Map<Class<?>, Object> contents = new HashMap<>();
 
     /**
@@ -33,7 +35,7 @@ public class CustomLocalDragboard {
     }
 
     public boolean hasType(Class<?> type) {
-        return contents.keySet().contains(type);
+        return contents.containsKey(type);
     }
 
     public void clear(Class<?> type) {
@@ -50,7 +52,7 @@ public class CustomLocalDragboard {
      * @param entries The list to put
      */
     public void putBibEntries(List<BibEntry> entries) {
-        putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
+        putValue(BIB_ENTRIES, entries);
     }
 
     /**
@@ -58,10 +60,14 @@ public class CustomLocalDragboard {
      * @return List of BibEntry or empty list if no entries are avaiable
      */
     public List<BibEntry> getBibEntries() {
-        if (hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-            return getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+        if (hasBibEntries()) {
+            return getValue(BIB_ENTRIES);
         }
         return Collections.emptyList();
+    }
+
+    public boolean hasBibEntries() {
+        return hasType(BIB_ENTRIES);
     }
 
     /**

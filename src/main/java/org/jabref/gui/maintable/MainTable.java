@@ -16,7 +16,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -36,11 +35,11 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -92,6 +91,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
+                .setOnDragExited(this::handleOnDragExited)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
 
@@ -238,13 +238,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-            event.acceptTransferModes(TransferMode.MOVE);
-
-        }
-        if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
-            event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+    private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.ANY);
+            ControlHelper.setDroppingPseudoClasses(row, event);
         }
         event.consume();
     }
@@ -256,6 +253,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         @SuppressWarnings("unchecked")
         TableRow<BibEntryTableViewModel> sourceRow = (TableRow<BibEntryTableViewModel>) event.getGestureSource();
         getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());
+    }
+
+    private void handleOnDragExited(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, DragEvent dragEvent) {
+        ControlHelper.removeDroppingPseudoClasses(row);
     }
 
     private void handleOnDragDetected(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseEvent event) {
@@ -278,41 +279,41 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         event.consume();
     }
 
-    private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
+    private void handleOnDragDropped(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel target, DragEvent event) {
         boolean success = false;
 
-        if (event.getDragboard().hasContent(DataFormat.FILES)) {
+        if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            List<Path> bibFiles = files.stream().filter(FileUtil::isBibFile).collect(Collectors.toList());
 
-            if (!bibFiles.isEmpty()) {
-                // Import all bibtex entries contained in the dropped bib files
-                for (Path file : bibFiles) {
-                    importHandler.importEntriesFromBibFiles(file);
-                }
-                success = true;
-            }
-            if (event.getGestureTarget() instanceof TableRow) {
-                // Depending on the pressed modifier, import as new entries or link to drop target
-                BibEntry entry = originalItem.getEntry();
-                if ((event.getTransferMode() == TransferMode.MOVE)) {
-                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+            // Different actions depending on where the user releases the drop in the target row
+            // Bottom + top -> import entries
+            // Center -> link files to entry
+            switch (ControlHelper.getDroppingMouseLocation(row, event)) {
+                case TOP:
+                case BOTTOM:
                     importHandler.importAsNewEntries(files);
-                    success = true;
-                }
-
-                if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("LINK"); //alt on win
-                    importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
-                }
-
-                if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); //ctrl on win
-                    importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
-                }
+                    break;
+                case CENTER:
+                    // Depending on the pressed modifier, move/copy/link files to drop target
+                    BibEntry entry = target.getEntry();
+                    switch (event.getTransferMode()) {
+                        case LINK:
+                            LOGGER.debug("Mode LINK"); //shift on win or no modifier
+                            importHandler.getLinker().addFilesToEntry(entry, files);
+                            break;
+                        case MOVE:
+                            LOGGER.debug("Mode MOVE"); //alt on win
+                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                            break;
+                        case COPY:
+                            LOGGER.debug("Mode Copy"); //ctrl on win
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                            break;
+                    }
+                    break;
             }
+
+            success = true;
         }
 
         event.setDropCompleted(success);

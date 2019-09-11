@@ -34,6 +34,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -173,41 +174,7 @@ public class JabRefFrame extends BorderPane {
 
         initKeyBindings();
 
-        Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
-        dndIndicator.getStyleClass().add("drop");
-        this.setOnDragOver(event -> {
-            if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
-                event.acceptTransferModes(TransferMode.ANY);
-                if (!tabbedPane.getTabs().contains(dndIndicator)) {
-                    tabbedPane.getTabs().add(dndIndicator);
-                }
-            } else {
-                tabbedPane.getTabs().remove(dndIndicator);
-            }
-            event.consume();
-        });
-
-        this.setOnDragExited(event -> {
-            tabbedPane.getTabs().remove(dndIndicator);
-        });
-
-        this.setOnDragDropped(event -> {
-            tabbedPane.getTabs().remove(dndIndicator);
-
-            boolean success = false;
-
-            List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-            if (!bibFiles.isEmpty()) {
-                for (Path file : bibFiles) {
-                    ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                    addParserResult(pr, true);
-                }
-                success = true;
-            }
-
-            event.setDropCompleted(success);
-            event.consume();
-        });
+        initDragAndDrop();
 
         //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
         //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
@@ -255,6 +222,57 @@ public class JabRefFrame extends BorderPane {
             currentBasePanel.getMainTable().requestFocus();
         });
         initShowTrackingNotification();
+    }
+
+    public void initDragAndDrop() {
+        Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
+        dndIndicator.getStyleClass().add("drop");
+
+        EasyBind.subscribe(tabbedPane.skinProperty(), skin -> {
+            if (!(skin instanceof TabPaneSkin)) {
+                return;
+            }
+
+            // We need to get the tab header, the following is a ugly workaround
+            Node tabHeaderArea = ((TabPaneSkin) this.tabbedPane.getSkin())
+                    .getChildren()
+                    .stream()
+                    .filter(node -> node.getStyleClass().contains("tab-header-area"))
+                    .findFirst()
+                    .orElseThrow();
+
+            tabHeaderArea.setOnDragOver(event -> {
+                if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
+                    event.acceptTransferModes(TransferMode.ANY);
+                    if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                        tabbedPane.getTabs().add(dndIndicator);
+                    }
+                    event.consume();
+                } else {
+                    tabbedPane.getTabs().remove(dndIndicator);
+                }
+            });
+
+            tabHeaderArea.setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
+
+            tabHeaderArea.setOnDragDropped(event -> {
+                tabbedPane.getTabs().remove(dndIndicator);
+
+                boolean success = false;
+
+                List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
+                if (!bibFiles.isEmpty()) {
+                    for (Path file : bibFiles) {
+                        ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                        addParserResult(pr, true);
+                    }
+                    success = true;
+                }
+
+                event.setDropCompleted(success);
+                event.consume();
+            });
+        });
     }
 
     private void initKeyBindings() {
