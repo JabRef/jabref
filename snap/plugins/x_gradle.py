@@ -28,7 +28,12 @@ Additionally, this plugin uses the following plugin-specific keywords:
     - gradle-options:
       (list of strings)
       Flags to pass to the build using the gradle semantics for parameters.
-      The 'jar' option is always passed in as the last parameter.
+      The 'jar' option is always passed in as the last parameter, if not disabled.
+
+    - gradle-build-jar:
+      (bool; default: True)
+      Use this flag to disable building a jar, for example if using the java11
+      modular system packages.
 
     - gradle-output-dir:
       (string; default: 'build/libs')
@@ -103,6 +108,7 @@ class GradlePlugin(snapcraft.BasePlugin):
             "items": {"type": "string"},
             "default": [],
         }
+        schema["properties"]["gradle-build-jar"] = {"type": "boolean", "default": True}
         schema["properties"]["gradle-output-dir"] = {
             "type": "string",
             "default": "build/libs",
@@ -131,7 +137,11 @@ class GradlePlugin(snapcraft.BasePlugin):
     def get_build_properties(cls):
         # Inform Snapcraft of the properties associated with building. If these
         # change in the YAML Snapcraft will consider the build step dirty.
-        return super().get_build_properties() + ["gradle-options", "gradle-output-dir"]
+        return super().get_build_properties() + [
+            "gradle-options",
+            "gradle-build-jar",
+            "gradle-output-dir",
+        ]
 
     @property
     def _gradle_tar(self):
@@ -206,22 +216,24 @@ class GradlePlugin(snapcraft.BasePlugin):
         self.run(
             gradle_cmd
             + self._get_proxy_options()
-            + self.options.gradle_options,
+            + self.options.gradle_options
+            + (["jar"] if self.options.gradle_build_jar else []),
             rootdir=self.builddir,
         )
 
         src = os.path.join(self.builddir, self.options.gradle_output_dir)
-        basedir = "jabref"
-        # jarfiles = glob(os.path.join(src, "*.jar"))
-        # warfiles = glob(os.path.join(src, "*.war"))
+        basedir = "java"
+        if self.options.gradle_build_jar:
+            jarfiles = glob(os.path.join(src, "*.jar"))
+            warfiles = glob(os.path.join(src, "*.war"))
 
-        # if len(jarfiles) > 0:
-        #     basedir = "jar"
-        # elif len(warfiles) > 0:
-        #     basedir = "war"
-        #     jarfiles = warfiles
-        # else:
-        #     raise RuntimeError("Could not find any built jar files for part")
+            if len(jarfiles) > 0:
+                basedir = "jar"
+            elif len(warfiles) > 0:
+                basedir = "war"
+                jarfiles = warfiles
+            else:
+                raise RuntimeError("Could not find any built jar files for part")
 
         file_utils.link_or_copy_tree(
             src,
