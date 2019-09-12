@@ -35,7 +35,7 @@ jobs:
       - run: ./gradlew jlink
       - run: mv build/image jabref
       - run: tar cvzf JabRef-latest.tar.gz jabref
-
+      - run: mv JabRef-latest.tar.gz build/releases/
       - save_cache:
           key: gradle
           paths:
