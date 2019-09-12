@@ -24,9 +24,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11.0.4
-    - name: Download and extract JDK 14
-      run: ?
+        java-version: 13.0.3
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Add runtime image as artifact
@@ -50,5 +48,3 @@ jobs:
         username: builds_jabref_org
         privateKey: ${{ secrets.buildJabRefPrivateKey }}
         port: 9922
-}
-      
