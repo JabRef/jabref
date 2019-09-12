@@ -1,6 +1,6 @@
 name: Deployment
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
            displayName: macOS
            
     runs-on: ${{ matrix.os }}
-    name: Deploy on ${{ matrix.os }}
+    name: Deploy on ${{ matrix.displayName }}
 
     steps:
     - uses: actions/checkout@v1
@@ -29,6 +29,6 @@ jobs:
     - name: Save artifact
       uses: actions/upload-artifact@master
       with:
-        name: JabRef-${{ displayName }}
+        name: JabRef-${{ matrix.displayName }}
         path: build/image
       
