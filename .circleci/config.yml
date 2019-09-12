@@ -33,8 +33,8 @@ jobs:
       - run: git submodule update --init
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j8" release --stacktrace
       - run: ./gradlew jlink
-      - run: mv build/image jabref-{{ CIRCLE_SHA1 }}
-      - run: tar cvzf jabref-{{ CIRCLE_SHA1 }}.tar.gz jabref-{{ CIRCLE_SHA1 }}
+      - run: mv build/image jabref
+      - run: tar cvzf JabRef-{{ CIRCLE_SHA1 }}--{{ CIRCLE_BRANCH }}.tar.gz jabref
 
       - save_cache:
           key: gradle
