@@ -25,13 +25,22 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11.0.4
-    - name: Build with Gradle
+    - name: Download and extract JDK 14
+      run: ?
+    - name: Build runtime image
       run: ./gradlew jlinkZip
-    - name: Save artifact
+    - name: Add runtime image as artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: JabRef-${{ matrix.displayName }}-raw
+        path: build/image
+    - name: Build installer
+      run: ./gradlew jpackage
+    - name: Add installer as artifact
       uses: actions/upload-artifact@master
       with:
         name: JabRef-${{ matrix.displayName }}
-        path: build/image
+        path: build/jpackage
     - name: Upload to build.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
