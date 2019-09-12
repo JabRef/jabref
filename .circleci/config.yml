@@ -34,7 +34,7 @@ jobs:
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j8" release --stacktrace
       - run: ./gradlew jlink
       - run: mv build/image jabref
-      - run: tar cvzf JabRef-{{ CIRCLE_SHA1 }}--{{ CIRCLE_BRANCH }}.tar.gz jabref
+      - run: tar cvzf JabRef-latest.tar.gz jabref
 
       - save_cache:
           key: gradle
