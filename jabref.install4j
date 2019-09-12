@@ -745,8 +745,5 @@ return console.askYesNo(message, true);
     <macosFolder name="macOS Folder" id="446">
       <jreBundle usePack200="false" jreBundleSource="generated" />
     </macosFolder>
-    <unixArchive name="Unix Archive" id="456">
-       <jreBundle usePack200="false" jreBundleSource="generated" />
-    </unixArchive>
   </mediaSets>
 </install4j>
