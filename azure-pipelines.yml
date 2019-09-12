@@ -7,10 +7,13 @@ strategy:
   matrix:
     linux:
       imageName: "ubuntu-latest"
+      name: "linux"
     mac:
       imageName: "macOS-latest"
+      name: "mac"
     windows:
       imageName: "windows-latest"
+      name: "windows"
   maxParallel: 3
 
 pool:
@@ -27,4 +30,5 @@ steps:
       tasks: 'jlinkZip'
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: '$(System.DefaultWorkingDirectory)/build/image/'
+      pathToPublish: '$(System.DefaultWorkingDirectory)/build/image.zip'
+      artifactName: 'JabRef-$(name).zip'
