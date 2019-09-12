@@ -8,7 +8,7 @@ description: JabRef is an open source bibliography reference manager. The native
 grade: devel
 confinement: strict
 base: core18
-
+license: MIT
 architectures:
   - build-on: amd64
 
