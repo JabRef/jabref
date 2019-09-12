@@ -19,16 +19,27 @@ jobs:
     name: Deploy on ${{ matrix.displayName }}
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout source
+      uses: actions/checkout@v1
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
         java-version: 11.0.4
     - name: Build with Gradle
-      run: ./gradlew jlink
+      run: ./gradlew jlinkZip
     - name: Save artifact
       uses: actions/upload-artifact@master
       with:
         name: JabRef-${{ matrix.displayName }}
         path: build/image
+    - name: Upload to build.jabref.org
+      uses: garygrossgarten/github-action-scp@release
+        with:
+          local: build/image.zip
+          remote: JabRef-${{ matrix.displayName }}.zip
+          host: build-upload.jabref.org
+          username: builds_jabref_org
+          privateKey: ${{ secrets.buildJabRefPrivateKey }}
+          port: 9922
+}
       
