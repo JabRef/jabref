@@ -32,6 +32,10 @@ jobs:
       - run: git submodule sync
       - run: git submodule update --init
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j8" release --stacktrace
+      - run: ./gradlew jlink
+      - run: mv build/image jabref
+      - run: tar cvzf JabRef-linux-${CIRCLE_BRANCH}-latest.tar.gz jabref
+      - run: mv JabRef-linux-${CIRCLE_BRANCH}-latest.tar.gz build/releases/
       - save_cache:
           key: gradle
           paths:
