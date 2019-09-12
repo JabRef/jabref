@@ -745,8 +745,8 @@ return console.askYesNo(message, true);
     <macosFolder name="macOS Folder" id="446">
       <jreBundle usePack200="false" jreBundleSource="generated" />
     </macosFolder>
-    <unixInstaller name="Unix Installer" id="455" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}">
-      <jreBundle usePack200="false" jreBundleSource="generated" />
-    </unixInstaller>
+    <unixArchive name="Unix Archive" id="456">
+       <jreBundle usePack200="false" jreBundleSource="generated" />
+    </unixArchive>
   </mediaSets>
 </install4j>
