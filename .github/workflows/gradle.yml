@@ -24,7 +24,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 1.12
+        java-version: 11.0.4
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Add runtime image as artifact
@@ -32,13 +32,14 @@ jobs:
       with:
         name: JabRef-${{ matrix.displayName }}-raw
         path: build/image
-    - name: Build installer
-      run: ./gradlew jpackage
-    - name: Add installer as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/jpackage
+    # TODO: Needs jpackage from https://jdk.java.net/jpackage/
+    #- name: Build installer
+    #  run: ./gradlew jpackage
+    #- name: Add installer as artifact
+    #  uses: actions/upload-artifact@master
+    #  with:
+    #    name: JabRef-${{ matrix.displayName }}
+    #    path: build/jpackage
     - name: Upload to build.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
