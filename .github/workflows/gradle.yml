@@ -24,7 +24,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 13.0.3
+        java-version: 1.13
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Add runtime image as artifact
