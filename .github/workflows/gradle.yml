@@ -33,11 +33,16 @@ jobs:
       run: |
         import os
         import tarfile
-        import urllib
+        import sys
+
+        if sys.version_info[0] >= 3:
+          from urllib.request import urlretrieve
+        else:
+          from urllib import urlretrieve
 
         url = "${{ matrix.jpackageDownload }}"
 
-        tmpfile, headers = urllib.urlretrieve(url)
+        tmpfile, headers = urlretrieve(url)
         base_name = os.path.basename(url)
 
         file_name, file_extension = os.path.splitext(base_name)
