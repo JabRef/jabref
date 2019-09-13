@@ -10,10 +10,13 @@ jobs:
         include:
          - os: ubuntu-latest
            displayName: linux
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_linux-x64_bin.tar.gz
          - os: windows-latest
            displayName: windows
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_osx-x64_bin.tar.gz 
          - os: macOS-latest
            displayName: macOS
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_osx-x64_bin.tar.gz
            
     runs-on: ${{ matrix.os }}
     name: Deploy on ${{ matrix.displayName }}
@@ -32,20 +35,38 @@ jobs:
       with:
         name: JabRef-${{ matrix.displayName }}-raw
         path: build/image
-    # TODO: Needs jpackage from https://jdk.java.net/jpackage/
-    #- name: Build installer
-    #  run: ./gradlew jpackage
-    #- name: Add installer as artifact
-    #  uses: actions/upload-artifact@master
-    #  with:
-    #    name: JabRef-${{ matrix.displayName }}
-    #    path: build/jpackage
-    - name: Upload to build.jabref.org
-      uses: garygrossgarten/github-action-scp@release
+    - name: Download jpackage
+      # We need to download jpackage from https://jdk.java.net/jpackage/
+      run: |
+        import os
+        import tarfile
+        import urllib
+
+        url = ${{ matrix.jpackageDownload }}
+
+        tmpfile = urllib.urlretrieve(url, filename=None)[0]
+        base_name = os.path.basename(url)
+
+        file_name, file_extension = os.path.splitext(base_name)
+        tar = tarfile.open(tmpfile)
+        tar.extractall()
+        tar.close()
+      shell: python
+    - name: Build installer
+      env:
+        BADASS_JLINK_JPACKAGE_HOME: /jdk-14
+      run: ./gradlew jpackage
+    - name: Add installer as artifact
+      uses: actions/upload-artifact@master
       with:
-        local: build/image.zip
-        remote: JabRef-${{ matrix.displayName }}.zip
-        host: build-upload.jabref.org
-        username: builds_jabref_org
-        privateKey: ${{ secrets.buildJabRefPrivateKey }}
-        port: 9922
+        name: JabRef-${{ matrix.displayName }}
+        path: build/jpackage
+    #- name: Upload to build.jabref.org
+    #  uses: garygrossgarten/github-action-scp@release
+    #  with:
+    #    local: build/image.zip
+    #    remote: JabRef-${{ matrix.displayName }}.zip
+    #    host: build-upload.jabref.org
+    #    username: builds_jabref_org
+    #    privateKey: ${{ secrets.buildJabRefPrivateKey }}
+    #    port: 9922
