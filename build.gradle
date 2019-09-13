@@ -672,7 +672,7 @@ jlink {
         installerOptions = [
            '--vendor', 'JabRef',
            '--app-version', "${project.version}",
-           '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+           // '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
            '--win-dir-chooser'
         ]
     }
