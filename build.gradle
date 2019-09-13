@@ -522,7 +522,7 @@ shadowJar {
 }
 
 /*
- * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
+ * Changes project.version to VERSION--DATE--GIT_HASH
  */
 if (hasProperty('dev')) {
     String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
@@ -551,7 +551,7 @@ if (hasProperty('dev')) {
     // first the date (%cd), then the branch name, and finally the commit id (%h)
     String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
 
-    project.version += "--snapshot--" + infoString
+    project.version += "--" + infoString
 }
 
 install4j {
@@ -615,7 +615,7 @@ task snapJar(dependsOn: "releaseJar", type: Delete) {
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'JabRefMain'
+        name = 'JabRef'
     }
 
     addOptions("--bind-services")
@@ -669,6 +669,12 @@ jlink {
         // In order for this to work, you need to dowload jpackage from https://jdk.java.net/jpackage/
         // and put the path to the jdk-14 folder in the environment variable  BADASS_JLINK_JPACKAGE_HOME
         outputDir = "distribution"
+        installerOptions = [
+           '--vendor', 'JabRef',
+           '--app-version', "${project.version}",
+           '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+           '--win-dir-chooser'
+        ]
     }
 }
 
