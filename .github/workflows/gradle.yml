@@ -31,7 +31,6 @@ jobs:
     - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
-        import os
         import tarfile
         import sys
 
@@ -40,12 +39,7 @@ jobs:
         else:
           from urllib import urlretrieve
 
-        url = "${{ matrix.jpackageDownload }}"
-
-        tmpfile, headers = urlretrieve(url)
-        base_name = os.path.basename(url)
-
-        file_name, file_extension = os.path.splitext(base_name)
+        tmpfile, headers = urlretrieve("${{ matrix.jpackageDownload }}")
         tar = tarfile.open(tmpfile)
         tar.extractall()
         tar.close()
@@ -65,7 +59,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: JabRef-${{ matrix.displayName }}
-        path: build/jpackage
+        path: build/distribution
     #- name: Upload to build.jabref.org
     #  uses: garygrossgarten/github-action-scp@release
     #  with:
