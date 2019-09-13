@@ -13,7 +13,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+- We added a short DOI field formatter which shortens DOI to more human readable form. [koppor#343](https://github.com/koppor/jabref/issues/343)
+
 ### Fixed
+
+- Inherit fields from cross-referenced entries as specified by biblatex [#5045](https://github.com/JabRef/jabref/issues/5045)
 
 ### Removed
 
@@ -70,7 +74,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [5.0-alpha] – 2019-08-25
 
 ### Changed
-
+- We added eventitle, eventdate and venue fields to @unpublished entry type.
+- We added @software and @dataSet entry type to biblatex.
 - All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)

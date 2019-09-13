@@ -34,7 +34,11 @@ public enum StandardEntryType implements EntryType {
     SuppCollection("SuppCollection"),
     SuppPeriodical("SuppPeriodical"),
     Thesis("Thesis"),
-    WWW("WWW");
+    WWW("WWW"),
+    Software("Software"),
+    DATESET("DataSet");
+
+
 
     private final String displayName;
 

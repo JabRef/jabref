@@ -122,7 +122,7 @@ public class VM implements Warn {
 
         this.buildInFunctions = new HashMap<>(37);
 
-        /**
+        /*
          * Pops the top two (integer) literals, compares them, and pushes
          * the integer 1 if the second is greater than the first, 0
          * otherwise.
@@ -141,7 +141,7 @@ public class VM implements Warn {
             stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
         });
 
-        /** Analogous. */
+        /* Analogous. */
         buildInFunctions.put("<", context -> {
             if (stack.size() < 2) {
                 throw new VMException("Not enough operands on stack for operation <");
@@ -156,7 +156,7 @@ public class VM implements Warn {
             stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
         });
 
-        /**
+        /*
          * Pops the top two (both integer or both string) literals, compares
          * them, and pushes the integer 1 if they're equal, 0 otherwise.
          */
@@ -180,7 +180,7 @@ public class VM implements Warn {
             stack.push(o1.equals(o2) ? VM.TRUE : VM.FALSE);
         });
 
-        /** Pops the top two (integer) literals and pushes their sum. */
+        /* Pops the top two (integer) literals and pushes their sum. */
         buildInFunctions.put("+", context -> {
             if (stack.size() < 2) {
                 throw new VMException("Not enough operands on stack for operation +");
@@ -195,7 +195,7 @@ public class VM implements Warn {
             stack.push((Integer) o1 + (Integer) o2);
         });
 
-        /**
+        /*
          * Pops the top two (integer) literals and pushes their difference
          * (the first subtracted from the second).
          */
@@ -213,7 +213,7 @@ public class VM implements Warn {
             stack.push((Integer) o1 - (Integer) o2);
         });
 
-        /**
+        /*
          * Pops the top two (string) literals, concatenates them (in reverse
          * order, that is, the order in which pushed), and pushes the
          * resulting string.
@@ -232,7 +232,7 @@ public class VM implements Warn {
             stack.push(o1.toString() + o2);
         });
 
-        /**
+        /*
          * Pops the top two literals and assigns to the first (which must be
          * a global or entry variable) the value of the second.
          */
@@ -245,14 +245,14 @@ public class VM implements Warn {
             assign(context, o1, o2);
         });
 
-        /**
+        /*
          * Pops the top (string) literal, adds a `.' to it if the last non
          * '}' character isn't a `.', `?', or `!', and pushes this resulting
          * string.
          */
         buildInFunctions.put("add.period$", context -> addPeriodFunction());
 
-        /**
+        /*
          * Executes the function whose name is the entry type of an entry.
          * For example if an entry is of type book, this function executes
          * the book function. When given as an argument to the ITERATE
@@ -271,7 +271,7 @@ public class VM implements Warn {
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));
 
-        /**
+        /*
          * Pops the top (string) literal, makes sure it's a single
          * character, converts it to the corresponding ASCII integer, and
          * pushes this integer.
@@ -291,7 +291,7 @@ public class VM implements Warn {
             stack.push((int) s.charAt(0));
         });
 
-        /**
+        /*
          * Pushes the string that was the \cite-command argument for this
          * entry.
          */
@@ -302,7 +302,7 @@ public class VM implements Warn {
             stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
         });
 
-        /**
+        /*
          * Pops the top literal from the stack and pushes two copies of it.
          */
         buildInFunctions.put("duplicate$", context -> {
@@ -315,7 +315,7 @@ public class VM implements Warn {
             stack.push(o1);
         });
 
-        /**
+        /*
          * Pops the top literal and pushes the integer 1 if it's a missing
          * field or a string having no non-white-space characters, 0
          * otherwise.
@@ -342,7 +342,7 @@ public class VM implements Warn {
 
         buildInFunctions.put("format.name$", new FormatNameFunction(this));
 
-        /**
+        /*
          * Pops the top three literals (they are two function literals and
          * an integer literal, in that order); if the integer is greater
          * than 0, it executes the second literal, else it executes the
@@ -368,7 +368,7 @@ public class VM implements Warn {
             }
         });
 
-        /**
+        /*
          * Pops the top (integer) literal, interpreted as the ASCII integer
          * value of a single character, converts it to the corresponding
          * single-character string, and pushes this string.
@@ -388,7 +388,7 @@ public class VM implements Warn {
             stack.push(String.valueOf((char) i.intValue()));
         });
 
-        /**
+        /*
          * Pops the top (integer) literal, converts it to its (unique)
          * string equivalent, and pushes this string.
          */
@@ -405,7 +405,7 @@ public class VM implements Warn {
             stack.push(o1.toString());
         });
 
-        /**
+        /*
          * Pops the top literal and pushes the integer 1 if it's a missing
          * field, 0 otherwise.
          */
@@ -429,7 +429,7 @@ public class VM implements Warn {
             stack.push(VM.FALSE);
         });
 
-        /**
+        /*
          * Writes onto the bbl file what is accumulated in the output buffer.
          * It writes a blank line if and only if the output buffer is empty.
          * Since write$ does reasonable line breaking, you should use this
@@ -438,7 +438,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("newline$", context -> VM.this.bbl.append('\n'));
 
-        /**
+        /*
          * Pops the top (string) literal and pushes the number of names the
          * string represents one plus the number of occurrences of the
          * substring "and" (ignoring case differences) surrounded by
@@ -458,13 +458,13 @@ public class VM implements Warn {
             stack.push(AuthorList.parse(s).getNumberOfAuthors());
         });
 
-        /**
+        /*
          * Pops the top of the stack but doesn't print it; this gets rid of
          * an unwanted stack literal.
          */
         buildInFunctions.put("pop$", context -> stack.pop());
 
-        /**
+        /*
          * The |built_in| function {\.{preamble\$}} pushes onto the stack
          * the concatenation of all the \.{preamble} strings read from the
          * database files. (or the empty string if there where none)
@@ -475,7 +475,7 @@ public class VM implements Warn {
             stack.push(preamble);
         });
 
-        /**
+        /*
          * Pops the top (string) literal, removes nonalphanumeric characters
          * except for white-space characters and hyphens and ties (these all get
          * converted to a space), removes certain alphabetic characters
@@ -484,19 +484,19 @@ public class VM implements Warn {
          */
         buildInFunctions.put("purify$", new PurifyFunction(this));
 
-        /**
+        /*
          * Pushes the string consisting of the double-quote character.
          */
         buildInFunctions.put("quote$", context -> stack.push("\""));
 
-        /**
+        /*
          * Is a no-op.
          */
         buildInFunctions.put("skip$", context -> {
                 // Nothing to do! Yeah!
         });
 
-        /**
+        /*
          * Pops and prints the whole stack; it's meant to be used for style
          * designers while debugging.
          */
@@ -507,7 +507,7 @@ public class VM implements Warn {
         });
 
 
-        /**
+        /*
          * Pops the top three literals (they are the two integers literals
          * len and start, and a string literal, in that order). It pushes
          * the substring of the (at most) len consecutive characters
@@ -518,7 +518,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("substring$", context -> substringFunction());
 
-        /**
+        /*
          * Swaps the top two literals on the stack. text.length$ Pops the
          * top (string) literal, and pushes the number of text characters
          * it contains, where an accented character (more precisely, a
@@ -537,7 +537,7 @@ public class VM implements Warn {
             stack.push(f2);
         });
 
-        /**
+        /*
          * text.length$ Pops the top (string) literal, and pushes the number
          * of text characters it contains, where an accented character (more
          * precisely, a "special character", defined in Section 4) counts as
@@ -550,7 +550,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("text.length$", context -> textLengthFunction());
 
-        /**
+        /*
          * Pops the top two literals (the integer literal len and a string
          * literal, in that order). It pushes the substring of the (at most) len
          * consecutive text characters starting from the beginning of the
@@ -563,12 +563,12 @@ public class VM implements Warn {
          */
         buildInFunctions.put("text.prefix$", new TextPrefixFunction(this));
 
-        /**
+        /*
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
         buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry", stack.pop()));
 
-        /**
+        /*
          * Pushes the current entry's type (book, article, etc.), but pushes
          * the null string if the type is either unknown or undefined.
          */
@@ -580,7 +580,7 @@ public class VM implements Warn {
             stack.push(context.getBibtexEntry().getType().getName());
         });
 
-        /**
+        /*
          * Pops the top (string) literal and prints it following a warning
          * message. This also increments a count of the number of warning
          * messages issued.
@@ -595,7 +595,7 @@ public class VM implements Warn {
             }
         });
 
-        /**
+        /*
          * Pops the top two (function) literals, and keeps executing the
          * second as long as the (integer) literal left on the stack by
          * executing the first is greater than 0.
@@ -604,7 +604,7 @@ public class VM implements Warn {
 
         buildInFunctions.put("width$", new WidthFunction(this));
 
-        /**
+        /*
          * Pops the top (string) literal and writes it on the output buffer
          * (which will result in stuff being written onto the bbl file when
          * the buffer fills up).
@@ -1146,7 +1146,6 @@ public class VM implements Warn {
      * ables. You may have any number of these commands, but a variable's
      * declaration must precede its use.
      *
-     * @param child
      */
     private void integers(Tree child) {
         Tree t = child.getChild(0);

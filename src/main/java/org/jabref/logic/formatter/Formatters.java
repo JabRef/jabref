@@ -19,6 +19,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
@@ -67,7 +68,8 @@ public class Formatters {
                 new OrdinalsToSuperscriptFormatter(),
                 new RemoveBracesFormatter(),
                 new UnitsToLatexFormatter(),
-                new EscapeUnderscoresFormatter()
+                new EscapeUnderscoresFormatter(),
+                new ShortenDOIFormatter()
         );
     }
 
@@ -102,5 +104,4 @@ public class Formatters {
             return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
     }
-
 }

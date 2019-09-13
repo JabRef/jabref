@@ -35,6 +35,8 @@ plugins {
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
 
+// show stacktrace on error
+gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -55,7 +57,7 @@ project.ext.threeDotVersion = "5.0.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
 sourceCompatibility = 11
 targetCompatibility = 11
-mainClassName = "org.jabref.JabRefLauncher"
+mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names
@@ -204,9 +206,9 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
 
     testCompile 'junit:junit:4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.1'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.5.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
@@ -225,7 +227,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.24'
-    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
 
@@ -351,10 +353,9 @@ task generateEndnoteSource(type: XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/RSXML.dtd"
+    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-    arguments = '-dtd'
 }
 
 task generateModsSource(type: XjcTask) {
