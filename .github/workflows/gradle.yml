@@ -28,13 +28,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11.0.4
-    - name: Build runtime image
-      run: ./gradlew jlinkZip
-    - name: Add runtime image as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}-raw
-        path: build/image
     - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
@@ -42,7 +35,7 @@ jobs:
         import tarfile
         import urllib
 
-        url = ${{ matrix.jpackageDownload }}
+        url = "${{ matrix.jpackageDownload }}"
 
         tmpfile = urllib.urlretrieve(url, filename=None)[0]
         base_name = os.path.basename(url)
@@ -52,10 +45,17 @@ jobs:
         tar.extractall()
         tar.close()
       shell: python
+    - name: Build runtime image
+      run: ./gradlew jlinkZip
     - name: Build installer
       env:
         BADASS_JLINK_JPACKAGE_HOME: /jdk-14
       run: ./gradlew jpackage
+    - name: Add runtime image as artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: JabRef-${{ matrix.displayName }}-raw
+        path: build/image
     - name: Add installer as artifact
       uses: actions/upload-artifact@master
       with:
