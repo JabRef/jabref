@@ -48,11 +48,18 @@ jobs:
     - name: Display content of path
       run: ls
       shell: bash
+    - name: Display content of path
+      env:
+        BADASS_JLINK_JPACKAGE_HOME: ${GITHUB_WORKSPACE}/jdk-14
+      run: |
+        cd ${BADASS_JLINK_JPACKAGE_HOME}
+        ls
+      shell: bash
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Build installer
       env:
-        BADASS_JLINK_JPACKAGE_HOME: /jdk-14
+        BADASS_JLINK_JPACKAGE_HOME: ${GITHUB_WORKSPACE}/jdk-14
       run: ./gradlew jpackage
     - name: Add runtime image as artifact
       uses: actions/upload-artifact@master
