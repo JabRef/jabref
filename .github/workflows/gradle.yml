@@ -56,8 +56,6 @@ jobs:
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Build installer
-      env:
-        BADASS_JLINK_JPACKAGE_HOME: ${{GITHUB_WORKSPACE}}/jdk-14
       run: ./gradlew jpackage
     - name: Add runtime image as artifact
       uses: actions/upload-artifact@master
