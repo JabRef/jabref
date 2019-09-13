@@ -71,12 +71,12 @@ jobs:
       with:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
-    #- name: Upload to build.jabref.org
-    #  uses: garygrossgarten/github-action-scp@release
-    #  with:
-    #    local: build/image.zip
-    #    remote: JabRef-${{ matrix.displayName }}.zip
-    #    host: build-upload.jabref.org
-    #    username: builds_jabref_org
-    #    privateKey: ${{ secrets.buildJabRefPrivateKey }}
-    #    port: 9922
+    - name: Upload to build.jabref.org
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: build/distribution
+        remote: scp/directory
+        host: build-upload.jabref.org
+        username: builds_jabref_org
+        privateKey: ${{ secrets.buildJabRefPrivateKey }}
+        port: 9922
