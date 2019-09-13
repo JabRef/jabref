@@ -24,7 +24,6 @@ public class ChildFirstClassLoader extends URLClassLoader {
                 loadedClass = super.loadClass(name, resolve);
             }
         }
-
         if (resolve) { // marked to resolve
             resolveClass(loadedClass);
         }
