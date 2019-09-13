@@ -34,7 +34,6 @@ jobs:
       run: |
         import tarfile
         import sys
-        import os
 
         if sys.version_info[0] >= 3:
           from urllib.request import urlretrieve
@@ -45,19 +44,21 @@ jobs:
         tar = tarfile.open(tmpfile)
         tar.extractall()
         tar.close()
-        
-        os.environ["BADASS_JLINK_JPACKAGE_HOME"] = os.environ["GITHUB_WORKSPACE"] + "/jdk-14"
       shell: python
     - name: Display content of path
       run: |
         ls
-        cd ${BADASS_JLINK_JPACKAGE_HOME}
+        BADASS_JLINK_JPACKAGE_HOME = "$GITHUB_WORKSPACE" + "/jdk-14"
+        cd "$BADASS_JLINK_JPACKAGE_HOME"
         ls
       shell: bash
     - name: Build runtime image
       run: ./gradlew jlinkZip
     - name: Build installer
-      run: ./gradlew jpackage
+      run: |
+        BADASS_JLINK_JPACKAGE_HOME = "$GITHUB_WORKSPACE" + "/jdk-14"
+        ./gradlew jpackage
+      shell: bash
     - name: Add runtime image as artifact
       uses: actions/upload-artifact@master
       with:
