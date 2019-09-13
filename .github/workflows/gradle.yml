@@ -51,7 +51,7 @@ jobs:
     - name: Display content of path
       run: |
         ls
-        export BADASS_JLINK_JPACKAGE_HOME=$GITHUB_WORKSPACE "${{ matrix.jdk14Path }}"
+        export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
         cd "$BADASS_JLINK_JPACKAGE_HOME"
         ls
       shell: bash
@@ -59,7 +59,7 @@ jobs:
       run: ./gradlew jlinkZip
     - name: Build installer
       run: |
-        export BADASS_JLINK_JPACKAGE_HOME=$GITHUB_WORKSPACE "${{ matrix.jdk14Path }}"
+        export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
         ./gradlew jpackage
       shell: bash
     - name: Add runtime image as artifact
