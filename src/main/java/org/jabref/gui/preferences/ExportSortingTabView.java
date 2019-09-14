@@ -1,0 +1,51 @@
+package org.jabref.gui.preferences;
+
+import javafx.scene.control.Label;
+import org.jabref.gui.SaveOrderConfigDisplayView;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExportSortingTabView extends AbstractPreferenceTabView implements PreferencesTab {
+
+    private final SaveOrderConfigDisplayView exportOrderPanel;
+
+    public ExportSortingTabView(JabRefPreferences preferences) {
+        this.preferences = preferences;
+
+        Label title = new Label(Localization.lang("Export sorting"));
+        title.getStyleClass().add("titleHeader");
+
+        exportOrderPanel = new SaveOrderConfigDisplayView(preferences.loadExportSaveOrder());
+
+        this.setWidth(650.0);
+        this.setSpacing(10.0);
+        this.getChildren().add(title);
+        this.getChildren().add(exportOrderPanel);
+    }
+
+    @Override
+    public String getTabName() { return Localization.lang("Export sorting"); }
+
+    @Override
+    public void setValues() {
+
+    }
+
+    @Override
+    public void storeSettings() {
+        exportOrderPanel.storeConfig();
+    }
+
+    @Override
+    public boolean validateSettings() {
+        return true;
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
+}

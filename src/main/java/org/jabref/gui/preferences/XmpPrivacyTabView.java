@@ -24,7 +24,7 @@ import org.jabref.preferences.JabRefPreferences;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class XmpPrivacyTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox enableXmpFilter;
     @FXML private TableView<Field> filterList;
@@ -47,13 +47,12 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
     public String getTabName() { return Localization.lang("XMP-metadata"); }
 
     public void initialize () {
-        XmpPrivacyTabViewModel xmpPrivacyTabViewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
-        this.viewModel = xmpPrivacyTabViewModel;
+        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
 
-        enableXmpFilter.selectedProperty().bindBidirectional(xmpPrivacyTabViewModel.xmpFilterEnabledProperty());
-        filterList.disableProperty().bind(xmpPrivacyTabViewModel.xmpFilterEnabledProperty().not());
-        addFieldName.disableProperty().bind(xmpPrivacyTabViewModel.xmpFilterEnabledProperty().not());
-        addField.disableProperty().bind(xmpPrivacyTabViewModel.xmpFilterEnabledProperty().not());
+        enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
+        filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+        addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
+        addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
 
         fieldColumn.setSortable(true);
         fieldColumn.setReorderable(false);
@@ -68,25 +67,24 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
         new ValueTableCellFactory<Field, Field>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(item -> Localization.lang("Remove") + " " + item.getName())
-                .withOnMouseClickedEvent(item -> evt -> {
-                    xmpPrivacyTabViewModel.removeFilter(filterList.getFocusModel().getFocusedItem());
-                })
+                .withOnMouseClickedEvent(
+                        item -> evt -> viewModel.removeFilter(filterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
         filterList.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
-                xmpPrivacyTabViewModel.removeFilter(filterList.getSelectionModel().getSelectedItem());
+                viewModel.removeFilter(filterList.getSelectionModel().getSelectedItem());
             }
         });
 
-        filterList.itemsProperty().bind(xmpPrivacyTabViewModel.filterListProperty());
+        filterList.itemsProperty().bind(viewModel.filterListProperty());
 
         addFieldName.setEditable(true);
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(addFieldName);
-        addFieldName.itemsProperty().bind(xmpPrivacyTabViewModel.availableFieldsProperty());
-        addFieldName.valueProperty().bindBidirectional(xmpPrivacyTabViewModel.addFieldNameProperty());
+        addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
+        addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
         addFieldName.setConverter(new StringConverter<>() {
             @Override
             public String toString(Field object) {
@@ -104,8 +102,8 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView implements Pref
         });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(xmpPrivacyTabViewModel.xmpFilterListValidationStatus(), filterList));
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));
     }
 
-    public void addField() { ((XmpPrivacyTabViewModel) viewModel).addField(); }
+    public void addField() { viewModel.addField(); }
 }

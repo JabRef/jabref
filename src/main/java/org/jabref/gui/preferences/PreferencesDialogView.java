@@ -14,6 +14,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -36,12 +37,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @Inject private DialogService dialogService;
 
     private JabRefFrame frame;
-    private TaskExecutor taskExecutor;
     private PreferencesDialogViewModel viewModel;
 
-    public PreferencesDialogView(JabRefFrame frame, TaskExecutor taskExecutor) {
+    public PreferencesDialogView(JabRefFrame frame) {
         this.frame = frame;
-        this.taskExecutor = taskExecutor;
         this.setTitle(Localization.lang("JabRef preferences"));
 
         ViewLoader.view(this)
@@ -61,7 +60,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, taskExecutor, frame);
+        viewModel = new PreferencesDialogViewModel(dialogService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
@@ -76,10 +75,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab != null) {
-                preferencePaneContainer.setContent(tab.getBuilder());
-            } else {
+            if (tab == null) {
                 preferencePaneContainer.setContent(null);
+            } else {
+                preferencePaneContainer.setContent(tab.getBuilder());
             }
         });
 
@@ -88,7 +87,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
 
-        viewModel.setValues(); // ToDo: Remove this after conversion of all tabs
+        DefaultTaskExecutor.runInJavaFXThread(viewModel::setValues);
     }
 
     @FXML

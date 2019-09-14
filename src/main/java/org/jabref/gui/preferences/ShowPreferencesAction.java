@@ -16,6 +16,6 @@ public class ShowPreferencesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new PreferencesDialogView(jabRefFrame, taskExecutor).show();
+        new PreferencesDialogView(jabRefFrame).show();
     }
 }

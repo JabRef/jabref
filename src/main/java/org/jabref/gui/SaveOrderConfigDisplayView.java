@@ -7,7 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -16,7 +16,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class SaveOrderConfigDisplayView extends GridPane {
+public class SaveOrderConfigDisplayView extends VBox {
 
     private final SaveOrderConfig config;
 

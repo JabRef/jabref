@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ExternalTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
@@ -55,40 +55,39 @@ public class ExternalTabView extends AbstractPreferenceTabView implements Prefer
     public String getTabName() { return Localization.lang("External programs"); }
 
     public void initialize() {
-        ExternalTabViewModel externalTabViewModel = new ExternalTabViewModel(dialogService, preferences, frame);
-        this.viewModel = externalTabViewModel;
+        this.viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getApplicationName)
                 .withIcon(PushToApplication::getIcon)
                 .install(pushToApplicationCombo);
 
-        eMailReferenceSubject.textProperty().bindBidirectional(externalTabViewModel.eMailReferenceSubjectProperty());
-        autoOpenAttachedFolders.selectedProperty().bindBidirectional(externalTabViewModel.autoOpenAttachedFoldersProperty());
+        eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());
+        autoOpenAttachedFolders.selectedProperty().bindBidirectional(viewModel.autoOpenAttachedFoldersProperty());
 
-        pushToApplicationCombo.itemsProperty().bind(externalTabViewModel.pushToApplicationsListProperty());
-        pushToApplicationCombo.valueProperty().bindBidirectional(externalTabViewModel.selectedPushToApplication());
-        citeCommand.textProperty().bindBidirectional(externalTabViewModel.citeCommandProperty());
+        pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
+        pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
+        citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
 
-        useTerminalDefault.selectedProperty().bindBidirectional(externalTabViewModel.useTerminalDefaultProperty());
-        useTerminalSpecial.selectedProperty().bindBidirectional(externalTabViewModel.useTerminalSpecialProperty());
-        useTerminalCommand.textProperty().bindBidirectional(externalTabViewModel.useTerminalCommandProperty());
+        useTerminalDefault.selectedProperty().bindBidirectional(viewModel.useTerminalDefaultProperty());
+        useTerminalSpecial.selectedProperty().bindBidirectional(viewModel.useTerminalSpecialProperty());
+        useTerminalCommand.textProperty().bindBidirectional(viewModel.useTerminalCommandProperty());
         useTerminalCommand.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
         useTerminalBrowse.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
 
-        usePDFAcrobat.selectedProperty().bindBidirectional(externalTabViewModel.usePDFAcrobatProperty());
-        usePDFAcrobatCommand.textProperty().bindBidirectional(externalTabViewModel.usePDFAcrobatCommandProperty());
+        usePDFAcrobat.selectedProperty().bindBidirectional(viewModel.usePDFAcrobatProperty());
+        usePDFAcrobatCommand.textProperty().bindBidirectional(viewModel.usePDFAcrobatCommandProperty());
         usePDFAcrobatCommand.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
         usePDFAcrobatBrowse.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
 
-        usePDFSumatra.selectedProperty().bindBidirectional(externalTabViewModel.usePDFSumatraProperty());
-        usePDFSumatraCommand.textProperty().bindBidirectional(externalTabViewModel.usePDFSumatraCommandProperty());
+        usePDFSumatra.selectedProperty().bindBidirectional(viewModel.usePDFSumatraProperty());
+        usePDFSumatraCommand.textProperty().bindBidirectional(viewModel.usePDFSumatraCommandProperty());
         usePDFSumatraCommand.disableProperty().bind(usePDFSumatra.selectedProperty().not());
         usePDFSumatraBrowse.disableProperty().bind(usePDFSumatra.selectedProperty().not());
 
-        useFileBrowserDefault.selectedProperty().bindBidirectional(externalTabViewModel.useFileBrowserDefaultProperty());
-        useFileBrowserSpecial.selectedProperty().bindBidirectional(externalTabViewModel.useFileBrowserSpecialProperty());
-        useFileBrowserSpecialCommand.textProperty().bindBidirectional(externalTabViewModel.useFileBrowserSpecialCommandProperty());
+        useFileBrowserDefault.selectedProperty().bindBidirectional(viewModel.useFileBrowserDefaultProperty());
+        useFileBrowserSpecial.selectedProperty().bindBidirectional(viewModel.useFileBrowserSpecialProperty());
+        useFileBrowserSpecialCommand.textProperty().bindBidirectional(viewModel.useFileBrowserSpecialCommandProperty());
         useFileBrowserSpecialCommand.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
         useFileBrowserSpecialBrowse.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
     }

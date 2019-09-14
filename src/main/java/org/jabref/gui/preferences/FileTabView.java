@@ -21,7 +21,7 @@ import org.jabref.preferences.NewLineSeparator;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class FileTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
     @FXML private CheckBox backupOldFile;
@@ -59,38 +59,37 @@ public class FileTabView extends AbstractPreferenceTabView implements Preference
     public String getTabName() { return Localization.lang("File"); }
 
     public void initialize() {
-        FileTabViewModel fileTabViewModel = new FileTabViewModel(dialogService, preferences);
-        this.viewModel = fileTabViewModel;
+        this.viewModel = new FileTabViewModel(dialogService, preferences);
 
-        openLastStartup.selectedProperty().bindBidirectional(fileTabViewModel.openLastStartupProperty());
-        backupOldFile.selectedProperty().bindBidirectional(fileTabViewModel.backupOldFileProperty());
-        noWrapFiles.textProperty().bindBidirectional(fileTabViewModel.noWrapFilesProperty());
-        resolveStringsBibTex.selectedProperty().bindBidirectional(fileTabViewModel.resolveStringsBibTexProperty());
-        resolveStringsAll.selectedProperty().bindBidirectional(fileTabViewModel.resolveStringsAllProperty());
-        resolveStringsExcept.textProperty().bindBidirectional(fileTabViewModel.resolvStringsExceptProperty());
+        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
+        backupOldFile.selectedProperty().bindBidirectional(viewModel.backupOldFileProperty());
+        noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
+        resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
+        resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
+        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolvStringsExceptProperty());
         resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
-        newLineSeparator.itemsProperty().bind(fileTabViewModel.newLineSeparatorListProperty());
-        newLineSeparator.valueProperty().bindBidirectional(fileTabViewModel.selectedNewLineSeparatorProperty());
-        alwaysReformatBib.selectedProperty().bindBidirectional(fileTabViewModel.alwaysReformatBibProperty());
+        newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
+        newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
-        mainFileDir.textProperty().bindBidirectional(fileTabViewModel.mainFileDirProperty());
-        useBibLocationAsPrimary.selectedProperty().bindBidirectional(fileTabViewModel.useBibLocationAsPrimaryProperty());
-        autolinkFileStartsBibtex.selectedProperty().bindBidirectional(fileTabViewModel.autolinkFileStartsBibtexProperty());
-        autolinkFileExactBibtex.selectedProperty().bindBidirectional(fileTabViewModel.autolinkFileExactBibtexProperty());
-        autolinkUseRegex.selectedProperty().bindBidirectional(fileTabViewModel.autolinkUseRegexProperty());
-        autolinkRegexKey.textProperty().bindBidirectional(fileTabViewModel.autolinkRegexKeyProperty());
+        mainFileDir.textProperty().bindBidirectional(viewModel.mainFileDirProperty());
+        useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
+        autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
+        autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
+        autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
+        autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        searchFilesOnOpen.selectedProperty().bindBidirectional(fileTabViewModel.searchFilesOnOpenProperty());
-        openBrowseOnCreate.selectedProperty().bindBidirectional(fileTabViewModel.openBrowseOnCreateProperty());
+        searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
+        openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
 
-        autosaveLocalLibraries.selectedProperty().bindBidirectional(fileTabViewModel.autosaveLocalLibrariesProperty());
+        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(fileTabViewModel.mainFileDirValidationStatus(), mainFileDir));
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
     public void mainFileDirBrowse() {

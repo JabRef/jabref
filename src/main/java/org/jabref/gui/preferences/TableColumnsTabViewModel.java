@@ -86,8 +86,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Entry table columns"),
                         Localization.lang("Columns"),
                         Localization.lang("List must not be empty."))));
-
-        setValues();
     }
 
     @Override
@@ -104,13 +102,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         fillColumnList();
 
-        List<Field> internalFields = new ArrayList<>();
-        internalFields.add(InternalField.OWNER);
-        internalFields.add(InternalField.TIMESTAMP);
-        internalFields.add(InternalField.GROUPS);
-        internalFields.add(InternalField.KEY_FIELD);
-        internalFields.add(InternalField.TYPE_HEADER);
-        internalFields.forEach(item -> availableColumnsProperty.getValue().add(item));
+        availableColumnsProperty.clear();
+
+        availableColumnsProperty.add(InternalField.TIMESTAMP);
+        availableColumnsProperty.add(InternalField.OWNER);
+        availableColumnsProperty.add(InternalField.GROUPS);
+        availableColumnsProperty.add(InternalField.KEY_FIELD);
+        availableColumnsProperty.add(InternalField.TYPE_HEADER);
 
         EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(item));
 
