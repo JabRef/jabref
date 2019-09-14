@@ -12,9 +12,7 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url 'https://oss.sonatype.org/content/groups/public'
-        }
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
     }
 }
 
@@ -95,9 +93,8 @@ sourceSets {
 repositories {
     mavenLocal()
     jcenter()
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public'
-    }
+    maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://repository.apache.org/snapshots' }
 }
 
 configurations {
@@ -174,12 +171,11 @@ dependencies {
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
-    compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.12.1'
+    compile 'org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
@@ -203,7 +199,9 @@ dependencies {
     */
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
+    compile (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
+        exclude module: "log4j-core"
+    }
 
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
@@ -211,8 +209,8 @@ dependencies {
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.12.1'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.0.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile ('org.reflections:reflections:0.9.11') {
