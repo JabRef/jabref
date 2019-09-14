@@ -137,8 +137,9 @@ public class Bootstrap {
         xInit.initialize(args);
 
         // initial component context
-        if (context_entries == null)
-            context_entries = new HashMap<String, Object>(1);
+        if (context_entries == null) {
+            context_entries = new HashMap<>(1);
+        }
         // add smgr
         context_entries.put("/singletons/com.sun.star.lang.theServiceManager", new ComponentContextEntry(null, xSMgr));
         // ... xxx todo: add standard entries
@@ -166,10 +167,10 @@ public class Bootstrap {
     }
 
     /** Bootstraps the initial component context from a native UNO installation.
-    
+
         @throws Exception if things go awry.
         @return a freshly bootstrapped component context.
-    
+
         See also
         <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
     */
@@ -193,15 +194,15 @@ public class Bootstrap {
     }
 
     /** Bootstraps the initial component context from a native UNO installation.
-    
+
         See also
         <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
-    
+
         @param ini_file
                ini_file (may be null: uno.rc besides cppuhelper lib)
         @param bootstrap_parameters
                bootstrap parameters (maybe null)
-    
+
         @throws Exception if things go awry.
         @return a freshly bootstrapped component context.
     */
@@ -286,15 +287,17 @@ public class Bootstrap {
         try {
             // create default local component context
             XComponentContext xLocalContext = createInitialComponentContext((Map<String, Object>) null);
-            if (xLocalContext == null)
+            if (xLocalContext == null) {
                 throw new BootstrapException("no local component context!");
+            }
 
             // find office executable relative to this class's class loader
             String sOffice = System.getProperty("os.name").startsWith("Windows") ? "soffice.exe" : "soffice";
 
             File fOffice = NativeLibraryLoader.getResource(loader, sOffice);
-            if (fOffice == null)
+            if (fOffice == null) {
                 throw new BootstrapException("no office executable found!");
+            }
 
             // create call with arguments
             //We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
@@ -311,8 +314,9 @@ public class Bootstrap {
 
             // initial service manager
             XMultiComponentFactory xLocalServiceManager = xLocalContext.getServiceManager();
-            if (xLocalServiceManager == null)
+            if (xLocalServiceManager == null) {
                 throw new BootstrapException("no initial service manager!");
+            }
 
             // create a URL resolver
             XUnoUrlResolver xUrlResolver = UnoUrlResolver.create(xLocalContext);
@@ -326,8 +330,9 @@ public class Bootstrap {
                     // try to connect to office
                     Object context = xUrlResolver.resolve(sConnect);
                     xContext = UnoRuntime.queryInterface(XComponentContext.class, context);
-                    if (xContext == null)
+                    if (xContext == null) {
                         throw new BootstrapException("no component context!");
+                    }
                     break;
                 } catch (com.sun.star.connection.NoConnectException ex) {
                     // Wait 500 ms, then try to connect again, but do not wait
