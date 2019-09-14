@@ -21,8 +21,6 @@ buildscript {
 plugins {
     id 'application'
     id 'com.gradle.build-scan' version '2.4.1'
-    id 'com.install4j.gradle' version '8.0.1'
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
@@ -42,7 +40,6 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'project-report'
 apply plugin: 'jacoco'
-apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 apply plugin: JabRefAntlrPlugin
@@ -53,8 +50,7 @@ apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0-dev"
-project.ext.threeDotVersion = "5.0.0.1"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
+project.ext.twoDotVersion = "5.0.1"
 sourceCompatibility = 11
 targetCompatibility = 11
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
@@ -66,7 +62,6 @@ patchModules.config = [
         "test2=fastparse-utils_2.12-1.0.0.jar",
         "test3=sourcecode_2.12-0.1.4.jar"
 ]
-
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
@@ -515,12 +510,6 @@ modernizer {
 }
 
 // Release tasks
-shadowJar {
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
-    classifier 'fat'
-    zip64 true
-}
-
 /*
  * Changes project.version to VERSION--DATE--GIT_HASH
  */
@@ -554,62 +543,12 @@ if (hasProperty('dev')) {
     project.version += "--" + infoString
 }
 
-install4j {
-    installDir = file(project.ext.install4jDir)
-}
-
 task generateFinalJabRefPS1File(type: Copy) {
     from('buildres') {
         include 'JabRef.ps1'
     }
     into 'build'
     filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
-}
-
-// has to be defined AFTER 'dev' things to have the correct project.version
-task media(type: com.install4j.gradle.Install4jTask, dependsOn: ["releaseJar", "generateFinalJabRefPS1File"]) {
-    projectFile = file('jabref.install4j')
-    release = project.version
-    winKeystorePassword = System.getenv('CERTIFICATE_PW')
-    macKeystorePassword = System.getenv('CERTIFICATE_PW')
-    variables = [
-            versionFourDots: project.ext.threeDotVersion,
-            buildFileName  : jar.archiveName,
-            version        : project.version
-    ]
-
-    doLast {
-        copy {
-            from "build/install4j"
-            into "build/releases"
-        }
-    }
-}
-
-
-task release(dependsOn: ["media", "releaseJar"]) {
-    group = 'JabRef - Release'
-    description 'Creates a release for all target platforms.'
-}
-
-task releaseJar(dependsOn: "shadowJar") {
-    group = 'JabRef - Release'
-    description "Creates a Jar release."
-    doLast {
-        copy {
-            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
-            into("$buildDir/releases")
-            rename { String fileName ->
-                fileName.replace('-fat', '')
-            }
-        }
-        // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
-    }
-}
-
-task snapJar(dependsOn: "releaseJar", type: Delete) {
-    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
 }
 
 jlink {
@@ -667,7 +606,7 @@ jlink {
 
     jpackage {
         // In order for this to work, you need to dowload jpackage from https://jdk.java.net/jpackage/
-        // and put the path to the jdk-14 folder in the environment variable  BADASS_JLINK_JPACKAGE_HOME
+        // and put the path to the jdk-14 folder in the environment variable BADASS_JLINK_JPACKAGE_HOME
         outputDir = "distribution"
 
         if (OperatingSystem.current().isWindows()) {
