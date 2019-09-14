@@ -69,6 +69,7 @@ import com.sun.star.uno.XComponentContext;
     </pre>
 */
 public class Bootstrap {
+
     private static final Random RANDOM_PIPE_NAME = new Random();
 
     private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader) throws Exception {
@@ -347,8 +348,6 @@ public class Bootstrap {
 
         return xContext;
     }
-
- 
 
     private static void pipe(final InputStream in, final PrintStream out, final String prefix) {
 
