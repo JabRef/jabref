@@ -27,7 +27,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -40,6 +39,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
@@ -73,12 +73,6 @@ public class GroupTreeView {
     private CustomLocalDragboard localDragboard;
 
     private DragExpansionHandler dragExpansionHandler;
-
-    private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
-        for (PseudoClass pseudoClass : pseudoClasses) {
-            row.pseudoClassStateChanged(pseudoClass, false);
-        }
-    }
 
     @FXML
     public void initialize() {
@@ -169,10 +163,6 @@ public class GroupTreeView {
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
         PseudoClass subElementPseudoClass = PseudoClass.getPseudoClass("sub");
 
-        // Pseudo-classes for drag and drop
-        PseudoClass dragOverBottom = PseudoClass.getPseudoClass("dragOver-bottom");
-        PseudoClass dragOverCenter = PseudoClass.getPseudoClass("dragOver-center");
-        PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
@@ -226,23 +216,16 @@ public class GroupTreeView {
                     //expand node and all children on drag over
                     dragExpansionHandler.expandGroup(row.getTreeItem());
 
-                    removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
-                    switch (getDroppingMouseLocation(row, event)) {
-                        case BOTTOM:
-                            row.pseudoClassStateChanged(dragOverBottom, true);
-                            break;
-                        case CENTER:
-                            row.pseudoClassStateChanged(dragOverCenter, true);
-                            break;
-                        case TOP:
-                            row.pseudoClassStateChanged(dragOverTop, true);
-                            break;
+                    if (localDragboard.hasBibEntries()) {
+                        ControlHelper.setDroppingPseudoClasses(row);
+                    } else {
+                        ControlHelper.setDroppingPseudoClasses(row, event);
                     }
                 }
                 event.consume();
             });
             row.setOnDragExited(event -> {
-                removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
+                ControlHelper.removeDroppingPseudoClasses(row);
             });
 
             row.setOnDragDropped(event -> {
@@ -255,13 +238,13 @@ public class GroupTreeView {
                         Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
-                            source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
+                            source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
                             success = true;
                         }
                     }
                 }
 
-                if (localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+                if (localDragboard.hasBibEntries()) {
                     List<BibEntry> entries = localDragboard.getBibEntries();
                     row.getItem().addEntriesToGroup(entries);
                     success = true;
@@ -281,7 +264,7 @@ public class GroupTreeView {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem<GroupNodeViewModel>::getValue).collect(Collectors.toList());
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }
@@ -375,19 +358,6 @@ public class GroupTreeView {
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
-        }
-    }
-
-    /**
-     * Determines where the mouse is in the given row.
-     */
-    private DroppingMouseLocation getDroppingMouseLocation(TreeTableRow<GroupNodeViewModel> row, DragEvent event) {
-        if ((row.getHeight() * 0.25) > event.getY()) {
-            return DroppingMouseLocation.TOP;
-        } else if ((row.getHeight() * 0.75) < event.getY()) {
-            return DroppingMouseLocation.BOTTOM;
-        } else {
-            return DroppingMouseLocation.CENTER;
         }
     }
 

@@ -1,9 +1,9 @@
-package org.jabref.gui.groups;
+package org.jabref.gui.util;
 
 /**
  * The mouse location within the cell when the dropping gesture occurs.
  */
-enum DroppingMouseLocation {
+public enum DroppingMouseLocation {
     BOTTOM,
     CENTER,
     TOP
