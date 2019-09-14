@@ -669,12 +669,20 @@ jlink {
         // In order for this to work, you need to dowload jpackage from https://jdk.java.net/jpackage/
         // and put the path to the jdk-14 folder in the environment variable  BADASS_JLINK_JPACKAGE_HOME
         outputDir = "distribution"
-        installerOptions = [
-           '--vendor', 'JabRef',
-           //'--app-version', "${project.version}",
-           // '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
-           //'--win-dir-chooser'
-        ]
+
+        if (OperatingSystem.current().isWindows()) {
+            // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
+            installerType = "msi"
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.ext.twoDotVersion}",
+                    '--win-dir-chooser',
+                    '--win-shortcut'
+            ]
+        }
     }
 }
 
