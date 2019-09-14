@@ -26,7 +26,7 @@
     /* Highlights */
     -jr-blue: #0abde3;
     -jr-light-blue: #48dbfb;
-    -jr-purple: #f368e0;
+    -jr-purple: #7559C2;
     -jr-light-purple: #ff9ff3;
     -jr-green: #10ac84;
     -jr-light-green: #1dd1a1;
@@ -52,8 +52,6 @@
     -jr-menu-foreground: -fx-dark-text-color;
     -jr-menu-item-foreground: -fx-dark-text-color;
     -jr-menu-forground-active: -fx-dark-text-color;
-
-    -jr-drag-target: -jr-accent;
 
     -jr-head-fg: -fx-text-inner-color;
 
@@ -95,6 +93,10 @@
     -jr-separator: derive(-fx-color, -5%);
 
     -jr-search-text: -fx-text-base-color;
+
+    /* For drag and drop actions */
+    -jr-drag-target: -jr-purple;
+    -jr-drag-target-hover: derive(-jr-purple, 80%);
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -489,6 +491,17 @@
     -fx-border-width: 0;
     -fx-border-insets: 0;
     -fx-border-radius: 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab.drop {
+    -fx-border-color: -jr-drag-target;
+    -fx-background-color: -jr-drag-target-hover;
+    -fx-border-width: 3 1 1 1;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab.drop .tab-label {
+    -fx-fill: -jr-drag-target;
+    -fx-text-fill: -jr-drag-target;
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
