@@ -3,6 +3,7 @@ package org.jabref.gui.openoffice;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -237,20 +238,12 @@ class OOBibBase {
         throws IllegalAccessException, InvocationTargetException, BootstrapException,
         CreationException, IOException, ClassNotFoundException {
 
+        String loPath = "C:\\Program Files\\LibreOffice\\program";
     
-        URL[] urls = jarUrls.toArray(new URL[3]);
-        Class<Bootstrap> clazz  = (Class<Bootstrap>) Class.forName("com.sun.star.comp.helper.Bootstrap", true, new ChildFirstClassLoader(urls, null));
-        Bootstrap boot =  null;
-        try {
-             boot = clazz.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | java.lang.IllegalArgumentException | NoSuchMethodException | SecurityException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        
-    
+  
+  
         //Get the office component context:
-        XComponentContext xContext = boot.bootstrap();
+        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
         //Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         //Create the desktop, which is the root frame of the
