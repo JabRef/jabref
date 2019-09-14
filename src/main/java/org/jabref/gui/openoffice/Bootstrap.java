@@ -71,6 +71,7 @@ import com.sun.star.uno.XComponentContext;
 public class Bootstrap {
 
     private static final Random RANDOM_PIPE_NAME = new Random();
+    private static boolean M_LOADED_JUH = false;
 
     private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader) throws Exception {
         // insert the factory of the loader
@@ -218,7 +219,7 @@ public class Bootstrap {
             }
         }
 
-        if (!m_loaded_juh) {
+        if (!M_LOADED_JUH) {
             if ("The Android Project".equals(System.getProperty("java.vendor"))) {
                 // Find out if we are configured with DISABLE_DYNLOADING or
                 // not. Try to load the lo-bootstrap shared library which
@@ -242,12 +243,10 @@ public class Bootstrap {
             } else {
                 NativeLibraryLoader.loadLibrary(Bootstrap.class.getClassLoader(), "juh");
             }
-            m_loaded_juh = true;
+            M_LOADED_JUH = true;
         }
         return UnoRuntime.queryInterface(XComponentContext.class, cppuhelper_bootstrap(ini_file, pairs, Bootstrap.class.getClassLoader()));
     }
-
-    private static boolean m_loaded_juh = false;
 
     private static native Object cppuhelper_bootstrap(String ini_file, String bootstrap_parameters[], ClassLoader loader) throws Exception;
 
