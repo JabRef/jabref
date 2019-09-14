@@ -26,8 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -300,11 +299,11 @@ public class Bootstrap {
      *
      * @since UDK 3.1.0
      */
-    public static final XComponentContext bootstrap(String path)
+    public static final XComponentContext bootstrap(URLClassLoader loader)
         throws BootstrapException {
 
         String[] defaultArgArray = getDefaultOptions();
-        return bootstrap( defaultArgArray, path );
+        return bootstrap( defaultArgArray,  loader);
     }
 
     /**
@@ -321,7 +320,7 @@ public class Bootstrap {
      *
      * @since LibreOffice 5.1
      */
-    public static final XComponentContext bootstrap( String[] argArray, String path )
+    public static final XComponentContext bootstrap( String[] argArray, URLClassLoader loader )
         throws BootstrapException {
 
         XComponentContext xContext = null;
@@ -338,20 +337,15 @@ public class Bootstrap {
                 System.getProperty( "os.name" ).startsWith( "Windows" ) ?
                 "soffice.exe" : "soffice";
             
-            Path fOffice = Paths.get(path).resolve(sOffice).toAbsolutePath();
-            /*File fOffice = NativeLibraryLoader.getResource(
-                Bootstrap.class.getClassLoader(), sOffice );*/
+            File fOffice = NativeLibraryLoader.getResource(loader, sOffice);
             if ( fOffice == null )
                 throw new BootstrapException( "no office executable found!" );
 
-            // create random pipe name
-            String sPipeName = "uno" +
-                Long.toString(randomPipeName.nextLong() & 0x7fffffffffffffffL);
-
             // create call with arguments
+            //We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[ argArray.length + 2 ];
-            cmdArray[0] = fOffice.toString();
-            cmdArray[1] = ( "--accept=pipe,name=" + sPipeName + ";urp;" );
+            cmdArray[0] = fOffice.getPath();
+            cmdArray[1] = ( "--accept=socket,host=localhost,port=2083" + ";urp;" );
 
             System.arraycopy( argArray, 0, cmdArray, 2, argArray.length );
 
@@ -371,7 +365,7 @@ public class Bootstrap {
                 UnoUrlResolver.create( xLocalContext );
 
             // connection string
-            String sConnect = "uno:pipe,name=" + sPipeName +
+            String sConnect = "uno:socket,host=localhost,port=2083"+
                 ";urp;StarOffice.ComponentContext";
 
             // wait until office is started

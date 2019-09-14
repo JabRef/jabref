@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,7 +28,6 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
-import org.jabref.logic.openoffice.ChildFirstClassLoader;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
@@ -47,7 +45,6 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
@@ -146,7 +143,7 @@ class OOBibBase {
         yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
 
         this.atEnd = atEnd;
- 
+
         xDesktop = simpleBootstrap(jarUrls);
     }
 
@@ -230,20 +227,18 @@ class OOBibBase {
             if (document != null) {
                 result.add(document);
             }
-        }
+        }   
         return result;
     }
 
     private XDesktop simpleBootstrap(List<URL> jarUrls)
-        throws IllegalAccessException, InvocationTargetException, BootstrapException,
-        CreationException, IOException, ClassNotFoundException {
+        throws CreationException, BootstrapException {
 
-        String loPath = "C:\\Program Files\\LibreOffice\\program";
-    
-  
-  
+        URL[] urls = jarUrls.toArray(new URL[1]);
+        URLClassLoader loader = new URLClassLoader(urls, null);
+
         //Get the office component context:
-        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
+        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loader);
         //Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         //Create the desktop, which is the root frame of the
