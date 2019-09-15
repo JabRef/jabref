@@ -135,10 +135,6 @@ public class OpenOfficePanel {
         initPanel();
     }
 
-    private static void addURL(List<URL> jarList) throws IOException, ClassNotFoundException {
-       // Class<?> clazz = Class.forName("com.sun.star.comp.helper.Bootstrap", true, new ChildFirstClassLoader( jarList.toArray(new URL[0]),null ));
-    }
-
     public Node getContent() {
         return vbox;
     }
@@ -366,12 +362,12 @@ public class OpenOfficePanel {
     private void connect() {
         ooPrefs = jabRefPreferences.getOpenOfficePreferences();
 
-        Task<OOBibBase> connectTask = new Task<OOBibBase>() {
+        Task<OOBibBase> connectTask = new Task<>() {
 
             @Override
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
-                List<URL> jarUrls = loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
+                List<URL> jarUrls = findOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
 
                 return createBibBase(jarUrls);
             }
@@ -427,7 +423,7 @@ public class OpenOfficePanel {
 
     }
 
-    private List<URL> loadOpenOfficeJars(Path configurationPath) throws IOException {
+    private List<URL> findOpenOfficeJars(Path configurationPath) throws IOException {
         List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
         if (!filePaths.stream().allMatch(Optional::isPresent)) {
@@ -444,9 +440,7 @@ public class OpenOfficePanel {
 
     private OOBibBase createBibBase(List<URL> jarUrls) throws IOException, InvocationTargetException, IllegalAccessException,
         BootstrapException, CreationException, ClassNotFoundException {
-        // Connect
-        
-        return new OOBibBase(jarUrls,true, dialogService);
+        return new OOBibBase(jarUrls, true, dialogService);
     }
 
     private Optional<Boolean> showManualConnectionDialog() {
