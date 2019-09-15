@@ -24,7 +24,7 @@
             <RowConstraints vgrow="SOMETIMES"/>
         </rowConstraints>
         <Label text="%Filename format pattern"/>
-        <ComboBox fx:id="fileNamePattern" promptText="Choose pattern" GridPane.columnIndex="1" editable="true"
+        <ComboBox fx:id="fileNamePattern" promptText="%Choose pattern" GridPane.columnIndex="1" editable="true"
                   prefWidth="300" minWidth="300" maxWidth="300"/>
 
         <Label text="%File directory pattern" GridPane.rowIndex="1"/>
