@@ -25,13 +25,13 @@
             <Button fx:id="toRightButton" onAction="#toRightButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="MOVE_RIGHT"/>
+                    <JabRefIconView glyph="LIST_MOVE_RIGHT"/>
                 </graphic>
             </Button>
             <Button fx:id="toLeftButton" onAction="#toLeftButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="MOVE_LEFT"/>
+                    <JabRefIconView glyph="LIST_MOVE_LEFT"/>
                 </graphic>
             </Button>
         </VBox>
@@ -44,13 +44,13 @@
             <Button fx:id="sortUpButton" onAction="#sortUpButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="MOVE_UP"/>
+                    <JabRefIconView glyph="LIST_MOVE_UP"/>
                 </graphic>
             </Button>
             <Button fx:id="sortDownButton" onAction="#sortDownButtonAction"
                     prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="MOVE_DOWN"/>
+                    <JabRefIconView glyph="LIST_MOVE_DOWN"/>
                 </graphic>
             </Button>
         </VBox>

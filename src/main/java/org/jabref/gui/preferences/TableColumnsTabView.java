@@ -9,7 +9,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -22,7 +21,6 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -102,21 +100,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
                 .install(addColumnName);
         addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
-        addColumnName.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field object) {
-                if (object != null) {
-                    return object.getName();
-                } else {
-                    return "";
-                }
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return FieldFactory.parseField(string);
-            }
-        });
+        addColumnName.setConverter(FieldsUtil.fieldStringConverter);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));

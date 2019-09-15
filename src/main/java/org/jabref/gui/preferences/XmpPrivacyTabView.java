@@ -8,7 +8,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
@@ -18,7 +17,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -85,21 +83,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
-        addFieldName.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field object) {
-                if (object != null) {
-                    return object.getDisplayName();
-                } else {
-                    return "";
-                }
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return FieldFactory.parseField(string);
-            }
-        });
+        addFieldName.setConverter(FieldsUtil.fieldStringConverter);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));

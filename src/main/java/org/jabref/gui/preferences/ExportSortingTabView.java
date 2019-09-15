@@ -23,8 +23,7 @@ public class ExportSortingTabView extends AbstractPreferenceTabView implements P
 
         this.setWidth(650.0);
         this.setSpacing(10.0);
-        this.getChildren().add(title);
-        this.getChildren().add(exportOrderPanel);
+        this.getChildren().addAll(title, exportOrderPanel);
     }
 
     @Override
