@@ -174,8 +174,9 @@ dependencies {
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
     compile 'org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT'
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
