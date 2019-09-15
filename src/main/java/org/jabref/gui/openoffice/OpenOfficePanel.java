@@ -3,9 +3,7 @@ package org.jabref.gui.openoffice;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -135,23 +133,6 @@ public class OpenOfficePanel {
                                  Globals.prefs.getDefaultEncoding());
 
         initPanel();
-    }
-
-    private static void addURL(List<URL> jarList) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<URLClassLoader> sysclass = URLClassLoader.class;
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
-            for (URL anU : jarList) {
-                method.invoke(sysloader, anU);
-            }
-        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
-                 InvocationTargetException e) {
-            LOGGER.error("Could not add URL to system classloader", e);
-            sysloader.close();
-            throw new IOException("Error, could not add URL to system classloader", e);
-        }
     }
 
     public Node getContent() {
@@ -381,14 +362,14 @@ public class OpenOfficePanel {
     private void connect() {
         ooPrefs = jabRefPreferences.getOpenOfficePreferences();
 
-        Task<OOBibBase> connectTask = new Task<OOBibBase>() {
+        Task<OOBibBase> connectTask = new Task<>() {
 
             @Override
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
-                loadOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
+                List<URL> jarUrls = findOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
 
-                return createBibBase();
+                return createBibBase(jarUrls);
             }
         };
 
@@ -442,7 +423,7 @@ public class OpenOfficePanel {
 
     }
 
-    private void loadOpenOfficeJars(Path configurationPath) throws IOException {
+    private List<URL> findOpenOfficeJars(Path configurationPath) throws IOException {
         List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
         if (!filePaths.stream().allMatch(Optional::isPresent)) {
@@ -453,13 +434,13 @@ public class OpenOfficePanel {
         for (Optional<Path> jarPath : filePaths) {
             jarURLs.add((jarPath.get().toUri().toURL()));
         }
-        addURL(jarURLs);
+        return jarURLs;
+      
     }
 
-    private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
-        BootstrapException, CreationException {
-        // Connect
-        return new OOBibBase(ooPrefs.getExecutablePath(), true, dialogService);
+    private OOBibBase createBibBase(List<URL> jarUrls) throws IOException, InvocationTargetException, IllegalAccessException,
+        BootstrapException, CreationException, ClassNotFoundException {
+        return new OOBibBase(jarUrls, true, dialogService);
     }
 
     private Optional<Boolean> showManualConnectionDialog() {
