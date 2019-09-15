@@ -9,6 +9,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -18,15 +20,13 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class SaveOrderConfigDisplayView extends VBox {
 
-    private final SaveOrderConfig config;
-
     @FXML private ToggleGroup saveOrderToggleGroup;
-    @FXML private ComboBox<Field> savePriSort;
-    @FXML private ComboBox<Field> saveSecSort;
-    @FXML private ComboBox<Field> saveTerSort;
     @FXML private RadioButton exportInSpecifiedOrder;
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;
+    @FXML private ComboBox<Field> savePriSort;
+    @FXML private ComboBox<Field> saveSecSort;
+    @FXML private ComboBox<Field> saveTerSort;
     @FXML private CheckBox savePriDesc;
     @FXML private CheckBox saveSecDesc;
     @FXML private CheckBox saveTerDesc;
@@ -34,9 +34,7 @@ public class SaveOrderConfigDisplayView extends VBox {
 
     private SaveOrderConfigDisplayViewModel viewModel;
 
-    public SaveOrderConfigDisplayView(SaveOrderConfig config) {
-        this.config = config;
-
+    public SaveOrderConfigDisplayView() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -45,24 +43,41 @@ public class SaveOrderConfigDisplayView extends VBox {
     @FXML
     private void initialize() {
 
-        viewModel = new SaveOrderConfigDisplayViewModel(config, preferencesService);
+        viewModel = new SaveOrderConfigDisplayViewModel(preferencesService);
 
-        exportInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
         exportInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());
+        exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
+        exportInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
 
+        new ViewModelListCellFactory<Field>()
+                .withText(FieldsUtil::getNameWithType)
+                .install(savePriSort);
         savePriSort.itemsProperty().bindBidirectional(viewModel.priSortFieldsProperty());
-        saveSecSort.itemsProperty().bindBidirectional(viewModel.secSortFieldsProperty());
-        saveTerSort.itemsProperty().bindBidirectional(viewModel.terSortFieldsProperty());
-
         savePriSort.valueProperty().bindBidirectional(viewModel.savePriSortSelectedValueProperty());
+        savePriSort.setConverter(FieldsUtil.fieldStringConverter);
+
+        new ViewModelListCellFactory<Field>()
+                .withText(FieldsUtil::getNameWithType)
+                .install(saveSecSort);
+        saveSecSort.itemsProperty().bindBidirectional(viewModel.secSortFieldsProperty());
         saveSecSort.valueProperty().bindBidirectional(viewModel.saveSecSortSelectedValueProperty());
+        saveSecSort.setConverter(FieldsUtil.fieldStringConverter);
+
+        new ViewModelListCellFactory<Field>()
+                .withText(FieldsUtil::getNameWithType)
+                .install(saveTerSort);
+        saveTerSort.itemsProperty().bindBidirectional(viewModel.terSortFieldsProperty());
         saveTerSort.valueProperty().bindBidirectional(viewModel.saveTerSortSelectedValueProperty());
+        saveTerSort.setConverter(FieldsUtil.fieldStringConverter);
 
         savePriDesc.selectedProperty().bindBidirectional(viewModel.savePriDescPropertySelected());
         saveSecDesc.selectedProperty().bindBidirectional(viewModel.saveSecDescPropertySelected());
         saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTerDescPropertySelected());
 
+    }
+
+    public void setValues(SaveOrderConfig config) {
+        viewModel.setSaveOrderConfig(config);
     }
 
     public void changeExportDescriptionToSave() {

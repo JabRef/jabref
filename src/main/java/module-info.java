@@ -6,7 +6,11 @@ open module org.jabref {
     exports org.jabref.gui.maintable;
     exports org.jabref.gui.specialfields;
 
+    exports org.jabref.model.metadata;
     exports org.jabref.model.database;
+    exports org.jabref.model.entry.field;
+
+    exports org.jabref.preferences;
 
     exports org.jabref.logic;
     exports org.jabref.logic.citationstyle;

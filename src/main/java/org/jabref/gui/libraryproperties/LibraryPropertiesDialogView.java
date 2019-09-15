@@ -79,14 +79,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         encoding.disableProperty().bind(viewModel.encodingDisableProperty());
         protect.disableProperty().bind(viewModel.protectDisableProperty());
 
+        saveOrderConfigDisplayView = new SaveOrderConfigDisplayView();
         Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
-        if (storedSaveOrderConfig.isPresent()) {
-            saveOrderConfigDisplayView = new SaveOrderConfigDisplayView(storedSaveOrderConfig.get());
-            oldSaveOrderConfig = storedSaveOrderConfig.get();
-        } else {
-            oldSaveOrderConfig = preferencesService.loadExportSaveOrder();
-            saveOrderConfigDisplayView = new SaveOrderConfigDisplayView(preferencesService.loadExportSaveOrder());
-        }
+        oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
 
         saveOrderConfigDisplayView.changeExportDescriptionToSave();
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
@@ -103,6 +98,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     private void setValues() {
         fieldFormatterCleanupsPanel.setValues(panel.getBibDatabaseContext().getMetaData());
+        saveOrderConfigDisplayView.setValues(oldSaveOrderConfig);
     }
 
     @FXML

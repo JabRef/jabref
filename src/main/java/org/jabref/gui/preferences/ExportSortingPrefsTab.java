@@ -21,7 +21,7 @@ class ExportSortingPrefsTab extends Pane implements PreferencesTab {
     private final GridPane builder = new GridPane();
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
-        exportOrderPanel = new SaveOrderConfigDisplayView(prefs.loadExportSaveOrder());
+        exportOrderPanel = new SaveOrderConfigDisplayView();
 
         builder.add(exportOrderPanel, 1, 8);
         builder.add(new Line(), 2, 9);

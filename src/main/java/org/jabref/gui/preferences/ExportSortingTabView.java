@@ -18,7 +18,8 @@ public class ExportSortingTabView extends AbstractPreferenceTabView implements P
         Label title = new Label(Localization.lang("Export sorting"));
         title.getStyleClass().add("titleHeader");
 
-        exportOrderPanel = new SaveOrderConfigDisplayView(preferences.loadExportSaveOrder());
+        exportOrderPanel = new SaveOrderConfigDisplayView();
+        exportOrderPanel.setValues(preferences.loadExportSaveOrder());
 
         this.setWidth(650.0);
         this.setSpacing(10.0);
@@ -31,7 +32,7 @@ public class ExportSortingTabView extends AbstractPreferenceTabView implements P
 
     @Override
     public void setValues() {
-
+        exportOrderPanel.setValues(preferences.loadExportSaveOrder());
     }
 
     @Override
