@@ -356,7 +356,6 @@ task generateEndnoteSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-    arguments = '-encoding UTF8'
 }
 
 task generateModsSource(type: XjcTask) {
