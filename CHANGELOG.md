@@ -18,6 +18,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Fixed
 
 - Inherit fields from cross-referenced entries as specified by biblatex [#5045](https://github.com/JabRef/jabref/issues/5045)
+- We fixed an issue where it was no longer possible to connect to LibreOffice [#5261](https://github.com/JabRef/jabref/issues/5261)
+
 
 ### Removed
 
