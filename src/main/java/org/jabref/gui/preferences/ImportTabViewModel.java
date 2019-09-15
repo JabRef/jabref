@@ -1,7 +1,10 @@
 package org.jabref.gui.preferences;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -10,8 +13,9 @@ import java.util.List;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
 
-    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
+    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] { "[bibtexkey]", "[bibtexkey] - [title]" };
 
+    private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
 
@@ -21,10 +25,6 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     public ImportTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-    }
-
-    public void setDefaultNamePattern(String namePattern) {
-        fileNamePatternProperty.setValue(namePattern);
     }
 
     @Override
@@ -48,6 +48,8 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     public List<String> getRestartWarnings() {
         return new ArrayList<>();
     }
+
+    public ListProperty<String> defaultFileNamePatternsProperty() { return defaultFileNamePatternsProperty; }
 
     public StringProperty fileNamePatternProperty() { return fileNamePatternProperty; }
 
