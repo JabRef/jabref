@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import javafx.util.StringConverter;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -31,6 +32,21 @@ public class FieldsUtil {
         }
     }
 
+    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Field object) {
+            if (object != null) {
+                return object.getDisplayName();
+            } else {
+                return "";
+            }
+        }
+        @Override
+        public Field fromString(String string) {
+            return FieldFactory.parseField(string);
+        }
+    };
+
     public static class ExtraFilePseudoField implements Field {
 
         String name;
@@ -48,25 +64,10 @@ public class FieldsUtil {
         public String getName() {
             return name;
         }
-
         @Override
         public boolean isStandardField() {
             return false;
         }
-    }
 
-    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
-        @Override
-        public String toString(Field object) {
-            if (object != null) {
-                return object.getDisplayName();
-            } else {
-                return "";
-            }
-        }
-        @Override
-        public Field fromString(String string) {
-            return FieldFactory.parseField(string);
-        }
-    };
+    }
 }

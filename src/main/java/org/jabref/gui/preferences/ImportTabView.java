@@ -1,11 +1,13 @@
 package org.jabref.gui.preferences;
 
-import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel> implements PreferencesTab {
 

@@ -1,11 +1,13 @@
 package org.jabref.gui.preferences;
 
-import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> implements PreferencesTab {
 

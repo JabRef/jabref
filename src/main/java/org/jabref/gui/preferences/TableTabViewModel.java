@@ -1,12 +1,13 @@
 package org.jabref.gui.preferences;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import org.jabref.gui.DialogService;
-import org.jabref.preferences.JabRefPreferences;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+import org.jabref.gui.DialogService;
+import org.jabref.preferences.JabRefPreferences;
 
 public class TableTabViewModel implements PreferenceTabViewModel {
 

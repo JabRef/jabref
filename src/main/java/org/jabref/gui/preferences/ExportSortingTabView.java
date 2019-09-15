@@ -1,12 +1,13 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.control.Label;
+
 import org.jabref.gui.SaveOrderConfigDisplayView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExportSortingTabView extends AbstractPreferenceTabView implements PreferencesTab {
 

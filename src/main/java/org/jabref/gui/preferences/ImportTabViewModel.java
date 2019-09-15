@@ -1,15 +1,16 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
 import org.jabref.preferences.JabRefPreferences;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
 
