@@ -150,7 +150,7 @@ dependencies {
 
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.3'
 
-    compile 'org.postgresql:postgresql:42.2.6'
+    compile 'org.postgresql:postgresql:42.2.8'
 
     compile ('com.google.guava:guava:28.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
