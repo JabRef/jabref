@@ -615,7 +615,7 @@ task snapJar(dependsOn: "releaseJar", type: Delete) {
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'JabRefMain'
+        name = 'JabRefLauncher'
     }
 
     addOptions("--bind-services")
