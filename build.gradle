@@ -26,7 +26,7 @@ plugins {
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
-    id 'com.github.ben-manes.versions' version '0.24.0'
+    id 'com.github.ben-manes.versions' version '0.25.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.15.1'
