@@ -172,11 +172,11 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
-    compile 'org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-20190915.182410-364'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-20190915.182922-250'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-20190915.182113-372'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
@@ -210,8 +210,8 @@ dependencies {
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
-    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
-    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
     testCompile 'org.mockito:mockito-core:3.0.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile ('org.reflections:reflections:0.9.11') {
