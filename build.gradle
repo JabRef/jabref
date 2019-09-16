@@ -148,7 +148,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.3'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.4'
 
     compile 'org.postgresql:postgresql:42.2.6'
 
