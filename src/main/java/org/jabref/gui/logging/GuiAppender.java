@@ -20,8 +20,8 @@ public class GuiAppender extends AbstractAppender {
     }
 
     @PluginBuilderFactory
-    public static <B extends ApplicationInsightsAppender.Builder<B>> B newBuilder() {
-        return new ApplicationInsightsAppender.Builder<B>().asBuilder();
+    public static <B extends GuiAppender.Builder<B>> B newBuilder() {
+        return new GuiAppender.Builder<B>().asBuilder();
     }
 
     /**
