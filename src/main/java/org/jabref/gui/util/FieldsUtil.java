@@ -16,6 +16,22 @@ import org.jabref.model.entry.field.UnknownField;
 
 public class FieldsUtil {
 
+    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Field object) {
+            if (object != null) {
+                return object.getDisplayName();
+            } else {
+                return "";
+            }
+        }
+
+        @Override
+        public Field fromString(String string) {
+            return FieldFactory.parseField(string);
+        }
+    };
+
     public static String getNameWithType(Field field) {
         if (field instanceof SpecialField) {
             return field.getDisplayName() + " (" + Localization.lang("Special") + ")";
@@ -31,21 +47,6 @@ public class FieldsUtil {
             return field.getDisplayName();
         }
     }
-
-    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
-        @Override
-        public String toString(Field object) {
-            if (object != null) {
-                return object.getDisplayName();
-            } else {
-                return "";
-            }
-        }
-        @Override
-        public Field fromString(String string) {
-            return FieldFactory.parseField(string);
-        }
-    };
 
     public static class ExtraFilePseudoField implements Field {
 
@@ -64,6 +65,7 @@ public class FieldsUtil {
         public String getName() {
             return name;
         }
+
         @Override
         public boolean isStandardField() {
             return false;
