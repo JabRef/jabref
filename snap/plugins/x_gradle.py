@@ -177,7 +177,8 @@ class GradlePlugin(snapcraft.BasePlugin):
                 version=version, base=base, valid_versions=valid_versions
             )
 
-        self.stage_packages.append("openjdk-{}-jre-headless".format(version))
+        if self.options.gradle_build_jar:
+            self.stage_packages.append("openjdk-{}-jre-headless".format(version))
         self.build_packages.append("openjdk-{}-jdk-headless".format(version))
         self.build_packages.append("ca-certificates-java")
         self._java_version = version
@@ -250,6 +251,8 @@ class GradlePlugin(snapcraft.BasePlugin):
             raise errors.PluginBaseError(
                 part_name=self.name, base=self.project.info.get_build_base()
             )
+        if not self.options.gradle_build_jar:
+            return
 
         os.makedirs(os.path.join(self.installdir, "bin"), exist_ok=True)
         java_bin = glob(
