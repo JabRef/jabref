@@ -200,21 +200,19 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     private void dragOver(DragEvent event) { viewModel.dragOver(event); }
 
     private void dragDetectedInAvailable(MouseEvent event) {
-        PreviewTabViewModel previewTabViewModel = viewModel;
-        List<PreviewLayout> selectedLayouts = new ArrayList<>(previewTabViewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            previewTabViewModel.dragDetected(previewTabViewModel.availableListProperty(), selectedLayouts, dragboard);
+            viewModel.dragDetected(viewModel.availableListProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
 
     private void dragDetectedInChosen(MouseEvent event) {
-        PreviewTabViewModel previewTabViewModel = viewModel;
-        List<PreviewLayout> selectedLayouts = new ArrayList<>(previewTabViewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            previewTabViewModel.dragDetected(previewTabViewModel.chosenListProperty(), selectedLayouts, dragboard);
+            viewModel.dragDetected(viewModel.chosenListProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }

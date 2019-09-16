@@ -9,12 +9,15 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 
@@ -34,6 +37,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     private JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
@@ -86,7 +90,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
 
-        DefaultTaskExecutor.runInJavaFXThread(viewModel::setValues);
+        BackgroundTask.wrap(() ->
+                DefaultTaskExecutor.runInJavaFXThread(viewModel::setValues))
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 
     @FXML
