@@ -1054,8 +1054,8 @@ public class BasePanel extends StackPane {
      *
      * @param currentSearchQuery can be null
      */
-    public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
-        this.currentSearchQuery = Optional.ofNullable(currentSearchQuery);
+    public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
+        this.currentSearchQuery = currentSearchQuery;
     }
 
     public CitationStyleCache getCitationStyleCache() {
