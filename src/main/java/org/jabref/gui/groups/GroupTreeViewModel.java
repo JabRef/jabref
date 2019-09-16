@@ -126,12 +126,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard));
 
             rootGroup.setValue(newRoot);
-            this.selectedGroups.setAll(
+            selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
                             .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
                             .collect(Collectors.toList()));
         } else {
-            rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor, localDragboard));
+            rootGroup.setValue(null);
         }
 
         currentDatabase = newDatabase;

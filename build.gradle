@@ -392,6 +392,7 @@ run {
             '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
             '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
             '--add-opens', 'org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref',
+            '--add-opens', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             // Not sure why we need to restate the controlfx exports
             // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
             "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",

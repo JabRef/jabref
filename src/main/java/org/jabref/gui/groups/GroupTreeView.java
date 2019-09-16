@@ -6,15 +6,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -84,13 +81,10 @@ public class GroupTreeView {
         dragExpansionHandler = new DragExpansionHandler();
 
         // Set-up bindings
-        Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
-                (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
-
         BindingsHelper.bindContentBidirectional(
                 groupTree.getSelectionModel().getSelectedItems(),
                 viewModel.selectedGroupsProperty(),
-                updateSelectedGroups,
+                (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode),
                 this::updateSelection
         );
 
@@ -104,11 +98,17 @@ public class GroupTreeView {
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
-                        group -> new RecursiveTreeItem<>(
-                                group,
-                                GroupNodeViewModel::getChildren,
-                                GroupNodeViewModel::expandedProperty,
-                                viewModel.filterPredicateProperty())));
+                        group -> {
+                            if (group == null) {
+                                return null;
+                            } else {
+                                return new RecursiveTreeItem<>(
+                                        group,
+                                        GroupNodeViewModel::getChildren,
+                                        GroupNodeViewModel::expandedProperty,
+                                        viewModel.filterPredicateProperty());
+                            }
+                        }));
 
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
@@ -343,7 +343,8 @@ public class GroupTreeView {
         return menu;
     }
 
-    public void addNewGroup(ActionEvent actionEvent) {
+    @FXML
+    private void addNewGroup() {
         viewModel.addNewGroupToRoot();
     }
 
