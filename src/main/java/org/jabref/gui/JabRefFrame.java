@@ -163,65 +163,8 @@ public class JabRefFrame extends BorderPane {
         this.undoManager = Globals.undoManager;
     }
 
-    public void init() {
-        sidePaneManager = new SidePaneManager(Globals.prefs, this);
-        sidePane = sidePaneManager.getPane();
-
-        tabbedPane = new TabPane();
-        tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
-
-        initLayout();
-
-        initKeyBindings();
-
-        initDragAndDrop();
-
-        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
-        //        JabRefPreferences.SIZE_Y);
-        //pw.displayWindowAtStoredLocation();
-
-        /*
-         * The following state listener makes sure focus is registered with the
-         * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would some times occur in the wrong tab.
-         */
-        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), e -> {
-            if (e == null) {
-                stateManager.activeDatabaseProperty().setValue(Optional.empty());
-                return;
-            }
-
-            BasePanel currentBasePanel = getCurrentBasePanel();
-            if (currentBasePanel == null) {
-                return;
-            }
-
-            // Poor-mans binding to global state
-            stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext()));
-            stateManager.setSelectedEntries(currentBasePanel.getSelectedEntries());
-
-            // Update search query
-            String content = "";
-            Optional<SearchQuery> currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-            if (currentSearchQuery.isPresent()) {
-                content = currentSearchQuery.get().getQuery();
-            }
-            globalSearchBar.setSearchTerm(content);
-
-            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-
-            setWindowTitle();
-            // Update search autocompleter with information for the correct database:
-            currentBasePanel.updateSearchManager();
-
-            currentBasePanel.getUndoManager().postUndoRedoEvent();
-            currentBasePanel.getMainTable().requestFocus();
-        });
-        initShowTrackingNotification();
+    private static BasePanel getBasePanel(Tab tab) {
+        return (BasePanel) tab.getContent();
     }
 
     public void initDragAndDrop() {
@@ -612,6 +555,66 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getSelectionModel().select(getTab(bp));
     }
 
+    public void init() {
+        sidePaneManager = new SidePaneManager(Globals.prefs, this);
+        sidePane = sidePaneManager.getPane();
+
+        tabbedPane = new TabPane();
+        tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+
+        initLayout();
+
+        initKeyBindings();
+
+        initDragAndDrop();
+
+        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        //        JabRefPreferences.SIZE_Y);
+        //pw.displayWindowAtStoredLocation();
+
+        // Bind global state
+        stateManager.activeDatabaseProperty().bind(
+                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
+                        tab -> Optional.ofNullable(tab).map(JabRefFrame::getBasePanel).map(BasePanel::getBibDatabaseContext)));
+        /*
+         * The following state listener makes sure focus is registered with the
+         * correct database when the user switches tabs. Without this,
+         * cut/paste/copy operations would some times occur in the wrong tab.
+         */
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
+            if (tab == null) {
+                return;
+            }
+
+            BasePanel newBasePanel = getBasePanel(tab);
+
+            // Poor-mans binding to global state
+            stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
+
+            // Update search query
+            String content = "";
+            Optional<SearchQuery> currentSearchQuery = newBasePanel.getCurrentSearchQuery();
+            if (currentSearchQuery.isPresent()) {
+                content = currentSearchQuery.get().getQuery();
+            }
+            globalSearchBar.setSearchTerm(content);
+
+            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
+            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+
+            setWindowTitle();
+            // Update search autocompleter with information for the correct database:
+            newBasePanel.updateSearchManager();
+
+            newBasePanel.getUndoManager().postUndoRedoEvent();
+            newBasePanel.getMainTable().requestFocus();
+        });
+        initShowTrackingNotification();
+    }
+
     /**
      * Returns the currently viewed BasePanel.
      */
@@ -619,7 +622,7 @@ public class JabRefFrame extends BorderPane {
         if ((tabbedPane == null) || (tabbedPane.getSelectionModel().getSelectedItem() == null)) {
             return null;
         }
-        return (BasePanel) tabbedPane.getSelectionModel().getSelectedItem().getContent();
+        return getBasePanel(tabbedPane.getSelectionModel().getSelectedItem());
     }
 
     /**

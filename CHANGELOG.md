@@ -17,8 +17,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 
-- Inherit fields from cross-referenced entries as specified by biblatex [#5045](https://github.com/JabRef/jabref/issues/5045)
-- We fixed an issue where it was no longer possible to connect to LibreOffice [#5261](https://github.com/JabRef/jabref/issues/5261)
+- Inherit fields from cross-referenced entries as specified by biblatex. [#5045](https://github.com/JabRef/jabref/issues/5045)
+- We fixed an issue where it was no longer possible to connect to LibreOffice. [#5261](https://github.com/JabRef/jabref/issues/5261)
+- The "All entries group" is no longer shown when no library is open.
+- The group panel is now properly updated when switching between libraries (or when closing/opening one). [#3142](https://github.com/JabRef/jabref/issues/3142)
+- We fixed an error where the number of matched entries shown in the group pane was not updated correctly. [#4441](https://github.com/JabRef/jabref/issues/4441)
+- We fixed an error mentioning "javafx.controls/com.sun.javafx.scene.control" that was thrown when interacting with the toolbar.
 
 
 ### Removed
