@@ -92,7 +92,5 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
-    public void mainFileDirBrowse() {
-        ((FileTabViewModel) viewModel).mainFileDirBrowse();
-    }
+    public void mainFileDirBrowse() { viewModel.mainFileDirBrowse(); }
 }

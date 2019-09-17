@@ -52,9 +52,8 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         formatterNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterNameColumn.setEditable(true);
         formatterNameColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getRowValue().setName(event.getNewValue());
-                });
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
+                        event.getRowValue().setName(event.getNewValue()));
 
         formatterStringColumn.setSortable(true);
         formatterStringColumn.setReorderable(false);
@@ -62,9 +61,8 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         formatterStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterStringColumn.setEditable(true);
         formatterStringColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getRowValue().setFormat(event.getNewValue());
-                });
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
+                    event.getRowValue().setFormat(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
@@ -72,9 +70,8 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         new ValueTableCellFactory<NameFormatterItemModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove") + " " + name)
-                .withOnMouseClickedEvent(item -> evt -> {
-                    viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem());
-                })
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
         formatterList.setOnKeyPressed(event -> {
@@ -92,8 +89,6 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER), formatterHelp);
     }
 
-    public void addFormatter() {
-        ((NameFormatterTabViewModel) viewModel).addFormatter();
-    }
+    public void addFormatter() { viewModel.addFormatter(); }
 
 }

@@ -109,22 +109,14 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     }
 
     @FXML
-    void exportPreferences() {
-        viewModel.exportPreferences();
-    }
+    void exportPreferences() { viewModel.exportPreferences(); }
 
     @FXML
-    void importPreferences() {
-        viewModel.importPreferences();
-    }
+    void importPreferences() { viewModel.importPreferences(); }
 
     @FXML
-    void showAllPreferences() {
-        viewModel.showPreferences();
-    }
+    void showAllPreferences() { viewModel.showPreferences(); }
 
     @FXML
-    void resetPreferences() {
-        viewModel.resetPreferences();
-    }
+    void resetPreferences() { viewModel.resetPreferences(); }
 }

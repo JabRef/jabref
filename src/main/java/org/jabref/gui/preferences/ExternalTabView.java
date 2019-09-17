@@ -93,28 +93,20 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     }
 
     @FXML
-    void pushToApplicationSettings() { ((ExternalTabViewModel) viewModel).pushToApplicationSettings(); }
+    void pushToApplicationSettings() { viewModel.pushToApplicationSettings(); }
 
     @FXML
-    void manageExternalFileTypes() {
-        ((ExternalTabViewModel) viewModel).manageExternalFileTypes();
-    }
+    void manageExternalFileTypes() { viewModel.manageExternalFileTypes(); }
 
     @FXML
-    void useTerminalCommandBrowse() {
-        ((ExternalTabViewModel) viewModel).useTerminalCommandBrowse();
-    }
+    void useTerminalCommandBrowse() { viewModel.useTerminalCommandBrowse(); }
 
     @FXML
-    void usePDFAcrobatCommandBrowse() {
-        ((ExternalTabViewModel) viewModel).usePDFAcrobatCommandBrowse();
-    }
+    void usePDFAcrobatCommandBrowse() { viewModel.usePDFAcrobatCommandBrowse(); }
 
     @FXML
-    void usePDFSumatraCommandBrowse() {
-        ((ExternalTabViewModel) viewModel).usePDFSumatraCommandBrowse();
-    }
+    void usePDFSumatraCommandBrowse() { viewModel.usePDFSumatraCommandBrowse(); }
 
     @FXML
-    void useFileBrowserSpecialCommandBrowse() { ((ExternalTabViewModel) viewModel).useFileBrowserSpecialCommandBrowse(); }
+    void useFileBrowserSpecialCommandBrowse() { viewModel.useFileBrowserSpecialCommandBrowse(); }
 }
