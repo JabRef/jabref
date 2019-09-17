@@ -59,7 +59,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     public FileTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        setValues();
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirProperty,

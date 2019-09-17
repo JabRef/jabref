@@ -3,8 +3,11 @@ package org.jabref.gui.util;
 import java.util.Collections;
 import java.util.Set;
 
+import javafx.util.StringConverter;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
@@ -12,6 +15,22 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.UnknownField;
 
 public class FieldsUtil {
+
+    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(Field object) {
+            if (object != null) {
+                return object.getDisplayName();
+            } else {
+                return "";
+            }
+        }
+
+        @Override
+        public Field fromString(String string) {
+            return FieldFactory.parseField(string);
+        }
+    };
 
     public static String getNameWithType(Field field) {
         if (field instanceof SpecialField) {
@@ -51,5 +70,6 @@ public class FieldsUtil {
         public boolean isStandardField() {
             return false;
         }
+
     }
 }

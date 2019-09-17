@@ -9,7 +9,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -22,13 +21,12 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class TableColumnsTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<TableColumnsItemModel> columnsList;
     @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
@@ -85,61 +83,47 @@ public class TableColumnsTabView extends AbstractPreferenceTabView implements Pr
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove column") + " " + name.getDisplayName())
                 .withOnMouseClickedEvent(item -> evt ->
-                        ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getFocusModel().getFocusedItem()))
+                        viewModel.removeColumn(columnsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
-        ((TableColumnsTabViewModel) viewModel).selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
+        viewModel.selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
         columnsList.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
-                ((TableColumnsTabViewModel) viewModel).removeColumn(columnsList.getSelectionModel().getSelectedItem());
+                viewModel.removeColumn(columnsList.getSelectionModel().getSelectedItem());
             }
         });
 
-        columnsList.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).columnsListProperty());
+        columnsList.itemsProperty().bind(viewModel.columnsListProperty());
 
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(addColumnName);
-        addColumnName.itemsProperty().bind(((TableColumnsTabViewModel) viewModel).availableColumnsProperty());
-        addColumnName.valueProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).addColumnProperty());
-        addColumnName.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Field object) {
-                if (object != null) {
-                    return object.getName();
-                } else {
-                    return "";
-                }
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return FieldFactory.parseField(string);
-            }
-        });
+        addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
+        addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
+        addColumnName.setConverter(FieldsUtil.fieldStringConverter);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(((TableColumnsTabViewModel) viewModel).columnsListValidationStatus(), columnsList));
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));
     }
 
     private void setupBindings() {
-        showFileColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showFileColumnProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showUrlColumnProperty());
-        urlFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).preferDoiProperty());
-        showEPrintColumn.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).showEPrintColumnProperty());
-        specialFieldsEnable.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsEnabledProperty());
-        specialFieldsSyncKeywords.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSyncKeywordsProperty());
-        specialFieldsSerialize.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).specialFieldsSerializeProperty());
-        extraFileColumnsEnable.selectedProperty().bindBidirectional(((TableColumnsTabViewModel) viewModel).extraFileColumnsEnabledProperty());
+        showFileColumn.selectedProperty().bindBidirectional(viewModel.showFileColumnProperty());
+        showUrlColumn.selectedProperty().bindBidirectional(viewModel.showUrlColumnProperty());
+        urlFirst.selectedProperty().bindBidirectional(viewModel.preferUrlProperty());
+        doiFirst.selectedProperty().bindBidirectional(viewModel.preferDoiProperty());
+        showEPrintColumn.selectedProperty().bindBidirectional(viewModel.showEPrintColumnProperty());
+        specialFieldsEnable.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
+        specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
+        specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
+        extraFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
     }
 
-    public void updateToCurrentColumnOrder() { ((TableColumnsTabViewModel) viewModel).fillColumnList(); }
+    public void updateToCurrentColumnOrder() { viewModel.fillColumnList(); }
 
-    public void sortColumnUp() { ((TableColumnsTabViewModel) viewModel).moveColumnUp(); }
+    public void sortColumnUp() { viewModel.moveColumnUp(); }
 
-    public void sortColumnDown() { ((TableColumnsTabViewModel) viewModel).moveColumnDown(); }
+    public void sortColumnDown() { viewModel.moveColumnDown(); }
 
-    public void addColumn() { ((TableColumnsTabViewModel) viewModel).insertColumnInList(); }
+    public void addColumn() { viewModel.insertColumnInList(); }
 
 }
