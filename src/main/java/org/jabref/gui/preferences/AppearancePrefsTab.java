@@ -24,7 +24,6 @@ import org.jabref.preferences.JabRefPreferences;
 class AppearancePrefsTab extends Pane implements PreferencesTab {
 
     private final JabRefPreferences prefs;
-    private final CheckBox fontTweaksLAF;
     private final TextField fontSize;
     private final CheckBox overrideFonts;
     private final DialogService dialogService;
@@ -46,7 +45,6 @@ class AppearancePrefsTab extends Pane implements PreferencesTab {
         fontSize = new TextField();
         fontSize.setTextFormatter(ControlHelper.getIntegerTextFormatter());
         Label fontSizeLabel = new Label(Localization.lang("Font size:"));
-        fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
         ToggleGroup themeGroup = new ToggleGroup();
         lightTheme = new RadioButton("Light theme");
@@ -83,17 +81,12 @@ class AppearancePrefsTab extends Pane implements PreferencesTab {
 
     @Override
     public void setValues() {
-        fontTweaksLAF.setSelected(prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
         overrideFonts.setSelected(prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
         fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
     }
 
     @Override
     public void storeSettings() {
-        // Java FX font rendering tweak
-        final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
-        prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fontTweaksLAF.isSelected());
-
         final boolean oldOverrideDefaultFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE);
         final int oldFontSize = prefs.getInt(JabRefPreferences.MAIN_FONT_SIZE);
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE, overrideFonts.isSelected());
@@ -111,8 +104,7 @@ class AppearancePrefsTab extends Pane implements PreferencesTab {
         }
 
         boolean isRestartRequired =
-                (oldFxTweakValue != fontTweaksLAF.isSelected())
-                        || (oldOverrideDefaultFontSize != overrideFonts.isSelected())
+                (oldOverrideDefaultFontSize != overrideFonts.isSelected())
                         || (oldFontSize != newFontSize)
                         || isThemeChanged;
         if (isRestartRequired) {

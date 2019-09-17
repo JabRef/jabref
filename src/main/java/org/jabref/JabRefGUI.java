@@ -62,8 +62,6 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-        applyFontRenderingTweak();
-
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             openLastEditedDatabases();
@@ -227,15 +225,6 @@ public class JabRefGUI {
             }
         }
         return false;
-    }
-
-    private void applyFontRenderingTweak() {
-        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering setting.
-        // See https://github.com/woky/javafx-hates-linux
-        if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
-            System.setProperty("prism.text", "t2k");
-            System.setProperty("prism.lcdtext", "true");
-        }
     }
 
     public static JabRefFrame getMainFrame() {
