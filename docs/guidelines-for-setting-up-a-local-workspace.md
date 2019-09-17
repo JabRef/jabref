@@ -67,6 +67,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
    --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+   --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
    --patch-module org.jabref=build\resources\main
    ```
 4. Optional: Use IntellJ to build and run (instead of gradle): File -> Settings -> Build, Execution, Deployment ->  Build Tools -> Gradle -> Under "Build and run using" and "Run tests using" choose "Intellj IDEA"
