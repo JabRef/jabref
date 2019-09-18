@@ -408,6 +408,7 @@ run {
             "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
             "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
             "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
             "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
