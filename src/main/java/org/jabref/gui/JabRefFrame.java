@@ -109,7 +109,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -141,7 +140,7 @@ public class JabRefFrame extends BorderPane {
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
-    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
     private final ProgressBar progressBar = new ProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
@@ -577,6 +576,15 @@ public class JabRefFrame extends BorderPane {
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
                         tab -> Optional.ofNullable(tab).map(JabRefFrame::getBasePanel).map(BasePanel::getBibDatabaseContext)));
+
+        // Subscribe to the search
+        EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
+                query -> {
+                    if (getCurrentBasePanel() != null) {
+                        getCurrentBasePanel().setCurrentSearchQuery(query);
+                    }
+                });
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
@@ -592,13 +600,8 @@ public class JabRefFrame extends BorderPane {
             // Poor-mans binding to global state
             stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
 
-            // Update search query
-            String content = "";
-            Optional<SearchQuery> currentSearchQuery = newBasePanel.getCurrentSearchQuery();
-            if (currentSearchQuery.isPresent()) {
-                content = currentSearchQuery.get().getQuery();
-            }
-            globalSearchBar.setSearchTerm(content);
+            // Update active search query when switching between databases
+            stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
 
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
