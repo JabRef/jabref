@@ -27,7 +27,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     public GroupsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        setValues();
     }
 
     @Override

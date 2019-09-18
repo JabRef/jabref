@@ -78,8 +78,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.taskExecutor = taskExecutor;
         previewPreferences = preferences.getPreviewPreferences();
 
-        setValues();
-
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
             if (getCurrentLayout() instanceof TextBasedPreviewLayout) {
                 ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));

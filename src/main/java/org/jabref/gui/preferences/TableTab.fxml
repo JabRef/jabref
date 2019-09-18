@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root prefWidth="650.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/11.0.1"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.TableTabView">
+    <fx:define>
+        <ToggleGroup fx:id="namesFormat"/>
+        <ToggleGroup fx:id="abbreviationMode"/>
+    </fx:define>
+    <Label styleClass="titleHeader" text="%Entry table"/>
+
+    <Label styleClass="sectionHeader" text="%General"/>
+    <CheckBox fx:id="autoResizeName" text="%Fit table horizontally on screen"/>
+
+    <Label styleClass="sectionHeader" text="%Format of author and editor names"/>
+    <RadioButton fx:id="namesNatbib" mnemonicParsing="false" text="%Natbib style" toggleGroup="$namesFormat"/>
+    <RadioButton fx:id="nameAsIs" mnemonicParsing="false" text="%Show names unchanged" toggleGroup="$namesFormat"/>
+    <RadioButton fx:id="nameFirstLast" mnemonicParsing="false" text="%Show 'Firstname Lastname'" toggleGroup="$namesFormat"/>
+    <RadioButton fx:id="nameLastFirst" mnemonicParsing="false" text="%Show 'Lastname, Firstname'" toggleGroup="$namesFormat"/>
+    <Label styleClass="sectionHeader" text="%Abbreviations"/>
+    <RadioButton fx:id="abbreviationDisabled" disable="${namesNatbib.selected}" text="%Do not abbreviate names" toggleGroup="$abbreviationMode"/>
+    <RadioButton fx:id="abbreviationEnabled" disable="${namesNatbib.selected}" text="%Abbreviate names" toggleGroup="$abbreviationMode"/>
+    <RadioButton fx:id="abbreviationLastNameOnly" disable="${namesNatbib.selected}" text="%Show last names only" toggleGroup="$abbreviationMode"/>
+</fx:root>

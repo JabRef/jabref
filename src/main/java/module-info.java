@@ -62,4 +62,7 @@ open module org.jabref {
     requires antlr.runtime;
     requires commons.lang3;
     requires xmpbox;
+    requires de.saxsys.mvvmfx.validation;
+    requires richtextfx;
+    requires unirest.java;
 }

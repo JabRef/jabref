@@ -59,8 +59,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.frame = frame;
-
-        setValues();
     }
 
     public void setValues() {

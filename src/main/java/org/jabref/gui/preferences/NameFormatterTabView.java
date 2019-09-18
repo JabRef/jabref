@@ -20,7 +20,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class NameFormatterTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatterTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<NameFormatterItemModel> formatterList;
     @FXML private TableColumn<NameFormatterItemModel, String> formatterNameColumn;
@@ -42,8 +42,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
     public String getTabName() { return Localization.lang("Name formatter"); }
 
     public void initialize () {
-        NameFormatterTabViewModel nameFormatterTabViewModel = new NameFormatterTabViewModel(dialogService, preferences);
-        this.viewModel = nameFormatterTabViewModel;
+        this.viewModel = new NameFormatterTabViewModel(dialogService, preferences);
 
         formatterList.setEditable(true);
 
@@ -53,9 +52,8 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         formatterNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterNameColumn.setEditable(true);
         formatterNameColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getRowValue().setName(event.getNewValue());
-                });
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
+                        event.getRowValue().setName(event.getNewValue()));
 
         formatterStringColumn.setSortable(true);
         formatterStringColumn.setReorderable(false);
@@ -63,9 +61,8 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         formatterStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         formatterStringColumn.setEditable(true);
         formatterStringColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) -> {
-                    event.getRowValue().setFormat(event.getNewValue());
-                });
+                (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
+                    event.getRowValue().setFormat(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
@@ -73,28 +70,25 @@ public class NameFormatterTabView extends AbstractPreferenceTabView implements P
         new ValueTableCellFactory<NameFormatterItemModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove") + " " + name)
-                .withOnMouseClickedEvent(item -> evt -> {
-                    nameFormatterTabViewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem());
-                })
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
         formatterList.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
-                nameFormatterTabViewModel.removeFormatter(formatterList.getSelectionModel().getSelectedItem());
+                viewModel.removeFormatter(formatterList.getSelectionModel().getSelectedItem());
             }
         });
 
-        formatterList.itemsProperty().bindBidirectional(nameFormatterTabViewModel.formatterListProperty());
+        formatterList.itemsProperty().bindBidirectional(viewModel.formatterListProperty());
 
-        addFormatterName.textProperty().bindBidirectional(nameFormatterTabViewModel.addFormatterNameProperty());
-        addFormatterString.textProperty().bindBidirectional(nameFormatterTabViewModel.addFormatterStringProperty());
+        addFormatterName.textProperty().bindBidirectional(viewModel.addFormatterNameProperty());
+        addFormatterString.textProperty().bindBidirectional(viewModel.addFormatterStringProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER), formatterHelp);
     }
 
-    public void addFormatter() {
-        ((NameFormatterTabViewModel) viewModel).addFormatter();
-    }
+    public void addFormatter() { viewModel.addFormatter(); }
 
 }

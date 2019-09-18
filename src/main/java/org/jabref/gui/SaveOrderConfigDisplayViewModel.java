@@ -37,15 +37,13 @@ public class SaveOrderConfigDisplayViewModel {
 
     private final PreferencesService prefs;
 
-    public SaveOrderConfigDisplayViewModel(SaveOrderConfig config, PreferencesService prefs) {
+    public SaveOrderConfigDisplayViewModel(PreferencesService prefs) {
         this.prefs = prefs;
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();
         priSortFieldsProperty.addAll(fieldNames);
         secSortFieldsProperty.addAll(fieldNames);
         terSortFieldsProperty.addAll(fieldNames);
-
-        setSaveOrderConfig(config);
     }
 
     public ListProperty<Field> priSortFieldsProperty() {

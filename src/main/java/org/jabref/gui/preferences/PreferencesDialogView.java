@@ -34,14 +34,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     private JabRefFrame frame;
-    private TaskExecutor taskExecutor;
     private PreferencesDialogViewModel viewModel;
 
-    public PreferencesDialogView(JabRefFrame frame, TaskExecutor taskExecutor) {
+    public PreferencesDialogView(JabRefFrame frame) {
         this.frame = frame;
-        this.taskExecutor = taskExecutor;
         this.setTitle(Localization.lang("JabRef preferences"));
 
         ViewLoader.view(this)
@@ -61,7 +60,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, taskExecutor, frame);
+        viewModel = new PreferencesDialogViewModel(dialogService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
@@ -76,10 +75,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab != null) {
-                preferencePaneContainer.setContent(tab.getBuilder());
-            } else {
+            if (tab == null) {
                 preferencePaneContainer.setContent(null);
+            } else {
+                preferencePaneContainer.setContent(tab.getBuilder());
             }
         });
 
@@ -88,7 +87,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
 
-        viewModel.setValues(); // ToDo: Remove this after conversion of all tabs
+        viewModel.setValues();
     }
 
     @FXML
@@ -105,22 +104,14 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     }
 
     @FXML
-    void exportPreferences() {
-        viewModel.exportPreferences();
-    }
+    void exportPreferences() { viewModel.exportPreferences(); }
 
     @FXML
-    void importPreferences() {
-        viewModel.importPreferences();
-    }
+    void importPreferences() { viewModel.importPreferences(); }
 
     @FXML
-    void showAllPreferences() {
-        viewModel.showPreferences();
-    }
+    void showAllPreferences() { viewModel.showPreferences(); }
 
     @FXML
-    void resetPreferences() {
-        viewModel.resetPreferences();
-    }
+    void resetPreferences() { viewModel.resetPreferences(); }
 }

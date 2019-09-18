@@ -61,7 +61,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public GeneralTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        setValues();
 
         markTimeStampFormatValidator = new FunctionBasedValidator<>(
                 markTimeStampFormatProperty,

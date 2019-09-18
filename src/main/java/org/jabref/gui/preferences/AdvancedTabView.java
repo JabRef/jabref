@@ -23,7 +23,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
-public class AdvancedTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
@@ -62,35 +62,34 @@ public class AdvancedTabView extends AbstractPreferenceTabView implements Prefer
     public String getTabName() { return Localization.lang("Advanced"); }
 
     public void initialize() {
-        AdvancedTabViewModel advancedTabViewModel = new AdvancedTabViewModel(dialogService, preferences);
-        this.viewModel = advancedTabViewModel;
+        this.viewModel = new AdvancedTabViewModel(dialogService, preferences);
 
         remoteLabel.setVisible(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
-        remoteServer.selectedProperty().bindBidirectional(advancedTabViewModel.remoteServerProperty());
-        remotePort.textProperty().bindBidirectional(advancedTabViewModel.remotePortProperty());
+        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
+        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
 
-        useIEEELatexAbbreviations.selectedProperty().bindBidirectional(advancedTabViewModel.useIEEELatexAbbreviationsProperty());
+        useIEEELatexAbbreviations.selectedProperty().bindBidirectional(viewModel.useIEEELatexAbbreviationsProperty());
 
-        useCaseKeeper.selectedProperty().bindBidirectional(advancedTabViewModel.useCaseKeeperProperty());
-        useUnitFormatter.selectedProperty().bindBidirectional(advancedTabViewModel.useUnitFormatterProperty());
+        useCaseKeeper.selectedProperty().bindBidirectional(viewModel.useCaseKeeperProperty());
+        useUnitFormatter.selectedProperty().bindBidirectional(viewModel.useUnitFormatterProperty());
 
-        proxyUse.selectedProperty().bindBidirectional(advancedTabViewModel.proxyUseProperty());
+        proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());
-        proxyHostname.textProperty().bindBidirectional(advancedTabViewModel.proxyHostnameProperty());
+        proxyHostname.textProperty().bindBidirectional(viewModel.proxyHostnameProperty());
         proxyHostname.disableProperty().bind(proxyUse.selectedProperty().not());
         proxyPortLabel.disableProperty().bind(proxyUse.selectedProperty().not());
-        proxyPort.textProperty().bindBidirectional(advancedTabViewModel.proxyPortProperty());
+        proxyPort.textProperty().bindBidirectional(viewModel.proxyPortProperty());
         proxyPort.disableProperty().bind(proxyUse.selectedProperty().not());
-        proxyUseAuthentication.selectedProperty().bindBidirectional(advancedTabViewModel.proxyUseAuthenticationProperty());
+        proxyUseAuthentication.selectedProperty().bindBidirectional(viewModel.proxyUseAuthenticationProperty());
         proxyUseAuthentication.disableProperty().bind(proxyUse.selectedProperty().not());
 
         BooleanBinding proxyCustomAndAuthentication = proxyUse.selectedProperty().and(proxyUseAuthentication.selectedProperty());
         proxyUsernameLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
-        proxyUsername.textProperty().bindBidirectional(advancedTabViewModel.proxyUsernameProperty());
+        proxyUsername.textProperty().bindBidirectional(viewModel.proxyUsernameProperty());
         proxyUsername.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPasswordLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
-        proxyPassword.textProperty().bindBidirectional(advancedTabViewModel.proxyPasswordProperty());
+        proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyAttentionLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
 
@@ -104,11 +103,11 @@ public class AdvancedTabView extends AbstractPreferenceTabView implements Prefer
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
-            validationVisualizer.initVisualization(advancedTabViewModel.remotePortValidationStatus(), remotePort);
-            validationVisualizer.initVisualization(advancedTabViewModel.proxyHostnameValidationStatus(), proxyHostname);
-            validationVisualizer.initVisualization(advancedTabViewModel.proxyPortValidationStatus(), proxyPort);
-            validationVisualizer.initVisualization(advancedTabViewModel.proxyUsernameValidationStatus(), proxyUsername);
-            validationVisualizer.initVisualization(advancedTabViewModel.proxyPasswordValidationStatus(), proxyPassword);
+            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+            validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
+            validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
+            validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
+            validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
         });
     }
 

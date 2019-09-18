@@ -53,6 +53,7 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -336,7 +337,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                         }
                     } else if (texRadioButton.isSelected()) {
                         resultingGroup = TexGroup.create(groupName, getContext(),
-                                                      Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor(), basePanel.getBibDatabaseContext().getMetaData());
+                                Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor(), basePanel.getBibDatabaseContext().getMetaData());
                     }
 
                     resultingGroup.setColor(colorField.getValue());
@@ -376,6 +377,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             editedGroup.getColor().ifPresent(colorField::setValue);
             descriptionField.setText(editedGroup.getDescription().orElse(""));
             iconField.setText(editedGroup.getIconName().orElse(""));
+            setContext(editedGroup.getHierarchicalContext());
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
@@ -384,7 +386,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(false);
                 keywordsRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == RegexKeywordGroup.class) {
                 RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
                 keywordGroupSearchField.setText(group.getSearchField().getName());
@@ -392,20 +393,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 keywordGroupRegExp.setSelected(true);
                 keywordsRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == SearchGroup.class) {
                 SearchGroup group = (SearchGroup) editedGroup;
                 searchGroupSearchExpression.setText(group.getSearchExpression());
                 searchGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 searchGroupRegExp.setSelected(group.isRegularExpression());
                 searchRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == ExplicitGroup.class) {
                 explicitRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
-            } else if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
+            } else if (editedGroup instanceof AutomaticGroup) {
                 autoRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
@@ -418,7 +415,6 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
                 texRadioButton.setSelected(true);
-                setContext(editedGroup.getHierarchicalContext());
 
                 TexGroup group = (TexGroup) editedGroup;
                 texGroupFilePath.setText(group.getFilePath().toString());
@@ -588,7 +584,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
             if (okEnabled) {
                 setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
                         new SearchQuery(s1, isCaseSensitive(), isRegex()))
-                        .getDescription()));
+                                                                        .getDescription()));
 
                 if (isRegex()) {
                     try {
@@ -615,9 +611,9 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
 
     private void openBrowseDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-            .addExtensionFilter(StandardFileType.AUX)
-            .withDefaultExtension(StandardFileType.AUX)
-            .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .addExtensionFilter(StandardFileType.AUX)
+                .withDefaultExtension(StandardFileType.AUX)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePath.setText(relativize(file.toAbsolutePath()).toString()));
     }
 
@@ -672,21 +668,18 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
                 Text textElement = new Text(bs);
                 textElement.setStyle("-fx-font-weight: bold");
                 nodes.add(textElement);
-
             } else if (bs.matches("<i>[^<>]*</i>")) {
 
                 bs = bs.replaceAll("<i>|</i>", "");
                 Text textElement = new Text(bs);
                 textElement.setStyle("-fx-font-style: italic");
                 nodes.add(textElement);
-
             } else if (bs.matches("<tt>[^<>]*</tt>|<kbd>[^<>]*</kbd>")) {
 
                 bs = bs.replaceAll("<tt>|</tt>|<kbd>|</kbd>", "");
                 Text textElement = new Text(bs);
                 textElement.setStyle("-fx-font-family: 'Courier New', Courier, monospace");
                 nodes.add(textElement);
-
             } else {
                 nodes.add(new Text(bs));
             }
@@ -724,12 +717,16 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     }
 
     private void setContext(GroupHierarchyType context) {
-        if (context == GroupHierarchyType.REFINING) {
-            intersectionButton.setSelected(true);
-        } else if (context == GroupHierarchyType.INCLUDING) {
-            unionButton.setSelected(true);
-        } else {
-            independentButton.setSelected(true);
+        switch (context) {
+            case INDEPENDENT:
+                independentButton.setSelected(true);
+                break;
+            case REFINING:
+                intersectionButton.setSelected(true);
+                break;
+            case INCLUDING:
+                unionButton.setSelected(true);
+                break;
         }
     }
 }

@@ -36,7 +36,7 @@
             <ComboBox fx:id="addColumnName" editable="true" maxWidth="Infinity"/>
         </VBox>
         <VBox alignment="CENTER">
-            <Button fx:id="reloadTableColumns" prefHeight="20.0" prefWidth="20.0"
+            <Button prefHeight="20.0" prefWidth="20.0"
                     styleClass="icon-button,narrow" onAction="#updateToCurrentColumnOrder">
                 <graphic>
                     <JabRefIconView glyph="REFRESH"/>
@@ -49,7 +49,7 @@
                 <Button prefHeight="20.0" prefWidth="20.0"
                         styleClass="icon-button,narrow" onAction="#sortColumnUp">
                     <graphic>
-                        <JabRefIconView glyph="UP"/>
+                        <JabRefIconView glyph="LIST_MOVE_UP"/>
                     </graphic>
                     <tooltip>
                         <Tooltip text="%Sort column one step upwards"/>
@@ -58,7 +58,7 @@
                 <Button prefHeight="20.0" prefWidth="20.0"
                         styleClass="icon-button,narrow" onAction="#sortColumnDown">
                     <graphic>
-                        <JabRefIconView glyph="DOWN"/>
+                        <JabRefIconView glyph="LIST_MOVE_DOWN"/>
                     </graphic>
                     <tooltip>
                         <Tooltip text="%Sort column one step downwards"/>

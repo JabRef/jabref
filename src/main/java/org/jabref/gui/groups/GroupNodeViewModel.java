@@ -113,8 +113,13 @@ public class GroupNodeViewModel {
         //    return; // user aborted operation
         //}
 
-        return groupNode.addEntriesToGroup(entries);
+        var changes = groupNode.addEntriesToGroup(entries);
 
+        // Update appearance of group
+        anySelectedEntriesMatched.invalidate();
+        allSelectedEntriesMatched.invalidate();
+
+        return changes;
         // TODO: Store undo
         // if (!undo.isEmpty()) {
         // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
