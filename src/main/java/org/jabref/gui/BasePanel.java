@@ -1051,8 +1051,6 @@ public class BasePanel extends StackPane {
 
     /**
      * Set the query the user currently searches while this basepanel is active
-     *
-     * @param currentSearchQuery can be null
      */
     public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
         this.currentSearchQuery = currentSearchQuery;
