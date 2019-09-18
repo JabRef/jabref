@@ -111,8 +111,7 @@ public class GroupTreeView {
                         }));
 
         // Icon and group name
-        mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription)
@@ -121,7 +120,7 @@ public class GroupTreeView {
         // Number of hits
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
-        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(group -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
@@ -141,8 +140,7 @@ public class GroupTreeView {
                 .install(numberColumn);
 
         // Arrow indicating expanded status
-        disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
                     final StackPane disclosureNode = new StackPane();
                     disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
