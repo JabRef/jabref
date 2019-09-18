@@ -92,8 +92,10 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
       ```
       --add-exports org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-exports org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref --add-opens org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref --add-opens org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
       ```
-7. Create a run/debug configuration for main class `org.jabref.JabRefLauncher` 
-8. In the arguments tab enter the same runtime arguments as above for intellij.
+
+7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
+8. Create a run/debug configuration for main class `org.jabref.JabRefLauncher` 
+9. In the arguments tab enter the same runtime arguments as above for intellij.
 
 ## Final comments
 
