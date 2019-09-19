@@ -76,7 +76,7 @@ jobs:
       with:
         local: build/distribution
         remote: scp/directory
-        host: build-upload.jabref.org
+        host: builds.jabref.org
         username: builds_jabref_org
         privateKey: ${{ secrets.buildJabRefPrivateKey }}
         port: 9922
