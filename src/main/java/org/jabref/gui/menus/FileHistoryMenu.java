@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
