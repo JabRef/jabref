@@ -17,14 +17,12 @@ public class FileHistoryMenu extends Menu {
     private final FileHistory history;
     private final JabRefFrame frame;
     private final JabRefPreferences preferences;
-    private final DialogService dialogService;
 
     public FileHistoryMenu(JabRefPreferences preferences, JabRefFrame frame) {
         setText(Localization.lang("Recent libraries"));
 
         this.frame = frame;
         this.preferences = preferences;
-        this.dialogService = frame.getDialogService();
         history = preferences.getFileHistory();
         if (history.isEmpty()) {
             setDisable(true);
@@ -63,7 +61,7 @@ public class FileHistoryMenu extends Menu {
 
     public void openFile(Path file) {
         if (!Files.exists(file)) {
-            dialogService.showErrorDialogAndWait(
+            frame.getDialogService().showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("File not found") + ": " + file);
             history.removeItem(file);
