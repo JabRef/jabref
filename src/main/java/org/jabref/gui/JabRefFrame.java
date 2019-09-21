@@ -160,7 +160,7 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
-        this.fileHistory = new FileHistoryMenu(prefs, this);
+        this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
     }
 
     private static BasePanel getBasePanel(Tab tab) {
