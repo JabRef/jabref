@@ -143,7 +143,7 @@ public class JabRefFrame extends BorderPane {
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
     private final ProgressBar progressBar = new ProgressBar();
-    private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
+    private final FileHistoryMenu fileHistory;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -160,6 +160,7 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
+        this.fileHistory = new FileHistoryMenu(prefs, this);
     }
 
     private static BasePanel getBasePanel(Tab tab) {
