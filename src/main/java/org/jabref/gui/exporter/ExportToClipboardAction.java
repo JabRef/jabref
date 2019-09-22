@@ -121,7 +121,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     private void setContentToClipboard(ExportResult result) {
         ClipboardContent clipboardContent = new ClipboardContent();
         List<String> extensions = result.fileType.getExtensions();
-        if(extensions.contains("html")) {
+        if (extensions.contains("html")) {
             clipboardContent.putHtml(result.content);
         } else if (extensions.contains("rtf")) {
             clipboardContent.putRtf(result.content);
