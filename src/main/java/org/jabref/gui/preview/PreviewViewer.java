@@ -183,8 +183,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             previewStringContent.append(element.getTextContent());
         }
 
+        // remove JavaScript function for highlighting from plain text copy
+        String previewStringContentString = previewStringContent.toString().replaceAll("function highlight[\\w\\W]*\\}", "");
+
         ClipboardContent content = new ClipboardContent();
-        content.putString(previewStringContent.toString());
+        content.putString(previewStringContentString);
         content.putHtml((String) previewView.getEngine().executeScript("document.documentElement.outerHTML"));
 
         clipBoardManager.setContent(content);
