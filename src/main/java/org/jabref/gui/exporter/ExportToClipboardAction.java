@@ -20,6 +20,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -73,10 +74,9 @@ public class ExportToClipboardAction extends SimpleCommand {
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                                                              .onSuccess(this::setContentToClipboard)
                                                              .executeWith(Globals.TASK_EXECUTOR));
-
     }
 
-    private String exportToClipboard(Exporter exporter) {
+    private ExportResult exportToClipboard(Exporter exporter) throws Exception {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
@@ -102,7 +102,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                             entries);
             // Read the file and put the contents on the clipboard:
 
-            return readFileToString(tmp);
+            return new ExportResult(readFileToString(tmp), exporter.getFileType());
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e);
         } finally {
@@ -115,12 +115,20 @@ public class ExportToClipboardAction extends SimpleCommand {
                 }
             }
         }
-        return "";
+        throw new Exception("export failed.");
     }
 
-    private void setContentToClipboard(String content) {
+    private void setContentToClipboard(ExportResult result) {
         ClipboardContent clipboardContent = new ClipboardContent();
-        clipboardContent.putRtf(content);
+        List<String> extensions = result.fileType.getExtensions();
+        if(extensions.contains("html")) {
+            clipboardContent.putHtml(result.content);
+        } else if (extensions.contains("rtf")) {
+            clipboardContent.putRtf(result.content);
+        } else if (extensions.contains("rdf")) {
+            clipboardContent.putRtf(result.content);
+        }
+        clipboardContent.putString(result.content);
         Globals.clipboardManager.setContent(clipboardContent);
 
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
@@ -133,6 +141,16 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                                        .getEncoding()
                                                                        .orElse(Globals.prefs.getDefaultEncoding()))) {
             return reader.lines().collect(Collectors.joining(OS.NEWLINE));
+        }
+    }
+
+    private class ExportResult {
+        final String content;
+        final FileType fileType;
+
+        ExportResult(String content, FileType fileType) {
+            this.content = content;
+            this.fileType = fileType;
         }
     }
 }
