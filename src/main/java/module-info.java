@@ -29,7 +29,6 @@ open module org.jabref {
     requires org.apache.logging.log4j;
     requires org.apache.logging.log4j.core;
     requires org.apache.logging.log4j.plugins;
-    requires applicationinsights.logging.log4j2;
     provides org.apache.logging.log4j.plugins.processor.PluginService
             with org.jabref.gui.logging.plugins.Log4jPlugins;
 
