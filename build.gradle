@@ -622,6 +622,26 @@ jlink {
                     '--win-shortcut'
             ]
         }
+        
+        if (OperatingSystem.current().isLinux()) {
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.ext.version}"
+            ]
+        }
+        
+        if (OperatingSystem.current().isMacOsX()) {
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.ext.version}"
+            ]
+        }
     }
 }
 
