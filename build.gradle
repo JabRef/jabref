@@ -50,7 +50,7 @@ apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0-dev"
-project.ext.twoDotVersion = "5.0.1"
+project.ext.twoDotVersion = "5.0.0"
 sourceCompatibility = 11
 targetCompatibility = 11
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
@@ -629,7 +629,7 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.ext.version}"
+                    '--app-version', "${project.version}"
             ]
         }
         
@@ -639,7 +639,7 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.ext.version}"
+                    '--app-version', "${project.version}"
             ]
         }
     }
