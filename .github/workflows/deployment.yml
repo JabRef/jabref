@@ -13,14 +13,17 @@ jobs:
            displayName: linux
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
+           archivePortable: tar -czf JabRef-portable_linux.tar.gz build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_windows-x64_bin.zip
            jdk14Path: /jdk-14
+           archivePortable: 7z a -r JabRef-portable_windows.zip build/distribution/JabRef/ && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
+           archivePortable: tar -czf JabRef-portable_macos.tar.gz build/distribution/JabRef.app && rm -R build/distribution/JabRef.app
            
     runs-on: ${{ matrix.os }}
     name: Deploy on ${{ matrix.displayName }}
@@ -66,6 +69,9 @@ jobs:
       with:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
+    - name: Package application image
+      run: ${{ matrix.archivePortable }}
+      shell: bash
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
