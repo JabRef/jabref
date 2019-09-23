@@ -200,7 +200,7 @@ dependencies {
     */
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    compile (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
+    compile (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.5.0') {
         exclude module: "log4j-core"
     }
 
