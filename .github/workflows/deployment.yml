@@ -61,21 +61,20 @@ jobs:
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
         ./gradlew jpackage
       shell: bash
-    - name: Add runtime image as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}-raw
-        path: build/image
     - name: Add installer as artifact
       uses: actions/upload-artifact@master
       with:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
         local: build/distribution
-        remote: www
+        remote: www/${{ steps.extract_branch.outputs.branch }}
         host: builds.jabref.org
         username: builds_jabref_org
         privateKey: ${{ secrets.buildJabRefPrivateKey }}
