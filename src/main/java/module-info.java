@@ -52,7 +52,7 @@ open module org.jabref {
     requires com.google.common;
     requires easybind;
     requires jakarta.inject;
-    requires pdfbox;
+    requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires httpclient;
@@ -61,7 +61,7 @@ open module org.jabref {
     requires citeproc.java;
     requires antlr.runtime;
     requires commons.lang3;
-    requires xmpbox;
+    requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
