@@ -31,10 +31,10 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     private BiConsumer<S, ? super MouseEvent> onMouseClickedEvent;
     private Function<S, ContextMenu> contextMenuFactory;
     private TriConsumer<TableRow<S>, S, ? super MouseEvent> toOnDragDetected;
-    private BiConsumer<S, ? super DragEvent> toOnDragDropped;
+    private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragDropped;
     private BiConsumer<S, ? super DragEvent> toOnDragEntered;
-    private BiConsumer<S, ? super DragEvent> toOnDragExited;
-    private BiConsumer<S, ? super DragEvent> toOnDragOver;
+    private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragExited;
+    private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
     private Callback<S, String> toTooltip;
 
@@ -58,18 +58,17 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
-    public ViewModelTableRowFactory<S> setOnDragDropped(BiConsumer<S, ? super DragEvent> toOnDragDropped) {
+    public ViewModelTableRowFactory<S> setOnDragDropped(TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragDropped) {
         this.toOnDragDropped = toOnDragDropped;
         return this;
     }
 
-    public ViewModelTableRowFactory<S> setOnDragEntered(BiConsumer<S, ? super DragEvent> toOnDragEntered) {
-        this.toOnDragEntered = toOnDragEntered;
-        return this;
+    public ViewModelTableRowFactory<S> setOnDragDropped(BiConsumer<S, ? super DragEvent> toOnDragDropped) {
+        return setOnDragDropped((row, viewModel, event) -> toOnDragDropped.accept(viewModel, event));
     }
 
-    public ViewModelTableRowFactory<S> setOnMouseDragEntered(BiConsumer<S, ? super MouseDragEvent> toOnDragEntered) {
-        this.toOnMouseDragEntered = (row, viewModel, event) -> toOnDragEntered.accept(viewModel, event);
+    public ViewModelTableRowFactory<S> setOnDragEntered(BiConsumer<S, ? super DragEvent> toOnDragEntered) {
+        this.toOnDragEntered = toOnDragEntered;
         return this;
     }
 
@@ -78,14 +77,26 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
-    public ViewModelTableRowFactory<S> setOnDragExited(BiConsumer<S, ? super DragEvent> toOnDragExited) {
+    public ViewModelTableRowFactory<S> setOnMouseDragEntered(BiConsumer<S, ? super MouseDragEvent> toOnDragEntered) {
+        return setOnMouseDragEntered((row, viewModel, event) -> toOnDragEntered.accept(viewModel, event));
+    }
+
+    public ViewModelTableRowFactory<S> setOnDragExited(TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragExited) {
         this.toOnDragExited = toOnDragExited;
         return this;
     }
 
-    public ViewModelTableRowFactory<S> setOnDragOver(BiConsumer<S, ? super DragEvent> toOnDragOver) {
+    public ViewModelTableRowFactory<S> setOnDragExited(BiConsumer<S, ? super DragEvent> toOnDragExited) {
+        return setOnDragExited((row, viewModel, event) -> toOnDragExited.accept(viewModel, event));
+    }
+
+    public ViewModelTableRowFactory<S> setOnDragOver(TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver) {
         this.toOnDragOver = toOnDragOver;
         return this;
+    }
+
+    public ViewModelTableRowFactory<S> setOnDragOver(BiConsumer<S, ? super DragEvent> toOnDragOver) {
+        return setOnDragOver((row, viewModel, event) -> toOnDragOver.accept(viewModel, event));
     }
 
     public ViewModelTableRowFactory<S> withTooltip(Callback<S, String> toTooltip) {
@@ -150,7 +161,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         if (toOnDragDropped != null) {
             row.setOnDragDropped(event -> {
                 if (!row.isEmpty()) {
-                    toOnDragDropped.accept(row.getItem(), event);
+                    toOnDragDropped.accept(row, row.getItem(), event);
                 }
             });
         }
@@ -164,14 +175,14 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         if (toOnDragExited != null) {
             row.setOnDragExited(event -> {
                 if (!row.isEmpty()) {
-                    toOnDragExited.accept(row.getItem(), event);
+                    toOnDragExited.accept(row, row.getItem(), event);
                 }
             });
         }
         if (toOnDragOver != null) {
             row.setOnDragOver(event -> {
                 if (!row.isEmpty()) {
-                    toOnDragOver.accept(row.getItem(), event);
+                    toOnDragOver.accept(row, row.getItem(), event);
                 }
             });
         }

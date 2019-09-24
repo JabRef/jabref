@@ -12,19 +12,17 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url 'https://oss.sonatype.org/content/groups/public'
-        }
+        maven { url 'https://oss.sonatype.org/content/groups/public' }
     }
 }
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '2.4.1'
+    id 'com.gradle.build-scan' version '2.4.2'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
-    id 'com.github.ben-manes.versions' version '0.24.0'
+    id 'com.github.ben-manes.versions' version '0.25.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.15.1'
@@ -90,9 +88,8 @@ sourceSets {
 repositories {
     mavenLocal()
     jcenter()
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public'
-    }
+    maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://repository.apache.org/snapshots' }
 }
 
 configurations {
@@ -115,14 +112,14 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.16'
-    compile 'org.apache.pdfbox:fontbox:2.0.16'
-    compile 'org.apache.pdfbox:xmpbox:2.0.16'
+    compile 'org.apache.pdfbox:pdfbox:2.0.17'
+    compile 'org.apache.pdfbox:fontbox:2.0.17'
+    compile 'org.apache.pdfbox:xmpbox:2.0.17'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.62'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.63'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -143,9 +140,9 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.3'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.4'
 
-    compile 'org.postgresql:postgresql:42.2.6'
+    compile 'org.postgresql:postgresql:42.2.8'
 
     compile ('com.google.guava:guava:28.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
@@ -169,12 +166,12 @@ dependencies {
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
-    compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.12.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.12.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-20190915.182410-364'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-20190915.182922-250'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-20190915.182113-372'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
@@ -198,7 +195,9 @@ dependencies {
     */
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1'
+    compile (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
+        exclude module: "log4j-core"
+    }
 
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
@@ -206,8 +205,8 @@ dependencies {
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.12.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.12.1'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
     testCompile 'org.mockito:mockito-core:3.0.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile ('org.reflections:reflections:0.9.11') {
@@ -367,9 +366,6 @@ task generateModsSource(type: XjcTask) {
 tasks.withType(JavaCompile) {
     // use UTF-8
     options.encoding = 'UTF-8'
-
-    // ignore annotation processor from log4j2
-    options.compilerArgs += '-proc:none'
 }
 
 compileJava {
@@ -391,6 +387,7 @@ run {
             '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
             '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
             '--add-opens', 'org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref',
+            '--add-opens', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             // Not sure why we need to restate the controlfx exports
             // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
             "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
@@ -406,6 +403,7 @@ run {
             "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
             "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
             "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
             "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",

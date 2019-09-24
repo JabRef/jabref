@@ -35,6 +35,7 @@ import javafx.util.Duration;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
@@ -45,6 +46,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
@@ -77,11 +79,14 @@ public class GlobalSearchBar extends HBox {
     private final Button searchModeButton = new Button();
     private final Label currentResults = new Label("");
     private final Tooltip tooltip = new Tooltip();
+    private final StateManager stateManager;
     private SearchDisplayMode searchDisplayMode;
 
-    public GlobalSearchBar(JabRefFrame frame) {
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager) {
         super();
         this.frame = Objects.requireNonNull(frame);
+        this.stateManager = stateManager;
+
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchDisplayMode = searchPreferences.getSearchMode();
 
@@ -99,7 +104,7 @@ public class GlobalSearchBar extends HBox {
             if (keyBinding.isPresent()) {
                 if (keyBinding.get().equals(KeyBinding.CLOSE)) {
                     // Clear search and select first entry, if available
-                    clearSearch();
+                    searchField.setText("");
                     frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();
                     event.consume();
                 }
@@ -132,10 +137,7 @@ public class GlobalSearchBar extends HBox {
         searchField.setMaxWidth(initialSize);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), () -> {
-            LOGGER.debug("Run search " + searchField.getText());
-            performSearch();
-        });
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
@@ -156,9 +158,19 @@ public class GlobalSearchBar extends HBox {
 
         this.setAlignment(Pos.CENTER_LEFT);
 
-        EasyBind.subscribe(Globals.stateManager.activeSearchQueryProperty(), searchQuery -> {
+        BindingsHelper.bindBidirectional(
+                stateManager.activeSearchQueryProperty(),
+                searchField.textProperty(),
+                searchTerm -> {
+                    performSearch();
+                },
+                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
+        );
+
+        EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
+
             searchQuery.ifPresent(query -> {
-                updateResults(Globals.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
                               query.isGrammarBasedSearch());
             });
         });
@@ -180,7 +192,7 @@ public class GlobalSearchBar extends HBox {
     public void endSearch() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         if (currentBasePanel != null) {
-            clearSearch();
+            searchField.setText("");
             MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
             mainTable.requestFocus();
         }
@@ -196,38 +208,30 @@ public class GlobalSearchBar extends HBox {
         searchField.selectAll();
     }
 
-    private void clearSearch() {
-        currentResults.setText("");
-        searchField.setText("");
-        setHintTooltip(null);
-        Globals.stateManager.clearSearchQuery();
-    }
-
     public void performSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel == null) {
-            return;
-        }
+        LOGGER.debug("Run search " + searchField.getText());
+
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
-            clearSearch();
+            currentResults.setText("");
+            setHintTooltip(null);
+            stateManager.clearSearchQuery();
             return;
         }
 
-        SearchQuery searchQuery = getSearchQuery();
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
         }
 
-        Globals.stateManager.setSearchQuery(searchQuery);
-
+        stateManager.setSearchQuery(searchQuery);
     }
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
 
-        Globals.stateManager.clearSearchQuery();
+        stateManager.clearSearchQuery();
 
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
         currentResults.setText(illegalSearch);
@@ -260,13 +264,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    private SearchQuery getSearchQuery() {
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
-        this.frame.getCurrentBasePanel().setCurrentSearchQuery(searchQuery);
-        return searchQuery;
-    }
-
-    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
+    private void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);

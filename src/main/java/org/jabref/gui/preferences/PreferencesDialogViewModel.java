@@ -15,7 +15,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -34,33 +33,31 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
     private final DialogService dialogService;
-    private final TaskExecutor taskExecutor;
-    private final JabRefPreferences prefs;
+    private final JabRefPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
     private final JabRefFrame frame;
 
-    public PreferencesDialogViewModel(DialogService dialogService, TaskExecutor taskExecutor, JabRefFrame frame) {
+    public PreferencesDialogViewModel(DialogService dialogService, JabRefFrame frame) {
         this.dialogService = dialogService;
-        this.taskExecutor = taskExecutor;
-        this.prefs = Globals.prefs;
+        this.preferences = Globals.prefs;
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTabView(prefs),
-                new FileTabView(prefs),
-                new TablePrefsTab(prefs),
-                new TableColumnsTabView(prefs),
-                new PreviewTabView(prefs),
-                new ExternalTabView(prefs, frame),
-                new GroupsTabView(prefs),
-                new EntryEditorPrefsTab(prefs),
-                new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()),
-                new ImportSettingsTab(prefs),
-                new ExportSortingPrefsTab(prefs),
-                new NameFormatterTabView(prefs),
-                new XmpPrivacyTabView(prefs),
-                new AdvancedTabView(prefs),
-                new AppearancePrefsTab(dialogService, prefs)
+                new GeneralTabView(preferences),
+                new FileTabView(preferences),
+                new TableTabView(preferences),
+                new TableColumnsTabView(preferences),
+                new PreviewTabView(preferences),
+                new ExternalTabView(preferences, frame),
+                new GroupsTabView(preferences),
+                new EntryEditorTabView(preferences),
+                new BibtexKeyPatternPrefTab(preferences, frame.getCurrentBasePanel()),
+                new ImportTabView(preferences),
+                new ExportSortingTabView(preferences),
+                new NameFormatterTabView(preferences),
+                new XmpPrivacyTabView(preferences),
+                new AdvancedTabView(preferences),
+                new AppearancePrefsTab(dialogService, preferences)
         );
     }
 
@@ -72,11 +69,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
+                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
-                prefs.importPreferences(file);
+                preferences.importPreferences(file);
                 updateAfterPreferenceChanges();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
@@ -92,15 +89,15 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.setLastPreferencesExportPath())
+                .withInitialDirectory(preferences.setLastPreferencesExportPath())
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(exportFile -> {
                          try {
                              storeAllSettings();
-                             prefs.exportPreferences(exportFile);
-                             prefs.setLastPreferencesExportPath(exportFile);
+                             preferences.exportPreferences(exportFile);
+                             preferences.setLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
@@ -109,7 +106,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void showPreferences() {
-        new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).showAndWait();
+        new PreferencesFilterDialog(new JabRefPreferencesFilter(preferences)).showAndWait();
     }
 
     public void resetPreferences() {
@@ -120,7 +117,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 Localization.lang("Cancel"));
         if (resetPreferencesConfirmed) {
             try {
-                prefs.clear();
+                preferences.clear();
 
                 dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
                         Localization.lang("You must restart JabRef for this to come into effect."));
@@ -139,12 +136,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        List<TemplateExporter> customExporters = prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = prefs.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = prefs.getXMPPreferences();
+        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
+        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
-        prefs.updateEntryEditorTabList();
+        preferences.updateEntryEditorTabList();
     }
 
     /**
@@ -175,7 +172,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             tab.storeSettings();
             restartWarnings.addAll(tab.getRestartWarnings());
         }
-        prefs.flush();
+        preferences.flush();
 
         if (!restartWarnings.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Restart required"),

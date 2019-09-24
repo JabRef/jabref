@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -35,7 +34,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.DataFormat;
+import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -110,7 +109,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -142,10 +140,10 @@ public class JabRefFrame extends BorderPane {
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
-    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
     private final ProgressBar progressBar = new ProgressBar();
-    private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
+    private final FileHistoryMenu fileHistory;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -162,88 +160,62 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
+        this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
     }
 
-    public void init() {
-        sidePaneManager = new SidePaneManager(Globals.prefs, this);
-        sidePane = sidePaneManager.getPane();
+    private static BasePanel getBasePanel(Tab tab) {
+        return (BasePanel) tab.getContent();
+    }
 
-        tabbedPane = new TabPane();
-        tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+    public void initDragAndDrop() {
+        Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
+        dndIndicator.getStyleClass().add("drop");
 
-        initLayout();
-
-        initKeyBindings();
-
-        tabbedPane.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+        EasyBind.subscribe(tabbedPane.skinProperty(), skin -> {
+            if (!(skin instanceof TabPaneSkin)) {
+                return;
             }
-        });
 
-        tabbedPane.setOnDragDropped(event -> {
-            boolean success = false;
+            // We need to get the tab header, the following is a ugly workaround
+            Node tabHeaderArea = ((TabPaneSkin) this.tabbedPane.getSkin())
+                    .getChildren()
+                    .stream()
+                    .filter(node -> node.getStyleClass().contains("tab-header-area"))
+                    .findFirst()
+                    .orElseThrow();
 
-            if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
-                success = true;
-
-                for (Path file : files) {
-                    ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                    addParserResult(pr, true);
+            tabHeaderArea.setOnDragOver(event -> {
+                if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
+                    event.acceptTransferModes(TransferMode.ANY);
+                    if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                        tabbedPane.getTabs().add(dndIndicator);
+                    }
+                    event.consume();
+                } else {
+                    tabbedPane.getTabs().remove(dndIndicator);
                 }
-            }
+            });
 
-            event.setDropCompleted(success);
-            event.consume();
+            tabHeaderArea.setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
+
+            tabHeaderArea.setOnDragDropped(event -> {
+                tabbedPane.getTabs().remove(dndIndicator);
+
+                boolean success = false;
+
+                List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
+                if (!bibFiles.isEmpty()) {
+                    for (Path file : bibFiles) {
+                        ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                        addParserResult(pr, true);
+                    }
+                    success = true;
+                }
+
+                event.setDropCompleted(success);
+                event.consume();
+            });
         });
-
-        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
-        //        JabRefPreferences.SIZE_Y);
-        //pw.displayWindowAtStoredLocation();
-
-        /*
-         * The following state listener makes sure focus is registered with the
-         * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would some times occur in the wrong tab.
-         */
-        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), e -> {
-            if (e == null) {
-                stateManager.activeDatabaseProperty().setValue(Optional.empty());
-                return;
-            }
-
-            BasePanel currentBasePanel = getCurrentBasePanel();
-            if (currentBasePanel == null) {
-                return;
-            }
-
-            // Poor-mans binding to global state
-            stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext()));
-            stateManager.setSelectedEntries(currentBasePanel.getSelectedEntries());
-
-            // Update search query
-            String content = "";
-            Optional<SearchQuery> currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-            if (currentSearchQuery.isPresent()) {
-                content = currentSearchQuery.get().getQuery();
-            }
-            globalSearchBar.setSearchTerm(content);
-
-            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-
-            setWindowTitle();
-            // Update search autocompleter with information for the correct database:
-            currentBasePanel.updateSearchManager();
-
-            currentBasePanel.getUndoManager().postUndoRedoEvent();
-            currentBasePanel.getMainTable().requestFocus();
-        });
-        initShowTrackingNotification();
     }
 
     private void initKeyBindings() {
@@ -583,6 +555,70 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getSelectionModel().select(getTab(bp));
     }
 
+    public void init() {
+        sidePaneManager = new SidePaneManager(Globals.prefs, this);
+        sidePane = sidePaneManager.getPane();
+
+        tabbedPane = new TabPane();
+        tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+
+        initLayout();
+
+        initKeyBindings();
+
+        initDragAndDrop();
+
+        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        //        JabRefPreferences.SIZE_Y);
+        //pw.displayWindowAtStoredLocation();
+
+        // Bind global state
+        stateManager.activeDatabaseProperty().bind(
+                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
+                        tab -> Optional.ofNullable(tab).map(JabRefFrame::getBasePanel).map(BasePanel::getBibDatabaseContext)));
+
+        // Subscribe to the search
+        EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
+                query -> {
+                    if (getCurrentBasePanel() != null) {
+                        getCurrentBasePanel().setCurrentSearchQuery(query);
+                    }
+                });
+
+        /*
+         * The following state listener makes sure focus is registered with the
+         * correct database when the user switches tabs. Without this,
+         * cut/paste/copy operations would some times occur in the wrong tab.
+         */
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
+            if (tab == null) {
+                return;
+            }
+
+            BasePanel newBasePanel = getBasePanel(tab);
+
+            // Poor-mans binding to global state
+            stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
+
+            // Update active search query when switching between databases
+            stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
+
+            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
+            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+
+            setWindowTitle();
+            // Update search autocompleter with information for the correct database:
+            newBasePanel.updateSearchManager();
+
+            newBasePanel.getUndoManager().postUndoRedoEvent();
+            newBasePanel.getMainTable().requestFocus();
+        });
+        initShowTrackingNotification();
+    }
+
     /**
      * Returns the currently viewed BasePanel.
      */
@@ -590,7 +626,7 @@ public class JabRefFrame extends BorderPane {
         if ((tabbedPane == null) || (tabbedPane.getSelectionModel().getSelectedItem() == null)) {
             return null;
         }
-        return (BasePanel) tabbedPane.getSelectionModel().getSelectedItem().getContent();
+        return getBasePanel(tabbedPane.getSelectionModel().getSelectedItem());
     }
 
     /**

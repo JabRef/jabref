@@ -1,17 +1,4 @@
 open module org.jabref {
-    exports org.jabref;
-
-    exports org.jabref.gui;
-    exports org.jabref.gui.logging;
-    exports org.jabref.gui.maintable;
-    exports org.jabref.gui.specialfields;
-
-    exports org.jabref.model.database;
-
-    exports org.jabref.logic;
-    exports org.jabref.logic.citationstyle;
-    exports org.jabref.logic.search;
-
     // Swing
     requires java.desktop;
 
@@ -41,7 +28,10 @@ open module org.jabref {
     requires org.slf4j;
     requires org.apache.logging.log4j;
     requires org.apache.logging.log4j.core;
+    requires org.apache.logging.log4j.plugins;
     requires applicationinsights.logging.log4j2;
+    provides org.apache.logging.log4j.plugins.processor.PluginService
+            with org.jabref.gui.logging.plugins.Log4jPlugins;
 
     // Preferences and XML
     requires java.prefs;
@@ -62,7 +52,7 @@ open module org.jabref {
     requires com.google.common;
     requires easybind;
     requires jakarta.inject;
-    requires pdfbox;
+    requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires httpclient;
@@ -71,5 +61,8 @@ open module org.jabref {
     requires citeproc.java;
     requires antlr.runtime;
     requires commons.lang3;
-    requires xmpbox;
+    requires org.apache.xmpbox;
+    requires de.saxsys.mvvmfx.validation;
+    requires richtextfx;
+    requires unirest.java;
 }

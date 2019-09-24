@@ -58,8 +58,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
 
-        setValues();
-
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
                 input -> {

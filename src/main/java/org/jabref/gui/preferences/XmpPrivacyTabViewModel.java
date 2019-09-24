@@ -45,8 +45,6 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("XMP-metadata"),
                         Localization.lang("Filter List"),
                         Localization.lang("List must not be empty."))));
-
-        setValues();
     }
 
     @Override
