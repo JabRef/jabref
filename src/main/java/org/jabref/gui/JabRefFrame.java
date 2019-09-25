@@ -366,11 +366,6 @@ public class JabRefFrame extends BorderPane {
 
         fileHistory.storeHistory();
         prefs.flush();
-
-        // Close all open windows
-        for (Window window : Window.getWindows()) {
-            window.hide();
-        }
     }
 
     /**
