@@ -41,7 +41,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
