@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,6 +41,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -367,11 +367,9 @@ public class JabRefFrame extends BorderPane {
         fileHistory.storeHistory();
         prefs.flush();
 
-        // dispose all windows, even if they are not displayed anymore
-        // TODO: javafx variant only avaiable in java 9 and updwards
-        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
+        // Close all open windows
         for (Window window : Window.getWindows()) {
-            window.dispose();
+            window.hide();
         }
     }
 
