@@ -13,7 +13,7 @@ jobs:
            displayName: linux
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
-           archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz build/distribution/JabRef && rm -R build/distribution/JabRef
+           archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz -C build/distribution JabRef && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_windows-x64_bin.zip
@@ -23,7 +23,7 @@ jobs:
            displayName: macOS
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
-           archivePortable: tar -czf build/distribution/JabRef-portable_macos.tar.gz build/distribution/JabRef.app && rm -R build/distribution/JabRef.app
+           archivePortable: tar -czf build/distribution/JabRef-portable_macos.tar.gz -C build/distribution JabRef.app && rm -R build/distribution/JabRef.app
            
     runs-on: ${{ matrix.os }}
     name: Deploy on ${{ matrix.displayName }}
