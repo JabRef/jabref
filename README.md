@@ -13,3 +13,7 @@ Some issues are describing the bright future of JabRef if the developers had muc
 Everyone is invited to comment on an issue here or just start working on one.
 
 When fixing an issue, please follow [CONTRIBUTING.md of JabRef](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
+
+**Welcome here and start hacking for Hacktoberfest 2019**
+
+[![Hacktoberfest 2019](https://hacktoberfest.digitalocean.com/HF19_logo.png)](https://benbarth.github.io/hacktoberfest-swag/)
