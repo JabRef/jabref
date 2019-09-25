@@ -26,7 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an error mentioning "javafx.controls/com.sun.javafx.scene.control" that was thrown when interacting with the toolbar.
 - We fixed an error where a cleared search was restored after switching libraries. [#4846](https://github.com/JabRef/jabref/issues/4846) 
 - We fixed an exception which occured when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
-
+- The context menu for fields in the entry editor is back. [#5254](https://github.com/JabRef/jabref/issues/5254)
 
 ### Removed
 
