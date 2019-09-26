@@ -17,8 +17,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -129,27 +129,26 @@ class MainTableColumnFactory {
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        Color groupColor = matchedGroups.stream()
-                .flatMap(group -> OptionalUtil.toStream(group.getColor()))
-                .findFirst()
-                .orElse(Color.TRANSPARENT);
+        List<Color> groupColors = matchedGroups.stream()
+                                               .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                                               .collect(Collectors.toList());
 
-        if (groupColor != Color.TRANSPARENT) {
-            Rectangle border = new Rectangle();
-            border.setWidth(5);
-            border.setHeight(20);
-            border.setFill(Color.DARKGRAY);
-
-            Rectangle groupRectangle = new Rectangle();
-            groupRectangle.setWidth(3);
-            groupRectangle.setHeight(18);
-            groupRectangle.setFill(groupColor);
-
-            StackPane container = new StackPane();
+        if (!groupColors.isEmpty()) {
+            HBox container = new HBox();
+            container.setSpacing(2);
             container.setMinWidth(10);
             container.setAlignment(Pos.CENTER);
 
-            container.getChildren().addAll(border,groupRectangle);
+            for (Color groupColor : groupColors) {
+                Rectangle groupRectangle = new Rectangle();
+                groupRectangle.setWidth(3);
+                groupRectangle.setHeight(18);
+                groupRectangle.setFill(groupColor);
+                groupRectangle.setStroke(Color.DARKGRAY);
+                groupRectangle.setStrokeWidth(1);
+
+                container.getChildren().add(groupRectangle);
+            }
 
             String matchedGroupsString = matchedGroups.stream()
                     .map(AbstractGroup::getName)

@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 - We added a short DOI field formatter which shortens DOI to more human readable form. [koppor#343](https://github.com/koppor/jabref/issues/343)
+- We improved the display of group memberships by adding multiple colored bars if the entry belongs to more than one group. [#4574](https://github.com/JabRef/jabref/issues/4574)
 
 ### Fixed
 
