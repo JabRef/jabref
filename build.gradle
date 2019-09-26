@@ -47,8 +47,7 @@ apply plugin: LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = "5.0-dev"
-project.ext.twoDotVersion = "5.0.0"
+version = "5.0.0"
 sourceCompatibility = 11
 targetCompatibility = 11
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
@@ -278,7 +277,7 @@ processResources {
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
-        expand(version: project.version,
+        expand(version: createVersionString(),
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
@@ -508,39 +507,6 @@ modernizer {
 }
 
 // Release tasks
-/*
- * Changes project.version to VERSION--DATE--GIT_HASH
- */
-if (hasProperty('dev')) {
-    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
-    String commitInfo = ""
-    if (OperatingSystem.current().isWindows()) {
-        commitInfo = "cmd /c $command".execute().in.text
-    } else {
-        commitInfo = command.execute().in.text
-    }
-
-    // determine branch
-    command = "git symbolic-ref -q --short HEAD"
-    String branchName = ""
-    if (OperatingSystem.current().isWindows()) {
-        branchName = "cmd /c $command".execute().in.text
-    } else {
-        branchName = command.execute().in.text
-    }
-    // A newline is returned. Remove it. (trim())
-    // In the context of github, the branch name could be something like "pull/277"
-    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
-    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
-    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
-
-    // hack string
-    // first the date (%cd), then the branch name, and finally the commit id (%h)
-    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
-
-    project.version += "--" + infoString
-}
-
 task generateFinalJabRefPS1File(type: Copy) {
     from('buildres') {
         include 'JabRef.ps1'
@@ -615,22 +581,22 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.ext.twoDotVersion}",
+                    '--app-version', "${project.version}",
                     '--win-dir-chooser',
                     '--win-shortcut'
             ]
         }
-        
+
         if (OperatingSystem.current().isLinux()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.ext.twoDotVersion}"
+                    '--app-version', "${project.version}"
             ]
         }
-        
+
         if (OperatingSystem.current().isMacOsX()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
@@ -674,4 +640,36 @@ task bundleLibreOffice(type: Jar) {
 
     destinationDir = file('lib')
     archiveName = 'libreoffice.jar'
+}
+
+// Returns the value of project.version in production and a string of the format VERSION-dev--DATE--BRANCH--GIT_HASH for development versions
+def createVersionString() {
+    if (hasProperty('dev')) {
+        String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+        String commitInfo
+        if (OperatingSystem.current().isWindows()) {
+            commitInfo = "cmd /c $command".execute().in.text
+        } else {
+            commitInfo = command.execute().in.text
+        }
+
+        // determine branch
+        command = "git symbolic-ref -q --short HEAD"
+        String branchName
+        if (OperatingSystem.current().isWindows()) {
+            branchName = "cmd /c $command".execute().in.text
+        } else {
+            branchName = command.execute().in.text
+        }
+        // A newline is returned. Remove it. (trim())
+        // In the context of github, the branch name could be something like "pull/277"
+        // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+        // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
+        branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
+
+        // first the date (%cd), then the branch name, and finally the commit id (%h)
+        return project.version + "-dev--" + commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+    } else {
+        return project.version
+    }
 }
