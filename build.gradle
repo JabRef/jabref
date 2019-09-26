@@ -12,15 +12,12 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven { url 'https://oss.sonatype.org/content/groups/public' }
     }
 }
 
 plugins {
     id 'application'
     id 'com.gradle.build-scan' version '2.4.2'
-    id 'com.install4j.gradle' version '8.0.1'
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
@@ -40,7 +37,6 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'project-report'
 apply plugin: 'jacoco'
-apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 apply plugin: JabRefAntlrPlugin
@@ -50,9 +46,7 @@ apply plugin: LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = "5.0-dev"
-project.ext.threeDotVersion = "5.0.0.1"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j8' : 'install4j8')
+version = "5.0.0"
 sourceCompatibility = 11
 targetCompatibility = 11
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
@@ -64,7 +58,6 @@ patchModules.config = [
         "test2=fastparse-utils_2.12-1.0.0.jar",
         "test3=sourcecode_2.12-0.1.4.jar"
 ]
-
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
@@ -283,7 +276,7 @@ processResources {
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
-        expand(version: project.version,
+        expand(version: createVersionString(),
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
@@ -513,49 +506,6 @@ modernizer {
 }
 
 // Release tasks
-shadowJar {
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer)
-    classifier 'fat'
-    zip64 true
-}
-
-/*
- * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
- */
-if (hasProperty('dev')) {
-    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
-    String commitInfo = ""
-    if (OperatingSystem.current().isWindows()) {
-        commitInfo = "cmd /c $command".execute().in.text
-    } else {
-        commitInfo = command.execute().in.text
-    }
-
-    // determine branch
-    command = "git symbolic-ref -q --short HEAD"
-    String branchName = ""
-    if (OperatingSystem.current().isWindows()) {
-        branchName = "cmd /c $command".execute().in.text
-    } else {
-        branchName = command.execute().in.text
-    }
-    // A newline is returned. Remove it. (trim())
-    // In the context of github, the branch name could be something like "pull/277"
-    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
-    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
-    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
-
-    // hack string
-    // first the date (%cd), then the branch name, and finally the commit id (%h)
-    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
-
-    project.version += "--snapshot--" + infoString
-}
-
-install4j {
-    installDir = file(project.ext.install4jDir)
-}
-
 task generateFinalJabRefPS1File(type: Copy) {
     from('buildres') {
         include 'JabRef.ps1'
@@ -564,56 +514,10 @@ task generateFinalJabRefPS1File(type: Copy) {
     filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
 }
 
-// has to be defined AFTER 'dev' things to have the correct project.version
-task media(type: com.install4j.gradle.Install4jTask, dependsOn: ["releaseJar", "generateFinalJabRefPS1File"]) {
-    projectFile = file('jabref.install4j')
-    release = project.version
-    winKeystorePassword = System.getenv('CERTIFICATE_PW')
-    macKeystorePassword = System.getenv('CERTIFICATE_PW')
-    variables = [
-            versionFourDots: project.ext.threeDotVersion,
-            buildFileName  : jar.archiveName,
-            version        : project.version
-    ]
-
-    doLast {
-        copy {
-            from "build/install4j"
-            into "build/releases"
-        }
-    }
-}
-
-
-task release(dependsOn: ["media", "releaseJar"]) {
-    group = 'JabRef - Release'
-    description 'Creates a release for all target platforms.'
-}
-
-task releaseJar(dependsOn: "shadowJar") {
-    group = 'JabRef - Release'
-    description "Creates a Jar release."
-    doLast {
-        copy {
-            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
-            into("$buildDir/releases")
-            rename { String fileName ->
-                fileName.replace('-fat', '')
-            }
-        }
-        // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
-    }
-}
-
-task snapJar(dependsOn: "releaseJar", type: Delete) {
-    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
-}
-
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'JabRefMain'
+        name = 'JabRef'
     }
 
     addOptions("--bind-services")
@@ -663,10 +567,44 @@ jlink {
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
     }
 
-    // This is experimental thing; could replace install4j
     jpackage {
-        // Download from https://jdk.java.net/jpackage/ and change path accordingly
-        jpackageHome = 'H:\\Downloading\\openjdk-13-jpackage+49_windows-x64_bin\\jdk-13'
+        // In order for this to work, you need to dowload jpackage from https://jdk.java.net/jpackage/
+        // and put the path to the jdk-14 folder in the environment variable BADASS_JLINK_JPACKAGE_HOME
+        outputDir = "distribution"
+
+        if (OperatingSystem.current().isWindows()) {
+            // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
+            installerType = "msi"
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.version}",
+                    '--win-dir-chooser',
+                    '--win-shortcut'
+            ]
+        }
+
+        if (OperatingSystem.current().isLinux()) {
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.version}"
+            ]
+        }
+
+        if (OperatingSystem.current().isMacOsX()) {
+            imageOptions = [
+                    '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+            ]
+            installerOptions = [
+                    '--vendor', 'JabRef',
+                    '--app-version', "${project.version}"
+            ]
+        }
     }
 }
 
@@ -701,4 +639,36 @@ task bundleLibreOffice(type: Jar) {
 
     destinationDir = file('lib')
     archiveName = 'libreoffice.jar'
+}
+
+// Returns the value of project.version in production and a string of the format VERSION-dev--DATE--BRANCH--GIT_HASH for development versions
+def createVersionString() {
+    if (hasProperty('dev')) {
+        String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+        String commitInfo
+        if (OperatingSystem.current().isWindows()) {
+            commitInfo = "cmd /c $command".execute().in.text
+        } else {
+            commitInfo = command.execute().in.text
+        }
+
+        // determine branch
+        command = "git symbolic-ref -q --short HEAD"
+        String branchName
+        if (OperatingSystem.current().isWindows()) {
+            branchName = "cmd /c $command".execute().in.text
+        } else {
+            branchName = command.execute().in.text
+        }
+        // A newline is returned. Remove it. (trim())
+        // In the context of github, the branch name could be something like "pull/277"
+        // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+        // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
+        branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
+
+        // first the date (%cd), then the branch name, and finally the commit id (%h)
+        return project.version + "-dev--" + commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+    } else {
+        return project.version
+    }
 }
