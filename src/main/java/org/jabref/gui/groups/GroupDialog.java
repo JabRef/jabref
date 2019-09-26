@@ -39,6 +39,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -370,11 +371,12 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         // configure for current type
         if (editedGroup == null) {
             // creating new group -> defaults!
+            colorField.setValue(IconTheme.getDefaultGroupColor());
             explicitRadioButton.setSelected(true);
             setContext(GroupHierarchyType.INDEPENDENT);
         } else {
             nameField.setText(editedGroup.getName());
-            editedGroup.getColor().ifPresent(colorField::setValue);
+            colorField.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
             descriptionField.setText(editedGroup.getDescription().orElse(""));
             iconField.setText(editedGroup.getIconName().orElse(""));
             setContext(editedGroup.getHierarchicalContext());

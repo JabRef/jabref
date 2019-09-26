@@ -216,7 +216,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
     public static final String INVALID_FIELD_BACKGROUND_COLOR = "invalidFieldBackgroundColor";
     public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
-    public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String FONT_SIZE = "fontSize";
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -600,7 +599,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
         // default icon colors
-        defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(URL_COLUMN, Boolean.TRUE);
