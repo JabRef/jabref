@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -137,7 +138,8 @@ class MainTableColumnFactory {
             HBox container = new HBox();
             container.setSpacing(2);
             container.setMinWidth(10);
-            container.setAlignment(Pos.CENTER);
+            container.setAlignment(Pos.CENTER_RIGHT);
+            container.setPadding(new Insets(0, 2, 0, 2));
 
             for (Color groupColor : groupColors) {
                 Rectangle groupRectangle = new Rectangle();
