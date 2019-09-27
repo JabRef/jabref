@@ -14,7 +14,7 @@ architectures:
 
 apps:
   jabref:
-    command: java/bin/JabRefMain
+    command: java/bin/JabRef
     extensions: [gnome-3-28]
     environment:
       _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
