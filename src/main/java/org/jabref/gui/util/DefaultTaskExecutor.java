@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -25,7 +27,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
     /**
      *
@@ -95,13 +98,19 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     @Override
     public <V> Future<V> execute(Task<V> task) {
-        EXECUTOR.submit(task);
+        executor.submit(task);
         return task;
     }
 
     @Override
+    public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
+        return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
+    }
+
+    @Override
     public void shutdown() {
-        EXECUTOR.shutdownNow();
+        executor.shutdownNow();
+        scheduledExecutor.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
