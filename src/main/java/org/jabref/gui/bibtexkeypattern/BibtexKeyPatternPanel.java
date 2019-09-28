@@ -42,6 +42,10 @@ public class BibtexKeyPatternPanel extends Pane {
         buildGUI();
     }
 
+    public void setDefaultPat(String pattern) { this.defaultPat.setText(pattern); }
+
+    public String getDefaultPat() { return this.defaultPat.getText(); }
+
     private static void setValue(TextField tf, EntryType fieldName, AbstractBibtexKeyPattern keyPattern) {
         if (keyPattern.isDefaultValue(fieldName)) {
             tf.setText("");
@@ -118,7 +122,7 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
 
-    protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
+    public GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
         GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(Globals.prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         fillPatternUsingPanelData(res);
         return res;
