@@ -20,5 +20,5 @@ jobs:
         script: rm -rf www/${{ steps.extract_branch.outputs.branch }}
         host: builds.jabref.org
         username: builds_jabref_org
-        privateKey: ${{ secrets.buildJabRefPrivateKey }}
+        key: ${{ secrets.buildJabRefPrivateKey }}
         port: 9922
