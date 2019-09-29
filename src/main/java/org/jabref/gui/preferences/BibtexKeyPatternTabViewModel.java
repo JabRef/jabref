@@ -45,7 +45,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
         } else if (preferences.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A)) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
-            letterStartAProperty.setValue(false);
+            letterStartBProperty.setValue(false);
         } else {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(false);
@@ -67,15 +67,15 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
             preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
         } else if (letterStartAProperty.getValue()) {
+            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
             preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         } else if (letterStartBProperty.getValue()) {
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
             preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
+            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
         } else {
             // No Radioitem selected, should not happen, but if, make KEY_GEN_FIRST_LETTER_A default
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
             preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
+            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
         }
 
         preferences.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegexProperty.getValue());

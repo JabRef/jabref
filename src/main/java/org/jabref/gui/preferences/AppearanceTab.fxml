@@ -17,10 +17,10 @@
     <Label styleClass="titleHeader" text="%Appearance"/>
 
     <Label styleClass="sectionHeader" text="%Font"/>
+    <CheckBox fx:id="fontOverride" text="%Override default font settings"/>
     <HBox spacing="4.0" alignment="CENTER_LEFT">
-        <CheckBox fx:id="fontOverride" text="%Override default font settings"/>
         <Label text="%Size:" disable="${!fontOverride.selected}"/>
-        <TextField fx:id="fontSize" disable="${!fontOverride.selected}"/>
+        <TextField fx:id="fontSize" prefWidth="40" alignment="CENTER_RIGHT" disable="${!fontOverride.selected}"/>
         <padding>
             <Insets left="20.0"/>
         </padding>
