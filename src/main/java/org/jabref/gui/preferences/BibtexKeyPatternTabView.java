@@ -53,7 +53,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
         keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
         keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
 
-        specialKeyPatterns.getChildren().add(bibtexKeyPatternPanel);
+        specialKeyPatterns.getChildren().add(bibtexKeyPatternPanel.getPanel());
     }
 
     @Override

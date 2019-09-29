@@ -23,6 +23,15 @@
     -fx-padding: 1em 1em 1em 3em;
 }
 
+.preference-sidepane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.button-bar > .container {
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1;
+}
+
 *:search-highlight {
 	-fx-background-color: -jr-light-red;
 }

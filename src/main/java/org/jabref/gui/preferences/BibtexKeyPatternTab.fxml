@@ -24,16 +24,16 @@
             <Insets left="20.0"/>
         </padding>
     </CheckBox>
-    <CheckBox fx:id="generateOnSave" text="Generate keys before saving (for entries without a key)"/>
+    <CheckBox fx:id="generateOnSave" text="%Generate keys before saving (for entries without a key)"/>
 
     <RadioButton fx:id="letterStartA" text="%Ensure unique keys using letters (a, b, ...)" toggleGroup="$uniqueKeyLetters"/>
     <RadioButton fx:id="letterStartB" text="%Ensure unique keys using letters (b, c, ...)" toggleGroup="$uniqueKeyLetters"/>
     <RadioButton fx:id="letterAlwaysAdd" text="%Always add letter (a, b, ...) to generated keys" toggleGroup="$uniqueKeyLetters"/>
 
-    <Label text="Replace (regular expression)"/>
+    <Label text="%Replace (regular expression)"/>
     <HBox prefWidth="Infinity" spacing="4.0" alignment="CENTER">
         <TextField fx:id="keyPatternRegex" HBox.hgrow="ALWAYS"/>
-        <Label text="by"/>
+        <Label text="%by"/>
         <TextField fx:id="keyPatternReplacement" HBox.hgrow="ALWAYS"/>
     </HBox>
 
