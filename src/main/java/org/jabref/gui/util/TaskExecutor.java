@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javafx.concurrent.Task;
 
@@ -28,6 +29,18 @@ public interface TaskExecutor {
      * @param task the task to run
      */
     <V> Future<V> execute(Task<V> task);
+
+    /**
+     * Submits a one-shot task that becomes enabled after the given delay.
+     *
+     * @param task  the task to execute
+     * @param delay the time from now to delay execution
+     * @param unit  the time unit of the delay parameter
+     * @return a ScheduledFuture representing pending completion of
+     *         the task and whose {@code get()} method will return
+     *         {@code null} upon completion
+     */
+    <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit);
 
     /**
      * Shutdown the task executor.

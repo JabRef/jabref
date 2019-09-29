@@ -54,6 +54,11 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
     }
 
     @Override
+    public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
+        return execute(task);
+    }
+
+    @Override
     public void shutdown() {
         // Nothing to do here
     }
