@@ -218,7 +218,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.15-alpha"
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.24'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.25'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
