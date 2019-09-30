@@ -12,13 +12,14 @@ class XjcTask extends DefaultTask {
     private def bindingFile
     private def outputDirectory
     private String javaPackage
+    private String encoding
     @Optional
     private String arguments
 
     @TaskAction
     def generateClasses() {
         project.mkdir(outputDirectory)
-        project.ant.xjc(destdir: outputDirectory, package: javaPackage) {
+        project.ant.xjc(destdir: outputDirectory, package: javaPackage, encoding: getEncoding()) {
             schema(dir: schemaFile.getParent(), includes: schemaFile.getName())
             if (bindingFile != null) {
                 binding(dir: bindingFile.getParent(), includes: bindingFile.getName())
@@ -60,6 +61,19 @@ class XjcTask extends DefaultTask {
     void setJavaPackage(String javaPackage) {
         this.javaPackage = javaPackage
         updateOutput()
+    }
+
+    String getEncoding() {
+        if(encoding == null ) {
+            // use UTF-8 as default encoding
+            return "UTF-8"
+        } else {
+            return encoding
+        }
+    }
+
+    void setEncoding(String encoding) {
+        this.encoding = encoding
     }
 
     String getArguments() {

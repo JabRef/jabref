@@ -1,0 +1,89 @@
+name: Deployment
+
+on: [push]
+
+jobs:
+  deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+         - os: ubuntu-latest
+           displayName: linux
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_linux-x64_bin.tar.gz
+           jdk14Path: /jdk-14
+           archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz -C build/distribution JabRef && rm -R build/distribution/JabRef
+         - os: windows-latest
+           displayName: windows
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_windows-x64_bin.zip
+           jdk14Path: /jdk-14
+           archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip build/distribution/JabRef/ && rm -R build/distribution/JabRef
+         - os: macOS-latest
+           displayName: macOS
+           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_osx-x64_bin.tar.gz
+           jdk14Path: /jdk-14.jdk/Contents/Home
+           archivePortable: tar -czf build/distribution/JabRef-portable_macos.tar.gz -C build/distribution JabRef.app && rm -R build/distribution/JabRef.app
+
+    runs-on: ${{ matrix.os }}
+    name: Deploy on ${{ matrix.displayName }}
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11.0.4
+    - name: Download jpackage
+      # We need to download jpackage from https://jdk.java.net/jpackage/
+      run: |
+        import tarfile
+        import zipfile
+        import sys
+        if sys.version_info[0] >= 3:
+          from urllib.request import urlretrieve
+        else:
+          from urllib import urlretrieve
+
+        url = "${{ matrix.jpackageDownload }}"
+        tmpfile, headers = urlretrieve(url)
+        if (url.endswith("tar.gz")):
+          tar = tarfile.open(tmpfile)
+          tar.extractall()
+          tar.close()
+        elif (url.endswith("zip")):
+          zip = zipfile.ZipFile(tmpfile)
+          zip.extractall()
+          zip.close()
+      shell: python
+    - name: Build runtime image
+      run: ./gradlew -Pdev=true jlinkZip
+    - name: Build installer
+      run: |
+        export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
+        ./gradlew -Pdev=true jpackage
+      shell: bash
+    - name: Add installer as artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: JabRef-${{ matrix.displayName }}
+        path: build/distribution
+    - name: Package application image
+      run: ${{ matrix.archivePortable }}
+      shell: bash
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Upload to builds.jabref.org
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: build/distribution
+        remote: www/${{ steps.extract_branch.outputs.branch }}
+        host: builds.jabref.org
+        username: builds_jabref_org
+        privateKey: ${{ secrets.buildJabRefPrivateKey }}
+        port: 9922
