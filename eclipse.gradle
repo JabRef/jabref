@@ -16,17 +16,17 @@ eclipse {
     }
 
     classpath {
-        file {
+       file {
             whenMerged {
-                entries.findAll { isModule(it) }.each { //(1)
+                entries.findAll { isModule(it) }.each { //this was already necessary to build modular projects
                     it.entryAttributes['module'] = 'true'
                 }
 
-                entries.findAll { isSource(it) && isTestScope(it) }.each {
+                entries.findAll { isSource(it) && isTestScope(it) }.each { //mark test source folders
                     it.entryAttributes['test'] = 'true'
                 }
 
-                entries.findAll { isLibrary(it) && isTestScope(it) }.each {
+                entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
                 }
             }
@@ -39,8 +39,8 @@ eclipse {
 }
 
 boolean isLibrary(entry) { return entry.properties.kind.equals('lib') }
-boolean isTestScope(entry) { return entry.entryAttributes.get('gradle_used_by_scope').equals('test'); }
-boolean isModule(entry) { isLibrary(entry) && !isTestScope(entry); }
+boolean isTestScope(entry) { return ! entry.entryAttributes.get('gradle_used_by_scope').contains('main') }
+boolean isModule(entry) { isLibrary(entry) && !isTestScope(entry); } //a test-scope library should be put on the classpath instead of the modulepath
 boolean isSource(entry) { return entry.properties.kind.equals('src'); }
 
 
