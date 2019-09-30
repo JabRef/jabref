@@ -4,10 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
+import org.jabref.Globals;
+import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
@@ -24,14 +24,16 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @FXML public RadioButton letterAlwaysAdd;
     @FXML public TextField keyPatternRegex;
     @FXML public TextField keyPatternReplacement;
-    @FXML public Pane specialKeyPatterns;
+    @FXML public HBox keyPatternContainer;
 
-    private final BibtexKeyPatternPanel bibtexKeyPatternPanel;
+    private final BibtexKeyPatternTableView bibtexKeyPatternTable;
 
-    public BibtexKeyPatternTabView(JabRefPreferences preferences, BasePanel basePanel) {
+    public BibtexKeyPatternTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
-        bibtexKeyPatternPanel = new BibtexKeyPatternPanel(basePanel);
+        bibtexKeyPatternTable = new BibtexKeyPatternTableView(preferences,
+                Globals.entryTypesManager.getAllTypes(preferences.getDefaultBibDatabaseMode()),
+                preferences.getKeyPattern());
 
         ViewLoader.view(this)
                 .root(this)
@@ -53,21 +55,20 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
         keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
         keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
 
-        specialKeyPatterns.getChildren().add(bibtexKeyPatternPanel.getPanel());
+        bibtexKeyPatternTable.setPrefWidth(650.0);
+        keyPatternContainer.getChildren().add(bibtexKeyPatternTable);
     }
 
     @Override
     public void setValues() {
         viewModel.setValues();
-        bibtexKeyPatternPanel.setValues(preferences.getKeyPattern());
-        bibtexKeyPatternPanel.setDefaultPat(viewModel.defaultKeyProperty().getValue());
+        bibtexKeyPatternTable.setValues();
     }
 
     @Override
     public void storeSettings() {
-        viewModel.defaultKeyProperty().setValue(bibtexKeyPatternPanel.getDefaultPat());
+        viewModel.defaultKeyProperty().setValue(bibtexKeyPatternTable.getDefaultPattern());
         viewModel.storeSettings();
-        GlobalBibtexKeyPattern keyPatterns = bibtexKeyPatternPanel.getKeyPatternAsGlobalBibtexKeyPattern();
-        preferences.putKeyPattern(keyPatterns);
+        preferences.putKeyPattern((GlobalBibtexKeyPattern) bibtexKeyPatternTable.getKeyPattern());
     }
 }
