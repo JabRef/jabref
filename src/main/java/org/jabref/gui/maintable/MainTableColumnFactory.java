@@ -138,7 +138,7 @@ class MainTableColumnFactory {
             HBox container = new HBox();
             container.setSpacing(2);
             container.setMinWidth(10);
-            container.setAlignment(Pos.CENTER_RIGHT);
+            container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));
 
             for (Color groupColor : groupColors) {
