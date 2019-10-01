@@ -1,4 +1,3 @@
-import org.gradle.plugins.ide.eclipse.model.AccessRule
 apply plugin: "eclipse"
 
 // ensure that source code is generated, otherwise class `BstLexer` cannot be found
@@ -11,22 +10,25 @@ eclipseJdt.doLast {
     f.append('encoding/<project>=UTF-8')
 }
 eclipse {
-    project {
-        natures 'org.eclipse.buildship.core.gradleprojectnature'
-    }
-
     classpath {
         file {
             whenMerged {
-                entries.findAll { isModule(it) }.each { //(1)
+                entries.findAll { isModule(it) }.each { //this was already necessary to build modular projects
                     it.entryAttributes['module'] = 'true'
                 }
+                def controlsfx = entries.find { isControlsfx(it) };
+                controlsfx.entryAttributes['add-exports'] = 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref:org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref:org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref';
+                controlsfx.entryAttributes['add-opens'] = 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref:org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref:org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref';
 
-                entries.findAll { isSource(it) && isTestScope(it) }.each {
+                entries.findAll { isSource(it) && isTestScope(it) }.each { //mark test source folders
                     it.entryAttributes['test'] = 'true'
                 }
 
-                entries.findAll { isLibrary(it) && isTestScope(it) }.each {
+                def jreContainer = entries.find { isJREContainer(it) };
+                jreContainer.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref';
+                jreContainer.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref';
+
+                entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
                 }
             }
@@ -39,10 +41,19 @@ eclipse {
 }
 
 boolean isLibrary(entry) { return entry.properties.kind.equals('lib') }
-boolean isTestScope(entry) { return entry.entryAttributes.get('gradle_used_by_scope').equals('test'); }
-boolean isModule(entry) { isLibrary(entry) && !isTestScope(entry); }
+
+boolean isTestScope(entry) { return !entry.entryAttributes.get('gradle_used_by_scope').contains('main') }
+
+boolean isModule(entry) {
+    isLibrary(entry) && !isTestScope(entry);
+} //a test-scope library should be put on the classpath instead of the modulepath
 boolean isSource(entry) { return entry.properties.kind.equals('src'); }
 
+boolean isControlsfx(entry) { return entry.properties.path.contains('controlsfx'); }
+
+boolean isJREContainer(entry) {
+    return entry.properties.kind == 'con' && entry.properties.path.startsWith('org.eclipse.jdt.launching.JRE_CONTAINER')
+};
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282
@@ -465,7 +476,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_annotation=do not insert
         org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_switch=insert
         org.eclipse.jdt.core.javaFormatter=org.eclipse.jdt.core.defaultJavaFormatter
-        '''. stripIndent())
+        '''.stripIndent())
 
     File jdt_ui_prefs = file("${project.projectDir}/.settings/org.eclipse.jdt.ui.prefs")
     if (jdt_ui_prefs.exists()) {
@@ -597,6 +608,6 @@ tasks.eclipse.doFirst {
             sp_cleanup.use_this_for_non_static_method_access=false
             sp_cleanup.use_this_for_non_static_method_access_only_if_necessary=false
             sp_cleanup.use_type_arguments=false
-            '''. stripIndent())
+            '''.stripIndent())
     }
 }
