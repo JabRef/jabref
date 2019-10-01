@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -366,13 +365,6 @@ public class JabRefFrame extends BorderPane {
 
         fileHistory.storeHistory();
         prefs.flush();
-
-        // dispose all windows, even if they are not displayed anymore
-        // TODO: javafx variant only avaiable in java 9 and updwards
-        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
-        for (Window window : Window.getWindows()) {
-            window.dispose();
-        }
     }
 
     /**
