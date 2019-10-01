@@ -331,6 +331,9 @@ $RECYCLE.BIN/
 # Ignore Gradle GUI config
 gradle-app.setting
 
+# Ignore gradle.properties file for custom jdk settings
+gradle.properties
+
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
@@ -355,3 +358,7 @@ lib/ojdbc.jar
 
 # do not ignore JabRef icons (they are ignored by the macos setting above)
 !src/main/java/org/jabref/gui/icon
+
+# Ignore some eclipse annotation stuff
+/.apt_generated/
+/.apt_generated_tests/
