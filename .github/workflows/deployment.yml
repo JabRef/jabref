@@ -78,8 +78,11 @@ jobs:
       run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Package Linux snap
-      run: $({ matrix.snapBuild })
+      run: ${{ matrix.snapBuild }}
       shell: bash
+    - name: Upload snap
+      run: curl --upload-file ./*.snap https://transfer.sh/jabref_master.snap
+      shell: bash 
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
