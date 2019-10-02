@@ -72,19 +72,20 @@ jobs:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
     - name: Package application image
-      run:  ${{ matrix.archivePortable }}
+      run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
     - name: Build and publish snap
-      if: matrix.os == "ubuntu-latest"
+      if: matrix.os == 'ubuntu-latest'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
           docker run -v $(pwd):$(pwd) -t snapcore/snapcraft:stable sh -c "apt update -qq && cd $(pwd) && snapcraft && mv *.snap build/distribution/"
           # cd build/distribution/ && mdkir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=beta *.snap
+      shell: bash
     # - name: Upload to builds.jabref.org
     #   uses: garygrossgarten/github-action-scp@release
     #   with:
