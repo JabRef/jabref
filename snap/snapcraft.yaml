@@ -31,7 +31,7 @@ apps:
 parts:
   jabref:
     plugin: dump
-    source: http://builds.jabref.org/master/JabRef-portable_linux.tar.gz
+    source: build/distribution/JabRef-portable_linux.tar.gz
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(cat app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
