@@ -11,12 +11,12 @@ jobs:
         include:
          - os: ubuntu-latest
            container:
-            image: snapcore/snapcraft
+            image: snapcore/snapcraft:stable
            displayName: linux
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
            archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz -C build/distribution JabRef && rm -R build/distribution/JabRef
-           snapBuild: docker run -v $(pwd):$(pwd) -t snapcore:snapcraft sh -c "apt update -qq && cd $(pwd) && snapcraft && mv *.snap build/distribution/"
+           snapBuild: docker run -v $(pwd):$(pwd) -t snapcore/snapcraft:stable sh -c "apt update -qq && cd $(pwd) && snapcraft && mv *.snap build/distribution/"
          - os: windows-latest
            displayName: windows
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_windows-x64_bin.zip
@@ -96,21 +96,3 @@ jobs:
     #     username: builds_jabref_org
     #     privateKey: ${{ secrets.buildJabRefPrivateKey }}
     #     port: 9922
-        
-  # build-snap:
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: snapcore/snapcraft
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Build snap
-  #     run: |
-  #       docker run -v $(pwd):$(pwd) -t snapcore:snapcraft sh -c "apt update -qq && cd $(pwd) && snapcraft"
-    # - name: Push snap
-    #   env:
-    #     SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-    #   run: |
-    #     cd stable
-    #     mkdir .snapcraft
-    #     echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-    #     snapcraft push --release=stable *.snap
