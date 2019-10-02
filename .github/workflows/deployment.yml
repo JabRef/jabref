@@ -78,7 +78,7 @@ jobs:
       run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Package Linux snap
-      run: $({snapBuild})
+      run: $({ matrix.snapBuild })
       shell: bash
     - name: Extract branch name
       shell: bash
