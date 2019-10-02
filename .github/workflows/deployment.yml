@@ -15,6 +15,7 @@ jobs:
            jdk14Path: /jdk-14
            archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz -C build/distribution JabRef && rm -R build/distribution/JabRef
            snapBuild: docker run -v $(pwd):$(pwd) -t snapcore/snapcraft:stable sh -c "apt update -qq && cd $(pwd) && snapcraft && mv *.snap build/distribution/"
+           snapPushBeta: cd build/distribution/ && mdkir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=beta *.snap
          - os: windows-latest
            displayName: windows
            jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-35_windows-x64_bin.zip
@@ -73,14 +74,15 @@ jobs:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
     - name: Package application image
-      run: ${{ matrix.archivePortable }}
+      env:
+        SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
+      run: |
+        ${{ matrix.archivePortable }}
+        if [ ${{matrix.os}} == "ubuntu-latest" ] then
+          ${{ matrix.snapBuild }}
+          # ${{ matrix.snapPushBeta }}
+        fi
       shell: bash
-    - name: Package Linux snap
-      run: ${{ matrix.snapBuild }}
-      shell: bash
-    - name: Upload snap
-      run: curl --upload-file build/distribution/*.snap https://transfer.sh/jabref_master.snap
-      shell: bash 
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
