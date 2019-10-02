@@ -4,10 +4,13 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
@@ -48,6 +51,7 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
@@ -55,6 +59,10 @@ import org.jabref.model.entry.Author;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.fxmisc.easybind.EasyBind;
@@ -81,6 +89,7 @@ public class GlobalSearchBar extends HBox {
     private final Tooltip tooltip = new Tooltip();
     private final StateManager stateManager;
     private SearchDisplayMode searchDisplayMode;
+    private Validator regexValidator;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager) {
         super();
@@ -136,6 +145,15 @@ public class GlobalSearchBar extends HBox {
         searchField.setMinWidth(100);
         searchField.setMaxWidth(initialSize);
         HBox.setHgrow(searchField, Priority.ALWAYS);
+
+        regexValidator = new FunctionBasedValidator<>(
+                searchField.textProperty(),
+                query -> !(regularExp.isSelected() && !validRegex()),
+                ValidationMessage.error(Localization.lang("Invalid regular expression"))
+        );
+        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+        visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
+        Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
 
         Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
@@ -219,13 +237,28 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
+        // Invalid regular expression
+        if (!regexValidator.getValidationStatus().isValid()) {
+            currentResults.setText(Localization.lang("Invalid regular expression"));
+            return;
+        }
+
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
         }
-
         stateManager.setSearchQuery(searchQuery);
+    }
+
+    private boolean validRegex() {
+        try {
+            Pattern.compile(searchField.getText());
+        } catch (PatternSyntaxException e) {
+            LOGGER.debug(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     private void informUserAboutInvalidSearchQuery() {

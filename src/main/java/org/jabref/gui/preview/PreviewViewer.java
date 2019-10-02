@@ -3,6 +3,7 @@ package org.jabref.gui.preview;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -62,7 +63,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private boolean registered;
 
     private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        try {
+            searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        } catch (PatternSyntaxException e) {
+            LOGGER.error(e.getMessage());
+        }
         highlightSearchPattern();
     };
 
