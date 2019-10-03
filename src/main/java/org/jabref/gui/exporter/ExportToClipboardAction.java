@@ -77,8 +77,9 @@ public class ExportToClipboardAction extends SimpleCommand {
                 Localization.lang("Export"), defaultChoice, exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                             .onSuccess(this::setContentToClipboard)
-                                                             .executeWith(Globals.TASK_EXECUTOR));
+                                                                .onSuccess(this::setContentToClipboard)
+                                                                .onFailure(ex -> {/* swallow as already logged */})
+                                                                .executeWith(Globals.TASK_EXECUTOR));
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
@@ -110,6 +111,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             return new ExportResult(readFileToString(tmp), exporter.getFileType());
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e);
+            throw new Exception("Rethrow ", e);
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -120,7 +122,6 @@ public class ExportToClipboardAction extends SimpleCommand {
                 }
             }
         }
-        throw new Exception("export failed.");
     }
 
     private void setContentToClipboard(ExportResult result) {
