@@ -1603,7 +1603,6 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PreviewPreferences getPreviewPreferences() {
-        int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
         double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
@@ -1627,6 +1626,14 @@ public class JabRefPreferences implements PreferencesService {
                                            })
                                            .filter(Objects::nonNull)
                                            .collect(Collectors.toList());
+
+        int cyclePos;
+        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
+        if (storedCyclePos < layouts.size()) {
+            cyclePos = storedCyclePos;
+        } else {
+            cyclePos = 0; // fallback if stored position is no longer valid
+        }
 
         return new PreviewPreferences(layouts, cyclePos, panelHeight, enabled, style, styleDefault);
     }
