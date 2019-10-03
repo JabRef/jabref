@@ -1,5 +1,7 @@
 name: jabref
-adopt-info: jabref
+# adopt-info: jabref
+version: 'master'
+version-script: cat build.gradle | grep "^version =" | cut -d'"' -f2
 icon: snap/gui/jabref.png
 license: MIT
 summary: Bibliography manager
@@ -32,8 +34,8 @@ parts:
   jabref:
     plugin: dump
     source: build/distribution/JabRef-portable_linux.tar.gz
-    override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version "$(cat app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+    # override-pull: |
+    #   snapcraftctl pull
+    #   snapcraftctl set-version "$(cat app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
     stage-packages:
       - x11-utils
