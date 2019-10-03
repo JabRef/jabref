@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,9 @@ import org.slf4j.LoggerFactory;
 public class ExportToClipboardAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
+
+    // Only text based exporters can be used
+    private static final List<String> SUPPORTED_FILETYPES = Arrays.asList("txt", "rtf", "rdf", "xml", "html", "htm", "csv", "ris");
 
     private JabRefFrame frame;
     private final DialogService dialogService;
@@ -60,6 +64,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
                                                         .sorted(Comparator.comparing(Exporter::getName))
+                                                        .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensions()))
                                                         .collect(Collectors.toList());
 
         //Find default choice, if any
