@@ -352,6 +352,9 @@ public class BasePanel extends StackPane {
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
+        actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
+
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
@@ -845,20 +848,11 @@ public class BasePanel extends StackPane {
     }
 
     public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+        entryEditor.nextPreviewStyle();
     }
 
     public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                             .getBuilder()
-                                                             .withPreviewCyclePosition(newPosition)
-                                                             .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-        entryEditor.updatePreviewInTabs(previewPreferences);
+        entryEditor.previousPreviewStyle();
     }
 
     /**

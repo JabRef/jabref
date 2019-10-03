@@ -141,21 +141,19 @@ public class PreviewPanel extends VBox {
         copyPreview.setOnAction(event -> previewView.copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> previewView.print());
-        /* Deleted since it does not work anymore. Needs refactoring.
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.previousPreviewStyle());
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.nextPreviewStyle());
-        */
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyPreview);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
-        // menu.getItems().add(nextPreviewLayout);
-        // menu.getItems().add(previousPreviewLayout);
+        menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
         return menu;
     }
 
@@ -166,5 +164,21 @@ public class PreviewPanel extends VBox {
 
     public void print() {
         previewView.print();
+    }
+
+    public void nextPreviewStyle() {
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+    }
+
+    public void previousPreviewStyle() {
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
+    }
+
+    private void cyclePreview(int newPosition) {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        updateLayout(previewPreferences);
     }
 }

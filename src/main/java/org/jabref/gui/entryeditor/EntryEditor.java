@@ -411,4 +411,20 @@ public class EntryEditor extends BorderPane {
             }
         }
     }
+
+    public void nextPreviewStyle() {
+        for (Tab tab : this.entryEditorTabs) {
+            if (tab instanceof FieldsEditorTab) {
+                ((FieldsEditorTab) tab).previewPanel.nextPreviewStyle();
+            }
+        }
+    }
+
+    public void previousPreviewStyle() {
+        for (Tab tab : this.entryEditorTabs) {
+            if (tab instanceof FieldsEditorTab) {
+                ((FieldsEditorTab) tab).previewPanel.previousPreviewStyle();
+            }
+        }
+    }
 }
