@@ -24,7 +24,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.25.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.15.1'
+    id 'org.beryx.jlink' version '2.16.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
