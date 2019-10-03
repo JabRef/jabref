@@ -86,12 +86,12 @@ jobs:
           docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv *.snap build/distribution/"
           # cd build/distribution/ && mdkir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=beta *.snap
       shell: bash
-    # - name: Upload to builds.jabref.org
-    #   uses: garygrossgarten/github-action-scp@release
-    #   with:
-    #     local: build/distribution
-    #     remote: www/${{ steps.extract_branch.outputs.branch }}
-    #     host: builds.jabref.org
-    #     username: builds_jabref_org
-    #     privateKey: ${{ secrets.buildJabRefPrivateKey }}
-    #     port: 9922
+    - name: Upload to builds.jabref.org
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: build/distribution
+        remote: www/${{ steps.extract_branch.outputs.branch }}
+        host: builds.jabref.org
+        username: builds_jabref_org
+        privateKey: ${{ secrets.buildJabRefPrivateKey }}
+        port: 9922
