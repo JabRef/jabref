@@ -41,11 +41,9 @@ public class PreviewPanel extends VBox {
     private final KeyBindingRepository keyBindingRepository;
     private final PreviewViewer previewView;
     private BibEntry entry;
-    private BasePanel basePanel;
     private DialogService dialogService;
 
-    public PreviewPanel(BibDatabaseContext database, BasePanel basePanel, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
-        this.basePanel = basePanel;
+    public PreviewPanel(BibDatabaseContext database, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), database);
@@ -100,10 +98,6 @@ public class PreviewPanel extends VBox {
         updateLayout(preferences, true);
     }
 
-    public void close() {
-        basePanel.closeBottomPane();
-    }
-
     public void updateLayout(PreviewPreferences previewPreferences) {
         updateLayout(previewPreferences, false);
     }
@@ -125,10 +119,6 @@ public class PreviewPanel extends VBox {
                         previewView.copyPreviewToClipBoard();
                         event.consume();
                         break;
-                    case CLOSE:
-                        close();
-                        event.consume();
-                        break;
                     default:
                 }
             }
@@ -143,10 +133,10 @@ public class PreviewPanel extends VBox {
         printEntryPreview.setOnAction(event -> previewView.print());
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
-        previousPreviewLayout.setOnAction(event -> basePanel.previousPreviewStyle());
+        previousPreviewLayout.setOnAction(event -> this.previousPreviewStyle());
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
-        nextPreviewLayout.setOnAction(event -> basePanel.nextPreviewStyle());
+        nextPreviewLayout.setOnAction(event -> this.nextPreviewStyle());
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyPreview);

@@ -208,7 +208,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
-            previewPanel = new PreviewPanel(databaseContext, null, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+            previewPanel = new PreviewPanel(databaseContext, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
 
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
