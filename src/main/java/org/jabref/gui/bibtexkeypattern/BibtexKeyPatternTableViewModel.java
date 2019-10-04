@@ -114,6 +114,6 @@ public class BibtexKeyPatternTableViewModel {
         public String getName() { return ENTRY_TYPE_DEFAULT_NAME; }
 
         @Override
-        public String getDisplayName() { return Localization.lang("Default Pattern"); }
+        public String getDisplayName() { return Localization.lang("Default pattern"); }
     }
 }

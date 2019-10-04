@@ -42,10 +42,6 @@ public class BibtexKeyPatternPanel extends Pane {
         buildGUI();
     }
 
-    public void setDefaultPat(String pattern) { this.defaultPat.setText(pattern); }
-
-    public String getDefaultPat() { return this.defaultPat.getText(); }
-
     private static void setValue(TextField tf, EntryType fieldName, AbstractBibtexKeyPattern keyPattern) {
         if (keyPattern.isDefaultValue(fieldName)) {
             tf.setText("");
