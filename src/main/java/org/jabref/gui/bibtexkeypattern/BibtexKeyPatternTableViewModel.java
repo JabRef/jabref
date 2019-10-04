@@ -18,6 +18,15 @@ import org.jabref.preferences.JabRefPreferences;
 public class BibtexKeyPatternTableViewModel {
 
     private final ListProperty<BibtexKeyPatternTableItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    private final BibtexKeyPatternTableItemModel defaultItem = new BibtexKeyPatternTableItemModel(new EntryType() {
+        @Override
+        public String getName() { return "default"; }
+
+        @Override
+        public String getDisplayName() { return Localization.lang("Default Pattern"); }
+    }, "");
+
     private final AbstractBibtexKeyPattern keyPattern;
     private final Collection<BibEntryType> bibEntryTypeList;
     private final JabRefPreferences preferences;
@@ -38,13 +47,8 @@ public class BibtexKeyPatternTableViewModel {
             defaultPattern = keyPattern.getDefaultValue().get(0);
         }
 
-        patternListProperty.add(new BibtexKeyPatternTableItemModel(new EntryType() {
-            @Override
-            public String getName() { return "default"; }
-
-            @Override
-            public String getDisplayName() { return Localization.lang("Default Pattern"); }
-        }, defaultPattern));
+        defaultItem.setPattern(defaultPattern);
+        patternListProperty.add(defaultItem);
 
         bibEntryTypeList.stream()
                         .map(BibEntryType::getType)
@@ -69,45 +73,33 @@ public class BibtexKeyPatternTableViewModel {
 
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
-            if (item.getEntryType().getName().equals("default")) {
-                if (!patternString.trim().isEmpty()) {
-                    // we do not trim the value at the assignment to enable users to have spaces at the beginning and
-                    // at the end of the pattern
-                    newKeyPattern.setDefaultValue(item.getPattern());
-                }
-            } else {
+            if (!item.getEntryType().getName().equals("default")) {
                 if (!patternString.trim().isEmpty()) {
                     newKeyPattern.addBibtexKeyPattern(item.getEntryType(), patternString);
                 }
             }
         });
 
+        if (!defaultItem.getPattern().trim().isEmpty()) {
+            // we do not trim the value at the assignment to enable users to have spaces at the beginning and
+            // at the end of the pattern
+            newKeyPattern.setDefaultValue(defaultItem.getPattern());
+        }
+
         return newKeyPattern;
     }
 
-    public void setDefaultPattern(String pattern) {
-        patternListProperty.stream().filter(item -> item.getEntryType().getName().equals("default")).findFirst()
-                           .ifPresent(item -> item.setPattern(pattern));
-    }
+    public void setDefaultPattern(String pattern) { defaultItem.setPattern(pattern); }
 
-    public String getDefaultPattern() {
-        Optional<BibtexKeyPatternTableItemModel> defaultItem;
-        defaultItem = patternListProperty.stream().filter(item -> item.getEntryType().getName().equals("default"))
-                                         .findFirst();
-
-        if (defaultItem.isEmpty()) {
-            String defaultPattern = "";
-            if (!(keyPattern.getDefaultValue() == null || keyPattern.getDefaultValue().isEmpty())) {
-                defaultPattern = keyPattern.getDefaultValue().get(0);
-            }
-            return defaultPattern;
-        }
-
-        return defaultItem.get().getPattern();
-    }
+    public String getDefaultPattern() { return defaultItem.getPattern(); }
 
     public void setItemToDefaultPattern(BibtexKeyPatternTableItemModel item) {
         item.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+    }
+
+    public void resetAll() {
+        patternListProperty.forEach(item -> item.setPattern(""));
+        defaultItem.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
     }
 
     public ListProperty<BibtexKeyPatternTableItemModel> patternListProperty() { return patternListProperty; }

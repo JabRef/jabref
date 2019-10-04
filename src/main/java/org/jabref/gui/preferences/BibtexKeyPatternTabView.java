@@ -67,8 +67,10 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
 
     @Override
     public void storeSettings() {
-        viewModel.defaultKeyProperty().setValue(bibtexKeyPatternTable.getDefaultPattern());
         viewModel.storeSettings();
         preferences.putKeyPattern((GlobalBibtexKeyPattern) bibtexKeyPatternTable.getKeyPattern());
     }
+
+    @FXML
+    public void resetAllKeyPatterns() { bibtexKeyPatternTable.resetAll(); }
 }

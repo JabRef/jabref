@@ -70,9 +70,7 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
 
     public void setValues() { viewModel.setValues(); }
 
+    public void resetAll() { viewModel.resetAll(); }
+
     public AbstractBibtexKeyPattern getKeyPattern() { return viewModel.getKeyPattern(); }
-
-    public void setDefaultPattern(String pattern) { viewModel.setDefaultPattern(pattern); }
-
-    public String getDefaultPattern() { return viewModel.getDefaultPattern(); }
 }
