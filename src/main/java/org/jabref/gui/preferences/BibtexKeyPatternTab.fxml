@@ -48,7 +48,10 @@
         </padding>
     </HBox>
 
-    <Label styleClass="sectionHeader" text="%Key patterns"/>
+    <HBox prefWidth="650.0" alignment="BASELINE_CENTER">
+        <Label styleClass="sectionHeader" text="%Key patterns"/>
+        <HBox HBox.hgrow="ALWAYS"/>
+        <Button text="Reset All" onAction="#resetAllKeyPatterns"/>
+    </HBox>
     <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="220.0"/>
-    <Button text="Reset All" onAction="#resetAllKeyPatterns"/>
 </fx:root>

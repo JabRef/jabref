@@ -36,8 +36,8 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
                 preferences.getKeyPattern());
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override

@@ -4,8 +4,10 @@ import java.util.Collection;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -24,6 +26,9 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
     @FXML public TableColumn<BibtexKeyPatternTableItemModel, EntryType> actionsColumn;
 
     private BibtexKeyPatternTableViewModel viewModel;
+
+    private long lastKeyPressTime;
+    private String tableSearchTerm;
 
     public BibtexKeyPatternTableView(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractBibtexKeyPattern keyPattern) {
         super();
@@ -45,6 +50,8 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
         new ValueTableCellFactory<BibtexKeyPatternTableItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
+        this.setOnSort(event ->
+                viewModel.patternListProperty().sort(BibtexKeyPatternTableViewModel.defaultOnTopComparator));
 
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
@@ -60,11 +67,14 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
         new ValueTableCellFactory<BibtexKeyPatternTableItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
-                .withTooltip(entryType -> Localization.lang("Reset %s to default value", entryType.getDisplayName()))
+                .withTooltip(entryType ->
+                        String.format(Localization.lang("Reset %s to default value"), entryType.getDisplayName()))
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.setItemToDefaultPattern(this.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
+        this.setRowFactory(item -> new HighlightTableRow());
+        this.setOnKeyTyped(this::jumpToSearchKey);
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }
 
@@ -73,4 +83,37 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
     public void resetAll() { viewModel.resetAll(); }
 
     public AbstractBibtexKeyPattern getKeyPattern() { return viewModel.getKeyPattern(); }
+
+    private void jumpToSearchKey(KeyEvent keypressed) {
+        if (keypressed.getCharacter() == null) {
+            return;
+        }
+
+        if (System.currentTimeMillis() - lastKeyPressTime < 1000) {
+            tableSearchTerm += keypressed.getCharacter().toLowerCase();
+        } else {
+            tableSearchTerm = keypressed.getCharacter().toLowerCase();
+        }
+
+        lastKeyPressTime = System.currentTimeMillis();
+
+        this.getItems().stream().filter(item -> item.getEntryType().getName().toLowerCase().startsWith(tableSearchTerm))
+            .findFirst().ifPresent(this::scrollTo);
+    }
+
+    private static class HighlightTableRow extends TableRow<BibtexKeyPatternTableItemModel> {
+        @Override
+        public void updateItem(BibtexKeyPatternTableItemModel item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || item.getEntryType() == null) {
+                setStyle("");
+            } else if (isSelected()) {
+                setStyle("-fx-background-color: -fx-selection-bar");
+            } else if (item.getEntryType().getName().equals(BibtexKeyPatternTableViewModel.ENTRY_TYPE_DEFAULT_NAME)) {
+                setStyle("-fx-background-color: -fx-default-button");
+            } else {
+                setStyle("");
+            }
+        }
+    }
 }

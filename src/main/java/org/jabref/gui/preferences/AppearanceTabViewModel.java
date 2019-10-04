@@ -59,17 +59,14 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontTweaksLinuxProperty.setValue(preferences.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
 
         switch (preferences.get(JabRefPreferences.FX_THEME)) {
-            case ThemeLoader.MAIN_CSS:
-                themeLightProperty.setValue(true);
-                themeDarkProperty.setValue(false);
-                break;
             case ThemeLoader.DARK_CSS:
                 themeLightProperty.setValue(false);
                 themeDarkProperty.setValue(true);
                 break;
+            case ThemeLoader.MAIN_CSS:
             default:
                 // select nothing if theme is unknown
-                themeLightProperty.setValue(false);
+                themeLightProperty.setValue(true);
                 themeDarkProperty.setValue(false);
         }
     }

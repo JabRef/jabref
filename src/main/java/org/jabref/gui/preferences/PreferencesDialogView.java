@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -29,7 +28,6 @@ import org.fxmisc.easybind.EasyBind;
  */
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
-    @FXML private VBox sidepane;
     @FXML private CustomTextField searchBox;
     @FXML private ListView<PreferencesTab> preferenceTabList;
     @FXML private ScrollPane container;
