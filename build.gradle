@@ -197,6 +197,8 @@ dependencies {
         exclude module: "log4j-core"
     }
 
+
+    compile "io.github.classgraph:classgraph:4.8.47"
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
@@ -207,9 +209,6 @@ dependencies {
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
     testCompile 'org.mockito:mockito-core:3.0.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
-    testCompile ('org.reflections:reflections:0.9.11') {
-        exclude module: "jsr305"
-    }
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
