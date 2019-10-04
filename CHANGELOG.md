@@ -33,6 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an exception which occured when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
 - The context menu for fields in the entry editor is back. [#5254](https://github.com/JabRef/jabref/issues/5254)
 - We fixed an exception which occurred when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
+- We fixed some display errors in the preferences dialog and replaced some of the controls [#5033](https://github.com/JabRef/jabref/pull/5033) [#5047](https://github.com/JabRef/jabref/pull/5047) [#5062](https://github.com/JabRef/jabref/pull/5062) [#5141](https://github.com/JabRef/jabref/pull/5141) [#5185](https://github.com/JabRef/jabref/pull/5185) [#5265](https://github.com/JabRef/jabref/pull/5265) [#5315](https://github.com/JabRef/jabref/pull/5315) [#5360](https://github.com/JabRef/jabref/pull/5360)
 
 ### Removed
 
