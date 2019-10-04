@@ -95,7 +95,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.fxmisc.easybind.EasyBind;
