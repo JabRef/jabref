@@ -27,6 +27,7 @@ import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import org.slf4j.Logger;
@@ -39,16 +40,19 @@ public class PreviewPanel extends VBox {
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
     private final PreviewViewer previewView;
+    private final JabRefPreferences preferences;
     private BibEntry entry;
     private DialogService dialogService;
 
-    public PreviewPanel(BibDatabaseContext database, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
+    public PreviewPanel(BibDatabaseContext database, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, JabRefPreferences preferences) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), database);
+        this.preferences = preferences;
+        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
-        previewView.setLayout(preferences.getCurrentPreviewStyle());
+        previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
@@ -94,7 +98,7 @@ public class PreviewPanel extends VBox {
         this.getChildren().add(previewView);
 
         createKeyBindings();
-        updateLayout(preferences, true);
+        updateLayout(previewPreferences, true);
     }
 
     public void updateLayout(PreviewPreferences previewPreferences) {
@@ -104,6 +108,7 @@ public class PreviewPanel extends VBox {
     private void updateLayout(PreviewPreferences previewPreferences, boolean init) {
         PreviewLayout currentPreviewStyle = previewPreferences.getCurrentPreviewStyle();
         previewView.setLayout(currentPreviewStyle);
+        preferences.storePreviewPreferences(previewPreferences);
         if (!init) {
             dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getName()));
         }
@@ -156,15 +161,15 @@ public class PreviewPanel extends VBox {
     }
 
     public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() + 1);
     }
 
     public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
+        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() - 1);
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
                 .build();

@@ -351,8 +351,12 @@ public class BasePanel extends StackPane {
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
-        actions.put(Actions.NEXT_PREVIEW_STYLE, this::nextPreviewStyle);
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
+        actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
+            entryEditor.nextPreviewStyle();
+        });
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
+            entryEditor.previousPreviewStyle();
+        });
 
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -844,14 +848,6 @@ public class BasePanel extends StackPane {
         if (!mainTable.getSelectedEntries().isEmpty()) {
             showAndEdit(mainTable.getSelectedEntries().get(0));
         }
-    }
-
-    public void nextPreviewStyle() {
-        entryEditor.nextPreviewStyle();
-    }
-
-    public void previousPreviewStyle() {
-        entryEditor.previousPreviewStyle();
     }
 
     /**
