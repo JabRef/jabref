@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.UndoManager;
 
@@ -113,11 +112,7 @@ public class SourceTab extends EntryEditorTab {
         this.stateManager = stateManager;
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            try {
-                searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            } catch (PatternSyntaxException e) {
-                LOGGER.error(e.getMessage());
-            }
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });
 
