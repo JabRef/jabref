@@ -40,7 +40,7 @@ import org.jabref.model.entry.field.Field;
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-    public PreviewPanel previewPanel;
+    private PreviewPanel previewPanel;
     protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
@@ -195,6 +195,16 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             // Restore focus to field (run this async so that editor is already initialized correctly)
             selectedFieldName.ifPresent(this::requestFocus);
         });
+    }
+
+    @Override
+    protected void nextPreviewStyle() {
+        previewPanel.nextPreviewStyle();
+    }
+
+    @Override
+    protected void previousPreviewStyle() {
+        previewPanel.previousPreviewStyle();
     }
 
     protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);

@@ -50,7 +50,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -404,27 +403,11 @@ public class EntryEditor extends BorderPane {
         });
     }
 
-    public void updatePreviewInTabs(PreviewPreferences previewPreferences) {
-        for (Tab tab : this.entryEditorTabs) {
-            if (tab instanceof FieldsEditorTab) {
-                ((FieldsEditorTab) tab).previewPanel.updateLayout(previewPreferences);
-            }
-        }
-    }
-
     public void nextPreviewStyle() {
-        for (Tab tab : this.entryEditorTabs) {
-            if (tab instanceof FieldsEditorTab) {
-                ((FieldsEditorTab) tab).previewPanel.nextPreviewStyle();
-            }
-        }
+        this.entryEditorTabs.forEach(EntryEditorTab::nextPreviewStyle);
     }
 
     public void previousPreviewStyle() {
-        for (Tab tab : this.entryEditorTabs) {
-            if (tab instanceof FieldsEditorTab) {
-                ((FieldsEditorTab) tab).previewPanel.previousPreviewStyle();
-            }
-        }
+        this.entryEditorTabs.forEach(EntryEditorTab::previousPreviewStyle);
     }
 }
