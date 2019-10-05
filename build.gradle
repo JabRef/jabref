@@ -197,7 +197,6 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
