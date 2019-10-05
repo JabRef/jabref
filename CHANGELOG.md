@@ -33,6 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an exception which occured when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
 - The context menu for fields in the entry editor is back. [#5254](https://github.com/JabRef/jabref/issues/5254)
 - We fixed an exception which occurred when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
+- We fixed a problem where the "editor" information has been duplicated during saving a .bib-Database. [#5359](https://github.com/JabRef/jabref/issues/5359)
 
 ### Removed
 
