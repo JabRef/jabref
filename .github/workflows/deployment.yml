@@ -32,7 +32,6 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v1
       with:
-        fetch-depth: 1
         submodules: true
     - name: Set up JDK
       uses: actions/setup-java@v1
