@@ -7,11 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -19,7 +19,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.field.StandardField;
@@ -29,11 +28,8 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,39 +37,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class DBMSSynchronizerTest {
 
-    @Parameter
-    public DBMSType dbmsType;
     private DBMSSynchronizer dbmsSynchronizer;
-    private DBMSConnection dbmsConnection;
-    private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
-    private GlobalBibtexKeyPattern pattern;
+    private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
+    private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
+        Collection<Object[]> result = new ArrayList<>();
+        for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
+            result.add(new Object[] {
+                                     dbmsType,
+                                     TestConnector.getTestDBMSConnection(dbmsType),
+                                     DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
+        }
+        return result.stream();
     }
 
-    @BeforeEach
-    public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
-
-        dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testEntryAddedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-
-        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
-
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
-
         bibDatabase.registerListener(dbmsSynchronizer);
-
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-    }
 
-    @Test
-    public void testEntryAddedEventListener() {
         BibEntry expectedEntry = getBibEntryExample(1);
         BibEntry furtherEntry = getBibEntryExample(1);
 
@@ -87,8 +75,15 @@ public class DBMSSynchronizerTest {
         assertEquals(expectedEntry, actualEntries.get(0));
     }
 
-    @Test
-    public void testFieldChangedEventListener() {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testFieldChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         BibEntry expectedEntry = getBibEntryExample(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
@@ -102,8 +97,15 @@ public class DBMSSynchronizerTest {
         assertEquals("The nano processor1", actualEntries.get(0).getField(StandardField.TITLE).get());
     }
 
-    @Test
-    public void testEntryRemovedEventListener() {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -124,8 +126,15 @@ public class DBMSSynchronizerTest {
         assertEquals(bibEntry, actualEntries.get(0));
     }
 
-    @Test
-    public void testMetaDataChangedEventListener() {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testMetaDataChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -137,17 +146,29 @@ public class DBMSSynchronizerTest {
         assertEquals(expectedMap, actualMap);
     }
 
-    @Test
-    public void testInitializeDatabases() throws SQLException, DatabaseNotSupportedException {
-        clear();
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testInitializeDatabases(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
+        clear(dbmsConnection);
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 
-    @Test
-    public void testSynchronizeLocalDatabaseWithEntryRemoval() {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testSynchronizeLocalDatabaseWithEntryRemoval(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         List<BibEntry> expectedBibEntries = Arrays.asList(getBibEntryExample(1), getBibEntryExample(2));
 
         dbmsProcessor.insertEntry(expectedBibEntries.get(0));
@@ -169,8 +190,14 @@ public class DBMSSynchronizerTest {
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
     }
 
-    @Test
-    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SQLException {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testSynchronizeLocalDatabaseWithEntryUpdate(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(1, bibDatabase.getEntries().size());
@@ -187,14 +214,19 @@ public class DBMSSynchronizerTest {
         assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
     }
 
-    @Test
-    public void testApplyMetaData() {
+    @ParameterizedTest
+    @MethodSource("getTestingDatabaseSystems")
+    public void testApplyMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.setSaveActions(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
+        testMetaData.setSaveActions(new FieldFormatterCleanups(true, Collections.singletonList(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();
@@ -211,8 +243,7 @@ public class DBMSSynchronizerTest {
         return bibEntry;
     }
 
-    @AfterEach
-    public void clear() throws SQLException {
+    public void clear(DBMSConnection dbmsConnection) throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
 }
