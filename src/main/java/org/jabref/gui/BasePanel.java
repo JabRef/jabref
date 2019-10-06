@@ -95,7 +95,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.fxmisc.easybind.EasyBind;
@@ -351,6 +350,13 @@ public class BasePanel extends StackPane {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
+
+        actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
+            entryEditor.nextPreviewStyle();
+        });
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
+            entryEditor.previousPreviewStyle();
+        });
 
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -842,23 +848,6 @@ public class BasePanel extends StackPane {
         if (!mainTable.getSelectedEntries().isEmpty()) {
             showAndEdit(mainTable.getSelectedEntries().get(0));
         }
-    }
-
-    public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
-    }
-
-    public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                             .getBuilder()
-                                                             .withPreviewCyclePosition(newPosition)
-                                                             .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-        entryEditor.updatePreviewInTabs(previewPreferences);
     }
 
     /**
