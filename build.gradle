@@ -215,8 +215,8 @@ dependencies {
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
     //testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.11.0'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
-    testCompile "org.testfx:testfx-core:4.0.15-alpha"
-    testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit5:4.0.+"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.25'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
