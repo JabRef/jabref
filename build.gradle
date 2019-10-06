@@ -506,14 +506,6 @@ modernizer {
 }
 
 // Release tasks
-task generateFinalJabRefPS1File(type: Copy) {
-    from('buildres') {
-        include 'JabRef.ps1'
-    }
-    into 'build'
-    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
-}
-
 task deleteInstallerTemp(type: Delete) {
     delete "$buildDir/installer"
 }
