@@ -576,11 +576,13 @@ jlink {
             // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
             installerType = "msi"
             imageOptions = [
+                    '--win-console',
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
+                    '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
                     '--win-shortcut'
             ]

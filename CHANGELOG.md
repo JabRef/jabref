@@ -33,7 +33,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an exception which occured when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
 - The context menu for fields in the entry editor is back. [#5254](https://github.com/JabRef/jabref/issues/5254)
 - We fixed an exception which occurred when trying to open a non existing file from the "Recent files"-menu [#5334](https://github.com/JabRef/jabref/issues/5334)
+- We re-introduced the feature to switch between different preview styles. [#5221](https://github.com/JabRef/jabref/issues/5221)
 - We fixed various issues (including [#5263](https://github.com/JabRef/jabref/issues/5263)) related to copying entries to the clipboard
+
+
+
+
+
+
+
 
 ### Removed
 
