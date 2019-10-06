@@ -107,6 +107,64 @@ public class BibEntryWriterTest {
     }
 
     @Test
+    void writeEntryWithOrField() throws Exception {
+            StringWriter stringWriter = new StringWriter();
+
+            BibEntry entry = new BibEntry(StandardEntryType.InBook);
+            //set an required OR field (author/editor)
+            entry.setField(StandardField.EDITOR, "Foo Bar");
+            entry.setField(StandardField.JOURNAL, "International Journal of Something");
+            //set an optional field
+            entry.setField(StandardField.NUMBER, "1");
+            entry.setField(StandardField.NOTE, "some note");
+
+            writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+            String actual = stringWriter.toString();
+
+            // @formatter:off
+            String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
+                    "  editor  = {Foo Bar}," + OS.NEWLINE +
+                    "  note    = {some note}," + OS.NEWLINE +
+                    "  number  = {1}," + OS.NEWLINE +
+                    "  journal = {International Journal of Something}," + OS.NEWLINE +
+                    "}" + OS.NEWLINE;
+            // @formatter:on
+
+            assertEquals(expected, actual);
+    }
+
+    @Test
+    void writeEntryWithOrFieldBothFieldsPresent() throws Exception {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry(StandardEntryType.InBook);
+        //set an required OR field with both fields(author/editor)
+        entry.setField(StandardField.AUTHOR, "Foo Thor");
+        entry.setField(StandardField.EDITOR, "Edi Bar");
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
+        //set an optional field
+        entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.NOTE, "some note");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
+                "  author  = {Foo Thor}," + OS.NEWLINE +
+                "  editor  = {Edi Bar}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void writeReallyUnknownTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
