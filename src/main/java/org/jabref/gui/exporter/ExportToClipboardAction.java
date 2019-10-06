@@ -78,7 +78,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                                                                 .onSuccess(this::setContentToClipboard)
-                                                                .onFailure(ex -> {/* swallow as already logged */})
+                                                                .onFailure(ex -> { /* swallow as already logged */ })
                                                                 .executeWith(Globals.TASK_EXECUTOR));
     }
 
