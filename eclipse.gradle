@@ -24,9 +24,10 @@ eclipse {
                     it.entryAttributes['test'] = 'true'
                 }
 
-                def jreContainer = entries.find { isJREContainer(it) };
-                jreContainer.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref';
-                jreContainer.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref';
+                def javafxcontrols = entries.find { isJavafxControls(it) };
+                javafxcontrols.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
+                javafxcontrols.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
+
 
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
@@ -51,9 +52,8 @@ boolean isSource(entry) { return entry.properties.kind.equals('src'); }
 
 boolean isControlsfx(entry) { return entry.properties.path.contains('controlsfx'); }
 
-boolean isJREContainer(entry) {
-    return entry.properties.kind == 'con' && entry.properties.path.startsWith('org.eclipse.jdt.launching.JRE_CONTAINER')
-};
+boolean isJavafxControls(entry) { return entry.properties.path.contains('javafx-controls'); }
+
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282
