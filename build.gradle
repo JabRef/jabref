@@ -206,7 +206,7 @@ dependencies {
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
-    testCompile 'org.mockito:mockito-core:3.0.0'
+    testCompile 'org.mockito:mockito-core:3.1.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile ('org.reflections:reflections:0.9.11') {
         exclude module: "jsr305"
