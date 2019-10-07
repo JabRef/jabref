@@ -1,6 +1,6 @@
 name: Deployment
 
-on: [pull_request, push]
+on: [push]
 
 jobs:
   deploy:
@@ -84,7 +84,7 @@ jobs:
       run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Build and publish snap
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest' && steps.extract_branch.outputs.branch == 'master'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
