@@ -1,4 +1,4 @@
-name: Snap-Deployment
+name: Deployment
 
 on: [push]
 
