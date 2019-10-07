@@ -164,7 +164,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
+    compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-20190915.182410-364'
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-20190915.182922-250'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-20190915.182113-372'
