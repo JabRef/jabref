@@ -1,6 +1,6 @@
 name: Deployment
 
-on: [push]
+on: [pull_request, push]
 
 jobs:
   deploy:
