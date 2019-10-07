@@ -79,7 +79,7 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
     - name: Build and publish snap
-      if: matrix.os == 'ubuntu-latest'
+      #if: matrix.os == 'ubuntu-latest'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
