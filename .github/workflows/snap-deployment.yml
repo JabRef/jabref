@@ -1,6 +1,6 @@
-name: Deployment
+name: Snap-Deployment
 
-on: [pull_request, push]
+on: [push]
 
 jobs:
   deploy:
