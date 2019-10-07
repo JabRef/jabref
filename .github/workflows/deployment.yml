@@ -37,9 +37,9 @@ jobs:
     - name: Extract branch name
       shell: bash
       run: |
-         ref = ${GITHUB_REF#refs/heads/}
-         ref = ${ref#refs/pull/}
-         ref = ${ref%/merge}
+         ref=${GITHUB_REF#refs/heads/}
+         ref=${ref#refs/pull/}
+         ref=${ref%/merge}
          echo "##[set-output name=branch;]$(ref)"
       id: extract_branch
     - name: Set up JDK
