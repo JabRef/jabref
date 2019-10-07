@@ -76,7 +76,7 @@ jobs:
       shell: bash
     - name: Extract branch name
       shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      run: echo "##[set-output name=branch;]$(echo ${${${GITHUB_REF#refs/heads/}#refs/pull/}%/merge})"
       id: extract_branch
     - name: Build and publish snap
       if: matrix.os == 'ubuntu-latest'
