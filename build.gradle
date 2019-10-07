@@ -138,7 +138,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.4'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.0'
 
     compile 'org.postgresql:postgresql:42.2.8'
 
@@ -164,9 +164,10 @@ dependencies {
     compile 'org.jsoup:jsoup:1.12.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    compile 'org.slf4j:slf4j-api:2.0.0-alpha0'
+    compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-20190915.182410-364'
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-20190915.182922-250'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-20190915.182837-57'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-20190915.182113-372'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
@@ -205,7 +206,7 @@ dependencies {
     testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
-    testCompile 'org.mockito:mockito-core:3.0.0'
+    testCompile 'org.mockito:mockito-core:3.1.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile ('org.reflections:reflections:0.9.11') {
         exclude module: "jsr305"
@@ -576,11 +577,13 @@ jlink {
             // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
             installerType = "msi"
             imageOptions = [
+                    '--win-console',
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
+                    '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
                     '--win-shortcut'
             ]

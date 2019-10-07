@@ -40,12 +40,12 @@ import org.jabref.model.entry.field.Field;
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-    public PreviewPanel previewPanel;
     protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
+    private PreviewPanel previewPanel;
     private FieldEditorFX activeField;
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
@@ -197,6 +197,16 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         });
     }
 
+    @Override
+    protected void nextPreviewStyle() {
+        previewPanel.nextPreviewStyle();
+    }
+
+    @Override
+    protected void previousPreviewStyle() {
+        previewPanel.previousPreviewStyle();
+    }
+
     protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);
 
     public Collection<Field> getShownFields() {
@@ -208,7 +218,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
-            previewPanel = new PreviewPanel(databaseContext, null, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+            previewPanel = new PreviewPanel(databaseContext, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs);
 
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
