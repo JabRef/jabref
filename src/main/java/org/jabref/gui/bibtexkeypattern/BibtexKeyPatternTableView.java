@@ -2,6 +2,8 @@ package org.jabref.gui.bibtexkeypattern;
 
 import java.util.Collection;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -82,7 +84,9 @@ public class BibtexKeyPatternTableView extends TableView<BibtexKeyPatternTableIt
 
     public void resetAll() { viewModel.resetAll(); }
 
-    public AbstractBibtexKeyPattern getKeyPattern() { return viewModel.getKeyPattern(); }
+    public ListProperty<BibtexKeyPatternTableItemModel> patternListProperty() { return viewModel.patternListProperty(); }
+
+    public ObjectProperty<BibtexKeyPatternTableItemModel> defaultKeyPatternProperty() { return viewModel.defaultKeyPatternProperty(); }
 
     private void jumpToSearchKey(KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {

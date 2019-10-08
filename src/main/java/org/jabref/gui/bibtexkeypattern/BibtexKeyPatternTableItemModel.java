@@ -13,7 +13,7 @@ public class BibtexKeyPatternTableItemModel {
     private final ObjectProperty<EntryType> entryType = new SimpleObjectProperty<>();
     private final StringProperty pattern = new SimpleStringProperty("");
 
-    BibtexKeyPatternTableItemModel(EntryType entryType, String pattern) {
+    public BibtexKeyPatternTableItemModel(EntryType entryType, String pattern) {
         Objects.requireNonNull(entryType);
         Objects.requireNonNull(pattern);
         this.entryType.setValue(entryType);

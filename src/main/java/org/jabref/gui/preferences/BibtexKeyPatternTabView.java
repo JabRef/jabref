@@ -9,7 +9,6 @@ import javafx.scene.layout.HBox;
 import org.jabref.Globals;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableView;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -56,6 +55,8 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
         keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
 
         bibtexKeyPatternTable.setPrefWidth(650.0);
+        bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
+        bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
         keyPatternContainer.getChildren().add(bibtexKeyPatternTable);
     }
 
@@ -68,7 +69,6 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @Override
     public void storeSettings() {
         viewModel.storeSettings();
-        preferences.putKeyPattern((GlobalBibtexKeyPattern) bibtexKeyPatternTable.getKeyPattern());
     }
 
     @FXML

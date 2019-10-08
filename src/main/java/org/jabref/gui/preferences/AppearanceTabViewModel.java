@@ -65,7 +65,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 break;
             case ThemeLoader.MAIN_CSS:
             default:
-                // select nothing if theme is unknown
                 themeLightProperty.setValue(true);
                 themeDarkProperty.setValue(false);
         }

@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
@@ -34,68 +34,41 @@ public class BibtexKeyPatternTableViewModel {
         return 0;
     };
 
-    private final ListProperty<BibtexKeyPatternTableItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final BibtexKeyPatternTableItemModel defaultItem = new BibtexKeyPatternTableItemModel(new DefaultEntryType(),"");
-    private final AbstractBibtexKeyPattern keyPattern;
+    private final ListProperty<BibtexKeyPatternTableItemModel> patternListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<BibtexKeyPatternTableItemModel> defaultItemProperty = new SimpleObjectProperty<>();
+    private final AbstractBibtexKeyPattern initialKeyPattern;
     private final Collection<BibEntryType> bibEntryTypeList;
     private final JabRefPreferences preferences;
 
-    public BibtexKeyPatternTableViewModel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractBibtexKeyPattern keyPattern) {
+    public BibtexKeyPatternTableViewModel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractBibtexKeyPattern initialKeyPattern) {
         this.preferences = preferences;
         this.bibEntryTypeList = entryTypeList;
-        this.keyPattern = keyPattern;
+        this.initialKeyPattern = initialKeyPattern;
     }
 
     public void setValues() {
-        patternListProperty.clear();
-
         String defaultPattern;
-        if ((keyPattern.getDefaultValue() == null) || keyPattern.getDefaultValue().isEmpty()) {
+        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().isEmpty()) {
             defaultPattern = "";
         } else {
-            defaultPattern = keyPattern.getDefaultValue().get(0);
+            defaultPattern = initialKeyPattern.getDefaultValue().get(0);
         }
 
-        defaultItem.setPattern(defaultPattern);
-        patternListProperty.add(defaultItem);
+        defaultItemProperty.setValue(new BibtexKeyPatternTableItemModel(new DefaultEntryType(), defaultPattern));
+        patternListProperty.setValue(FXCollections.observableArrayList());
+        patternListProperty.add(defaultItemProperty.getValue());
 
         bibEntryTypeList.stream()
                         .map(BibEntryType::getType)
                         .forEach(entryType -> {
                             String pattern;
-                            if (keyPattern.isDefaultValue(entryType)) {
+                            if (initialKeyPattern.isDefaultValue(entryType)) {
                                 pattern = "";
                             } else {
-                                pattern = keyPattern.getPatterns().get(entryType).get(0);
+                                pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
                             }
                             patternListProperty.add(new BibtexKeyPatternTableItemModel(entryType, pattern));
                         });
-    }
-
-    public AbstractBibtexKeyPattern getKeyPattern() {
-        AbstractBibtexKeyPattern newKeyPattern;
-        if (keyPattern instanceof GlobalBibtexKeyPattern) {
-             newKeyPattern = GlobalBibtexKeyPattern.fromPattern(preferences.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
-        } else {
-            newKeyPattern = new DatabaseBibtexKeyPattern(preferences.getKeyPattern());
-        }
-
-        patternListProperty.forEach(item -> {
-            String patternString = item.getPattern();
-            if (!item.getEntryType().getName().equals("default")) {
-                if (!patternString.trim().isEmpty()) {
-                    newKeyPattern.addBibtexKeyPattern(item.getEntryType(), patternString);
-                }
-            }
-        });
-
-        if (!defaultItem.getPattern().trim().isEmpty()) {
-            // we do not trim the value at the assignment to enable users to have spaces at the beginning and
-            // at the end of the pattern
-            newKeyPattern.setDefaultValue(defaultItem.getPattern());
-        }
-
-        return newKeyPattern;
     }
 
     public void setItemToDefaultPattern(BibtexKeyPatternTableItemModel item) {
@@ -104,12 +77,14 @@ public class BibtexKeyPatternTableViewModel {
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItem.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
     }
 
     public ListProperty<BibtexKeyPatternTableItemModel> patternListProperty() { return patternListProperty; }
 
-    private class DefaultEntryType implements EntryType {
+    public ObjectProperty<BibtexKeyPatternTableItemModel> defaultKeyPatternProperty() { return defaultItemProperty; }
+
+    public static class DefaultEntryType implements EntryType {
         @Override
         public String getName() { return ENTRY_TYPE_DEFAULT_NAME; }
 
