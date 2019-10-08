@@ -1,7 +1,7 @@
 package org.jabref.model.event;
 
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
@@ -16,9 +16,10 @@ public class TestEventListener {
         this.bibEntry = event.getBibEntry();
     }
 
+    // Not sure if this will work
     @Subscribe
-    public void listen(EntryRemovedEvent event) {
-        this.bibEntry = event.getBibEntry();
+    public void listen(EntriesRemovedEvent event) {
+        this.bibEntry = event.getBibEntries().get(0);
     }
 
     @Subscribe

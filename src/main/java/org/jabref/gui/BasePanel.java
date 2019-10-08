@@ -56,11 +56,7 @@ import org.jabref.gui.preview.CitationStyleToClipboardWorker;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.*;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -80,8 +76,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -409,11 +405,9 @@ public class BasePanel extends StackPane {
         } else {
             compound = new NamedCompound((entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
         }
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry));
-            bibDatabaseContext.getDatabase().removeEntry(entry);
-            ensureNotShowingBottomPanel(entry);
-        }
+        compound.addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
+        bibDatabaseContext.getDatabase().removeEntries(entries);
+        ensureNotShowingBottomPanel(entries);
         compound.end();
         getUndoManager().addEdit(compound);
 
@@ -886,7 +880,7 @@ public class BasePanel extends StackPane {
     /**
      * Closes the entry editor if it is showing the given entry.
      */
-    private void ensureNotShowingBottomPanel(BibEntry entry) {
+    private void ensureNotShowingBottomPanel(List<BibEntry> entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))) {
             closeBottomPane();
         }
@@ -1145,8 +1139,8 @@ public class BasePanel extends StackPane {
     private class EntryRemovedListener {
 
         @Subscribe
-        public void listen(EntryRemovedEvent entryRemovedEvent) {
-            ensureNotShowingBottomPanel(entryRemovedEvent.getBibEntry());
+        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
+            ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
         }
     }
 
@@ -1184,7 +1178,7 @@ public class BasePanel extends StackPane {
         }
 
         @Subscribe
-        public void listen(EntryRemovedEvent removedEntryEvent) {
+        public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }

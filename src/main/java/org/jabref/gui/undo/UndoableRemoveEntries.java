@@ -9,33 +9,43 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * This class represents the removal of an entry. The constructor needs
  * references to the database, the entry, and the map of open entry editors.
  * The latter to be able to close the entry's editor if it is opened after
  * an undo, and the removal is then undone.
  */
-public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
+public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntry.class);
     private final BibDatabase base;
-    private final BibEntry entry;
+    private final List<BibEntry> entries;
 
-    public UndoableRemoveEntry(BibDatabase base, BibEntry entry) {
+    public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries) {
         this.base = base;
-        this.entry = entry;
+        this.entries = entries;
     }
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("remove entry %0",
-                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+        if (entries.size() > 1) {
+            return Localization.lang("remove entries");
+        }
+        else if (entries.size() == 1) {
+            return Localization.lang("remove entry %0",
+                    StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
     public void undo() {
         super.undo();
-        base.insertEntry(entry, EntryEventSource.UNDO);
+        base.insertEntries(entries, EntryEventSource.UNDO);
     }
 
     @Override
@@ -44,7 +54,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
 
         // Redo the change.
         try {
-            base.removeEntry(entry);
+            base.removeEntries(entries);
         } catch (Throwable ex) {
             LOGGER.warn("Problem to redo `remove entry`", ex);
         }

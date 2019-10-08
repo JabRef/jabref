@@ -3,8 +3,9 @@ package org.jabref.model.database;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
@@ -32,39 +33,51 @@ public class KeyChangeListener {
     }
 
     @Subscribe
-    public void listen(EntryRemovedEvent event) {
-        event.getBibEntry().getCiteKeyOptional().ifPresent(oldKey -> updateEntryLinks(null, oldKey));
+    public void listen(EntriesRemovedEvent event) {
+        List<BibEntry> entries = event.getBibEntries();
+        List<String> oldKeys = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            Optional<String> citeKey = entry.getCiteKeyOptional();
+            if (citeKey.isPresent()) {
+                oldKeys.add(citeKey);
+            }
+        }
+        updateEntryLinks(null, oldKeys);
     }
 
-    private void updateEntryLinks(String newKey, String oldKey) {
+    private void updateEntryLinks(String newKey, List<String> oldKeys) {
         for (BibEntry entry : database.getEntries()) {
             for (Field field : FieldFactory.getKeyFields()) {
                 entry.getField(field).ifPresent(fieldContent -> {
                     if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                        replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
+                        replaceSingleKeyInField(newKey, oldKeys, entry, field, fieldContent);
                     } else { // MULTIPLE_ENTRY_LINK
-                        replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+                        replaceKeyInMultiplesKeyField(newKey, oldKeys, entry, field, fieldContent);
                     }
                 });
             }
         }
     }
 
-    private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
+    // These methods may have to be renamed
+    private void replaceKeyInMultiplesKeyField(String newKey, List<String> oldKeys, BibEntry entry, Field field, String fieldContent) {
         List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
-        int index = keys.indexOf(oldKey);
-        if (index != -1) {
-            if (newKey == null) {
-                keys.remove(index);
-            } else {
-                keys.set(index, newKey);
+        for (String key : keys) {
+            int index = oldKeys.indexOf(key);
+            if (index != -1) {
+                if (newKey == null) {
+                    keys.remove(index);
+                } else {
+                    keys.set(index, newKey);
+                }
+                entry.setField(field, String.join(",", keys));
             }
-            entry.setField(field, String.join(",", keys));
         }
     }
 
-    private void replaceSingleKeyInField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
-        if (fieldContent.equals(oldKey)) {
+    private void replaceSingleKeyInField(String newKey, List<String> oldKeys, BibEntry entry, Field field, String fieldContent) {
+        int index = oldKeys.indexOf(fieldContent);
+        if (index != -1) {
             if (newKey == null) {
                 entry.clearField(field);
             } else {

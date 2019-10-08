@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
@@ -216,7 +216,7 @@ public class BibDatabase {
         insertEntries(entries, EntryEventSource.LOCAL);
     }
 
-    private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
 
         for (BibEntry entry : newEntries) {
@@ -238,8 +238,8 @@ public class BibDatabase {
      * The Entry is removed based on the id {@link BibEntry#id}
      * @param toBeDeleted Entry to delete
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted) {
-        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
+        removeEntries(toBeDeleted, EntryEventSource.LOCAL);
     }
 
     /**
@@ -249,13 +249,18 @@ public class BibDatabase {
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntryEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
+        //Require not empty?
 
-        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        List<String> ids = new ArrayList<>();
+        for (BibEntry entry : toBeDeleted) {
+            ids.add(entry.getId());
+        }
+        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
-            internalIDs.remove(toBeDeleted.getId());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
+            internalIDs.removeAll(ids);
+            eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
 

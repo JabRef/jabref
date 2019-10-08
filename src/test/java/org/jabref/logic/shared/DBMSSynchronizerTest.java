@@ -103,7 +103,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testEntryRemovedEventListener() {
+    public void testEntriesRemovedEventListener() {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -111,13 +111,13 @@ public class DBMSSynchronizerTest {
         assertEquals(1, actualEntries.size());
         assertEquals(bibEntry, actualEntries.get(0));
 
-        bibDatabase.removeEntry(bibEntry);
+        bibDatabase.removeEntries(Collections.singletonList(bibEntry));
         actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
-        bibDatabase.removeEntry(bibEntry, EntryEventSource.SHARED);
+        bibDatabase.removeEntries(Collections.singletonList(bibEntry), EntryEventSource.SHARED);
 
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());

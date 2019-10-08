@@ -20,13 +20,14 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -108,12 +109,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      *
      * @param event {@link EntryRemovedEvent} object
      */
+
+    // This has not been made parellel yet - hence the for loop - that will take more effort
     @Subscribe
-    public void listen(EntryRemovedEvent event) {
+    public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            dbmsProcessor.removeEntry(event.getBibEntry());
+            List<BibEntry> entries = event.getBibEntries();
+            for (BibEntry entry : entries) {
+                dbmsProcessor.removeEntry(entry);
+            }
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there where some
         }
@@ -350,7 +356,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @param event An {@link EntryEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */
-    public boolean isEventSourceAccepted(EntryEvent event) {
+    public boolean isEventSourceAccepted(EntriesEvent event) {
         EntryEventSource eventSource = event.getEntryEventSource();
         return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
     }
