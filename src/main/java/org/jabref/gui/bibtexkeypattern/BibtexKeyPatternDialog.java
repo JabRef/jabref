@@ -44,7 +44,7 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
 /* void storeSettings() {
         DataBaseKeyPattern newKeyPattern = new DatabaseBibtexKeyPattern(preferences.getKeyPattern());
 
-        patternListProperty.forEach(item -> {
+        bibtexKeyPatternTableView.patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {
                 if (!patternString.trim().isEmpty()) {
@@ -56,7 +56,7 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
         if (!defaultItem.getPattern().trim().isEmpty()) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
-            newKeyPattern.setDefaultValue(defaultItem.getPattern());
+            newKeyPattern.setDefaultValue(defaultItemProperty.getPattern());
         }
      } */
 
