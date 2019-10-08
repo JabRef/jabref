@@ -880,8 +880,8 @@ public class BasePanel extends StackPane {
     /**
      * Closes the entry editor if it is showing the given entry.
      */
-    private void ensureNotShowingBottomPanel(List<BibEntry> entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))) {
+    private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
+        if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
     }
