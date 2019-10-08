@@ -1,0 +1,43 @@
+{
+    "app-id" : "org.deisi.jabref",
+    "runtime" : "org.freedesktop.Platform",
+    "runtime-version" : "18.08",
+    "sdk" : "org.freedesktop.Sdk",
+    "sdk-extensions" : [
+        "org.freedesktop.Sdk.Extension.openjdk11"
+    ],
+    "command" : "JabRef",
+    "modules" : [
+        {
+            "name" : "openjdk",
+            "buildsystem" : "simple",
+            "build-commands" : [
+                "/usr/lib/sdk/openjdk11/install.sh"
+            ]
+        },
+        {
+            "name" : "jabref",
+            "buildsystem" : "simple",
+            "build-commands" : [
+                "tar -xvzf JabRef-portable_linux.tar.gz -C /app/"
+            ],
+            "sources" : [
+                {
+                    "type" : "archive",
+                    "path": "JabRef-portable_linux.tar.gz"
+                }
+            ]
+        }
+    ],
+    "finish-args" : [
+        "--env=PATH=/app/jre/bin:/usr/bin:/app/JabRef/bin",
+        "--socket=wayland",
+        "--socket=fallback-x11",
+        "--share=network",
+        "--filesystem=home"
+    ],
+    "build-options" : {
+        "env" : {
+        }
+    }
+}
