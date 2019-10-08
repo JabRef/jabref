@@ -39,7 +39,8 @@ class CitationStyleToClipboardWorkerTest {
                 OS.NEWLINE +
                 "Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. ";
 
-        String actual = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        ClipboardContent clipboardContent = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        String actual = clipboardContent.getString();
 
         assertEquals(expected, actual);
     }
@@ -91,8 +92,8 @@ class CitationStyleToClipboardWorkerTest {
                 "</dd>" + OS.NEWLINE +
                 "<p></p></font>";
 
-        String actual = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
-
+        ClipboardContent clipboardContent = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        String actual = clipboardContent.getString();
         assertEquals(expected, actual);
     }
 

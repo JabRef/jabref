@@ -111,7 +111,7 @@ public class BibEntryWriter {
             for (OrFields value : type.get().getRequiredFields()) {
                 for (Field field : value) {
                     writeField(entry, out, field, indentation);
-                    written.add(value.getPrimary());
+                    written.add(field);
                 }
             }
             // Then optional fields.
