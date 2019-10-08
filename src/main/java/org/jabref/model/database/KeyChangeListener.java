@@ -62,8 +62,8 @@ public class KeyChangeListener {
     // These methods may have to be renamed
     private void replaceKeyInMultiplesKeyField(String newKey, List<String> oldKeys, BibEntry entry, Field field, String fieldContent) {
         List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
-        for (String key : keys) {
-            int index = oldKeys.indexOf(key);
+        for (String key : oldKeys) {
+            int index = keys.indexOf(key);
             if (index != -1) {
                 if (newKey == null) {
                     keys.remove(index);
