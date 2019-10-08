@@ -507,14 +507,11 @@ modernizer {
 }
 
 // Release tasks
-task generateFinalJabRefPS1File(type: Copy) {
-    from('buildres') {
-        include 'JabRef.ps1'
-    }
-    into 'build'
-    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
+task deleteInstallerTemp(type: Delete) {
+    delete "$buildDir/installer"
 }
 
+jpackage.dependsOn deleteInstallerTemp
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
@@ -585,7 +582,9 @@ jlink {
                     '--app-version', "${project.version}",
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
-                    '--win-shortcut'
+                    '--win-shortcut',
+                    '--temp', "$buildDir/installer",
+                    '--resource-dir', "${projectDir}/buildres"
             ]
         }
 
@@ -608,6 +607,14 @@ jlink {
                     '--app-version', "${project.version}"
             ]
         }
+    }
+}
+tasks.jpackageImage.doLast {
+    copy {
+        from("/buildres/") {
+            include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+        }
+        into "$buildDir/distribution/JabRef"
     }
 }
 
