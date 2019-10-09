@@ -11,8 +11,7 @@ function Respond($response) {
     }
 }
 
-$jabRefJarFileName = "@jabRefJarFileName@"
-$jabRefJar = [System.IO.Path]::Combine($PSScriptRoot, $jabRefJarFileName)
+$jabRefExe = [System.IO.Path]::Combine($PSScriptRoot, "JabRef.exe")
 
 try {
     $reader = New-Object System.IO.BinaryReader([System.Console]::OpenStandardInput())
@@ -21,16 +20,16 @@ try {
     $message = $messageRaw | ConvertFrom-Json
 
     if ($message.Status -eq "validate") {
-        if (-not (Test-Path $jabRefJar)) {
-            return Respond @{message="jarNotFound";path=$jabRefJar}
+        if (-not (Test-Path $jabRefExe)) {
+            return Respond @{message="jarNotFound";path=$jabRefExe}
         } else {
             return Respond @{message="jarFound"}
         }
     }
-    
-    if (-not (Test-Path $jabRefJar)) {
+
+    if (-not (Test-Path $jabRefExe)) {
         $wshell = New-Object -ComObject Wscript.Shell
-        $popup = "Unable to locate '$jabRefJarFileName' in '$([System.IO.Path]::GetDirectoryName($jabRefJar))'."
+        $popup = "Unable to locate '$jabRefExe'."
         $wshell.Popup($popup,0,"JabRef", 0x0 + 0x30)
         return
     }
@@ -39,7 +38,7 @@ try {
     #$wshell.Popup($message.Text,0,"JabRef", 0x0 + 0x30)
 
     $messageText = $message.Text
-    $output = & java -jar $jabRefJar -importBibtex "$messageText" 2>&1
+    $output = & $jabRefExe -importBibtex "$messageText" 2>&1
     #$output = & echoargs -importBibtex $messageText 2>&1
     #$wshell.Popup($output,0,"JabRef", 0x0 + 0x30)
     return Respond @{message="ok";output="$output"}
