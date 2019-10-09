@@ -56,6 +56,7 @@ public class DBMSSynchronizerTest {
     @MethodSource("getTestingDatabaseSystems")
     public void testEntryAddedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
 
+        System.out.println("dbmstype"+ dbmsType);
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());

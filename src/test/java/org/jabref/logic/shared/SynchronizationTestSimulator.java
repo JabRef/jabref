@@ -53,6 +53,9 @@ public class SynchronizationTestSimulator {
     @MethodSource("getTestingDatabaseSystems")
     public void setUp(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
+        
+        System.out.println("dbmstype before each"+ dbmsType);
+
         clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
