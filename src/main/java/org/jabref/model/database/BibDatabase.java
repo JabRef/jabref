@@ -234,7 +234,7 @@ public class BibDatabase {
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
-        removeEntries(Collections.singletonList());
+        removeEntries(Collections.singletonList(bibEntry));
     }
 
     /**
