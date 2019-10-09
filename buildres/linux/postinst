@@ -38,6 +38,6 @@ else
     INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
 fi
 
-\cp /opt/jabref/lib/jabref.json INSTALL_PATH
+\cp /opt/jabref/lib/org.jabref.jabref.json INSTALL_PATH
 
 exit 0
