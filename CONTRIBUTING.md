@@ -34,8 +34,8 @@ In case you add keys to the changelog, please follow these rules:
 
 
 ### Author credits
-You will be given credit in the `AUTHORS` file in the root of the repository and the 'About' pages inside the main application.
-We will periodically update the contributors list inside `AUTHORS`.
+You will be given credit in the [`AUTHORS`](AUTHORS) file in the root of the repository and the 'About' pages inside the main application.
+We will periodically update the contributors list inside [`AUTHORS`](AUTHORS).
 This is done by an automatic shell script `scripts/generate-authors.sh`.
 
 If you want to add yourself directly with your pull request please run this script.
@@ -51,14 +51,14 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
-The first line of your commit message is automatically taken as title for the pull-request.
+The first line of your commit message is automatically taken as the title for the pull-request.
 All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 
 ### Test your code
-We know that writing test cases causes a lot of time.
+We know that writing test cases takes a lot of time.
 Nevertheless, we rely on our test cases to ensure that a bug fix or a feature implementation doesn't break anything.
-In case you do not have time to add a test case, we nevertheless ask you to run `gradlew check` to ensure that your change doesn't break anything else.
+In case you do not have time to add a test case, we nevertheless ask you to at least run `gradlew check` to ensure that your change doesn't break anything else.
 
 
 ### When adding a library
@@ -90,8 +90,8 @@ because <additional rationale>.
 
 
 ### When adding a new Localization.lang entry
-Add new `Localization.lang("KEY")` to Java file.
-Tests fail. In the test output a snippet is generated which must be added to the English translation file.
+Add new `Localization.lang("KEY")` to a Java file.
+The tests will fail and in the test output a snippet is generated, which must be added to the English translation file.
 
 Example:
 
@@ -105,7 +105,7 @@ Expected :[]
 Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFrame.java LANG)]
 ```
 
-Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
+Add the above snippet to the English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
 [Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
 
 You can also directly run the specific test in your IDE.
@@ -117,7 +117,7 @@ Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
 
-You can add the prefix `[WIP]` to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
+You can add the prefix `[WIP]` (which stands for Work in Progress) to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
 
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
