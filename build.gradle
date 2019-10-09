@@ -584,7 +584,7 @@ jlink {
                     '--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres"
+                    '--resource-dir', "${projectDir}/buildres/windows"
             ]
         }
 
@@ -594,7 +594,9 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.version}"
+                    '--app-version', "${project.version}",
+                    '--temp', "$buildDir/installer",
+                    '--resource-dir', "${projectDir}/buildres/linux"
             ]
         }
 
@@ -609,12 +611,26 @@ jlink {
         }
     }
 }
-tasks.jpackageImage.doLast {
-    copy {
-        from("/buildres/") {
-            include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+
+if (OperatingSystem.current().isWindows()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/windows") {
+                include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+            }
+            into "$buildDir/distribution/JabRef"
         }
-        into "$buildDir/distribution/JabRef"
+    }
+}
+
+if (OperatingSystem.current().isLinux()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/linux") {
+                include "jabref.json", "jabrefHost.py"
+            }
+            into "$buildDir/distribution/JabRef/lib"
+        }
     }
 }
 
