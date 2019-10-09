@@ -19,7 +19,9 @@ set -e
 
 case "$1" in
     configure)
-
+        INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
+        mkdir -p $INSTALL_PATH
+        \cp /opt/jabref/lib/jabref.json $INSTALL_PATH
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -30,14 +32,5 @@ case "$1" in
         exit 1
     ;;
 esac
-
-if [[ $EUID != 0 ]]; then
-    # User-based install
-    INSTALL_PATH="$HOME/.mozilla/native-messaging-hosts/"
-else
-    INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
-fi
-
-\cp /opt/jabref/lib/org.jabref.jabref.json INSTALL_PATH
 
 exit 0
