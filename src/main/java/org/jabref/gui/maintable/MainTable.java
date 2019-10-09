@@ -37,6 +37,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -111,6 +112,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
+
+        model.getEntriesFilteredAndSorted().addListener(
+            (ListChangeListener<BibEntryTableViewModel>) change -> {
+                if (change.next()) {
+                    if (change.wasAdded()) {
+                        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(change.getAddedSubList().get(0).getEntry()));
+                    }
+                }
+            });
 
         this.panel = panel;
 
