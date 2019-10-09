@@ -627,7 +627,7 @@ if (OperatingSystem.current().isLinux()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/linux") {
-                include "jabref.json", "jabrefHost.py"
+                include "org.jabref.jabref.json", "jabrefHost.py"
             }
             into "$buildDir/distribution/JabRef/lib"
         }
