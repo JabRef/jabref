@@ -440,26 +440,26 @@ test {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events "failed"
+        events = "failed"
         exceptionFormat "full"
     }
 }
 
 task databaseTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.DatabaseTest'
+    useJUnitPlatform {
+        includeTags 'DatabaseTest'
     }
 }
 
 task fetcherTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.FetcherTest'
+    useJUnitPlatform {
+        includeTags 'FetcherTest'
     }
 }
 
 task guiTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.GUITest'
+    useJUnitPlatform {
+        includeTags 'GUITest'
     }
 }
 
