@@ -440,7 +440,7 @@ test {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events = "failed"
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
         exceptionFormat "full"
     }
 }
