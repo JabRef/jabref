@@ -3,23 +3,13 @@
     "runtime" : "org.freedesktop.Platform",
     "runtime-version" : "18.08",
     "sdk" : "org.freedesktop.Sdk",
-    "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.openjdk11"
-    ],
     "command" : "JabRef",
     "modules" : [
-        {
-            "name" : "openjdk",
-            "buildsystem" : "simple",
-            "build-commands" : [
-                "/usr/lib/sdk/openjdk11/install.sh"
-            ]
-        },
         {
             "name" : "jabref",
             "buildsystem" : "simple",
             "build-commands" : [
-                "tar -xvzf JabRef-portable_linux.tar.gz -C /app/"
+                "tar -xvzf flatpak/JabRef-portable_linux.tar.gz -C /app/"
             ],
             "sources" : [
                 {
