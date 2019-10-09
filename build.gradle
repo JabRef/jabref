@@ -595,7 +595,7 @@ jlink {
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
-                    '--temp', "$buildDir/installer",
+                    //'--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/linux"
             ]
         }
