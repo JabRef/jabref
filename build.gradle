@@ -449,17 +449,32 @@ task databaseTest(type: Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
     }
+       testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
+    }
 }
 
 task fetcherTest(type: Test) {
     useJUnitPlatform {
         includeTags 'FetcherTest'
     }
+    testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
+    }
 }
 
 task guiTest(type: Test) {
     useJUnitPlatform {
         includeTags 'GUITest'
+    }
+    testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
     }
 }
 
