@@ -233,6 +233,10 @@ public class BibDatabase {
         entries.addAll(newEntries);
     }
 
+    public synchronized void removeEntry(BibEntry bibEntry) {
+        removeEntries(Collections.singletonList());
+    }
+
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
