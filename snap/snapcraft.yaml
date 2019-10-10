@@ -16,10 +16,10 @@ plugs:
   jabfox-integration:
     interface: system-files
     write:
-    - /usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+    - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 
 hooks:
-  jabref-interface:
+  connect-plug-system-files:
     plugs:
       - jabfox-integration
 
@@ -38,7 +38,6 @@ apps:
       - opengl
       - network-bind
       - removable-media
-      - jabfox-integration
 
 parts:
   jabref:
