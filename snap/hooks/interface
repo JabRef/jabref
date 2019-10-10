@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+cp $SNAP/lib/org.jabref.jabref.json /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
