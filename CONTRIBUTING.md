@@ -131,9 +131,7 @@ Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
 
-If you want to indicate that a pull request is not yet complete **before** creating the pull request, you may consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) 
-
-Alternatively, once the PR has been created, you can add the prefix `[WIP]` (which stands for "Work in Progress") to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
+You can add the prefix `[WIP]` (which stands for "Work in Progress") to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
 
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
