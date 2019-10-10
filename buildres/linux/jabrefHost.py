@@ -9,7 +9,6 @@ import sys
 import struct
 import subprocess
 import shlex
-import os
 import logging
 from pathlib import Path
 
@@ -52,7 +51,7 @@ def send_message(message):
     sys.stdout.buffer.flush()
 
 def add_jabref_entry(data):
-    cmd = JABREF_PATH + " -importBibtex " + "\"" + data + "\""
+    cmd = str(JABREF_PATH) + " -importBibtex " + "\"" + data + "\""
     try: 
         response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
@@ -71,7 +70,7 @@ except Exception as e:
 logging.info(str(message))
 
 if 'status' in message and message["status"] == "validate":
-    cmd = JABREF_PATH + " -version"
+    cmd = str(JABREF_PATH) + " -version"
     try: 
         response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as exc:
