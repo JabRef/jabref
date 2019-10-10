@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 
 # Note that running python with the `-u` flag is required on Windows,
 # in order to ensure that stdin and stdout are opened in binary, rather
@@ -10,16 +10,19 @@ import struct
 import subprocess
 import shlex
 import logging
+import shutil
 from pathlib import Path
 
 # We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
-script_dir = os.path.dirname(os.path.realpath('__file__'))
-JABREF_PATH = os.path.join(script_dir, '../bin/JabRef')
+script_dir = Path(__file__).resolve().parent.parent
+JABREF_PATH = script_dir / "bin/JabRef"
+if not JABREF_PATH.exists():
+    JABREF_PATH = shutil.which("jabref")
 
-logging_dir = str(Path.home()) + "/.mozilla/native-messaging-hosts/"
-if not os.path.exists(logging_dir):
-    os.makedirs(logging_dir)
-logging.basicConfig(filename=logging_dir + 'jabref_browser_extension.log')
+logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
+if not logging_dir.exists():
+    logging_dir.mkdir(parents=True)
+logging.basicConfig(filename=logging_dir / 'jabref_browser_extension.log')
 
 # Read a message from stdin and decode it.
 def get_message():
@@ -72,9 +75,9 @@ logging.info(str(message))
 if 'status' in message and message["status"] == "validate":
     cmd = str(JABREF_PATH) + " -version"
     try: 
-        response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, shell=True)
+        response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
-        logging.error("Failed to call JabRef", exc.returncode, exc.output)
+        logging.error("Failed to call JabRef: %s %s", exc.returncode, exc.output)
         send_message({"message": "jarNotFound", "path": JABREF_PATH})
     else:
         logging.info(f'{response}')
