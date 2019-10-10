@@ -15,13 +15,10 @@ architectures:
 plugs:
   jabfox-integration:
     interface: system-files
+    read:
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts
     write:
-    - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
-
-hooks:
-  connect-plug-system-files:
-    plugs:
-      - jabfox-integration
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 
 apps:
   jabref:
@@ -42,9 +39,9 @@ apps:
 parts:
   jabref:
     plugin: dump
-    # source: build/distribution/JabRef-portable_linux.tar.gz
+    source: build/distribution/JabRef-portable_linux.tar.gz
     # Use this source for debug purposes:
-    source: https://builds.jabref.org/master/JabRef-portable_linux.tar.gz
+    # source: https://builds.jabref.org/master/JabRef-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
