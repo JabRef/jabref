@@ -2,6 +2,7 @@
 
 After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
+
 ## Understanding the basics
 
 We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
@@ -19,6 +20,7 @@ In case you have any questions, do not hesitate to write one of our [JabRef deve
 ## Formal requirements for a pull request
 
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
+
 
 ### Add your change to CHANGELOG.md
 
@@ -131,8 +133,7 @@ Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
 
-If you want to indicate that a pull request is not yet complete **before** creating the pull request, you may consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) 
-
+If you want to indicate that a pull request is not yet complete **before** creating the pull request, you may consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/).
 Alternatively, once the PR has been created, you can add the prefix `[WIP]` (which stands for "Work in Progress") to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
 
 
