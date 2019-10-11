@@ -47,8 +47,8 @@ apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0.0"
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 13
+targetCompatibility = 13
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
