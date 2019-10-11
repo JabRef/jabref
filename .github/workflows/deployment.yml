@@ -45,7 +45,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11.0.4
+        java-version: 13
     - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
