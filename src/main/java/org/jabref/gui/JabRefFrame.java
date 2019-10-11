@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -147,11 +149,13 @@ public class JabRefFrame extends BorderPane {
     private final Stage mainStage;
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
-    private SidePaneManager sidePaneManager;
-    private TabPane tabbedPane;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private SidePaneManager sidePaneManager;
+    private TabPane tabbedPane;
     private SidePane sidePane;
+
+    private JabRefExecutorService executorService;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -160,13 +164,14 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
+        this.executorService = JabRefExecutorService.INSTANCE;
     }
 
     private static BasePanel getBasePanel(Tab tab) {
         return (BasePanel) tab.getContent();
     }
 
-    public void initDragAndDrop() {
+    private void initDragAndDrop() {
         Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
         dndIndicator.getStyleClass().add("drop");
 
@@ -200,21 +205,31 @@ public class JabRefFrame extends BorderPane {
             tabHeaderArea.setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
 
-                boolean success = false;
-
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-                if (!bibFiles.isEmpty()) {
-                    for (Path file : bibFiles) {
-                        ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                        addParserResult(pr, true);
-                    }
-                    success = true;
-                }
-
+                boolean success = loadBibFiles(bibFiles);
                 event.setDropCompleted(success);
                 event.consume();
             });
         });
+    }
+
+    // Loading data within an UI related class is really bad practice. Therefore this logic should be moved somewhere else
+    // and feed finished data into the frame, once it's completed.
+    private boolean loadBibFiles(List<Path> bibFiles) {
+        boolean success = false;
+        if (!bibFiles.isEmpty()) {
+            List<CompletableFuture<ParserResult>> futureList = bibFiles.stream().map(file -> {
+                CompletableFuture<ParserResult> parserResultCompletableFuture = new CompletableFuture<>();
+                executorService.execute(() -> {
+                    ParserResult parserResult = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    parserResultCompletableFuture.complete(parserResult);
+                });
+                parserResultCompletableFuture.thenAccept(pr -> addParserResult(pr, true));
+                return parserResultCompletableFuture;
+            }).collect(Collectors.toList());
+            success = true;
+        }
+        return success;
     }
 
     private void initKeyBindings() {
@@ -261,7 +276,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                        DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
                 }
             }, 60000); // run in one minute
         }
@@ -1205,6 +1220,34 @@ public class JabRefFrame extends BorderPane {
         return dialogService;
     }
 
+    private void setDefaultTableFontSize() {
+        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void increaseTableFontSize() {
+        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void decreaseTableFontSize() {
+        double currentSize = GUIGlobals.currentFont.getSize();
+        if (currentSize < 2) {
+            return;
+        }
+        GUIGlobals.setFont(currentSize - 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
     /**
      * The action concerned with closing the window.
      */
@@ -1271,34 +1314,6 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         }
-    }
-
-    private void setDefaultTableFontSize() {
-        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void increaseTableFontSize() {
-        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void decreaseTableFontSize() {
-        double currentSize = GUIGlobals.currentFont.getSize();
-        if (currentSize < 2) {
-            return;
-        }
-        GUIGlobals.setFont(currentSize - 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private class CloseDatabaseAction extends SimpleCommand {
