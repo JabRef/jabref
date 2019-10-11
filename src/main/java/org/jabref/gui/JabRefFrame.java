@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -106,7 +104,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -206,30 +203,12 @@ public class JabRefFrame extends BorderPane {
                 tabbedPane.getTabs().remove(dndIndicator);
 
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-                boolean success = loadBibFiles(bibFiles);
-                event.setDropCompleted(success);
+                OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                openDatabaseAction.openFiles(bibFiles, true);
+                event.setDropCompleted(true);
                 event.consume();
             });
         });
-    }
-
-    // Loading data within an UI related class is really bad practice. Therefore this logic should be moved somewhere else
-    // and feed finished data into the frame, once it's completed.
-    private boolean loadBibFiles(List<Path> bibFiles) {
-        boolean success = false;
-        if (!bibFiles.isEmpty()) {
-            List<CompletableFuture<ParserResult>> futureList = bibFiles.stream().map(file -> {
-                CompletableFuture<ParserResult> parserResultCompletableFuture = new CompletableFuture<>();
-                executorService.execute(() -> {
-                    ParserResult parserResult = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                    parserResultCompletableFuture.complete(parserResult);
-                });
-                parserResultCompletableFuture.thenAccept(pr -> addParserResult(pr, true));
-                return parserResultCompletableFuture;
-            }).collect(Collectors.toList());
-            success = true;
-        }
-        return success;
     }
 
     private void initKeyBindings() {
