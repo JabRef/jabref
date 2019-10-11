@@ -13,7 +13,7 @@ architectures:
   - build-on: amd64
 
 plugs:
-  jabfox-integration:
+  browser-extension:
     interface: system-files
     read:
       - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts
