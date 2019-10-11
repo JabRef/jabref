@@ -23,6 +23,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolve
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -162,10 +163,8 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            for (BibEntry entry : result.getToRemove()) {
-                panel.getDatabase().removeEntry(entry);
-                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry));
-            }
+            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove());
+            panel.getDatabase().removeEntries(result.getToRemove();
             panel.markBaseChanged();
         }
         // and adding merged entries:

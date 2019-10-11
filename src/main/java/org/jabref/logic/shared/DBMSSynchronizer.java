@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -229,6 +230,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @param sharedIDs Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
+        List<BibEntry> entriesToRemove = new ArrayList<>();
         for (int i = 0; i < localEntries.size(); i++) {
             BibEntry localEntry = localEntries.get(i);
             boolean match = false;
@@ -239,11 +241,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 }
             }
             if (!match) {
-                eventBus.post(new SharedEntryNotPresentEvent(localEntry));
-                bibDatabase.removeEntry(localEntry, EntryEventSource.SHARED); // Should not reach the listeners above.
-                i--; // due to index shift on localEntries
+                entriesToRemove.add(localEntry);
             }
         }
+        eventBus.post(new SharedEntriesNotPresentEvent(localEntries));\
+        panel.getUndoManager().addEdit(new UndoableRemoveEntries(panel.getDatabase(), event.getBibEntries()));
+        bibDatabase.removeEntries(entriesToRemove, EntryEventSource.SHARED); // Should not reach the listeners above.
     }
 
     /**

@@ -125,9 +125,7 @@ public class SharedDatabaseUIManager {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
         EntryEditor entryEditor = panel.getEntryEditor();
 
-        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry()));
-
-        if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
+        if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                                                        Localization.lang("The entry you currently work on has been deleted on the shared side.")
