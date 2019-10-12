@@ -148,11 +148,10 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private final JabRefExecutorService executorService;
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
-
-    private final JabRefExecutorService executorService;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
