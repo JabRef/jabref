@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<package>
+   <job id="postImage">
+    <script language="jscript">
+     <![CDATA[
+        var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+        // The script is invoked in the "image" folder and not in "config" for some reason
+        var jabRefRoot = fileSystem.GetFolder(".").ParentFolder.ParentFolder.ParentFolder.ParentFolder.Path;
+        var installerConfig = jabRefRoot + "/build/installer/config/";
+
+        // Copy additional installer resources
+        fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
+
+        var wxsFilePath = installerConfig + "JabRef.wxs";
+        wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);
+        var contents = wxsFile.ReadAll();
+        wxsFile.Close();
+
+        // Add registry values for JabFox
+        contents = contents.replace("</Product>", "<DirectoryRef Id=\"TARGETDIR\"><Component Id=\"RegistryJabFoxEntries\" Guid=\"b6bc55ad-905c-4258-89b1-8b37abbe559c\" Win64=\"yes\"><RegistryKey Root=\"HKMU\" Key=\"SOFTWARE\\Mozilla\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[APPLICATIONFOLDER]jabref.json\"/></RegistryKey></Component></DirectoryRef><Feature Id=\"JabFox\" Level=\"1\"><ComponentRef Id=\"RegistryJabFoxEntries\" /></Feature></Product>");
+
+        // Specify correct icon in Add/Remove Programs
+        contents = contents.replace("</Product>", "<Property Id=\"ARPPRODUCTICON\" Value=\"DesktopIcon.exe\" /></Product>");
+
+        // Specify banner
+        contents = contents.replace("</Product>", "<WixVariable Id=\"WixUIBannerBmp\" Value=\"JabRefTopBanner.bmp\" /></Product>");
+        //contents = contents.replace("</Product>", "<WixVariable Id=\"WixUIDialogBmp\" Value=\"\" /></Product>");
+
+         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 2, true);
+         wxsFile.Write(contents);
+         wxsFile.Close();
+     ]]>
+    </script>
+   </job>
+</package>

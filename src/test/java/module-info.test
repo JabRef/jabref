@@ -38,3 +38,9 @@
 --add-opens
     // Needed for localization tests
     javafx.fxml/javafx.fxml=org.jabref
+
+--add-modules
+    io.github.classgraph
+
+--add-reads
+   org.jabref=io.github.classgraph

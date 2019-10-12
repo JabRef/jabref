@@ -11,7 +11,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.plugins.Plugin;
-import org.apache.logging.log4j.plugins.PluginBuilderFactory;
+import org.apache.logging.log4j.plugins.PluginFactory;
 
 @Plugin(name = "OurApplicationInsightsAppender", category = "Core", elementType = "appender", printObject = true)
 @SuppressWarnings("unused") // class is indirectly constructed by log4j
@@ -21,7 +21,7 @@ public class ApplicationInsightsAppender extends AbstractAppender {
         super(name, filter, null, ignoreExceptions, properties);
     }
 
-    @PluginBuilderFactory
+    @PluginFactory
     public static <B extends Builder<B>> B newBuilder() {
         return new Builder<B>().asBuilder();
     }

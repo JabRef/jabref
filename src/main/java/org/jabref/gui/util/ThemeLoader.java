@@ -88,23 +88,20 @@ public class ThemeLoader {
         scene.getStylesheets().add(index, cssFile.toExternalForm());
 
         try {
-
+            // If the file is an ordinary file (i.e. not part of a java runtime bundle), we watch it for changes and turn on live reloading
             URI cssUri = cssFile.toURI();
-            if (!cssUri.toString().contains("jar")) {
+            if (!cssUri.toString().contains("jrt")) {
                 LOGGER.debug("CSS URI {}", cssUri);
 
                 Path cssPath = Paths.get(cssUri).toAbsolutePath();
-                // If the file is an ordinary file (i.e. not a resource part of a .jar bundle), we watch it for changes and turn on live reloading
-                if (!cssUri.toString().contains("jar")) {
-                    LOGGER.info("Enabling live reloading of {}", cssPath);
-                    fileUpdateMonitor.addListenerForFile(cssPath, () -> {
-                        LOGGER.info("Reload css file " + cssFile);
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            scene.getStylesheets().remove(cssFile.toExternalForm());
-                            scene.getStylesheets().add(index, cssFile.toExternalForm());
-                        });
+                LOGGER.info("Enabling live reloading of {}", cssPath);
+                fileUpdateMonitor.addListenerForFile(cssPath, () -> {
+                    LOGGER.info("Reload css file {}", cssFile);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        scene.getStylesheets().remove(cssFile.toExternalForm());
+                        scene.getStylesheets().add(index, cssFile.toExternalForm());
                     });
-                }
+                });
             }
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.error("Could not watch css file for changes " + cssFile, e);
