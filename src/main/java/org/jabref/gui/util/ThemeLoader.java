@@ -96,7 +96,7 @@ public class ThemeLoader {
                 Path cssPath = Paths.get(cssUri).toAbsolutePath();
                 LOGGER.info("Enabling live reloading of {}", cssPath);
                 fileUpdateMonitor.addListenerForFile(cssPath, () -> {
-                    LOGGER.info("Reload css file " + cssFile);
+                    LOGGER.info("Reload css file {}", cssFile);
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         scene.getStylesheets().remove(cssFile.toExternalForm());
                         scene.getStylesheets().add(index, cssFile.toExternalForm());
