@@ -751,9 +751,9 @@ public class BasePanel extends StackPane {
         // Set up name autocompleter for search:
         executorService.execute(() -> {
             instantiateSearchAutoCompleter();
-            this.getDatabase().registerListener(new SearchAutoCompleteListener());
             setupAutoCompletion();
         });
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
