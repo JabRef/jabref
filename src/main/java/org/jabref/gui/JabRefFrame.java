@@ -152,7 +152,7 @@ public class JabRefFrame extends BorderPane {
     private TabPane tabbedPane;
     private SidePane sidePane;
 
-    private JabRefExecutorService executorService;
+    private final JabRefExecutorService executorService;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
