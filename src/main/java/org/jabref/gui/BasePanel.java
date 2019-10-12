@@ -139,7 +139,7 @@ public class BasePanel extends StackPane {
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
-    @SuppressWarnings({ "FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
@@ -435,9 +435,9 @@ public class BasePanel extends StackPane {
         if (!selectedBibEntries.isEmpty()) {
             // Collect all non-null titles.
             List<String> titles = selectedBibEntries.stream()
-                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                    .map(bibEntry -> bibEntry.getTitle().get())
-                    .collect(Collectors.toList());
+                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                                                    .map(bibEntry -> bibEntry.getTitle().get())
+                                                    .collect(Collectors.toList());
 
             if (titles.isEmpty()) {
                 output(Localization.lang("None of the selected entries have titles."));
@@ -469,8 +469,8 @@ public class BasePanel extends StackPane {
             }
 
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> cite.contains("\\")) // must contain \
-                    .orElse("\\cite");
+                                         .filter(cite -> cite.contains("\\")) // must contain \
+                                         .orElse("\\cite");
             final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
             Globals.clipboardManager.setContent(copiedCiteCommand);
 
@@ -665,11 +665,11 @@ public class BasePanel extends StackPane {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                .stream()
-                .findFirst()
-                .ifPresent(entry -> {
-                    entryEditor.setEntry(entry);
-                }));
+                                                         .stream()
+                                                         .findFirst()
+                                                         .ifPresent(entry -> {
+                                                             entryEditor.setEntry(entry);
+                                                         }));
 
         // TODO: Register these actions globally
         /*
@@ -754,12 +754,12 @@ public class BasePanel extends StackPane {
             this.getDatabase().registerListener(new SearchAutoCompleteListener());
             setupAutoCompletion();
         });
-        
+
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                .flatMap(SplitPane.Divider::positionProperty)
-                .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+                                              .flatMap(SplitPane.Divider::positionProperty)
+                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -1236,10 +1236,10 @@ public class BasePanel extends StackPane {
                     List<LinkedFile> files = bes.get(0).getFiles();
 
                     Optional<LinkedFile> linkedFile = files.stream()
-                            .filter(file -> (StandardField.URL.getName().equalsIgnoreCase(file.getFileType())
-                                    || StandardField.PS.getName().equalsIgnoreCase(file.getFileType())
-                                    || StandardField.PDF.getName().equalsIgnoreCase(file.getFileType())))
-                            .findFirst();
+                                                           .filter(file -> (StandardField.URL.getName().equalsIgnoreCase(file.getFileType())
+                                                                   || StandardField.PS.getName().equalsIgnoreCase(file.getFileType())
+                                                                   || StandardField.PDF.getName().equalsIgnoreCase(file.getFileType())))
+                                                           .findFirst();
 
                     if (linkedFile.isPresent()) {
 
