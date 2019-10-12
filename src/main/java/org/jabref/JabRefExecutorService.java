@@ -7,11 +7,14 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,6 @@ public class JabRefExecutorService {
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
-
     });
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
@@ -71,7 +73,8 @@ public class JabRefExecutorService {
     }
 
     /**
-     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
+     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation
+     * is done.
      *
      * @param tasks The tasks to execute
      * @return A List of Future objects that provide the returning values.
@@ -94,6 +97,15 @@ public class JabRefExecutorService {
             // Ignored
             return Collections.emptyList();
         }
+    }
+
+    public <T> CompletableFuture<T> execute(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, executorService);
+    }
+
+    public <T> List<CompletableFuture<T>> executeAll(List<Supplier<T>> supplierList) {
+        return supplierList.stream().map(supplier -> CompletableFuture.supplyAsync(supplier, executorService))
+                           .collect(Collectors.toList());
     }
 
     public void executeInterruptableTask(final Runnable runnable, String taskName) {
@@ -165,5 +177,4 @@ public class JabRefExecutorService {
             }
         }
     }
-
 }
