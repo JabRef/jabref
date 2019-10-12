@@ -89,7 +89,9 @@ jobs:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
           docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/"
-          cd build/distribution/ && mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=edge *.snap || true
+          cd build/distribution/
+          mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
+          docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "snapcraft push --release=edge *.snap || true"
       shell: bash
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
