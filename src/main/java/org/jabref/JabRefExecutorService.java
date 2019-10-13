@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for managing of all threads (except GUI threads) in JabRef
  */
+@Deprecated
 public class JabRefExecutorService {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
