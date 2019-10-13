@@ -472,10 +472,6 @@ processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
-
-    jacoco {
-        append = true
-    }
 }
 
 task jacocoMerge(type: JacocoMerge) {
