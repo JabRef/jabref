@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -48,10 +49,13 @@
         </padding>
     </HBox>
 
-    <HBox prefWidth="650.0" alignment="BASELINE_CENTER">
+    <HBox prefWidth="650.0">
         <Label styleClass="sectionHeader" text="%Key patterns"/>
         <HBox HBox.hgrow="ALWAYS"/>
-        <Button text="Reset All" onAction="#resetAllKeyPatterns"/>
+        <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
     </HBox>
-    <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="220.0"/>
+    <AnchorPane>
+        <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="220.0"/>
+        <Button text="Reset All" onAction="#resetAllKeyPatterns" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+    </AnchorPane>
 </fx:root>

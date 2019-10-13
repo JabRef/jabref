@@ -1,13 +1,18 @@
 package org.jabref.gui.preferences;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 import org.jabref.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableView;
+import org.jabref.gui.help.HelpAction;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -24,6 +29,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @FXML public TextField keyPatternRegex;
     @FXML public TextField keyPatternReplacement;
     @FXML public HBox keyPatternContainer;
+    @FXML public Button keyPatternHelp;
 
     private final BibtexKeyPatternTableView bibtexKeyPatternTable;
 
@@ -58,6 +64,9 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
         keyPatternContainer.getChildren().add(bibtexKeyPatternTable);
+
+        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.BIBTEX_KEY_PATTERN), keyPatternHelp);
     }
 
     @Override
