@@ -103,6 +103,15 @@ public class JabRefExecutorService {
         return CompletableFuture.supplyAsync(supplier, executorService);
     }
 
+    public <T> CompletableFuture<T> executeInterruptible(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, lowPriorityExecutorService);
+    }
+
+    public <T> List<CompletableFuture<T>> executeAllInterruptible(List<Supplier<T>> supplierList) {
+        return supplierList.stream().map(supplier -> CompletableFuture.supplyAsync(supplier, lowPriorityExecutorService))
+                           .collect(Collectors.toList());
+    }
+
     public <T> List<CompletableFuture<T>> executeAll(List<Supplier<T>> supplierList) {
         return supplierList.stream().map(supplier -> CompletableFuture.supplyAsync(supplier, executorService))
                            .collect(Collectors.toList());
