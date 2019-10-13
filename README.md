@@ -31,7 +31,7 @@ JabRef supports you in every step of your research work.
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
 - [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
-	
+    
 #### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your own manual assignments
@@ -43,18 +43,18 @@ JabRef supports you in every step of your research work.
 - Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
 - Automatically rename and move associated documents according to customizable rules
 - Keep track of what you read: ranking, priority, printed, quality-assured 
-	
+    
 #### Cite
 
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
 - Format references in one of the many thousand built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
-	
+    
 #### Share
 
 - Many built-in export options or create your own export format
-- Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
+- The library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
 - Work in a team: sync the contents of your library via a SQL database
 
 ## Installation
@@ -91,7 +91,7 @@ An explanation of donation possibilities and usage of donations is available at 
 
 > Not a programmer? [Learn how to help.](http://contribute.jabref.org)
 
-Want to be part of a free and open-source project that tens of thousands scientist use every day? Check out the ways you can contribute, below:
+Want to be part of a free and open-source project that tens of thousands of scientist use every day? Check out the ways you can contribute, below:
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
 - You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
