@@ -143,10 +143,12 @@ public class BasePanel extends StackPane {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+    private JabRefExecutorService executorService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
+        this.executorService = JabRefExecutorService.INSTANCE;
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
@@ -674,7 +676,7 @@ public class BasePanel extends StackPane {
         String clearSearch = "clearSearch";
         mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
         mainTable.getActionMap().put(clearSearch, new AbstractAction() {
-
+        
             @Override
             public void actionPerformed(ActionEvent e) {
                 // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
@@ -695,9 +697,9 @@ public class BasePanel extends StackPane {
                 }
             }
         });
-
+        
         mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-
+        
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -708,7 +710,7 @@ public class BasePanel extends StackPane {
             }
         });
         mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-
+        
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -719,7 +721,7 @@ public class BasePanel extends StackPane {
             }
         });
         mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-
+        
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -747,10 +749,11 @@ public class BasePanel extends StackPane {
         splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
-        instantiateSearchAutoCompleter();
+        executorService.execute(() -> {
+            instantiateSearchAutoCompleter();
+            setupAutoCompletion();
+        });
         this.getDatabase().registerListener(new SearchAutoCompleteListener());
-
-        setupAutoCompletion();
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
