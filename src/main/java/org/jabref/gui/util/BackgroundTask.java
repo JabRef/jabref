@@ -1,10 +1,12 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -45,6 +47,15 @@ public abstract class BackgroundTask<V> {
             @Override
             protected V call() throws Exception {
                 return callable.call();
+            }
+        };
+    }
+
+    public static <V> BackgroundTask<V> wrap(Supplier<V> supplier) {
+        return new BackgroundTask<V>() {
+            @Override
+            protected V call() throws Exception {
+                return supplier.get();
             }
         };
     }
@@ -118,6 +129,7 @@ public abstract class BackgroundTask<V> {
      * Sets the {@link Consumer} that is invoked after the task is successfully finished.
      * The consumer always runs on the JavaFX thread.
      */
+    @Deprecated
     public BackgroundTask<V> onSuccess(Consumer<V> onSuccess) {
         this.onSuccess = onSuccess;
         return this;
@@ -141,16 +153,17 @@ public abstract class BackgroundTask<V> {
      * Sets the {@link Consumer} that is invoked after the task has failed with an exception.
      * The consumer always runs on the JavaFX thread.
      */
+    @Deprecated
     public BackgroundTask<V> onFailure(Consumer<Exception> onException) {
         this.onException = onException;
         return this;
     }
 
-    public Future<?> executeWith(TaskExecutor taskExecutor) {
+    public CompletableFuture<V> executeWith(TaskExecutor taskExecutor) {
         return taskExecutor.execute(this);
     }
 
-    public Future<?> scheduleWith(TaskExecutor taskExecutor, long delay, TimeUnit unit) {
+    public Future<V> scheduleWith(TaskExecutor taskExecutor, long delay, TimeUnit unit) {
         return taskExecutor.schedule(this, delay, unit);
     }
 
@@ -158,6 +171,7 @@ public abstract class BackgroundTask<V> {
      * Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was successful or
      * failed with an error.
      */
+    @Deprecated
     public BackgroundTask<V> onFinished(Runnable onFinished) {
         this.onFinished = onFinished;
         return this;
@@ -169,6 +183,7 @@ public abstract class BackgroundTask<V> {
      * @param nextTaskFactory the function that creates the new task
      * @param <T>             type of the return value of the second task
      */
+    @Deprecated
     public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
         return new BackgroundTask<T>() {
             @Override
@@ -187,12 +202,13 @@ public abstract class BackgroundTask<V> {
      * @param nextOperation the function that performs the next operation
      * @param <T>           type of the return value of the second task
      */
+    @Deprecated
     public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
-        return new BackgroundTask<T>() {
+        return new BackgroundTask<>() {
             @Override
             protected T call() throws Exception {
                 V result = BackgroundTask.this.call();
-                BackgroundTask<T> nextTask = BackgroundTask.wrap(() -> nextOperation.apply(result));
+                BackgroundTask<T> nextTask = BackgroundTask.wrap((Callable<T>) () -> nextOperation.apply(result));
                 EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
                 return nextTask.call();
             }
@@ -204,6 +220,7 @@ public abstract class BackgroundTask<V> {
      *
      * @param nextOperation the function that performs the next operation
      */
+    @Deprecated
     public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
         return new BackgroundTask<Void>() {
             @Override
