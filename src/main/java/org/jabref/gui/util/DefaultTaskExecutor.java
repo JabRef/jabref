@@ -106,7 +106,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     @Override
     public <V> Future<V> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
-        return scheduledExecutor.schedule(task::call, delay, unit);
+        return scheduledExecutor.schedule(() -> getJavaFXTask(task).get(), delay, unit);
     }
 
     @Override
