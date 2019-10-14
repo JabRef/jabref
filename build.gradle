@@ -199,7 +199,7 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.47'
+    testCompile 'io.github.classgraph:classgraph:4.8.48'
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
