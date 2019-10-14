@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for managing of all threads (except GUI threads) in JabRef
+ * @deprecated Use {@link org.jabref.gui.util.BackgroundTask} instead
  */
 @Deprecated
 public class JabRefExecutorService {
