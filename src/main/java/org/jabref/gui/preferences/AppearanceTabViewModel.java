@@ -39,8 +39,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 fontSizeProperty,
                 input -> {
                     try {
-                        int fontSize = Integer.parseInt(fontSizeProperty().getValue());
-                        return (fontSize > 8) && (fontSize < 22);
+                        return Integer.parseInt(fontSizeProperty().getValue()) > 8;
                     } catch (NumberFormatException ex) {
                         return false;
                     }
@@ -48,7 +47,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
                         Localization.lang("Appearance"),
                         Localization.lang("Font settings"),
-                        Localization.lang("You must enter an integer value in the interval  8-22."))));
+                        Localization.lang("You must enter an integer value higher than 8."))));
     }
 
     @Override
