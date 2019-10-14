@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javafx.scene.input.ClipboardContent;
 
@@ -55,7 +56,7 @@ public class CitationStyleToClipboardWorker {
     }
 
     public void copyCitationStyleToClipboard(TaskExecutor taskExecutor) {
-        BackgroundTask.wrap(this::generateCitations)
+        BackgroundTask.wrap((Callable<List<String>>) this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
                       .onSuccess(this::setClipBoardContent)
                       .executeWith(taskExecutor);

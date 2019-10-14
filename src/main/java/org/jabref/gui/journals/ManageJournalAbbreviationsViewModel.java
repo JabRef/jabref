@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -116,7 +117,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     void addBuiltInLists() {
         BackgroundTask
-                .wrap(JournalAbbreviationLoader::getBuiltInAbbreviations)
+                .wrap((Callable<List<Abbreviation>>) JournalAbbreviationLoader::getBuiltInAbbreviations)
                 .onRunning(() -> isLoadingBuiltIn.setValue(true))
                 .onSuccess(result -> {
                     isLoadingBuiltIn.setValue(false);
@@ -127,7 +128,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 .executeWith(taskExecutor);
 
         BackgroundTask
-                .wrap(() -> {
+                .wrap((Callable<List<Abbreviation>>) () -> {
                     if (abbreviationsPreferences.useIEEEAbbreviations()) {
                         return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
                     } else {

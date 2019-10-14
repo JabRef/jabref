@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -148,8 +149,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         if (entry != null) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
-                                                                                                   .wrap(() -> findAssociatedNotLinkedFiles(entry))
-                                                                                                   .onSuccess(files::addAll);
+                    .wrap((Callable<List<LinkedFileViewModel>>) () -> findAssociatedNotLinkedFiles(entry))
+                    .onSuccess(files::addAll);
             taskExecutor.execute(findAssociatedNotLinkedFiles);
         }
     }
@@ -178,17 +179,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void fetchFulltext() {
         FulltextFetchers fetcher = new FulltextFetchers(preferences.getImportFormatPreferences());
         BackgroundTask
-                      .wrap(() -> fetcher.findFullTextPDF(entry))
-                      .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                      .onFinished(() -> fulltextLookupInProgress.setValue(false))
-                      .onSuccess(url -> {
+                .wrap((Callable<Optional<URL>>) () -> fetcher.findFullTextPDF(entry))
+                .onRunning(() -> fulltextLookupInProgress.setValue(true))
+                .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                .onSuccess(url -> {
                           if (url.isPresent()) {
                               addFromURL(url.get());
                           } else {
                               dialogService.notify(Localization.lang("No full text document found"));
                           }
                       })
-                      .executeWith(taskExecutor);
+                .executeWith(taskExecutor);
     }
 
     public void addFromURL() {

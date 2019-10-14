@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultTexParser;
 import org.jabref.logic.texparser.TexBibEntriesResolver;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.texparser.TexBibEntriesResolverResult;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -121,7 +123,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
      * Run a recursive search in a background task.
      */
     public void searchButtonClicked() {
-        BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
+        BackgroundTask.wrap((Callable<FileNodeViewModel>) () -> searchDirectory(Paths.get(texDirectory.get())))
                       .onRunning(() -> {
                           root.set(null);
                           noFilesFound.set(true);
@@ -201,7 +203,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
                 preferencesService.getImportFormatPreferences(), fileMonitor);
 
-        BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultTexParser().parse(fileList)))
+        BackgroundTask.wrap((Callable<TexBibEntriesResolverResult>) () -> entriesResolver.resolve(new DefaultTexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
                       .onSuccess(result -> new ParseTexResultView(result, databaseContext, Paths.get(texDirectory.get())).showAndWait())

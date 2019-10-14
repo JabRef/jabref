@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,7 +106,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             availableListProperty.getValue().add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
+        BackgroundTask.wrap((Callable<List<CitationStyle>>) CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
                                                  .map(CitationStylePreviewLayout::new)
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->

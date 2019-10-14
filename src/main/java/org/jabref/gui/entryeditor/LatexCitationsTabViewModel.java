@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -103,7 +104,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private void startSearch(String citeKey) {
-        searchTask = BackgroundTask.wrap(() -> searchAndParse(citeKey))
+        searchTask = BackgroundTask.wrap((Callable<Collection<Citation>>) () -> searchAndParse(citeKey))
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
                                    .onSuccess(result -> {
                                        citationList.setAll(result);

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -226,7 +227,7 @@ public class GroupNodeViewModel {
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
         BackgroundTask
-                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
+                .wrap((Callable<Long>) () -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
                 .onSuccess(hits::setValue)
                 .executeWith(taskExecutor);
     }

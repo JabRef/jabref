@@ -2,6 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -94,7 +95,7 @@ public class WebSearchPaneViewModel {
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap((Callable<List<BibEntry>>) () -> activeFetcher.performSearch(getQuery().trim()))
                                                             .withInitialMessage(Localization.lang("Processing %0", getQuery()));
 
         task.onFailure(ex -> dialogService.showErrorDialogAndWait(ex));

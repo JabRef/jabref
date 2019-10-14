@@ -3,6 +3,7 @@ package org.jabref.gui.exporter;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
@@ -102,7 +103,7 @@ public class ExportCommand extends SimpleCommand {
 
         final List<BibEntry> finEntries = entries;
         BackgroundTask
-                .wrap(() -> {
+                .wrap((Callable<Object>) () -> {
                     format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
                             file,
                             frame.getCurrentBasePanel()

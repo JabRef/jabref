@@ -2,6 +2,7 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.swing.undo.UndoManager;
 
@@ -76,8 +77,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
-            BackgroundTask.wrap(() -> entriesToImport.stream()
-                    .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
+            BackgroundTask.wrap((Callable<Boolean>) () -> entriesToImport.stream()
+                                                                         .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                             Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -47,7 +48,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
         ChangeScanner scanner = new ChangeScanner(database, referenceFile);
-        BackgroundTask.wrap(scanner::scanForChanges)
+        BackgroundTask.wrap((Callable<List<DatabaseChangeViewModel>>) scanner::scanForChanges)
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
                               listeners.forEach(listener -> listener.databaseChanged(changes));

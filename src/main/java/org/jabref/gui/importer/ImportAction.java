@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.jabref.Globals;
@@ -51,7 +52,7 @@ public class ImportAction {
      */
     public void automatedImport(List<String> filenames) {
         List<Path> files = filenames.stream().map(Paths::get).collect(Collectors.toList());
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> {
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap((Callable<List<BibEntry>>) () -> {
             List<ImportFormatReader.UnknownFormatImport> imports = doImport(files);
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found

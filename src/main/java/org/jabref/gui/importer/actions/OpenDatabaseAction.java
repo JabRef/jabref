@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.jabref.Globals;
@@ -188,7 +189,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         Objects.requireNonNull(file);
         if (Files.exists(file)) {
 
-            BackgroundTask.wrap(() -> loadDatabase(file))
+            BackgroundTask.wrap((Callable<ParserResult>) () -> loadDatabase(file))
                           .onSuccess(result -> {
                               BasePanel panel = addNewDatabase(result, file, raisePanel);
                               OpenDatabaseAction.performPostOpenActions(panel, result);
