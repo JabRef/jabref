@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -69,6 +71,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
+
         this.undoManager = panel.getUndoManager();
 
         importHandler = new ImportHandler(
@@ -113,15 +116,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
-        model.getEntriesFilteredAndSorted().addListener(
-            (ListChangeListener<BibEntryTableViewModel>) change -> {
-                if (change.next()) {
-                    if (change.wasAdded()) {
-                        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(change.getAddedSubList().get(0).getEntry()));
-                    }
-                }
-            });
-
         this.panel = panel;
 
         pane = new ScrollPane(this);
@@ -137,6 +131,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
+
+        database.getDatabase().registerListener(this);
+    }
+
+    @Subscribe
+    public void listen(AllInsertsFinishedEvent event) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getBibEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {

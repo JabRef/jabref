@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.database.event.EntryAddedEvent;
+import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -219,6 +220,7 @@ public class BibDatabase {
     private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
 
+        BibEntry firstEntry = null;
         for (BibEntry entry : newEntries) {
             String id = entry.getId();
             if (containsEntryWithId(id)) {
@@ -227,10 +229,15 @@ public class BibDatabase {
 
             internalIDs.add(id);
             entry.registerListener(this);
-
-            eventBus.post(new EntryAddedEvent(entry, eventSource));
+            if (firstEntry == null) {
+                firstEntry = entry;
+            }
         }
         entries.addAll(newEntries);
+
+        if (firstEntry != null) {
+            eventBus.post(new AllInsertsFinishedEvent(firstEntry, eventSource));
+        }
     }
 
     /**
@@ -563,6 +570,7 @@ public class BibDatabase {
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
      *   - {@link EntryRemovedEvent}
+     *   - {@link AllInsertsFinishedEvent}
      *
      * @param listener listener (subscriber) to add
      */
