@@ -37,7 +37,7 @@ public class ImportCommand extends SimpleCommand {
         this.frame = frame;
         this.openInNew = openInNew;
 
-        if(!openInNew) {
+        if (!openInNew) {
             this.executable.bind(needsDatabase(stateManager));
         }
 
