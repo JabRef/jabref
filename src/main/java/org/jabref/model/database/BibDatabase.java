@@ -229,12 +229,14 @@ public class BibDatabase {
 
             internalIDs.add(id);
             entry.registerListener(this);
+
+            eventBus.post(new EntryAddedEvent(entry, eventSource));
+
             if (firstEntry == null) {
                 firstEntry = entry;
             }
         }
         entries.addAll(newEntries);
-
         if (firstEntry != null) {
             eventBus.post(new AllInsertsFinishedEvent(firstEntry, eventSource));
         }
