@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -92,19 +93,20 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> Future<V> execute(BackgroundTask<V> task) {
+    public <V> CompletableFuture<V> execute(BackgroundTask<V> task) {
         return execute(getJavaFXTask(task));
     }
 
     @Override
-    public <V> Future<V> execute(Task<V> task) {
-        executor.submit(task);
-        return task;
+    public <V> CompletableFuture<V> execute(Task<V> task) {
+        CompletableFuture<V> future = new CompletableFuture<>();
+        executor.submit((Callable<V>) task::get);
+        return future;
     }
 
     @Override
-    public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
-        return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
+    public <V> Future<V> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
+        return scheduledExecutor.schedule(task::call, delay, unit);
     }
 
     @Override
