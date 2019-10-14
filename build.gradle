@@ -594,8 +594,14 @@ jlink {
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
-                    //'--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres/linux"
+                    // '--temp', "$buildDir/installer",
+                    '--resource-dir', "${projectDir}/buildres/linux",
+                    '--linux-menu-group', 'Office;',
+                    '--linux-rpm-license-type', 'MIT',
+                    // '--license-file', "${projectDir}/LICENSE.md",
+                    '--file-associations', "${projectDir}/buildres/linux/desktop.properties",
+                    '--description', 'JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.',
+                    '--linux-shortcut'
             ]
         }
 
@@ -626,7 +632,7 @@ if (OperatingSystem.current().isLinux()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/linux") {
-                include "org.jabref.jabref.json", "jabrefHost.py", "jabref.desktop"
+                include "org.jabref.jabref.json", "jabrefHost.py"
             }
             into "$buildDir/distribution/JabRef/lib"
         }

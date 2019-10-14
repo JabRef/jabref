@@ -21,7 +21,7 @@ case "$1" in
     configure)
         INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
         install -D -m0755 /opt/jabref/lib/org.jabref.jabref.json $INSTALL_PATH
-        install -D -m0644 /opt/jabref/lib/jabref.desktop /usr/share/applications/
+        DESKTOP_COMMANDS_INSTALL
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
