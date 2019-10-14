@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.CannotRedoException;
@@ -48,6 +50,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
+import org.jabref.gui.journals.UndoableAbbreviator;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
@@ -65,6 +68,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
@@ -362,11 +367,69 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
-        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
-        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        Supplier<List<BibEntry>> selectedEntriesSupplier = () -> mainTable.getSelectedEntries();
+        NamedCompound compound = new NamedCompound(Localization.lang("Abbreviate journal names"));
+        Supplier<NamedCompound> compoundSupplier = () -> compound;
+        AbbreviateAction.AbbreviateActionListener abbreviateActionListener = new AbbreviateAction.AbbreviateActionAdapter() {
+            @Override
+            public void notifyAbbreviationStart() {
+                BasePanel.this.output(Localization.lang("Abbreviating..."));
+            }
+
+            @Override
+            public void notifyAbbreviationStarted(CompletableFuture<List<CompletableFuture<AbbreviateAction.AbbreviationResult>>> futureResult) {
+                // TODO append further tasks (if necessary)
+                // futureResult.thenRun(...);
+                //futureResult.thenApply(abbrList -> {...});
+            }
+
+            @Override
+            public void notifyAbbreviationCompleted(AbbreviateAction.AbbreviationResult result) {
+                // TODO update GUI (if necessary)
+            }
+
+            @Override
+            public void notifyAbbreviationCompleted(List<AbbreviateAction.AbbreviationResult> abbreviationResults) {
+                long count = abbreviationResults.stream().filter(AbbreviateAction.AbbreviationResult::getResult).count();
+                String outputString;
+                if (count > 0) {
+                    compound.end();
+                    BasePanel.this.getUndoManager().addEdit(compound);
+                    BasePanel.this.markBaseChanged();
+                    outputString = Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
+                } else {
+                    outputString = Localization.lang("No journal names could be abbreviated.");
+                }
+                BasePanel.this.output(outputString);
+            }
+        };
+
+        Supplier<BibDatabase> databaseSupplier = bibDatabaseContext::getDatabase;
+
+        // The Supplier<UndoableAbbreviator> could be a more sophisticated mechanism in the future, to handle things easier.
+        // For the time being, this should be sufficient.
+        AbbreviateAction isoAbbreviateAction = new AbbreviateAction(selectedEntriesSupplier, () -> getAbbreviator(true), databaseSupplier, compoundSupplier, abbreviateActionListener);
+        AbbreviateAction abbreviateAction = new AbbreviateAction(selectedEntriesSupplier, () -> getAbbreviator(false), databaseSupplier, compoundSupplier, abbreviateActionListener);
+
+        actions.put(Actions.ABBREVIATE_ISO, isoAbbreviateAction);
+        actions.put(Actions.ABBREVIATE_MEDLINE, abbreviateAction);
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
+    }
+
+    private UndoableAbbreviator getAbbreviator(boolean iso) {
+        JournalAbbreviationPreferences journalAbbreviationPreferences = Globals.prefs.getJournalAbbreviationPreferences();
+        JournalAbbreviationRepository repository = Globals.journalAbbreviationLoader.getRepository(journalAbbreviationPreferences);
+        return iso ? getIsoAbbreviator(repository) : getMedlineAbbreviator(repository);
+    }
+
+    private UndoableAbbreviator getIsoAbbreviator(JournalAbbreviationRepository repository) {
+        return new UndoableAbbreviator(repository, true);
+    }
+
+    private UndoableAbbreviator getMedlineAbbreviator(JournalAbbreviationRepository repository) {
+        return new UndoableAbbreviator(repository, false);
     }
 
     /**
@@ -647,7 +710,7 @@ public class BasePanel extends StackPane {
         });
     }
 
-    public void updateTableFont() {
+    void updateTableFont() {
         mainTable.updateFont();
     }
 
@@ -665,9 +728,7 @@ public class BasePanel extends StackPane {
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
                                                          .stream()
                                                          .findFirst()
-                                                         .ifPresent(entry -> {
-                                                             entryEditor.setEntry(entry);
-                                                         }));
+                                                         .ifPresent(entryEditor::setEntry));
 
         // TODO: Register these actions globally
         /*
