@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -69,7 +70,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         JabRefExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
-        BackgroundTask.wrap(this::verifyDuplicates)
+        BackgroundTask.wrap((Supplier<DuplicateSearchResult>) this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
 

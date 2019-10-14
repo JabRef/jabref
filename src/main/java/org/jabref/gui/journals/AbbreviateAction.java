@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -39,7 +40,7 @@ public class AbbreviateAction implements BaseAction {
     @Override
     public void action() {
         panel.output(Localization.lang("Abbreviating..."));
-        BackgroundTask.wrap(this::abbreviate)
+        BackgroundTask.wrap((Supplier<String>) this::abbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
 

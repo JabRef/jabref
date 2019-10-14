@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -61,18 +62,18 @@ public class RelatedArticlesTab extends EntryEditorTab {
         MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
                                                   Globals.BUILD_INFO.getVersion());
         BackgroundTask
-                      .wrap(() -> fetcher.performSearch(entry))
-                      .onRunning(() -> progress.setVisible(true))
-                      .onSuccess(relatedArticles -> {
+                .wrap((Callable<List<BibEntry>>) () -> fetcher.performSearch(entry))
+                .onRunning(() -> progress.setVisible(true))
+                .onSuccess(relatedArticles -> {
                           progress.setVisible(false);
                           root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
                       })
-                      .onFailure(exception -> {
+                .onFailure(exception -> {
                           LOGGER.error("Error while fetching from Mr. DLib", exception);
                           progress.setVisible(false);
                           root.getChildren().add(getErrorInfo());
                       })
-                      .executeWith(Globals.TASK_EXECUTOR);
+                .executeWith(Globals.TASK_EXECUTOR);
 
         root.getChildren().add(progress);
 

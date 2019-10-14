@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -76,7 +77,6 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                     }
                 }
         );
-
     }
 
     public boolean getIdentifierLookupInProgress() {
@@ -94,7 +94,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     public void lookupIdentifier(BibEntry entry) {
         WebFetchers.getIdFetcherForField(field).ifPresent(idFetcher -> {
             BackgroundTask
-                    .wrap(() -> idFetcher.findIdentifier(entry))
+                    .wrap((Callable<Optional<? extends Identifier>>) () -> idFetcher.findIdentifier(entry))
                     .onRunning(() -> identifierLookupInProgress.setValue(true))
                     .onFinished(() -> identifierLookupInProgress.setValue(false))
                     .onSuccess(identifier -> {

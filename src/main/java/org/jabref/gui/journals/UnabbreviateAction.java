@@ -1,6 +1,7 @@
 package org.jabref.gui.journals;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -26,7 +27,7 @@ public class UnabbreviateAction implements BaseAction {
     @Override
     public void action() {
         panel.output(Localization.lang("Unabbreviating..."));
-        BackgroundTask.wrap(this::unabbreviate)
+        BackgroundTask.wrap((Supplier<String>) this::unabbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
     }

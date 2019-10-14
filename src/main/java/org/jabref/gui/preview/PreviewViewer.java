@@ -2,6 +2,7 @@ package org.jabref.gui.preview;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import javafx.beans.InvalidationListener;
@@ -134,14 +135,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                      .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                      .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
-                      .onSuccess(this::setPreviewText)
-                      .onFailure(exception -> {
+                .wrap((Callable<String>) () -> layout.generatePreview(entry.get(), database.getDatabase()))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onSuccess(this::setPreviewText)
+                .onFailure(exception -> {
                           LOGGER.error("Error while generating citation style", exception);
                           setPreviewText(Localization.lang("Error while generating citation style"));
                       })
-                      .executeWith(taskExecutor);
+                .executeWith(taskExecutor);
     }
 
     private void setPreviewText(String text) {

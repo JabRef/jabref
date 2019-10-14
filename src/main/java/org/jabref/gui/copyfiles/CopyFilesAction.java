@@ -11,6 +11,7 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -56,7 +57,7 @@ public class CopyFilesAction extends SimpleCommand {
                     Localization.lang("Copy linked files to folder..."),
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);
-            Globals.TASK_EXECUTOR.execute(exportTask);
+            BackgroundTask.wrap(exportTask).executeWith(Globals.TASK_EXECUTOR);
             exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue()));
         });
     }

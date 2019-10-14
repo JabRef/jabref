@@ -2,6 +2,7 @@ package org.jabref.gui.importer;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
@@ -112,7 +113,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     container.getStyleClass().add("entry-container");
                     BindingsHelper.includePseudoClassWhen(container, entrySelected, addToggle.selectedProperty());
 
-                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
+                    BackgroundTask.wrap((Callable<Boolean>) () -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
                         if (duplicateFound) {
                             Button duplicateButton = IconTheme.JabRefIcons.DUPLICATE.asButton();
                             duplicateButton.setTooltip(new Tooltip(Localization.lang("Possible duplicate of existing entry. Click to resolve.")));

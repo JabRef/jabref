@@ -2,8 +2,10 @@ package org.jabref.gui.texparser;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -17,6 +19,7 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.TexBibEntriesResolverResult;
 
@@ -70,7 +73,7 @@ public class ParseTexResultViewModel extends AbstractViewModel {
      * Search and import unknown references from associated BIB files.
      */
     public void importButtonClicked() {
-        ImportEntriesDialog dialog = new ImportEntriesDialog(databaseContext, BackgroundTask.wrap(() ->
+        ImportEntriesDialog dialog = new ImportEntriesDialog(databaseContext, BackgroundTask.wrap((Callable<List<BibEntry>>) () ->
                 new ArrayList<>(resolverResult.getNewEntries())));
 
         dialog.setTitle(Localization.lang("Import entries from LaTeX files"));

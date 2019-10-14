@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javafx.scene.input.ClipboardContent;
@@ -76,10 +77,10 @@ public class ExportToClipboardAction extends SimpleCommand {
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                 Localization.lang("Export"), defaultChoice, exporters);
 
-        selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                                .onSuccess(this::setContentToClipboard)
-                                                                .onFailure(ex -> { /* swallow as already logged */ })
-                                                                .executeWith(Globals.TASK_EXECUTOR));
+        selectedExporter.ifPresent(exporter -> BackgroundTask.wrap((Callable<ExportResult>) () -> exportToClipboard(exporter))
+                                                             .onSuccess(this::setContentToClipboard)
+                                                             .onFailure(ex -> { /* swallow as already logged */ })
+                                                             .executeWith(Globals.TASK_EXECUTOR));
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -1044,7 +1045,7 @@ public class JabRefFrame extends BorderPane {
      * @param entries The entries to add.
      */
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries) {
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> entries);
+        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap((Callable<List<BibEntry>>) () -> entries);
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();

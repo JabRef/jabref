@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.function.BiPredicate;
 
 import javax.xml.transform.TransformerException;
@@ -369,7 +370,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void writeXMPMetadata() {
         // Localization.lang("Writing XMP-metadata...")
-        BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
+        BackgroundTask<Void> writeTask = BackgroundTask.wrap((Callable<Void>) () -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (!file.isPresent()) {
                 // TODO: Print error message
@@ -418,7 +419,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
         BackgroundTask<Path> downloadTask = BackgroundTask
-                .wrap(() -> {
+                .wrap((Callable<Path>) () -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
                     linkedFile.setFileType(suggestedTypeName);

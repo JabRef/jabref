@@ -3,6 +3,7 @@ package org.jabref.gui.documentviewer;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javafx.animation.FadeTransition;
 import javafx.beans.property.DoubleProperty;
@@ -157,7 +158,7 @@ public class DocumentViewerControl extends StackPane {
             background.setStyle("-fx-fill: WHITE");
             //imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .wrap(() -> renderPage(initialPage))
+                    .wrap((Callable<Image>) () -> renderPage(initialPage))
                     .onSuccess(image -> {
                         imageView.setImage(image);
                         progress.setVisible(false);
@@ -197,7 +198,7 @@ public class DocumentViewerControl extends StackPane {
             imageView.setOpacity(0);
 
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .wrap(() -> renderPage(page))
+                    .wrap((Callable<Image>) () -> renderPage(page))
                     .onSuccess(image -> {
                         imageView.setImage(image);
 

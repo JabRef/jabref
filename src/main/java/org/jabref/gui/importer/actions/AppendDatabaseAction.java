@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.swing.undo.CompoundEdit;
 
@@ -165,7 +166,7 @@ public class AppendDatabaseAction implements BaseAction {
 
             for (Path file : filesToOpen) {
                 // Run the actual open in a thread to prevent the program locking until the file is loaded.
-                BackgroundTask.wrap(() -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
+                BackgroundTask.wrap((Callable<String>) () -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
                               .onSuccess(fileName -> dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'"))
                               .onFailure(exception -> {
                                   LOGGER.warn("Could not open database", exception);

@@ -7,6 +7,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -45,7 +46,7 @@ public class SendAsEMailAction implements BaseAction {
 
     @Override
     public void action() {
-        BackgroundTask.wrap(this::sendEmail)
+        BackgroundTask.wrap((Callable<String>) this::sendEmail)
                       .onSuccess(frame.getDialogService()::notify)
                       .onFailure(e -> {
                           String message = Localization.lang("Error creating email");

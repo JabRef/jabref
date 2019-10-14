@@ -2,6 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.swing.undo.UndoManager;
 
@@ -53,7 +54,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
     @Override
     public void execute() {
         try {
-            BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
+            BackgroundTask.wrap((Callable<String>) () -> lookupIdentifiers(stateManager.getSelectedEntries()))
                           .onSuccess(frame.getDialogService()::notify)
                           .executeWith(Globals.TASK_EXECUTOR);
         } catch (Exception e) {
