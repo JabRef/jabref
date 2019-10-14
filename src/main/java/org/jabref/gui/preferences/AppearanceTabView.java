@@ -18,7 +18,6 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
 
     @FXML public CheckBox fontOverride;
     @FXML public TextField fontSize;
-    @FXML public CheckBox fontTweaksLinux;
     @FXML public RadioButton themeLight;
     @FXML public RadioButton themeDark;
 
@@ -41,7 +40,6 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
         fontSize.setTextFormatter(ControlHelper.getIntegerTextFormatter());
         fontSize.textProperty().bindBidirectional(viewModel.fontSizeProperty());
-        fontTweaksLinux.selectedProperty().bindBidirectional(viewModel.fontTweaksLinuxProperty());
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());

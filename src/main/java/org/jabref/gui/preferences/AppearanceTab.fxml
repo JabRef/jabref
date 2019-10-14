@@ -25,7 +25,6 @@
             <Insets left="20.0"/>
         </padding>
     </HBox>
-    <CheckBox fx:id="fontTweaksLinux" text="%Tweak font rendering for entry editor on Linux"/>
 
     <Label styleClass="sectionHeader" text="%Visual theme"/>
     <RadioButton fx:id="themeLight" text="%Light theme" toggleGroup="$theme"/>

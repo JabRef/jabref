@@ -21,7 +21,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
-    private final BooleanProperty fontTweaksLinuxProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
 
@@ -56,7 +55,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         fontOverrideProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
         fontSizeProperty.setValue(String.valueOf(preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
-        fontTweaksLinuxProperty.setValue(preferences.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
 
         switch (preferences.get(JabRefPreferences.FX_THEME)) {
             case ThemeLoader.DARK_CSS:
@@ -81,11 +79,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         if (preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE) != newFontSize) {
             restartWarnings.add(Localization.lang("Override font size"));
             preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
-        }
-
-        if (preferences.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK) != fontTweaksLinuxProperty.getValue()) {
-            restartWarnings.add(Localization.lang("Font rendering tweak for Linux"));
-            preferences.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fontTweaksLinuxProperty.getValue());
         }
 
         if (themeLightProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
@@ -117,8 +110,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty fontOverrideProperty() { return fontOverrideProperty; }
 
     public StringProperty fontSizeProperty() { return fontSizeProperty; }
-
-    public BooleanProperty fontTweaksLinuxProperty() { return fontTweaksLinuxProperty; }
 
     public BooleanProperty themeLightProperty() { return themeLightProperty; }
 
