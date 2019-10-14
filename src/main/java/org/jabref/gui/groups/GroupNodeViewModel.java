@@ -113,8 +113,13 @@ public class GroupNodeViewModel {
         //    return; // user aborted operation
         //}
 
-        return groupNode.addEntriesToGroup(entries);
+        var changes = groupNode.addEntriesToGroup(entries);
 
+        // Update appearance of group
+        anySelectedEntriesMatched.invalidate();
+        allSelectedEntriesMatched.invalidate();
+
+        return changes;
         // TODO: Store undo
         // if (!undo.isEmpty()) {
         // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
@@ -191,12 +196,8 @@ public class GroupNodeViewModel {
     }
 
     private JabRefIcon createDefaultIcon() {
-        Optional<Color> color = groupNode.getGroup().getColor();
-        if (color.isPresent()) {
-            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color.get());
-        } else {
-            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(Color.web("#8a8a8a"));
-        }
+        Color color = groupNode.getGroup().getColor().orElse(IconTheme.getDefaultGroupColor());
+        return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color);
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
@@ -243,7 +244,7 @@ public class GroupNodeViewModel {
     }
 
     public Color getColor() {
-        return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultColor());
+        return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultGroupColor());
     }
 
     public String getPath() {

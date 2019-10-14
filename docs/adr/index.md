@@ -1,3 +1,4 @@
+
 # Architectural Decision Log
 
 This log lists the architectural decisions for JabRef.
@@ -10,6 +11,7 @@ This log lists the architectural decisions for JabRef.
 - [ADR-0003](0003-use-gradle-as-build-tool.md) - Use Gradle as build tool
 - [ADR-0004](0004-use-mariadb-connector.md) - Use MariaDB Connector
 - [ADR-0005](0005-fully-support-utf8-only-for-latex-files.md) - Fully Support UTF-8 Only For LaTeX Files
+- [ADR-0006](0006-only-translated-strings-in-language-file.md) - Only translated strings in language file
 
 <!-- adrlogstop -->
 

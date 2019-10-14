@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -105,11 +104,9 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -141,18 +138,19 @@ public class JabRefFrame extends BorderPane {
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
-    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
     private final ProgressBar progressBar = new ProgressBar();
-    private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
+    private final FileHistoryMenu fileHistory;
 
     private final Stage mainStage;
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
-    private SidePaneManager sidePaneManager;
-    private TabPane tabbedPane;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private final JabRefExecutorService executorService;
+    private SidePaneManager sidePaneManager;
+    private TabPane tabbedPane;
     private SidePane sidePane;
 
     public JabRefFrame(Stage mainStage) {
@@ -161,13 +159,15 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
+        this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
+        this.executorService = JabRefExecutorService.INSTANCE;
     }
 
     private static BasePanel getBasePanel(Tab tab) {
         return (BasePanel) tab.getContent();
     }
 
-    public void initDragAndDrop() {
+    private void initDragAndDrop() {
         Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
         dndIndicator.getStyleClass().add("drop");
 
@@ -201,18 +201,10 @@ public class JabRefFrame extends BorderPane {
             tabHeaderArea.setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
 
-                boolean success = false;
-
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-                if (!bibFiles.isEmpty()) {
-                    for (Path file : bibFiles) {
-                        ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                        addParserResult(pr, true);
-                    }
-                    success = true;
-                }
-
-                event.setDropCompleted(success);
+                OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                openDatabaseAction.openFiles(bibFiles, true);
+                event.setDropCompleted(true);
                 event.consume();
             });
         });
@@ -262,7 +254,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                        DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
                 }
             }, 60000); // run in one minute
         }
@@ -366,13 +358,6 @@ public class JabRefFrame extends BorderPane {
 
         fileHistory.storeHistory();
         prefs.flush();
-
-        // dispose all windows, even if they are not displayed anymore
-        // TODO: javafx variant only avaiable in java 9 and updwards
-        // https://docs.oracle.com/javase/9/docs/api/javafx/stage/Window.html#getWindows--
-        for (Window window : Window.getWindows()) {
-            window.dispose();
-        }
     }
 
     /**
@@ -577,6 +562,15 @@ public class JabRefFrame extends BorderPane {
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
                         tab -> Optional.ofNullable(tab).map(JabRefFrame::getBasePanel).map(BasePanel::getBibDatabaseContext)));
+
+        // Subscribe to the search
+        EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
+                query -> {
+                    if (getCurrentBasePanel() != null) {
+                        getCurrentBasePanel().setCurrentSearchQuery(query);
+                    }
+                });
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
@@ -592,13 +586,8 @@ public class JabRefFrame extends BorderPane {
             // Poor-mans binding to global state
             stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
 
-            // Update search query
-            String content = "";
-            Optional<SearchQuery> currentSearchQuery = newBasePanel.getCurrentSearchQuery();
-            if (currentSearchQuery.isPresent()) {
-                content = currentSearchQuery.get().getQuery();
-            }
-            globalSearchBar.setSearchTerm(content);
+            // Update active search query when switching between databases
+            stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
 
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
@@ -1209,6 +1198,34 @@ public class JabRefFrame extends BorderPane {
         return dialogService;
     }
 
+    private void setDefaultTableFontSize() {
+        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void increaseTableFontSize() {
+        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void decreaseTableFontSize() {
+        double currentSize = GUIGlobals.currentFont.getSize();
+        if (currentSize < 2) {
+            return;
+        }
+        GUIGlobals.setFont(currentSize - 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
     /**
      * The action concerned with closing the window.
      */
@@ -1275,34 +1292,6 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         }
-    }
-
-    private void setDefaultTableFontSize() {
-        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void increaseTableFontSize() {
-        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void decreaseTableFontSize() {
-        double currentSize = GUIGlobals.currentFont.getSize();
-        if (currentSize < 2) {
-            return;
-        }
-        GUIGlobals.setFont(currentSize - 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private class CloseDatabaseAction extends SimpleCommand {

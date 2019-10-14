@@ -5,13 +5,11 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -40,13 +38,12 @@ import org.jabref.model.entry.field.Field;
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-    public PreviewPanel previewPanel;
     protected final BibDatabaseContext databaseContext;
     private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
-    private FieldEditorFX activeField;
+    private PreviewPanel previewPanel;
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private GridPane gridPane;
@@ -82,7 +79,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         fields = determineFieldsToShow(entry);
 
         List<Label> labels = new ArrayList<>();
-        boolean isFirstField = true;
         for (Field field : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(field, Globals.TASK_EXECUTOR, dialogService,
                     Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
@@ -90,11 +86,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
-            if (isFirstField) {
-                activeField = fieldEditor;
-                isFirstField = false;
-            }
-
             labels.add(new FieldNameLabel(field));
         }
 
@@ -161,8 +152,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
      */
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
-            activeField = editors.get(fieldName);
-            activeField.focus();
+            editors.get(fieldName).focus();
         }
     }
 
@@ -172,29 +162,21 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     @Override
-    public void handleFocus() {
-        if (activeField != null) {
-            activeField.focus();
-        }
-    }
-
-    @Override
     protected void bindToEntry(BibEntry entry) {
-        Optional<Field> selectedFieldName = editors.entrySet()
-                                                   .stream()
-                                                   .filter(editor -> editor.getValue().childIsFocused())
-                                                   .map(Map.Entry::getKey)
-                                                   .findFirst();
-
         initPanel();
         setupPanel(entry, isCompressed, suggestionProviders, undoManager);
 
         previewPanel.setEntry(entry);
+    }
 
-        Platform.runLater(() -> {
-            // Restore focus to field (run this async so that editor is already initialized correctly)
-            selectedFieldName.ifPresent(this::requestFocus);
-        });
+    @Override
+    protected void nextPreviewStyle() {
+        previewPanel.nextPreviewStyle();
+    }
+
+    @Override
+    protected void previousPreviewStyle() {
+        previewPanel.previousPreviewStyle();
     }
 
     protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);
@@ -208,7 +190,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
-            previewPanel = new PreviewPanel(databaseContext, null, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+            previewPanel = new PreviewPanel(databaseContext, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs);
 
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();

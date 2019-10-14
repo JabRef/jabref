@@ -27,10 +27,6 @@ import org.slf4j.LoggerFactory;
 
 public class IconTheme {
 
-    /**
-     * JabRef's default color
-     */
-    public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
     public static final javafx.scene.paint.Color SELECTED_COLOR = javafx.scene.paint.Color.web("#50618F");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
@@ -60,8 +56,8 @@ public class IconTheme {
         return IconTheme.class.getResource("/fonts/JabRefMaterialDesign.ttf").openStream();
     }
 
-    public static Color getDefaultColor() {
-        return DEFAULT_COLOR;
+    public static Color getDefaultGroupColor() {
+        return Color.web("#8a8a8a");
     }
 
     public static Image getJabRefImageFX() {
