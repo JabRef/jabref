@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - openjdk11
+  - openjdk12
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
@@ -53,7 +53,7 @@ script:
   - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS -x checkstyleJmh -x checkstyleMain -x checkstyleTest --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
-  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport; bash <(curl -s https://codecov.io/bash); fi
+  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash); fi
   - if [ "$DEPENDENCY_UPDATES" == "check" ]; then ./gradlew -q checkOutdatedDependencies; fi
 
 after_failure:
