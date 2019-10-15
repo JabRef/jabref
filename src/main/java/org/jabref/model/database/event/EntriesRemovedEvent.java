@@ -2,7 +2,6 @@ package org.jabref.model.database.event;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 
 import java.util.List;

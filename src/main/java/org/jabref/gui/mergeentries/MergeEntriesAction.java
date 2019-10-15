@@ -12,7 +12,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

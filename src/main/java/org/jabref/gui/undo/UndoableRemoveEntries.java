@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntries.class);
     private final BibDatabase base;
     private final List<BibEntry> entries;
 

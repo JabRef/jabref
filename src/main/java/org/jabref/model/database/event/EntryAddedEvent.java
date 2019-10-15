@@ -2,19 +2,21 @@ package org.jabref.model.database.event;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEvent;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntryEventSource;
+
+import java.util.Collections;
 
 /**
  * {@link EntryAddedEvent} is fired when a new {@link BibEntry} was added to the {@link BibDatabase}.
  */
-public class EntryAddedEvent extends EntryEvent {
+public class EntryAddedEvent extends EntriesEvent {
 
     /**
      * @param bibEntry the entry which has been added
      */
     public EntryAddedEvent(BibEntry bibEntry) {
-        super(bibEntry);
+        super(Collections.singletonList(bibEntry));
     }
 
     /**
@@ -22,6 +24,6 @@ public class EntryAddedEvent extends EntryEvent {
      * @param location Location affected by this event
      */
     public EntryAddedEvent(BibEntry bibEntry, EntryEventSource location) {
-        super(bibEntry, location);
+        super(Collections.singletonList(bibEntry), location);
     }
 }

@@ -32,6 +32,9 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
         this.location = Objects.requireNonNull(location);
     }
 
+    //Temporary, while we change to plural entries
+    public BibEntry getBibEntry() { return this.bibEntries.get(0); }
+
     public List<BibEntry> getBibEntries() {
         return this.bibEntries;
     }

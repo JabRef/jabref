@@ -28,7 +28,6 @@ import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;

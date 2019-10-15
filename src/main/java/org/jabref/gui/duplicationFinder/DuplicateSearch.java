@@ -24,7 +24,6 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolve
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -164,7 +163,7 @@ public class DuplicateSearch extends SimpleCommand {
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
             compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), new ArrayList<>(result.getToRemove())));
-            panel.getDatabase().removeEntries(result.getToRemove());
+            panel.getDatabase().removeEntries(new ArrayList<>(result.getToRemove()));
             panel.markBaseChanged();
         }
         // and adding merged entries:
