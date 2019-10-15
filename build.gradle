@@ -117,7 +117,7 @@ dependencies {
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.63'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.64'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -199,7 +199,7 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.47'
+    testCompile 'io.github.classgraph:classgraph:4.8.48'
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
