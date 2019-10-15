@@ -676,7 +676,7 @@ public class BasePanel extends StackPane {
         String clearSearch = "clearSearch";
         mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
         mainTable.getActionMap().put(clearSearch, new AbstractAction() {
-        
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
@@ -697,9 +697,9 @@ public class BasePanel extends StackPane {
                 }
             }
         });
-        
+
         mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-        
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -710,7 +710,7 @@ public class BasePanel extends StackPane {
             }
         });
         mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-        
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -721,7 +721,7 @@ public class BasePanel extends StackPane {
             }
         });
         mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-        
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -749,10 +749,8 @@ public class BasePanel extends StackPane {
         splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
-        executorService.execute(() -> {
-            instantiateSearchAutoCompleter();
-            setupAutoCompletion();
-        });
+        setupAutoCompletion();
+        executorService.execute(this::instantiateSearchAutoCompleter);
         this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         // Saves the divider position as soon as it changes

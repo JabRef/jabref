@@ -57,6 +57,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
+    private final BooleanProperty showAsExtraTab = new SimpleBooleanProperty(false);
+
+    public BooleanProperty showAsExtraTabProperty() {
+        return showAsExtraTab;
+    }
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
 
     private final ObjectProperty<PreviewLayout> layoutProperty = new SimpleObjectProperty<>();
@@ -97,6 +102,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
+        showAsExtraTab.set(previewPreferences.showPreviewAsExtraTab());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
 
@@ -187,6 +193,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
                                                               .getBuilder()
                                                               .withPreviewCycle(chosenListProperty)
+                                                              .withShowAsExtraTab(showAsExtraTab.getValue())
                                                               .withPreviewStyle(((TextBasedPreviewLayout) previewStyle).getText())
                                                               .build();
 
