@@ -30,9 +30,6 @@ plugins {
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
 
-// show stacktrace on error
-gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
-
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'project-report'
