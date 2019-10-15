@@ -16,14 +16,14 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
-import org.jabref.logic.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -121,9 +121,11 @@ public class SharedDatabaseUIManager {
     }
 
     @Subscribe
-    public void listen(SharedEntryNotPresentEvent event) {
+    public void listen(SharedEntriesNotPresentEvent event) {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
         EntryEditor entryEditor = panel.getEntryEditor();
+
+        panel.getUndoManager().addEdit(new UndoableRemoveEntries(panel.getDatabase(), event.getBibEntries()));
 
         if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
 

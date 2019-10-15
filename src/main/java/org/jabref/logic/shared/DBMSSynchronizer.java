@@ -9,13 +9,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
-import org.jabref.logic.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -244,8 +243,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 entriesToRemove.add(localEntry);
             }
         }
-        eventBus.post(new SharedEntriesNotPresentEvent(localEntries));\
-        panel.getUndoManager().addEdit(new UndoableRemoveEntries(panel.getDatabase(), event.getBibEntries()));
+        eventBus.post(new SharedEntriesNotPresentEvent(localEntries));
         bibDatabase.removeEntries(entriesToRemove, EntryEventSource.SHARED); // Should not reach the listeners above.
     }
 
