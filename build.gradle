@@ -595,7 +595,6 @@ jlink {
                     '--linux-menu-group', 'Office;',
                     '--linux-rpm-license-type', 'MIT',
                     // '--license-file', "${projectDir}/LICENSE.md",
-                    '--file-associations', "${projectDir}/buildres/linux/desktop.properties",
                     '--description', 'JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.',
                     '--linux-shortcut'
             ]
