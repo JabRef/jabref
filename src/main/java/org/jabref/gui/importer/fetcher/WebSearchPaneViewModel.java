@@ -97,7 +97,7 @@ public class WebSearchPaneViewModel {
         BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
                                                             .withInitialMessage(Localization.lang("Processing %0", getQuery()));
 
-        task.onFailure(ex -> dialogService.showErrorDialogAndWait(ex));
+        task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
         dialog.setTitle(activeFetcher.getName());

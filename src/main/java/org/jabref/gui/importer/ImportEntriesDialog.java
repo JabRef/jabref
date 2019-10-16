@@ -27,7 +27,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
@@ -110,7 +109,6 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox container = new HBox(entryNode, separator, addToggle);
                     container.getStyleClass().add("entry-container");
-                    BindingsHelper.includePseudoClassWhen(container, entrySelected, addToggle.selectedProperty());
 
                     BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
                         if (duplicateFound) {
