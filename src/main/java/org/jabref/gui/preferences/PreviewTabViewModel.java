@@ -68,10 +68,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private FunctionBasedValidator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
 
-    public BooleanProperty showAsExtraTabProperty() {
-        return showAsExtraTab;
-    }
-
     public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -94,6 +90,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                         )
                 )
         );
+    }
+
+    public BooleanProperty showAsExtraTabProperty() {
+        return showAsExtraTab;
     }
 
     public void setValues() {
