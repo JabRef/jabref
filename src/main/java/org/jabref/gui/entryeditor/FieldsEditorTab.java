@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.stream.Stream;
 
@@ -22,7 +23,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -30,9 +30,12 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -43,17 +46,25 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
+    private final JabRefPreferences preferences;
+    private final ExternalFileTypes externalFileTypes;
+    private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationLoader journalAbbreviationLoader;
     private PreviewPanel previewPanel;
     private UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private GridPane gridPane;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
         this.isCompressed = compressed;
-        this.databaseContext = databaseContext;
-        this.suggestionProviders = suggestionProviders;
-        this.undoManager = undoManager;
-        this.dialogService = dialogService;
+        this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
+        this.undoManager = Objects.requireNonNull(undoManager);
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.journalAbbreviationLoader = Objects.requireNonNull(journalAbbreviationLoader);
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -64,10 +75,10 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private void setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    private void setupPanel(BibEntry entry, boolean compressed) {
         // The preferences might be not initialized in tests -> return immediately
         // TODO: Replace this ugly workaround by proper injection propagation
-        if (Globals.prefs == null) {
+        if (preferences == null) {
             return;
         }
 
@@ -80,9 +91,9 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         List<Label> labels = new ArrayList<>();
         for (Field field : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(field, Globals.TASK_EXECUTOR, dialogService,
-                    Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                    Globals.prefs, databaseContext, entry.getType(), suggestionProviders, undoManager);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
+                    journalAbbreviationLoader.getRepository(preferences.getJournalAbbreviationPreferences()),
+                    preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
@@ -164,19 +175,25 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         initPanel();
-        setupPanel(entry, isCompressed, suggestionProviders, undoManager);
+        setupPanel(entry, isCompressed);
 
-        previewPanel.setEntry(entry);
+        if (previewPanel != null) {
+            previewPanel.setEntry(entry);
+        }
     }
 
     @Override
     protected void nextPreviewStyle() {
-        previewPanel.nextPreviewStyle();
+        if (previewPanel != null) {
+            previewPanel.nextPreviewStyle();
+        }
     }
 
     @Override
     protected void previousPreviewStyle() {
-        previewPanel.previousPreviewStyle();
+        if (previewPanel != null) {
+            previewPanel.previousPreviewStyle();
+        }
     }
 
     protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);
@@ -190,8 +207,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane = new GridPane();
             gridPane.getStyleClass().add("editorPane");
 
-            previewPanel = new PreviewPanel(databaseContext, dialogService, ExternalFileTypes.getInstance(), Globals.getKeyPrefs(), Globals.prefs);
-
             // Warp everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -200,7 +215,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(true);
 
-            SplitPane container = new SplitPane(scrollPane, previewPanel);
+            SplitPane container = new SplitPane(scrollPane);
+            if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
+                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences);
+                container.getItems().add(previewPanel);
+            }
 
             setContent(container);
         }
