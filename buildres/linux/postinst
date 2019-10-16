@@ -20,9 +20,8 @@ set -e
 case "$1" in
     configure)
         INSTALL_PATH="/usr/lib/mozilla/native-messaging-hosts/"
-        mkdir -p $INSTALL_PATH
-        \cp /opt/jabref/lib/org.jabref.jabref.json $INSTALL_PATH
-        chmod a+x "/opt/jabref/lib/jabrefHost.py"
+        install -D -m0755 /opt/jabref/lib/org.jabref.jabref.json $INSTALL_PATH
+        DESKTOP_COMMANDS_INSTALL
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
