@@ -41,7 +41,6 @@ public class WebSearchPaneViewModel {
         this.dialogService = dialogService;
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
-        allFetchers.sort(Comparator.comparing(WebFetcher::getName));
         fetchers.setAll(allFetchers);
 
         // Choose last-selected fetcher as default
