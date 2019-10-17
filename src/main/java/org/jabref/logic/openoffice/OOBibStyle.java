@@ -273,7 +273,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             if (!line.isEmpty() && (line.charAt(line.length() - 1) == '\r')) {
                 line = line.substring(0, line.length() - 1);
             }
-            // Check for empty lin  e or comment:
+            // Check for empty line or comment:
             if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
                 continue;
             }
