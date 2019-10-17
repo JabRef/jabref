@@ -108,7 +108,7 @@ public class WebFetchers {
     /**
      * @return sorted list containing id based fetchers
      */
-    public static List<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static SortedList<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
@@ -130,7 +130,7 @@ public class WebFetchers {
     /**
      * @return sorted list containing entry based fetchers
      */
-    public static List<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static SortedList<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<EntryBasedFetcher> list = new ArrayList<>();
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new DoiFetcher(importFormatPreferences));
