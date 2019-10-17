@@ -122,7 +122,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
-    private boolean setDefault;
+    private boolean isDefaultLayoutPresent;
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
@@ -324,7 +324,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         // Set validity boolean based on whether we found anything interesting
         // in the file:
-        if ((mode != BibStyleMode.NONE) && setDefault) {
+        if ((mode != BibStyleMode.NONE) && isDefaultLayoutPresent) {
             valid = true;
         }
     }
@@ -349,11 +349,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
-             setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
+            isDefaultLayoutPresent = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             EntryType type = EntryTypeFactory.parse(line.substring(0, index));
             try {
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
-                if (setDefault) {
+                if (isDefaultLayoutPresent) {
                     defaultBibLayout = layout;
                 } else {
                     bibLayout.put(type, layout);
