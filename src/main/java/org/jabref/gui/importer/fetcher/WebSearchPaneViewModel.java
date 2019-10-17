@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.beans.property.ListProperty;
@@ -18,7 +17,6 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
