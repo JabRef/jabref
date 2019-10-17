@@ -5,6 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
@@ -76,7 +80,10 @@ public class WebFetchers {
         return Optional.empty();
     }
 
-    public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    /**
+     * @return sorted list containing search based fetchers
+     */
+    public static SortedList<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<SearchBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
         list.add(new INSPIREFetcher(importFormatPreferences));
@@ -93,10 +100,14 @@ public class WebFetchers {
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
         list.add(new IEEE(importFormatPreferences));
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+
+        ObservableList<SearchBasedFetcher> observableList = FXCollections.observableList(list);
+        return new SortedList<>(observableList, Comparator.comparing(WebFetcher::getName));
     }
 
+    /**
+     * @return sorted list containing id based fetchers
+     */
     public static List<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
@@ -111,10 +122,14 @@ public class WebFetchers {
         list.add(new LibraryOfCongress(importFormatPreferences));
         list.add(new IacrEprintFetcher(importFormatPreferences));
         list.add(new RfcFetcher(importFormatPreferences));
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+
+        ObservableList<IdBasedFetcher> observableList = FXCollections.observableList(list);
+        return new SortedList<>(observableList, Comparator.comparing(WebFetcher::getName));
     }
 
+    /**
+     * @return sorted list containing entry based fetchers
+     */
     public static List<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<EntryBasedFetcher> list = new ArrayList<>();
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
@@ -122,18 +137,26 @@ public class WebFetchers {
         list.add(new IsbnFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new CrossRef());
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+
+        ObservableList<EntryBasedFetcher> observableList = FXCollections.observableList(list);
+        return new SortedList<>(observableList, Comparator.comparing(WebFetcher::getName));
     }
 
-    public static List<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+    /**
+     * @return sorted list containing id fetchers
+     */
+    public static SortedList<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdFetcher> list = new ArrayList<>();
         list.add(new CrossRef());
         list.add(new ArXiv(importFormatPreferences));
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+
+        ObservableList<IdFetcher> observableList = FXCollections.observableList(list);
+        return new SortedList<>(observableList, Comparator.comparing(WebFetcher::getName));
     }
 
+    /**
+     * @return unsorted list containing fulltext fetchers
+     */
     public static List<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
         List<FulltextFetcher> fetchers = new ArrayList<>();
         // Original
