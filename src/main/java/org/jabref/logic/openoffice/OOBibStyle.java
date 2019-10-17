@@ -122,6 +122,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
+    private boolean setDefault;
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
@@ -143,7 +144,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getDefaultBibLayout() {
-        return defaultBibLayout;
+        return defaultBibLayout ;
     }
 
     private void setDefaultProperties() {
@@ -272,7 +273,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             if (!line.isEmpty() && (line.charAt(line.length() - 1) == '\r')) {
                 line = line.substring(0, line.length() - 1);
             }
-            // Check for empty line or comment:
+            // Check for empty lin  e or comment:
             if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
                 continue;
             }
@@ -321,13 +322,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
         }
-
         // Set validity boolean based on whether we found anything interesting
         // in the file:
-        if (mode != BibStyleMode.NONE) {
+        if ((mode != BibStyleMode.NONE) && setDefault) {
             valid = true;
         }
-
     }
 
     /**
@@ -350,7 +349,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
-            boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
+             setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             EntryType type = EntryTypeFactory.parse(line.substring(0, index));
             try {
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
