@@ -144,7 +144,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getDefaultBibLayout() {
-        return defaultBibLayout ;
+        return defaultBibLayout;
     }
 
     private void setDefaultProperties() {
