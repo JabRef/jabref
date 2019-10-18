@@ -7,8 +7,8 @@ For a complete step-by-step guide (using IntellJ as the IDE), have a look at the
 
 ## Prerequisites
 
-### Java Development Kit 11
-Since JabRef 5.0, a working Java 11 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 11 (e.g `javac 11.0.2`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
+### Java Development Kit 12
+Since 2019-10-12, a working Java 12 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 12 (e.g `javac 12.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
 
 ### git
 It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
