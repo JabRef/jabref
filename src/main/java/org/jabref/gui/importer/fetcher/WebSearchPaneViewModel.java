@@ -1,6 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.List;
+import java.util.SortedSet;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -38,7 +39,7 @@ public class WebSearchPaneViewModel {
         this.frame = frame;
         this.dialogService = dialogService;
 
-        List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
+        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
         fetchers.setAll(allFetchers);
 
         // Choose last-selected fetcher as default
