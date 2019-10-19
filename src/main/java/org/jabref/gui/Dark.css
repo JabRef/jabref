@@ -50,3 +50,8 @@
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
 }
+
+#previewBody{
+    background-color: #272b38; /* -fx-control-inner-background*/
+    color : #7d8591; /* -fx-mid-text-color*/
+}

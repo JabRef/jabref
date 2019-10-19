@@ -38,7 +38,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
     private static final String JS_HIGHLIGHT_FUNCTION =
-            "<head>" +
+             "<head>" +
                     "   <meta charset=\"UTF-8\">" +
                     "   <style>" +
                     "       mark{" +
@@ -109,10 +109,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
 
     }
+
     public void setTheme(String theme){
         if(theme.equals("Dark.css")){
-            previewView.getEngine().setUserStyleSheetLocation(getClass().getResource("Dark_preview.css").toString());
+            previewView.getEngine().setUserStyleSheetLocation(ClipBoardManager.class.getResource("Dark.css").toString());
         }
+    
     }
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
@@ -177,7 +179,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION + "<body><div id=\"content\">" + text + "</div></body></html>";
+        String myText = "<html>" +  JS_HIGHLIGHT_FUNCTION+  "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 
