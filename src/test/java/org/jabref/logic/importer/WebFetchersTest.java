@@ -1,6 +1,6 @@
 package org.jabref.logic.importer;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ class WebFetchersTest {
 
     @Test
     void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws Exception {
-        List<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
+        Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
 
@@ -50,7 +50,7 @@ class WebFetchersTest {
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        List<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
@@ -64,7 +64,7 @@ class WebFetchersTest {
 
     @Test
     void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        List<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
@@ -76,7 +76,7 @@ class WebFetchersTest {
 
     @Test
     void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
-        List<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
+        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
@@ -87,7 +87,7 @@ class WebFetchersTest {
 
     @Test
     void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
-        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
+        Set<IdFetcher> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdFetcher.class.getCanonicalName());
@@ -98,7 +98,7 @@ class WebFetchersTest {
         }
     }
 
-    private Set<? extends Class<?>> getClasses(List<?> objects) {
+    private Set<? extends Class<?>> getClasses(Collection<?> objects) {
         return objects.stream().map(Object::getClass).collect(Collectors.toSet());
     }
 }
