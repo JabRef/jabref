@@ -38,7 +38,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
     private static final String JS_HIGHLIGHT_FUNCTION =
-             "<head>" +
+            "<head>" +
                     "   <meta charset=\"UTF-8\">" +
                     "   <style>" +
                     "       mark{" +
@@ -97,7 +97,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView = new WebView();
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
+
         previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -116,7 +118,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
     
     }
-    
+
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
             String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
@@ -180,7 +182,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String myText = "<html>" +  JS_HIGHLIGHT_FUNCTION+  "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
+        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION+ "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 
