@@ -3,8 +3,8 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.model.entry.BibEntry;
@@ -34,8 +34,7 @@ public class FulltextFetchersTest {
     public void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = (e) -> Optional.of(pdfUrl);
-        FulltextFetchers fetcher = new FulltextFetchers(Arrays.asList(finder));
-
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
     }
 
@@ -43,7 +42,7 @@ public class FulltextFetchersTest {
     public void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
         FulltextFetcher finder = (e) -> Optional.of(pdfUrl);
-        FulltextFetchers fetcher = new FulltextFetchers(Arrays.asList(finder));
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.empty(), fetcher.findFullTextPDF(entry));
     }
@@ -52,7 +51,7 @@ public class FulltextFetchersTest {
     public void noTrustLevel() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = (e) -> Optional.of(pdfUrl);
-        FulltextFetchers fetcher = new FulltextFetchers(Arrays.asList(finder));
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
     }
@@ -69,7 +68,7 @@ public class FulltextFetchersTest {
         when(finderHigh.findFullText(entry)).thenReturn(Optional.of(highUrl));
         when(finderLow.findFullText(entry)).thenReturn(Optional.of(lowUrl));
 
-        FulltextFetchers fetcher = new FulltextFetchers(Arrays.asList(finderLow, finderHigh));
+        FulltextFetchers fetcher = new FulltextFetchers(Set.of(finderLow, finderHigh));
 
         assertEquals(Optional.of(highUrl), fetcher.findFullTextPDF(entry));
     }
