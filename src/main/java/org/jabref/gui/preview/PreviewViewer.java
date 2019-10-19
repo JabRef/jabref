@@ -79,9 +79,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView = new WebView();
         setContent(previewView);
         previewView.setContextMenuEnabled(false);
-
         previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -93,7 +91,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
 
     }
-
+    public void setTheme(String theme){
+        System.out.println("hi");
+        if(theme.equals("Dark.css")){
+            previewView.getEngine().setUserStyleSheetLocation(getClass().getResource("Dark_preview.css").toString());
+        }
+    }
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
             String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
