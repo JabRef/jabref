@@ -111,6 +111,8 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
+        Globals.clipboardManager.install(searchField);
+
         regularExp = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         regularExp.setSelected(searchPreferences.isRegularExpression());
         regularExp.setTooltip(new Tooltip(Localization.lang("regular expression")));

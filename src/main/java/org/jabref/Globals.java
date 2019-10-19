@@ -57,7 +57,7 @@ public class Globals {
      * Manager for the state of the GUI.
      */
 
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
+    public static ClipBoardManager clipboardManager = ClipBoardManager.getInstance();
 
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
