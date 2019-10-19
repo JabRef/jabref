@@ -8,7 +8,7 @@ For a complete step-by-step guide (using IntellJ as the IDE), have a look at the
 ## Prerequisites
 
 ### Java Development Kit 12
-Since 2019-10-12, a working Java 12 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 12 (e.g `javac 12.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
+A working Java 12 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 12 (e.g `javac 12.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
 
 ### git
 It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
@@ -46,10 +46,12 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ### IntelliJ
 1. Open `jabref/build.gradle` as a project
-2. Configure module settings: Right click on project -> Open Module Settings
-   * Ensure that the projects SDK is Java 11: Project Settings -> Project -> Project SDK: Choose Java 11
-   * Ensure that standard SDK is Java 11: Platform Settings -> SDK -> Choose Java 11
-3. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
+2. Enable annotation processors:
+   * Settings -> Compiler -> Annotation processors -> Check "Enable annotation processing"
+3. Configure module settings: Right click on project -> Open Module Settings
+   * Ensure that the projects SDK is Java 12: Project Settings -> Project -> Project SDK: Choose Java 12
+   * Ensure that standard SDK is Java 12: Platform Settings -> SDK -> Choose Java 12
+4. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
    ```batch
    --patch-module test=fastparse_2.12-1.0.0.jar
    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
