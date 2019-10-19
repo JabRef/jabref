@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -147,6 +148,11 @@ public class CitationStyle {
                 try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
                     Path path = fs.getPath(STYLES_ROOT);
                     STYLES.addAll(discoverCitationStylesInPath(path));
+                } catch (FileSystemAlreadyExistsException e) {
+                    try (FileSystem fs = FileSystems.getFileSystem(uri)) {
+                        Path path = fs.getPath(STYLES_ROOT);
+                        STYLES.addAll(discoverCitationStylesInPath(path));
+                    }
                 }
             } else {
                 STYLES.addAll(discoverCitationStylesInPath(Paths.get(uri)));
