@@ -182,7 +182,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION+ "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
+        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION + "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 
