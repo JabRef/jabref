@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -28,7 +29,13 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
         setPrefHeight(Double.POSITIVE_INFINITY);
         HBox.setHgrow(this, Priority.ALWAYS);
 
-        Globals.clipboardManager.install(this);
+        // Active Primary clipboard
+        this.selectedTextProperty().addListener((observable, oldValue, newValue) -> Globals.clipboardManager.watchInput(newValue));
+        this.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.MIDDLE) {
+                Globals.clipboardManager.inputToPrimary(this);
+            }
+        });
     }
 
     @Override

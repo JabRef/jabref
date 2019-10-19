@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.Globals;
 
@@ -32,7 +33,13 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
 
-        Globals.clipboardManager.install(this);
+        // Active Primary clipboard
+        this.selectedTextProperty().addListener((observable, oldValue, newValue) -> Globals.clipboardManager.watchInput(newValue));
+        this.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.MIDDLE) {
+                Globals.clipboardManager.inputToPrimary(this);
+            }
+        });
     }
 
     @Override

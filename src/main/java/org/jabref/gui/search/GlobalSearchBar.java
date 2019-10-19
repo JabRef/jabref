@@ -111,7 +111,13 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        Globals.clipboardManager.install(searchField);
+        // Active Primary clipboard
+        searchField.selectedTextProperty().addListener((observable, oldValue, newValue) -> Globals.clipboardManager.watchInput(newValue));
+        searchField.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.MIDDLE) {
+                Globals.clipboardManager.inputToPrimary(searchField);
+            }
+        });
 
         regularExp = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         regularExp.setSelected(searchPreferences.isRegularExpression());
