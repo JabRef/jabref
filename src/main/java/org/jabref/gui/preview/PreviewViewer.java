@@ -116,6 +116,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
     
     }
+    
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
             String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
