@@ -43,7 +43,6 @@ public class PreviewPanel extends VBox {
     private final JabRefPreferences preferences;
     private BibEntry entry;
     private DialogService dialogService;
-
     public PreviewPanel(BibDatabaseContext database, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, JabRefPreferences preferences) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
@@ -54,6 +53,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
+        previewView.setTheme(this.preferences.get(JabRefPreferences.FX_THEME));
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
@@ -99,6 +99,7 @@ public class PreviewPanel extends VBox {
 
         createKeyBindings();
         updateLayout(previewPreferences, true);
+
     }
 
     public void updateLayout(PreviewPreferences previewPreferences) {
