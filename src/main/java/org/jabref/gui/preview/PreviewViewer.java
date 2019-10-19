@@ -99,7 +99,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.setContextMenuEnabled(false);
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-            
+
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
