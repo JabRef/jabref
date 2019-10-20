@@ -16,9 +16,11 @@ import javafx.scene.web.WebView;
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
@@ -113,8 +115,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setTheme(String theme){
-        if(theme.equals("Dark.css")){
-            previewView.getEngine().setUserStyleSheetLocation(ClipBoardManager.class.getResource("Dark.css").toString());
+        if(theme.equals(ThemeLoader.DARK_CSS)){
+            previewView.getEngine().setUserStyleSheetLocation(JabRefFrame.class.getResource("Dark.css").toString());
         }
     
     }
