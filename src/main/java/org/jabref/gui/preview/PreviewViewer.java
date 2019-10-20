@@ -16,9 +16,11 @@ import javafx.scene.web.WebView;
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
@@ -112,6 +114,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     }
 
+    public void setTheme(String theme) {
+        if (theme.equals(ThemeLoader.DARK_CSS)) {
+            previewView.getEngine().setUserStyleSheetLocation(JabRefFrame.class.getResource(ThemeLoader.DARK_CSS).toString());
+        }
+    
+    }
+
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
             String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
@@ -175,7 +184,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION + "<body><div id=\"content\">" + text + "</div></body></html>";
+        String myText = "<html>" + JS_HIGHLIGHT_FUNCTION + "<body id=\"previewBody\"><div id=\"content\">" + text + "</div></body></html>";
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 
