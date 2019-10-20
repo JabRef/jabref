@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javafx.scene.input.ClipboardContent;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.util.OS;
 
 import org.junit.jupiter.api.Test;
@@ -192,7 +193,7 @@ class CitationStyleToClipboardWorkerTest {
 
         ClipboardContent xmlTransferable = CitationStyleToClipboardWorker.processXslFo(Arrays.asList(citation, citation));
 
-        Object actual = xmlTransferable.get(CitationStyleToClipboardWorker.XML);
+        Object actual = xmlTransferable.get(ClipBoardManager.XML);
         assertEquals(expected, actual);
     }
 

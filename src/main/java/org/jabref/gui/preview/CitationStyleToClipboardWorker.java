@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -34,8 +33,6 @@ import org.slf4j.LoggerFactory;
  * This worker cannot be reused.
  */
 public class CitationStyleToClipboardWorker {
-
-    public static final DataFormat XML = new DataFormat("application/xml");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleToClipboardWorker.class);
 
@@ -142,7 +139,7 @@ public class CitationStyleToClipboardWorker {
 
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
-        content.put(XML, result);
+        content.put(ClipBoardManager.XML, result);
         return content;
     }
 

@@ -15,6 +15,8 @@ import java.util.Optional;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.Globals;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -34,45 +36,54 @@ import org.jabref.model.util.OptionalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Singleton with enum
-public enum ClipBoardManager {
+public class ClipBoardManager {
 
-    INSTANCE;
+    public static final DataFormat XML = new DataFormat("application/xml");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
-    private final Clipboard clipboard = Clipboard.getSystemClipboard();
-    private final java.awt.datatransfer.Clipboard primary = Toolkit.getDefaultToolkit().getSystemSelection();
-    private final ImportFormatReader importFormatReader = Globals.IMPORT_FORMAT_READER;
+    private static Clipboard clipboard;
+    private static java.awt.datatransfer.Clipboard primary;
+    private static ImportFormatReader importFormatReader;
 
-    ClipBoardManager() {
+    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, ImportFormatReader importFormatReader) {
+        ClipBoardManager.clipboard = clipboard;
+        ClipBoardManager.primary = primary;
+        ClipBoardManager.importFormatReader = importFormatReader;
     }
 
-    public void watchInput(String newValue) {
-        if (!newValue.isEmpty()) {
-            primary.setContents(new StringSelection(newValue), null);
-        }
+    public ClipBoardManager() {
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER);
     }
-
-    public void inputToPrimary(TextInputControl input) {
-        input.insertText(input.getCaretPosition(), getContentsPrimary());
-    }
-
-    // For activating this functionality in an input, use:
-    //
-    // input.selectedTextProperty().addListener((observable, oldValue, newValue) -> watchInput(newValue));
-    // input.setOnMouseClicked(event -> {
-    //     if (event.getButton() == MouseButton.MIDDLE) {
-    //         inputToPrimary(input);
-    //     }
-    // });
 
     /**
-     * Get the String residing on the clipboard.
+     * Add X11 clipboard support to a text input control.
+     * It is necessary to call this method in every input where you want to use it:
+     * {@code ClipBoardManager.addX11Support(TextInputControl input);}.
+     *
+     * @param input the TextInputControl (e.g., TextField, TextArea, and children) where adding this functionality.
+     * @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11 clipboards</a>
+     * @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer text over clipboards</a>
+     */
+    public static void addX11Support(TextInputControl input) {
+        input.selectedTextProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                primary.setContents(new StringSelection(newValue), null);
+            }
+        });
+        input.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.MIDDLE) {
+                input.insertText(input.getCaretPosition(), getContentsPrimary());
+            }
+        });
+    }
+
+    /**
+     * Get the String residing on the system clipboard.
      *
      * @return any text found on the Clipboard; if none found, return an empty String.
      */
-    public String getContents() {
+    public static String getContents() {
         String result = clipboard.getString();
         if (result == null) {
             return "";
@@ -80,8 +91,12 @@ public enum ClipBoardManager {
         return result;
     }
 
-    // Get the text from Primary
-    public String getContentsPrimary() {
+    /**
+     * Get the String residing on the primary clipboard.
+     *
+     * @return any text found on the primary Clipboard; if none found, try with the system clipboard.
+     */
+    public static String getContentsPrimary() {
         Transferable contents = primary.getContents(null);
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
@@ -93,31 +108,37 @@ public enum ClipBoardManager {
         return getContents();
     }
 
-    // Copy from Clipboard to Primary
-    private void clipboardToPrimary(ClipboardContent content) {
-        primary.setContents(new StringSelection(content.getString()), null);
-    }
-
     /**
-     * Puts content onto the clipboard.
+     * Puts content onto the system clipboard.
+     *
+     * @param content the ClipboardContent to set as current value of the system clipboard.
      */
     public void setContent(ClipboardContent content) {
         clipboard.setContent(content);
-        clipboardToPrimary(content);
+        setPrimaryClipboardContent(content);
+    }
+
+    /**
+     * Puts content onto the primary clipboard.
+     *
+     * @param content the ClipboardContent to set as current value of the primary clipboard.
+     */
+    public void setPrimaryClipboardContent(ClipboardContent content) {
+        primary.setContents(new StringSelection(content.getString()), null);
     }
 
     public void setHtmlContent(String html) {
         final ClipboardContent content = new ClipboardContent();
         content.putHtml(html);
         clipboard.setContent(content);
-        clipboardToPrimary(content);
+        setPrimaryClipboardContent(content);
     }
 
     public void setContent(String string) {
         final ClipboardContent content = new ClipboardContent();
         content.putString(string);
         clipboard.setContent(content);
-        clipboardToPrimary(content);
+        setPrimaryClipboardContent(content);
     }
 
     public void setContent(List<BibEntry> entries) throws IOException {
@@ -127,7 +148,7 @@ public enum ClipBoardManager {
         content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
         content.putString(serializedEntries);
         clipboard.setContent(content);
-        clipboardToPrimary(content);
+        setPrimaryClipboardContent(content);
     }
 
     public List<BibEntry> extractData() {
