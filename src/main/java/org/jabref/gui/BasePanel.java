@@ -178,6 +178,8 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+        // Open entry editor for first entry on start up.
+        Platform.runLater(() -> clearAndSelectFirst());
     }
 
     @Subscribe
@@ -865,6 +867,14 @@ public class BasePanel extends StackPane {
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
+    }
+
+    /**
+     * Select and open entry editor for first entry in main table.
+     */
+    private void clearAndSelectFirst() {
+        mainTable.clearAndSelectFirst();
+        showAndEdit();
     }
 
     public void selectPreviousEntry() {

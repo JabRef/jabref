@@ -206,7 +206,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
     }
 
-    private void clearAndSelectFirst() {
+    public void clearAndSelectFirst() {
         getSelectionModel().clearSelection();
         getSelectionModel().selectFirst();
         scrollTo(0);
