@@ -81,6 +81,7 @@ public class BibDatabaseTest {
         allEntries.add(entry1);
         allEntries.add(entry2);
         allEntries.add(entry3);
+        database.insertEntries(allEntries);
         List<BibEntry> entriesToDelete = new ArrayList<>();
         entriesToDelete.add(entry1);
         entriesToDelete.add(entry3);

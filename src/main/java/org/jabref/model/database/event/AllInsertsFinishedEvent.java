@@ -2,19 +2,21 @@ package org.jabref.model.database.event;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEvent;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntryEventSource;
+
+import java.util.Collections;
 
 /**
  * {@link AllInsertsFinishedEvent} is fired when insertion of {@link BibEntry} to the {@link BibDatabase} was finished.
  */
-public class AllInsertsFinishedEvent extends EntryEvent {
+public class AllInsertsFinishedEvent extends EntriesEvent {
 
     /**
      * @param bibEntry the entry which has been added
      */
     public AllInsertsFinishedEvent(BibEntry bibEntry) {
-        super(bibEntry);
+        super(Collections.singletonList(bibEntry));
     }
 
     /**
@@ -22,6 +24,6 @@ public class AllInsertsFinishedEvent extends EntryEvent {
      * @param location Location affected by this event
      */
     public AllInsertsFinishedEvent(BibEntry bibEntry, EntryEventSource location) {
-        super(bibEntry, location);
+        super(Collections.singletonList(bibEntry), location);
     }
 }
