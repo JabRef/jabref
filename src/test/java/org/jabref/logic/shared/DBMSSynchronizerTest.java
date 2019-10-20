@@ -111,13 +111,13 @@ public class DBMSSynchronizerTest {
         assertEquals(1, actualEntries.size());
         assertEquals(bibEntry, actualEntries.get(0));
 
-        bibDatabase.removeEntries(Collections.singletonList(bibEntry));
+        bibDatabase.removeEntry(bibEntry);
         actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
-        bibDatabase.removeEntries(Collections.singletonList(bibEntry), EntryEventSource.SHARED);
+        bibDatabase.removeEntry(bibEntry, EntryEventSource.SHARED);
 
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());

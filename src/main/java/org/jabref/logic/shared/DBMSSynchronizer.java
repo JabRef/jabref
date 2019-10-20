@@ -242,7 +242,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 entriesToRemove.add(localEntry);
             }
         }
-        eventBus.post(new SharedEntriesNotPresentEvent(localEntries));
+        if (!entriesToRemove.isEmpty()) {
+            eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
+        }
         bibDatabase.removeEntries(entriesToRemove, EntryEventSource.SHARED); // Should not reach the listeners above.
     }
 

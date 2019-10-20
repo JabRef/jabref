@@ -237,6 +237,10 @@ public class BibDatabase {
         removeEntries(Collections.singletonList(bibEntry));
     }
 
+    public synchronized void removeEntry(BibEntry bibEntry, EntryEventSource eventSource) {
+        removeEntries(Collections.singletonList(bibEntry), eventSource);
+    }
+
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}

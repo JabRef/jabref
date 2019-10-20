@@ -17,6 +17,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.event.TestEventListener;
 
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,6 +71,43 @@ public class BibDatabaseTest {
         database.removeEntry(entry);
         assertEquals(Collections.emptyList(), database.getEntries());
         assertFalse(database.containsEntryWithId(entry.getId()));
+    }
+
+    @Test
+    public void removeSomeEntriesRemovesThoseEntriesFromEntriesList() {
+        List<BibEntry> allEntries = new ArrayList<>();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        allEntries.add(entry1);
+        allEntries.add(entry2);
+        allEntries.add(entry3);
+        List<BibEntry> entriesToDelete = new ArrayList<>();
+        entriesToDelete.add(entry1);
+        entriesToDelete.add(entry3);
+
+        database.removeEntries(entriesToDelete);
+        assertEquals(Collections.singletonList(entry2), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertTrue(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    public void removeAllEntriesRemovesAllEntriesFromEntriesList() {
+        List<BibEntry> allEntries = new ArrayList<>();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        allEntries.add(entry1);
+        allEntries.add(entry2);
+        allEntries.add(entry3);
+
+        database.removeEntries(allEntries);
+        assertEquals(Collections.emptyList(), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertFalse(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
     }
 
     @Test
