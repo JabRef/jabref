@@ -871,6 +871,10 @@
     -fx-text-fill: -jr-search-text;
 }
 
+.mainToolbar .search-field .label {
+    -fx-padding: 0em 1.8em 0em 0em;
+}
+
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
