@@ -66,7 +66,9 @@ public class CitationStyleCache {
          */
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
-            citationStyleCache.invalidateAll(entriesRemovedEvent.getBibEntries());
+            for (BibEntry entry : entriesRemovedEvent.getBibEntries()) {
+                citationStyleCache.invalidate(entry);
+            }
         }
     }
 }
