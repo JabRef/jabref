@@ -1,6 +1,8 @@
 package org.jabref.gui.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -19,6 +21,8 @@ import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
+
+import org.fxmisc.easybind.Subscription;
 
 /**
  * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
@@ -144,9 +148,15 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
         return new ListCell<T>() {
 
+            List<Subscription> subscriptions = new ArrayList<>();
+
             @Override
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
+
+                // Remove previous subscriptions
+                subscriptions.forEach(Subscription::unsubscribe);
+                subscriptions.clear();
 
                 T viewModel = getItem();
                 if (empty || (viewModel == null)) {
@@ -190,10 +200,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
-                        BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
+                        Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
+                        subscriptions.add(subscription);
                     }
                 }
-                getListView().refresh();
             }
         };
     }

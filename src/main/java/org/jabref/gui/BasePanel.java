@@ -139,10 +139,12 @@ public class BasePanel extends StackPane {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+    private JabRefExecutorService executorService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
+        this.executorService = JabRefExecutorService.INSTANCE;
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
@@ -741,10 +743,9 @@ public class BasePanel extends StackPane {
         splitPane.getItems().add(pane);
 
         // Set up name autocompleter for search:
-        instantiateSearchAutoCompleter();
-        this.getDatabase().registerListener(new SearchAutoCompleteListener());
-
         setupAutoCompletion();
+        executorService.execute(this::instantiateSearchAutoCompleter);
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected

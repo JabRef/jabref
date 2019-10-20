@@ -104,7 +104,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -147,10 +146,11 @@ public class JabRefFrame extends BorderPane {
     private final Stage mainStage;
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
-    private SidePaneManager sidePaneManager;
-    private TabPane tabbedPane;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private final JabRefExecutorService executorService;
+    private SidePaneManager sidePaneManager;
+    private TabPane tabbedPane;
     private SidePane sidePane;
 
     public JabRefFrame(Stage mainStage) {
@@ -160,13 +160,14 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
+        this.executorService = JabRefExecutorService.INSTANCE;
     }
 
     private static BasePanel getBasePanel(Tab tab) {
         return (BasePanel) tab.getContent();
     }
 
-    public void initDragAndDrop() {
+    private void initDragAndDrop() {
         Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
         dndIndicator.getStyleClass().add("drop");
 
@@ -200,18 +201,10 @@ public class JabRefFrame extends BorderPane {
             tabHeaderArea.setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
 
-                boolean success = false;
-
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-                if (!bibFiles.isEmpty()) {
-                    for (Path file : bibFiles) {
-                        ParserResult pr = OpenDatabase.loadDatabase(file.toString(), Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-                        addParserResult(pr, true);
-                    }
-                    success = true;
-                }
-
-                event.setDropCompleted(success);
+                OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                openDatabaseAction.openFiles(bibFiles, true);
+                event.setDropCompleted(true);
                 event.consume();
             });
         });
@@ -261,7 +254,7 @@ public class JabRefFrame extends BorderPane {
 
                 @Override
                 public void run() {
-                        DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
                 }
             }, 60000); // run in one minute
         }
@@ -679,8 +672,8 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.MERGE_DATABASE, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, stateManager)), // TODO: merge with import
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true))),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, stateManager)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, stateManager))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false, Globals.prefs)),
@@ -1205,6 +1198,34 @@ public class JabRefFrame extends BorderPane {
         return dialogService;
     }
 
+    private void setDefaultTableFontSize() {
+        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void increaseTableFontSize() {
+        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
+    private void decreaseTableFontSize() {
+        double currentSize = GUIGlobals.currentFont.getSize();
+        if (currentSize < 2) {
+            return;
+        }
+        GUIGlobals.setFont(currentSize - 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
+
     /**
      * The action concerned with closing the window.
      */
@@ -1271,34 +1292,6 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         }
-    }
-
-    private void setDefaultTableFontSize() {
-        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void increaseTableFontSize() {
-        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void decreaseTableFontSize() {
-        double currentSize = GUIGlobals.currentFont.getSize();
-        if (currentSize < 2) {
-            return;
-        }
-        GUIGlobals.setFont(currentSize - 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     private class CloseDatabaseAction extends SimpleCommand {

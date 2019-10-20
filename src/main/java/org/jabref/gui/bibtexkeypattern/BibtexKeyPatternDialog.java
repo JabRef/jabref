@@ -40,6 +40,26 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
             return null;
         });
 
+        // Keep this for later conversion of the library-properties
+/* void storeSettings() {
+        DataBaseKeyPattern newKeyPattern = new DatabaseBibtexKeyPattern(preferences.getKeyPattern());
+
+        bibtexKeyPatternTableView.patternListProperty.forEach(item -> {
+            String patternString = item.getPattern();
+            if (!item.getEntryType().getName().equals("default")) {
+                if (!patternString.trim().isEmpty()) {
+                    newKeyPattern.addBibtexKeyPattern(item.getEntryType(), patternString);
+                }
+            }
+        });
+
+        if (!defaultItem.getPattern().trim().isEmpty()) {
+            // we do not trim the value at the assignment to enable users to have spaces at the beginning and
+            // at the end of the pattern
+            newKeyPattern.setDefaultValue(defaultItemProperty.getPattern());
+        }
+     } */
+
     }
 
 }

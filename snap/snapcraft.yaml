@@ -1,7 +1,5 @@
 name: jabref
-# adopt-info: jabref
-version: 'master'
-version-script: cat build.gradle | grep "^version =" | cut -d'"' -f2
+adopt-info: jabref
 icon: snap/gui/jabref.png
 license: MIT
 summary: Bibliography manager
@@ -13,6 +11,14 @@ base: core18
 license: MIT
 architectures:
   - build-on: amd64
+
+plugs:
+  browser-extension:
+    interface: system-files
+    read:
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts
+    write:
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 
 apps:
   jabref:
@@ -34,8 +40,12 @@ parts:
   jabref:
     plugin: dump
     source: build/distribution/JabRef-portable_linux.tar.gz
-    # override-pull: |
-    #   snapcraftctl pull
-    #   snapcraftctl set-version "$(cat app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+    # Use this source for debug purposes:
+    # source: https://builds.jabref.org/master/JabRef-portable_linux.tar.gz
     stage-packages:
       - x11-utils
+    override-build: |
+      snapcraftctl build
+      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+      sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/jabref/current/lib/jabrefHost.py|g' $SNAPCRAFT_PART_INSTALL/lib/org.jabref.jabref.json
+      

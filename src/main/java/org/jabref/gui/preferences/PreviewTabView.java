@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -39,6 +40,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 
 public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox showAsTabCheckBox;
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;
     @FXML private Button toRightButton;
@@ -112,6 +114,8 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         );
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
+
+        showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
 
         availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
