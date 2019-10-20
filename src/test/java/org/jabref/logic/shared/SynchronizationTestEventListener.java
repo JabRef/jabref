@@ -22,7 +22,7 @@ public class SynchronizationTestEventListener {
         this.updateRefusedEvent = event;
     }
 
-    public SharedEntriesNotPresentEvent getSharedEntryNotPresentEvent() {
+    public SharedEntriesNotPresentEvent getSharedEntriesNotPresentEvent() {
         return sharedEntriesNotPresentEvent;
     }
 
