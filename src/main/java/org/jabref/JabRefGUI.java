@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -87,7 +88,7 @@ public class JabRefGUI {
                 event.consume();
             }
         });
-        this.openDatabases();
+        Platform.runLater(this::openDatabases);
     }
 
     private void openDatabases() {
