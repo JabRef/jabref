@@ -116,6 +116,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void setTheme(String theme) {
         if (theme.equals(ThemeLoader.DARK_CSS)) {
+            System.out.println(JabRefFrame.class.getResource(ThemeLoader.DARK_CSS));
+            
+            
             previewView.getEngine().setUserStyleSheetLocation(JabRefFrame.class.getResource(ThemeLoader.DARK_CSS).toString());
         }
     
