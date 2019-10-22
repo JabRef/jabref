@@ -1,13 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,29 +16,24 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (http://www.adsabs.harvard.edu/)
- *
- * Search query-based: http://adsabs.harvard.edu/basic_search.html
- * Entry -based: http://adsabs.harvard.edu/abstract_service.html
- *
- * There is also a new API (https://github.com/adsabs/adsabs-dev-api) but it returns JSON
- * (or at least needs multiple calls to get BibTeX, status: September 2016)
+ * <p>
+ * Search query-based: http://adsabs.harvard.edu/basic_search.html Entry -based: http://adsabs.harvard.edu/abstract_service.html
+ * <p>
+ * There is also a new API (https://github.com/adsabs/adsabs-dev-api) but it returns JSON (or at least needs multiple
+ * calls to get BibTeX, status: September 2016)
  */
 public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBasedParserFetcher, EntryBasedParserFetcher {
 
@@ -124,33 +114,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     @Override
     public Parser getParser() {
         return new BibtexParser(preferences, new DummyFileUpdateMonitor());
-    }
-
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        try {
-            URLConnection connection = getURLForQuery(query).openConnection();
-            connection.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
-            try (InputStream stream = connection.getInputStream()) {
-                List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
-
-                // Post-cleanup
-                fetchedEntries.forEach(this::doPostCleanup);
-                return fetchedEntries;
-            } catch (IOException e) {
-                throw new FetcherException("An I/O exception occurred", e);
-            }
-        } catch (URISyntaxException | MalformedURLException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("An I/O exception occurred", e);
-        } catch (ParseException e) {
-            throw new FetcherException("Error occurred when parsing entry", Localization.lang("Error occurred when parsing entry"), e);
-        }
     }
 
     @Override
