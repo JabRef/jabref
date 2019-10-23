@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,7 +7,6 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -17,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ public class NewAstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField(StandardField.KEYWORDS, "Mathematics - Differential Geometry, Mathematical Physics, 58B25, (58D19, 58B20, 22E99, 58A35)");
         diezSliceTheoremEntry.setField(StandardField.MONTH, "Dec");
         diezSliceTheoremEntry.setField(StandardField.PAGES, "arXiv:1812.04698");
-        diezSliceTheoremEntry.setField(new UnknownField("eid"), "arXiv:1812.04698");
+        diezSliceTheoremEntry.setField(StandardField.EID, "arXiv:1812.04698");
         diezSliceTheoremEntry.setField(StandardField.PRIMARYCLASS, "math.DG");
         diezSliceTheoremEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2018arXiv181204698D");
         diezSliceTheoremEntry.setField(StandardField.ABSTRACT,
@@ -64,7 +63,7 @@ public class NewAstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField(StandardField.ARCHIVEPREFIX, "arXiv");
         famaeyMcGaughEntry.setField(StandardField.DOI, "10.12942/lrr-2012-10");
         famaeyMcGaughEntry.setField(StandardField.PRIMARYCLASS, "astro-ph.CO");
-        famaeyMcGaughEntry.setField(new UnknownField("eid"), "10");
+        famaeyMcGaughEntry.setField(StandardField.EID, "10");
         famaeyMcGaughEntry.setField(StandardField.EPRINT, "1112.3960");
         famaeyMcGaughEntry.setField(StandardField.PAGES, "10");
         famaeyMcGaughEntry.setField(StandardField.KEYWORDS, "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics, Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Astrophysics of Galaxies, General Relativity and Quantum Cosmology, High Energy Physics - Phenomenology, High Energy Physics - Theory");
@@ -143,7 +142,7 @@ public class NewAstrophysicsDataSystemTest {
     @Test
     public void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
-        assertEquals(Collections.singletonList(diezSliceTheoremEntry), fetchedEntries);
+        assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
     @Test
@@ -161,7 +160,7 @@ public class NewAstrophysicsDataSystemTest {
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT));//Remove abstract due to copyright
-        assertEquals(famaeyMcGaughEntry, fetchedEntry.get());
+        assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
     @Test
