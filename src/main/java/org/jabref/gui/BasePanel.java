@@ -882,6 +882,9 @@ public class BasePanel extends StackPane {
      * Closes the entry editor if it is showing the given entry.
      */
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
+
+        // This method is not able to close the bottom pane currently
+
         if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
