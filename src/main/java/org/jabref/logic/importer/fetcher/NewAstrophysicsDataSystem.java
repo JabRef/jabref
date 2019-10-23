@@ -88,8 +88,8 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        Optional<String> title = entry.getFieldOrAlias(StandardField.TITLE).map(t -> "title:" + t);
-        Optional<String> author = entry.getFieldOrAlias(StandardField.TITLE).map(a -> "author:" + a);
+        Optional<String> title = entry.getFieldOrAlias(StandardField.TITLE).map(t -> "title:\"" + t + "\"");
+        Optional<String> author = entry.getFieldOrAlias(StandardField.AUTHOR).map(a -> "author:\"" + a + "\"");
 
         if (title.isPresent()) {
             stringBuilder.append(title.get())
@@ -109,7 +109,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
     @Override
     public URL getURLForID(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
-        String query = "doi:" + identifier + " OR " + "bibcode:" + identifier;
+        String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
@@ -151,7 +151,8 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         try {
             List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
             String[] bibcodeArray = new String[bibcodes.size()];
-            return performSearchByIds(bibcodes.toArray(bibcodeArray));
+            bibcodes.toArray(bibcodeArray);
+            return performSearchByIds(bibcodeArray);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
