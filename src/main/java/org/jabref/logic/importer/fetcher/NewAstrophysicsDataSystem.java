@@ -67,6 +67,10 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         return obj.toString();
     }
 
+    private URL getURLforExport() throws URISyntaxException, MalformedURLException {
+        return new URIBuilder(API_EXPORT_URL).build().toURL();
+    }
+
     @Override
     public String getName() {
         return "New SAO/NASA Astrophysics Data System";
@@ -89,7 +93,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
         if (title.isPresent()) {
             stringBuilder.append(title.get())
-                         .append(author.map(s -> " OR " + s)
+                         .append(author.map(s -> " AND " + s)
                                        .orElse(""));
         } else {
             stringBuilder.append(author.orElse(""));
@@ -105,7 +109,11 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
     @Override
     public URL getURLForID(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
-        return new URIBuilder(API_EXPORT_URL).build().toURL();
+        String query = "doi:" + identifier + " OR " + "bibcode:" + identifier;
+        URIBuilder builder = new URIBuilder(API_SEARCH_URL);
+        builder.addParameter("q", query);
+        builder.addParameter("fl", "bibcode");
+        return builder.build().toURL();
     }
 
     @Override
@@ -194,18 +202,29 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        List<BibEntry> fetchedEntries = performSearchByIds(identifier);
-        if (fetchedEntries.isEmpty()) {
+        if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
 
-        if (fetchedEntries.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                    + ". We will use the first entry.");
-        }
+        try {
+            List<String> bibcodes = fetchBibcodes(getURLForID(identifier));
+            String[] bibcodeArray = new String[bibcodes.size()];
+            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes.toArray(bibcodeArray));
 
-        BibEntry entry = fetchedEntries.get(0);
-        return Optional.of(entry);
+            if (fetchedEntries.isEmpty()) {
+                return Optional.empty();
+            }
+            if (fetchedEntries.size() > 1) {
+                LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+                        + ". We will use the first entry.");
+            }
+            BibEntry entry = fetchedEntries.get(0);
+            return Optional.of(entry);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
+        }
     }
 
     private List<BibEntry> performSearchByIds(String... identifiers) throws FetcherException {
@@ -216,7 +235,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         }
         try {
             String postData = buildPostData(identifiers);
-            URLDownload download = new URLDownload(getURLForID(""));
+            URLDownload download = new URLDownload(getURLforExport());
             download.addHeader("Authorization", "Bearer " + API_KEY);
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
