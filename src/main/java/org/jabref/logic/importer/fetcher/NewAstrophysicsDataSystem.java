@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +27,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 //TODO Replace Old ADS after the new one is mature
@@ -40,8 +43,8 @@ import org.json.JSONObject;
  */
 public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBasedParserFetcher, EntryBasedParserFetcher {
 
-    private static String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
-    private static String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
+    private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
+    private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
     private static String API_KEY = ""; //TODO Add API Token
 
@@ -75,7 +78,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional<String> title = entry.getFieldOrAlias(StandardField.TITLE).map(t -> "title:" + t);
-        Optional<String> author = entry.getFieldOrAlias(StandardField.TITLE).map(a -> "author" + a);
+        Optional<String> author = entry.getFieldOrAlias(StandardField.TITLE).map(a -> "author:" + a);
 
         if (title.isPresent()) {
             stringBuilder.append(title.get())
@@ -89,6 +92,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
+        builder.addParameter("rows", "20");
         return builder.build().toURL();
     }
 
@@ -114,18 +118,69 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        return Collections.emptyList();
+
+        if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
+            String[] bibcodeArray = new String[bibcodes.size()];
+            return performSearchByIds(bibcodes.toArray(bibcodeArray));
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
+        }
+    }
+
+    @Override
+    public List<BibEntry> performSearch(String query) throws FetcherException {
+
+        if (StringUtil.isBlank(query)) {
+            return Collections.emptyList();
+        }
+
+        try {
+            List<String> bibcodes = fetchBibcodes(getURLForQuery(query));
+            String[] bibcodeArray = new String[bibcodes.size()];
+            return performSearchByIds(bibcodes.toArray(bibcodeArray));
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
+        }
+    }
+
+    private List<String> fetchBibcodes(URL url) throws FetcherException {
+
+        try {
+            URLDownload download = new URLDownload(url);
+            download.addHeader("Authorization", "Bearer " + API_KEY);
+            String content = download.asString();
+            JSONObject obj = new JSONObject(content);
+
+            try {
+                JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
+                List<String> bibcodes = new ArrayList<>();
+                for (int i = 0; i < codes.length(); i++) {
+                    bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
+                }
+                return bibcodes;
+            } catch (JSONException e) {
+                return Collections.emptyList();
+            }
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
+        }
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-
-        Optional<List<BibEntry>> results = performSearchByIds(identifier);
-        if (results.isEmpty()) {
+        List<BibEntry> fetchedEntries = performSearchByIds(identifier);
+        if (fetchedEntries.isEmpty()) {
             return Optional.empty();
         }
-
-        List<BibEntry> fetchedEntries = results.get();
 
         if (fetchedEntries.size() > 1) {
             LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
@@ -136,33 +191,33 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         return Optional.of(entry);
     }
 
-    private Optional<List<BibEntry>> performSearchByIds(String... identifiers) throws FetcherException {
+    private List<BibEntry> performSearchByIds(String... identifiers) throws FetcherException {
 
         long idCount = Arrays.stream(identifiers).filter(identifier -> !StringUtil.isBlank(identifier)).count();
         if (idCount == 0) {
-            return Optional.empty();
+            return Collections.emptyList();
         }
-
         try {
-
             String postData = buildPostData(identifiers);
             URLDownload download = new URLDownload(getURLForID(""));
             download.addHeader("Authorization", "Bearer " + API_KEY);
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
-            download.asString();
             String content = download.asString();
             JSONObject obj = new JSONObject(content);
 
-            List<BibEntry> fetchedEntries = getParser().parseEntries(obj.getString("export"));
+            try {
+                List<BibEntry> fetchedEntries = getParser().parseEntries(obj.optString("export"));
+                if (fetchedEntries.isEmpty()) {
+                    return Collections.emptyList();
+                }
+                // Post-cleanup
+                fetchedEntries.forEach(this::doPostCleanup);
 
-            if (fetchedEntries.isEmpty()) {
-                return Optional.empty();
+                return fetchedEntries;
+            } catch (JSONException e) {
+                return Collections.emptyList();
             }
-            // Post-cleanup
-            fetchedEntries.forEach(this::doPostCleanup);
-
-            return Optional.of(fetchedEntries);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
@@ -172,9 +227,5 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         }
     }
 
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
 
-        return Collections.emptyList();
-    }
 }
