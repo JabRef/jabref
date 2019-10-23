@@ -226,6 +226,4 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
             throw new FetcherException("An internal parser error occurred", e);
         }
     }
-
-
 }
