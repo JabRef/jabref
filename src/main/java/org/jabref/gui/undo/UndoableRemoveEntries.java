@@ -9,6 +9,7 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,6 +23,10 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntries.class);
     private final BibDatabase base;
     private final List<BibEntry> entries;
+
+    public UndoableRemoveEntries(BibDatabase base, BibEntry entry) {
+        this(base, entry));
+    }
 
     public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries) {
         this.base = base;
