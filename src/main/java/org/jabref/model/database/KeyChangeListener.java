@@ -37,7 +37,7 @@ public class KeyChangeListener {
         List<BibEntry> entries = event.getBibEntries();
         for (BibEntry entry : entries) {
             Optional<String> citeKey = entry.getCiteKeyOptional();
-            citeKey.ifPresent(key -> updateEntryLinks(null, key));
+            citeKey.ifPresent(oldkey -> updateEntryLinks(null, oldkey));
         }
     }
 
