@@ -81,20 +81,8 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 6. Use the provided run configuration: Run -> Run "JabRef Main"
 
 ### Set-up Eclipse
-1. Run `gradlew eclipse`
-2. Go to build path  -> Libraries
-3. Move all test related libs to classpath
-4. Move jmh to classpath as well
-5. Go to Source -> Mark src/jmh as test folder
-6. Go to Module dependencies   
-   6.1. Select `org.controlsfx.controls` in the list  
-   6.2. Add export and opens entry  for `impl.org.controlsfx.autocompletion`, `impl.org.controlsfx.skin` and `org.controlsfx.control.textfield` to `org.jabref`  
-   6.3. Select `javafx.controls` add epxorts and opens entry for `com.sun.javafx.scene.control`  to `org.jabref`
-   6.4 JPMS options should look like this:
-      ```
-      --add-exports org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-exports org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref --add-opens org.controlsfx.controls/impl.org.controlsfx.autocompletion=org.jabref --add-opens org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
-      ```
-
+1. Run `./gradlew run` to generate all resources and to check if jabref runs.
+2. Run `./gradlew eclipse`
 7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
 8. Create a run/debug configuration for main class `org.jabref.JabRefLauncher` 
 9. In the arguments tab enter the same runtime arguments as above for intellij.
