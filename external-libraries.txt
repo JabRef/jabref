@@ -50,9 +50,9 @@ Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
 License: BSD-3-Clause
 
-Id:      com.mashape.unirest
+Id:      com.konghq.unirest
 Project: Unirest for Java
-URL:     https://github.com/Mashape/unirest-java
+URL:     https://github.com/Kong/unirest-java
 License: MIT
 
 Id:      com.microsoft.azure:applicationinsights-core
