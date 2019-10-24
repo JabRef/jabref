@@ -22,7 +22,7 @@ public class DBMSTypeTest {
     public void testGetDriverClassPath() {
         assertEquals("org.mariadb.jdbc.Driver", DBMSType.MYSQL.getDriverClassPath());
         assertEquals("oracle.jdbc.driver.OracleDriver", DBMSType.ORACLE.getDriverClassPath());
-        assertEquals("org.postgresql.Drive", DBMSType.POSTGRESQL.getDriverClassPath());
+        assertEquals("org.postgresql.Driver", DBMSType.POSTGRESQL.getDriverClassPath());
     }
 
     @Test

@@ -21,7 +21,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -52,6 +51,8 @@ class DBMSProcessorTest {
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         clear(dbmsConnection);
         assertFalse(dbmsProcessor.checkBaseIntegrity());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -61,6 +62,8 @@ class DBMSProcessorTest {
         clear(dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -94,6 +97,7 @@ class DBMSProcessorTest {
         Map<Field, String> expectedFieldMap = expectedEntry.getFieldMap();
 
         assertEquals(expectedFieldMap, actualFieldMap);
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -115,6 +119,7 @@ class DBMSProcessorTest {
                 .getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedEntry, actualEntryOptional.get());
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -133,6 +138,8 @@ class DBMSProcessorTest {
 
         assertEquals(firstEntry.getId(), sharedEntriesByIdList.get(0).getId());
         assertEquals(secondEntry.getId(), sharedEntriesByIdList.get(1).getId());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -148,6 +155,8 @@ class DBMSProcessorTest {
         bibEntry.setField(StandardField.YEAR, "1993");
 
         assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(bibEntry));
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -165,6 +174,8 @@ class DBMSProcessorTest {
                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedBibEntry, actualBibEntryOptional.get());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -178,6 +189,7 @@ class DBMSProcessorTest {
         try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(resultSet.next());
         }
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -192,6 +204,7 @@ class DBMSProcessorTest {
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(expectedEntries, actualEntries);
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -206,6 +219,7 @@ class DBMSProcessorTest {
                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedBibEntry, actualBibEntryOptional.get());
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -214,6 +228,8 @@ class DBMSProcessorTest {
         dbmsProcessor.setupSharedDatabase();
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -234,6 +250,8 @@ class DBMSProcessorTest {
         Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
         assertEquals(expectedIDVersionMap, actualIDVersionMap);
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -249,6 +267,7 @@ class DBMSProcessorTest {
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMetaData, actualMetaData);
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -261,6 +280,7 @@ class DBMSProcessorTest {
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMetaData, actualMetaData);
+        clear(dbmsConnection);
     }
 
     private Map<String, String> getMetaDataExample() {
@@ -322,7 +342,6 @@ class DBMSProcessorTest {
         return "'" + value + "'";
     }
 
-    @AfterEach
     void clear(DBMSConnection dbmsConnection) throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
