@@ -5,11 +5,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -61,7 +62,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    private String buildPostData(String... bibcodes) {
+    private String buildPostData(Collection<String> bibcodes) {
         JSONObject obj = new JSONObject();
         obj.put("bibcode", bibcodes);
         return obj.toString();
@@ -150,9 +151,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
-            String[] bibcodeArray = new String[bibcodes.size()];
-            bibcodes.toArray(bibcodeArray);
-            return performSearchByIds(bibcodeArray);
+            return performSearchByIds(bibcodes);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
@@ -169,8 +168,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForQuery(query));
-            String[] bibcodeArray = new String[bibcodes.size()];
-            return performSearchByIds(bibcodes.toArray(bibcodeArray));
+            return performSearchByIds(bibcodes);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
@@ -209,8 +207,7 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForID(identifier));
-            String[] bibcodeArray = new String[bibcodes.size()];
-            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes.toArray(bibcodeArray));
+            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
 
             if (fetchedEntries.isEmpty()) {
                 return Optional.empty();
@@ -228,14 +225,14 @@ public class NewAstrophysicsDataSystem implements IdBasedParserFetcher, SearchBa
         }
     }
 
-    private List<BibEntry> performSearchByIds(String... identifiers) throws FetcherException {
+    private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
 
-        long idCount = Arrays.stream(identifiers).filter(identifier -> !StringUtil.isBlank(identifier)).count();
-        if (idCount == 0) {
+        List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
+        if (ids.isEmpty()) {
             return Collections.emptyList();
         }
         try {
-            String postData = buildPostData(identifiers);
+            String postData = buildPostData(ids);
             URLDownload download = new URLDownload(getURLforExport());
             download.addHeader("Authorization", "Bearer " + API_KEY);
             download.addHeader("ContentType", "application/json");
