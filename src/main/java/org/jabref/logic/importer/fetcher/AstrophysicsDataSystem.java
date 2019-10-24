@@ -47,7 +47,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = ""; //TODO Add API Token
+    private static final String API_KEY = "tDueGIu6zl96OqkcCS5LOHboWbTgEEx8yAR7Etta";
     private final ImportFormatPreferences preferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
