@@ -126,9 +126,9 @@ class DBMSProcessorTest {
     void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
-        firstEntry.setId("1");
+        firstEntry.setId("00000024");
         BibEntry secondEntry = getBibEntryExample();
-        secondEntry.setId("2");
+        secondEntry.setId("00000028");
 
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
