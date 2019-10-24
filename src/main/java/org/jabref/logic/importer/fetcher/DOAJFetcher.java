@@ -23,9 +23,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,25 +153,6 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         return entry;
     }
 
-    @Override
-    public String getName() {
-        return "DOAJ";
-    }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_DOAJ);
-    }
-
-    @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        DOAJFetcher.addPath(uriBuilder, query);
-        uriBuilder.addParameter("pageSize", "30"); // Number of results
-        //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
-        return uriBuilder.build().toURL();
-    }
-
     /**
      * @implNote slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
      */
@@ -194,6 +175,25 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         }
 
         return path + "/" + segment;
+    }
+
+    @Override
+    public String getName() {
+        return "DOAJ";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DOAJ);
+    }
+
+    @Override
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
+        DOAJFetcher.addPath(uriBuilder, query);
+        uriBuilder.addParameter("pageSize", "30"); // Number of results
+        //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
+        return uriBuilder.build().toURL();
     }
 
     @Override
