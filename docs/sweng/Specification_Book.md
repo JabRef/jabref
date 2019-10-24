@@ -1,9 +1,12 @@
 # Specification Book
+Project title: Parser for plain text references
+Short description: Extend Jabref by the feature to convert plain text references into BibEntries
+Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 
 ## 1. Visions and Goals 
 
 * /V10/ Reduce the time users spend to add entries to a library in Jabref.
-* /V20/ It is more efficient to use the parser, than adding the entries by hand.
+* /V20/ It is more efficient to use the feature, than adding the entries by hand.
 * /G10/ Users can easily add entries to a library by parsing a plain text reference.
 * /G20/ One or more entries can be parsed in one process.
 * /G30/ Users can change the parsing results if necessary.
@@ -71,8 +74,8 @@
 
 ## 6. Acceptance Criteria  
 
-* /A10/ One plain reference text is passed to the feature.
-* /A20/ Multiple plain reference texts are passed to the feature.
+* /A10/ One plain text reference is passed to the feature.
+* /A20/ Multiple plain text references are passed to the feature.
 * /A30/ Garbage text is passed to the feature.
 * /A40/ No text is passed to the feature.
 
@@ -86,10 +89,10 @@
 ### Use Case 1:
 * Name: *Adding bibtex entry with the feature*
 * Agents: *Jabref user*
-* Preconditions: *A plain reference text is available*
+* Preconditions: *A plain text reference is available*
 * Common process: 
     * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
-    * Insert the plain reference text
+    * Insert the plain text reference
     * Press the "parse" button on the GUI (pop-up window)
     * Check if the parser results are correct
     * (Change bibtex entry if needed)
@@ -100,7 +103,7 @@
 ### Use Case 2:
 * Name: *Trying to parse a text which is not a reference*
 * Agents: *Jabref user*
-* Preconditions: *A plain reference text is available*
+* Preconditions: *A plain text reference is available*
 * Common process:
     * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
     * Insert the plain text (which is not a reference)
@@ -120,7 +123,7 @@
 * Postcondition failure: *An entry is being added with empty fields*
 
 ### Use Case 4:
-* Name: *Adding multiple valid bibtex entries with the parser*
+* Name: *Adding multiple valid bibtex entries with the feature*
 * Agents: *Jabref user*
 * Preconditions: *A plain text with multiple valid references is available, one entry on each line*
 * Common process 
@@ -135,7 +138,7 @@
 * Postcondition failure: *Too many or too little entries or entries with wrongly parsed attributes were added to the library*
 
 ### Use Case 5:
-* Name: *Adding multiple bibtex entries with the parser*
+* Name: *Adding multiple bibtex entries with the feature*
 * Agents: *Jabref user*
 * Preconditions: *A plain text with some valid and some invalid references is available*
 * Common process 
@@ -153,7 +156,7 @@
 * Postcondition failure: *Several accepted entries have not been added or invalid references were added with garbage values to the library*
 
 ### Use Case 6:
-* Name: *Adding multiple invalid bibtex entries with the parser*
+* Name: *Adding multiple invalid bibtex entries with the feature*
 * Agents: *Jabref user*
 * Preconditions: *A plain text with multiple invalid references is available*
 * Common process 
@@ -166,10 +169,10 @@
 ### Use Case 7:
 * Name: *User wants to add two entries one by one*
 * Agents: *Jabref user*
-* Preconditions: *Two valid plain reference texts are available*
+* Preconditions: *Two valid plain text references are available*
 * Common process 
     * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
-    * Insert one plain reference text
+    * Insert one plain text reference
     * Press the "parse" button on the GUI (pop-up window)
     * Check if the parser results are correct
     * (Change bibtex entry if needed)
