@@ -65,5 +65,4 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
-    requires json;
 }
