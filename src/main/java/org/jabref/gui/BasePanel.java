@@ -401,17 +401,9 @@ public class BasePanel extends StackPane {
             return;
         }
 
-        NamedCompound compound;
-        if (cut) {
-            compound = new NamedCompound((entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
-        } else {
-            compound = new NamedCompound((entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
-        }
-        compound.addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
         bibDatabaseContext.getDatabase().removeEntries(entries);
         ensureNotShowingBottomPanel(entries);
-        compound.end();
-        getUndoManager().addEdit(compound);
 
         markBaseChanged();
         this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));

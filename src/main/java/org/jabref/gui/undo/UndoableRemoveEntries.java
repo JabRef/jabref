@@ -23,27 +23,45 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntries.class);
     private final BibDatabase base;
     private final List<BibEntry> entries;
+    private final boolean cut;
 
     public UndoableRemoveEntries(BibDatabase base, BibEntry entry) {
-        this(base, entry));
+        this(base, Collections.singletonList(entry));
     }
 
     public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries) {
+        this(base, entries, false);
+    }
+
+    public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries, boolean cut) {
         this.base = base;
         this.entries = entries;
+        this.cut = cut;
     }
 
     @Override
     public String getPresentationName() {
-        if (entries.size() > 1) {
-            return Localization.lang("remove entries");
-        }
-        else if (entries.size() == 1) {
-            return Localization.lang("remove entry %0",
-                    StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-        }
-        else {
-            return null;
+        if (cut) {
+            if (entries.size() > 1) {
+                return Localization.lang("cut entries");
+            }
+            else if (entries.size() == 1) {
+                return Localization.lang("cut entry %0",
+                        StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            } else  {
+                return null;
+            }
+        } else {
+            if (entries.size() > 1) {
+                return Localization.lang("remove entries");
+            }
+            else if (entries.size() == 1) {
+                return Localization.lang("remove entry %0",
+                        StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            }
+            else {
+                return null;
+            }
         }
     }
 
