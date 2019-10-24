@@ -40,12 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Fetches data from the SAO/NASA Astrophysics Data System (http://www.adsabs.harvard.edu/)
- * <p>
- * Search query-based: http://adsabs.harvard.edu/basic_search.html Entry -based: http://adsabs.harvard.edu/abstract_service.html
- * <p>
- * There is also a new API (https://github.com/adsabs/adsabs-dev-api) but it returns JSON (or at least needs multiple
- * calls to get BibTeX, status: September 2016)
+ * Fetches data from the SAO/NASA Astrophysics Data System (https://ui.adsabs.harvard.edu/)
  */
 public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBasedParserFetcher, EntryBasedParserFetcher {
 
@@ -59,13 +54,19 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    private String buildPostData(Collection<String> bibcodes) {
+    /**
+     * @param bibcodes collection of bibcodes for which a JSON object should be created
+     */
+    private static String buildPostData(Collection<String> bibcodes) {
         JSONObject obj = new JSONObject();
         obj.put("bibcode", bibcodes);
         return obj.toString();
     }
 
-    private URL getURLforExport() throws URISyntaxException, MalformedURLException {
+    /**
+     * @return export URL endpoint
+     */
+    private static URL getURLforExport() throws URISyntaxException, MalformedURLException {
         return new URIBuilder(API_EXPORT_URL).build().toURL();
     }
 
@@ -74,6 +75,10 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         return "SAO/NASA Astrophysics Data System";
     }
 
+    /**
+     * @param query query string, matching the apache solr format
+     * @return URL which points to a search request for given query
+     */
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
@@ -82,6 +87,10 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         return builder.build().toURL();
     }
 
+    /**
+     * @param entry BibEntry for which a search URL is created
+     * @return URL which points to a search request for given entry
+     */
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -105,6 +114,10 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         return builder.build().toURL();
     }
 
+    /**
+     * @param identifier bibcode or doi for which a search URL is created
+     * @return URL which points to a search URL for given identifier
+     */
     @Override
     public URL getURLForID(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
@@ -173,6 +186,10 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         }
     }
 
+    /**
+     * @param url search ul for which bibcode will be returned
+     * @return list of bibcodes matching the search request. May be empty
+     */
     private List<String> fetchBibcodes(URL url) throws FetcherException {
 
         try {
@@ -180,19 +197,16 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
             download.addHeader("Authorization", "Bearer " + API_KEY);
             String content = download.asString();
             JSONObject obj = new JSONObject(content);
-
-            try {
-                JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
-                List<String> bibcodes = new ArrayList<>();
-                for (int i = 0; i < codes.length(); i++) {
-                    bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
-                }
-                return bibcodes;
-            } catch (JSONException e) {
-                return Collections.emptyList();
+            JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
+            List<String> bibcodes = new ArrayList<>();
+            for (int i = 0; i < codes.length(); i++) {
+                bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
             }
+            return bibcodes;
         } catch (IOException e) {
             throw new FetcherException("A network error occurred", e);
+        } catch (JSONException e) {
+            return Collections.emptyList();
         }
     }
 
@@ -222,6 +236,11 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         }
     }
 
+    /**
+     * @param identifiers bibcodes for which bibentries ahould be fetched
+     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested
+     * bibcodes
+     */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
 
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
