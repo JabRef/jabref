@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -36,10 +36,10 @@ class DBMSProcessorTest {
     private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
         Collection<Object[]> result = new ArrayList<>();
         for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-            result.add(new Object[]{
-                    dbmsType,
-                    TestConnector.getTestDBMSConnection(dbmsType),
-                    DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
+            result.add(new Object[] {
+                                     dbmsType,
+                                     TestConnector.getTestDBMSConnection(dbmsType),
+                                     DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
         }
         return result.stream();
     }
@@ -94,7 +94,7 @@ class DBMSProcessorTest {
             }
         }
 
-        Map<Field, String> expectedFieldMap = expectedEntry.getFieldMap();
+        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
         clear(dbmsConnection);
@@ -102,7 +102,7 @@ class DBMSProcessorTest {
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
-    void testUpdateEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+    void testUpdateEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
 
@@ -115,8 +115,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntryOptional = dbmsProcessor
-                .getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualEntryOptional = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedEntry, actualEntryOptional.get());
         clear(dbmsConnection);
@@ -124,7 +123,7 @@ class DBMSProcessorTest {
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
-    void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+    void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setId("1");
@@ -172,7 +171,7 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(expectedBibEntry);
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
-                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
+                                                                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedBibEntry, actualBibEntryOptional.get());
 
@@ -216,8 +215,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedBibEntry);
 
-        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
-                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
         assertEquals(expectedBibEntry, actualBibEntryOptional.get());
         clear(dbmsConnection);
@@ -328,8 +326,8 @@ class DBMSProcessorTest {
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
         try {
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA", dbmsProcessor) + "("
-                    + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
-                    + escapeValue(key) + ", " + escapeValue(value) + ")");
+                                                                           + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
+                                                                           + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
             fail(e.getMessage());
         }
