@@ -30,7 +30,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML private CustomTextField searchBox;
     @FXML private ListView<PreferencesTab> preferenceTabList;
-    @FXML private ScrollPane preferencePaneContainer;
+    @FXML private ScrollPane container;
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
@@ -76,9 +76,9 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
-                preferencePaneContainer.setContent(null);
+                container.setContent(null);
             } else {
-                preferencePaneContainer.setContent(tab.getBuilder());
+                container.setContent(tab.getBuilder());
             }
         });
 

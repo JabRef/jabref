@@ -45,7 +45,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11.0.4
+        java-version: 12.0.2
     - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
@@ -88,8 +88,8 @@ jobs:
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
-          docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/"
-          # cd build/distribution/ && mdkir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg && snapcraft push --release=beta *.snap
+          mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
+          docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
       shell: bash
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release

@@ -11,12 +11,15 @@ import javafx.stage.FileChooser;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 /**
  * Perform import operation
@@ -30,9 +33,14 @@ public class ImportCommand extends SimpleCommand {
     /**
      * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
      */
-    public ImportCommand(JabRefFrame frame, boolean openInNew) {
+    public ImportCommand(JabRefFrame frame, boolean openInNew, StateManager stateManager) {
         this.frame = frame;
         this.openInNew = openInNew;
+
+        if (!openInNew) {
+            this.executable.bind(needsDatabase(stateManager));
+        }
+
         this.dialogService = frame.getDialogService();
     }
 

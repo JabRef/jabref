@@ -21,17 +21,14 @@ plugins {
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
-    id 'com.github.ben-manes.versions' version '0.25.0'
+    id 'com.github.ben-manes.versions' version '0.27.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.16.0'
+    id 'org.beryx.jlink' version '2.16.2'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
-
-// show stacktrace on error
-gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -47,8 +44,8 @@ apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0.0"
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 12
+targetCompatibility = 12
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
@@ -102,7 +99,7 @@ configurations {
 }
 
 javafx {
-    version = "11.0.2"
+    version = "13"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -117,7 +114,7 @@ dependencies {
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.63'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.64'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -138,7 +135,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.0'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.1'
 
     compile 'org.postgresql:postgresql:42.2.8'
 
@@ -165,12 +162,12 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-20190915.182410-364'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-20190915.182922-250'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-20190915.182837-57'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-20190915.182113-372'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
-    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '3.0.0-SNAPSHOT'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
     compile 'de.undercouch:citeproc-java:1.0.1'
 
@@ -198,18 +195,17 @@ dependencies {
         exclude module: "log4j-core"
     }
 
+
+    testCompile 'io.github.classgraph:classgraph:4.8.52'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
-    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-20190915.182215-368'
-    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-20190915.182552-364'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.2'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
+    testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.1.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
-    testCompile ('org.reflections:reflections:0.9.11') {
-        exclude module: "jsr305"
-    }
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.11.0'
@@ -487,10 +483,6 @@ processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
-
-    jacoco {
-        append = true
-    }
 }
 
 task jacocoMerge(type: JacocoMerge) {
@@ -598,7 +590,7 @@ jlink {
                     '--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres"
+                    '--resource-dir', "${projectDir}/buildres/windows"
             ]
         }
 
@@ -608,7 +600,14 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.version}"
+                    '--app-version', "${project.version}",
+                    // '--temp', "$buildDir/installer",
+                    '--resource-dir', "${projectDir}/buildres/linux",
+                    '--linux-menu-group', 'Office;',
+                    '--linux-rpm-license-type', 'MIT',
+                    // '--license-file', "${projectDir}/LICENSE.md",
+                    '--description', 'JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.',
+                    '--linux-shortcut'
             ]
         }
 
@@ -623,14 +622,35 @@ jlink {
         }
     }
 }
-tasks.jpackageImage.doLast {
-    copy {
-        from("/buildres/") {
-            include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+
+if (OperatingSystem.current().isWindows()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/windows") {
+                include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+            }
+            into "$buildDir/distribution/JabRef"
         }
-        into "$buildDir/distribution/JabRef"
     }
 }
+
+if (OperatingSystem.current().isLinux()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/linux") {
+                include "org.jabref.jabref.json", "jabrefHost.py"
+            }
+            into "$buildDir/distribution/JabRef/lib"
+        }
+    }
+}
+
+// Delete unnecessary folder in application image
+// TODO: Remove this workaround as soon as https://github.com/beryx/badass-jlink-plugin/issues/51 is fixed
+task deleteModsFolder(type: Delete) {
+    delete "$buildDir/distribution/JabRef/app/mods"
+}
+deleteModsFolder.shouldRunAfter jpackageImage
 
 jmh {
     warmupIterations = 5

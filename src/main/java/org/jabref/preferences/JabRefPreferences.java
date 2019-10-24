@@ -127,7 +127,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
-    public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -366,7 +365,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
-    private static final String PREVIEW_ENABLED = "previewEnabled";
+    private static final String PREVIEW_AS_TAB = "previewAsTab";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -471,7 +470,6 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
-        defaults.put(FX_FONT_RENDERING_TWEAK, OS.LINUX); //we turn this on per default on Linux
         defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
@@ -747,7 +745,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
-        defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
+        defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                      "<font face=\"sans-serif\">"
                                     + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
@@ -1597,7 +1595,7 @@ public class JabRefPreferences implements PreferencesService {
         }).collect(Collectors.toList()));
         putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
-        putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
+        putBoolean(PREVIEW_AS_TAB, previewPreferences.showPreviewAsExtraTab());
         return this;
     }
 
@@ -1607,7 +1605,7 @@ public class JabRefPreferences implements PreferencesService {
         double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
-        boolean enabled = getBoolean(PREVIEW_ENABLED);
+        boolean showAsTab = getBoolean(PREVIEW_AS_TAB);
 
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
@@ -1635,7 +1633,7 @@ public class JabRefPreferences implements PreferencesService {
             cyclePos = 0; // fallback if stored position is no longer valid
         }
 
-        return new PreviewPreferences(layouts, cyclePos, panelHeight, enabled, style, styleDefault);
+        return new PreviewPreferences(layouts, cyclePos, panelHeight, style, styleDefault, showAsTab);
     }
 
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {

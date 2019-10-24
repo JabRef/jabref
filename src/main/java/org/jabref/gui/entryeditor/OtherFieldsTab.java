@@ -13,34 +13,40 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.preferences.JabRefPreferences;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
     private final List<Field> customTabFieldNames;
+    private final BibEntryTypesManager entryTypesManager;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<Field> customTabFieldNames, DialogService dialogService) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService);
+    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<Field> customTabFieldNames, DialogService dialogService, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
+        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, externalFileTypes, taskExecutor, journalAbbreviationLoader);
+        this.entryTypesManager = entryTypesManager;
+        this.customTabFieldNames = customTabFieldNames;
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
-        this.customTabFieldNames = customTabFieldNames;
     }
 
     @Override
     protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
-        Optional<BibEntryType> entryType = Globals.entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields().stream().map(BibField::getField).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
             SortedSet<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));

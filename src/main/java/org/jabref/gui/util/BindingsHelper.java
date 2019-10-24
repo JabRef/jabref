@@ -24,6 +24,7 @@ import javafx.scene.Node;
 
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.PreboundBinding;
+import org.fxmisc.easybind.Subscription;
 
 /**
  * Helper methods for javafx binding.
@@ -43,12 +44,13 @@ public class BindingsHelper {
         return Bindings.createBooleanBinding(() -> !source.isEmpty() && source.stream().allMatch(predicate), source);
     }
 
-    public static void includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
+    public static Subscription includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
         Consumer<Boolean> changePseudoClass = value -> node.pseudoClassStateChanged(pseudoClass, value);
-        EasyBind.subscribe(condition, changePseudoClass);
+        Subscription subscription = EasyBind.subscribe(condition, changePseudoClass);
 
         // Put the pseudo class there depending on the current value
         changePseudoClass.accept(condition.getValue());
+        return subscription;
     }
 
     /**

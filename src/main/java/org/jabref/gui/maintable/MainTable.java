@@ -37,13 +37,16 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +71,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
+
         this.undoManager = panel.getUndoManager();
 
         importHandler = new ImportHandler(
@@ -127,6 +131,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
+
+        database.getDatabase().registerListener(this);
+    }
+
+    @Subscribe
+    public void listen(AllInsertsFinishedEvent event) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getBibEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
@@ -195,7 +206,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
     }
 
-    private void clearAndSelectFirst() {
+    public void clearAndSelectFirst() {
         getSelectionModel().clearSelection();
         getSelectionModel().selectFirst();
         scrollTo(0);

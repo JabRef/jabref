@@ -9,7 +9,7 @@
         var installerConfig = jabRefRoot + "/build/installer/config/";
 
         // Copy additional installer resources
-        fileSystem.CopyFile(jabRefRoot + "/buildres/JabRefTopBanner.bmp", installerConfig);
+        fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
 
         var wxsFilePath = installerConfig + "JabRef.wxs";
         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);

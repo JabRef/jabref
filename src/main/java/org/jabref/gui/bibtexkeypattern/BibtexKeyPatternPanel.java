@@ -19,7 +19,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -116,12 +115,6 @@ public class BibtexKeyPatternPanel extends Pane {
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
         gridPane.add(btnDefaultAll1, 2, rowIndex);
-    }
-
-    protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
-        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(Globals.prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
-        fillPatternUsingPanelData(res);
-        return res;
     }
 
     public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
