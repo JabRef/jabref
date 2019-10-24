@@ -52,17 +52,24 @@ public class DBMSSynchronizerTest {
         return result.stream();
     }
 
+    public void setUp(DBMSConnection dbmsConnection) throws Exception {
+
+        bibDatabase = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
+
+        bibDatabase.registerListener(dbmsSynchronizer);
+
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+    }
+
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testEntryAddedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
 
-        System.out.println("dbmstype"+ dbmsType);
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        bibDatabase.registerListener(dbmsSynchronizer);
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        System.out.println("dbmstype" + dbmsType);
 
+        setUp(dbmsConnection);
         BibEntry expectedEntry = getBibEntryExample(1);
         BibEntry furtherEntry = getBibEntryExample(1);
 
@@ -74,16 +81,15 @@ public class DBMSSynchronizerTest {
 
         assertEquals(1, actualEntries.size());
         assertEquals(expectedEntry, actualEntries.get(0));
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testFieldChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
 
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        setUp(dbmsConnection);
 
         BibEntry expectedEntry = getBibEntryExample(1);
         expectedEntry.registerListener(dbmsSynchronizer);
@@ -96,16 +102,15 @@ public class DBMSSynchronizerTest {
         assertEquals(1, actualEntries.size());
         assertEquals(expectedEntry.getField(StandardField.AUTHOR), actualEntries.get(0).getField(StandardField.AUTHOR));
         assertEquals("The nano processor1", actualEntries.get(0).getField(StandardField.TITLE).get());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
 
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        setUp(dbmsConnection);
 
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
@@ -125,6 +130,8 @@ public class DBMSSynchronizerTest {
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
         assertEquals(bibEntry, actualEntries.get(0));
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
@@ -145,30 +152,26 @@ public class DBMSSynchronizerTest {
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMap, actualMap);
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testInitializeDatabases(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        setUp(dbmsConnection);
 
         clear(dbmsConnection);
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testSynchronizeLocalDatabaseWithEntryRemoval(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        setUp(dbmsConnection);
 
         List<BibEntry> expectedBibEntries = Arrays.asList(getBibEntryExample(1), getBibEntryExample(2));
 
@@ -189,15 +192,15 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
+
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testSynchronizeLocalDatabaseWithEntryUpdate(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
+        setUp(dbmsConnection);
 
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
@@ -213,15 +216,13 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
+        clear(dbmsConnection);
     }
 
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testApplyMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+        setUp(dbmsConnection);
 
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
@@ -233,6 +234,8 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.applyMetaData();
 
         assertEquals("wirthlin, michael j1", bibEntry.getField(StandardField.AUTHOR).get());
+
+        clear(dbmsConnection);
     }
 
     private BibEntry getBibEntryExample(int index) {
