@@ -159,12 +159,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile ('com.konghq:unirest-java:3.1.02'){
-        // Use lib directly from maven, because current unirest build uses an older build of this library.
-        // There has been a bugfix for the automatic name manifest property of httpcore-nio this library depends on.
-        exclude module: "httpcore-nio"
-    }
-    compile ('org.apache.httpcomponents:httpcore-nio:4.4.12')
+    compile ('com.konghq:unirest-java:3.1.03')
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
