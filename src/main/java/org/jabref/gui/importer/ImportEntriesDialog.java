@@ -119,6 +119,10 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                         }
                     }).executeWith(Globals.TASK_EXECUTOR);
 
+                    if (entriesListView.getItems().size() == 1) {
+                        selectAllNewEntries();
+                    }
+
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
