@@ -79,7 +79,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
         try {
             base.removeEntries(entries);
         } catch (Throwable ex) {
-            LOGGER.warn("Problem to redo `remove entry`", ex);
+            LOGGER.warn("Problem to redo `remove entries`", ex);
         }
     }
 
