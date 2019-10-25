@@ -1,5 +1,7 @@
 package org.jabref.gui.preview;
 
+import java.net.URL;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -27,6 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,9 +119,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void setTheme(String theme) {
         if (theme.equals(ThemeLoader.DARK_CSS)) {
-            previewView.getEngine().setUserStyleSheetLocation(JabRefFrame.class.getResource(ThemeLoader.DARK_CSS).toString());
+            // We need to load the css file manually, due to a bug in the jdk
+            // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
+            URL url = JabRefFrame.class.getResource(ThemeLoader.DARK_CSS);
+            String dataUrl = "data:text/css;charset=utf-8;base64," +
+                    Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
+
+            previewView.getEngine().setUserStyleSheetLocation(dataUrl);
         }
-    
     }
 
     private void highlightSearchPattern() {
