@@ -53,7 +53,8 @@ public class DBMSSynchronizerTest {
     }
 
     public void setUp(DBMSConnection dbmsConnection) throws Exception {
-
+        clear(dbmsConnection);
+        
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
@@ -94,15 +95,17 @@ public class DBMSSynchronizerTest {
         BibEntry expectedEntry = getBibEntryExample(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
-        bibDatabase.insertEntry(expectedEntry);
+        bibDatabase.insertEntry(expectedEntry); 
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
+    
+        //problem is that we somehow now have an empty entry with no fields maybe due to the all entries event?
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntryEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
         assertEquals(expectedEntry.getField(StandardField.AUTHOR), actualEntries.get(0).getField(StandardField.AUTHOR));
         assertEquals("The nano processor1", actualEntries.get(0).getField(StandardField.TITLE).get());
-
+ //somehow the field stable is not filled
         clear(dbmsConnection);
     }
 
@@ -137,12 +140,8 @@ public class DBMSSynchronizerTest {
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testMetaDataChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
-        bibDatabase = new BibDatabase();
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
-        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
-
+        
+        setUp(dbmsConnection);
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -199,7 +198,6 @@ public class DBMSSynchronizerTest {
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testSynchronizeLocalDatabaseWithEntryUpdate(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
         setUp(dbmsConnection);
 
         BibEntry bibEntry = getBibEntryExample(1);
