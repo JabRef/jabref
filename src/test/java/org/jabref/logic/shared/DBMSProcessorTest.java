@@ -129,7 +129,7 @@ class DBMSProcessorTest {
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
-        firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00002");
+        secondEntry.setField(InternalField.INTERNAL_ID_FIELD, "00002");
 
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
