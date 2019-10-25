@@ -16,6 +16,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -126,9 +127,9 @@ class DBMSProcessorTest {
     void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
-        firstEntry.setId("00000024");
+        firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
-        secondEntry.setId("00000028");
+        firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00002");
 
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
@@ -137,8 +138,8 @@ class DBMSProcessorTest {
 
         clear(dbmsConnection);
 
-        assertEquals(firstEntry.getId(), sharedEntriesByIdList.get(0).getId());
-        assertEquals(secondEntry.getId(), sharedEntriesByIdList.get(1).getId());
+        assertEquals(firstEntry, sharedEntriesByIdList.get(0));
+        assertEquals(secondEntry, sharedEntriesByIdList.get(1));
 
     }
 
