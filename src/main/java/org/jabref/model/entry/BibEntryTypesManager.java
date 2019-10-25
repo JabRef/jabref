@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -10,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -56,7 +58,12 @@ public class BibEntryTypesManager {
         builder.append(": req[");
         builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
         builder.append("] opt[");
-        builder.append(FieldFactory.serializeFieldsList(entryType.getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet())));
+        builder.append(FieldFactory.serializeFieldsList(
+                entryType.getOptionalFields()
+                         .stream()
+                         .map(BibField::getField)
+                         .sorted(Comparator.comparing(Field::getName))
+                         .collect(Collectors.toList())));
         builder.append("]");
         return builder.toString();
     }
