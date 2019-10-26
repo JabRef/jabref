@@ -3,7 +3,7 @@
 }
 
 .text-unchanged {
-
+    -fx-fill: -fx-light-text-color;
 }
 
 .text-added {
