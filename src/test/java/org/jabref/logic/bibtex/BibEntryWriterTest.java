@@ -602,7 +602,7 @@ class BibEntryWriterTest {
                 "  number       = {1}," + OS.NEWLINE +
                 "  chapter      = {chapter}," + OS.NEWLINE +
                 "  year         = {2019}," + OS.NEWLINE +
-                "}";
+                "}" + OS.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);
