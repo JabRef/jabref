@@ -17,4 +17,8 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     List<BibEntry> performSearch(String query) throws FetcherException;
+
+    default boolean supportsPaging() {
+        return false;
+    }
 }
