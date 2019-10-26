@@ -30,21 +30,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class BibEntryWriterTest {
+class BibEntryWriterTest {
 
     private static ImportFormatPreferences importFormatPreferences;
     private BibEntryWriter writer;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
-    public void setUpWriter() {
+    void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), new BibEntryTypesManager());
     }
 
     @Test
-    public void testSerialization() throws IOException {
+    void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -72,7 +72,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void writeOtherTypeTest() throws Exception {
+    void writeOtherTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Other{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
@@ -165,7 +165,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void writeReallyUnknownTypeTest() throws Exception {
+    void writeReallyUnknownTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
@@ -184,7 +184,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripTest() throws IOException {
+    void roundTripTest() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -208,7 +208,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithPrependingNewlines() throws IOException {
+    void roundTripWithPrependingNewlines() throws IOException {
         // @formatter:off
         String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -232,7 +232,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithModification() throws IOException {
+    void roundTripWithModification() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -267,7 +267,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
+    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -304,7 +304,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void testEntryTypeChange() throws IOException {
+    void testEntryTypeChange() throws IOException {
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
@@ -341,7 +341,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithAppendedNewlines() throws IOException {
+    void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -366,7 +366,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void multipleWritesWithoutModification() throws IOException {
+    void multipleWritesWithoutModification() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -399,7 +399,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void monthFieldSpecialSyntax() throws IOException {
+    void monthFieldSpecialSyntax() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -427,7 +427,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void addFieldWithLongerLength() throws IOException {
+    void addFieldWithLongerLength() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author =  {BlaBla}," + OS.NEWLINE +
@@ -463,7 +463,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void doNotWriteEmptyFields() throws IOException {
+    void doNotWriteEmptyFields() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -482,7 +482,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void trimFieldContents() throws IOException {
+    void trimFieldContents() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -500,7 +500,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
+    void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -510,7 +510,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithPrecedingCommentTest() throws IOException {
+    void roundTripWithPrecedingCommentTest() throws IOException {
         // @formatter:off
         String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
                 "@Article{test," + OS.NEWLINE +
@@ -535,7 +535,7 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripWithPrecedingCommentAndModificationTest() throws IOException {
+    void roundTripWithPrecedingCommentAndModificationTest() throws IOException {
         // @formatter:off
         String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
                 "@Article{test," + OS.NEWLINE +
@@ -566,6 +566,43 @@ public class BibEntryWriterTest {
                 "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
+        // @formatter:on
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void alphabeticSerialization() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        //required fields
+        entry.setField(StandardField.AUTHOR, "Foo Bar");
+        entry.setField(StandardField.JOURNALTITLE, "International Journal of Something");
+        entry.setField(StandardField.TITLE, "Title");
+        entry.setField(StandardField.DATE, "2019-10-16");
+        //optional fields
+        entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.NOTE, "some note");
+        //unknown fields
+        entry.setField(StandardField.YEAR, "2019");
+        entry.setField(StandardField.CHAPTER, "chapter");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBLATEX);
+
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  author       = {Foo Bar}," + OS.NEWLINE +
+                "  date         = {2019-10-16}," + OS.NEWLINE +
+                "  journaltitle = {International Journal of Something}," + OS.NEWLINE +
+                "  title        = {Title}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  chapter      = {chapter}," + OS.NEWLINE +
+                "  year         = {2019}," + OS.NEWLINE +
+                "}";
         // @formatter:on
 
         assertEquals(expected, actual);
