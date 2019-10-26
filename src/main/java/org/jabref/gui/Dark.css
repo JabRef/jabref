@@ -59,3 +59,8 @@
 .text-unchanged {
     -fx-fill: -fx-light-text-color;
 }
+
+.radio-button > .radio {
+    -fx-background-color: -fx-light-text-color, -fx-control-inner-background;
+}
+
