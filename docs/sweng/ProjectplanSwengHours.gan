@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="Sweng project predicted workload" company="" webLink="http://" view-date="2019-10-23" view-index="1" gantt-divider-location="475" resource-divider-location="300" version="2.8.10" locale="en_US">
+    <description/>
+    <view zooming-state="default:2" id="gantt-chart">
+        <field id="tpd3" name="Name" width="240" order="0"/>
+        <field id="tpd4" name="Begin date" width="116" order="1"/>
+        <field id="tpd5" name="End date" width="115" order="2"/>
+        <option id="color.recent">
+            <![CDATA[#ff6666]]>
+        </option>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Name" width="210" order="0"/>
+        <field id="1" name="Default role" width="86" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="1" mon="0" tue="0" wed="0" thu="0" fri="0" sat="1"/>
+            <only-show-weekends value="false"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="0" name="F10: milestone 2" color="#8cb6ce" meeting="false" start="2019-10-23" duration="10" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="1" name="F20: milestone 2" color="#8cb6ce" meeting="false" start="2019-10-23" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="2" name="F30: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="15" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="3" name="F40: milestone 2" color="#8cb6ce" meeting="false" start="2019-10-23" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="4" name="F41: milestone 2" color="#8cb6ce" meeting="false" start="2019-10-23" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="5" name="F50: milestone 2" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="6" name="F60: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="15" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="9" name="F70: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="20" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="10" name="F80: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="11" name="F90: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="20" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="12" name="F91: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="13" name="F100: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="45" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="14" name="F110: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="15" name="F120: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="7" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="16" name="F121: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="17" name="F130: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="18" name="F140: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="5" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="19" name="F141: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="10" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="20" name="F150: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="8" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="21" name="F160: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="15" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="22" name="F161: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="23" name="F170: milestone 3" color="#8cb6ce" meeting="false" start="2019-10-23" duration="15" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="24" name="F171: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="10" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+        <task id="25" name="F180: milestone 4" color="#8cb6ce" meeting="false" start="2019-10-23" duration="10" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+    </tasks>
+    <resources>
+        <resource id="0" name="Nikodem Kernbach" function="Default:0" contacts="" phone=""/>
+        <resource id="1" name="Güneş Aydin" function="Default:0" contacts="" phone=""/>
+        <resource id="2" name="Joey Zgraggen" function="Default:0" contacts="" phone=""/>
+        <resource id="3" name="Luka Obser" function="Default:0" contacts="" phone=""/>
+    </resources>
+    <allocations>
+        <allocation task-id="2" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="11" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="13" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="14" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="15" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="17" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="18" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="24" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="25" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="0" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="1" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="9" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="12" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="13" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="15" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="16" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="19" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="21" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="22" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="25" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="6" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="11" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="13" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="14" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="17" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="18" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="21" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="24" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="25" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="0" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="1" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="2" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="3" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="4" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="5" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="9" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="12" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="13" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="16" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="19" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="22" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+        <allocation task-id="25" resource-id="3" function="Default:0" responsible="false" load="100.0"/>
+    </allocations>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+</project>
