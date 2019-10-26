@@ -55,3 +55,7 @@
     background-color: #272b38; /* -fx-control-inner-background*/
     color : #7d8591; /* -fx-mid-text-color*/
 }
+
+.text-unchanged {
+    -fx-fill: -fx-light-text-color;
+}
