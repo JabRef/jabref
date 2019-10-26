@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
@@ -745,10 +744,7 @@ public class BasePanel extends StackPane {
 
         createMainTable();
 
-        ScrollPane pane = mainTable.getPane();
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-        splitPane.getItems().add(pane);
+        splitPane.getItems().add(mainTable);
 
         // Set up name autocompleter for search:
         setupAutoCompletion();
