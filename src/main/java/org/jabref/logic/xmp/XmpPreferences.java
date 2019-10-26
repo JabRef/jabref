@@ -1,16 +1,16 @@
 package org.jabref.logic.xmp;
 
-import java.util.List;
+import java.util.Set;
 
 import org.jabref.model.entry.field.Field;
 
 public class XmpPreferences {
 
     private final boolean useXMPPrivacyFilter;
-    private final List<Field> xmpPrivacyFilter;
+    private final Set<Field> xmpPrivacyFilter;
     private final Character keywordSeparator;
 
-    public XmpPreferences(boolean useXMPPrivacyFilter, List<Field> xmpPrivacyFilter, Character keywordSeparator) {
+    public XmpPreferences(boolean useXMPPrivacyFilter, Set<Field> xmpPrivacyFilter, Character keywordSeparator) {
         this.useXMPPrivacyFilter = useXMPPrivacyFilter;
         this.xmpPrivacyFilter = xmpPrivacyFilter;
         this.keywordSeparator = keywordSeparator;
@@ -20,7 +20,7 @@ public class XmpPreferences {
         return useXMPPrivacyFilter;
     }
 
-    public List<Field> getXmpPrivacyFilter() {
+    public Set<Field> getXmpPrivacyFilter() {
         return xmpPrivacyFilter;
     }
 
