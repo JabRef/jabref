@@ -229,8 +229,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove = new ArrayList<>();
-        for (int i = 0; i < localEntries.size(); i++) {
-            BibEntry localEntry = localEntries.get(i);
+        for (BibEntry localEntry : localEntries) {
             boolean match = false;
             for (int sharedID : sharedIDs) {
                 if (localEntry.getSharedBibEntryData().getSharedID() == sharedID) {
