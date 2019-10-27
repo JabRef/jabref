@@ -273,7 +273,7 @@ class BibtexDatabaseWriterTest {
                         new OrFields(StandardField.TITLE),
                         new OrFields(StandardField.AUTHOR),
                         new OrFields(StandardField.DATE)));
-        entryTypesManager.addCustomizedEntryType(customizedBibType, BibDatabaseMode.BIBTEX);
+        entryTypesManager.addCustomOrModifiedType(customizedBibType, BibDatabaseMode.BIBTEX);
         BibEntry entry = new BibEntry(customizedType);
         database.insertEntry(entry);
 

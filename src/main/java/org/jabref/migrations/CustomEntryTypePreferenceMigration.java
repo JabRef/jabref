@@ -32,7 +32,7 @@ class CustomEntryTypePreferenceMigration {
         int number = 0;
         Optional<BibEntryType> type;
         while ((type = getBibEntryType(number)).isPresent()) {
-            Globals.entryTypesManager.addCustomizedEntryType(type.get(), defaultBibDatabaseMode);
+            Globals.entryTypesManager.addCustomOrModifiedType(type.get(), defaultBibDatabaseMode);
             storedOldTypes.add(type.get());
             number++;
         }
