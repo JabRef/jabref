@@ -57,14 +57,14 @@ public class FindFullTextAction extends SimpleCommand {
 
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
-                                                                                  Localization.lang("Look up full text documents"),
-                                                                                  Localization.lang("You are about to look up full text documents for %0 entries.",
-                                                                                                    String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
-                                                                                                                                    + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                                                                                                                                    + "\n"
-                                                                                                                                    + Localization.lang("Do you still want to continue?"),
-                                                                                  Localization.lang("Look up full text documents"),
-                                                                                  Localization.lang("Cancel"));
+                    Localization.lang("Look up full text documents"),
+                    Localization.lang("You are about to look up full text documents for %0 entries.",
+                                    String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                                                                    + Localization.lang("JabRef will send at least one request per entry to a publisher.")
+                                                                    + "\n"
+                                                                    + Localization.lang("Do you still want to continue?"),
+                    Localization.lang("Look up full text documents"),
+                    Localization.lang("Cancel"));
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
