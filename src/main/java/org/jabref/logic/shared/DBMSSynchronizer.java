@@ -192,7 +192,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (Field field : sharedEntry.get().getFields()) {
-                                localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
+                                Optional<String> sharedFieldValue = sharedEntry.get().getField(field);
+                                if (sharedFieldValue.isPresent()) {
+                                    localEntry.setField(field, sharedFieldValue.get(), EntryEventSource.SHARED);
+                                }
                             }
 
                             Set<Field> redundantLocalEntryFields = localEntry.getFields();

@@ -289,7 +289,56 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtrip() throws Exception {
+    void writeEntryWithConstantMonthApril() throws Exception {
+        BibEntry entry = new BibEntry.Builder(StandardEntryType.Misc)
+                .field(StandardField.MONTH, "#apr#")
+                .build();
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+
+        assertEquals(OS.NEWLINE +
+                "@Misc{," + OS.NEWLINE +
+                "  month = apr," + OS.NEWLINE +
+                "}" + OS.NEWLINE + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEntryWithMonthApril() throws Exception {
+        BibEntry entry = new BibEntry.Builder(StandardEntryType.Misc)
+                .field(StandardField.MONTH, "apr")
+                .build();
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+
+        assertEquals(OS.NEWLINE +
+                "@Misc{," + OS.NEWLINE +
+                "  month = {apr}," + OS.NEWLINE +
+                "}" + OS.NEWLINE + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void roundtripWithArticleMonths() throws Exception {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/articleWithMonths.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+
+        when(preferences.getEncoding()).thenReturn(encoding);
+        when(preferences.isSaveInOriginalOrder()).thenReturn(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
+        try (Scanner scanner = new Scanner(testBibtexFile, encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
+
+    @Test
+    void roundtripWithComplexBib() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));

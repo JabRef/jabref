@@ -63,12 +63,43 @@ public class BibEntry implements Cloneable {
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
+
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
+
+    /**
+     * A simple builder to enable quick creation of BibEntry instances.
+     *
+     * Builder pattern as described in Item 2 of the book "Effective Java".
+     */
+    public static class Builder {
+
+        private BibEntry bibEntry;
+
+        public Builder(EntryType type) {
+            Objects.requireNonNull(type);
+            bibEntry = new BibEntry(type);
+        }
+
+        public Builder citeKey(String citeKey) {
+            bibEntry.setCiteKey(citeKey);
+            return this;
+        }
+
+        public Builder field(Field field, String value) {
+            bibEntry.setField(field, value);
+            return this;
+        }
+
+        public BibEntry build() {
+            return bibEntry;
+        }
+
+    }
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
@@ -266,8 +297,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField.KEY_FIELD}.
+     *
+     * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
      */
@@ -521,13 +553,6 @@ public class BibEntry implements Cloneable {
             eventBus.post(new FieldChangedEvent(change, eventSource));
         }
         return Optional.of(change);
-    }
-
-    public Optional<FieldChange> setField(Field field, Optional<String> value, EntryEventSource eventSource) {
-        if (value.isPresent()) {
-            return setField(field, value.get(), eventSource);
-        }
-        return Optional.empty();
     }
 
     /**
