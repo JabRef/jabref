@@ -50,4 +50,3 @@ parts:
       snapcraftctl build
       snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/org.jabref.jabref.json
-      chmod +x $SNAPCRAFT_PART_INSTALL/lib/jabrefHost.py
