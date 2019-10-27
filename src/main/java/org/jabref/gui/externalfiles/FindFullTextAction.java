@@ -57,15 +57,14 @@ public class FindFullTextAction extends SimpleCommand {
 
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Look up full text documents"),
-                    Localization.lang(
-                            "You are about to look up full text documents for %0 entries.",
-                            String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel"));
+                                                                                  Localization.lang("Look up full text documents"),
+                                                                                  Localization.lang("You are about to look up full text documents for %0 entries.",
+                                                                                                    String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                                                                                                                                    + Localization.lang("JabRef will send at least one request per entry to a publisher.")
+                                                                                                                                    + "\n"
+                                                                                                                                    + Localization.lang("Do you still want to continue?"),
+                                                                                  Localization.lang("Look up full text documents"),
+                                                                                  Localization.lang("Cancel"));
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
@@ -73,40 +72,43 @@ public class FindFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<Map<BibEntry, Optional<URL>>>() {
+        lookupFullText();
+    }
+
+    private void lookupFullText() {
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+
+        Task<List<BibEntry>> linkFilesTask = new Task<List<BibEntry>>() {
 
             @Override
-            protected Map<BibEntry, Optional<URL>> call() {
-                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
-                int count = 0;
-                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-                List<BibEntry> changed = util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
+            protected List<BibEntry> call() {
+                return util.linkAssociatedFiles(basePanel.getSelectedEntries(), new NamedCompound(""));
+            }
 
-                for (BibEntry entry : changed) {
+            @Override
+            protected void succeeded() {
+                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
+
+                for (BibEntry entry : getValue()) {
                     if (entry.getFiles().isEmpty()) {
                         downloads.put(entry, fetchers.findFullTextPDF(entry));
                     } else {
-                        //we need to add the entry with an empty url. The real download only happens later if the url is not empty.
-                        //empty url and file field indicates that we already have the file
-                        downloads.put(entry, Optional.empty());
+                        dialogService.notify(Localization.lang("Full text document found already on disk for entry %0. Not downloaded again.",
+                                                               entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                     }
-                    updateProgress(++count, basePanel.getSelectedEntries().size());
                 }
-                return downloads;
+                downloadMissingFullTexts(downloads);
             }
         };
 
-        findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
+        dialogService.showProgressDialogAndWait(Localization.lang("Look up full text documents"),
+                                                Localization.lang("Looking for full text document..."),
+                                                linkFilesTask);
+        Globals.TASK_EXECUTOR.execute(linkFilesTask);
 
-        dialogService.showProgressDialogAndWait(
-                Localization.lang("Look up full text documents"),
-                Localization.lang("Looking for full text document..."),
-                findFullTextsTask);
-
-        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
     }
 
-    private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads) {
+    private void downloadMissingFullTexts(Map<BibEntry, Optional<URL>> downloads) {
         for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
             BibEntry entry = download.getKey();
             Optional<URL> result = download.getValue();
@@ -116,19 +118,17 @@ public class FindFullTextAction extends SimpleCommand {
                 if (!dir.isPresent()) {
 
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"));
+                                                         Localization.lang("Main file directory not set!") + " "
+                                                           + Localization.lang("Preferences")
+                                                           + " -> " + Localization.lang("File"));
                     return;
                 }
                 //Download and link full text
                 addLinkedFileFromURL(result.get(), entry, dir.get());
 
-            } else if (!result.isPresent() && !entry.getFiles().isEmpty()) {
-                dialogService.notify(Localization.lang("Full text document found already on disk for entry %0. Not downloaded again.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                       entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
         }
     }
@@ -147,25 +147,25 @@ public class FindFullTextAction extends SimpleCommand {
         if (!entry.getFiles().contains(newLinkedFile)) {
 
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                    newLinkedFile,
-                    entry,
-                    basePanel.getBibDatabaseContext(),
-                    Globals.TASK_EXECUTOR,
-                    dialogService,
-                    JabRefPreferences.getInstance().getXMPPreferences(),
-                    JabRefPreferences.getInstance().getFilePreferences(),
-                    ExternalFileTypes.getInstance());
+                                                                     newLinkedFile,
+                                                                     entry,
+                                                                     basePanel.getBibDatabaseContext(),
+                                                                     Globals.TASK_EXECUTOR,
+                                                                     dialogService,
+                                                                     JabRefPreferences.getInstance().getXMPPreferences(),
+                                                                     JabRefPreferences.getInstance().getFilePreferences(),
+                                                                     ExternalFileTypes.getInstance());
 
             try {
                 URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
                 BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
-                            destination,
-                            basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
+                                                                                    destination,
+                                                                                    basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(JabRefPreferences.getInstance().getFilePreferences()), ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                           entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 });
                 Globals.TASK_EXECUTOR.execute(downloadTask);
             } catch (MalformedURLException exception) {
@@ -173,7 +173,7 @@ public class FindFullTextAction extends SimpleCommand {
             }
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
-                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                                                   entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
         }
     }
 }
