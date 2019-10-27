@@ -1722,10 +1722,9 @@ class BibtexParserTest {
                         "@String { et = \" and \" }" +
                         "@Misc{m1, author = kopp # et # kubovy }" );
 
-        BibEntry expectedEntry = new BibEntry.Builder(StandardEntryType.Misc)
-                .citeKey("m1")
-                .field(StandardField.AUTHOR, "#kopp##et##kubovy#")
-                .build();
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+                .withCiteKey("m1")
+                .withField(StandardField.AUTHOR, "#kopp##et##kubovy#");
 
         assertEquals(List.of(expectedEntry), parsed);
     }
@@ -1739,10 +1738,9 @@ class BibtexParserTest {
                         "@String { et = \" and \" }" +
                         "@Misc{m2, author = kopp # \" and \" # kubovy }" );
 
-        BibEntry expectedEntry = new BibEntry.Builder(StandardEntryType.Misc)
-                .citeKey("m2")
-                .field(StandardField.AUTHOR, "#kopp# and #kubovy#")
-                .build();
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+                .withCiteKey("m2")
+                .withField(StandardField.AUTHOR, "#kopp# and #kubovy#");
 
         assertEquals(List.of(expectedEntry), parsed);
     }

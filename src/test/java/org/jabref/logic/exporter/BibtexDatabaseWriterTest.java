@@ -289,38 +289,6 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntryWithConstantMonthApril() throws Exception {
-        BibEntry entry = new BibEntry.Builder(StandardEntryType.Misc)
-                .field(StandardField.MONTH, "#apr#")
-                .build();
-        database.insertEntry(entry);
-
-        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
-
-        assertEquals(OS.NEWLINE +
-                "@Misc{," + OS.NEWLINE +
-                "  month = apr," + OS.NEWLINE +
-                "}" + OS.NEWLINE + OS.NEWLINE +
-                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
-    }
-
-    @Test
-    void writeEntryWithMonthApril() throws Exception {
-        BibEntry entry = new BibEntry.Builder(StandardEntryType.Misc)
-                .field(StandardField.MONTH, "apr")
-                .build();
-        database.insertEntry(entry);
-
-        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
-
-        assertEquals(OS.NEWLINE +
-                "@Misc{," + OS.NEWLINE +
-                "  month = {apr}," + OS.NEWLINE +
-                "}" + OS.NEWLINE + OS.NEWLINE +
-                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
-    }
-
-    @Test
     void roundtripWithArticleMonths() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;

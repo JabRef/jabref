@@ -427,6 +427,36 @@ class BibEntryWriterTest {
     }
 
     @Test
+    void constantMonthApril() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.MONTH, "#apr#");
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                "@Misc{," + OS.NEWLINE +
+                "  month = apr," + OS.NEWLINE +
+                "}" + OS.NEWLINE + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void monthApril() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.MONTH, "apr");
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                "@Misc{," + OS.NEWLINE +
+                "  month = {apr}," + OS.NEWLINE +
+                "}" + OS.NEWLINE + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
     void addFieldWithLongerLength() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +

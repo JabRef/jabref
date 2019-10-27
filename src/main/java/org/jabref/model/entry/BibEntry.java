@@ -42,6 +42,11 @@ import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents a BibTex / BibLaTeX entry.
+ *
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCiteKey(String)} and {@link #withField(Field, String)}.
+ */
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
@@ -72,41 +77,10 @@ public class BibEntry implements Cloneable {
     private boolean changed;
 
     /**
-     * A simple builder to enable quick creation of BibEntry instances.
-     *
-     * Builder pattern as described in Item 2 of the book "Effective Java".
-     */
-    public static class Builder {
-
-        private BibEntry bibEntry;
-
-        public Builder(EntryType type) {
-            Objects.requireNonNull(type);
-            bibEntry = new BibEntry(type);
-        }
-
-        public Builder citeKey(String citeKey) {
-            bibEntry.setCiteKey(citeKey);
-            return this;
-        }
-
-        public Builder field(Field field, String value) {
-            bibEntry.setField(field, value);
-            return this;
-        }
-
-        public BibEntry build() {
-            return bibEntry;
-        }
-
-    }
-
-    /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
     public BibEntry() {
         this(IdGenerator.next(), DEFAULT_TYPE);
-
     }
 
     /**
