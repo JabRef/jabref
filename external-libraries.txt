@@ -1,7 +1,7 @@
 This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
-One can list all depdencies by using Gradle task `depdencyReport`.
+One can list all dependencies by using Gradle task `dependencyReport`.
 It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
 
 # Legend
@@ -16,7 +16,7 @@ Note that the SPDX license identifiers are different from the ones used by debia
 
 # Fonts and Icons
 
-The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
+The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under license CC0 1.0.
 
 Id:      material-design-icons.font
 Project: Material Design Icons
