@@ -5,7 +5,7 @@
         <field id="tpd4" name="Begin date" width="123" order="1"/>
         <field id="tpd5" name="End date" width="123" order="2"/>
         <option id="color.recent">
-            <![CDATA[#ff6666]]>
+            <![CDATA[#ff6666 #000000]]>
         </option>
     </view>
     <view id="resource-table">
@@ -36,49 +36,57 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="milestone1" color="#8cb6ce" meeting="true" start="2019-10-29" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" priority="2" expand="true"/>
-        <task id="29" name="Scope statement" color="#8cb6ce" meeting="false" start="2019-10-23" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
-            <depend id="0" type="2" difference="0" hardness="Strong"/>
+        <task id="84" name="Milestone1" color="#000000" meeting="false" start="2019-10-23" duration="9" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
+            <task id="26" name="UseCases" color="#8cb6ce" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="4" expand="true">
+                <depend id="0" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="29" name="Scope statement" color="#8cb6ce" meeting="false" start="2019-10-23" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                <depend id="0" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="23" name="Project plan with Gantt" color="#8cb6ce" meeting="false" start="2019-10-23" duration="3" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="2" expand="true">
+                <depend id="0" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="0" name="milestone1" color="#ff6666" meeting="true" start="2019-10-29" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" priority="2" expand="true"/>
+            <task id="73" name="Milestone 1 conference" color="#8cb6ce" meeting="true" start="2019-10-30" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="69" name="Final version milestone 1" color="#8cb6ce" meeting="true" start="2019-11-05" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="26" name="UseCases" color="#ff6666" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="4" expand="true">
-            <depend id="0" type="2" difference="0" hardness="Strong"/>
+        <task id="90" name="Milestone2" color="#000000" meeting="false" start="2019-10-28" duration="16" complete="0" thirdDate="2019-10-28" thirdDate-constraint="0" expand="false">
+            <task id="4" name="Design" color="#8cb6ce" meeting="false" start="2019-10-28" duration="11" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" priority="2" expand="true">
+                <depend id="45" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="91" name="Write Unit-Tests" color="#8cb6ce" meeting="false" start="2019-10-28" duration="11" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="51" name="Prototype" color="#8cb6ce" meeting="false" start="2019-11-05" duration="5" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="2" expand="true">
+                <depend id="45" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="63" name="UI implementation" color="#8cb6ce" meeting="false" start="2019-11-05" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="65" name="Parser skeleton" color="#8cb6ce" meeting="false" start="2019-11-05" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="83" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-11" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="45" name="milestone2" color="#ff6666" meeting="true" start="2019-11-12" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="74" name="Milestone 2 conference" color="#8cb6ce" meeting="true" start="2019-11-13" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="70" name="Final version milestone 2" color="#8cb6ce" meeting="true" start="2019-11-19" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="23" name="Project plan with Gantt" color="#8cb6ce" meeting="false" start="2019-10-23" duration="3" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="2" expand="true">
-            <depend id="0" type="2" difference="0" hardness="Strong"/>
+        <task id="97" name="Milestone3" color="#000000" meeting="false" start="2019-11-08" duration="17" complete="0" thirdDate="2019-11-08" thirdDate-constraint="0" expand="false">
+            <task id="62" name="Implementing Parser" color="#8cb6ce" meeting="false" start="2019-11-08" duration="7" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="8" name="Testplan" color="#8cb6ce" meeting="false" start="2019-11-11" duration="10" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                <depend id="55" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="81" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-22" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="55" name="milestone3" color="#ff6666" meeting="true" start="2019-11-25" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
+            <task id="75" name="Milestone 3 conference" color="#8cb6ce" meeting="true" start="2019-11-27" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="71" name="Final version milestone 3" color="#8cb6ce" meeting="true" start="2019-12-03" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="73" name="Milestone 1 conference" color="#8cb6ce" meeting="true" start="2019-10-30" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="69" name="Final version milestone 1" color="#8cb6ce" meeting="true" start="2019-11-05" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="45" name="milestone2" color="#8cb6ce" meeting="true" start="2019-11-12" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
-        <task id="4" name="Design" color="#8cb6ce" meeting="false" start="2019-10-28" duration="7" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" priority="2" expand="true">
-            <depend id="45" type="2" difference="0" hardness="Strong"/>
+        <task id="100" name="Milestone4" color="#000000" meeting="false" start="2019-11-27" duration="16" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
+            <task id="10" name="Presentation" color="#8cb6ce" meeting="false" start="2019-11-27" duration="11" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <depend id="58" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="68" name="Testing" color="#8cb6ce" meeting="false" start="2019-12-03" duration="12" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="60" name="Finish Project" color="#8cb6ce" meeting="false" start="2019-12-03" duration="12" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                <depend id="58" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="76" name="Milestone 4 conference" color="#8cb6ce" meeting="true" start="2019-12-11" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="72" name="Final version milestone 4" color="#8cb6ce" meeting="true" start="2019-12-18" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="58" name="milestone4" color="#ff6666" meeting="true" start="2019-12-19" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="61" name="Write Unit-Tests" color="#8cb6ce" meeting="false" start="2019-10-28" duration="11" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="51" name="Prototype" color="#8cb6ce" meeting="false" start="2019-11-05" duration="5" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="2" expand="true">
-            <depend id="45" type="2" difference="0" hardness="Strong"/>
-        </task>
-        <task id="63" name="UI implementation" color="#8cb6ce" meeting="false" start="2019-11-05" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="65" name="Parser skeleton" color="#8cb6ce" meeting="false" start="2019-11-05" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="83" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-11" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="74" name="Milestone 2 conference" color="#8cb6ce" meeting="true" start="2019-11-13" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="70" name="Final version milestone 2" color="#8cb6ce" meeting="true" start="2019-11-19" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="55" name="milestone3" color="#8cb6ce" meeting="true" start="2019-11-25" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
-        <task id="62" name="Implementing Parser" color="#8cb6ce" meeting="false" start="2019-11-08" duration="7" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="8" name="Testplan" color="#8cb6ce" meeting="false" start="2019-11-11" duration="10" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
-            <depend id="55" type="2" difference="0" hardness="Strong"/>
-        </task>
-        <task id="81" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-22" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="75" name="Milestone 3 conference" color="#8cb6ce" meeting="true" start="2019-11-27" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="71" name="Final version milestone 3" color="#8cb6ce" meeting="true" start="2019-12-03" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="58" name="milestone4" color="#8cb6ce" meeting="true" start="2019-12-19" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
-        <task id="10" name="Presentation" color="#8cb6ce" meeting="false" start="2019-11-27" duration="11" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
-            <depend id="58" type="2" difference="0" hardness="Strong"/>
-        </task>
-        <task id="68" name="Testing" color="#8cb6ce" meeting="false" start="2019-12-03" duration="12" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="60" name="Finish Project" color="#8cb6ce" meeting="false" start="2019-12-03" duration="12" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
-            <depend id="58" type="2" difference="0" hardness="Strong"/>
-        </task>
-        <task id="76" name="Milestone 4 conference" color="#8cb6ce" meeting="true" start="2019-12-11" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-        <task id="72" name="Final version milestone 4" color="#8cb6ce" meeting="true" start="2019-12-18" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         <task id="77" name="Documentation" color="#8cb6ce" meeting="false" start="2019-10-23" duration="41" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         <task id="78" name="Updating Gantt file" color="#8cb6ce" meeting="false" start="2019-10-23" duration="41" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
         <task id="67" name="Quality control" color="#8cb6ce" meeting="false" start="2019-10-23" duration="41" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
