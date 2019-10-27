@@ -116,7 +116,7 @@ public class BibDatabaseContext {
 
     /**
      *
-     * @param Set the database file
+     * @param file the database file
      * @deprecated use {@link #setDatabaseFile(Path)}
      */
     @Deprecated

@@ -2,10 +2,6 @@
     -fx-fill: darkgreen;
 }
 
-.text-unchanged {
-
-}
-
 .text-added {
     -fx-fill: blue;
 }
@@ -13,3 +9,4 @@
 .text-removed {
     -fx-fill: red;
 }
+

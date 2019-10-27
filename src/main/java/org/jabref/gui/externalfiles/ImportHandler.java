@@ -87,6 +87,8 @@ public class ImportHandler {
                         entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                     }
                 }
+            } else if (FileUtil.isBibFile(file)) {
+                entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
             } else {
                 entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
             }
@@ -103,11 +105,6 @@ public class ImportHandler {
         entry.setField(StandardField.TITLE, file.getFileName().toString());
         linker.addFilesToEntry(entry, Collections.singletonList(file));
         return entry;
-    }
-
-    public void importEntriesFromBibFiles(Path bibFile) {
-        List<BibEntry> entriesToImport = contentImporter.importFromBibFile(bibFile, fileUpdateMonitor);
-        importEntries(entriesToImport);
     }
 
     public void importEntries(List<BibEntry> entries) {

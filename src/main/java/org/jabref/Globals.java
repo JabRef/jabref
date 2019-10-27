@@ -40,7 +40,7 @@ public class Globals {
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
     public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
-    // In the main program, this field is initialized in JabRef.java
+    // In the main program, this field is initialized in JabRefMain.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
     /**
@@ -56,13 +56,11 @@ public class Globals {
     /**
      * Manager for the state of the GUI.
      */
-
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
-
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+    public static ClipBoardManager clipboardManager = new ClipBoardManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;

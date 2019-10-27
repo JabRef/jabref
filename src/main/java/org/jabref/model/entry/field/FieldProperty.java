@@ -13,7 +13,6 @@ public enum FieldProperty {
     JOURNAL_NAME,
     LANGUAGE,
     MONTH,
-    MULTILINE_TEXT,
     MULTIPLE_ENTRY_LINK,
     NUMERIC,
     PAGES,

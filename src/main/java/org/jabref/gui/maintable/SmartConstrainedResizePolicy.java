@@ -42,6 +42,10 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                 for (TableColumnBase col : visibleLeafColumns) {
                     double share = col.getPrefWidth() / totalPrefWidth;
                     double newSize = tableWidth * share;
+
+                    // Just to make sure that we are staying under the total table width (due to rounding errors)
+                    newSize -= 2;
+
                     resize(col, newSize - col.getWidth());
                 }
             }
@@ -53,6 +57,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     private void resize(TableColumnBase column, double delta) {
         // We have to use reflection since TableUtil is not visible to us
         try {
+            // TODO: reflective access, should be removed
             Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
             Method constrainedResize = clazz.getDeclaredMethod("resize", TableColumnBase.class, double.class);
             constrainedResize.setAccessible(true);
@@ -67,13 +72,14 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
         return constrainedResize(prop,
                 false,
-                getContentWidth(table),
+                getContentWidth(table) - 2,
                 visibleLeafColumns);
     }
 
     private Boolean constrainedResize(TableView.ResizeFeatures prop, Boolean isFirstRun, Double contentWidth, List<? extends TableColumnBase<?, ?>> visibleLeafColumns) {
         // We have to use reflection since TableUtil is not visible to us
         try {
+            // TODO: reflective access, should be removed
             Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
             Method constrainedResize = clazz.getDeclaredMethod("constrainedResize", ResizeFeaturesBase.class, Boolean.TYPE, Double.TYPE, List.class);
             constrainedResize.setAccessible(true);
@@ -87,6 +93,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private Double getContentWidth(TableView<?> table) {
         try {
+            // TODO: reflective access, should be removed
             Field privateStringField = TableView.class.getDeclaredField("contentWidth");
             privateStringField.setAccessible(true);
             return (Double) privateStringField.get(table);

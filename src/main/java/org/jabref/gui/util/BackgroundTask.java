@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -147,6 +148,10 @@ public abstract class BackgroundTask<V> {
 
     public Future<?> executeWith(TaskExecutor taskExecutor) {
         return taskExecutor.execute(this);
+    }
+
+    public Future<?> scheduleWith(TaskExecutor taskExecutor, long delay, TimeUnit unit) {
+        return taskExecutor.schedule(this, delay, unit);
     }
 
     /**

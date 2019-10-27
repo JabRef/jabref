@@ -90,14 +90,12 @@ public class FieldEditors {
             return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isSingleLine);
         } else if (StandardField.KEYWORDS.equals(field)) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
-        } else if (fieldProperties.contains(FieldProperty.MULTILINE_TEXT)) {
-            return new MultilineEditor(field, suggestionProvider, fieldCheckers, preferences);
         } else if (field == InternalField.KEY_FIELD) {
             return new BibtexKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+        } else {
+            // default
+            return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isSingleLine);
         }
-
-        // default
-        return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isSingleLine);
     }
 
     @SuppressWarnings("unchecked")

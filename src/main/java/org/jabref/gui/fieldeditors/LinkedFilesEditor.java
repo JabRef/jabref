@@ -30,9 +30,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,8 +44,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
@@ -52,6 +52,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
+    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
     public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
@@ -75,7 +76,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         listView.setCellFactory(cellFactory);
 
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
+        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
         setUpKeyBindings();
     }
 
@@ -142,13 +144,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(icon, link, desc, progressIndicator);
 
-        Button acceptAutoLinkedFile = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.BRIEFCASE_CHECK);
+        Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeXMPMetadata = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.IMPORT);
+        Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();
         writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP-metadata to PDF.")));
         writeXMPMetadata.visibleProperty().bind(linkedFile.canWriteXMPMetadataProperty());
         writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());

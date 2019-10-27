@@ -20,6 +20,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -42,6 +43,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
+    @Inject private FileUpdateMonitor fileMonitor;
     private ParseTexDialogViewModel viewModel;
 
     public ParseTexDialogView(BibDatabaseContext databaseContext) {
@@ -60,7 +62,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseTexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService);
+        viewModel = new ParseTexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService, fileMonitor);
 
         fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());

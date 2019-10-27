@@ -1,8 +1,6 @@
 package org.jabref.logic.net;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
+/*
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,3 +106,4 @@ class MimeTypeDetectorTest {
         assertTrue(new URLDownload(mimeTypeVariation).isMimeType("application/pdf"));
     }
 }
+*/

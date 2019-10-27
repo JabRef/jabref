@@ -17,7 +17,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -28,6 +27,7 @@ import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import org.slf4j.Logger;
@@ -40,19 +40,21 @@ public class PreviewPanel extends VBox {
     private final ExternalFilesEntryLinker fileLinker;
     private final KeyBindingRepository keyBindingRepository;
     private final PreviewViewer previewView;
+    private final JabRefPreferences preferences;
     private BibEntry entry;
-    private BasePanel basePanel;
     private DialogService dialogService;
 
-    public PreviewPanel(BibDatabaseContext database, BasePanel basePanel, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
-        this.basePanel = basePanel;
+    public PreviewPanel(BibDatabaseContext database, DialogService dialogService, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository, JabRefPreferences preferences) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFilePreferences(), database);
+        this.preferences = preferences;
+        fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
-        previewView.setLayout(preferences.getCurrentPreviewStyle());
+        previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
+        previewView.setTheme(this.preferences.get(JabRefPreferences.FX_THEME));
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
@@ -97,11 +99,7 @@ public class PreviewPanel extends VBox {
         this.getChildren().add(previewView);
 
         createKeyBindings();
-        updateLayout(preferences, true);
-    }
-
-    public void close() {
-        basePanel.closeBottomPane();
+        updateLayout(previewPreferences, true);
     }
 
     public void updateLayout(PreviewPreferences previewPreferences) {
@@ -111,6 +109,7 @@ public class PreviewPanel extends VBox {
     private void updateLayout(PreviewPreferences previewPreferences, boolean init) {
         PreviewLayout currentPreviewStyle = previewPreferences.getCurrentPreviewStyle();
         previewView.setLayout(currentPreviewStyle);
+        preferences.storePreviewPreferences(previewPreferences);
         if (!init) {
             dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getName()));
         }
@@ -125,10 +124,6 @@ public class PreviewPanel extends VBox {
                         previewView.copyPreviewToClipBoard();
                         event.consume();
                         break;
-                    case CLOSE:
-                        close();
-                        event.consume();
-                        break;
                     default:
                 }
             }
@@ -141,21 +136,19 @@ public class PreviewPanel extends VBox {
         copyPreview.setOnAction(event -> previewView.copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> previewView.print());
-        /* Deleted since it does not work anymore. Needs refactoring.
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
-        previousPreviewLayout.setOnAction(event -> basePanel.previousPreviewStyle());
+        previousPreviewLayout.setOnAction(event -> this.previousPreviewStyle());
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
-        nextPreviewLayout.setOnAction(event -> basePanel.nextPreviewStyle());
-        */
+        nextPreviewLayout.setOnAction(event -> this.nextPreviewStyle());
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyPreview);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
-        // menu.getItems().add(nextPreviewLayout);
-        // menu.getItems().add(previousPreviewLayout);
+        menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
         return menu;
     }
 
@@ -166,5 +159,21 @@ public class PreviewPanel extends VBox {
 
     public void print() {
         previewView.print();
+    }
+
+    public void nextPreviewStyle() {
+        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() + 1);
+    }
+
+    public void previousPreviewStyle() {
+        cyclePreview(preferences.getPreviewPreferences().getPreviewCyclePosition() - 1);
+    }
+
+    private void cyclePreview(int newPosition) {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        updateLayout(previewPreferences);
     }
 }

@@ -18,7 +18,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
-import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
@@ -28,10 +27,6 @@ import org.slf4j.LoggerFactory;
 
 public class IconTheme {
 
-    /**
-     * JabRef's default color
-     */
-    public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
     public static final javafx.scene.paint.Color SELECTED_COLOR = javafx.scene.paint.Color.web("#50618F");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
@@ -61,8 +56,8 @@ public class IconTheme {
         return IconTheme.class.getResource("/fonts/JabRefMaterialDesign.ttf").openStream();
     }
 
-    public static Color getDefaultColor() {
-        return DEFAULT_COLOR;
+    public static Color getDefaultGroupColor() {
+        return Color.web("#8a8a8a");
     }
 
     public static Image getJabRefImageFX() {
@@ -209,6 +204,7 @@ public class IconTheme {
         EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT) /*css: clipboard-arrow-left */,
         ATTACH_FILE(MaterialDesignIcon.PAPERCLIP) /*css: paperclip*/,
         AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND) /*css: file-find */,
+        AUTO_LINKED_FILE(MaterialDesignIcon.BRIEFCASE_CHECK) /*css: briefcase-check */,
         QUALITY_ASSURED(MaterialDesignIcon.CERTIFICATE), /*css: certificate */
         QUALITY(MaterialDesignIcon.CERTIFICATE), /*css: certificate */
         OPEN(MaterialDesignIcon.FOLDER_OUTLINE) /*css: folder */,
@@ -251,6 +247,7 @@ public class IconTheme {
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         CONNECT_DB(MaterialDesignIcon.CLOUD_UPLOAD), /*cloud-upload*/
         SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
+        CHECK(MaterialDesignIcon.CHECK) /*css: check */,
         WARNING(MaterialDesignIcon.ALERT),
         ERROR(MaterialDesignIcon.ALERT_CIRCLE),
         CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
@@ -263,13 +260,17 @@ public class IconTheme {
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
         DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
-        ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
+        ALL_ENTRIES_GROUP_ICON(MaterialDesignIcon.DATABASE),
         IMPORT(MaterialDesignIcon.CALL_RECEIVED),
         EXPORT(MaterialDesignIcon.CALL_MADE),
         PREVIOUS_LEFT(MaterialDesignIcon.CHEVRON_LEFT),
         PREVIOUS_UP(MaterialDesignIcon.CHEVRON_UP),
         NEXT_RIGHT(MaterialDesignIcon.CHEVRON_RIGHT),
         NEXT_DOWN(MaterialDesignIcon.CHEVRON_DOWN),
+        LIST_MOVE_LEFT(MaterialDesignIcon.CHEVRON_LEFT),
+        LIST_MOVE_UP(MaterialDesignIcon.CHEVRON_UP),
+        LIST_MOVE_RIGHT(MaterialDesignIcon.CHEVRON_RIGHT),
+        LIST_MOVE_DOWN(MaterialDesignIcon.CHEVRON_DOWN),
         FIT_WIDTH(MaterialDesignIcon.ARROW_EXPAND_ALL),
         FIT_SINGLE_PAGE(MaterialDesignIcon.NOTE),
         ZOOM_OUT(MaterialDesignIcon.MAGNIFY_MINUS),

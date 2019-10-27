@@ -1,4 +1,4 @@
-# JabRef Bibliography Management
+# JabRef Bibliography Management [![Hacktoberfest](https://img.shields.io/github/hacktoberfest/2019/JabRef/jabref?suggestion_label=hacktoberfest)](https://www.jabref.org/hacktoberfest/2019.html)
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
@@ -34,7 +34,7 @@ JabRef supports you in every step of your research work.
 	
 #### Organize
 
-- Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your own manual assignments
+- Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
 - Advanced search and filter features
 - Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathSciNet
 - Customizable citation key generator
@@ -48,12 +48,12 @@ JabRef supports you in every step of your research work.
 
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references in one of the many thousand built-in citation styles or create your own style
+- Format references in one of the many thousand built-in citation styles or create your style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 	
 #### Share
 
-- Many built-in export options or create your own export format
+- Many built-in export options or create your export format
 - Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
 - Work in a team: sync the contents of your library via a SQL database
 
@@ -62,7 +62,7 @@ JabRef supports you in every step of your research work.
 Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
 The [latest stable release is available at FossHub](https://www.fosshub.com/JabRef.html).
 
-JabRef runs on any system equipped with the Java Virtual Machine (1.8), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html). Note that Java 9 is currently not supported.
+JabRef runs on any system equipped with the Java Virtual Machine (Java 11 or higher), which can be downloaded at no cost from [AdoptOpenDJK](https://adoptopenjdk.net/).
 From JabRef 4.0 onwards, [JavaFX] support has to be installed.
  - Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://help.jabref.org/en/FAQwindows)
  - Linux: Please see our [Installation Guide](http://help.jabref.org/en/Installation).
@@ -91,7 +91,7 @@ An explanation of donation possibilities and usage of donations is available at 
 
 > Not a programmer? [Learn how to help.](http://contribute.jabref.org)
 
-Want to be part of a free and open-source project that tens of thousands scientist use every day? Check out the ways you can contribute, below:
+Want to be part of a free and open-source project that tens of thousands of scientists use every day? Check out the ways you can contribute, below:
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
 - You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.

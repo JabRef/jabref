@@ -3,30 +3,27 @@ package org.jabref.gui.logging;
 import org.jabref.Globals;
 import org.jabref.logic.logging.LogMessages;
 
-import com.microsoft.applicationinsights.log4j.v2.internal.ApplicationInsightsLogEvent;
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.config.plugins.Plugin;
-import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
-import org.apache.logging.log4j.core.config.plugins.PluginElement;
-import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.plugins.Plugin;
+import org.apache.logging.log4j.plugins.PluginFactory;
 
 @Plugin(name = "OurApplicationInsightsAppender", category = "Core", elementType = "appender", printObject = true)
 @SuppressWarnings("unused") // class is indirectly constructed by log4j
 public class ApplicationInsightsAppender extends AbstractAppender {
 
-    private ApplicationInsightsAppender(String name, Filter filter) {
-        super(name, filter, null);
+    private ApplicationInsightsAppender(String name, Filter filter, boolean ignoreExceptions, Property[] properties) {
+        super(name, filter, null, ignoreExceptions, properties);
     }
 
     @PluginFactory
-    public static ApplicationInsightsAppender createAppender(@PluginAttribute("name") String name,
-                                                             @PluginElement("Filters") Filter filter) {
-        return new ApplicationInsightsAppender(name, filter);
+    public static <B extends Builder<B>> B newBuilder() {
+        return new Builder<B>().asBuilder();
     }
 
     /**
@@ -51,4 +48,14 @@ public class ApplicationInsightsAppender extends AbstractAppender {
 
         Globals.getTelemetryClient().ifPresent(client -> client.track(telemetry));
     }
+
+    public static class Builder<B extends Builder<B>> extends AbstractAppender.Builder<B>
+            implements org.apache.logging.log4j.plugins.util.Builder<ApplicationInsightsAppender> {
+
+        @Override
+        public ApplicationInsightsAppender build() {
+            return new ApplicationInsightsAppender(this.getName(), this.getFilter(), this.isIgnoreExceptions(), this.getPropertyArray());
+        }
+    }
+
 }

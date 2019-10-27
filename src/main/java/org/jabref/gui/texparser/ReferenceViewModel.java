@@ -11,13 +11,19 @@ import org.jabref.model.texparser.Citation;
 public class ReferenceViewModel {
 
     private final String entry;
+    private final boolean highlighted;
     private final ObservableList<Citation> citationList;
 
-    public ReferenceViewModel(String entry, Collection<Citation> citationColl) {
+    public ReferenceViewModel(String entry, boolean highlighted, Collection<Citation> citationColl) {
         this.entry = entry;
+        this.highlighted = highlighted;
         this.citationList = FXCollections.observableArrayList();
 
         citationList.setAll(citationColl);
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
     }
 
     public ObservableList<Citation> getCitationList() {
@@ -33,8 +39,9 @@ public class ReferenceViewModel {
 
     @Override
     public String toString() {
-        return String.format("ReferenceViewModel{entry='%s', citationList=%s}",
+        return String.format("ReferenceViewModel{entry='%s', highlighted=%s, citationList=%s}",
                 this.entry,
+                this.highlighted,
                 this.citationList);
     }
 }

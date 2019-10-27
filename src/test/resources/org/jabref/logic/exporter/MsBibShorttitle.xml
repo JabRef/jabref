@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:SourceType>JournalArticle</b:SourceType>
-<b:ShortTitle>Title</b:ShortTitle>
-<b:Author/>
-<b:BIBTEX_Entry>article</b:BIBTEX_Entry>
-</b:Source>
+    <b:Source>
+        <b:ShortTitle>Title</b:ShortTitle>
+        <b:BIBTEX_Entry>article</b:BIBTEX_Entry>
+        <b:SourceType>JournalArticle</b:SourceType>
+        <b:Author/>
+    </b:Source>
 </b:Sources>

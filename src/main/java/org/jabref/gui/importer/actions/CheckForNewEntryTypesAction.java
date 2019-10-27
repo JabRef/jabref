@@ -27,7 +27,6 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
         ImportCustomEntryTypesDialog importBibEntryTypesDialog = new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult));
         importBibEntryTypesDialog.showAndWait();
-
     }
 
     private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
@@ -35,7 +34,7 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
         return parserResult.getEntryTypes()
                            .stream()
-                           .filter(type -> Globals.entryTypesManager.isCustomizedType(type, mode))
+                           .filter(type -> Globals.entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
                            .collect(Collectors.toList());
     }
 

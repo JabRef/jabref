@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Scanner;
 
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -260,9 +262,18 @@ class BibtexDatabaseWriterTest {
         EntryType customizedType = new UnknownEntryType("customizedType");
         BibEntryType customizedBibType = new BibEntryType(
                 customizedType,
-                Arrays.asList(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT), new BibField(StandardField.YEAR, FieldPriority.IMPORTANT)),
-                Collections.singleton(new OrFields(StandardField.TITLE)));
-        entryTypesManager.addCustomizedEntryType(customizedBibType, BibDatabaseMode.BIBTEX);
+                Arrays.asList(
+                        new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.DATE, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.YEAR, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.MONTH, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.PUBLISHER, FieldPriority.IMPORTANT)),
+                Arrays.asList(
+                        new OrFields(StandardField.TITLE),
+                        new OrFields(StandardField.AUTHOR),
+                        new OrFields(StandardField.DATE)));
+        entryTypesManager.addCustomOrModifiedType(customizedBibType, BibDatabaseMode.BIBTEX);
         BibEntry entry = new BibEntry(customizedType);
         database.insertEntry(entry);
 
@@ -273,7 +284,7 @@ class BibtexDatabaseWriterTest {
                         "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: customizedtype: req[title] opt[year]}" + OS.NEWLINE,
+                        + "@Comment{jabref-entrytype: customizedtype: req[author;date;title] opt[month;publisher;year]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -433,13 +444,23 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeSaveActions() throws Exception {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
+                Arrays.asList(
+                        new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
+                        new FieldFormatterCleanup(StandardField.JOURNAL, new TitleCaseFormatter()),
+                        new FieldFormatterCleanup(StandardField.DAY, new UpperCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
-        assertEquals(OS.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + OS.NEWLINE
-                + "title[lower_case]" + OS.NEWLINE + ";}" + OS.NEWLINE, stringWriter.toString());
+        assertEquals(
+                OS.NEWLINE +
+                        "@Comment{jabref-meta: saveActions:enabled;"
+                        + OS.NEWLINE
+                        + "day[upper_case]" + OS.NEWLINE
+                        + "journal[title_case]" + OS.NEWLINE
+                        + "title[lower_case]" + OS.NEWLINE
+                        + ";}"
+                        + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test

@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
@@ -95,7 +94,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.fxmisc.easybind.EasyBind;
@@ -121,12 +119,12 @@ public class BasePanel extends StackPane {
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, BaseAction> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-    private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
     private MainTable mainTable;
+    private BasePanelPreferences preferences;
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
@@ -144,10 +142,12 @@ public class BasePanel extends StackPane {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+    private JabRefExecutorService executorService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
+        this.executorService = JabRefExecutorService.INSTANCE;
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
@@ -177,6 +177,8 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+        // Open entry editor for first entry on start up.
+        Platform.runLater(() -> clearAndSelectFirst());
     }
 
     @Subscribe
@@ -240,7 +242,7 @@ public class BasePanel extends StackPane {
     }
 
     private void setupActions() {
-        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs);
+        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
         CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
 
         actions.put(Actions.UNDO, undoAction);
@@ -351,6 +353,13 @@ public class BasePanel extends StackPane {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
+
+        actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
+            entryEditor.nextPreviewStyle();
+        });
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
+            entryEditor.previousPreviewStyle();
+        });
 
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -727,22 +736,20 @@ public class BasePanel extends StackPane {
     }
 
     public void setupMainPanel() {
+        preferences = BasePanelPreferences.from(Globals.prefs);
+
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         createMainTable();
 
-        ScrollPane pane = mainTable.getPane();
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-        splitPane.getItems().add(pane);
+        splitPane.getItems().add(mainTable);
 
         // Set up name autocompleter for search:
-        instantiateSearchAutoCompleter();
-        this.getDatabase().registerListener(new SearchAutoCompleteListener());
-
         setupAutoCompletion();
+        executorService.execute(this::instantiateSearchAutoCompleter);
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
@@ -842,23 +849,6 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
-    }
-
-    public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                                                             .getBuilder()
-                                                             .withPreviewCyclePosition(newPosition)
-                                                             .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-        entryEditor.updatePreviewInTabs(previewPreferences);
-    }
-
     /**
      * Removes the bottom component.
      */
@@ -873,6 +863,14 @@ public class BasePanel extends StackPane {
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
+    }
+
+    /**
+     * Select and open entry editor for first entry in main table.
+     */
+    private void clearAndSelectFirst() {
+        mainTable.clearAndSelectFirst();
+        showAndEdit();
     }
 
     public void selectPreviousEntry() {
@@ -1049,11 +1047,9 @@ public class BasePanel extends StackPane {
 
     /**
      * Set the query the user currently searches while this basepanel is active
-     *
-     * @param currentSearchQuery can be null
      */
-    public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
-        this.currentSearchQuery = Optional.ofNullable(currentSearchQuery);
+    public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
+        this.currentSearchQuery = currentSearchQuery;
     }
 
     public CitationStyleCache getCitationStyleCache() {

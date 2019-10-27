@@ -1,11 +1,10 @@
 package org.jabref.model.texparser;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.common.collect.Multimap;
@@ -13,31 +12,30 @@ import com.google.common.collect.Multimap;
 public class TexBibEntriesResolverResult {
 
     private final TexParserResult texParserResult;
-    private final List<String> unresolvedKeys;
-    private final List<BibEntry> newEntries;
-    private int crossRefsCount;
+    private final Set<BibEntry> newEntries;
 
     public TexBibEntriesResolverResult(TexParserResult texParserResult) {
         this.texParserResult = texParserResult;
-        this.unresolvedKeys = new ArrayList<>();
-        this.newEntries = new ArrayList<>();
-        this.crossRefsCount = 0;
+        this.newEntries = new HashSet<>();
     }
 
     public TexParserResult getTexParserResult() {
         return texParserResult;
     }
 
-    public List<String> getUnresolvedKeys() {
-        return unresolvedKeys;
-    }
-
-    public List<BibEntry> getNewEntries() {
+    public Set<BibEntry> getNewEntries() {
         return newEntries;
     }
 
-    public int getCrossRefsCount() {
-        return crossRefsCount;
+    public void addEntry(BibEntry entry) {
+        newEntries.add(entry);
+    }
+
+    /**
+     * Return the BIB files multimap from the TexParserResult object.
+     */
+    public Multimap<Path, Path> getBibFiles() {
+        return texParserResult.getBibFiles();
     }
 
     /**
@@ -47,55 +45,11 @@ public class TexBibEntriesResolverResult {
         return texParserResult.getCitations();
     }
 
-    /**
-     * Return a set of strings with the keys of the citations multimap from the TexParserResult object.
-     */
-    public Set<String> getCitationsKeySet() {
-        return texParserResult.getCitationsKeySet();
-    }
-
-    /**
-     * Add an unresolved key to the list.
-     */
-    public void addUnresolvedKey(String key) {
-        unresolvedKeys.add(key);
-    }
-
-    /**
-     * Check if an entry with the given key is not present in the list of new entries.
-     */
-    public boolean isNotKeyIntoNewEntries(String key) {
-        return newEntries.stream().noneMatch(entry -> key.equals(entry.getCiteKeyOptional().orElse(null)));
-    }
-
-    /**
-     * Add 1 to the cross references counter.
-     */
-    public void increaseCrossRefsCount() {
-        crossRefsCount++;
-    }
-
-    /**
-     * Insert into the list of new entries an entry with the given key.
-     */
-    public void insertEntry(BibDatabase masterDatabase, String key) {
-        masterDatabase.getEntryByKey(key).ifPresent(this::insertEntry);
-    }
-
-    /**
-     * Insert into the list of new entries the given entry.
-     */
-    public void insertEntry(BibEntry entry) {
-        newEntries.add(entry);
-    }
-
     @Override
     public String toString() {
-        return String.format("TexBibEntriesResolverResult{texParserResult=%s, unresolvedKeys=%s, newEntries=%s, crossRefsCount=%s}",
+        return String.format("TexBibEntriesResolverResult{texParserResult=%s, newEntries=%s}",
                 this.texParserResult,
-                this.unresolvedKeys,
-                this.newEntries,
-                this.crossRefsCount);
+                this.newEntries);
     }
 
     @Override
@@ -111,13 +65,11 @@ public class TexBibEntriesResolverResult {
         TexBibEntriesResolverResult that = (TexBibEntriesResolverResult) obj;
 
         return Objects.equals(texParserResult, that.texParserResult)
-                && Objects.equals(unresolvedKeys, that.unresolvedKeys)
-                && Objects.equals(newEntries, that.newEntries)
-                && Objects.equals(crossRefsCount, that.crossRefsCount);
+                && Objects.equals(newEntries, that.newEntries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(texParserResult, unresolvedKeys, newEntries, crossRefsCount);
+        return Objects.hash(texParserResult, newEntries);
     }
 }

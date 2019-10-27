@@ -10,7 +10,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GroupsTabView extends AbstractPreferenceTabView implements PreferencesTab {
+public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox grayNonHits;
     @FXML private RadioButton groupViewModeIntersection;
@@ -31,14 +31,13 @@ public class GroupsTabView extends AbstractPreferenceTabView implements Preferen
     public String getTabName() { return Localization.lang("Groups"); }
 
     public void initialize() {
-        GroupsTabViewModel groupsTabViewModel = new GroupsTabViewModel(dialogService, preferences);
-        this.viewModel = groupsTabViewModel;
+        this.viewModel = new GroupsTabViewModel(dialogService, preferences);
 
-        grayNonHits.selectedProperty().bindBidirectional(groupsTabViewModel.grayNonHitsProperty());
-        groupViewModeIntersection.selectedProperty().bindBidirectional(groupsTabViewModel.groupViewModeIntersectionProperty());
-        groupViewModeUnion.selectedProperty().bindBidirectional(groupsTabViewModel.groupViewModeUnionProperty());
-        autoAssignGroup.selectedProperty().bindBidirectional(groupsTabViewModel.autoAssignGroupProperty());
-        defaultGroupingField.textProperty().bindBidirectional(groupsTabViewModel.defaultGroupingFieldProperty());
-        keywordSeparator.textProperty().bindBidirectional(groupsTabViewModel.keywordSeparatorProperty());
+        grayNonHits.selectedProperty().bindBidirectional(viewModel.grayNonHitsProperty());
+        groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
+        groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
+        autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
+        defaultGroupingField.textProperty().bindBidirectional(viewModel.defaultGroupingFieldProperty());
+        keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
     }
 }

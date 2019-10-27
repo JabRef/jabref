@@ -8,10 +8,10 @@ import com.tngtech.archunit.junit.ArchTest;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "org.jabref")
-public class MainArchitectureTestsWithArchUnit {
+class MainArchitectureTestsWithArchUnit {
 
     @ArchTest
-    public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
+    static void doNotUseApacheCommonsLang3(JavaClasses classes) {
         noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
                    .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
                    .check(classes);
@@ -41,7 +41,12 @@ public class MainArchitectureTestsWithArchUnit {
     public static void doNotUseGlazedLists(JavaClasses classes) {
         noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..").check(classes);
     }
-    
+
+    @ArchTest
+    public static void doNotUseGlyphsDirectly(JavaClasses classes) {
+        noClasses().that().resideOutsideOfPackage("org.jabref.gui.icon").should().accessClassesThat().resideInAnyPackage("de.jensd.fx.glyphs", "de.jensd.fx.glyphs.materialdesignicons").check(classes);
+    }
+
     //"Currently disabled as there is no alternative for the rest of classes who need awt"
     @ArchIgnore
     @ArchTest

@@ -9,6 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
@@ -62,11 +63,12 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         Optional<KeywordList> keywordList = entry.getLatexFreeField(field)
-                .map(fieldValue -> KeywordList.parse(fieldValue, keywordDelimiter));
+                                                 .map(fieldValue -> KeywordList.parse(fieldValue, keywordDelimiter));
         return OptionalUtil.toStream(keywordList)
-                .flatMap(KeywordList::stream)
-                .map(this::createGroup)
-                .collect(Collectors.toSet());
+                           .flatMap(KeywordList::stream)
+                           .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+                           .map(this::createGroup)
+                           .collect(Collectors.toSet());
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {
@@ -80,8 +82,8 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
                 true);
         GroupTreeNode root = new GroupTreeNode(rootGroup);
         keywordChain.getChild()
-                .map(this::createGroup)
-                .ifPresent(root::addChild);
+                    .map(this::createGroup)
+                    .ifPresent(root::addChild);
         return root;
     }
 }

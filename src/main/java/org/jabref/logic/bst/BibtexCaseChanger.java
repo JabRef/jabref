@@ -137,7 +137,7 @@ public final class BibtexCaseChanger {
      * special with |colon|s.
      *
      * @param c
-     * @param i the current position. It points to the opening brace
+     * @param start the current position. It points to the opening brace
      * @param format
      * @return
      */

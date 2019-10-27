@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,6 +27,7 @@ public class DefaultTexParser implements TexParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTexParser.class);
     private static final String TEX_EXT = ".tex";
+    private static final String BIB_EXT = ".bib";
 
     /**
      * It is allowed to add new cite commands for pattern matching. Some valid examples: "citep", "[cC]ite", and
@@ -42,6 +42,10 @@ public class DefaultTexParser implements TexParser {
     private static final Pattern CITE_PATTERN = Pattern.compile(
             String.format("\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?<%s>[^\\}]*)\\}(?:\\{[^\\}]*\\})?",
                     String.join("|", CITE_COMMANDS), CITE_GROUP));
+
+    private static final String BIBLIOGRAPHY_GROUP = "bib";
+    private static final Pattern BIBLIOGRAPHY_PATTERN = Pattern.compile(
+            String.format("\\\\(?:bibliography|addbibresource)\\{(?<%s>[^\\}]*)\\}", BIBLIOGRAPHY_GROUP));
 
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
@@ -89,6 +93,7 @@ public class DefaultTexParser implements TexParser {
                         continue;
                     }
                     matchCitation(file, lineNumberReader.getLineNumber(), line);
+                    matchBibFile(file, line);
                     matchNestedFile(file, texFiles, referencedFiles, line);
                 }
             } catch (ClosedChannelException e) {
@@ -118,8 +123,30 @@ public class DefaultTexParser implements TexParser {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            Arrays.stream(citeMatch.group(CITE_GROUP).split(","))
-                  .forEach(key -> texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line));
+            for (String key : citeMatch.group(CITE_GROUP).split(",")) {
+                texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+            }
+        }
+    }
+
+    /**
+     * Find BIB files along a specific line and store them.
+     */
+    private void matchBibFile(Path file, String line) {
+        Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
+
+        while (bibliographyMatch.find()) {
+            for (String bibString : bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(",")) {
+                bibString = bibString.trim();
+                Path bibFile = file.getParent().resolve(
+                        bibString.endsWith(BIB_EXT)
+                                ? bibString
+                                : String.format("%s%s", bibString, BIB_EXT));
+
+                if (bibFile.toFile().exists()) {
+                    texParserResult.addBibFile(file, bibFile);
+                }
+            }
         }
     }
 

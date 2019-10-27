@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JabRefCLITest {
 
     @Test
-    void parsingLongOptions() {
+    void parsingLongOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(new String[]{"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
@@ -20,7 +20,7 @@ class JabRefCLITest {
     }
 
     @Test
-    void parsingShortOptions() {
+    void parsingShortOptions() throws Exception {
         JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
@@ -30,7 +30,7 @@ class JabRefCLITest {
     }
 
     @Test
-    void preferencesExport() {
+    void preferencesExport() throws Exception {
         JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-x=some/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
@@ -39,7 +39,7 @@ class JabRefCLITest {
     }
 
     @Test
-    void recognizesImportBibtex() {
+    void recognizesImportBibtex() throws Exception {
         String bibtex = "@article{test, title=\"test title\"}";
         JabRefCLI cli = new JabRefCLI(new String[]{"-ib", bibtex});
         assertEquals(Collections.emptyList(), cli.getLeftOver());
@@ -48,7 +48,7 @@ class JabRefCLITest {
     }
 
     @Test
-    void recognizesImportBibtexLong() {
+    void recognizesImportBibtexLong() throws Exception {
         String bibtex = "@article{test, title=\"test title\"}";
         JabRefCLI cli = new JabRefCLI(new String[]{"-importBibtex", bibtex});
         assertEquals(Collections.emptyList(), cli.getLeftOver());

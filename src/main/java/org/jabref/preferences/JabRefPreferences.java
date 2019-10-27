@@ -51,7 +51,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
-import org.jabref.gui.preferences.ImportSettingsTab;
+import org.jabref.gui.preferences.ImportTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.ThemeLoader;
@@ -100,7 +100,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -128,7 +127,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
-    public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -207,7 +205,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
-    public static final String LIST_OF_FILE_COLUMNS = "listOfFileColumns";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
     public static final String ARXIV_COLUMN = "arxivColumn";
     public static final String FILE_COLUMN = "fileColumn";
@@ -218,7 +215,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
     public static final String INVALID_FIELD_BACKGROUND_COLOR = "invalidFieldBackgroundColor";
     public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
-    public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String FONT_SIZE = "fontSize";
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -340,17 +336,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String STYLES_POS_Y = "stylesPosY";
     public static final String STYLES_POS_X = "stylesPosX";
     // Special field preferences
-    public static final String SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
-    public static final String SHOWCOLUMN_READ = "showReadColumn";
-    public static final String SHOWCOLUMN_RANKING = "showRankingColumn";
-    public static final String SHOWCOLUMN_QUALITY = "showQualityColumn";
-    public static final String SHOWCOLUMN_PRIORITY = "showPriorityColumn";
-    public static final String SHOWCOLUMN_PRINTED = "showPrintedColumn";
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
-    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
+    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
     public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -376,7 +365,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
-    private static final String PREVIEW_ENABLED = "previewEnabled";
+    private static final String PREVIEW_AS_TAB = "previewAsTab";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -481,7 +470,6 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
-        defaults.put(FX_FONT_RENDERING_TWEAK, OS.LINUX); //we turn this on per default on Linux
         defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
@@ -609,7 +597,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
         // default icon colors
-        defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(URL_COLUMN, Boolean.TRUE);
@@ -618,7 +605,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ARXIV_COLUMN, Boolean.FALSE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        defaults.put(LIST_OF_FILE_COLUMNS, "");
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
@@ -651,12 +637,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(STYLES_SIZE_Y, 400);
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
-        defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RANKING, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
-        defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
         defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.TRUE);
         defaults.put(SERIALIZESPECIALFIELDS, Boolean.FALSE);
 
@@ -729,7 +709,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
 
         // use BibTeX key appended with filename as default pattern
-        defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         //Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
 
@@ -765,7 +745,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
-        defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
+        defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                      "<font face=\"sans-serif\">"
                                     + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
@@ -1555,7 +1535,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXMPPreferences() {
-        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
                                   getKeywordDelimiter());
     }
 
@@ -1615,18 +1595,17 @@ public class JabRefPreferences implements PreferencesService {
         }).collect(Collectors.toList()));
         putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
-        putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
+        putBoolean(PREVIEW_AS_TAB, previewPreferences.showPreviewAsExtraTab());
         return this;
     }
 
     @Override
     public PreviewPreferences getPreviewPreferences() {
-        int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
         double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
-        boolean enabled = getBoolean(PREVIEW_ENABLED);
+        boolean showAsTab = getBoolean(PREVIEW_AS_TAB);
 
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
@@ -1646,7 +1625,15 @@ public class JabRefPreferences implements PreferencesService {
                                            .filter(Objects::nonNull)
                                            .collect(Collectors.toList());
 
-        return new PreviewPreferences(layouts, cyclePos, panelHeight, enabled, style, styleDefault);
+        int cyclePos;
+        int storedCyclePos = getInt(CYCLE_PREVIEW_POS);
+        if (storedCyclePos < layouts.size()) {
+            cyclePos = storedCyclePos;
+        } else {
+            cyclePos = 0; // fallback if stored position is no longer valid
+        }
+
+        return new PreviewPreferences(layouts, cyclePos, panelHeight, style, styleDefault, showAsTab);
     }
 
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
@@ -1869,44 +1856,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
-    private List<String> createExtraFileColumns() {
-        if (getBoolean(EXTRA_FILE_COLUMNS)) {
-            return getStringList(LIST_OF_FILE_COLUMNS);
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    private List<SpecialField> createSpecialFieldColumns() {
-        if (getBoolean(SPECIALFIELDSENABLED)) {
-            List<SpecialField> fieldsToShow = new ArrayList<>();
-            if (getBoolean(SHOWCOLUMN_RANKING)) {
-                fieldsToShow.add(SpecialField.RANKING);
-            }
-            if (getBoolean(SHOWCOLUMN_RELEVANCE)) {
-                fieldsToShow.add(SpecialField.RELEVANCE);
-            }
-            if (getBoolean(SHOWCOLUMN_QUALITY)) {
-                fieldsToShow.add(SpecialField.QUALITY);
-            }
-
-            if (getBoolean(SHOWCOLUMN_PRIORITY)) {
-                fieldsToShow.add(SpecialField.PRIORITY);
-            }
-
-            if (getBoolean(SHOWCOLUMN_PRINTED)) {
-                fieldsToShow.add(SpecialField.PRINTED);
-            }
-
-            if (getBoolean(SHOWCOLUMN_READ)) {
-                fieldsToShow.add(SpecialField.READ_STATUS);
-            }
-            return fieldsToShow;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     private Map<String, Double> createColumnWidths() {
         List<String> columns = getStringList(COLUMN_NAMES);
         List<Double> widths = getStringList(COLUMN_WIDTHS)
@@ -1930,15 +1879,36 @@ public class JabRefPreferences implements PreferencesService {
 
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
-                                     getBoolean(FILE_COLUMN),
-                                     getBoolean(URL_COLUMN),
-                                     getBoolean(PREFER_URL_DOI),
-                                     getBoolean(ARXIV_COLUMN),
-                                     getStringList(COLUMN_NAMES),
-                                     createSpecialFieldColumns(),
-                                     createExtraFileColumns(),
-                                     createColumnWidths(),
-                                     getMainTableColumnSortTypes());
+                getBoolean(FILE_COLUMN),
+                getBoolean(URL_COLUMN),
+                getBoolean(PREFER_URL_DOI),
+                getBoolean(ARXIV_COLUMN),
+                getStringList(COLUMN_NAMES),
+                getBoolean(SPECIALFIELDSENABLED),
+                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
+                getBoolean(SERIALIZESPECIALFIELDS),
+                getBoolean(EXTRA_FILE_COLUMNS),
+                createColumnWidths(),
+                getMainTableColumnSortTypes());
+    }
+
+    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
+        putBoolean(FILE_COLUMN, columnPreferences.showFileColumn());
+        putBoolean(URL_COLUMN, columnPreferences.showUrlColumn());
+        putBoolean(PREFER_URL_DOI, columnPreferences.preferDoiOverUrl());
+        putBoolean(ARXIV_COLUMN, columnPreferences.showEprintColumn());
+        putStringList(COLUMN_NAMES, columnPreferences.getColumnNames());
+
+        putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, columnPreferences.getSerializeSpecialFields());
+        putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
+
+        List<String> columnWidthsInOrder = new ArrayList<>();
+        columnPreferences.getColumnNames().forEach(name -> columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(name).toString()));
+        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
+
+        setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
     }
 
     public MainTablePreferences getMainTablePreferences() {

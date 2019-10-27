@@ -15,10 +15,7 @@ import javafx.scene.control.CheckBoxTreeItem;
 import javafx.util.Callback;
 
 /**
- * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
- */
-
-/**
+ * @implNote Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
  * @implNote As CheckBoxTreeItem extends TreeItem, this class will work for both.
  */
 public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {

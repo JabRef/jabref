@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -42,37 +43,66 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    private final String focusedFile;
-
-    public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
-        this.bibDatabases = argsDatabases;
+    public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
+        this.bibDatabases = databases;
         this.isBlank = isBlank;
         mainFrame = new JabRefFrame(mainStage);
 
-        // passed file (we take the first one) should be focused
-        focusedFile = argsDatabases.stream()
-                                    .findFirst()
-                                    .flatMap(ParserResult::getFile)
-                                    .map(File::getAbsolutePath)
-                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
-
         openWindow(mainStage);
         new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
-                .checkForNewVersionAsync(false);
+                .checkForNewVersionDelayed();
     }
 
     private void openWindow(Stage mainStage) {
-        applyFontRenderingTweak();
+        GUIGlobals.init();
 
+        LOGGER.debug("Initializing frame");
+        mainFrame.init();
+
+        // Restore window location and/or maximised state
+        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
+            mainStage.setMaximized(true);
+        } else {
+            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
+            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
+            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
+        }
+
+        // We create a decoration pane ourselves for performance reasons
+        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
+        DecorationPane root = new DecorationPane();
+        root.getChildren().add(JabRefGUI.mainFrame);
+
+        Scene scene = new Scene(root, 800, 800);
+        Globals.getThemeLoader().installCss(scene, Globals.prefs);
+        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
+        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
+        mainStage.setScene(scene);
+        mainStage.show();
+
+        mainStage.setOnCloseRequest(event -> {
+            saveWindowState(mainStage);
+            boolean reallyQuit = mainFrame.quit();
+            if (!reallyQuit) {
+                event.consume();
+            }
+        });
+        Platform.runLater(this::openDatabases);
+    }
+
+    private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             openLastEditedDatabases();
         }
 
-        GUIGlobals.init();
-
-        LOGGER.debug("Initializing frame");
-        mainFrame.init();
+        // passed file (we take the first one) should be focused
+        String focusedFile = bibDatabases.stream()
+                                         .findFirst()
+                                         .flatMap(ParserResult::getFile)
+                                         .map(File::getAbsolutePath)
+                                         .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
@@ -119,44 +149,11 @@ public class JabRefGUI {
             first = false;
         }
 
-        // If we are set to remember the window location, we also remember the maximised
-        // state. This needs to be set after the window has been made visible, so we
-        // do it here:
-        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            mainStage.setMaximized(true);
-        } else {
-            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
-            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
-            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
-            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
-        }
-
-        // We create a decoration pane ourselves for performance reasons
-        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
-        DecorationPane root = new DecorationPane();
-        root.getChildren().add(JabRefGUI.mainFrame);
-
-        Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeLoader().installCss(scene, Globals.prefs);
-        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
-        mainStage.setScene(scene);
-        mainStage.show();
-
-        mainStage.setOnCloseRequest(event -> {
-            saveWindowState(mainStage);
-            boolean reallyQuit = mainFrame.quit();
-            if (!reallyQuit) {
-                event.consume();
-            }
-        });
-
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
                     + pr.getErrorMessage();
 
             mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
-
         }
 
         // Display warnings, if any
@@ -177,6 +174,7 @@ public class JabRefGUI {
         for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
             BasePanel panel = mainFrame.getBasePanelAt(i);
+
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 
@@ -227,15 +225,6 @@ public class JabRefGUI {
             }
         }
         return false;
-    }
-
-    private void applyFontRenderingTweak() {
-        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering setting.
-        // See https://github.com/woky/javafx-hates-linux
-        if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
-            System.setProperty("prism.text", "t2k");
-            System.setProperty("prism.lcdtext", "true");
-        }
     }
 
     public static JabRefFrame getMainFrame() {

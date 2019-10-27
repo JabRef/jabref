@@ -1,6 +1,8 @@
 package org.jabref.gui.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -14,14 +16,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
 
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
+import org.fxmisc.easybind.Subscription;
 
 /**
  * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
@@ -53,22 +54,21 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withIcon(Callback<T, GlyphIcons> toIcon) {
+    public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon) {
         this.toGraphic = viewModel -> {
-            GlyphIcons icon = toIcon.call(viewModel);
+            JabRefIcon icon = toIcon.call(viewModel);
             if (icon != null) {
-                return MaterialDesignIconFactory.get().createIcon(icon);
+                return icon.getGraphicNode();
             }
             return null;
         };
         return this;
     }
 
-    public ViewModelListCellFactory<T> withIcon(Callback<T, GlyphIcons> toIcon, Callback<T, Paint> toColor) {
+    public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon, Callback<T, Color> toColor) {
         this.toGraphic = viewModel -> {
-            Text graphic = MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
-            graphic.setFill(toColor.call(viewModel));
-            return graphic;
+
+            return toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
         };
         return this;
     }
@@ -148,9 +148,15 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
         return new ListCell<T>() {
 
+            List<Subscription> subscriptions = new ArrayList<>();
+
             @Override
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
+
+                // Remove previous subscriptions
+                subscriptions.forEach(Subscription::unsubscribe);
+                subscriptions.clear();
 
                 T viewModel = getItem();
                 if (empty || (viewModel == null)) {
@@ -194,10 +200,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
-                        BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
+                        Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
+                        subscriptions.add(subscription);
                     }
                 }
-                getListView().refresh();
             }
         };
     }
