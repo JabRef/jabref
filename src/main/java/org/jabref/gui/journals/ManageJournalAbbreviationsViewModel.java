@@ -225,11 +225,12 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * Method to add a new abbreviation to the abbreviations list property.
      * It also sets the currentAbbreviation property to the new abbreviation.
      *
-     * @param name         of the abbreviation object
-     * @param abbreviation of the abbreviation object
+     * @param name           of the abbreviation object
+     * @param abbreviation   of the abbreviation object
+     * @param shortestUnique of the abbreviation object
      */
-    public void addAbbreviation(String name, String abbreviation) {
-        Abbreviation abbreviationObject = new Abbreviation(name, abbreviation);
+    public void addAbbreviation(String name, String abbreviation, String shortestUnique) {
+        Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUnique);
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"), Localization.lang("Abbreviation %s for journal %s already defined.", abbreviation, name));
@@ -243,31 +244,32 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     /**
      * Method to change the currentAbbrevaition property to a new abbreviation.
      *
-     * @param name         of the abbreviation object
-     * @param abbreviation of the abbreviation object
+     * @param name           of the abbreviation object
+     * @param abbreviation   of the abbreviation object
+     * @param shortestUnique of the abbreviation object
      */
-    public void editAbbreviation(String name, String abbreviation) {
+    public void editAbbreviation(String name, String abbreviation, String shortestUnique) {
         if (isAbbreviationEditableAndRemovable.get()) {
-            Abbreviation abbreviationObject = new Abbreviation(name, abbreviation);
+            Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUnique);
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationObject);
             if (abbreviations.contains(abbViewModel)) {
                 if (!abbViewModel.equals(currentAbbreviation.get())) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"), Localization.lang("Abbreviation %s for journal %s already defined.", abbreviation, name));
                 } else {
-                    setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation);
+                    setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUnique);
                 }
             } else {
-                setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation);
+                setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUnique);
             }
         }
     }
 
     /**
      * Sets the name and the abbreviation of the {@code currentAbbreviation} property
-     * to the values of the {@code abbreviationsName} and {@code abbreviationsAbbreviation}
-     * properties.
+     * to the values of the {@code abbreviationsName}, {@code abbreviationsAbbreviation},
+     * and {@code shortestUnique} properties.
      */
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
+    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation, String shortestUnique) {
         if (name.trim().isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
@@ -277,6 +279,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         }
         currentAbbreviation.get().setName(name);
         currentAbbreviation.get().setAbbreviation(abbreviation);
+        currentAbbreviation.get().setShortestUnique(shortestUnique);
         shouldWriteLists = true;
     }
 
@@ -395,7 +398,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     public void addAbbreviation() {
-        addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"));
+        addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"), Localization.lang("Shortest unique"));
     }
 
     public void init() {

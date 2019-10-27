@@ -15,6 +15,9 @@ import org.jabref.logic.util.OS;
  */
 public class AbbreviationWriter {
 
+    private static final String separator = "\t";
+    private static final String textQuote = "\"";
+
     private AbbreviationWriter() {
     }
 
@@ -30,13 +33,21 @@ public class AbbreviationWriter {
         try (OutputStream outStream = Files.newOutputStream(path);
                 OutputStreamWriter writer = new OutputStreamWriter(outStream, encoding)) {
             for (Abbreviation entry : abbreviations) {
-                writer.write(entry.getName());
-                writer.write(" = ");
-                writer.write(entry.getAbbreviation());
+                writer.write(writeField(entry.getName()));
+                writer.write(separator);
+                writer.write(writeField(entry.getAbbreviation()));
+                writer.write(separator);
+                writer.write(writeField(entry.getShortestUnique()));
                 writer.write(OS.NEWLINE);
             }
         }
-
     }
 
+    private static String writeField(String field) {
+        if (field.contains(separator) || field.contains(textQuote)) {
+            return String.format("%s%s%s", textQuote, field.replace(textQuote, textQuote + textQuote), textQuote);
+        } else {
+            return field;
+        }
+    }
 }

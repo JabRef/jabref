@@ -19,8 +19,8 @@ public class AbbreviationViewModel {
     private final Abbreviation abbreviationObject;
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty abbreviation = new SimpleStringProperty("");
+    private final StringProperty shortestUnique = new SimpleStringProperty("");
     private final BooleanProperty pseudoAbbreviation = new SimpleBooleanProperty();
-
 
     public AbbreviationViewModel(Abbreviation abbreviation) {
         this.abbreviationObject = abbreviation;
@@ -28,6 +28,7 @@ public class AbbreviationViewModel {
         if (this.abbreviationObject != null) {
             this.name.bindBidirectional(this.abbreviationObject.nameProperty());
             this.abbreviation.bindBidirectional(this.abbreviationObject.abbreviationProperty());
+            this.shortestUnique.bindBidirectional(this.abbreviationObject.shortestUniqueProperty());
         } else {
             this.name.set("Add new Abbreviation");
         }
@@ -45,12 +46,20 @@ public class AbbreviationViewModel {
         this.abbreviation.set(abbreviation);
     }
 
+    public void setShortestUnique(String shortestUnique) {
+        this.shortestUnique.set(shortestUnique);
+    }
+
     public String getName() {
         return this.name.get();
     }
 
     public String getAbbreviation() {
         return this.abbreviation.get();
+    }
+
+    public String getShortestUnique() {
+        return this.shortestUnique.get();
     }
 
     public boolean isPseudoAbbreviation() {
@@ -63,6 +72,10 @@ public class AbbreviationViewModel {
 
     public StringProperty abbreviationProperty() {
         return this.abbreviation;
+    }
+
+    public StringProperty shortestUniqueProperty() {
+        return this.shortestUnique;
     }
 
     public BooleanProperty isPseudoAbbreviationProperty() {

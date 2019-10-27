@@ -38,6 +38,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
+    @FXML private TableColumn<AbbreviationViewModel, String> journalTableShortestUniqueColumn;
     @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableEditColumn;
     @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableDeleteColumn;
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
@@ -86,6 +87,8 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
         journalTableNameColumn.setCellFactory(cell -> new JournalAbbreviationsNameTableEditingCell());
         journalTableAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
         journalTableAbbreviationColumn.setCellFactory(cell -> new JournalAbbreviationsAbbreviationTableEditingCell());
+        journalTableShortestUniqueColumn.setCellValueFactory(cellData -> cellData.getValue().shortestUniqueProperty());
+        journalTableShortestUniqueColumn.setCellFactory(cell -> new JournalAbbreviationsShortestUniqueTableEditingCell());
         journalTableEditColumn.setCellValueFactory(cellData -> cellData.getValue().isPseudoAbbreviationProperty());
         journalTableDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().isPseudoAbbreviationProperty());
         journalTableEditColumn.setCellFactory(new ValueTableCellFactory<AbbreviationViewModel, Boolean>().
@@ -132,10 +135,10 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
         journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
 
-        viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) ->
-                journalAbbreviationsTable.getSelectionModel().select(newvalue));
+        viewModel.currentAbbreviationProperty().addListener((observable, oldValue, newValue) ->
+                journalAbbreviationsTable.getSelectionModel().select(newValue));
         journalAbbreviationsTable.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldvalue, newvalue) -> viewModel.currentAbbreviationProperty().set(newvalue));
+                .addListener((observable, oldValue, newValue) -> viewModel.currentAbbreviationProperty().set(newValue));
 
         removeJournalAbbreviationsButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
 
@@ -246,7 +249,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(name);
             current.setName(oldName);
-            viewModel.editAbbreviation(name, current.getAbbreviation());
+            viewModel.editAbbreviation(name, current.getAbbreviation(), current.getShortestUnique());
         }
 
         private void createTextField() {
@@ -333,7 +336,94 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(abbreviation);
             current.setAbbreviation(oldAbbreviation);
-            viewModel.editAbbreviation(current.getName(), abbreviation);
+            viewModel.editAbbreviation(current.getName(), abbreviation, current.getShortestUnique());
+        }
+
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - (this.getGraphicTextGap() * 2));
+            textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    commitEdit(textField.getText());
+                }
+            });
+            textField.setOnKeyPressed(t -> {
+                if (t.getCode() == KeyCode.ENTER) {
+                    if (isEditing()) {
+                        journalAbbreviationsTable.requestFocus();
+                    } else {
+                        startEdit();
+                    }
+                } else if (t.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
+                }
+            });
+        }
+
+        private String getString() {
+            return getItem() == null ? "" : getItem();
+        }
+    }
+
+    /**
+     * This class provides a editable text field that is used as table cell.
+     * It handles the editing of the shortest unique abbreviation column.
+     */
+    public class JournalAbbreviationsShortestUniqueTableEditingCell extends TableCell<AbbreviationViewModel, String> {
+
+        private TextField textField;
+        private String oldShortestUnique;
+        private int editingIndex;
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
+                oldShortestUnique = viewModel.currentAbbreviationProperty().get().getShortestUnique();
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                editingIndex = journalAbbreviationsTable.getSelectionModel().getSelectedIndex();
+                textField.requestFocus();
+                textField.selectAll();
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+            setText(getItem());
+            setGraphic(null);
+            journalAbbreviationsTable.itemsProperty().get().get(editingIndex).setShortestUnique(oldShortestUnique);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+        }
+
+        @Override
+        public void commitEdit(String shortestUnique) {
+            journalAbbreviationsTable.getSelectionModel().select(editingIndex);
+            AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
+            super.commitEdit(shortestUnique);
+            current.setShortestUnique(oldShortestUnique);
+            viewModel.editAbbreviation(current.getName(), current.getAbbreviation(), shortestUnique);
         }
 
         private void createTextField() {

@@ -10,10 +10,12 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     private final SimpleStringProperty name = new SimpleStringProperty("");
     private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
+    private final SimpleStringProperty shortestUnique = new SimpleStringProperty("");
 
-    public Abbreviation(String name, String abbreviation) {
+    public Abbreviation(String name, String abbreviation, String shortestUnique) {
         this.name.set(Objects.requireNonNull(name).trim());
         this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
+        this.shortestUnique.set(shortestUnique.trim());
     }
 
     public String getName() {
@@ -38,6 +40,18 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     public SimpleStringProperty abbreviationProperty() {
         return abbreviation;
+    }
+
+    public String getShortestUnique() {
+        return this.shortestUnique.get();
+    }
+
+    public void setShortestUnique(String shortestUnique) {
+        this.shortestUnique.set(shortestUnique);
+    }
+
+    public SimpleStringProperty shortestUniqueProperty() {
+        return shortestUnique;
     }
 
     public String getIsoAbbreviation() {
@@ -71,7 +85,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, iso=%s, medline=%s}", getName(), getIsoAbbreviation(), getMedlineAbbreviation());
+        return String.format("Abbreviation{name=%s, iso=%s, medline=%s, shortestUnique=%s}", getName(), getIsoAbbreviation(), getMedlineAbbreviation(), getShortestUnique());
     }
 
     @Override

@@ -14,9 +14,9 @@ public class JournalAbbreviationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
     // journal initialization
-    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
+    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.csv";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.csv";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.csv";
     private JournalAbbreviationRepository journalAbbrev;
 
     public static List<Abbreviation> getOfficialIEEEAbbreviations() {

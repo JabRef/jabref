@@ -20,11 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
+ * Reads abbreviation files (CSV format) into a list of Abbreviations.
  */
 public class AbbreviationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
+
+    private static final String separator = "\t";
+    private static final String textQuote = "\"";
 
     private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 
@@ -60,8 +63,8 @@ public class AbbreviationParser {
     }
 
     /**
-     * Read the given file, which should contain a list of journal names and their
-     * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
+     * Read the given file, which should contain a list of journal names and their abbreviations.
+     * Each line should be formatted as: "Full Journal Name\tAbbr. Journal Name\t[Shortest Unique Name]"
      *
      * @param in
      */
@@ -81,17 +84,36 @@ public class AbbreviationParser {
         if (line.startsWith("#")) {
             return;
         }
-        String[] parts = line.split("=");
-        if (parts.length == 2) {
-            final String fullName = parts[0].trim();
-            final String abbrName = parts[1].trim();
 
-            // check
+        String[] parts = line.replace(textQuote + textQuote, textQuote).split(separator);
+        if (parts.length > 1) {
+            String fullName = parts[0].trim();
+            String abbrName = parts[1].trim();
+
+            String shortestName = "";
+            if (parts.length > 2) {
+                shortestName = parts[2].trim();
+            }
+
+            // Check name and abbreviation
             if ((fullName.length() <= 0) || (abbrName.length() <= 0)) {
                 return;
             }
 
-            Abbreviation abbreviation = new Abbreviation(fullName, abbrName);
+            // Clean text quotes
+            if (fullName.startsWith(textQuote) && fullName.endsWith(textQuote)) {
+                fullName = fullName.substring(1, fullName.length() - 1);
+            }
+
+            if (abbrName.startsWith(textQuote) && abbrName.endsWith(textQuote)) {
+                abbrName = abbrName.substring(1, abbrName.length() - 1);
+            }
+
+            if (shortestName.startsWith(textQuote) && shortestName.endsWith(textQuote)) {
+                shortestName = shortestName.substring(1, shortestName.length() - 1);
+            }
+
+            Abbreviation abbreviation = new Abbreviation(fullName, abbrName, shortestName);
             this.abbreviations.add(abbreviation);
         }
     }
