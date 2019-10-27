@@ -1535,7 +1535,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public XmpPreferences getXMPPreferences() {
-        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
                                   getKeywordDelimiter());
     }
 
