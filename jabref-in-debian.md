@@ -23,7 +23,7 @@ At [koppor's repository](https://github.com/koppor/jabref/), required Debian ada
 - [ ] packaging of [latex2unicode](https://github.com/tomtung/latex2unicode): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=858809
   - [ ] depends on packaging of [fastparse](https://github.com/lihaoyi/fastparse): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=858810
   - [x] depends on packaging of [sbt](https://github.com/sbt/sbt): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=855304
-- [ ] packaging of [pgjdbc-ng](http://impossibl.github.io/pgjdbc-ng/): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841011
+- [ ] packaging of [pgjdbc-ng](http://impossibl.github.io/pgjdbc-ng/): Obsolete: We use `org.postgresql.Driver`
 - [ ] packaging of [java-diff-utils](https://github.com/bkromhout/java-diff-utils/). Need some more work due to licensing issues. See https://github.com/bkromhout/java-diff-utils/pull/4. The token is currently @koppor
 - [x] CSL styles - styles: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841018 
   - [x] https://github.com/citation-style-language/styles/issues/2372 needs to be solved
@@ -38,5 +38,5 @@ At [koppor's repository](https://github.com/koppor/jabref/), required Debian ada
 
 ## Other issues
 
-- [ ] Remove `org.json` dependency: https://github.com/JabRef/jabref/issues/3703
-- [ ] Make JabRef running on Java9. Triggered by the discussion at https://lists.debian.org/debian-java/2017/11/msg00028.html. This is WIP at see https://github.com/JabRef/jabref/issues/2594#issuecomment-346829982
+- [x] Remove `org.json` dependency: https://github.com/JabRef/jabref/issues/3703
+- [x] Make JabRef running on Java 9. JabRef now runs on jdk12https://github.com/JabRef/jabref/pull/5426
