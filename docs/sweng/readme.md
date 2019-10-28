@@ -1,15 +1,15 @@
-#Sweng Project: Parser for plain text references
+# Sweng Project: Parser for plain text references
 
 Short description: Extend Jabref by the feature to convert plain text references into BibEntries
 (New Jabref feature).
 
 Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 
-##Documentation
+## Documentation
 
 In this folder you will find all the documentation we create for our Project.
 
-##Table of contents
+## Table of contents
 
 #### *SpecificationBook.md*
 This document contains the vision of the end product as well as the general conditions and functional requirements for the project.
