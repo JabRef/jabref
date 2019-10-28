@@ -28,5 +28,5 @@
         "--socket=fallback-x11",
         "--share=network",
         "--filesystem=home"
-    ],
+    ]
 }
