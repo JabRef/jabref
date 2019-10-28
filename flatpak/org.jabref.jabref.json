@@ -18,6 +18,10 @@
                     "type" : "file",
                     "url": "http://builds.jabref.org/master/JabRef-portable_linux.tar.gz",
                     "sha256": "be69feee0536fa8500dda867290dbeeeda6191c60e636a0b6e254fbaac02d471"
+                },
+                {
+                    "type": "file",
+                    "path": "org.jabref.jabref.desktop"
                 }
             ]
         }
