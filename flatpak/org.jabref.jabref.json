@@ -15,7 +15,7 @@
             ],
             "sources" : [
                 {
-                    "type" : "archive",
+                    "type" : "file",
                     "path": "JabRef-portable_linux.tar.gz"
                 }
             ]
