@@ -30,7 +30,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -191,20 +190,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
-                            for (Field field : sharedEntry.get().getFields()) {
-                                Optional<String> sharedFieldValue = sharedEntry.get().getField(field);
-                                if (sharedFieldValue.isPresent()) {
-                                    localEntry.setField(field, sharedFieldValue.get(), EntryEventSource.SHARED);
-                                }
-                            }
+                            // copy remote values to local entry
+                            sharedEntry.get().getFieldMap().forEach(
+                                    (field, value) -> localEntry.setField(field, value, EntryEventSource.SHARED)
+                            );
 
-                            Set<Field> redundantLocalEntryFields = localEntry.getFields();
-                            redundantLocalEntryFields.removeAll(sharedEntry.get().getFields());
-
-                            // remove not existing fields
-                            for (Field redundantField : redundantLocalEntryFields) {
-                                localEntry.clearField(redundantField, EntryEventSource.SHARED);
-                            }
+                            // locally remove not existing fields
+                            localEntry.getFields().stream()
+                                      .filter(field -> !sharedEntry.get().hasField(field))
+                                      .forEach(
+                                              field -> localEntry.clearField(field, EntryEventSource.SHARED)
+                                      );
                         }
                     }
                 }
