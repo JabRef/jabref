@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -119,9 +118,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
             if (InternalField.TYPE_HEADER.equals(searchField)) {
                 return searchWords.stream().filter(word -> entry.getType().getName().equalsIgnoreCase(word)).collect(Collectors.toSet());
             }
-            return entry.getField(searchField)
-                    .map(content -> KeywordList.parse(content, keywordSeparator).toStringList())
-                    .orElse(Collections.emptySet());
+            return entry.getFieldAsKeywords(searchField, keywordSeparator).toStringList();
         } else {
             return entry.getFieldAsWords(searchField);
         }

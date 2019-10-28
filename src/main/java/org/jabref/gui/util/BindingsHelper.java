@@ -204,6 +204,20 @@ public class BindingsHelper {
         });
     }
 
+    /**
+     * Invokes {@code subscriber} for the every new value of {@code observable}, but not for the current value.
+     *
+     * @param observable observable value to subscribe to
+     * @param subscriber action to invoke for values of {@code observable}.
+     * @return a subscription that can be used to stop invoking subscriber for any further {@code observable} changes.
+     * @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the {@code subscriber} for the current value
+     */
+    public static <T> Subscription subscribeFuture(ObservableValue<T> observable, Consumer<? super T> subscriber) {
+        ChangeListener<? super T> listener = (obs, oldValue, newValue) -> subscriber.accept(newValue);
+        observable.addListener(listener);
+        return () -> observable.removeListener(listener);
+    }
+
     private static class BidirectionalBinding<A, B> {
 
         private final ObservableValue<A> propertyA;
