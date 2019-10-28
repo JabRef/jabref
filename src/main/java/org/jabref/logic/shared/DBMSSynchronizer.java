@@ -40,8 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Synchronizes the shared or local databases with their opposite side.
- * Local changes are pushed by {@link EntryEvent} using Google's Guava EventBus.
+ * Synchronizes the shared or local databases with their opposite side. Local changes are pushed by {@link EntryEvent}
+ * using Google's Guava EventBus.
  */
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
@@ -134,11 +134,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Sets the table structure of shared database if needed and pulls all shared entries
-     * to the new local database.
+     * Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
      *
-     * @throws DatabaseNotSupportedException if the version of shared database does not match
-     *          the version of current shared database support ({@link DBMSProcessor}).
+     * @throws DatabaseNotSupportedException if the version of shared database does not match the version of current
+     *                                       shared database support ({@link DBMSProcessor}).
      */
     public void initializeDatabases() throws DatabaseNotSupportedException {
         try {
@@ -162,8 +161,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Synchronizes the local database with shared one.
-     * Possible update types are removal, update or insert of a {@link BibEntry}.
+     * Synchronizes the local database with shared one. Possible update types are removal, update or insert of a {@link
+     * BibEntry}.
      */
     @Override
     public void synchronizeLocalDatabase() {
@@ -219,7 +218,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Removes all local entries which are not present on shared database.
      *
      * @param localEntries List of {@link BibEntry} the entries should be removed from
-     * @param sharedIDs Set of all IDs which are present on shared database
+     * @param sharedIDs    Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         for (int i = 0; i < localEntries.size(); i++) {
@@ -324,8 +323,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Checks whether the current SQL connection is valid.
-     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     * Checks whether the current SQL connection is valid. In case that the connection is not valid a new {@link
+     * ConnectionLostEvent} is going to be sent.
      *
      * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
@@ -336,7 +335,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
             }
             return isValid;
-
         } catch (SQLException e) {
             LOGGER.error("SQL Error:", e);
             return false;
@@ -347,7 +345,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
      *
      * @param event An {@link EntryEvent}
-     * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
+     * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else
+     * <code>false</code>
      */
     public boolean isEventSourceAccepted(EntryEvent event) {
         EntryEventSource eventSource = event.getEntryEventSource();
