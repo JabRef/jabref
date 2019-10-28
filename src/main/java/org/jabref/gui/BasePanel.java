@@ -365,8 +365,9 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
-        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
-        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, 0));
+        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, 1));
+        actions.put(Actions.ABBREVIATE_SHORTEST, new AbbreviateAction(this, 2));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);

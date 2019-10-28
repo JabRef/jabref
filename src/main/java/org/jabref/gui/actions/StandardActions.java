@@ -96,6 +96,7 @@ public enum StandardActions implements Action {
     ABBREVIATE(Localization.lang("Abbreviate journal names")),
     ABBREVIATE_ISO("ISO", Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"), KeyBinding.ABBREVIATE),
     ABBREVIATE_MEDLINE("MEDLINE", Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
+    ABBREVIATE_SHORTEST("SHORTEST", Localization.lang("Abbreviate journal names of the selected entries (SHORTEST abbreviation)")),
     UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),

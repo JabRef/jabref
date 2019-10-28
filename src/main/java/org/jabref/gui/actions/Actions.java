@@ -8,6 +8,7 @@ public enum Actions {
 
     ABBREVIATE_ISO,
     ABBREVIATE_MEDLINE,
+    ABBREVIATE_SHORTEST,
     ADD_FILE_LINK,
     CLEANUP,
     COPY,

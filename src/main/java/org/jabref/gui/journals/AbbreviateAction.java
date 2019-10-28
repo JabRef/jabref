@@ -29,11 +29,11 @@ public class AbbreviateAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
     private final BasePanel panel;
-    private final boolean iso;
+    private final int abbrvType;
 
-    public AbbreviateAction(BasePanel panel, boolean iso) {
+    public AbbreviateAction(BasePanel panel, int abbrvType) {
         this.panel = panel;
-        this.iso = iso;
+        this.abbrvType = abbrvType;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class AbbreviateAction implements BaseAction {
         List<BibEntry> entries = panel.getSelectedEntries();
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                iso);
+                abbrvType);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         Set<Callable<Boolean>> tasks = new HashSet<>();

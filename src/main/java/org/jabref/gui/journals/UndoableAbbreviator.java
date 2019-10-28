@@ -12,12 +12,12 @@ import org.jabref.model.entry.field.Field;
 public class UndoableAbbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final boolean isoAbbreviationStyle;
+    private final int abbrvType;
 
 
-    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, boolean isoAbbreviationStyle) {
+    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, int abbrvType) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
-        this.isoAbbreviationStyle = isoAbbreviationStyle;
+        this.abbrvType = abbrvType;
     }
 
     /**
@@ -55,11 +55,13 @@ public class UndoableAbbreviator {
     }
 
     private String getAbbreviatedName(Abbreviation text) {
-        if (isoAbbreviationStyle) {
+        if (abbrvType == 0) {
             return text.getIsoAbbreviation();
-        } else {
+        } else if (abbrvType == 1) {
             return text.getMedlineAbbreviation();
+        } else if (abbrvType == 2) {
+            return text.getShortestUnique();
         }
+        return null;
     }
-
 }

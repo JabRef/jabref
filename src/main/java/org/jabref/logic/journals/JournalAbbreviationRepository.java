@@ -23,12 +23,14 @@ public class JournalAbbreviationRepository {
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
                 || name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUnique());
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
         boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUnique());
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         return isAbbreviated && !isExpanded;
     }
@@ -92,5 +94,9 @@ public class JournalAbbreviationRepository {
 
     public Optional<String> getIsoAbbreviation(String text) {
         return getAbbreviation(text).map(Abbreviation::getIsoAbbreviation);
+    }
+
+    public Optional<String> getShortestUnique(String text) {
+        return getAbbreviation(text).map(Abbreviation::getShortestUnique);
     }
 }

@@ -74,12 +74,14 @@ public class Abbreviation implements Comparable<Abbreviation> {
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
-        if (getMedlineAbbreviation().equals(currentTrimmed)) {
+        if (getShortestUnique().equals(currentTrimmed)) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getIsoAbbreviation();
-        } else {
+        } else if (getIsoAbbreviation().equals(currentTrimmed)) {
             return getMedlineAbbreviation();
+        } else {
+            return getShortestUnique();
         }
     }
 
