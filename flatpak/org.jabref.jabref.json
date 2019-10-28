@@ -29,7 +29,6 @@
         "--share=network",
         "--filesystem=home"
     ],
-    "build-options" : {
         "env" : {
         }
     }
