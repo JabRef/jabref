@@ -29,7 +29,6 @@
         "--share=network",
         "--filesystem=home"
     ],
-        "env" : {
         }
     }
 }
