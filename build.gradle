@@ -17,7 +17,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '2.4.2'
+    id 'com.gradle.build-scan' version '3.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
