@@ -27,7 +27,6 @@
         }
     ],
     "finish-args" : [
-        "--env=PATH=/usr/bin:/app/JabRef/bin",
         "--socket=wayland",
         "--socket=fallback-x11",
         "--share=network",
