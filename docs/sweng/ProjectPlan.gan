@@ -45,14 +45,33 @@
                 <depend id="0" type="2" difference="0" hardness="Strong"/>
                 <depend id="23" type="2" difference="0" hardness="Strong"/>
                 <depend id="133" type="2" difference="0" hardness="Strong"/>
-                <task id="26" name="UseCases" color="#8cb6ce" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="4" expand="true"/>
-                <task id="117" name="Visions and requirements" color="#8cb6ce" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-                <task id="101" name="Glossary" color="#8cb6ce" meeting="false" start="2019-10-24" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                <task id="26" name="UseCases" color="#8cb6ce" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" priority="4" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
+                <task id="117" name="Visions and requirements" color="#8cb6ce" meeting="false" start="2019-10-23" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
+                <task id="101" name="Glossary" color="#8cb6ce" meeting="false" start="2019-10-24" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
             </task>
             <task id="23" name="Project plan with Gantt" color="#8cb6ce" meeting="false" start="2019-10-25" duration="2" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 2h]]>
+                </notes>
                 <depend id="0" type="2" difference="0" hardness="Strong"/>
             </task>
-            <task id="133" name="Mockup" color="#8cb6ce" meeting="false" start="2019-10-25" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="133" name="Mockup" color="#8cb6ce" meeting="false" start="2019-10-25" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 2h]]>
+                </notes>
+            </task>
             <task id="124" name="Deadlines" color="#ff6666" meeting="false" start="2019-10-28" duration="7" complete="0" thirdDate="2019-10-29" thirdDate-constraint="0" expand="false">
                 <task id="0" name="Milestone 1 deadline" color="#ff6666" meeting="true" start="2019-10-28" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" priority="2" expand="true"/>
                 <task id="73" name="Milestone 1 conference" color="#8cb6ce" meeting="true" start="2019-10-30" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
@@ -63,41 +82,87 @@
             <task id="205" name="Unit tests" color="#0000cc" meeting="false" start="2019-11-01" duration="8" complete="0" thirdDate="2019-11-06" thirdDate-constraint="0" expand="false">
                 <depend id="45" type="2" difference="0" hardness="Strong"/>
                 <task id="199" name="Prepare unit tests" color="#8cb6ce" meeting="false" start="2019-11-01" duration="4" complete="0" thirdDate="2019-11-06" thirdDate-constraint="0" expand="false">
-                    <task id="200" name="GUI tests" color="#8cb6ce" meeting="false" start="2019-11-01" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                    <task id="200" name="GUI tests" color="#8cb6ce" meeting="false" start="2019-11-01" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                        <notes>
+                            <![CDATA[Estimated time cost: 3h]]>
+                        </notes>
+                    </task>
                 </task>
                 <task id="166" name="Write unit tests" color="#8cb6ce" meeting="false" start="2019-11-06" duration="4" complete="0" thirdDate="2019-11-06" thirdDate-constraint="0" expand="false">
-                    <task id="167" name="pipeline-windows interaction tests" color="#8cb6ce" meeting="false" start="2019-11-06" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-                    <task id="168" name="string converter tests" color="#8cb6ce" meeting="false" start="2019-11-06" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                    <task id="167" name="pipeline-windows interaction tests" color="#8cb6ce" meeting="false" start="2019-11-06" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                        <notes>
+                            <![CDATA[Estimated time cost: 5h]]>
+                        </notes>
+                    </task>
+                    <task id="168" name="string converter tests" color="#8cb6ce" meeting="false" start="2019-11-06" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                        <notes>
+                            <![CDATA[3h]]>
+                        </notes>
+                    </task>
                 </task>
             </task>
             <task id="247" name="Work on backend" color="#8cb6ce" meeting="false" start="2019-10-28" duration="8" complete="0" thirdDate="2019-10-28" thirdDate-constraint="0" expand="false">
                 <task id="150" name="Select parser for project" color="#8cb6ce" meeting="false" start="2019-10-28" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
                     <depend id="151" type="2" difference="0" hardness="Strong"/>
                 </task>
                 <task id="151" name="Include parser into Jabref" color="#8cb6ce" meeting="false" start="2019-10-29" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 3h]]>
+                    </notes>
                     <depend id="175" type="2" difference="0" hardness="Strong"/>
                 </task>
                 <task id="152" name="Design pipeline interface" color="#8cb6ce" meeting="false" start="2019-10-28" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 4h]]>
+                    </notes>
                     <depend id="45" type="2" difference="0" hardness="Strong"/>
                     <depend id="175" type="2" difference="0" hardness="Strong"/>
                 </task>
                 <task id="175" name="Implement pipeline interface" color="#8cb6ce" meeting="false" start="2019-11-01" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 3h]]>
+                    </notes>
                     <depend id="45" type="2" difference="0" hardness="Strong"/>
                     <depend id="153" type="2" difference="0" hardness="Strong"/>
                 </task>
                 <task id="153" name="Fill pipeline with dummy methods" color="#8cb6ce" meeting="false" start="2019-11-04" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
                     <depend id="167" type="2" difference="0" hardness="Strong"/>
                     <depend id="168" type="2" difference="0" hardness="Strong"/>
                 </task>
             </task>
             <task id="216" name="Work on GUI" color="#8cb6ce" meeting="false" start="2019-10-28" duration="7" complete="0" thirdDate="2019-10-28" thirdDate-constraint="0" expand="false">
                 <task id="217" name="Add context menu button" color="#8cb6ce" meeting="false" start="2019-10-28" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
                     <depend id="224" type="2" difference="0" hardness="Strong"/>
                 </task>
-                <task id="224" name="Add parser window" color="#8cb6ce" meeting="false" start="2019-10-29" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-                <task id="223" name="Add verify window" color="#8cb6ce" meeting="false" start="2019-10-31" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-                <task id="218" name="Add success window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-                <task id="219" name="Add failure window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                <task id="224" name="Add parser window" color="#8cb6ce" meeting="false" start="2019-10-29" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 3h]]>
+                    </notes>
+                </task>
+                <task id="223" name="Add verify window" color="#8cb6ce" meeting="false" start="2019-10-31" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 5h]]>
+                    </notes>
+                </task>
+                <task id="218" name="Add success window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
+                <task id="219" name="Add failure window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
             </task>
             <task id="127" name="Deadlines" color="#ff6666" meeting="false" start="2019-11-11" duration="7" complete="0" thirdDate="2019-11-12" thirdDate-constraint="0" expand="false">
                 <task id="45" name="Milestone 2 deadline" color="#ff6666" meeting="true" start="2019-11-11" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
@@ -108,25 +173,53 @@
         <task id="97" name="Milestone 3" color="#000000" meeting="false" start="2019-11-11" duration="19" complete="0" thirdDate="2019-11-08" thirdDate-constraint="0" expand="true">
             <task id="196" name="Write unit tests" color="#0000cc" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="false">
                 <depend id="55" type="2" difference="0" hardness="Strong"/>
-                <task id="197" name="GUI tests" color="#8cb6ce" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
+                <task id="197" name="GUI tests" color="#8cb6ce" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 4h]]>
+                    </notes>
+                </task>
             </task>
             <task id="177" name="Implement pipeline-windows interaction" color="#8cb6ce" meeting="false" start="2019-11-11" duration="8" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
                 <depend id="196" type="2" difference="0" hardness="Strong"/>
-                <task id="178" name="Implement pipeline call" color="#8cb6ce" meeting="false" start="2019-11-11" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                <task id="178" name="Implement pipeline call" color="#8cb6ce" meeting="false" start="2019-11-11" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 1h]]>
+                    </notes>
+                </task>
                 <task id="179" name="Implement BibtexEntry display" color="#8cb6ce" meeting="false" start="2019-11-12" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 2h]]>
+                    </notes>
                     <depend id="180" type="2" difference="0" hardness="Strong"/>
                     <depend id="181" type="2" difference="0" hardness="Strong"/>
                 </task>
                 <task id="180" name="Implement BibtexEntry update" color="#8cb6ce" meeting="false" start="2019-11-15" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 5h]]>
+                    </notes>
                     <depend id="181" type="2" difference="0" hardness="Strong"/>
                 </task>
-                <task id="181" name="Implement BibtexEntry save" color="#8cb6ce" meeting="false" start="2019-11-18" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+                <task id="181" name="Implement BibtexEntry save" color="#8cb6ce" meeting="false" start="2019-11-18" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                    <notes>
+                        <![CDATA[Estimated time cost: 2h]]>
+                    </notes>
+                </task>
             </task>
-            <task id="182" name="Implement ParserString converter" color="#8cb6ce" meeting="false" start="2019-11-11" duration="6" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
+            <task id="182" name="Implement ParserString converter" color="#8cb6ce" meeting="false" start="2019-11-11" duration="6" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 7h]]>
+                </notes>
+            </task>
             <task id="8" name="Testing plan" color="#8cb6ce" meeting="false" start="2019-11-16" duration="3" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 3h]]>
+                </notes>
                 <depend id="81" type="2" difference="0" hardness="Strong"/>
             </task>
             <task id="81" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 5h]]>
+                </notes>
                 <depend id="55" type="2" difference="0" hardness="Strong"/>
             </task>
             <task id="170" name="Deadlines" color="#ff6666" meeting="false" start="2019-11-25" duration="7" complete="0" thirdDate="2019-11-22" thirdDate-constraint="0" expand="false">
@@ -137,12 +230,21 @@
         </task>
         <task id="100" name="Milestone 4" color="#000000" meeting="false" start="2019-11-25" duration="20" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
             <task id="311" name="Debugging" color="#8cb6ce" meeting="false" start="2019-11-25" duration="5" complete="0" thirdDate="2019-11-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 10h]]>
+                </notes>
                 <depend id="58" type="2" difference="0" hardness="Strong"/>
             </task>
             <task id="68" name="Testing" color="#8cb6ce" meeting="false" start="2019-11-27" duration="7" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 5h]]>
+                </notes>
                 <depend id="58" type="2" difference="0" hardness="Strong"/>
             </task>
             <task id="10" name="Create Presentation" color="#8cb6ce" meeting="false" start="2019-12-02" duration="6" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <notes>
+                    <![CDATA[Estimated time cost: 5h]]>
+                </notes>
                 <depend id="58" type="2" difference="0" hardness="Strong"/>
             </task>
             <task id="297" name="Deadlines" color="#ff6666" meeting="false" start="2019-12-09" duration="8" complete="0" thirdDate="2019-11-19" thirdDate-constraint="0" expand="false">
@@ -151,9 +253,9 @@
                 <task id="72" name="Final version milestone 4" color="#8cb6ce" meeting="true" start="2019-12-18" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
             </task>
         </task>
-        <task id="77" name="Documentation" color="#009933" meeting="false" start="2019-10-25" duration="38" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
+        <task id="77" name="Documentation" color="#009933" meeting="false" start="2019-10-25" duration="46" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
             <task id="78" name="Updating gantt file" color="#8cb6ce" meeting="false" start="2019-10-28" duration="36" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
-            <task id="316" name="Updating specification book" color="#8cb6ce" meeting="false" start="2019-10-25" duration="38" complete="0" thirdDate="2019-11-23" thirdDate-constraint="0" expand="true"/>
+            <task id="316" name="Updating specification book" color="#8cb6ce" meeting="false" start="2019-10-25" duration="46" complete="0" thirdDate="2019-11-23" thirdDate-constraint="0" expand="true"/>
         </task>
     </tasks>
     <resources>
