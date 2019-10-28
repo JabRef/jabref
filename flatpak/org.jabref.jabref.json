@@ -29,5 +29,4 @@
         "--share=network",
         "--filesystem=home"
     ],
-    }
 }
