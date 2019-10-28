@@ -97,7 +97,10 @@ public class DuplicationChecker {
         //This should be done differently, maybe with a stream
         List<BibEntry> entries = entriesRemovedEvent.getBibEntries();
         for (BibEntry entry : entries) {
-            entry.getCiteKeyOptional().ifPresent(this::removeKeyFromSet);
+            Optional<String> citeKey = entry.getCiteKeyOptional();
+            if (citeKey.isPresent()) {
+                removeKeyFromSet(citeKey.get());
+            }
         }
     }
 
