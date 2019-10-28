@@ -34,10 +34,10 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (https://ui.adsabs.harvard.edu/)

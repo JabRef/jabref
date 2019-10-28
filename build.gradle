@@ -159,7 +159,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
+    compile 'com.konghq:unirest-java:3.1.03'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'

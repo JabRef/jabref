@@ -41,7 +41,7 @@ import javax.net.ssl.X509TrustManager;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
-import com.mashape.unirest.http.Unirest;
+import kong.unirest.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +131,7 @@ public class URLDownload {
     }
 
     public String getMimeType() {
-        Unirest.setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         String contentType;
         // Try to use HEAD request to avoid downloading the whole file

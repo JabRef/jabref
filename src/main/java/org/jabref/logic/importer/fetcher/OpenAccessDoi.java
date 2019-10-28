@@ -11,11 +11,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONObject;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
@@ -49,8 +49,8 @@ public class OpenAccessDoi implements FulltextFetcher {
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {
         HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
-                .header("accept", "application/json")
-                .asJson();
+                                                     .header("accept", "application/json")
+                                                     .asJson();
         JSONObject root = jsonResponse.getBody().getObject();
         Optional<String> url = Optional.ofNullable(root.optJSONObject("best_oa_location"))
                 .map(location -> location.optString("url"));
