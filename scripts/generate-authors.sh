@@ -57,7 +57,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
     # authors %aN = author name
 
     # co-authors
-    coauthors=$(git log --grep=Co-authored  | grep "Co-au" | sed "s/.*Co-authored-by: \(.*\) <.*/\1/")
-	echo -e "$authors\n$(git log --format='%aN')\n$coauthors" | LC_ALL=C.UTF-8 sort --unique --ignore-case
+    coauthors=$(git log --grep=Co-authored  | grep "Co-au" | grep "<" | sed "s/.*Co-authored-by: \(.*\) <.*/\1/")
+	echo -e "$authors\n$(git log --format='%aN')\n$coauthors" | grep -v "dependabot" | grep -v "halirutan" | grep -v "matthiasgeiger" | grep -v "Gitter Badger" | LC_ALL=C.UTF-8 sort --unique --ignore-case
 } > AUTHORS
 

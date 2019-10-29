@@ -42,6 +42,11 @@ import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents a BibTex / BibLaTeX entry.
+ *
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCiteKey(String)} and {@link #withField(Field, String)}.
+ */
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
@@ -63,6 +68,7 @@ public class BibEntry implements Cloneable {
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
+
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
@@ -75,7 +81,6 @@ public class BibEntry implements Cloneable {
      */
     public BibEntry() {
         this(IdGenerator.next(), DEFAULT_TYPE);
-
     }
 
     /**
@@ -266,8 +271,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField.KEY_FIELD}.
+     *
+     * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
      */
@@ -521,13 +527,6 @@ public class BibEntry implements Cloneable {
             eventBus.post(new FieldChangedEvent(change, eventSource));
         }
         return Optional.of(change);
-    }
-
-    public Optional<FieldChange> setField(Field field, Optional<String> value, EntryEventSource eventSource) {
-        if (value.isPresent()) {
-            return setField(field, value.get(), eventSource);
-        }
-        return Optional.empty();
     }
 
     /**

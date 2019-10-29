@@ -46,14 +46,14 @@ public class ClipBoardManager {
     private static java.awt.datatransfer.Clipboard primary;
     private static ImportFormatReader importFormatReader;
 
+    public ClipBoardManager() {
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER);
+    }
+
     public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, ImportFormatReader importFormatReader) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
         ClipBoardManager.importFormatReader = importFormatReader;
-    }
-
-    public ClipBoardManager() {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER);
     }
 
     /**
@@ -67,7 +67,7 @@ public class ClipBoardManager {
      */
     public static void addX11Support(TextInputControl input) {
         input.selectedTextProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty()) {
+            if (!newValue.isEmpty() && primary != null) {
                 primary.setContents(new StringSelection(newValue), null);
             }
         });
@@ -92,17 +92,19 @@ public class ClipBoardManager {
     }
 
     /**
-     * Get the String residing on the primary clipboard.
+     * Get the String residing on the primary clipboard (if it exists).
      *
      * @return any text found on the primary Clipboard; if none found, try with the system clipboard.
      */
     public static String getContentsPrimary() {
-        Transferable contents = primary.getContents(null);
-        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
-                return (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException | IOException e) {
-                LOGGER.warn(e.getMessage());
+        if (primary != null) {
+            Transferable contents = primary.getContents(null);
+            if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                try {
+                    return (String) contents.getTransferData(DataFlavor.stringFlavor);
+                } catch (UnsupportedFlavorException | IOException e) {
+                    LOGGER.warn(e.getMessage());
+                }
             }
         }
         return getContents();
@@ -119,12 +121,14 @@ public class ClipBoardManager {
     }
 
     /**
-     * Puts content onto the primary clipboard.
+     * Puts content onto the primary clipboard (if it exists).
      *
      * @param content the ClipboardContent to set as current value of the primary clipboard.
      */
     public void setPrimaryClipboardContent(ClipboardContent content) {
-        primary.setContents(new StringSelection(content.getString()), null);
+        if (primary != null) {
+            primary.setContents(new StringSelection(content.getString()), null);
+        }
     }
 
     public void setHtmlContent(String html) {
