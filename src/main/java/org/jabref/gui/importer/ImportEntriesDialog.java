@@ -119,16 +119,20 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                         }
                     }).executeWith(Globals.TASK_EXECUTOR);
 
-                    if (entriesListView.getItems().size() == 1) {
-                        selectAllNewEntries();
-                    }
-
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
         entriesListView.setSelectionModel(new NoSelectionModel<>());
+
+        Platform.runLater(new Runnable() {
+          public void run() {
+            if (entriesListView.getItems().size() == 1) {
+              selectAllNewEntries();
+            }
+          }
+        });
     }
 
     private Node getEntryNode(BibEntry entry) {
