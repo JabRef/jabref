@@ -18,6 +18,9 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 
+/**
+ * A column that displays the text-value of the field
+ */
 public class NormalTableColumn extends MainTableColumn<String> {
 
     private final OrFields bibtexFields;
@@ -32,12 +35,16 @@ public class NormalTableColumn extends MainTableColumn<String> {
     private final String columnName;
 
     public NormalTableColumn(String columnName, OrFields bibtexFields, BibDatabase database) {
-        super(columnName);
+        super(MainTableColumnType.NORMALFIELD);
+
         this.columnName = columnName;
         this.bibtexFields = bibtexFields;
         this.isIconColumn = false;
         this.iconLabel = Optional.empty();
         this.database = Optional.of(database);
+
+        setText(columnName);
+        setCellValueFactory(param -> getColumnValue(param.getValue()));
     }
 
     /**
@@ -49,7 +56,6 @@ public class NormalTableColumn extends MainTableColumn<String> {
         return bibtexFields.getDisplayName();
     }
 
-    @Override
     public ObservableValue<String> getColumnValue(BibEntryTableViewModel entry) {
         if (bibtexFields.isEmpty()) {
             return null;
@@ -96,7 +102,7 @@ public class NormalTableColumn extends MainTableColumn<String> {
      * The reasons for being different are (combinations may also happen): - The entry has a crossref where the field
      * content is obtained from - The field has a string in it (which getColumnValue() resolves) - There are some alias
      * fields. For example, if the entry has a date field but no year field, {@link
-     * BibEntry#getResolvedFieldOrAlias(String, BibDatabase)} will return the year value from the date field when
+     * BibEntry#getResolvedFieldOrAlias(Field, BibDatabase)} will return the year value from the date field when
      * queried for year
      *
      * @param entry the BibEntry

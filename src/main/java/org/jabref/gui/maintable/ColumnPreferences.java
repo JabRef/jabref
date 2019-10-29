@@ -7,7 +7,9 @@ import javafx.scene.control.TableColumn.SortType;
 
 public class ColumnPreferences {
 
+    public static final String QUALIFIER_SEPARATOR = ":";
     public static final double DEFAULT_FIELD_LENGTH = 100;
+
     private final boolean showFileColumn;
     private final boolean showUrlColumn;
     private final boolean preferDoiOverUrl;

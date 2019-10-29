@@ -1,15 +1,15 @@
 package org.jabref.gui.maintable;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 
-abstract class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
+class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
 
-    MainTableColumn(String text) {
-        super(text);
+    MainTableColumnType columnType;
 
-        setCellValueFactory(param -> getColumnValue(param.getValue()));
+    MainTableColumn(MainTableColumnType columnType) {
+        this.columnType = columnType;
     }
 
-    abstract ObservableValue<T> getColumnValue(BibEntryTableViewModel entry);
+    public MainTableColumnType getColumnType() { return columnType; }
+
 }
