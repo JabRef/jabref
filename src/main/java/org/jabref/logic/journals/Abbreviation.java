@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javafx.beans.property.SimpleStringProperty;
 
-import org.apache.commons.lang3.StringUtils;
+import org.jabref.model.strings.StringUtil;
 
 public class Abbreviation implements Comparable<Abbreviation> {
 
@@ -13,7 +13,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
     private final SimpleStringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
 
     public Abbreviation(String name, String abbreviation) {
-        this(name, abbreviation, StringUtils.EMPTY);
+        this(name, abbreviation, StringUtil.EMPTY);
     }
 
     public Abbreviation(String name, String abbreviation, String shortestUnique) {

@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.model.strings.StringUtil;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +71,9 @@ public class AbbreviationParser {
     private void readJournalList(Reader in) {
         try (CSVParser csvParser = new CSVParser(in, AbbreviationFormat.getCSVFormat())) {
             for (CSVRecord csvRecord : csvParser) {
-                String name = csvRecord.size() > 0 ? csvRecord.get(0) : StringUtils.EMPTY;
-                String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : StringUtils.EMPTY;
-                String shortestUniqueAbbreviation = csvRecord.size() > 2 ? csvRecord.get(2) : StringUtils.EMPTY;
+                String name = csvRecord.size() > 0 ? csvRecord.get(0) : StringUtil.EMPTY;
+                String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : StringUtil.EMPTY;
+                String shortestUniqueAbbreviation = csvRecord.size() > 2 ? csvRecord.get(2) : StringUtil.EMPTY;
 
                 // Check name and abbreviation
                 if ((name.length() <= 0) || (abbreviation.length() <= 0)) {

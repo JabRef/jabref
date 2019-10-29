@@ -25,9 +25,9 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,7 +236,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     public void addAbbreviation(String name, String abbreviation) {
-        addAbbreviation(name, abbreviation, StringUtils.EMPTY);
+        addAbbreviation(name, abbreviation, StringUtil.EMPTY);
     }
 
     /**
@@ -263,7 +263,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     public void editAbbreviation(String name, String abbreviation) {
-        editAbbreviation(name, abbreviation, StringUtils.EMPTY);
+        editAbbreviation(name, abbreviation, StringUtil.EMPTY);
     }
 
     /**
@@ -289,7 +289,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
-        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, StringUtils.EMPTY);
+        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, StringUtil.EMPTY);
     }
 
     /**
