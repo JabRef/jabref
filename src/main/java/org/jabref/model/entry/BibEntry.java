@@ -49,14 +49,17 @@ public class BibEntry implements Cloneable {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
+    
     /**
      * Map to store the words in every field
      */
     private final Map<Field, Set<String>> fieldsAsWords = new HashMap<>();
+    
     /**
      * Cache that stores latex free versions of fields.
      */
     private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
+    
     /**
      * Cache that stores the field as keyword lists (format <Field, Separator, Keyword list>)
      */
@@ -69,6 +72,7 @@ public class BibEntry implements Cloneable {
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
+    
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
