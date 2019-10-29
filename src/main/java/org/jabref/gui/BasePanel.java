@@ -908,10 +908,6 @@ public class BasePanel extends StackPane {
 
     public void markBaseChanged() {
         baseChanged = true;
-        markBasedChangedInternal();
-    }
-
-    private void markBasedChangedInternal() {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
@@ -1083,11 +1079,6 @@ public class BasePanel extends StackPane {
 
     public void cut() {
         mainTable.cut();
-    }
-
-    @Subscribe
-    public void listen(EntryChangedEvent entryChangedEvent) {
-        this.markBaseChanged();
     }
 
     private static class SearchAndOpenFile {
