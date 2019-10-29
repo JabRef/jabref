@@ -66,17 +66,17 @@ public class AbbreviationParser {
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
      * formatted as: "Full Journal Name;Abbr. Journal Name;[Shortest Unique Abbreviation]"
      *
-     * @param in a given file into a Reader object
+     * @param reader a given file into a Reader object
      */
-    private void readJournalList(Reader in) {
-        try (CSVParser csvParser = new CSVParser(in, AbbreviationFormat.getCSVFormat())) {
+    private void readJournalList(Reader reader) {
+        try (CSVParser csvParser = new CSVParser(reader, AbbreviationFormat.getCSVFormat())) {
             for (CSVRecord csvRecord : csvParser) {
                 String name = csvRecord.size() > 0 ? csvRecord.get(0) : StringUtil.EMPTY;
                 String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : StringUtil.EMPTY;
                 String shortestUniqueAbbreviation = csvRecord.size() > 2 ? csvRecord.get(2) : StringUtil.EMPTY;
 
                 // Check name and abbreviation
-                if ((name.length() <= 0) || (abbreviation.length() <= 0)) {
+                if (name.isEmpty() || abbreviation.isEmpty()) {
                     return;
                 }
 
