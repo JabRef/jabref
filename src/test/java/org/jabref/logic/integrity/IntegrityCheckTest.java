@@ -348,7 +348,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW", "")), true, false)
+                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
                 .checkDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -386,7 +386,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW", "")), true, false)
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
                 .checkDatabase();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -395,7 +395,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW", "")), true, false
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
@@ -404,7 +404,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW", "")), true,
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
                 allowIntegerEdition
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JournalAbbreviationLoader {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
     // journal initialization
@@ -93,7 +94,6 @@ public class JournalAbbreviationLoader {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }
         }
-
     }
 
     public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {

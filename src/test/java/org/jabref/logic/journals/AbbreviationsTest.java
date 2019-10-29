@@ -31,7 +31,7 @@ public class AbbreviationsTest {
     public void getNextAbbreviationExpandsIEEEAbbreviation() {
         when(prefs.useIEEEAbbreviations()).thenReturn(true);
 
-        assertEquals("#IEEE_J_PROC#",
+        assertEquals("Proceedings of the IEEE",
                 abbreviations.getRepository(prefs)
                              .getNextAbbreviation("#IEEE_J_PROC#").get());
     }
@@ -52,7 +52,7 @@ public class AbbreviationsTest {
 
     @Test
     public void getNextAbbreviationExpandsAbbreviation() {
-        assertEquals("",
+        assertEquals("Proceedings of the IEEE",
                 abbreviations.getRepository(prefs)
                              .getNextAbbreviation("Proc IEEE").get());
     }

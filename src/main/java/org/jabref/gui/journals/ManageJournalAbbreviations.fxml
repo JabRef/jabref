@@ -19,7 +19,7 @@
               <columns>
                   <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full journal name"/>
                   <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name"/>
-                  <TableColumn fx:id="journalTableShortestUniqueColumn" prefWidth="200.0" text="%Shortest unique name"/>
+                  <TableColumn fx:id="journalTableShortestUniqueAbbreviationColumn" prefWidth="200.0" text="%Shortest unique abbreviation"/>
                   <TableColumn fx:id="journalTableEditColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
                   <TableColumn fx:id="journalTableDeleteColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
               </columns>

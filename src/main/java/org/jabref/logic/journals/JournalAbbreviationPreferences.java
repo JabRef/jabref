@@ -9,8 +9,9 @@ public class JournalAbbreviationPreferences {
     private final Charset defaultEncoding;
     private List<String> externalJournalLists;
     private boolean useIEEEAbbreviations;
+
     public JournalAbbreviationPreferences(List<String> externalJournalLists, String personalJournalLists,
-            boolean useIEEEAbbreviations, Charset defaultEncoding) {
+                                          boolean useIEEEAbbreviations, Charset defaultEncoding) {
         this.externalJournalLists = externalJournalLists;
         this.personalJournalLists = personalJournalLists;
         this.useIEEEAbbreviations = useIEEEAbbreviations;

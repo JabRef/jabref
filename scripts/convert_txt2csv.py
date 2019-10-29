@@ -26,5 +26,5 @@ for file in glob.glob("../src/main/resources/journals/*.txt"):
     df = pd.read_csv(fileName + ".txt", sep=separator, skiprows=commented_lines, header=None, engine="python", skipinitialspace=True, index_col=0, names=["Name", "Abbrev"])
     df.index = df.index.str.strip()
     df = df.Abbrev.str.split(";", expand=True)
-    df.to_csv(fileName + ".csv", sep="\t", header=False)
+    df.to_csv(fileName + ".csv", sep=";", header=False)
     print(fileName + ".csv")

@@ -4,18 +4,22 @@ import java.util.Objects;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class Abbreviation implements Comparable<Abbreviation> {
+import org.apache.commons.lang3.StringUtils;
 
-    private static final String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
+public class Abbreviation implements Comparable<Abbreviation> {
 
     private final SimpleStringProperty name = new SimpleStringProperty("");
     private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
-    private final SimpleStringProperty shortestUnique = new SimpleStringProperty("");
+    private final SimpleStringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
+
+    public Abbreviation(String name, String abbreviation) {
+        this(name, abbreviation, StringUtils.EMPTY);
+    }
 
     public Abbreviation(String name, String abbreviation, String shortestUnique) {
         this.name.set(Objects.requireNonNull(name).trim());
         this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
-        this.shortestUnique.set(shortestUnique.trim());
+        this.shortestUniqueAbbreviation.set(shortestUnique.trim());
     }
 
     public String getName() {
@@ -42,28 +46,24 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return abbreviation;
     }
 
-    public String getShortestUnique() {
-        return this.shortestUnique.get();
-    }
-
-    public void setShortestUnique(String shortestUnique) {
-        this.shortestUnique.set(shortestUnique);
-    }
-
-    public SimpleStringProperty shortestUniqueProperty() {
-        return shortestUnique;
-    }
-
-    public String getIsoAbbreviation() {
-        if (getAbbreviation().contains(SPLITTER)) {
-            String[] restParts = getAbbreviation().split(SPLITTER);
-            return restParts[0].trim();
+    public String getShortestUniqueAbbreviation() {
+        String result = this.shortestUniqueAbbreviation.get();
+        if (result.isEmpty()) {
+            return getAbbreviation();
         }
-        return getAbbreviation();
+        return result;
+    }
+
+    public void setShortestUniqueAbbreviation(String shortestUniqueAbbreviation) {
+        this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation);
+    }
+
+    public SimpleStringProperty shortestUniqueAbbreviationProperty() {
+        return shortestUniqueAbbreviation;
     }
 
     public String getMedlineAbbreviation() {
-        return getIsoAbbreviation().replace(".", " ").replace("  ", " ").trim();
+        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
     }
 
     @Override
@@ -74,20 +74,21 @@ public class Abbreviation implements Comparable<Abbreviation> {
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
-        if (getShortestUnique().equals(currentTrimmed)) {
+        if (getMedlineAbbreviation().equals(currentTrimmed)) {
+            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
+        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
-            return getIsoAbbreviation();
-        } else if (getIsoAbbreviation().equals(currentTrimmed)) {
-            return getMedlineAbbreviation();
+            return getAbbreviation();
         } else {
-            return getShortestUnique();
+            return getMedlineAbbreviation();
         }
     }
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, iso=%s, medline=%s, shortestUnique=%s}", getName(), getIsoAbbreviation(), getMedlineAbbreviation(), getShortestUnique());
+        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+                getName(), getAbbreviation(), getMedlineAbbreviation(), getShortestUniqueAbbreviation());
     }
 
     @Override

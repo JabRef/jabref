@@ -12,12 +12,11 @@ import org.jabref.model.entry.field.Field;
 public class UndoableAbbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final int abbrvType;
+    private final AbbreviationType abbreviationType;
 
-
-    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, int abbrvType) {
+    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
-        this.abbrvType = abbrvType;
+        this.abbreviationType = abbreviationType;
     }
 
     /**
@@ -33,6 +32,7 @@ public class UndoableAbbreviator {
         if (!entry.hasField(fieldName)) {
             return false;
         }
+
         String text = entry.getField(fieldName).get();
         String origText = text;
         if (database != null) {
@@ -55,13 +55,15 @@ public class UndoableAbbreviator {
     }
 
     private String getAbbreviatedName(Abbreviation text) {
-        if (abbrvType == 0) {
-            return text.getIsoAbbreviation();
-        } else if (abbrvType == 1) {
-            return text.getMedlineAbbreviation();
-        } else if (abbrvType == 2) {
-            return text.getShortestUnique();
+        switch (abbreviationType) {
+            case DEFAULT:
+                return text.getAbbreviation();
+            case MEDLINE:
+                return text.getMedlineAbbreviation();
+            case SHORTEST_UNIQUE:
+                return text.getShortestUniqueAbbreviation();
+            default:
+                throw new IllegalStateException("Unexpected value: " + abbreviationType);
         }
-        return null;
     }
 }

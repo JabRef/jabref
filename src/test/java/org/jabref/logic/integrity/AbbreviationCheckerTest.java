@@ -18,7 +18,7 @@ class AbbreviationCheckerTest {
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository = new JournalAbbreviationRepository(new Abbreviation("Test Journal", "T. J.", "TJ"));
+        abbreviationRepository = new JournalAbbreviationRepository(new Abbreviation("Test Journal", "T. J."));
         checker = new AbbreviationChecker(abbreviationRepository);
     }
 
@@ -29,7 +29,7 @@ class AbbreviationCheckerTest {
 
     @Test
     void checkValueDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
-        abbreviationRepository.addEntry(new Abbreviation("Journal", "Journal", "J"));
+        abbreviationRepository.addEntry(new Abbreviation("Journal", "Journal"));
         assertEquals(Optional.empty(), checker.checkValue("Journal"));
     }
 }

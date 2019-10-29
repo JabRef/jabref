@@ -22,15 +22,15 @@ public class JournalAbbreviationRepository {
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
-                || name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUnique());
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
-        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
+        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUnique());
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         return isAbbreviated && !isExpanded;
     }
@@ -69,9 +69,7 @@ public class JournalAbbreviationRepository {
         Objects.requireNonNull(abbreviation);
 
         // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
-        if (abbreviations.contains(abbreviation)) {
-            abbreviations.remove(abbreviation);
-        }
+        abbreviations.remove(abbreviation);
 
         abbreviations.add(abbreviation);
     }
@@ -88,15 +86,15 @@ public class JournalAbbreviationRepository {
         return getAbbreviation(text).map(abbreviation -> abbreviation.getNext(text));
     }
 
+    public Optional<String> getDefaultAbbreviation(String text) {
+        return getAbbreviation(text).map(Abbreviation::getAbbreviation);
+    }
+
     public Optional<String> getMedlineAbbreviation(String text) {
         return getAbbreviation(text).map(Abbreviation::getMedlineAbbreviation);
     }
 
-    public Optional<String> getIsoAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getIsoAbbreviation);
-    }
-
-    public Optional<String> getShortestUnique(String text) {
-        return getAbbreviation(text).map(Abbreviation::getShortestUnique);
+    public Optional<String> getShortestUniqueAbbreviation(String text) {
+        return getAbbreviation(text).map(Abbreviation::getShortestUniqueAbbreviation);
     }
 }
