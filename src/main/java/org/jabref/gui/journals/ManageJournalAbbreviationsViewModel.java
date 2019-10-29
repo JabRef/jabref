@@ -174,7 +174,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * abbreviation files. If the file also exists its abbreviations will be read and written to the abbreviations
      * property.
      *
-     * @param filePath to the file
+     * @param filePath path to the file
      */
     private void openFile(Path filePath) {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
@@ -242,9 +242,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     /**
      * Method to change the currentAbbrevaition property to a new abbreviation.
      *
-     * @param name                       of the abbreviation
-     * @param abbreviation               of the abbreviation
-     * @param shortestUniqueAbbreviation of the abbreviation
+     * @param name                       name of the abbreviation
+     * @param abbreviation               default abbreviation of the abbreviation
+     * @param shortestUniqueAbbreviation shortest unique abreviation of the abbreviation
      */
     public void editAbbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         if (isAbbreviationEditableAndRemovable.get()) {
@@ -267,12 +267,12 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     /**
-     * Sets the name and the abbreviation of the {@code currentAbbreviation} property to the values of the {@code
-     * abbreviationsName}, {@code abbreviationsAbbreviation}, and {@code shortestUnique} properties.
+     * Sets the name and the abbreviation of the {@code currentAbbreviation} property to the values of the {@code name},
+     * {@code abbreviation}, and {@code shortestUniqueAbbreviation} properties.
      *
-     * @param name                       of the abbreviation
-     * @param abbreviation               of the abbreviation
-     * @param shortestUniqueAbbreviation of the abbreviation
+     * @param name                       name of the abbreviation
+     * @param abbreviation               default abbreviation of the abbreviation
+     * @param shortestUniqueAbbreviation shortest unique abreviation of the abbreviation
      */
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation, String shortestUniqueAbbreviation) {
         if (name.trim().isEmpty()) {
