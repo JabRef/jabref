@@ -5,7 +5,6 @@ package org.jabref.gui.actions;
  */
 @Deprecated
 public enum Actions {
-
     ABBREVIATE_DEFAULT,
     ABBREVIATE_MEDLINE,
     ABBREVIATE_SHORTEST_UNIQUE,

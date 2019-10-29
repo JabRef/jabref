@@ -219,9 +219,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * Method to add a new abbreviation to the abbreviations list property. It also sets the currentAbbreviation
      * property to the new abbreviation.
      *
-     * @param name                       of the abbreviation
-     * @param abbreviation               of the abbreviation
-     * @param shortestUniqueAbbreviation of the abbreviation
+     * @param name                       name of the abbreviation
+     * @param abbreviation               default abbreviation of the abbreviation
+     * @param shortestUniqueAbbreviation shortest unique abreviation of the abbreviation
      */
     public void addAbbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
