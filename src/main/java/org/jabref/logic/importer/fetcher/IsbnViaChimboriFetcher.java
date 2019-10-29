@@ -13,14 +13,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import kong.unirest.RawResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 /**
  * Fetcher for ISBN using https://bibtex.chimbori.com/, which in turn uses Amazon's API.
  */
 public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
+    private RawResponse postResponse;
 
     public IsbnViaChimboriFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
@@ -47,21 +48,21 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
 
         this.ensureThatIsbnIsValid(identifier);
 
-        HttpResponse<String> postResponse;
+        postResponse = null;
         try {
-            postResponse = Unirest.post("https://bibtex.chimbori.com/isbn-bibtex")
-                    .field("isbn", identifier)
-                    .asString();
+            Unirest.post("https://bibtex.chimbori.com/isbn-bibtex")
+                   .field("isbn", identifier)
+                   .thenConsume(rawResponse -> postResponse = rawResponse);
         } catch (UnirestException e) {
             throw new FetcherException("Could not retrieve data from chimbori.com", e);
         }
         if (postResponse.getStatus() != 200) {
-            throw new FetcherException("Error while retrieving data from chimbori.com: " + postResponse.getBody());
+            throw new FetcherException("Error while retrieving data from chimbori.com: " + postResponse.getContentAsString());
         }
 
         List<BibEntry> fetchedEntries;
         try {
-            fetchedEntries = getParser().parseEntries(postResponse.getRawBody());
+            fetchedEntries = getParser().parseEntries(postResponse.getContent());
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }

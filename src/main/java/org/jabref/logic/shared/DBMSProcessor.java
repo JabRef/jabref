@@ -473,7 +473,10 @@ public abstract class DBMSProcessor {
                     lastId = selectEntryResultSet.getInt("SHARED_ID");
                 }
 
-                bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntryEventSource.SHARED);
+                String value = selectEntryResultSet.getString("VALUE");
+                if (value != null) {
+                    bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntryEventSource.SHARED);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);

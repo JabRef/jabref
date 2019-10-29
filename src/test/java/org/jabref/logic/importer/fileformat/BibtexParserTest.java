@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.InternalField;
@@ -1710,5 +1711,77 @@ class BibtexParserTest {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003} }");
 
         assertEquals(new Date(2003), result.get().getPublicationDate().get());
+    }
+
+    @Test
+    void parseEntryUsingStringConstantsForTwoAuthorsWithEtAsStringConstant() throws ParseException {
+        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        Collection<BibEntry> parsed = parser
+                .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
+                        "@String { kubovy = \"Kubovy, Jan\" }" +
+                        "@String { et = \" and \" }" +
+                        "@Misc{m1, author = kopp # et # kubovy }" );
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+                .withCiteKey("m1")
+                .withField(StandardField.AUTHOR, "#kopp##et##kubovy#");
+
+        assertEquals(List.of(expectedEntry), parsed);
+    }
+
+    @Test
+    void parseStringConstantsForTwoAuthorsHasCorrectBibTeXEntry() throws ParseException {
+        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        Collection<BibEntry> parsed = parser
+                .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
+                        "@String { kubovy = \"Kubovy, Jan\" }" +
+                        "@String { et = \" and \" }" +
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+                .withCiteKey("m2")
+                .withField(StandardField.AUTHOR, "#kopp# and #kubovy#");
+
+        assertEquals(List.of(expectedEntry), parsed);
+    }
+
+    @Test
+    void parseStringConstantsForTwoAuthors() throws ParseException {
+        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        Collection<BibEntry> parsed = parser
+                .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
+                        "@String { kubovy = \"Kubovy, Jan\" }" +
+                        "@String { et = \" and \" }" +
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+
+        assertEquals("#kopp# and #kubovy#", parsed.iterator().next().getField(StandardField.AUTHOR).get());
+    }
+
+    @Test
+    void textAprilIsParsedAsMonthApril() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+
+        assertEquals(Month.APRIL, result.get().getMonth().get());
+    }
+
+    @Test
+    void textAprilIsDisplayedAsConstant() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+
+        assertEquals("apr", result.get().getField(StandardField.MONTH).get());
+    }
+
+    @Test
+    void bibTeXConstantAprilIsParsedAsMonthApril() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+
+        assertEquals(Month.APRIL, result.get().getMonth().get());
+    }
+
+    @Test
+    void bibTeXConstantAprilIsDisplayedAsConstant() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+
+        assertEquals("#apr#", result.get().getField(StandardField.MONTH).get());
     }
 }

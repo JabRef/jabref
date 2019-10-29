@@ -17,7 +17,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '2.4.2'
+    id 'com.gradle.build-scan' version '3.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
@@ -161,7 +161,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
+    compile 'com.konghq:unirest-java:3.1.03'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -217,7 +217,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.15-alpha"
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.25'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
