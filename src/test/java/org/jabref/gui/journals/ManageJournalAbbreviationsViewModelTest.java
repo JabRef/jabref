@@ -294,6 +294,18 @@ class ManageJournalAbbreviationsViewModelTest {
     }
 
     @Test
+    void testEditSameAbbreviationWithShortestUniqueAbbreviationWithNoChangeDoesNotResultInException() throws Exception {
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
+        viewModel.addNewFile();
+        viewModel.selectLastJournalFile();
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE", "Y");
+        addAbbrevaition(testAbbreviation);
+        editAbbreviation(testAbbreviation);
+
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+    }
+
+    @Test
     void testEditAbbreviationIncludesNewAbbreviationInAbbreviationsList() throws Exception {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile4Entries));
         viewModel.addNewFile();
@@ -443,7 +455,7 @@ class ManageJournalAbbreviationsViewModelTest {
 
     private Path createTestFile(Path folder, String name, String content) throws Exception {
         Path file = folder.resolve(name);
-        Files.write(file, content.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(file, content);
         return file;
     }
 
