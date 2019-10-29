@@ -108,30 +108,30 @@ class BibEntryWriterTest {
 
     @Test
     void writeEntryWithOrField() throws Exception {
-            StringWriter stringWriter = new StringWriter();
+        StringWriter stringWriter = new StringWriter();
 
-            BibEntry entry = new BibEntry(StandardEntryType.InBook);
-            //set an required OR field (author/editor)
-            entry.setField(StandardField.EDITOR, "Foo Bar");
-            entry.setField(StandardField.JOURNAL, "International Journal of Something");
-            //set an optional field
-            entry.setField(StandardField.NUMBER, "1");
-            entry.setField(StandardField.NOTE, "some note");
+        BibEntry entry = new BibEntry(StandardEntryType.InBook);
+        //set an required OR field (author/editor)
+        entry.setField(StandardField.EDITOR, "Foo Bar");
+        entry.setField(StandardField.JOURNAL, "International Journal of Something");
+        //set an optional field
+        entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.NOTE, "some note");
 
-            writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
 
-            String actual = stringWriter.toString();
+        String actual = stringWriter.toString();
 
-            // @formatter:off
-            String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
-                    "  editor  = {Foo Bar}," + OS.NEWLINE +
-                    "  note    = {some note}," + OS.NEWLINE +
-                    "  number  = {1}," + OS.NEWLINE +
-                    "  journal = {International Journal of Something}," + OS.NEWLINE +
-                    "}" + OS.NEWLINE;
-            // @formatter:on
+        // @formatter:off
+        String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
+                "  editor  = {Foo Bar}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
 
-            assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -424,6 +424,36 @@ class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    void constantMonthApril() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.MONTH, "#apr#");
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                        "@Misc{," + OS.NEWLINE +
+                        "  month = apr," + OS.NEWLINE +
+                        "}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void monthApril() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.MONTH, "apr");
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                        "@Misc{," + OS.NEWLINE +
+                        "  month = {apr}," + OS.NEWLINE +
+                        "}" + OS.NEWLINE,
+                stringWriter.toString());
     }
 
     @Test

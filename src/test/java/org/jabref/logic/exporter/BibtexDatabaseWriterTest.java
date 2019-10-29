@@ -289,7 +289,24 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtrip() throws Exception {
+    void roundtripWithArticleMonths() throws Exception {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/articleWithMonths.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+
+        when(preferences.getEncoding()).thenReturn(encoding);
+        when(preferences.isSaveInOriginalOrder()).thenReturn(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
+        try (Scanner scanner = new Scanner(testBibtexFile, encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
+
+    @Test
+    void roundtripWithComplexBib() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
