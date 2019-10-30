@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -79,7 +79,7 @@ public class DBMSSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry);
         // should not add into shared database.
-        bibDatabase.insertEntry(furtherEntry, EntryEventSource.SHARED);
+        bibDatabase.insertEntry(furtherEntry, EntriesEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
@@ -94,7 +94,7 @@ public class DBMSSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry);
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
-        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntryEventSource.SHARED);
+        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntriesEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
@@ -117,7 +117,7 @@ public class DBMSSynchronizerTest {
         assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
-        bibDatabase.removeEntry(bibEntry, EntryEventSource.SHARED);
+        bibDatabase.removeEntry(bibEntry, EntriesEventSource.SHARED);
 
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());

@@ -84,7 +84,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -1119,7 +1119,7 @@ public class BasePanel extends StackPane {
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
+            if (addedEntryEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
                 return;
             }
 

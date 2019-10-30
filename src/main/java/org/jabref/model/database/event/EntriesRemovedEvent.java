@@ -2,7 +2,7 @@ package org.jabref.model.database.event;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class EntriesRemovedEvent extends EntriesEvent {
      * @param <code>List</List></code> of bibEntry <code>BibEntry</code> object which have been removed.
      * @param location Location affected by this event
      */
-    public EntriesRemovedEvent(List<BibEntry> bibEntries, EntryEventSource location) {
+    public EntriesRemovedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
     }
 

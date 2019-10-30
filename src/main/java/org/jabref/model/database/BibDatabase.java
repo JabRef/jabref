@@ -28,7 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -193,7 +193,7 @@ public class BibDatabase {
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntryEventSource.LOCAL);
+        return insertEntry(entry, EntriesEventSource.LOCAL);
     }
 
     /**
@@ -204,20 +204,20 @@ public class BibDatabase {
      * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntriesEventSource eventSource) throws KeyCollisionException {
         insertEntries(Collections.singletonList(entry), eventSource);
         return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
     public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
-        insertEntries(Arrays.asList(entries), EntryEventSource.LOCAL);
+        insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);
     }
 
     public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
-        insertEntries(entries, EntryEventSource.LOCAL);
+        insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
 
         BibEntry firstEntry = null;
@@ -246,7 +246,7 @@ public class BibDatabase {
         removeEntries(Collections.singletonList(bibEntry));
     }
 
-    public synchronized void removeEntry(BibEntry bibEntry, EntryEventSource eventSource) {
+    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
         removeEntries(Collections.singletonList(bibEntry), eventSource);
     }
 
@@ -256,7 +256,7 @@ public class BibDatabase {
      * @param toBeDeleted Entries to delete
      */
     public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
-        removeEntries(toBeDeleted, EntryEventSource.LOCAL);
+        removeEntries(toBeDeleted, EntriesEventSource.LOCAL);
     }
 
     /**
@@ -266,7 +266,7 @@ public class BibDatabase {
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntryEventSource eventSource) {
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
         //Require not empty?
 

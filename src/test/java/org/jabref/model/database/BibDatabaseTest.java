@@ -228,7 +228,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void removeEntryPostsRemovedEntryEvent() {
+    public void removeEntryPostsRemovedEntriesEvent() {
         BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
         database.insertEntry(expectedEntry);

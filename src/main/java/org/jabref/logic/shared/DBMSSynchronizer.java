@@ -28,7 +28,7 @@ import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.MetaData;
@@ -77,7 +77,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Subscribe
     public void listen(EntryAddedEvent event) {
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
+        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
@@ -93,7 +93,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
+        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
         if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
@@ -112,7 +112,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     // This has not been made parallel yet - hence the for loop - that will take more effort
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
+        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             List<BibEntry> entries = event.getBibEntries();
@@ -193,11 +193,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
                         if (sharedEntry.isPresent()) {
                             // update fields
-                            localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
+                            localEntry.setType(sharedEntry.get().getType(), EntriesEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (Field field : sharedEntry.get().getFields()) {
-                                localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
+                                localEntry.setField(field, sharedEntry.get().getField(field), EntriesEventSource.SHARED);
                             }
 
                             Set<Field> redundantLocalEntryFields = localEntry.getFields();
@@ -205,7 +205,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
                             // remove not existing fields
                             for (Field redundantField : redundantLocalEntryFields) {
-                                localEntry.clearField(redundantField, EntryEventSource.SHARED);
+                                localEntry.clearField(redundantField, EntriesEventSource.SHARED);
                             }
                         }
                     }
@@ -217,7 +217,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         for (BibEntry bibEntry : dbmsProcessor.getSharedEntries(entriesToDrag)) {
-            bibDatabase.insertEntry(bibEntry, EntryEventSource.SHARED);
+            bibDatabase.insertEntry(bibEntry, EntriesEventSource.SHARED);
         }
     }
 
@@ -244,7 +244,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
         }
-        bibDatabase.removeEntries(entriesToRemove, EntryEventSource.SHARED); // Should not reach the listeners above.
+        bibDatabase.removeEntries(entriesToRemove, EntriesEventSource.SHARED); // Should not reach the listeners above.
     }
 
     /**
@@ -352,14 +352,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Checks whether the {@link EntryEventSource} of an {@link EntriesEvent} is crucial for this class.
+     * Checks whether the {@link EntriesEventSource} of an {@link EntriesEvent} is crucial for this class.
      *
      * @param event An {@link EntriesEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */
     public boolean isEventSourceAccepted(EntriesEvent event) {
-        EntryEventSource eventSource = event.getEntryEventSource();
-        return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
+        EntriesEventSource eventSource = event.getEntriesEventSource();
+        return ((eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO));
     }
 
     @Override

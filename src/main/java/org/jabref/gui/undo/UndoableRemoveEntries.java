@@ -3,7 +3,7 @@ package org.jabref.gui.undo;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
     @Override
     public void undo() {
         super.undo();
-        base.insertEntries(entries, EntryEventSource.UNDO);
+        base.insertEntries(entries, EntriesEventSource.UNDO);
     }
 
     @Override

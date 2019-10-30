@@ -13,21 +13,21 @@ import org.jabref.model.entry.BibEntry;
 public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
 
     private final List<BibEntry> bibEntries;
-    private final EntryEventSource location;
+    private final EntriesEventSource location;
 
 
     /**
      * @param List of bibEntry BibEntry objects which are involved in this event
      */
     public EntriesEvent(List<BibEntry> bibEntries) {
-        this(bibEntries, EntryEventSource.LOCAL);
+        this(bibEntries, EntriesEventSource.LOCAL);
     }
 
     /**
      * @param List of bibEntry BibEntry objects which are involved in this event
      * @param location Location affected by this event
      */
-    public EntriesEvent(List<BibEntry> bibEntries, EntryEventSource location) {
+    public EntriesEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         this.bibEntries = Objects.requireNonNull(bibEntries);
         this.location = Objects.requireNonNull(location);
     }
@@ -39,7 +39,7 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
         return this.bibEntries;
     }
 
-    public EntryEventSource getEntryEventSource() {
+    public EntriesEventSource getEntriesEventSource() {
         return this.location;
     }
 }

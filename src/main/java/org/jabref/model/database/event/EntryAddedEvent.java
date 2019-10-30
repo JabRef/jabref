@@ -3,7 +3,7 @@ package org.jabref.model.database.event;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 
 import java.util.Collections;
 
@@ -23,7 +23,7 @@ public class EntryAddedEvent extends EntriesEvent {
      * @param bibEntry <code>BibEntry</code> object which has been added.
      * @param location Location affected by this event
      */
-    public EntryAddedEvent(BibEntry bibEntry, EntryEventSource location) {
+    public EntryAddedEvent(BibEntry bibEntry, EntriesEventSource location) {
         super(Collections.singletonList(bibEntry), location);
     }
 }

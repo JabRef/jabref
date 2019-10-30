@@ -22,7 +22,7 @@ import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -473,7 +473,7 @@ public abstract class DBMSProcessor {
                     lastId = selectEntryResultSet.getInt("SHARED_ID");
                 }
 
-                bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntryEventSource.SHARED);
+                bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), Optional.ofNullable(selectEntryResultSet.getString("VALUE")), EntriesEventSource.SHARED);
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
