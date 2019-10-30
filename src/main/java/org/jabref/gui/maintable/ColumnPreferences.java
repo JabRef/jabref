@@ -10,10 +10,6 @@ public class ColumnPreferences {
     public static final String QUALIFIER_SEPARATOR = ":";
     public static final double DEFAULT_FIELD_LENGTH = 100;
 
-    private final boolean showFileColumn;
-    private final boolean showUrlColumn;
-    private final boolean preferDoiOverUrl;
-    private final boolean showEPrintColumn;
     private final List<String> columnNames;
     private final boolean specialFieldsEnabled;
     private final boolean autoSyncSpecialFieldsToKeyWords;
@@ -22,11 +18,7 @@ public class ColumnPreferences {
     private final Map<String, Double> columnWidths;
     private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEPrintColumn, List<String> columnNames, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
-        this.showFileColumn = showFileColumn;
-        this.showUrlColumn = showUrlColumn;
-        this.preferDoiOverUrl = preferDoiOverUrl;
-        this.showEPrintColumn = showEPrintColumn;
+    public ColumnPreferences(List<String> columnNames, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
         this.columnNames = columnNames;
         this.specialFieldsEnabled = specialFieldsEnabled;
         this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
@@ -34,22 +26,6 @@ public class ColumnPreferences {
         this.extraFileColumnsEnabled = extraFileColumnsEnabled;
         this.columnWidths = columnWidths;
         this.columnSortType = columnSortType;
-    }
-
-    public boolean showFileColumn() {
-        return showFileColumn;
-    }
-
-    public boolean showUrlColumn() {
-        return showUrlColumn;
-    }
-
-    public boolean preferDoiOverUrl() {
-        return preferDoiOverUrl;
-    }
-
-    public boolean showEprintColumn() {
-        return showEPrintColumn;
     }
 
     public boolean getSpecialFieldsEnabled() { return specialFieldsEnabled; }

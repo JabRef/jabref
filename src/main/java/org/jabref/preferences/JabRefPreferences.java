@@ -206,10 +206,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
-    public static final String ARXIV_COLUMN = "arxivColumn";
-    public static final String FILE_COLUMN = "fileColumn";
-    public static final String PREFER_URL_DOI = "preferUrlDoi";
-    public static final String URL_COLUMN = "urlColumn";
     // Colors
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
@@ -598,11 +594,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // default icon colors
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
-
-        defaults.put(URL_COLUMN, Boolean.TRUE);
-        defaults.put(PREFER_URL_DOI, Boolean.FALSE);
-        defaults.put(FILE_COLUMN, Boolean.TRUE);
-        defaults.put(ARXIV_COLUMN, Boolean.FALSE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -1879,10 +1870,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
-                getBoolean(FILE_COLUMN),
-                getBoolean(URL_COLUMN),
-                getBoolean(PREFER_URL_DOI),
-                getBoolean(ARXIV_COLUMN),
                 getStringList(COLUMN_NAMES),
                 getBoolean(SPECIALFIELDSENABLED),
                 getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
@@ -1893,10 +1880,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putBoolean(FILE_COLUMN, columnPreferences.showFileColumn());
-        putBoolean(URL_COLUMN, columnPreferences.showUrlColumn());
-        putBoolean(PREFER_URL_DOI, columnPreferences.preferDoiOverUrl());
-        putBoolean(ARXIV_COLUMN, columnPreferences.showEprintColumn());
         putStringList(COLUMN_NAMES, columnPreferences.getColumnNames());
 
         putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());

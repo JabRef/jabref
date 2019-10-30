@@ -43,11 +43,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
-    private final BooleanProperty showFileColumnProperty = new SimpleBooleanProperty();
-    private final BooleanProperty showUrlColumnProperty = new SimpleBooleanProperty();
-    private final BooleanProperty preferUrlProperty = new SimpleBooleanProperty();
-    private final BooleanProperty preferDoiProperty = new SimpleBooleanProperty();
-    private final BooleanProperty showEPrintColumnProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
     private FunctionBasedValidator columnsNotEmptyValidator;
@@ -90,11 +85,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        showFileColumnProperty.setValue(columnPreferences.showFileColumn());
-        showUrlColumnProperty.setValue(columnPreferences.showUrlColumn());
-        preferUrlProperty.setValue(!columnPreferences.preferDoiOverUrl());
-        preferDoiProperty.setValue(columnPreferences.preferDoiOverUrl());
-        showEPrintColumnProperty.setValue(columnPreferences.showEprintColumn());
         specialFieldsEnabledProperty.setValue(columnPreferences.getSpecialFieldsEnabled());
         specialFieldsSyncKeywordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
         specialFieldsSerializeProperty.setValue(columnPreferences.getSerializeSpecialFields());
@@ -193,17 +183,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         List<String> columnNames = columnsListProperty.stream()
-                .map(item -> item.getField().getName()).collect(Collectors.toList());
+                                                      .map(item -> item.getField().getName()).collect(Collectors.toList());
 
         // for each column get either actual width or - if it does not exist - default value
         Map<String,Double> columnWidths = new HashMap<>();
         columnNames.forEach(field -> columnWidths.put(field,columnPreferences.getColumnWidth(field)));
 
         ColumnPreferences newColumnPreferences = new ColumnPreferences(
-                showFileColumnProperty.getValue(),
-                showUrlColumnProperty.getValue(),
-                preferDoiProperty.getValue(),
-                showEPrintColumnProperty.getValue(),
                 columnNames,
                 specialFieldsEnabledProperty.getValue(),
                 specialFieldsSyncKeywordsProperty.getValue(),
@@ -251,21 +237,11 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<Field> addColumnProperty() { return this.addColumnProperty; }
 
-    public BooleanProperty showFileColumnProperty() { return this.showFileColumnProperty; }
-
-    public BooleanProperty showUrlColumnProperty() { return this.showUrlColumnProperty; }
-
-    public BooleanProperty preferUrlProperty() { return this.preferUrlProperty; }
-
-    public BooleanProperty preferDoiProperty() { return this.preferDoiProperty; }
-
     public BooleanProperty specialFieldsEnabledProperty() { return this.specialFieldsEnabledProperty; }
 
     public BooleanProperty specialFieldsSyncKeywordsProperty() { return this.specialFieldsSyncKeywordsProperty; }
 
     public BooleanProperty specialFieldsSerializeProperty() { return this.specialFieldsSerializeProperty; }
-
-    public BooleanProperty showEPrintColumnProperty() { return this.showEPrintColumnProperty; }
 
     public BooleanProperty extraFileColumnsEnabledProperty() { return this.extraFileColumnsEnabledProperty; }
 

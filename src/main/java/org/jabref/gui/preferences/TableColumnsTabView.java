@@ -32,11 +32,6 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
     @FXML private TableColumn<TableColumnsItemModel, Field> actionsColumn;
     @FXML private ComboBox<Field> addColumnName;
-    @FXML private CheckBox showFileColumn;
-    @FXML private CheckBox showUrlColumn;
-    @FXML private RadioButton urlFirst;
-    @FXML private RadioButton doiFirst;
-    @FXML private CheckBox showEPrintColumn;
     @FXML private CheckBox specialFieldsEnable;
     @FXML private Button specialFieldsHelp;
     @FXML private RadioButton specialFieldsSyncKeywords;
@@ -107,11 +102,6 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     }
 
     private void setupBindings() {
-        showFileColumn.selectedProperty().bindBidirectional(viewModel.showFileColumnProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(viewModel.showUrlColumnProperty());
-        urlFirst.selectedProperty().bindBidirectional(viewModel.preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(viewModel.preferDoiProperty());
-        showEPrintColumn.selectedProperty().bindBidirectional(viewModel.showEPrintColumnProperty());
         specialFieldsEnable.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
         specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
         specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
