@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
@@ -178,6 +177,8 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+        // Open entry editor for first entry on start up.
+        Platform.runLater(() -> clearAndSelectFirst());
     }
 
     @Subscribe
@@ -733,10 +734,7 @@ public class BasePanel extends StackPane {
 
         createMainTable();
 
-        ScrollPane pane = mainTable.getPane();
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-        splitPane.getItems().add(pane);
+        splitPane.getItems().add(mainTable);
 
         // Set up name autocompleter for search:
         setupAutoCompletion();
@@ -857,6 +855,14 @@ public class BasePanel extends StackPane {
         mainTable.clearAndSelect(bibEntry);
     }
 
+    /**
+     * Select and open entry editor for first entry in main table.
+     */
+    private void clearAndSelectFirst() {
+        mainTable.clearAndSelectFirst();
+        showAndEdit();
+    }
+
     public void selectPreviousEntry() {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }
@@ -895,10 +901,6 @@ public class BasePanel extends StackPane {
 
     public void markBaseChanged() {
         baseChanged = true;
-        markBasedChangedInternal();
-    }
-
-    private void markBasedChangedInternal() {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
@@ -1070,11 +1072,6 @@ public class BasePanel extends StackPane {
 
     public void cut() {
         mainTable.cut();
-    }
-
-    @Subscribe
-    public void listen(EntryChangedEvent entryChangedEvent) {
-        this.markBaseChanged();
     }
 
     private static class SearchAndOpenFile {

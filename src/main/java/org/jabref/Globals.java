@@ -1,7 +1,6 @@
 package org.jabref;
 
 import java.awt.GraphicsEnvironment;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,11 +25,11 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.StandardSystemProperty;
-import com.mashape.unirest.http.Unirest;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
+import kong.unirest.Unirest;
 
 public class Globals {
 
@@ -56,13 +55,11 @@ public class Globals {
     /**
      * Manager for the state of the GUI.
      */
-
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
-
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+    public static ClipBoardManager clipboardManager = new ClipBoardManager();
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
@@ -129,9 +126,7 @@ public class Globals {
 
     public static void stopBackgroundTasks() {
         stopTelemetryClient();
-        try {
-            Unirest.shutdown();
-        } catch (IOException ignore) { }
+        Unirest.shutDown();
     }
 
     public static Optional<TelemetryClient> getTelemetryClient() {

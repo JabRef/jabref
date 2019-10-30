@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -41,12 +42,10 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
-    private final JabRefExecutorService executorService;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
-        executorService = JabRefExecutorService.INSTANCE;
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
@@ -89,8 +88,7 @@ public class JabRefGUI {
                 event.consume();
             }
         });
-
-        executorService.execute(this::openDatabases);
+        Platform.runLater(this::openDatabases);
     }
 
     private void openDatabases() {
@@ -176,6 +174,7 @@ public class JabRefGUI {
         for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
             BasePanel panel = mainFrame.getBasePanelAt(i);
+
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 

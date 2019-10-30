@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,9 +116,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
         Task<V> javaTask = new Task<V>() {
 
             {
-                EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
-                EasyBind.subscribe(task.messageProperty(), this::updateMessage);
-                EasyBind.subscribe(task.isCanceledProperty(), cancelled -> {
+                BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+                BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
+                BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {
                     if (cancelled) {
                         cancel();
                     }

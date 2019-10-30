@@ -12,6 +12,7 @@ This log lists the architectural decisions for JabRef.
 - [ADR-0004](0004-use-mariadb-connector.md) - Use MariaDB Connector
 - [ADR-0005](0005-fully-support-utf8-only-for-latex-files.md) - Fully Support UTF-8 Only For LaTeX Files
 - [ADR-0006](0006-only-translated-strings-in-language-file.md) - Only translated strings in language file
+- [ADR-0007](0007-human-readable-changelog.md) - Provide a human-readable changelog
 
 <!-- adrlogstop -->
 

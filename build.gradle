@@ -17,14 +17,14 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '2.4.2'
+    id 'com.gradle.build-scan' version '3.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
-    id 'com.github.ben-manes.versions' version '0.26.0'
+    id 'com.github.ben-manes.versions' version '0.27.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.16.0'
+    id 'org.beryx.jlink' version '2.16.2'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -135,7 +135,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.0'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.1'
 
     compile 'org.postgresql:postgresql:42.2.8'
 
@@ -159,7 +159,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
+    compile 'com.konghq:unirest-java:3.1.03'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -196,13 +196,13 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.48'
+    testCompile 'io.github.classgraph:classgraph:4.8.52'
     testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.1'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.2'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.1.0'
@@ -215,7 +215,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.15-alpha"
     testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.25'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }

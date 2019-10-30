@@ -10,11 +10,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONObject;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +42,9 @@ public class SpringerLink implements FulltextFetcher {
             // Available in catalog?
             try {
                 HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                        .queryString("api_key", API_KEY)
-                        .queryString("q", String.format("doi:%s", doi.get().getDOI()))
-                        .asJson();
+                                                             .queryString("api_key", API_KEY)
+                                                             .queryString("q", String.format("doi:%s", doi.get().getDOI()))
+                                                             .asJson();
 
                 JSONObject json = jsonResponse.getBody().getObject();
                 int results = json.getJSONArray("result").getJSONObject(0).getInt("total");
