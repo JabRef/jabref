@@ -36,6 +36,7 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 
 * /F10/ The feature must be accessible over the GUI.
 * /F20/ The feature must start when the user presses on a context menu button.
+* /F21/ The button should be found under the 'tools' drop-down-items it the Jabref toolbar.
 * /F30/ The feature must give the user the possibility to add one or multiple .bib-entries to Jabref.
 * /F40/ The feature must inform the user when an entry was successfully added.
 * /F41/ This should be realized with a pop-up information window.
@@ -63,10 +64,10 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 
 | Feature quality   | very good | good | normal | not relevant   |
 | ----------------- |:---------:|:----:|:------:|:--------------:| 
-| Functionality     |      x    |      |        |                |
-| Reliability       |           |   x  |        |                |
-| Usage             |      x    |      |        |                |
-| Efficiency        |           |   x  |        |                |
+| Functionality     |           |      |    x   |                |
+| Reliability       |           |      |    x   |                |
+| Usage             |           |      |    x   |                |
+| Efficiency        |           |      |    x   |                |
 | Maintainability   |           |      |    x   |                |
 | Portability       |           |      |        |        x       |
 | Reusability       |           |      |        |        x       |
@@ -74,10 +75,10 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 
 ## 6. Acceptance Criteria  
 
-* /A10/ One plain text reference is passed to the feature.
-* /A20/ Multiple plain text references are passed to the feature.
-* /A30/ Garbage text is passed to the feature.
-* /A40/ No text is passed to the feature.
+* /A10/ The user opens the feature, pastes a plain text reference(&rarr;Glossary) and parses it. (&rarr; Use-case 1 & 7)
+* /A20/ The user opens the feature, pastes multiple plain text references(&rarr;Glossary) and parses them. (&rarr; Use-case 4)
+* /A30/ The user opens the feature, pastes an arbitrary text (not a vaild plain text reference) and tries to parse it. (&rarr; Use-case 2)
+* /A40/ The user opens the feature, pastes nothing and tries to parse. (&rarr; Use-case 3)
 
 
 
