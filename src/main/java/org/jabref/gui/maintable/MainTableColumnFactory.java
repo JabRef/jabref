@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,7 +18,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -27,28 +27,37 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.MainTableUtils;
+import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.RankingFieldComparator;
+import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 
+import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class MainTableColumnFactory {
 
+    private static final String STYLE_ICON_COLUMN = "column-icon";
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final ColumnPreferences preferences;
@@ -83,34 +92,29 @@ class MainTableColumnFactory {
                     columns.add(createFileColumn());
                     break;
                 case LINKED_IDENTIFIER:
-                    if (preferences.preferDoiOverUrl()) {
-                        columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, StandardField.DOI, StandardField.URL));
-                    } else {
-                        columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, StandardField.URL, StandardField.DOI));
-                    }
-                    columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, StandardField.EPRINT));
+                    columns.add(createIdentifierColumn());
                     break;
                 case EXTRAFILE:
-                    if (columnTokens.length != 2) {
-                        break;
+                    if (columnTokens.length == 2) {
+                        columns.add(createExtraFileColumn(columnTokens[1]));
                     }
-                    columns.add(new ExtraFileTableColumn(externalFileTypes, columnTokens[1]));
                     break;
                 case SPECIALFIELD:
-                    if (columnTokens.length != 2) {
-                        break;
-                    }
-                    field = FieldFactory.parseField(columnTokens[1]);
-                    if (field instanceof SpecialField) {
-                        columns.add(new SpecialTableColumn(undoManager, (SpecialField) field));
+                    if (columnTokens.length == 2) {
+                        field = FieldFactory.parseField(columnTokens[1]);
+                        if (field instanceof SpecialField) {
+                            columns.add(createSpecialFieldColumn((SpecialField) field));
+                        } else {
+                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", columnTokens[1]));
+                            columns.add(createNormalColumn(field));
+                        }
                     }
                     break;
                 case NORMALFIELD:
-                    if (columnTokens.length != 2) {
-                        break;
+                    if (columnTokens.length == 2) {
+                        field = FieldFactory.parseField(columnTokens[1]);
+                        columns.add(createNormalColumn(field));
                     }
-                    field = FieldFactory.parseField(columnTokens[1]);
-                    columns.add(createNormalColumn(field));
                     break;
                 default:
                     LOGGER.warn(Localization.lang("Column type %0 is unknown.", columnName));
@@ -120,13 +124,22 @@ class MainTableColumnFactory {
         return columns;
     }
 
+    private void setExactWidth(TableColumn<?, ?> column, int width) {
+        column.setMinWidth(width);
+        column.setPrefWidth(width);
+        column.setMaxWidth(width);
+    }
+
+    /**
+     * Creates a column for group color bars.
+     */
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(MainTableColumnType.GROUPS);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
-        column.getStyleClass().add(MainTableUtils.STYLE_ICON_COLUMN);
-        MainTableUtils.setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
@@ -169,37 +182,44 @@ class MainTableColumnFactory {
         return new Pane();
     }
 
+    /**
+     * Creates a text column to display any standard field.
+     */
     private TableColumn<BibEntryTableViewModel, ?> createNormalColumn(Field field) {
         String columnName = field.getName();
         NormalTableColumn column = new NormalTableColumn(columnName, FieldFactory.parseOrFields(columnName), database.getDatabase());
-            new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                    .withText(text -> text)
-                    .install(column);
-            column.setSortable(true);
-            column.setPrefWidth(preferences.getColumnWidth(columnName));
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                .withText(text -> text)
+                .install(column);
+        column.setSortable(true);
+        column.setPrefWidth(preferences.getColumnWidth(columnName));
         return column;
     }
 
+    /**
+     * Creates a column for all the linked files. Instead of creating a column for a single file type, like
+     * {@code createExtraFileColumn} does, this creates one single column collecting all file links.
+     */
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFileColumn() {
         TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(MainTableColumnType.FILE);
         Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
         column.setGraphic(headerGraphic);
-        column.getStyleClass().add(MainTableUtils.STYLE_ICON_COLUMN);
-        MainTableUtils.setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
-                new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                        .withGraphic(filetype -> MainTableUtils.createFileIcon(externalFileTypes, filetype))
-                        .withTooltip(this::createFileTooltip)
-                        .withMenu(this::createFileMenu)
-                        .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
-                            if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
-                                // Only one linked file -> open directly
-                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
-                                linkedFileViewModel.open();
-                            }
-                        })
-                        .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
+                .withGraphic(this::createFileIcon)
+                .withTooltip(this::createFileTooltip)
+                .withMenu(this::createFileMenu)
+                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
+                    if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
+                        // Only one linked file -> open directly
+                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
+                        linkedFileViewModel.open();
+                    }
+                })
+                .install(column);
         return column;
     }
 
@@ -228,72 +248,169 @@ class MainTableColumnFactory {
         return contextMenu;
     }
 
+    private Node createFileIcon(List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 1) {
+            return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
+        } else if (linkedFiles.size() == 1) {
+            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), false)
+                                    .map(ExternalFileType::getIcon)
+                                    .orElse(IconTheme.JabRefIcons.FILE)
+                                    .getGraphicNode();
+        } else {
+            return null;
+        }
+    }
+
     /**
-     * Creates a column for DOIs or URLs.
-     * The {@code firstField} is preferred to be shown over {@code secondField}.
+     * Creates a column for all the linked files of a single file type.
      */
-    private TableColumn<BibEntryTableViewModel, Field> createUrlOrDoiColumn(JabRefIcon icon, Field firstField, Field secondField) {
-        TableColumn<BibEntryTableViewModel, Field> column = new MainTableColumn<>(MainTableColumnType.LINKED_IDENTIFIER);
-        Node headerGraphic = icon.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(firstField.getDisplayName() + " / " + secondField.getDisplayName()));
+    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(String externalFileTypeName) {
+        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(MainTableColumnType.EXTRAFILE);
+        column.setGraphic(externalFileTypes
+                .getExternalFileTypeByName(externalFileTypeName)
+                .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
+                .getGraphicNode());
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
+        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
+                .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList())))
+                .install(column);
+
+        return column;
+    }
+
+    /**
+     * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
+     */
+    private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn() {
+        TableColumn<BibEntryTableViewModel, Map<Field, String>> column = new MainTableColumn<>(MainTableColumnType.LINKED_IDENTIFIER);
+        Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
         column.setGraphic(headerGraphic);
-        column.getStyleClass().add(MainTableUtils.STYLE_ICON_COLUMN);
-        MainTableUtils.setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
-        // icon is chosen based on field name in cell, so map fields to its names
-        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
-        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
-                .withGraphic(cellFactory::getTableIcon)
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
+        new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
+                .withGraphic(this::createIdentifierGraphic)
                 .withTooltip(this::createIdentifierTooltip)
-                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
+                .withMenu(this::createIdentifierMenu)
                 .install(column);
         return column;
     }
 
-    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, Field field) {
-        if (event.getButton() != MouseButton.PRIMARY) {
-            return;
+    private Node createIdentifierGraphic(Map<Field, String> values) {
+        if (values.isEmpty()) {
+            return null;
+        } else {
+            return cellFactory.getTableIcon(StandardField.URL);
         }
+    }
 
-        if (!entry.getEntry().hasField(field)) {
-            LOGGER.error("Requested opening viewer for {} of entry '{}', but field is not present.", field, entry.getEntry().getId());
-            return;
-        }
+    private String createIdentifierTooltip(Map<Field, String> values) {
+        StringBuilder identifiers = new StringBuilder();
+        values.keySet().forEach(field -> identifiers.append(field.getDisplayName()).append(": ").append(values.get(field)).append("\n"));
+        return identifiers.toString();
+    }
 
-        entry.getEntry().getField(field).ifPresent(identifier -> {
-            try {
-                JabRefDesktop.openExternalViewer(database, identifier, field);
-            } catch (IOException e) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
-            }
+    private ContextMenu createIdentifierMenu(BibEntryTableViewModel entry, Map<Field, String> values) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        values.keySet().forEach(field -> {
+            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " + values.get(field), cellFactory.getTableIcon(field));
+            menuItem.setOnAction(event -> {
+                try {
+                    JabRefDesktop.openExternalViewer(database, values.get(field), field);
+                } catch (IOException e) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                }
+                event.consume();
+            });
+            contextMenu.getItems().add(menuItem);
         });
-        event.consume();
+
+        return contextMenu;
     }
 
-    private String createIdentifierTooltip(BibEntryTableViewModel entry, Field field) {
-        Optional<String> value = entry.getEntry().getField(field);
-        if (value.isPresent()) {
-            if (StandardField.DOI.equals(field)) {
-                return Localization.lang("Open %0 URL (%1)", "DOI", value.get());
-            } else if (StandardField.URL.equals(field)) {
-                return Localization.lang("Open URL (%0)", value.get());
-            } else if (StandardField.EPRINT.equals(field)) {
-                return Localization.lang("Open %0 URL (%1)", "ArXiv", value.get());
+    /**
+     * A column that displays a specialField
+     */
+    private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
+        TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new MainTableColumn<>(MainTableColumnType.SPECIALFIELD);
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
+        Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        if (specialField == SpecialField.RANKING) {
+            setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
+            new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                    .withGraphicIfPresent(this::createSpecialRating)
+                    .install(column);
+        } else {
+            setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+
+            if (specialField.isSingleValueField()) {
+                new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
+                        .withOnMouseClickedEvent((entry, value) -> event -> {
+                            if (event.getButton() == MouseButton.PRIMARY) {
+                                specialFieldViewModel.toggle(entry.getEntry());
+                            }
+                        })
+                        .install(column);
+            } else {
+                new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
+                        .withMenu((entry, value) -> createSpecialFieldMenu(entry.getEntry(), specialFieldViewModel))
+                        .install(column);
             }
         }
-        return null;
+        column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
+
+        if (specialField == SpecialField.RANKING) {
+            column.setComparator(new RankingFieldComparator());
+        }
+
+        // Added comparator for Read Status
+        if (specialField == SpecialField.READ_STATUS) {
+            column.setComparator(new ReadStatusFieldComparator());
+        }
+
+        column.setSortable(true);
+
+        return column;
     }
 
-    private TableColumn<BibEntryTableViewModel, Field> createEprintColumn(JabRefIcon icon, Field field) {
-        TableColumn<BibEntryTableViewModel, Field> column = new MainTableColumn<>(MainTableColumnType.LINKED_IDENTIFIER);
-        column.setGraphic(icon.getGraphicNode());
-        column.getStyleClass().add(MainTableUtils.STYLE_ICON_COLUMN);
-        MainTableUtils.setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
-        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(field)).map(x -> field));
-        new ValueTableCellFactory<BibEntryTableViewModel, Field>()
-                .withGraphic(cellFactory::getTableIcon)
-                .withTooltip(this::createIdentifierTooltip)
-                .withOnMouseClickedEvent((BibEntryTableViewModel entry, Field content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
-                .install(column);
-        return column;
+    private Rating createSpecialRating(BibEntryTableViewModel entry, SpecialFieldValueViewModel value) {
+        Rating ranking = new Rating();
+        ranking.setRating(value.getValue().toRating());
+        EasyBind.subscribe(ranking.ratingProperty(), rating ->
+                new SpecialFieldViewModel(SpecialField.RANKING, undoManager).setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue()))
+        );
+        return ranking;
+    }
+
+    private ContextMenu createSpecialFieldMenu(BibEntry entry, SpecialFieldViewModel specialField) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        for (SpecialFieldValueViewModel value : specialField.getValues()) {
+            MenuItem menuItem = new MenuItem(value.getMenuString(), value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null));
+            menuItem.setOnAction(event -> specialField.setSpecialFieldValue(entry, value.getValue()));
+            contextMenu.getItems().add(menuItem);
+        }
+
+        return contextMenu;
+    }
+
+    private Node createSpecialFieldIcon(Optional<SpecialFieldValueViewModel> fieldValue, SpecialFieldViewModel specialField) {
+        return fieldValue
+                .flatMap(SpecialFieldValueViewModel::getIcon)
+                .map(JabRefIcon::getGraphicNode)
+                .orElseGet(() -> {
+                    Node node = specialField.getEmptyIcon().getGraphicNode();
+                    node.getStyleClass().add("empty-special-field");
+                    return node;
+                });
     }
 }

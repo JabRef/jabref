@@ -1,7 +1,9 @@
 package org.jabref.gui.maintable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,17 @@ public class BibEntryTableViewModel {
 
     public ObservableValue<List<LinkedFile>> getLinkedFiles() {
         return EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
+    }
+
+    public ObservableValue<Map<Field,String>> getLinkedIdentifiers() {
+        SimpleObjectProperty<Map<Field,String>> linkedIdentifiers = new SimpleObjectProperty<>(new HashMap<>());
+
+        entry.getField(StandardField.URL).ifPresent(value -> linkedIdentifiers.getValue().put(StandardField.URL, value));
+        entry.getField(StandardField.DOI).ifPresent(value -> linkedIdentifiers.getValue().put(StandardField.DOI, value));
+        entry.getField(StandardField.URI).ifPresent(value -> linkedIdentifiers.getValue().put(StandardField.URI, value));
+        entry.getField(StandardField.EPRINT).ifPresent(value -> linkedIdentifiers.getValue().put(StandardField.EPRINT, value));
+
+        return linkedIdentifiers;
     }
 
     public ObservableValue<List<AbstractGroup>> getMatchedGroups(BibDatabaseContext database) {
