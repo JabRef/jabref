@@ -8,7 +8,7 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * This abstract class pretends a minimal set of attributes and methods
- * which an entry event should have.
+ * which an entries event should have.
  */
 public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
 
@@ -17,14 +17,14 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
 
 
     /**
-     * @param bibEntry BibEntry object which is involved in this event
+     * @param List of bibEntry BibEntry objects which are involved in this event
      */
     public EntriesEvent(List<BibEntry> bibEntries) {
         this(bibEntries, EntryEventSource.LOCAL);
     }
 
     /**
-     * @param bibEntry BibEntry object which is involved in this event
+     * @param List of bibEntry BibEntry objects which are involved in this event
      * @param location Location affected by this event
      */
     public EntriesEvent(List<BibEntry> bibEntries, EntryEventSource location) {
@@ -32,7 +32,7 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
         this.location = Objects.requireNonNull(location);
     }
 
-    //Temporary, while we change to plural entries
+    //Temporary fix, while we change to plural entries
     public BibEntry getBibEntry() { return this.bibEntries.get(0); }
 
     public List<BibEntry> getBibEntries() {

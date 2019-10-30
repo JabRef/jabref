@@ -871,7 +871,7 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * Closes the entry editor if it is showing the given entry.
+     * Closes the entry editor if it is showing any of the given entries.
      */
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
 

@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Synchronizes the shared or local databases with their opposite side.
- * Local changes are pushed by {@link EntryEvent} using Google's Guava EventBus.
+ * Local changes are pushed by {@link EntriesEvent} using Google's Guava EventBus.
  */
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
@@ -104,12 +104,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Listening method. Deletes the given {@link BibEntry} from shared database.
+     * Listening method. Deletes the given list of {@link BibEntry} from shared database.
      *
      * @param event {@link EntryRemovedEvent} object
      */
 
-    // This has not been made parellel yet - hence the for loop - that will take more effort
+    // This has not been made parallel yet - hence the for loop - that will take more effort
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
@@ -352,9 +352,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
+     * Checks whether the {@link EntryEventSource} of an {@link EntriesEvent} is crucial for this class.
      *
-     * @param event An {@link EntryEvent}
+     * @param event An {@link EntriesEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */
     public boolean isEventSourceAccepted(EntriesEvent event) {

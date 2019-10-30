@@ -251,17 +251,17 @@ public class BibDatabase {
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
-     * @param toBeDeleted Entry to delete
+     * Removes the given entries.
+     * The entries removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entries to delete
      */
     public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
         removeEntries(toBeDeleted, EntryEventSource.LOCAL);
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
+     * Removes the given entries.
+     * The entries are removed based on the id {@link BibEntry#id}
      *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from

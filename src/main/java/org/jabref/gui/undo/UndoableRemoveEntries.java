@@ -13,8 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This class represents the removal of an entry. The constructor needs
- * references to the database, the entry, and the map of open entry editors.
+ * This class represents the removal of entries. The constructor needs
+ * references to the database, the entries, and the map of open entry editors.
+ * TODO is this map still being used?
  * The latter to be able to close the entry's editor if it is opened after
  * an undo, and the removal is then undone.
  */

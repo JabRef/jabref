@@ -94,7 +94,6 @@ public class DuplicationChecker {
 
     @Subscribe
     public void listen(EntriesRemovedEvent entriesRemovedEvent) {
-        //This should be done differently, maybe with a stream
         List<BibEntry> entries = entriesRemovedEvent.getBibEntries();
         for (BibEntry entry : entries) {
             Optional<String> citeKey = entry.getCiteKeyOptional();

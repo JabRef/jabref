@@ -62,7 +62,7 @@ public class CitationStyleCache {
         }
 
         /**
-         * removes the citation of the removed entry as it's not needed anymore
+         * removes the citation of the removed entries as they are not needed anymore
          */
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
