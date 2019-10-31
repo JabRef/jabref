@@ -90,19 +90,21 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     private void setBindings() {
         journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
 
-        EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue -> viewModel.currentAbbreviationProperty().set(newValue));
-        EasyBind.subscribe(viewModel.currentAbbreviationProperty(), newValue -> journalAbbreviationsTable.getSelectionModel().select(newValue));
+        EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue ->
+                viewModel.currentAbbreviationProperty().set(newValue));
+        EasyBind.subscribe(viewModel.currentAbbreviationProperty(), newValue ->
+                journalAbbreviationsTable.getSelectionModel().select(newValue));
 
-        journalTableNameColumn.editableProperty().bind(viewModel.isEditableAndRemovableProperty());
-        journalTableAbbreviationColumn.editableProperty().bind(viewModel.isEditableAndRemovableProperty());
-        journalTableShortestUniqueAbbreviationColumn.editableProperty().bind(viewModel.isEditableAndRemovableProperty());
+        journalTableNameColumn.editableProperty().bind(viewModel.isAbbreviationEditableAndRemovable());
+        journalTableAbbreviationColumn.editableProperty().bind(viewModel.isAbbreviationEditableAndRemovable());
+        journalTableShortestUniqueAbbreviationColumn.editableProperty().bind(viewModel.isAbbreviationEditableAndRemovable());
 
         removeAbbreviationListButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
         journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
 
         addAbbreviationButton.disableProperty().bind(viewModel.isEditableAndRemovableProperty().not());
-        removeAbbreviationButton.disableProperty().bind(viewModel.isEditableAndRemovableProperty().not());
+        removeAbbreviationButton.disableProperty().bind(viewModel.isAbbreviationEditableAndRemovable().not());
 
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());

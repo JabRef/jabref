@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -108,10 +109,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         return isLoading;
     }
 
-    public boolean isAbbreviationEditableAndRemovable() {
-        return isAbbreviationEditableAndRemovable.get();
-    }
-
     /**
      * This will wrap the built in and ieee abbreviations in pseudo abbreviation files and add them to the list of
      * journal abbreviation files.
@@ -142,8 +139,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     private void addList(String name, List<Abbreviation> abbreviations) {
-        List<AbbreviationViewModel> builtInListViewModel = new ArrayList<>();
-        abbreviations.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
+        List<AbbreviationViewModel> builtInListViewModel = abbreviations.stream()
+                                                                        .map(AbbreviationViewModel::new)
+                                                                        .collect(Collectors.toList());
         AbbreviationsFileViewModel fileViewModel = new AbbreviationsFileViewModel(builtInListViewModel, name);
         journalFiles.add(fileViewModel);
     }
@@ -336,11 +334,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     private void saveExternalFilesList() {
         List<String> extFiles = new ArrayList<>();
-        journalFiles.forEach(file -> {
-            if (!file.isBuiltInListProperty().get()) {
-                file.getAbsolutePath().ifPresent(path -> extFiles.add(path.toAbsolutePath().toString()));
-            }
-        });
+        journalFiles.stream()
+                    .filter(file -> !file.isBuiltInListProperty().get())
+                    .forEach(file -> file.getAbsolutePath().ifPresent(path -> extFiles.add(path.toAbsolutePath().toString())));
         abbreviationsPreferences.setExternalJournalLists(extFiles);
     }
 
@@ -398,6 +394,10 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public SimpleBooleanProperty isEditableAndRemovableProperty() {
         return isEditableAndRemovable;
+    }
+
+    public SimpleBooleanProperty isAbbreviationEditableAndRemovable() {
+        return isAbbreviationEditableAndRemovable;
     }
 
     public SimpleBooleanProperty isFileRemovableProperty() {
