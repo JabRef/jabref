@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
-[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
+[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://github.com/JabRef/jabref/wiki/Donations)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/jabref/localized.svg)](https://crowdin.com/project/jabref)
 
 JabRef is an open-source, cross-platform citation and reference management tool licensed under the  [MIT license](https://tldrlegal.com/license/mit-license).
@@ -74,14 +74,14 @@ Try to double click the `jar` file or execute the following command:
 
 ## Bug Reports, Suggestions, Other Feedback
 
-[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
+[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://github.com/JabRef/jabref/wiki/Donations)
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
 If you need support in using JabRef, please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
-An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
+An explanation of donation possibilities and usage of donations is available at our [donations page](https://github.com/JabRef/jabref/wiki/Donations).
 
 ## Contributing
 
@@ -89,7 +89,7 @@ An explanation of donation possibilities and usage of donations is available at 
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 
-> Not a programmer? [Learn how to help.](http://contribute.jabref.org)
+> Not a programmer? [Learn how to help.](https://help.jabref.org/en/FAQcontributing)
 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day? Check out the ways you can contribute, below:
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
