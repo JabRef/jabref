@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ManageJournalAbbreviationsViewModelTest {
+class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
     private Path emptyTestFile;
@@ -58,10 +58,10 @@ class ManageJournalAbbreviationsViewModelTest {
         JournalAbbreviationLoader journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
-        testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
-        testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "");
-        testFile4Entries = createTestFile(tempFolder, "testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "Entry;E" + NEWLINE + "");
-        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv","Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
+        testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + "");
+        testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
+        testFile4Entries = createTestFile(tempFolder, "testFile4Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;En;E" + NEWLINE + "");
+        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv","Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
     }
 
     @Test
@@ -153,8 +153,8 @@ class ManageJournalAbbreviationsViewModelTest {
 
     @Test
     void testMixedFileUsage() throws Exception {
-        Abbreviation testAbbreviation = new Abbreviation("Entry", "E");
-        Abbreviation testAbbreviation2 = new Abbreviation("EntryEntry", "EE");
+        Abbreviation testAbbreviation = new Abbreviation("Entry", "En", "E");
+        Abbreviation testAbbreviation2 = new Abbreviation("EntryEntry", "EnEn", "EE");
 
         // simulate open file button twice
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile3Entries));
@@ -264,7 +264,7 @@ class ManageJournalAbbreviationsViewModelTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE", "Y");
         addAbbrevaition(testAbbreviation);
 
         assertEquals(6, viewModel.abbreviationsProperty().size());
@@ -276,25 +276,13 @@ class ManageJournalAbbreviationsViewModelTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile3Entries));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
-        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.addAbbreviation("YetAnotherEntry", "YAE", "Y");
+        viewModel.addAbbreviation("YetAnotherEntry", "YAE", "Y");
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
     }
 
     @Test
     void testEditSameAbbreviationWithNoChangeDoesNotResultInException() throws Exception {
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
-        viewModel.addNewFile();
-        viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbrevaition(testAbbreviation);
-        editAbbreviation(testAbbreviation);
-
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
-    }
-
-    @Test
-    void testEditSameAbbreviationWithShortestUniqueAbbreviationWithNoChangeDoesNotResultInException() throws Exception {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
@@ -313,7 +301,7 @@ class ManageJournalAbbreviationsViewModelTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         selectLastAbbreviation();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE", "Y");
         editAbbreviation(testAbbreviation);
 
         assertEquals(5, viewModel.abbreviationsProperty().size());
@@ -337,9 +325,9 @@ class ManageJournalAbbreviationsViewModelTest {
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.editAbbreviation("YetAnotherEntry", "YAE", "Y");
         viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(2));
-        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.editAbbreviation("YetAnotherEntry", "YAE", "Y");
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
     }
 
@@ -352,7 +340,7 @@ class ManageJournalAbbreviationsViewModelTest {
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("", "YAE");
+        viewModel.editAbbreviation("", "YAE", "Y");
         verify(dialogService).showErrorDialogAndWait(anyString());
     }
 
@@ -365,7 +353,7 @@ class ManageJournalAbbreviationsViewModelTest {
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("YetAnotherEntry", "");
+        viewModel.editAbbreviation("YetAnotherEntry", "", "Y");
         verify(dialogService).showErrorDialogAndWait(anyString());
     }
 
@@ -376,7 +364,7 @@ class ManageJournalAbbreviationsViewModelTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE", "Y");
         addAbbrevaition(testAbbreviation);
 
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -394,7 +382,7 @@ class ManageJournalAbbreviationsViewModelTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile1Entries));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
+        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE", "Y");
         addAbbrevaition(testAbbreviation);
         viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(1));
         viewModel.deleteAbbreviation();
@@ -427,9 +415,9 @@ class ManageJournalAbbreviationsViewModelTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb",
-                "Test Entry;TE",
-                "MoreEntries;ME",
+                "Abbreviations;Abb;A",
+                "Test Entry;TE;T",
+                "MoreEntries;ME;M",
                 "JabRefTestEntry;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
@@ -437,8 +425,8 @@ class ManageJournalAbbreviationsViewModelTest {
 
         expected = Arrays.asList(
                 "EntryEntry;EE",
-                "Abbreviations;Abb",
-                "Test Entry;TE",
+                "Abbreviations;Abb;A",
+                "Test Entry;TE;T",
                 "SomeOtherEntry;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 

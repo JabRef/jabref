@@ -40,7 +40,7 @@ public class UndoableAbbreviator {
         }
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
-            return false; // unknown, cannot un/abbreviate anything
+            return false; // Unknown, cannot abbreviate anything.
         }
 
         String newText = getAbbreviatedName(journalAbbreviationRepository.getAbbreviation(text).get());
@@ -63,7 +63,7 @@ public class UndoableAbbreviator {
             case SHORTEST_UNIQUE:
                 return text.getShortestUniqueAbbreviation();
             default:
-                throw new IllegalStateException("Unexpected value: " + abbreviationType);
+                throw new IllegalStateException(String.format("Unexpected value: %s", abbreviationType));
         }
     }
 }

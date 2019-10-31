@@ -1,11 +1,11 @@
 package org.jabref.gui.journals;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -15,15 +15,13 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Converts journal full names to either iso or medline abbreviations for all
- * selected entries.
+ * Converts journal full names to either iso or medline abbreviations for all selected entries.
  */
 public class AbbreviateAction implements BaseAction {
 
@@ -42,7 +40,6 @@ public class AbbreviateAction implements BaseAction {
         BackgroundTask.wrap(this::abbreviate)
                       .onSuccess(panel::output)
                       .executeWith(Globals.TASK_EXECUTOR);
-
     }
 
     private String abbreviate() {
@@ -52,20 +49,13 @@ public class AbbreviateAction implements BaseAction {
                 abbreviationType);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
-        Set<Callable<Boolean>> tasks = new HashSet<>();
 
         // Collect all callables to execute in one collection.
-        for (BibEntry entry : entries) {
-            Callable<Boolean> callable = () -> {
-                for (Field journalField : FieldFactory.getJournalNameFields()) {
-                    if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-            tasks.add(callable);
-        }
+        Set<Callable<Boolean>> tasks = entries.stream()
+                .<Callable<Boolean>>map(entry -> () ->
+                        FieldFactory.getJournalNameFields().stream().anyMatch(journalField ->
+                                undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)))
+                .collect(Collectors.toSet());
 
         // Execute the callables and wait for the results.
         List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
@@ -85,8 +75,7 @@ public class AbbreviateAction implements BaseAction {
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
             return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
-        } else {
-            return Localization.lang("No journal names could be abbreviated.");
         }
+        return Localization.lang("No journal names could be abbreviated.");
     }
 }

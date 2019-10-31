@@ -28,17 +28,15 @@ public class AbbreviationViewModel {
             this.name.bindBidirectional(this.abbreviationObject.nameProperty());
             this.abbreviation.bindBidirectional(this.abbreviationObject.abbreviationProperty());
             this.shortestUniqueAbbreviation.bindBidirectional(this.abbreviationObject.shortestUniqueAbbreviationProperty());
-        } else {
-            this.name.set("Add new Abbreviation");
         }
     }
 
     public Abbreviation getAbbreviationObject() {
-        return this.abbreviationObject;
+        return abbreviationObject;
     }
 
     public String getName() {
-        return this.name.get();
+        return name.get();
     }
 
     public void setName(String name) {
@@ -46,7 +44,7 @@ public class AbbreviationViewModel {
     }
 
     public String getAbbreviation() {
-        return this.abbreviation.get();
+        return abbreviation.get();
     }
 
     public void setAbbreviation(String abbreviation) {
@@ -54,7 +52,7 @@ public class AbbreviationViewModel {
     }
 
     public String getShortestUniqueAbbreviation() {
-        return this.shortestUniqueAbbreviation.get();
+        return shortestUniqueAbbreviation.get();
     }
 
     public void setShortestUniqueAbbreviation(String shortestUniqueAbbreviation) {
@@ -62,23 +60,23 @@ public class AbbreviationViewModel {
     }
 
     public boolean isPseudoAbbreviation() {
-        return this.pseudoAbbreviation.get();
+        return pseudoAbbreviation.get();
     }
 
     public StringProperty nameProperty() {
-        return this.name;
+        return name;
     }
 
     public StringProperty abbreviationProperty() {
-        return this.abbreviation;
+        return abbreviation;
     }
 
     public StringProperty shortestUniqueAbbreviationProperty() {
-        return this.shortestUniqueAbbreviation;
+        return shortestUniqueAbbreviation;
     }
 
     public BooleanProperty isPseudoAbbreviationProperty() {
-        return this.pseudoAbbreviation;
+        return pseudoAbbreviation;
     }
 
     @Override

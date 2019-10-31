@@ -74,7 +74,7 @@ public class AbbreviationsFileViewModel {
     }
 
     public SimpleListProperty<AbbreviationViewModel> abbreviationsProperty() {
-        return this.abbreviations;
+        return abbreviations;
     }
 
     public boolean exists() {
@@ -86,12 +86,12 @@ public class AbbreviationsFileViewModel {
     }
 
     public ReadOnlyBooleanProperty isBuiltInListProperty() {
-        return this.isBuiltInList;
+        return isBuiltInList;
     }
 
     @Override
     public String toString() {
-        return this.name;
+        return name;
     }
 
     @Override

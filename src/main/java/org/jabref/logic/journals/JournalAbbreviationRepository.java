@@ -12,7 +12,8 @@ import java.util.Set;
  */
 public class JournalAbbreviationRepository {
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(16000); // We have over 15.000 abbreviations in the built-in lists
+    // We have over 15.000 abbreviations in the built-in lists
+    private final Set<Abbreviation> abbreviations = new HashSet<>(16000);
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
         for (Abbreviation abbreviation : abbreviations) {
@@ -70,7 +71,6 @@ public class JournalAbbreviationRepository {
 
         // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
         abbreviations.remove(abbreviation);
-
         abbreviations.add(abbreviation);
     }
 

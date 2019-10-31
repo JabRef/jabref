@@ -32,11 +32,11 @@ public class AbbreviationParser {
     private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 
     public void readJournalListFromResource(String resourceFileName) {
-        URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
         try {
+            URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
             readJournalList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            LOGGER.info("Could not read journal list from file " + resourceFileName, e);
+            LOGGER.info(String.format("Could not read journal list from file %s", resourceFileName), e);
         }
     }
 
@@ -47,7 +47,7 @@ public class AbbreviationParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
+            LOGGER.warn(String.format("Could not read journal list from file %s", file.getAbsolutePath()), e);
         }
     }
 
@@ -58,7 +58,7 @@ public class AbbreviationParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
+            LOGGER.warn(String.format("Could not read journal list from file %s", file.getAbsolutePath()), e);
         }
     }
 
@@ -80,7 +80,7 @@ public class AbbreviationParser {
                     return;
                 }
 
-                this.abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
+                abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
             }
         } catch (IOException ex) {
             LOGGER.info("Could not read journal list from file ", ex);

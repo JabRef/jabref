@@ -12,7 +12,7 @@ import org.apache.commons.csv.CSVPrinter;
 /**
  * This class provides handy static methods to save abbreviations to the file system.
  */
-public class AbbreviationWriter {
+public final class AbbreviationWriter {
 
     private AbbreviationWriter() {
     }

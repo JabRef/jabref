@@ -37,14 +37,14 @@ public class UndoableUnabbreviator {
         }
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
-            return false; // cannot do anything if it is not known
+            return false; // Cannot do anything if it is not known.
         }
 
         if (!journalAbbreviationRepository.isAbbreviatedName(text)) {
-            return false; // cannot unabbreviate unabbreviated name.
+            return false; // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.getAbbreviation(text).get(); // must be here
+        Abbreviation abbreviation = journalAbbreviationRepository.getAbbreviation(text).get(); // Must be here.
         String newText = abbreviation.getName();
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
