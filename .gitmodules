@@ -4,3 +4,6 @@
 [submodule "src/main/resources/csl-locales"]
 	path = src/main/resources/csl-locales
 	url = https://github.com/citation-style-language/locales.git
+[submodule "src/main/resources/anystyle-reference-parser"]
+	path = src/main/resources/anystyle-reference-parser
+	url = https://github.com/inukshuk/anystyle-cli
