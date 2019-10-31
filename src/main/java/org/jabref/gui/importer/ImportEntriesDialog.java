@@ -119,20 +119,22 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                         }
                     }).executeWith(Globals.TASK_EXECUTOR);
 
+                    /*
+                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    also tried to move it to the end of the initialize method, but it did not select the entry.
+                    */
+                    if (entriesListView.getItems().size() == 1) {
+                        selectAllNewEntries();
+                      }
+  
+                      return container;
+
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
         entriesListView.setSelectionModel(new NoSelectionModel<>());
-
-        Platform.runLater(new Runnable() {
-          public void run() {
-            if (entriesListView.getItems().size() == 1) {
-              selectAllNewEntries();
-            }
-          }
-        });
     }
 
     private Node getEntryNode(BibEntry entry) {
