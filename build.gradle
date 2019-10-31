@@ -111,6 +111,8 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.17'
     compile 'org.apache.pdfbox:xmpbox:2.0.17'
 
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
+
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
