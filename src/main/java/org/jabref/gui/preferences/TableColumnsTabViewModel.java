@@ -20,11 +20,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -38,8 +37,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<TableColumnsItemModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
-    private final ListProperty<Field> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<Field> addColumnProperty = new SimpleObjectProperty<>();
+    private final ListProperty<MainTableColumnModel> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<MainTableColumnModel> addColumnProperty = new SimpleObjectProperty<>();
     private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
@@ -94,13 +93,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         availableColumnsProperty.clear();
 
-        availableColumnsProperty.add(InternalField.TIMESTAMP);
-        availableColumnsProperty.add(InternalField.OWNER);
-        availableColumnsProperty.add(InternalField.GROUPS);
-        availableColumnsProperty.add(InternalField.KEY_FIELD);
-        availableColumnsProperty.add(InternalField.TYPE_HEADER);
+        availableColumnsProperty.add(new MainTableColumnModel(InternalField.TIMESTAMP.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(InternalField.OWNER.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(InternalField.GROUPS.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(InternalField.KEY_FIELD.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(InternalField.TYPE_HEADER.getName()));
 
-        EnumSet.allOf(StandardField.class).forEach(item -> availableColumnsProperty.getValue().add(item));
+        EnumSet.allOf(StandardField.class).stream()
+               .map(Field::getName)
+               .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, name))
+               .forEach(item -> availableColumnsProperty.getValue().add(item));
 
         if (specialFieldsEnabledProperty.getValue()) {
             insertSpecialFieldColumns();
@@ -115,30 +117,31 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         columnsListProperty.getValue().clear();
 
         columnPreferences.getColumnNames().stream()
-                .map(FieldFactory::parseField)
-                .map(field -> new TableColumnsItemModel(field, columnPreferences.getColumnWidth(field.getName())))
+                .map(columnName -> new TableColumnsItemModel(new MainTableColumnModel(columnName), columnPreferences.getColumnWidth(columnName)))
                 .forEach(columnsListProperty.getValue()::add);
     }
 
     private void insertSpecialFieldColumns() {
-        EnumSet.allOf(SpecialField.class).forEach(item -> availableColumnsProperty.getValue().add(0, item));
+        EnumSet.allOf(SpecialField.class).stream()
+               .map(Field::getName).map(name -> new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, name))
+               .forEach(item -> availableColumnsProperty.getValue().add(0, item));
     }
 
     private void removeSpecialFieldColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getField() instanceof SpecialField);
-        availableColumnsProperty.getValue().removeIf(field -> field instanceof SpecialField);
+        columnsListProperty.getValue().removeIf(column -> column.getColumnName().getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
+        availableColumnsProperty.getValue().removeIf(columnName -> columnName.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
     }
 
     private void insertExtraFileColumns() {
         ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream()
-                .map(ExternalFileType::getName)
-                .map(FieldsUtil.ExtraFilePseudoField::new)
-                .forEach(availableColumnsProperty::add);
+                         .map(ExternalFileType::getName)
+                         .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
+                         .forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getField() instanceof FieldsUtil.ExtraFilePseudoField);
-        availableColumnsProperty.getValue().removeIf(field -> field instanceof FieldsUtil.ExtraFilePseudoField);
+        columnsListProperty.getValue().removeIf(column -> column.getColumnName().getType() == MainTableColumnModel.Type.EXTRAFILE);
+        availableColumnsProperty.getValue().removeIf(columnName -> columnName.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
     }
 
     public void insertColumnInList() {
@@ -146,7 +149,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        if (columnsListProperty.getValue().stream().filter(item -> item.getField().equals(addColumnProperty.getValue())).findAny().isEmpty()) {
+        if (columnsListProperty.getValue().stream().map(TableColumnsItemModel::getColumnName).filter(item -> item.equals(addColumnProperty.getValue())).findAny().isEmpty()) {
             columnsListProperty.add(new TableColumnsItemModel(addColumnProperty.getValue()));
             addColumnProperty.setValue(null);
         }
@@ -183,7 +186,8 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         List<String> columnNames = columnsListProperty.stream()
-                                                      .map(item -> item.getField().getName()).collect(Collectors.toList());
+                                                      .map(item -> item.getColumnName().toString())
+                                                      .collect(Collectors.toList());
 
         // for each column get either actual width or - if it does not exist - default value
         Map<String,Double> columnWidths = new HashMap<>();
@@ -233,9 +237,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<SelectionModel<TableColumnsItemModel>> selectedColumnModelProperty() { return selectedColumnModelProperty; }
 
-    public ListProperty<Field> availableColumnsProperty() { return this.availableColumnsProperty; }
+    public ListProperty<MainTableColumnModel> availableColumnsProperty() { return this.availableColumnsProperty; }
 
-    public ObjectProperty<Field> addColumnProperty() { return this.addColumnProperty; }
+    public ObjectProperty<MainTableColumnModel> addColumnProperty() { return this.addColumnProperty; }
 
     public BooleanProperty specialFieldsEnabledProperty() { return this.specialFieldsEnabledProperty; }
 

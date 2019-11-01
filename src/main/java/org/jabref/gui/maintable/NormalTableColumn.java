@@ -7,6 +7,7 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.layout.LayoutFormatter;
@@ -21,7 +22,7 @@ import org.jabref.model.entry.field.OrFields;
 /**
  * A column that displays the text-value of the field
  */
-public class NormalTableColumn extends MainTableColumn<String> {
+public class NormalTableColumn extends TableColumn<BibEntryTableViewModel, String> {
 
     private final OrFields bibtexFields;
 
@@ -35,8 +36,6 @@ public class NormalTableColumn extends MainTableColumn<String> {
     private final String columnName;
 
     public NormalTableColumn(String columnName, OrFields bibtexFields, BibDatabase database) {
-        super(MainTableColumnType.NORMALFIELD);
-
         this.columnName = columnName;
         this.bibtexFields = bibtexFields;
         this.isIconColumn = false;

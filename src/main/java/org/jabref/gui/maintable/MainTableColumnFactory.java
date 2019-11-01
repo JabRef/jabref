@@ -79,12 +79,12 @@ class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        preferences.getColumnNames().forEach(columnName -> {
-            String[] columnTokens = columnName.split(ColumnPreferences.QUALIFIER_SEPARATOR);
-            MainTableColumnType type = MainTableColumnType.parse(columnTokens[0]);
+        preferences.getColumnNames().forEach(rawColumnName -> {
+            MainTableColumnModel column = new MainTableColumnModel(rawColumnName);
+
             Field field;
 
-            switch (type) {
+            switch (column.getType()) {
                 case GROUPS:
                     columns.add(createGroupColumn());
                     break;
@@ -95,29 +95,29 @@ class MainTableColumnFactory {
                     columns.add(createIdentifierColumn());
                     break;
                 case EXTRAFILE:
-                    if (columnTokens.length == 2) {
-                        columns.add(createExtraFileColumn(columnTokens[1]));
+                    if (!column.getName().equals("")) {
+                        columns.add(createExtraFileColumn(column.getName()));
                     }
                     break;
                 case SPECIALFIELD:
-                    if (columnTokens.length == 2) {
-                        field = FieldFactory.parseField(columnTokens[1]);
+                    if (!column.getName().equals("")) {
+                        field = FieldFactory.parseField(column.getName());
                         if (field instanceof SpecialField) {
                             columns.add(createSpecialFieldColumn((SpecialField) field));
                         } else {
-                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", columnTokens[1]));
+                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getName()));
                             columns.add(createNormalColumn(field));
                         }
                     }
                     break;
                 case NORMALFIELD:
-                    if (columnTokens.length == 2) {
-                        field = FieldFactory.parseField(columnTokens[1]);
+                    if (!column.getName().equals("")) {
+                        field = FieldFactory.parseField(column.getName());
                         columns.add(createNormalColumn(field));
                     }
                     break;
                 default:
-                    LOGGER.warn(Localization.lang("Column type %0 is unknown.", columnName));
+                    LOGGER.warn(Localization.lang("Column type %0 is unknown.", rawColumnName));
             }
         });
 
@@ -134,7 +134,7 @@ class MainTableColumnFactory {
      * Creates a column for group color bars.
      */
     private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
-        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(MainTableColumnType.GROUPS);
+        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group color")));
         column.setGraphic(headerGraphic);
@@ -201,7 +201,7 @@ class MainTableColumnFactory {
      * {@code createExtraFileColumn} does, this creates one single column collecting all file links.
      */
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFileColumn() {
-        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(MainTableColumnType.FILE);
+        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
         Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
         column.setGraphic(headerGraphic);
@@ -265,7 +265,7 @@ class MainTableColumnFactory {
      * Creates a column for all the linked files of a single file type.
      */
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(String externalFileTypeName) {
-        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(MainTableColumnType.EXTRAFILE);
+        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
         column.setGraphic(externalFileTypes
                 .getExternalFileTypeByName(externalFileTypeName)
                 .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
@@ -284,7 +284,7 @@ class MainTableColumnFactory {
      * Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
      */
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn() {
-        TableColumn<BibEntryTableViewModel, Map<Field, String>> column = new MainTableColumn<>(MainTableColumnType.LINKED_IDENTIFIER);
+        TableColumn<BibEntryTableViewModel, Map<Field, String>> column = new TableColumn<>();
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
         column.setGraphic(headerGraphic);
@@ -336,7 +336,7 @@ class MainTableColumnFactory {
      * A column that displays a specialField
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
-        TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new MainTableColumn<>(MainTableColumnType.SPECIALFIELD);
+        TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
         SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
