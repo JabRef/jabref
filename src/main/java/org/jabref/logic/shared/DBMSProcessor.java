@@ -401,16 +401,22 @@ public abstract class DBMSProcessor {
      *
      * @param bibEntry {@link BibEntry} to be deleted
      */
-    public void removeEntry(BibEntry bibEntry) {
+    public void removeEntries(List<BibEntry> bibEntries) {
         StringBuilder query = new StringBuilder()
                 .append("DELETE FROM ")
                 .append(escape("ENTRY"))
                 .append(" WHERE ")
                 .append(escape("SHARED_ID"))
-                .append(" = ?");
+                .append(" IN (");
+        for (int i = 0; i < bibEntries.size() - 1; i++) {
+            query.append("?, ");
+        }
+        query.append("?)");
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
-            preparedStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
+            for (int j = 0; j < bibEntries.size(); j++) {
+                preparedStatement.setInt(j + 1, bibEntries.get(j).getSharedBibEntryData().getSharedID());
+            }
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);

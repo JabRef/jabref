@@ -115,9 +115,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             List<BibEntry> entries = event.getBibEntries();
-            for (BibEntry entry : entries) {
-                dbmsProcessor.removeEntry(entry);
-            }
+            dbmsProcessor.removeEntries(entries);
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there where some
         }
