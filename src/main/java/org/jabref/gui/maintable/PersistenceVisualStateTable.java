@@ -57,12 +57,8 @@ public class PersistenceVisualStateTable {
         List<String> columnsWidths = new ArrayList<>();
 
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
-            if (column instanceof NormalTableColumn) {
-                NormalTableColumn normalColumn = (NormalTableColumn) column;
-
-                columnNames.add(normalColumn.getColumnName());
-                columnsWidths.add(String.valueOf(Double.valueOf(normalColumn.getWidth()).intValue()));
-            }
+            columnNames.add(((MainTableColumn) column).getModel().toString());
+            columnsWidths.add(String.valueOf(Double.valueOf(column.getWidth()).intValue()));
         }
 
         if ((columnNames.size() == columnsWidths.size()) &&

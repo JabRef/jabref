@@ -10,7 +10,7 @@ public class MainTableColumnModel {
 
     public enum Type {
         EXTRAFILE("extrafile", Localization.lang("File type")),
-        FILE("files", Localization.lang("Linked files")),
+        FILES("files", Localization.lang("Linked files")),
         GROUPS("groups", Localization.lang("Groups")),
         LINKED_IDENTIFIER("linked_id", Localization.lang("Linked identifiers")),
         NORMALFIELD("field"),
@@ -40,7 +40,7 @@ public class MainTableColumnModel {
         public static Type parse(String text) {
             switch (text) {
                 case "groups": return GROUPS;
-                case "files": return FILE;
+                case "files": return FILES;
                 case "extrafile": return EXTRAFILE;
                 case "linked_id": return LINKED_IDENTIFIER;
                 case "special": return SPECIALFIELD;
@@ -58,7 +58,7 @@ public class MainTableColumnModel {
 
         String[] splitname = rawColumnName.split(ColumnPreferences.QUALIFIER_SEPARATOR);
         type = Type.parse(splitname[0]);
-        if (type == Type.GROUPS || type == Type.FILE || type == Type.LINKED_IDENTIFIER) {
+        if (type == Type.GROUPS || type == Type.FILES || type == Type.LINKED_IDENTIFIER) {
             name = "";
         } else {
             if (splitname.length == 1) {
@@ -76,12 +76,18 @@ public class MainTableColumnModel {
         this.name = name;
     }
 
+    public MainTableColumnModel(Type type) {
+        Objects.requireNonNull(type);
+        this.type = type;
+        this.name = "";
+    }
+
     public Type getType() { return type; }
 
     public String getName() { return name; }
 
     public String getDisplayName() {
-        if ((type == Type.GROUPS || type == Type.FILE || type == Type.LINKED_IDENTIFIER) && name.isBlank()) {
+        if ((type == Type.GROUPS || type == Type.FILES || type == Type.LINKED_IDENTIFIER) && name.isBlank()) {
             return type.getDisplayName();
         } else {
             return FieldsUtil.getNameWithType(FieldFactory.parseField(name));

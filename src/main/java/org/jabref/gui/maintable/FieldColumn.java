@@ -5,11 +5,7 @@ import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 
-import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
@@ -22,27 +18,20 @@ import org.jabref.model.entry.field.OrFields;
 /**
  * A column that displays the text-value of the field
  */
-public class NormalTableColumn extends TableColumn<BibEntryTableViewModel, String> {
+public class FieldColumn extends MainTableColumn<String> {
 
     private final OrFields bibtexFields;
-
-    private final boolean isIconColumn;
-
-    private final Optional<JabRefIcon> iconLabel;
 
     private final Optional<BibDatabase> database;
 
     private final LayoutFormatter toUnicode = new LatexToUnicodeFormatter();
-    private final String columnName;
 
-    public NormalTableColumn(String columnName, OrFields bibtexFields, BibDatabase database) {
-        this.columnName = columnName;
+    public FieldColumn(MainTableColumnModel model, OrFields bibtexFields, BibDatabase database) {
+        super(model);
         this.bibtexFields = bibtexFields;
-        this.isIconColumn = false;
-        this.iconLabel = Optional.empty();
         this.database = Optional.of(database);
 
-        setText(columnName);
+        setText(getDisplayName());
         setCellValueFactory(param -> getColumnValue(param.getValue()));
     }
 
@@ -51,16 +40,15 @@ public class NormalTableColumn extends TableColumn<BibEntryTableViewModel, Strin
      *
      * @return name to be displayed. null if field is empty.
      */
-    public String getDisplayName() {
-        return bibtexFields.getDisplayName();
-    }
+    @Override
+    public String getDisplayName() { return bibtexFields.getDisplayName(); }
 
     public ObservableValue<String> getColumnValue(BibEntryTableViewModel entry) {
         if (bibtexFields.isEmpty()) {
             return null;
         }
 
-        ObjectBinding<Field>[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
+        ObjectBinding[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
         return Bindings.createStringBinding(() -> computeText(entry), dependencies);
     }
 
@@ -86,14 +74,6 @@ public class NormalTableColumn extends TableColumn<BibEntryTableViewModel, Strin
             result = toUnicode.format(result).trim();
         }
         return result;
-    }
-
-    public Node getHeaderLabel() {
-        if (isIconColumn) {
-            return iconLabel.map(JabRefIcon::getGraphicNode).get();
-        } else {
-            return new Label(getDisplayName());
-        }
     }
 
     /**
@@ -131,7 +111,4 @@ public class NormalTableColumn extends TableColumn<BibEntryTableViewModel, Strin
         return (!resolvedFieldContent.equals(plainFieldContent));
     }
 
-    public String getColumnName() {
-        return columnName;
-    }
 }
