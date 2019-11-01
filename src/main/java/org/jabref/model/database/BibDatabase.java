@@ -268,7 +268,6 @@ public class BibDatabase {
      */
     public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
-        //Require not empty?
 
         List<String> ids = new ArrayList<>();
         for (BibEntry entry : toBeDeleted) {
