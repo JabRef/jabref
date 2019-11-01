@@ -103,7 +103,6 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName()));
         availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
 
-
         EnumSet.allOf(StandardField.class).stream()
                .map(Field::getName)
                .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, name))
