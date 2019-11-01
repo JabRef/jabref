@@ -93,11 +93,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         availableColumnsProperty.clear();
 
-        availableColumnsProperty.add(new MainTableColumnModel(InternalField.TIMESTAMP.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(InternalField.OWNER.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(InternalField.GROUPS.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(InternalField.KEY_FIELD.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(InternalField.TYPE_HEADER.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName()));
+        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
+
 
         EnumSet.allOf(StandardField.class).stream()
                .map(Field::getName)
@@ -124,7 +129,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private void insertSpecialFieldColumns() {
         EnumSet.allOf(SpecialField.class).stream()
                .map(Field::getName).map(name -> new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, name))
-               .forEach(item -> availableColumnsProperty.getValue().add(0, item));
+               .forEach(item -> availableColumnsProperty.getValue().add(3, item));
     }
 
     private void removeSpecialFieldColumns() {
