@@ -126,8 +126,6 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     if (entriesListView.getItems().size() == 1) {
                         selectAllNewEntries();
                       }
-  
-                      return container;
 
                     return container;
                 })
