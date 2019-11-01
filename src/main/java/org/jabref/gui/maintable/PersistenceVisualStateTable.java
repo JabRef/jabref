@@ -26,8 +26,10 @@ public class PersistenceVisualStateTable {
         this.preferences = preferences;
 
         mainTable.getColumns().addListener(this::onColumnsChanged);
-        mainTable.getColumns().forEach(col -> col.sortTypeProperty().addListener(obs ->
-                updateColumnSortType(col.getText(), col.getSortType())));
+        mainTable.getColumns().forEach(col -> {
+            MainTableColumn column = (MainTableColumn) col;
+            col.sortTypeProperty().addListener(obs -> updateColumnSortType(column.getModel().toString(), column.getSortType()));
+        });
         mainTable.getColumns().forEach(col -> col.widthProperty().addListener(obs -> updateColumnPreferences()));
 
     }

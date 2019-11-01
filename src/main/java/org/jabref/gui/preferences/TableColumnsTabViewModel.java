@@ -128,7 +128,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private void insertSpecialFieldColumns() {
         EnumSet.allOf(SpecialField.class).stream()
                .map(Field::getName).map(name -> new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, name))
-               .forEach(item -> availableColumnsProperty.getValue().add(3, item));
+               .forEach(item -> availableColumnsProperty.getValue().add(0, item));
     }
 
     private void removeSpecialFieldColumns() {

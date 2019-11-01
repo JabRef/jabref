@@ -47,6 +47,11 @@ public class MainTableColumnModel {
                 case "field":
                 default: return NORMALFIELD;
             }
+            /* try {
+                return Type.valueOf(text);
+            } catch (IllegalArgumentException iae) {
+                return NORMALFIELD;
+            } */
         }
     }
 
