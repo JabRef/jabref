@@ -1,5 +1,6 @@
 package org.jabref.logic.reftextparser;
 
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -10,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 public class externalParser {
 
   private BibEntry bibEntry;
+  private BibDatabase bibDatabase;
   private static String referenceText;
   private static String parserResults;
   private static StandardField[] fields; // contains the fields which the parser filtered.
@@ -29,11 +31,18 @@ public class externalParser {
 
   public static void createNewEntry(BibEntry entry) {
     /*
+    if(bibDatabase.containsEntryWithId(entry.getId())) {
+    return;
+    }
+    else{
     for (StandardField field : fields) {
       entry.setField(field, parserResults);
     }
+    bibDatabase.insertEntry(entry);
+    }
      */
     //TODO: Finish it!
+
   }
 
 
