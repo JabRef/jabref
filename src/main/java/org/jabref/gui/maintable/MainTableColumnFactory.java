@@ -79,10 +79,7 @@ class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        preferences.getColumnNames().forEach(rawColumnName -> {
-            MainTableColumnModel column = new MainTableColumnModel(rawColumnName);
-
-            Field field;
+        preferences.getColumns().forEach(column -> {
 
             switch (column.getType()) {
                 case GROUPS:
@@ -95,29 +92,27 @@ class MainTableColumnFactory {
                     columns.add(createIdentifierColumn());
                     break;
                 case EXTRAFILE:
-                    if (!column.getName().equals("")) {
-                        columns.add(createExtraFileColumn(column.getName()));
+                    if (!column.getQualifier().equals("")) {
+                        columns.add(createExtraFileColumn(column.getQualifier()));
                     }
                     break;
                 case SPECIALFIELD:
-                    if (!column.getName().equals("")) {
-                        field = FieldFactory.parseField(column.getName());
+                    if (!column.getQualifier().equals("")) {
+                        Field field = FieldFactory.parseField(column.getQualifier());
                         if (field instanceof SpecialField) {
                             columns.add(createSpecialFieldColumn((SpecialField) field));
                         } else {
-                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getName()));
+                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getQualifier()));
                             columns.add(createFieldColumn(field));
                         }
                     }
                     break;
+                default:
                 case NORMALFIELD:
-                    if (!column.getName().equals("")) {
-                        field = FieldFactory.parseField(column.getName());
-                        columns.add(createFieldColumn(field));
+                    if (!column.getQualifier().equals("")) {
+                        columns.add(createFieldColumn(FieldFactory.parseField(column.getQualifier())));
                     }
                     break;
-                default:
-                    LOGGER.warn(Localization.lang("Column type %0 is unknown.", rawColumnName));
             }
         });
 

@@ -120,9 +120,11 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
 
-        columnPreferences.getColumnNames().stream()
-                .map(columnName -> new TableColumnsItemModel(new MainTableColumnModel(columnName), columnPreferences.getColumnWidth(columnName)))
-                .forEach(columnsListProperty.getValue()::add);
+        columnPreferences.getColumns().stream()
+                         .map(column -> new TableColumnsItemModel(
+                                 column,
+                                 columnPreferences.getColumnWidth(column.toString())))
+                         .forEach(columnsListProperty.getValue()::add);
     }
 
     private void insertSpecialFieldColumns() {
@@ -132,7 +134,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeSpecialFieldColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getColumnName().getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
+        columnsListProperty.getValue().removeIf(column -> column.getColumnModel().getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
         availableColumnsProperty.getValue().removeIf(columnName -> columnName.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
     }
 
@@ -144,7 +146,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeExtraFileColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getColumnName().getType() == MainTableColumnModel.Type.EXTRAFILE);
+        columnsListProperty.getValue().removeIf(column -> column.getColumnModel().getType() == MainTableColumnModel.Type.EXTRAFILE);
         availableColumnsProperty.getValue().removeIf(columnName -> columnName.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
     }
 
@@ -153,7 +155,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        if (columnsListProperty.getValue().stream().map(TableColumnsItemModel::getColumnName).filter(item -> item.equals(addColumnProperty.getValue())).findAny().isEmpty()) {
+        if (columnsListProperty.getValue().stream().map(TableColumnsItemModel::getColumnModel).filter(item -> item.equals(addColumnProperty.getValue())).findAny().isEmpty()) {
             columnsListProperty.add(new TableColumnsItemModel(addColumnProperty.getValue()));
             addColumnProperty.setValue(null);
         }
@@ -189,16 +191,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        List<String> columnNames = columnsListProperty.stream()
-                                                      .map(item -> item.getColumnName().toString())
-                                                      .collect(Collectors.toList());
+        List<MainTableColumnModel> columns = columnsListProperty.stream()
+                                                                .map(TableColumnsItemModel::getColumnModel)
+                                                                .collect(Collectors.toList());
 
         // for each column get either actual width or - if it does not exist - default value
-        Map<String,Double> columnWidths = new HashMap<>();
-        columnNames.forEach(field -> columnWidths.put(field,columnPreferences.getColumnWidth(field)));
+        Map<String, Double> columnWidths = new HashMap<>();
+        columns.forEach(column -> columnWidths.put(column.toString(),columnPreferences.getColumnWidth(column.toString())));
 
         ColumnPreferences newColumnPreferences = new ColumnPreferences(
-                columnNames,
+                columns,
                 specialFieldsEnabledProperty.getValue(),
                 specialFieldsSyncKeywordsProperty.getValue(),
                 specialFieldsSerializeProperty.getValue(),

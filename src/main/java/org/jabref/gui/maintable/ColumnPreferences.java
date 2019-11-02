@@ -7,10 +7,9 @@ import javafx.scene.control.TableColumn.SortType;
 
 public class ColumnPreferences {
 
-    public static final String QUALIFIER_SEPARATOR = ":";
     public static final double DEFAULT_FIELD_LENGTH = 100;
 
-    private final List<String> columnNames;
+    private final List<MainTableColumnModel> columns;
     private final boolean specialFieldsEnabled;
     private final boolean autoSyncSpecialFieldsToKeyWords;
     private final boolean serializeSpecialFields;
@@ -18,8 +17,8 @@ public class ColumnPreferences {
     private final Map<String, Double> columnWidths;
     private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(List<String> columnNames, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
-        this.columnNames = columnNames;
+    public ColumnPreferences(List<MainTableColumnModel> columns, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
+        this.columns = columns;
         this.specialFieldsEnabled = specialFieldsEnabled;
         this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
         this.serializeSpecialFields = serializeSpecialFields;
@@ -40,8 +39,8 @@ public class ColumnPreferences {
 
     public boolean getExtraFileColumnsEnabled() { return extraFileColumnsEnabled; }
 
-    public List<String> getColumnNames() {
-        return columnNames;
+    public List<MainTableColumnModel> getColumns() {
+        return columns;
     }
 
     public Map<String, Double> getColumnWidths() {

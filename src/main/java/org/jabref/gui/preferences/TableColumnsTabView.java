@@ -84,17 +84,17 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     private void setupTable() {
         nameColumn.setSortable(false);
         nameColumn.setReorderable(false);
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().columnModelProperty());
         new ValueTableCellFactory<TableColumnsItemModel, MainTableColumnModel>()
                 .withText(MainTableColumnModel::getDisplayName)
                 .install(nameColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().columnNameProperty());
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().columnModelProperty());
         new ValueTableCellFactory<TableColumnsItemModel, MainTableColumnModel>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove column") + " " + name.getName())
+                .withTooltip(name -> Localization.lang("Remove column") + " " + name.getQualifier())
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeColumn(columnsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);

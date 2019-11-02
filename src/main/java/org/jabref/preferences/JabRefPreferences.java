@@ -49,6 +49,7 @@ import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
@@ -353,8 +354,12 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
-    //File linking Options for entry editor
+    // File linking Options for entry editor
     public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
+
+    // String delimiters
+    public static final Character STRINGLIST_DELIMITER = ';';
+    public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
@@ -773,7 +778,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
     }
 
     /**
@@ -818,7 +823,7 @@ public class JabRefPreferences implements PreferencesService {
         // last character was escape symbol
         boolean escape = false;
 
-        // true if a ";" is found
+        // true if a STRINGLIST_DELIMITER is found
         boolean done = false;
 
         StringBuilder res = new StringBuilder();
@@ -831,9 +836,9 @@ public class JabRefPreferences implements PreferencesService {
                     escape = true;
                 }
             } else {
-                if (c == ';') {
+                if (c == STRINGLIST_DELIMITER) {
                     if (escape) {
-                        res.append(';');
+                        res.append(STRINGLIST_DELIMITER);
                     } else {
                         done = true;
                     }
@@ -959,7 +964,7 @@ public class JabRefPreferences implements PreferencesService {
                 break;
             }
 
-            customFields.addAll(Arrays.stream(fields.split(";")).map(FieldFactory::parseField).collect(Collectors.toList()));
+            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
             defNumber++;
         }
         return customFields;
@@ -968,7 +973,7 @@ public class JabRefPreferences implements PreferencesService {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(";"));
+        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
 
         // Entry editor tab 1:
@@ -1057,8 +1062,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
-     * characters make the process transparent even if strings contain ';'.
+     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single
+     * string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -1847,6 +1852,12 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
+    private List<MainTableColumnModel> createMainTableColumns() {
+        return getStringList(COLUMN_NAMES).stream()
+                .map(MainTableColumnModel::new)
+                .collect(Collectors.toList());
+    }
+
     private Map<String, Double> createColumnWidths() {
         List<String> columns = getStringList(COLUMN_NAMES);
         List<Double> widths = getStringList(COLUMN_WIDTHS)
@@ -1870,7 +1881,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
-                getStringList(COLUMN_NAMES),
+                createMainTableColumns(),
                 getBoolean(SPECIALFIELDSENABLED),
                 getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
                 getBoolean(SERIALIZESPECIALFIELDS),
@@ -1880,7 +1891,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putStringList(COLUMN_NAMES, columnPreferences.getColumnNames());
+
+        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
+                                                     .map(MainTableColumnModel::toString)
+                                                     .collect(Collectors.toList()));
 
         putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());
         putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
@@ -1888,7 +1902,8 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
 
         List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumnNames().forEach(name -> columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(name).toString()));
+        columnPreferences.getColumns().forEach(column ->
+                columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(column.toString()).toString()));
         putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
         setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());

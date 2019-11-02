@@ -13,33 +13,33 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 
 public class TableColumnsItemModel {
 
-    private final ObjectProperty<MainTableColumnModel> columnName;
+    private final ObjectProperty<MainTableColumnModel> columnModel;
     private final DoubleProperty length = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
 
-    public TableColumnsItemModel(MainTableColumnModel columnName) {
-        this.columnName = new SimpleObjectProperty<>(columnName);
+    public TableColumnsItemModel(MainTableColumnModel columnModel) {
+        this.columnModel = new SimpleObjectProperty<>(columnModel);
     }
 
-    public TableColumnsItemModel(MainTableColumnModel columnName, double length) {
-        this(columnName);
+    public TableColumnsItemModel(MainTableColumnModel columnModel, double length) {
+        this(columnModel);
         this.length.setValue(length);
     }
 
-    public MainTableColumnModel getColumnName() { return columnName.get(); }
+    public MainTableColumnModel getColumnModel() { return columnModel.get(); }
 
-    public ObservableValue<MainTableColumnModel> columnNameProperty() { return this.columnName; }
+    public ObservableValue<MainTableColumnModel> columnModelProperty() { return this.columnModel; }
 
     public void setLength(double length) { this.length.set(length); }
 
     public double getLength() { return length.get(); }
 
     @Override
-    public int hashCode() { return Objects.hash(columnName); }
+    public int hashCode() { return Objects.hash(columnModel); }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TableColumnsItemModel) {
-            return Objects.equals(this.columnName, ((TableColumnsItemModel) obj).columnName);
+            return Objects.equals(this.columnModel, ((TableColumnsItemModel) obj).columnModel);
         } else {
             return false;
         }
