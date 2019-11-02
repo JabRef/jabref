@@ -20,7 +20,7 @@ public class externalParser {
 
   /**
    * Takes a whole String and filters the specific fields for the entry which is done
-   * by an external parser. If the entry is already available then no changes are made.
+   * by an external parser.
    * @param refText Reference text to be parsed.
    */
   public static void parseRefText(String refText) {
@@ -29,6 +29,12 @@ public class externalParser {
      */
   }
 
+  /**
+   * Creates a new entry and fills the fields with the results of the parser, but only
+   * there where the parser has found something. If the entry already exists then
+   * nothing the function will immediately return.
+   * @param entry New entry.
+   */
   public static void createNewEntry(BibEntry entry) {
     /*
     if(bibDatabase.containsEntryWithId(entry.getId())) {
