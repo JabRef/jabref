@@ -1,6 +1,7 @@
 package org.jabref.logic.reftextparser;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * This class is used to help making new entries faster by parsing a string.
@@ -9,7 +10,10 @@ import org.jabref.model.entry.BibEntry;
 public class externalParser {
 
   private BibEntry bibEntry;
-  private String referenceText;
+  private static String referenceText;
+  private static String parserResults;
+  private static StandardField[] fields; // contains the fields which the parser filtered.
+
 
 
   /**
@@ -24,7 +28,12 @@ public class externalParser {
   }
 
   public static void createNewEntry(BibEntry entry) {
-
+    /*
+    for (StandardField field : fields) {
+      entry.setField(field, parserResults);
+    }
+     */
+    //TODO: Finish it!
   }
 
 
