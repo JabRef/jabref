@@ -137,20 +137,53 @@ public class EntryEditor extends BorderPane {
                 FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
-                    LOGGER.debug("Mode MOVE");
-                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    if (event.getTransferMode() == TransferMode.LINK) {
+                        // Alt on Windows
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                    } else if (event.getTransferMode() == TransferMode.COPY) {
+                        // Ctrl on Windows, no modifier on Xubuntu
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    } else {
+                        // Shift on Windows or no modifier
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    }
                     success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
-                    LOGGER.debug("Mode COPY");
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    if (event.getTransferMode() == TransferMode.COPY) {
+                        // Ctrl on Windows, no modifier on Xubuntu
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    } else if (event.getTransferMode() == TransferMode.LINK) {
+                        // Alt on Windows
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                    } else {
+                        // Shift on Windows or no modifier
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    }
                     success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
-                    LOGGER.debug("Mode LINK");
-                    fileLinker.addFilesToEntry(entry, files);
+                    if (event.getTransferMode() == TransferMode.COPY) {
+                        // Ctrl on Windows, no modifier on Xubuntu
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                    } else if (event.getTransferMode() == TransferMode.LINK) {
+                        // Alt on Windows
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                    } else {
+                        // Shift on Windows or no modifier
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                    }
                     success = true;
                 }
             }
