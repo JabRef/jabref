@@ -25,6 +25,5 @@ public class NewDatabaseAction extends SimpleCommand {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         bibDatabaseContext.setMode(mode);
         jabRefFrame.addTab(bibDatabaseContext, true);
-        jabRefFrame.getDialogService().notify(Localization.lang("New %0 library created.", mode.getFormattedName()));
     }
 }

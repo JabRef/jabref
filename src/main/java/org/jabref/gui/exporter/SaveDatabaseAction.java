@@ -143,8 +143,6 @@ public class SaveDatabaseAction {
                 // Reset title of tab
                 frame.setTabTitle(panel, panel.getTabTitle(),
                                   panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                frame.getDialogService().notify(Localization.lang("Saved library") + " '"
-                             + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
                 frame.setWindowTitle();
                 frame.updateAllTabTitles();
             }

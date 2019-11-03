@@ -1165,7 +1165,6 @@ public class JabRefFrame extends BorderPane {
             panel.cleanUp();
             tabbedPane.getTabs().remove(getTab(panel));
             setWindowTitle();
-            dialogService.notify(Localization.lang("Closed library") + '.');
             // update tab titles
             updateAllTabTitles();
         });
