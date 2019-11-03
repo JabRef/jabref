@@ -356,9 +356,8 @@ public class JabRefPreferences implements PreferencesService {
     // File linking Options for entry editor
     public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
 
-    // String delimiters
+    // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
-    public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";

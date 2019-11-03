@@ -13,7 +13,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,8 @@ import org.slf4j.LoggerFactory;
  * The type of the column and a qualifier, like the field name to be displayed in the column.
  */
 public class MainTableColumnModel {
+
+    public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
 
@@ -73,7 +74,7 @@ public class MainTableColumnModel {
     public MainTableColumnModel(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
 
-        String[] splittedName = rawColumnName.split(JabRefPreferences.COLUMNS_QUALIFIER_DELIMITER.toString());
+        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
         Type type = Type.fromString(splittedName[0]);
 
         typeProperty.setValue(type);
@@ -114,7 +115,7 @@ public class MainTableColumnModel {
         if (qualifierProperty.getValue().isBlank()) {
             return typeProperty.getValue().getName();
         } else {
-            return typeProperty.getValue().getName() + ":" + qualifierProperty.getValue();
+            return typeProperty.getValue().getName() + COLUMNS_QUALIFIER_DELIMITER + qualifierProperty.getValue();
         }
     }
 
