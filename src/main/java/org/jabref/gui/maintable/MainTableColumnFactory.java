@@ -93,24 +93,24 @@ class MainTableColumnFactory {
                     break;
                 case EXTRAFILE:
                     if (!column.getQualifier().equals("")) {
-                        columns.add(createExtraFileColumn(column.getQualifier()));
+                        columns.add(createExtraFileColumn(column));
                     }
                     break;
                 case SPECIALFIELD:
                     if (!column.getQualifier().equals("")) {
                         Field field = FieldFactory.parseField(column.getQualifier());
                         if (field instanceof SpecialField) {
-                            columns.add(createSpecialFieldColumn((SpecialField) field));
+                            columns.add(createSpecialFieldColumn(column));
                         } else {
                             LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getQualifier()));
-                            columns.add(createFieldColumn(field));
+                            columns.add(createFieldColumn(column));
                         }
                     }
                     break;
                 default:
                 case NORMALFIELD:
                     if (!column.getQualifier().equals("")) {
-                        columns.add(createFieldColumn(FieldFactory.parseField(column.getQualifier())));
+                        columns.add(createFieldColumn(column));
                     }
                     break;
             }
@@ -168,8 +168,8 @@ class MainTableColumnFactory {
             }
 
             String matchedGroupsString = matchedGroups.stream()
-                    .map(AbstractGroup::getName)
-                    .collect(Collectors.joining(", "));
+                                                      .map(AbstractGroup::getName)
+                                                      .collect(Collectors.joining(", "));
             Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
             Tooltip.install(container, tooltip);
             return container;
@@ -180,101 +180,15 @@ class MainTableColumnFactory {
     /**
      * Creates a text column to display any standard field.
      */
-    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(Field field) {
-        String columnName = field.getName();
-        FieldColumn column = new FieldColumn(new MainTableColumnModel(
-                MainTableColumnModel.Type.NORMALFIELD, columnName),
-                FieldFactory.parseOrFields(columnName),
+    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
+        FieldColumn column = new FieldColumn(columnModel,
+                FieldFactory.parseOrFields(columnModel.getQualifier()),
                 database.getDatabase());
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);
         column.setSortable(true);
-        column.setPrefWidth(preferences.getColumnWidth(columnName));
-        return column;
-    }
-
-    /**
-     * Creates a column for all the linked files. Instead of creating a column for a single file type, like
-     * {@code createExtraFileColumn} does, this creates one single column collecting all file links.
-     */
-    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn() {
-        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
-        Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
-        column.setGraphic(headerGraphic);
-        column.getStyleClass().add(STYLE_ICON_COLUMN);
-        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
-        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
-        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                .withGraphic(this::createFileIcon)
-                .withTooltip(this::createFileTooltip)
-                .withMenu(this::createFileMenu)
-                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
-                    if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
-                        // Only one linked file -> open directly
-                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
-                        linkedFileViewModel.open();
-                    }
-                })
-                .install(column);
-        return column;
-    }
-
-    private String createFileTooltip(List<LinkedFile> linkedFiles) {
-        if (linkedFiles.size() > 0) {
-            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
-        }
-        return null;
-    }
-
-    private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
-        if (linkedFiles.size() <= 1) {
-            return null;
-        }
-
-        ContextMenu contextMenu = new ContextMenu();
-
-        for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
-
-            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
-            menuItem.setOnAction(event -> linkedFileViewModel.open());
-            contextMenu.getItems().add(menuItem);
-        }
-
-        return contextMenu;
-    }
-
-    private Node createFileIcon(List<LinkedFile> linkedFiles) {
-        if (linkedFiles.size() > 1) {
-            return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
-        } else if (linkedFiles.size() == 1) {
-            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), false)
-                                    .map(ExternalFileType::getIcon)
-                                    .orElse(IconTheme.JabRefIcons.FILE)
-                                    .getGraphicNode();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Creates a column for all the linked files of a single file type.
-     */
-    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(String externalFileTypeName) {
-        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, externalFileTypeName));
-        column.setGraphic(externalFileTypes
-                .getExternalFileTypeByName(externalFileTypeName)
-                .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
-                .getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON_COLUMN);
-        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
-        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
-        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList())))
-                .install(column);
-
+        column.setPrefWidth(columnModel.getWidth());
         return column;
     }
 
@@ -333,8 +247,10 @@ class MainTableColumnFactory {
     /**
      * A column that displays a SpecialField
      */
-    private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
-        TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, specialField.getName()));
+    private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
+        SpecialField specialField = (SpecialField) FieldFactory.parseField(columnModel.getQualifier());
+        TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column =
+                new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, specialField.getName()));
         SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
@@ -410,5 +326,91 @@ class MainTableColumnFactory {
                     node.getStyleClass().add("empty-special-field");
                     return node;
                 });
+    }
+
+    /**
+     * Creates a column for all the linked files. Instead of creating a column for a single file type, like {@code
+     * createExtraFileColumn} does, this creates one single column collecting all file links.
+     */
+    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn() {
+        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+        Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
+        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
+                .withGraphic(this::createFileIcon)
+                .withTooltip(this::createFileTooltip)
+                .withMenu(this::createFileMenu)
+                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
+                    if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
+                        // Only one linked file -> open directly
+                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
+                        linkedFileViewModel.open();
+                    }
+                })
+                .install(column);
+        return column;
+    }
+
+    private String createFileTooltip(List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 0) {
+            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
+        }
+        return null;
+    }
+
+    private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() <= 1) {
+            return null;
+        }
+
+        ContextMenu contextMenu = new ContextMenu();
+
+        for (LinkedFile linkedFile : linkedFiles) {
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
+
+            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
+            menuItem.setOnAction(event -> linkedFileViewModel.open());
+            contextMenu.getItems().add(menuItem);
+        }
+
+        return contextMenu;
+    }
+
+    private Node createFileIcon(List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 1) {
+            return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
+        } else if (linkedFiles.size() == 1) {
+            return externalFileTypes.fromLinkedFile(linkedFiles.get(0), false)
+                                    .map(ExternalFileType::getIcon)
+                                    .orElse(IconTheme.JabRefIcons.FILE)
+                                    .getGraphicNode();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Creates a column for all the linked files of a single file type.
+     */
+    private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new MainTableColumn<>(
+                new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, columnModel.getQualifier()));
+        column.setGraphic(externalFileTypes
+                .getExternalFileTypeByName(columnModel.getQualifier())
+                .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
+                .getGraphicNode());
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COLUMN);
+        column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
+        new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
+                .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile ->
+                        linkedFile.getFileType().equalsIgnoreCase(columnModel.getQualifier())).collect(Collectors.toList())))
+                .install(column);
+
+        return column;
     }
 }

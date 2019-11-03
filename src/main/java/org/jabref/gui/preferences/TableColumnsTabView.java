@@ -32,7 +32,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         @Override
         public String toString(MainTableColumnModel object) {
             if (object != null) {
-                return object.toString();
+                return object.getName();
             } else {
                 return "";
             }
@@ -44,9 +44,9 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         }
     };
 
-    @FXML private TableView<TableColumnsItemModel> columnsList;
-    @FXML private TableColumn<TableColumnsItemModel, MainTableColumnModel> nameColumn;
-    @FXML private TableColumn<TableColumnsItemModel, MainTableColumnModel> actionsColumn;
+    @FXML private TableView<MainTableColumnModel> columnsList;
+    @FXML private TableColumn<MainTableColumnModel, String> nameColumn;
+    @FXML private TableColumn<MainTableColumnModel, String> actionsColumn;
     @FXML private ComboBox<MainTableColumnModel> addColumnName;
     @FXML private CheckBox specialFieldsEnable;
     @FXML private Button specialFieldsHelp;
@@ -84,17 +84,17 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     private void setupTable() {
         nameColumn.setSortable(false);
         nameColumn.setReorderable(false);
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().columnModelProperty());
-        new ValueTableCellFactory<TableColumnsItemModel, MainTableColumnModel>()
-                .withText(MainTableColumnModel::getDisplayName)
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        new ValueTableCellFactory<MainTableColumnModel, String>()
+                .withText(name -> name)
                 .install(nameColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().columnModelProperty());
-        new ValueTableCellFactory<TableColumnsItemModel, MainTableColumnModel>()
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        new ValueTableCellFactory<MainTableColumnModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove column") + " " + name.getQualifier())
+                .withTooltip(name -> Localization.lang("Remove column") + " " + name)
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeColumn(columnsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);

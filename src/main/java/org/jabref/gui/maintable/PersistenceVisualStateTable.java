@@ -28,7 +28,7 @@ public class PersistenceVisualStateTable {
         mainTable.getColumns().addListener(this::onColumnsChanged);
         mainTable.getColumns().forEach(col -> {
             MainTableColumn column = (MainTableColumn) col;
-            col.sortTypeProperty().addListener(obs -> updateColumnSortType(column.getModel().toString(), column.getSortType()));
+            col.sortTypeProperty().addListener(obs -> updateColumnSortType(column.getModel().getName(), column.getSortType()));
         });
         mainTable.getColumns().forEach(col -> col.widthProperty().addListener(obs -> updateColumnPreferences()));
 
@@ -55,18 +55,22 @@ public class PersistenceVisualStateTable {
      * Store shown columns and their width in preferences.
      */
     private void updateColumnPreferences() {
-        List<String> columnNames = new ArrayList<>();
-        List<String> columnsWidths = new ArrayList<>();
+        List<MainTableColumnModel> columns = new ArrayList<>();
 
-        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
-            columnNames.add(((MainTableColumn) column).getModel().toString());
-            columnsWidths.add(String.valueOf(Double.valueOf(column.getWidth()).intValue()));
-        }
+        mainTable.getColumns().forEach(column -> {
+            MainTableColumnModel columnModel = ((MainTableColumn<?>) column).getModel();
+            columnModel.setWidth(column.getWidth());
+            columns.add(columnModel);
+        });
 
-        if ((columnNames.size() == columnsWidths.size()) &&
-                (columnNames.size() == preferences.getStringList(JabRefPreferences.COLUMN_NAMES).size())) {
-            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
-            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
-        }
+        ColumnPreferences oldColumnPreferences = preferences.getColumnPreferences();
+
+        preferences.storeColumnPreferences(new ColumnPreferences(
+                columns,
+                oldColumnPreferences.getSpecialFieldsEnabled(),
+                oldColumnPreferences.getAutoSyncSpecialFieldsToKeyWords(),
+                oldColumnPreferences.getSerializeSpecialFields(),
+                oldColumnPreferences.getExtraFileColumnsEnabled(),
+                oldColumnPreferences.getSortTypesForColumns()));
     }
 }

@@ -2,6 +2,14 @@ package org.jabref.gui.maintable;
 
 import java.util.Objects;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
@@ -58,59 +66,74 @@ public class MainTableColumnModel {
         }
     }
 
-    private final Type type;
-    private final String qualifier;
+    private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
+    private final StringProperty qualifierProperty = new SimpleStringProperty("");
+    private final DoubleProperty widthProperty = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
 
     public MainTableColumnModel(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
 
         String[] splittedName = rawColumnName.split(JabRefPreferences.COLUMNS_QUALIFIER_DELIMITER.toString());
+        Type type = Type.fromString(splittedName[0]);
 
-        type = Type.fromString(splittedName[0]);
+        typeProperty.setValue(type);
 
         if (type == Type.NORMALFIELD || type == Type.SPECIALFIELD || type == Type.EXTRAFILE) {
             if (splittedName.length == 1) {
-                qualifier = splittedName[0]; // On default the rawColumnName is parsed as NORMALFIELD
+                qualifierProperty.setValue(splittedName[0]); // On default the rawColumnName is parsed as NORMALFIELD
             } else {
-                qualifier = splittedName[1];
+                qualifierProperty.setValue(splittedName[1]);
             }
-        } else {
-            qualifier = "";
         }
     }
 
-    public MainTableColumnModel(Type type, String qualifier) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(qualifier);
-        this.type = type;
-        this.qualifier = qualifier;
+    public MainTableColumnModel(String rawColumnName, Double width) {
+        this(rawColumnName);
+
+        Objects.requireNonNull(width);
+        this.widthProperty.setValue(width);
     }
 
-    public MainTableColumnModel(Type type) {
-        Objects.requireNonNull(type);
-        this.type = type;
-        this.qualifier = "";
+    public MainTableColumnModel(Type typeProperty, String qualifierProperty) {
+        Objects.requireNonNull(typeProperty);
+        Objects.requireNonNull(qualifierProperty);
+        this.typeProperty.setValue(typeProperty);
+        this.qualifierProperty.setValue(qualifierProperty);
     }
 
-    public Type getType() { return type; }
+    public MainTableColumnModel(Type typeProperty) {
+        Objects.requireNonNull(typeProperty);
+        this.typeProperty.setValue(typeProperty);
+    }
 
-    public String getQualifier() { return qualifier; }
+    public Type getType() { return typeProperty.getValue(); }
+
+    public String getQualifier() { return qualifierProperty.getValue(); }
+
+    public String getName() {
+        if (qualifierProperty.getValue().isBlank()) {
+            return typeProperty.getValue().getName();
+        } else {
+            return typeProperty.getValue().getName() + ":" + qualifierProperty.getValue();
+        }
+    }
 
     public String getDisplayName() {
-        if ((type == Type.GROUPS || type == Type.FILES || type == Type.LINKED_IDENTIFIER) && qualifier.isBlank()) {
-            return type.getDisplayName();
+        if ((typeProperty.getValue() == Type.GROUPS
+                || typeProperty.getValue() == Type.FILES
+                || typeProperty.getValue() == Type.LINKED_IDENTIFIER)
+                && qualifierProperty.getValue().isBlank()) {
+            return typeProperty.getValue().getDisplayName();
         } else {
-            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifier));
+            return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
         }
     }
 
-    public String toString() {
-        if (qualifier.isBlank()) {
-            return type.getName();
-        } else {
-            return type.getName() + ":" + qualifier;
-        }
-    }
+    public void setWidth(double length) { this.widthProperty.setValue(length); }
+
+    public Double getWidth() { return widthProperty.getValue(); }
+
+    public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
 
     public boolean equals(Object o) {
         if (this == o) {
@@ -123,13 +146,13 @@ public class MainTableColumnModel {
 
         MainTableColumnModel that = (MainTableColumnModel) o;
 
-        if (type != that.type) {
+        if (typeProperty != that.typeProperty) {
             return false;
         }
-        return Objects.equals(qualifier, that.qualifier);
+        return Objects.equals(qualifierProperty, that.qualifierProperty);
     }
 
     public int hashCode() {
-        return Objects.hash(type, qualifier);
+        return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
     }
 }

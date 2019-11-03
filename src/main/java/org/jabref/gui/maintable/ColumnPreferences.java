@@ -14,16 +14,14 @@ public class ColumnPreferences {
     private final boolean autoSyncSpecialFieldsToKeyWords;
     private final boolean serializeSpecialFields;
     private final boolean extraFileColumnsEnabled;
-    private final Map<String, Double> columnWidths;
     private final Map<String, SortType> columnSortType;
 
-    public ColumnPreferences(List<MainTableColumnModel> columns, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, Double> columnWidths, Map<String, SortType> columnSortType) {
+    public ColumnPreferences(List<MainTableColumnModel> columns, boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields, boolean extraFileColumnsEnabled, Map<String, SortType> columnSortType) {
         this.columns = columns;
         this.specialFieldsEnabled = specialFieldsEnabled;
         this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
         this.serializeSpecialFields = serializeSpecialFields;
         this.extraFileColumnsEnabled = extraFileColumnsEnabled;
-        this.columnWidths = columnWidths;
         this.columnSortType = columnSortType;
     }
 
@@ -41,14 +39,6 @@ public class ColumnPreferences {
 
     public List<MainTableColumnModel> getColumns() {
         return columns;
-    }
-
-    public Map<String, Double> getColumnWidths() {
-        return columnWidths;
-    }
-
-    public double getColumnWidth(String columnName) {
-        return columnWidths.getOrDefault(columnName, DEFAULT_FIELD_LENGTH);
     }
 
     public Map<String, SortType> getSortTypesForColumns() {

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -1853,30 +1852,24 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private List<MainTableColumnModel> createMainTableColumns() {
-        return getStringList(COLUMN_NAMES).stream()
-                .map(MainTableColumnModel::new)
+        List<String> columnNames = getStringList(COLUMN_NAMES);
+        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return ColumnPreferences.DEFAULT_FIELD_LENGTH;
+                    }
+                })
                 .collect(Collectors.toList());
-    }
 
-    private Map<String, Double> createColumnWidths() {
-        List<String> columns = getStringList(COLUMN_NAMES);
-        List<Double> widths = getStringList(COLUMN_WIDTHS)
-                                                          .stream()
-                                                          .map(string -> {
-                                                              try {
-                                                                  return Double.parseDouble(string);
-                                                              } catch (NumberFormatException e) {
-                                                                  LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                  return ColumnPreferences.DEFAULT_FIELD_LENGTH;
-                                                              }
-                                                          })
-                                                          .collect(Collectors.toList());
-
-        Map<String, Double> map = new TreeMap<>();
-        for (int i = 0; i < columns.size(); i++) {
-            map.put(columns.get(i), widths.get(i));
+        List<MainTableColumnModel> columns = new ArrayList<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            columns.add(new MainTableColumnModel(columnNames.get(i), columnWidths.get(i)));
         }
-        return map;
+        return columns;
     }
 
     public ColumnPreferences getColumnPreferences() {
@@ -1886,14 +1879,13 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
                 getBoolean(SERIALIZESPECIALFIELDS),
                 getBoolean(EXTRA_FILE_COLUMNS),
-                createColumnWidths(),
                 getMainTableColumnSortTypes());
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
 
         putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
-                                                     .map(MainTableColumnModel::toString)
+                                                     .map(MainTableColumnModel::getName)
                                                      .collect(Collectors.toList()));
 
         putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());
@@ -1902,8 +1894,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
 
         List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column ->
-                columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(column.toString()).toString()));
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.getWidth().toString()));
         putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
         setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
