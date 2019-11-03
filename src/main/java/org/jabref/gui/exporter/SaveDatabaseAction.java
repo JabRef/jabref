@@ -120,6 +120,7 @@ public class SaveDatabaseAction {
     }
 
     private boolean doSave() {
+        panel.setSaving(true);
         Path targetPath = panel.getBibDatabaseContext().getDatabasePath().get();
         try {
             // Save the database
@@ -158,9 +159,14 @@ public class SaveDatabaseAction {
     }
 
     public boolean save() {
+        return save(false);
+    }
+
+    public boolean save(boolean silent) {
         if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
-            panel.setSaving(true);
+            if (!silent) {
+                panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
+            }
             return doSave();
         } else {
             Optional<Path> savePath = getSavePath();
