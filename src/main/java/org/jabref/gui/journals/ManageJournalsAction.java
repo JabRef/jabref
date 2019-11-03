@@ -8,5 +8,4 @@ public class ManageJournalsAction extends SimpleCommand {
     public void execute() {
         new ManageJournalAbbreviationsView().show();
     }
-
 }

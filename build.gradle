@@ -30,6 +30,8 @@ plugins {
 // use the gradle build scan feature: https://scans.gradle.com/get-started
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
 
+gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS 
+
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'project-report'
@@ -110,6 +112,8 @@ dependencies {
     compile 'org.apache.pdfbox:pdfbox:2.0.17'
     compile 'org.apache.pdfbox:fontbox:2.0.17'
     compile 'org.apache.pdfbox:xmpbox:2.0.17'
+
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
 
@@ -573,7 +577,8 @@ jlink {
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
-                    '--win-dir-chooser',
+                    // temporarily disabled due to conflict with Jpackage update
+                    //'--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows"

@@ -20,8 +20,7 @@ import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 /**
- * This class provides a model for abbreviation files.
- * It actually doesn't save the files as objects but rather saves
+ * This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
  * their paths. This also allows to specify pseudo files as placeholder objects.
  */
 public class AbbreviationsFileViewModel {
@@ -32,7 +31,6 @@ public class AbbreviationsFileViewModel {
     private final String name;
     private final Optional<Path> path;
 
-
     public AbbreviationsFileViewModel(Path filePath) {
         this.path = Optional.ofNullable(filePath);
         this.name = path.get().toAbsolutePath().toString();
@@ -41,9 +39,9 @@ public class AbbreviationsFileViewModel {
     }
 
     /**
-     * This constructor should only be called to create a pseudo abbreviation file for built in lists.
-     * This means it is a placeholder and it's path will be null meaning it has no place on the filesystem.
-     * It's isPseudoFile property will therefore be set to true.
+     * This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
+     * a placeholder and it's path will be null meaning it has no place on the filesystem. It's isPseudoFile property
+     * will therefore be set to true.
      */
     public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
         this.abbreviations.addAll(abbreviations);
@@ -54,8 +52,7 @@ public class AbbreviationsFileViewModel {
 
     public void readAbbreviations() throws FileNotFoundException {
         if (path.isPresent()) {
-            List<Abbreviation> abbreviationList = JournalAbbreviationLoader
-                    .readJournalListFromFile(path.get().toFile());
+            List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get().toFile());
             abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
         } else {
             throw new FileNotFoundException();
@@ -65,18 +62,19 @@ public class AbbreviationsFileViewModel {
     /**
      * This method will write all abbreviations of this abbreviation file to the file on the file system.
      * It essentially will check if the current file is a built in list and if not it will call
-     * {@link AbbreviationWriter#writeOrCreate()}.
+     * {@link AbbreviationWriter#writeOrCreate}.
      */
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
-            List<Abbreviation> actualAbbreviations = abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
-                    .map(abb -> abb.getAbbreviationObject()).collect(Collectors.toList());
+            List<Abbreviation> actualAbbreviations =
+                    abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
+                                 .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList());
             AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations, StandardCharsets.UTF_8);
         }
     }
 
     public SimpleListProperty<AbbreviationViewModel> abbreviationsProperty() {
-        return this.abbreviations;
+        return abbreviations;
     }
 
     public boolean exists() {
@@ -88,12 +86,12 @@ public class AbbreviationsFileViewModel {
     }
 
     public ReadOnlyBooleanProperty isBuiltInListProperty() {
-        return this.isBuiltInList;
+        return isBuiltInList;
     }
 
     @Override
     public String toString() {
-        return this.name;
+        return name;
     }
 
     @Override

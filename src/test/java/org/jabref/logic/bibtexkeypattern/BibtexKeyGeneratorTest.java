@@ -1087,4 +1087,13 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("Newton-2019", BibtexKeyGenerator.generateKey(entry, "[auth]-[year]"));
     }
+
+    @Test
+    public void generateKeyWithWithFirstNCharacters() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.AUTHOR, "Newton, Isaac");
+        entry.setField(StandardField.YEAR, "2019");
+
+        assertEquals("newt-2019", BibtexKeyGenerator.generateKey(entry, "[auth4:lower]-[year]"));
+    }
 }

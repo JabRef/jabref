@@ -11,12 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JournalAbbreviationLoader {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
-    // journal initialization
-    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
+    // Journal initialization
+    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.csv";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.csv";
+    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.csv";
     private JournalAbbreviationRepository journalAbbrev;
 
     public static List<Abbreviation> getOfficialIEEEAbbreviations() {
@@ -38,14 +39,14 @@ public class JournalAbbreviationLoader {
     }
 
     public static List<Abbreviation> readJournalListFromFile(File file) throws FileNotFoundException {
-        LOGGER.debug("Reading journal list from file " + file);
+        LOGGER.debug(String.format("Reading journal list from file %s", file));
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(Objects.requireNonNull(file));
         return parser.getAbbreviations();
     }
 
     public static List<Abbreviation> readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
-        LOGGER.debug("Reading journal list from file " + file);
+        LOGGER.debug(String.format("Reading journal list from file %s", file));
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
         return parser.getAbbreviations();
@@ -54,14 +55,13 @@ public class JournalAbbreviationLoader {
     public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
-        // the order of reading the journal lists is important
-        // method: last added abbreviation wins
-        // for instance, in the personal list one can overwrite abbreviations in the built in list
+        // The order of reading the journal lists is important: last added abbreviation wins
+        // For instance, in the personal list one can overwrite abbreviations in the built in list
 
         // Read builtin list
         journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
 
-        // read IEEE list
+        // Read IEEE list
         if (journalAbbreviationPreferences.useIEEEAbbreviations()) {
             journalAbbrev.addEntries(getOfficialIEEEAbbreviations());
         } else {
@@ -77,7 +77,7 @@ public class JournalAbbreviationLoader {
                     journalAbbrev.addEntries(readJournalListFromFile(new File(filename)));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find external journal list file " + filename, e);
+                    LOGGER.info(String.format("Cannot find external journal list file %s", filename), e);
                 }
             }
         }
@@ -90,10 +90,9 @@ public class JournalAbbreviationLoader {
                         readJournalListFromFile(new File(personalJournalList),
                                 journalAbbreviationPreferences.getDefaultEncoding()));
             } catch (FileNotFoundException e) {
-                LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
+                LOGGER.info(String.format("Personal journal list file '%s' not found.", personalJournalList), e);
             }
         }
-
     }
 
     public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {

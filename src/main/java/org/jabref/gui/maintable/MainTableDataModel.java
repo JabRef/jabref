@@ -22,12 +22,13 @@ import org.jabref.model.search.matchers.MatcherSets;
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
+    private final GroupViewMode groupViewMode;
 
     public MainTableDataModel(BibDatabaseContext context) {
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        
+
         ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new);
-        
+
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 Bindings.createObjectBinding(() -> this::isMatched,
@@ -40,6 +41,7 @@ public class MainTableDataModel {
         Globals.stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
+        groupViewMode = Globals.prefs.getGroupViewMode();
     }
 
     private boolean isMatched(BibEntryTableViewModel entry) {
@@ -64,7 +66,7 @@ public class MainTableDataModel {
             return Optional.empty();
         }
 
-        final MatcherSet searchRules = MatcherSets.build(Globals.prefs.getGroupViewMode() == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+        final MatcherSet searchRules = MatcherSets.build(groupViewMode == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
         for (GroupTreeNode node : selectedGroups) {
             searchRules.addRule(node.getSearchMatcher());

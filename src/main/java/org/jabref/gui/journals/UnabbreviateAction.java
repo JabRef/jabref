@@ -9,7 +9,6 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 /**
@@ -32,27 +31,21 @@ public class UnabbreviateAction implements BaseAction {
     }
 
     private String unabbreviate() {
-        List<BibEntry> entries = panel.getSelectedEntries(); // never null
+        List<BibEntry> entries = panel.getSelectedEntries(); // Never null
 
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationLoader
                 .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
-        int count = 0;
-        for (BibEntry entry : entries) {
-            for (Field journalField : FieldFactory.getJournalNameFields()) {
-                if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, journalField, ce)) {
-                    count++;
-                }
-            }
-        }
+        int count = entries.stream().mapToInt(entry ->
+                (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
+                        undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, journalField, ce)).count()).sum();
         if (count > 0) {
             ce.end();
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
             return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
-        } else {
-            return Localization.lang("No journal names could be unabbreviated.");
         }
+        return Localization.lang("No journal names could be unabbreviated.");
     }
 }
