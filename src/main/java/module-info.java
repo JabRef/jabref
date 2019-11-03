@@ -66,4 +66,5 @@ open module org.jabref {
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
+    requires commons.csv;
 }
