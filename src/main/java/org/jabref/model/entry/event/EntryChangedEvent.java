@@ -1,8 +1,8 @@
 package org.jabref.model.entry.event;
 
-import org.jabref.model.entry.BibEntry;
-
 import java.util.Collections;
+
+import org.jabref.model.entry.BibEntry;
 
 /**
  * <code>EntryChangedEvent</code> is fired when a <code>BibEntry</code> has been changed.

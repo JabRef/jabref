@@ -1,11 +1,11 @@
 package org.jabref.model.database.event;
 
+import java.util.Collections;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
-
-import java.util.Collections;
 
 /**
  * {@link EntryAddedEvent} is fired when a new {@link BibEntry} was added to the {@link BibDatabase}.
