@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?ifdef JpIsSystemWide ?>
+    <?define JpInstallScope="perMachine"?>
+  <?else?>
+    <?define JpInstallScope="perUser"?>
+  <?endif?>
+
+  <Product  Id="$(var.JpProductCode)" Name="$(var.JpAppName)"
+            Language="1033" Version="$(var.JpAppVersion)"
+            Manufacturer="$(var.JpAppVendor)"
+            UpgradeCode="$(var.JpProductUpgradeCode)">
+    <Package  Description="$(var.JpAppDescription)"
+              Manufacturer="$(var.JpAppVendor)"
+              InstallerVersion="200" Compressed="yes"
+              InstallScope="$(var.JpInstallScope)" Platform="x64"/>
+    <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+
+    <?ifdef JpAllowDowngrades ?>
+    <MajorUpgrade AllowDowngrades="yes"/>
+    <?endif?>
+
+    <!-- Standard required root -->
+    <Directory Id="TARGETDIR" Name="SourceDir"/>
+
+    <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+      <ComponentGroupRef Id="Shortcuts"/>
+      <ComponentGroupRef Id="Files"/>
+      <ComponentGroupRef Id="FileAssociations"/>
+    </Feature>
+
+    <?ifdef JpInstallDirChooser ?>
+    <Binary Id="JpCaDll" SourceFile="wixhelper.dll"/>
+    <CustomAction Id="JpCheckInstallDir" BinaryKey="JpCaDll" DllEntry="CheckInstallDir" />
+    <?endif?>
+
+    <UI>
+      <?ifdef JpInstallDirChooser ?>
+      <Dialog Id="JpInvalidInstallDir" Width="300" Height="85" Title="[ProductName] Setup" NoMinimize="yes">
+        <Control Id="JpInvalidInstallDirYes" Type="PushButton" X="100" Y="55" Width="50" Height="15" Default="no" Cancel="no" Text="Yes">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        </Control>
+        <Control Id="JpInvalidInstallDirNo" Type="PushButton" X="150" Y="55" Width="50" Height="15" Default="yes" Cancel="yes" Text="No">
+          <Publish Event="NewDialog" Value="InstallDirDlg">1</Publish>
+        </Control>
+        <Control Id="Text" Type="Text" X="25" Y="15" Width="250" Height="30" TabSkip="no">
+          <Text>!(loc.message.install.dir.exist)</Text>
+        </Control>
+      </Dialog>
+
+      <!--
+        Run WixUI_InstallDir dialog in the default install directory.
+      -->
+      <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER"/>
+      <UIRef Id="WixUI_InstallDir" />
+
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="JpCheckInstallDir" Order="3">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="JpInvalidInstallDir" Order="5">INSTALLDIR_VALID="0"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="5">INSTALLDIR_VALID="1"</Publish>
+
+      <?ifndef JpLicenseRtf ?>
+      <!--
+        No license file provided.
+        Override the dialog sequence in built-in dialog set "WixUI_InstallDir"
+        to exclude license dialog.
+      -->
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">1</Publish>
+      <?endif?>
+
+      <?else?>
+
+      <?ifdef JpLicenseRtf ?>
+      <UIRef Id="WixUI_Minimal" />
+      <?endif?>
+
+      <?endif?>
+    </UI>
+
+    <?ifdef JpLicenseRtf ?>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.JpLicenseRtf)"/>
+    <?endif?>
+
+  <DirectoryRef Id="TARGETDIR"><Component Id="RegistryJabFoxEntries" Guid="b6bc55ad-905c-4258-89b1-8b37abbe559c" Win64="yes"><RegistryKey Root="HKMU" Key="SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes"><RegistryValue Type="string" Value="[APPLICATIONFOLDER]jabref.json"/></RegistryKey></Component></DirectoryRef><Feature Id="JabFox" Level="1"><ComponentRef Id="RegistryJabFoxEntries" /></Feature><Property Id="ARPPRODUCTICON" Value="DesktopIcon.exe" /><WixVariable Id="WixUIBannerBmp" Value="JabRefTopBanner.bmp" /><DirectoryRef Id="TARGETDIR"><Component Id="RegistryJabFoxEntries" Guid="b6bc55ad-905c-4258-89b1-8b37abbe559c" Win64="yes"><RegistryKey Root="HKMU" Key="SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes"><RegistryValue Type="string" Value="[APPLICATIONFOLDER]jabref.json"/></RegistryKey></Component></DirectoryRef><Feature Id="JabFox" Level="1"><ComponentRef Id="RegistryJabFoxEntries" /></Feature><Property Id="ARPPRODUCTICON" Value="DesktopIcon.exe" /><WixVariable Id="WixUIBannerBmp" Value="JabRefTopBanner.bmp" /><DirectoryRef Id="TARGETDIR"><Component Id="RegistryJabFoxEntries" Guid="b6bc55ad-905c-4258-89b1-8b37abbe559c" Win64="yes"><RegistryKey Root="HKMU" Key="SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes"><RegistryValue Type="string" Value="[APPLICATIONFOLDER]jabref.json"/></RegistryKey></Component></DirectoryRef><Feature Id="JabFox" Level="1"><ComponentRef Id="RegistryJabFoxEntries" /></Feature><Property Id="ARPPRODUCTICON" Value="DesktopIcon.exe" /><WixVariable Id="WixUIBannerBmp" Value="JabRefTopBanner.bmp" /></Product>
+</Wix>
