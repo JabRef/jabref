@@ -33,6 +33,10 @@ public class BibtexExtractorViewModel {
         trackNewEntry(StandardEntryType.Article);
     }
 
+    public void startParsing(){
+      //TODO add parsing method
+    }
+
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", type.getName());

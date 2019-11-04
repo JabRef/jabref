@@ -777,8 +777,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
-                factory.createMenuItem(StandardActions.ADD_ENTRY_FROM_PLAIN_TEXT,new EntryByPlainTextAction(stateManager)),
-
                 new SeparatorMenuItem(),
 
                 lookupIdentifiers,

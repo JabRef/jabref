@@ -9,6 +9,7 @@
     <content>
         <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0"/>
     </content>
+    <ButtonType fx:id="parseButtonType" buttonData="OK_DONE" text = "%Parse"/>
     <ButtonType fx:id="extractButtonType" buttonData="OK_DONE" text="%Extract"/>
     <ButtonType fx:constant="CANCEL"/>
 </DialogPane>

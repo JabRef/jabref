@@ -21,8 +21,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ExtractBibtexDialog extends BaseDialog<Void> {
 
     private final Button buttonExtract;
+    private final Button buttonParse;
     @FXML private TextArea input;
     @FXML private ButtonType extractButtonType;
+    @FXML private ButtonType parseButtonType;
     private BibtexExtractorViewModel viewModel;
 
     @Inject private StateManager stateManager;
@@ -34,9 +36,14 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         this.setTitle(Localization.lang("Input text to parse"));
+
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
+        buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
+        buttonParse.setTooltip(new Tooltip());
+        buttonParse.setOnAction(event -> viewModel.startParsing());
         buttonExtract.setTooltip(new Tooltip((Localization.lang("Starts the extraction of the BibTeX entry"))));
         buttonExtract.setOnAction(e -> viewModel.startExtraction());
+        buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
     }
 
