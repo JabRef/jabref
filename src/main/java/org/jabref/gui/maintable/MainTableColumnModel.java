@@ -69,8 +69,13 @@ public class MainTableColumnModel {
 
     private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
     private final StringProperty qualifierProperty = new SimpleStringProperty("");
-    private final DoubleProperty widthProperty = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_FIELD_LENGTH);
+    private final DoubleProperty widthProperty = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_WIDTH);
 
+    /**
+     * This is used by the preferences dialog, to allow the user to type in a field he wants to add to the table.
+     *
+     * @param rawColumnName the stored name of the column, e.g. "field:author", or "author"
+     */
     public MainTableColumnModel(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
 
@@ -88,6 +93,24 @@ public class MainTableColumnModel {
         }
     }
 
+    /**
+     * This is used by the preferences dialog, to initialize available columns the user can add to the table.
+     *
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
+     * @param qualifier the stored qualifier of the column, e.g. "author/editor"
+     */
+    public MainTableColumnModel(Type type, String qualifier) {
+        Objects.requireNonNull(type);
+        this.typeProperty.setValue(type);
+        this.qualifierProperty.setValue(qualifier);
+    }
+
+    /**
+     * This is used by JabRefPreferences, to create a new ColumnModel out ouf the stored preferences.
+     *
+     * @param rawColumnName the stored name of the column, e.g. "field:author"
+     * @param width the stored width of the column
+     */
     public MainTableColumnModel(String rawColumnName, Double width) {
         this(rawColumnName);
 
@@ -95,16 +118,8 @@ public class MainTableColumnModel {
         this.widthProperty.setValue(width);
     }
 
-    public MainTableColumnModel(Type typeProperty, String qualifierProperty) {
-        Objects.requireNonNull(typeProperty);
-        Objects.requireNonNull(qualifierProperty);
-        this.typeProperty.setValue(typeProperty);
-        this.qualifierProperty.setValue(qualifierProperty);
-    }
-
-    public MainTableColumnModel(Type typeProperty) {
-        Objects.requireNonNull(typeProperty);
-        this.typeProperty.setValue(typeProperty);
+    public MainTableColumnModel(Type type) {
+        this(type, "");
     }
 
     public Type getType() { return typeProperty.getValue(); }
@@ -130,11 +145,9 @@ public class MainTableColumnModel {
         }
     }
 
-    public void setWidth(double length) { this.widthProperty.setValue(length); }
-
-    public Double getWidth() { return widthProperty.getValue(); }
-
     public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
+
+    public DoubleProperty widthProperty() { return widthProperty; }
 
     public boolean equals(Object o) {
         if (this == o) {

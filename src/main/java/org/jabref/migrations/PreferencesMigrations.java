@@ -310,17 +310,15 @@ public class PreferencesMigrations {
     static void upgradeColumnPreferences(JabRefPreferences preferences) {
         String rawColumnsList = preferences.get(JabRefPreferences.COLUMN_NAMES);
 
-        if (!rawColumnsList.contains(MainTableColumnModel.Type.NORMALFIELD.getName()
-                + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER)) {
+        if (!rawColumnsList.isEmpty() &&
+                !rawColumnsList.contains(MainTableColumnModel.Type.NORMALFIELD.getName()
+                    + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER)) {
             ColumnPreferences oldColumnPreferences = preferences.getColumnPreferences();
             List<MainTableColumnModel> columns = oldColumnPreferences.getColumns();
             columns.add(0, new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
             columns.add(1, new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
             preferences.storeColumnPreferences(new ColumnPreferences(
                     columns,
-                    oldColumnPreferences.getSpecialFieldsEnabled(),
-                    oldColumnPreferences.getAutoSyncSpecialFieldsToKeyWords(),
-                    oldColumnPreferences.getSerializeSpecialFields(),
                     oldColumnPreferences.getExtraFileColumnsEnabled(),
                     oldColumnPreferences.getSortTypesForColumns()
             ));

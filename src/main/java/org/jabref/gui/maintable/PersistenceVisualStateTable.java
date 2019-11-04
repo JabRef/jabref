@@ -1,9 +1,8 @@
 package org.jabref.gui.maintable;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
@@ -55,22 +54,10 @@ public class PersistenceVisualStateTable {
      * Store shown columns and their width in preferences.
      */
     private void updateColumnPreferences() {
-        List<MainTableColumnModel> columns = new ArrayList<>();
-
-        mainTable.getColumns().forEach(column -> {
-            MainTableColumnModel columnModel = ((MainTableColumn<?>) column).getModel();
-            columnModel.setWidth(column.getWidth());
-            columns.add(columnModel);
-        });
-
         ColumnPreferences oldColumnPreferences = preferences.getColumnPreferences();
-
         preferences.storeColumnPreferences(new ColumnPreferences(
-                columns,
-                oldColumnPreferences.getSpecialFieldsEnabled(),
-                oldColumnPreferences.getAutoSyncSpecialFieldsToKeyWords(),
-                oldColumnPreferences.getSerializeSpecialFields(),
+                mainTable.getColumns().stream().map(column -> ((MainTableColumn) column).getModel()).collect(Collectors.toList()),
                 oldColumnPreferences.getExtraFileColumnsEnabled(),
-                oldColumnPreferences.getSortTypesForColumns()));
+                columnsSortOrder));
     }
 }

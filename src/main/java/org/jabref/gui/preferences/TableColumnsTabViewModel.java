@@ -18,6 +18,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -48,11 +49,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final ColumnPreferences columnPreferences;
+    private final SpecialFieldsPreferences specialFieldsPreferences;
 
     public TableColumnsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.columnPreferences = preferences.getColumnPreferences();
+        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -81,9 +84,12 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        specialFieldsEnabledProperty.setValue(columnPreferences.getSpecialFieldsEnabled());
-        specialFieldsSyncKeywordsProperty.setValue(columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(columnPreferences.getSerializeSpecialFields());
+        ColumnPreferences columnPreferences = preferences.getColumnPreferences();
+        SpecialFieldsPreferences specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+
+        specialFieldsEnabledProperty.setValue(specialFieldsPreferences.getSpecialFieldsEnabled());
+        specialFieldsSyncKeywordsProperty.setValue(specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        specialFieldsSerializeProperty.setValue(specialFieldsPreferences.getSerializeSpecialFields());
         extraFileColumnsEnabledProperty.setValue(columnPreferences.getExtraFileColumnsEnabled());
 
         fillColumnList();
@@ -184,24 +190,26 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        ColumnPreferences newColumnPreferences = new ColumnPreferences(
+        preferences.storeColumnPreferences(new ColumnPreferences(
                 columnsListProperty.getValue(),
-                specialFieldsEnabledProperty.getValue(),
-                specialFieldsSyncKeywordsProperty.getValue(),
-                specialFieldsSerializeProperty.getValue(),
                 extraFileColumnsEnabledProperty.getValue(),
                 columnPreferences.getSortTypesForColumns()
-        );
+        ));
 
-        if (columnPreferences.getAutoSyncSpecialFieldsToKeyWords() != newColumnPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
+        SpecialFieldsPreferences newSpecialFieldsPreferences = new SpecialFieldsPreferences(
+                specialFieldsEnabledProperty.getValue(),
+                specialFieldsSyncKeywordsProperty.getValue(),
+                specialFieldsSerializeProperty.getValue());
+
+        if (specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
             restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
         }
 
-        if (columnPreferences.getSerializeSpecialFields() != newColumnPreferences.getSerializeSpecialFields()) {
+        if (specialFieldsPreferences.getSerializeSpecialFields() != newSpecialFieldsPreferences.getSerializeSpecialFields()) {
             restartWarnings.add(Localization.lang("Serialize special fields"));
         }
 
-        preferences.storeColumnPreferences(newColumnPreferences);
+        preferences.storeSpecialFieldsPreferences(newSpecialFieldsPreferences);
     }
 
     ValidationStatus columnsListValidationStatus() {

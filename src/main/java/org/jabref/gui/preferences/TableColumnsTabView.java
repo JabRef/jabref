@@ -114,6 +114,12 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
         addColumnName.setConverter(columnNameStringConverter);
+        addColumnName.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.insertColumnInList();
+                event.consume();
+            }
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));

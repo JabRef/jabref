@@ -54,6 +54,7 @@ import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -1859,14 +1860,18 @@ public class JabRefPreferences implements PreferencesService {
                         return Double.parseDouble(string);
                     } catch (NumberFormatException e) {
                         LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return ColumnPreferences.DEFAULT_FIELD_LENGTH;
+                        return ColumnPreferences.DEFAULT_WIDTH;
                     }
                 })
                 .collect(Collectors.toList());
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
-            columns.add(new MainTableColumnModel(columnNames.get(i), columnWidths.get(i)));
+            if (i < columnWidths.size()) {
+                columns.add(new MainTableColumnModel(columnNames.get(i), columnWidths.get(i)));
+            } else {
+                columns.add(new MainTableColumnModel(columnNames.get(i)));
+            }
         }
         return columns;
     }
@@ -1874,9 +1879,6 @@ public class JabRefPreferences implements PreferencesService {
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
                 createMainTableColumns(),
-                getBoolean(SPECIALFIELDSENABLED),
-                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
-                getBoolean(SERIALIZESPECIALFIELDS),
                 getBoolean(EXTRA_FILE_COLUMNS),
                 getMainTableColumnSortTypes());
     }
@@ -1887,22 +1889,31 @@ public class JabRefPreferences implements PreferencesService {
                                                      .map(MainTableColumnModel::getName)
                                                      .collect(Collectors.toList()));
 
-        putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, columnPreferences.getSerializeSpecialFields());
         putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
 
         List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.getWidth().toString()));
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
         putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
         setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
     }
 
     public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(
-                                        getColumnPreferences(),
+        return new MainTablePreferences(getColumnPreferences(),
                                         getBoolean(AUTO_RESIZE_MODE));
+    }
+
+    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED),
+                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
+                getBoolean(SERIALIZESPECIALFIELDS));
+    }
+
+    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
+        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.getSpecialFieldsEnabled());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.getSerializeSpecialFields());
     }
 
     @Override
