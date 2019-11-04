@@ -1,4 +1,4 @@
-package org.jabref.logic.reftextparser;
+package org.jabref.logic.plaintextparser;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -8,7 +8,7 @@ import org.jabref.model.entry.field.StandardField;
  * This class is used to help making new entries faster by parsing a string.
  * An external parser called anystyle is being used for that.
  */
-public class externalParser {
+public class ParserPipeline {
 
   private BibEntry bibEntry;
   private BibDatabase bibDatabase;

@@ -1,4 +1,4 @@
-package org.jabref.logic.externalParser;
+package org.jabref.logic.plaintextparser;
 
 import org.junit.Test;
 
@@ -8,7 +8,7 @@ import org.junit.Test;
  * tested in this class.
  */
 
-public class externalParserTest {
+public class ParserPipelineTest {
 
     /**
      * Tests the base functionality of the parser is working by taking some example
