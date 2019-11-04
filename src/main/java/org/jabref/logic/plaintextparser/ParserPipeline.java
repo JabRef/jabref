@@ -1,5 +1,8 @@
 package org.jabref.logic.plaintextparser;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -10,13 +13,12 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class ParserPipeline {
 
-  private BibEntry bibEntry;
-  private BibDatabase bibDatabase;
+  private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
+  //private BibEntry bibEntry;
+  //private BibDatabase bibDatabase;
   private static String referenceText;
   private static String parserResults;
   private static StandardField[] fields; // contains the fields which the parser filtered.
-
-
 
   /**
    * Takes a whole String and filters the specific fields for the entry which is done
@@ -24,6 +26,7 @@ public class ParserPipeline {
    * @param refText Reference text to be parsed.
    */
   public static void parseRefText(String refText) {
+
     /*
     TODO: IMPLEMENT PARSER METHOD // IMPORT ANYSTYLE PARSER
      */
@@ -35,7 +38,7 @@ public class ParserPipeline {
    * nothing the function will immediately return.
    * @param entry New entry.
    */
-  public static void createNewEntry(BibEntry entry) {
+  public static void createNewEntry(String bibtexString) {
     /*
     if(bibDatabase.containsEntryWithId(entry.getId())) {
     return;
