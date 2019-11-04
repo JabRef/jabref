@@ -332,6 +332,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             boolean isValid = currentConnection.isValid(0);
             if (!isValid) {
+                LOGGER.warn("Lost SQL connection.");
                 eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
             }
             return isValid;
