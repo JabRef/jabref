@@ -1,5 +1,8 @@
 package org.jabref.logic.plaintextparser;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -13,7 +16,12 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class ParserPipeline {
 
+  private static final String ANYSTYLE_SCRIPT_PATH = "src/main/resources/anystyle-reference-parser/lib/anystyle.rb";
+  private static File anystyleScriptFile = Paths.get(ANYSTYLE_SCRIPT_PATH).toFile();
   private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
+
+
+
   //private BibEntry bibEntry;
   //private BibDatabase bibDatabase;
   private static String referenceText;
