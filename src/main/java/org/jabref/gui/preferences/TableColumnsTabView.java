@@ -9,7 +9,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -27,22 +26,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsTabViewModel> implements PreferencesTab {
-
-    private static StringConverter<MainTableColumnModel> columnNameStringConverter = new StringConverter<>() {
-        @Override
-        public String toString(MainTableColumnModel object) {
-            if (object != null) {
-                return object.getName();
-            } else {
-                return "";
-            }
-        }
-
-        @Override
-        public MainTableColumnModel fromString(String string) {
-            return new MainTableColumnModel(string);
-        }
-    };
 
     @FXML private TableView<MainTableColumnModel> columnsList;
     @FXML private TableColumn<MainTableColumnModel, String> nameColumn;
@@ -113,7 +96,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
                 .install(addColumnName);
         addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
-        addColumnName.setConverter(columnNameStringConverter);
+        addColumnName.setConverter(TableColumnsTabViewModel.columnNameStringConverter);
         addColumnName.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 viewModel.insertColumnInList();

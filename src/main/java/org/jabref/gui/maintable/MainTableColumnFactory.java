@@ -92,12 +92,12 @@ class MainTableColumnFactory {
                     columns.add(createIdentifierColumn(column));
                     break;
                 case EXTRAFILE:
-                    if (!column.getQualifier().equals("")) {
+                    if (!column.getQualifier().isBlank()) {
                         columns.add(createExtraFileColumn(column));
                     }
                     break;
                 case SPECIALFIELD:
-                    if (!column.getQualifier().equals("")) {
+                    if (!column.getQualifier().isBlank()) {
                         Field field = FieldFactory.parseField(column.getQualifier());
                         if (field instanceof SpecialField) {
                             columns.add(createSpecialFieldColumn(column));
@@ -109,7 +109,7 @@ class MainTableColumnFactory {
                     break;
                 default:
                 case NORMALFIELD:
-                    if (!column.getQualifier().equals("")) {
+                    if (!column.getQualifier().isBlank()) {
                         columns.add(createFieldColumn(column));
                     }
                     break;

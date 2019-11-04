@@ -1868,9 +1868,9 @@ public class JabRefPreferences implements PreferencesService {
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
             if (i < columnWidths.size()) {
-                columns.add(new MainTableColumnModel(columnNames.get(i), columnWidths.get(i)));
+                columns.add(MainTableColumnModel.parse(columnNames.get(i), columnWidths.get(i)));
             } else {
-                columns.add(new MainTableColumnModel(columnNames.get(i)));
+                columns.add(MainTableColumnModel.parse(columnNames.get(i)));
             }
         }
         return columns;

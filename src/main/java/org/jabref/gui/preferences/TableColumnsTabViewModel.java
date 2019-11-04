@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SelectionModel;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -32,6 +33,22 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
+
+    static StringConverter<MainTableColumnModel> columnNameStringConverter = new StringConverter<>() {
+        @Override
+        public String toString(MainTableColumnModel object) {
+            if (object != null) {
+                return object.getName();
+            } else {
+                return "";
+            }
+        }
+
+        @Override
+        public MainTableColumnModel fromString(String string) {
+            return MainTableColumnModel.parse(string);
+        }
+    };
 
     private final ListProperty<MainTableColumnModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());

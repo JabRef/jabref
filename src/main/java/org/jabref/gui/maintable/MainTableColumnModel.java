@@ -72,28 +72,6 @@ public class MainTableColumnModel {
     private final DoubleProperty widthProperty = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_WIDTH);
 
     /**
-     * This is used by the preferences dialog, to allow the user to type in a field he wants to add to the table.
-     *
-     * @param rawColumnName the stored name of the column, e.g. "field:author", or "author"
-     */
-    public MainTableColumnModel(String rawColumnName) {
-        Objects.requireNonNull(rawColumnName);
-
-        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
-        Type type = Type.fromString(splittedName[0]);
-
-        typeProperty.setValue(type);
-
-        if (type == Type.NORMALFIELD || type == Type.SPECIALFIELD || type == Type.EXTRAFILE) {
-            if (splittedName.length == 1) {
-                qualifierProperty.setValue(splittedName[0]); // On default the rawColumnName is parsed as NORMALFIELD
-            } else {
-                qualifierProperty.setValue(splittedName[1]);
-            }
-        }
-    }
-
-    /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
      * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
@@ -103,19 +81,6 @@ public class MainTableColumnModel {
         Objects.requireNonNull(type);
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
-    }
-
-    /**
-     * This is used by JabRefPreferences, to create a new ColumnModel out ouf the stored preferences.
-     *
-     * @param rawColumnName the stored name of the column, e.g. "field:author"
-     * @param width the stored width of the column
-     */
-    public MainTableColumnModel(String rawColumnName, Double width) {
-        this(rawColumnName);
-
-        Objects.requireNonNull(width);
-        this.widthProperty.setValue(width);
     }
 
     public MainTableColumnModel(Type type) {
@@ -168,5 +133,42 @@ public class MainTableColumnModel {
 
     public int hashCode() {
         return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
+    }
+
+    /**
+     * This is used by JabRefPreferences, to create a new ColumnModel out ouf the stored preferences.
+     *
+     * @param rawColumnName the stored name of the column, e.g. "field:author"
+     * @param width the stored width of the column
+     */
+    public static MainTableColumnModel parse(String rawColumnName, Double width) {
+        MainTableColumnModel columnModel = parse(rawColumnName);
+
+        Objects.requireNonNull(width);
+        columnModel.widthProperty().setValue(width);
+        return columnModel;
+    }
+
+    /**
+     * This is used by the preferences dialog, to allow the user to type in a field he wants to add to the table.
+     *
+     * @param rawColumnName the stored name of the column, e.g. "field:author", or "author"
+     */
+    public static MainTableColumnModel parse(String rawColumnName) {
+        Objects.requireNonNull(rawColumnName);
+        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
+
+        Type type = Type.fromString(splittedName[0]);
+        String qualifier = "";
+
+        if (type == Type.NORMALFIELD || type == Type.SPECIALFIELD || type == Type.EXTRAFILE) {
+            if (splittedName.length == 1) {
+                qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
+            } else {
+                qualifier = splittedName[1];
+            }
+        }
+
+        return new MainTableColumnModel(type, qualifier);
     }
 }
