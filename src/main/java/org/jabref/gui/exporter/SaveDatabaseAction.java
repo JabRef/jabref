@@ -47,6 +47,11 @@ import org.slf4j.LoggerFactory;
  * operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction {
+
+    public enum SaveDatabaseMode {
+        SILENT, NORMAL
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
@@ -159,12 +164,12 @@ public class SaveDatabaseAction {
     }
 
     public boolean save() {
-        return save(false);
+        return save(SaveDatabaseMode.NORMAL);
     }
 
-    public boolean save(boolean silent) {
+    public boolean save(SaveDatabaseMode mode) {
         if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            if (!silent) {
+            if (mode == SaveDatabaseMode.NORMAL) {
                 panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
             }
             return doSave();
