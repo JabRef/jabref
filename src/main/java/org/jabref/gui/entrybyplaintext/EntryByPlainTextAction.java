@@ -14,7 +14,7 @@ public class EntryByPlainTextAction extends SimpleCommand {
 
   @Override
   public void execute() {
-    EntryByPlainTextDialog dialog = new EntryByPlainTextDialog();
+    EntryValidateDialog dialog = new EntryValidateDialog();
     dialog.showAndWait();
   }
 }
