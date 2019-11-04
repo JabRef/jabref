@@ -1,10 +1,8 @@
 package org.jabref.logic.plaintextparser;
 
-import java.io.File;
-import java.nio.file.Paths;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import org.jruby.embed.LocalVariableBehavior;
+import org.jruby.embed.PathType;
+import org.jruby.embed.ScriptingContainer;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -17,9 +15,9 @@ import org.jabref.model.entry.field.StandardField;
 public class ParserPipeline {
 
   private static final String ANYSTYLE_SCRIPT_PATH = "src/main/resources/anystyle-reference-parser/lib/anystyle.rb";
-  private static File anystyleScriptFile = Paths.get(ANYSTYLE_SCRIPT_PATH).toFile();
-  private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
-
+  //private static File anystyleScriptFile = Paths.get(ANYSTYLE_SCRIPT_PATH).toFile();
+  //private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
+  private static ScriptingContainer ruby = new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
 
 
   //private BibEntry bibEntry;
@@ -31,10 +29,10 @@ public class ParserPipeline {
   /**
    * Takes a whole String and filters the specific fields for the entry which is done
    * by an external parser.
-   * @param refText Reference text to be parsed.
+   * @param plainText Reference text to be parsed.
    */
-  public static void parseRefText(String refText) {
-
+  public static void parseRefText(String plainText) {
+    //Object parserResult = ruby.runScriptlet(PathType.ABSOLUTE, ANYSTYLE_SCRIPT_PATH);
     /*
     TODO: IMPLEMENT PARSER METHOD // IMPORT ANYSTYLE PARSER
      */
