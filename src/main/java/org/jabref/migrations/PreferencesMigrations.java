@@ -12,7 +12,6 @@ import java.util.prefs.Preferences;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
-import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.field.StandardField;
@@ -308,20 +307,19 @@ public class PreferencesMigrations {
      * wired columns need to be added.
      */
     static void upgradeColumnPreferences(JabRefPreferences preferences) {
-        String rawColumnsList = preferences.get(JabRefPreferences.COLUMN_NAMES);
+        String columnNames = preferences.get(JabRefPreferences.COLUMN_NAMES);
 
-        if (!rawColumnsList.isEmpty() &&
-                !rawColumnsList.contains(MainTableColumnModel.Type.NORMALFIELD.getName()
+        if (!columnNames.isEmpty() &&
+                !columnNames.contains(MainTableColumnModel.Type.NORMALFIELD.getName() // "field:"
                     + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER)) {
-            ColumnPreferences oldColumnPreferences = preferences.getColumnPreferences();
-            List<MainTableColumnModel> columns = oldColumnPreferences.getColumns();
-            columns.add(0, new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
-            columns.add(1, new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
-            preferences.storeColumnPreferences(new ColumnPreferences(
-                    columns,
-                    oldColumnPreferences.getExtraFileColumnsEnabled(),
-                    oldColumnPreferences.getSortTypesForColumns()
-            ));
+
+            String columnWidths = preferences.get(JabRefPreferences.COLUMN_WIDTHS);
+
+            columnNames = "groups;linked_id;" + columnNames;
+            columnWidths = "28;28;" + columnWidths;
+
+            preferences.put(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.put(JabRefPreferences.COLUMN_WIDTHS,columnWidths);
         }
     }
 }
