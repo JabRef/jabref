@@ -1,5 +1,6 @@
 package org.jabref.logic.plaintextparser;
 
+import java.util.logging.Logger;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
@@ -18,6 +19,7 @@ public class ParserPipeline {
   //private static File anystyleScriptFile = Paths.get(ANYSTYLE_SCRIPT_PATH).toFile();
   //private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
   private static ScriptingContainer ruby = new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
+  private static Logger logger = Logger.getLogger(ParserPipeline.class.getName());
 
 
   //private BibEntry bibEntry;
