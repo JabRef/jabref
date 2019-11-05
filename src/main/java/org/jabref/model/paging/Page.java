@@ -1,23 +1,30 @@
 package org.jabref.model.paging;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 public class Page<T> {
 
     private int pageNumber;
     private String query;
-    private List<T> content;
+    private Collection<T> content;
 
-    Page(int pageNumber, String query ,Collection<T> content) {
-        this.pageNumber = pageNumber;
+    public Page(String query, int pageNumber, Collection<T> content) {
         this.query = query;
-        this.content = new ArrayList<>(content);
+        this.pageNumber = pageNumber;
+        this.content = content;
     }
 
-    public List<T> getContent() {
+    public Page(String query, int pageNumber) {
+        this(query, pageNumber, Collections.emptyList());
+    }
+
+    public Collection<T> getContent() {
         return content;
+    }
+
+    public void setContent(Collection<T> content) {
+        this.content = content;
     }
 
     public int getPageNumber() {
@@ -26,5 +33,9 @@ public class Page<T> {
 
     public String getQuery() {
         return query;
+    }
+
+    public int getSize() {
+        return content.size();
     }
 }
