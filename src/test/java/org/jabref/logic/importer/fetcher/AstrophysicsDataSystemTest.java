@@ -214,11 +214,4 @@ public class AstrophysicsDataSystemTest {
         //This tests if the fetcher actually performs paging
         assertNotEquals(page.getContent(), page2.getContent(), "Two conseecutive pages shouldn't be equal");
     }
-
-    @Test
-    public void performSearchByQueryPaged_pageAsParameter() throws Exception {
-        Page<BibEntry> searchPage = new Page<>("author:\"A\"", 0);
-        Page<BibEntry> page = fetcher.performSearchPaged(searchPage);
-        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher returns wrong page size");
-    }
 }
