@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entrybyplaintext.EntryByPlainTextAction;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
