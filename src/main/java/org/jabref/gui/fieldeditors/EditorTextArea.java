@@ -10,6 +10,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
+import org.jabref.gui.ClipBoardManager;
+
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -29,6 +31,8 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
+
+        ClipBoardManager.addX11Support(this);
     }
 
     @Override

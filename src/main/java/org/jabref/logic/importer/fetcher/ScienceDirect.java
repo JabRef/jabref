@@ -11,13 +11,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect.
  *
- * @see http://dev.elsevier.com/
+ * @see 'https://dev.elsevier.com/'
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
@@ -50,9 +50,9 @@ public class ScienceDirect implements FulltextFetcher {
                 // scrape the web page not as mobile client!
                 if (!sciLink.isEmpty()) {
                     Document html = Jsoup.connect(sciLink)
-                            .userAgent(URLDownload.USER_AGENT)
-                            .referrer("http://www.google.com")
-                            .ignoreHttpErrors(true).get();
+                                         .userAgent(URLDownload.USER_AGENT)
+                                         .referrer("http://www.google.com")
+                                         .ignoreHttpErrors(true).get();
 
                     // Retrieve PDF link from meta data (most recent)
                     Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
@@ -98,9 +98,9 @@ public class ScienceDirect implements FulltextFetcher {
         try {
             String request = API_URL + doi;
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
-                    .header("X-ELS-APIKey", API_KEY)
-                    .queryString("httpAccept", "application/json")
-                    .asJson();
+                                                         .header("X-ELS-APIKey", API_KEY)
+                                                         .queryString("httpAccept", "application/json")
+                                                         .asJson();
 
             JSONObject json = jsonResponse.getBody().getObject();
             JSONArray links = json.getJSONObject("full-text-retrieval-response").getJSONObject("coredata").getJSONArray("link");

@@ -42,6 +42,10 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                 for (TableColumnBase col : visibleLeafColumns) {
                     double share = col.getPrefWidth() / totalPrefWidth;
                     double newSize = tableWidth * share;
+
+                    // Just to make sure that we are staying under the total table width (due to rounding errors)
+                    newSize -= 2;
+
                     resize(col, newSize - col.getWidth());
                 }
             }
@@ -68,7 +72,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
         return constrainedResize(prop,
                 false,
-                getContentWidth(table),
+                getContentWidth(table) - 2,
                 visibleLeafColumns);
     }
 

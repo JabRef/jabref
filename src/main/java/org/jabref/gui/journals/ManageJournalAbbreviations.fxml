@@ -11,49 +11,61 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/8.0.65"
             fx:controller="org.jabref.gui.journals.ManageJournalAbbreviationsView">
-   <content>
-       <TableView fx:id="journalAbbreviationsTable" editable="true" styleClass="abbreviations-table">
-              <columns>
-                  <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full journal name"/>
-                  <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name"/>
-                  <TableColumn fx:id="journalTableEditColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
-                  <TableColumn fx:id="journalTableDeleteColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
-              </columns>
-           <columnResizePolicy>
-               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-           </columnResizePolicy>
-           <placeholder>
-               <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists"/>
-               <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4"/>
-           </placeholder>
-       </TableView>
-   </content>
-   <header>
-       <HBox spacing="10.0" styleClass="custom-header">
-           <ComboBox fx:id="journalFilesBox" minWidth="200.0" promptText="%No abbreviation files loaded"
-                     HBox.hgrow="ALWAYS"/>
-           <Pane HBox.hgrow="ALWAYS"/>
-           <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" styleClass="icon">
-               <tooltip>
-                   <Tooltip autoHide="true" text="%Create new list"/>
-               </tooltip>
-           </Button>
-           <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" styleClass="icon">
-               <tooltip>
-                   <Tooltip autoHide="true" text="%Add existing file"/>
-               </tooltip>
-           </Button>
-           <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList"
-                   styleClass="icon">
-               <tooltip>
-                   <Tooltip autoHide="true" text="%Remove list"/>
-               </tooltip>
-           </Button>
-       </HBox>
-   </header>
+    <content>
+        <TableView fx:id="journalAbbreviationsTable" editable="true" styleClass="abbreviations-table">
+            <columns>
+                <TableColumn fx:id="journalTableNameColumn" prefWidth="400.0" text="%Full journal name"/>
+                <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name"/>
+                <TableColumn fx:id="journalTableShortestUniqueAbbreviationColumn" prefWidth="200.0"
+                             text="%Shortest unique abbreviation"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists"/>
+                <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4"/>
+            </placeholder>
+        </TableView>
+    </content>
+    <header>
+        <HBox styleClass="custom-header">
+            <Button fx:id="addAbbreviationListButton" mnemonicParsing="false" onAction="#addList" styleClass="icon">
+                <tooltip>
+                    <Tooltip autoHide="true" text="%Add new list"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="openAbbreviationListButton" mnemonicParsing="false" onAction="#openList" styleClass="icon">
+                <tooltip>
+                    <Tooltip autoHide="true" text="%Open existing list"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="removeAbbreviationListButton" mnemonicParsing="false" onAction="#removeList"
+                    styleClass="icon">
+                <tooltip>
+                    <Tooltip autoHide="true" text="%Remove list"/>
+                </tooltip>
+            </Button>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="journalFilesBox" minWidth="200.0" promptText="%No abbreviation files loaded"
+                      HBox.hgrow="ALWAYS"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button fx:id="addAbbreviationButton" mnemonicParsing="false" onAction="#addAbbreviation" styleClass="icon">
+                <tooltip>
+                    <Tooltip autoHide="true" text="%Add abbreviation"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="removeAbbreviationButton" mnemonicParsing="false" onAction="#removeAbbreviation"
+                    styleClass="icon">
+                <tooltip>
+                    <Tooltip autoHide="true" text="%Remove abbreviation"/>
+                </tooltip>
+            </Button>
+        </HBox>
+    </header>
     <ButtonType fx:id="saveButton" text="%Save changes" buttonData="OK_DONE"/>
     <ButtonType fx:constant="CANCEL"/>
 </DialogPane>

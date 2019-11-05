@@ -347,13 +347,11 @@ public class DublinCoreExtractor {
     public void fillDublinCoreSchema() {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
-        // Fields for which not to write XMP data later on:
-        Set<Field> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
         Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());
         for (Entry<Field, String> field : fieldValues) {
-            if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
+            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field.getKey())) {
                 continue;
             }
 
