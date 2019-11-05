@@ -8,11 +8,11 @@
 <DialogPane prefHeight="430.0" prefWidth="586.0" xmlns="http://javafx.com/javafx/8.0.171"
         xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entrybyplaintext.EntryValidateDialog">
   <content>
-    <EditorTextField fx:id="inputAuthor" minHeight="-Infinity" prefHeight="100.0" prefWidth="586.0"/>
-    <EditorTextField fx:id="inputBibtex" minHeight="-Infinity" prefHeight="100.0" prefWidth="586.0"/>
-    <EditorTextField fx:id="inputJournal" minHeight="-Infinity" prefHeight="100.0" prefWidth="586.0"/>
-    <EditorTextField fx:id="inputTitle" minHeight="-Infinity" prefHeight="100.0" prefWidth="586.0"/>
-    <EditorTextField fx:id="inputYear" minHeight="-Infinity" prefHeight="100.0" prefWidth="586.0"/>
+    <EditorTextField fx:id="inputAuthor" minHeight="-Infinity" prefHeight="100.0" prefWidth="324.0"/>
+    <EditorTextField fx:id="inputBibtex" minHeight="-Infinity" prefHeight="100.0" prefWidth="324.0"/>
+    <EditorTextField fx:id="inputJournal" minHeight="-Infinity" prefHeight="100.0" prefWidth="324.0"/>
+    <EditorTextField fx:id="inputTitle" minHeight="-Infinity" prefHeight="100.0" prefWidth="324.0"/>
+    <EditorTextField fx:id="inputYear" minHeight="-Infinity" prefHeight="100.0" prefWidth="324.0"/>
 
   </content>
   <ButtonType fx:id="validateButton" buttonData="OK_DONE" text="Add"/>

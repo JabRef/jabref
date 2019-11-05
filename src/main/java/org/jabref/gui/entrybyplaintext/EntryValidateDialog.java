@@ -4,7 +4,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javax.inject.Inject;
 import org.jabref.gui.StateManager;
@@ -22,7 +21,7 @@ public class EntryValidateDialog extends BaseDialog<Void> {
     @FXML private EditorTextField inputBibtex;
     @FXML private EditorTextField inputYear;
     @FXML private ButtonType validateButton;
-    private BibtexExtractorViewModel viewModel;
+    private EntryByPlainTextViewModel textViewModel;
     @Inject private StateManager stateManager;
 
     public EntryValidateDialog(){
@@ -43,13 +42,13 @@ public class EntryValidateDialog extends BaseDialog<Void> {
   @FXML
   private void initialize() {
     BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-    this.viewModel = new BibtexExtractorViewModel(database);
+    this.textViewModel = new EntryByPlainTextViewModel(database);
 
-    inputAuthor.textProperty().bindBidirectional(viewModel.inputTextProperty());
-    inputYear.textProperty().bindBidirectional(viewModel.inputTextProperty());
-    inputTitle.textProperty().bindBidirectional(viewModel.inputTextProperty());
-    inputJournal.textProperty().bindBidirectional(viewModel.inputTextProperty());
-    inputBibtex.textProperty().bindBidirectional(viewModel.inputTextProperty());
+    inputAuthor.textProperty().bindBidirectional(textViewModel.inputTextProperty());
+    inputYear.textProperty().bindBidirectional(textViewModel.inputTextProperty());
+    inputTitle.textProperty().bindBidirectional(textViewModel.inputTextProperty());
+    inputJournal.textProperty().bindBidirectional(textViewModel.inputTextProperty());
+    inputBibtex.textProperty().bindBidirectional(textViewModel.inputTextProperty());
 
 
 

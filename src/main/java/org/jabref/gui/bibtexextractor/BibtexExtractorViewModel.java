@@ -36,10 +36,6 @@ public class BibtexExtractorViewModel {
         trackNewEntry(StandardEntryType.Article);
     }
 
-    public void startParsing(){
-      EntryValidateDialog dialog = new EntryValidateDialog();
-      dialog.showAndWait();
-    }
 
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
