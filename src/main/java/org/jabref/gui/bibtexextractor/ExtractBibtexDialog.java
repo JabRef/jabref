@@ -36,7 +36,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
+        //TODO: hört sich mad scheiße an so
         this.setTitle(Localization.lang("Input text to parse"));
 
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
