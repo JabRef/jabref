@@ -8,6 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -197,5 +199,26 @@ public class AstrophysicsDataSystemTest {
     public void testPerformSearchByLuceyPaulEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
+    }
+
+    @Test
+    public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
+        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
+    }
+
+    @Test
+    public void performSearchByQueryPaged_twoPagesNotEqual() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
+        Page<BibEntry> page2 = fetcher.performSearchPaged("author:\"A\"", 1);
+        //This tests if the fetcher actually performs paging
+        assertNotEquals(page.getContent(), page2.getContent(), "Two conseecutive pages shouldn't be equal");
+    }
+
+    @Test
+    public void performSearchByQueryPaged_pageAsParameter() throws Exception {
+        Page<BibEntry> searchPage = new Page<>("author:\"A\"", 0);
+        Page<BibEntry> page = fetcher.performSearchPaged(searchPage);
+        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher returns wrong page size");
     }
 }

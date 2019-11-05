@@ -13,7 +13,4 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
      * @param pageNumber the number of the page
      * */
     URL getURLForQuery(String query, int size, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException;
-
-
-
 }
