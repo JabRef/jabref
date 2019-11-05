@@ -65,5 +65,5 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
-    requires com.headius.invokebinder;
+    requires org.jruby;
 }
