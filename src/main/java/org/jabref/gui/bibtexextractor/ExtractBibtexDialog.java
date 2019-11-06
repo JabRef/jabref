@@ -37,7 +37,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
         //TODO: hört sich mad scheiße an so
-        this.setTitle(Localization.lang("Input text to parse"));
+        this.setTitle(Localization.lang("Jabref Parser"));
 
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
@@ -54,7 +54,6 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         this.viewModel = new BibtexExtractorViewModel(database);
         this.textViewModel = new EntryByPlainTextViewModel(database);
-
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
     }
 }
