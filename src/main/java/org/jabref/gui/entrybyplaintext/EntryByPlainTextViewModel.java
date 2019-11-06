@@ -3,7 +3,8 @@ package org.jabref.gui.entrybyplaintext;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.StateManager;
+
+import org.jabref.gui.bibtexextractor.FailedToExtractDialog;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class EntryByPlainTextViewModel {
@@ -31,10 +32,8 @@ public class EntryByPlainTextViewModel {
       dlg.showAndWait();
   }
 
-
-
-
-
-
-
+  public void parsingFail(String input){
+      FailedToExtractDialog dlg = new FailedToExtractDialog(input);
+      dlg.showAndWait();
+  }
 }

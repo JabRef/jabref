@@ -7,11 +7,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tooltip;
 import javax.inject.Inject;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.bibtexextractor.BibtexExtractorViewModel;
 import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.database.BibDatabaseContext;
-
+//TODO: call dialogservice to notify about added article
 public class EntryValidateDialog extends BaseDialog<Void> {
 
     private final Button buttonValidate;

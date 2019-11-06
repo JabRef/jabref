@@ -32,18 +32,21 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
 
     public ExtractBibtexDialog() {
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
         //TODO: hört sich mad scheiße an so
+<<<<<<< HEAD
         this.setTitle(Localization.lang("Jabref Parser"));
+=======
+        this.setTitle(Localization.lang("Input text to parse"));
+        input.setPromptText(Localization.lang("Please enter the text to extract from."));
+        input.selectAll();
+>>>>>>> 9e864419b06e63df298cc5d58ab973d155b66bda
 
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-        buttonParse.setTooltip(new Tooltip());
         buttonParse.setOnAction(event -> textViewModel.startParsing());
-        buttonExtract.setTooltip(new Tooltip((Localization.lang("Starts the extraction of the BibTeX entry"))));
         buttonExtract.setOnAction(e -> viewModel.startExtraction());
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
