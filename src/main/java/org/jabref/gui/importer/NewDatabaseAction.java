@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
