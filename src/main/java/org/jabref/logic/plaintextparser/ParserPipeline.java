@@ -1,8 +1,15 @@
 package org.jabref.logic.plaintextparser;
 
-import org.jruby.embed.LocalVariableBehavior;
-import org.jruby.embed.PathType;
-import org.jruby.embed.ScriptingContainer;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+
+import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -14,10 +21,11 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class ParserPipeline {
 
-  private static final String ANYSTYLE_SCRIPT_PATH = "src/main/resources/anystyle-reference-parser/lib/anystyle.rb";
+  private static final String ANYSTYLE_SCRIPT_PATH = "src/main/resources/anystyle-reference-parser/lib/";
+  private static final String GEM_FILES_PATH = "src/main/resources/gems/";
   //private static File anystyleScriptFile = Paths.get(ANYSTYLE_SCRIPT_PATH).toFile();
   //private static ScriptEngine rubyScriptEngine = new ScriptEngineManager().getEngineByName("jruby");
-  private static ScriptingContainer ruby = new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
+  //private static ScriptingContainer ruby = new ScriptingContainer(LocalVariableBehavior.PERSISTENT);
 
 
   //private BibEntry bibEntry;
@@ -45,6 +53,61 @@ public class ParserPipeline {
    * @param entry New entry.
    */
   public static void createNewEntry(String bibtexString) {
+    /*
+    try {
+      System.out.println("ABSDREIFJOERFJO");
+      System.out.println(new BufferedReader(new FileReader(ANYSTYLE_SCRIPT_PATH+"anystyle.rb")).readLine());
+      ArrayList<String> arrayList = new ArrayList<>();
+      arrayList.add(ANYSTYLE_SCRIPT_PATH);
+
+      //String everything;
+    //try(FileInputStream inputStream = new FileInputStream(ANYSTYLE_SCRIPT_PATH+"anystyle.rb")) {
+      //everything = IOUtils.toString(inputStream);
+      //System.out.println(everything);
+    //}
+
+      ScriptContext context = rubyScriptEngine.getContext();
+      try {
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "anystyle-1.3.5/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "anystyle-data-1.2.0/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "bibtex-ruby-5.0.0/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "builder-3.2.3/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "latex-decode-0.3.1/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "namae-1.0.1/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "wapiti-1.0.5/lib'", context);
+        rubyScriptEngine.eval("$LOAD_PATH << 'file:" + GEM_FILES_PATH + "wapiti-1.0.5/lib/wapiti'", context);
+
+
+        context.setAttribute("bibtexString", bibtexString, ScriptContext.ENGINE_SCOPE);
+
+        String parserOutput = (String) rubyScriptEngine.eval("'weiofweuf'", context);
+        System.out.println(parserOutput);
+
+        parserOutput = (String) rubyScriptEngine.eval("bibtexString", context);
+        System.out.println(parserOutput);
+
+        rubyScriptEngine.eval("require 'anystyle'", context);
+        parserOutput = (String) rubyScriptEngine.eval("Anystyle.parse bibtexString", context);
+        System.out.println(parserOutput);
+      } catch (ScriptException e) {
+        System.out.println(e.getMessage());
+      }
+
+      Ruby runtime = JavaEmbedUtils.initialize(arrayList);
+      RubyRuntimeAdapter evaler = JavaEmbedUtils.newRuntimeAdapter();
+      //evaler.eval(runtime, "gem install anystyle");
+      //evaler.eval(runtime, everything);
+
+      //rubyScriptEngine.eval(new BufferedReader(new FileReader(ANYSTYLE_SCRIPT_PATH)));
+      //rubyScriptEngine.put("bibtexString", bibtexString);
+      //String rubyret = (String) rubyScriptEngine.eval("put 'ABCD'");
+      //System.out.println(rubyret);
+    } catch (IOException e) {
+      //TODO
+    //} catch (ScriptException e) {
+      //TODO
+    }
+    */
     /*
     if(bibDatabase.containsEntryWithId(entry.getId())) {
     return;

@@ -148,9 +148,7 @@ dependencies {
     }
 
     compile group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
-
-    // Needed for the external plaintext parser, that is written in ruby
-    compile group: 'org.jruby', name:'jruby', version:'9.2.8.0'
+    
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-commons:11.0'
@@ -378,7 +376,7 @@ compileJava {
         // TODO: Remove access to internal api
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
         ]
     }
 }
@@ -416,12 +414,12 @@ run {
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
         ]
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref'
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabreg'
         ]
     }
 }
