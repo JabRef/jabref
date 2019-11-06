@@ -37,9 +37,7 @@ public class FailedToExtractDialog extends BaseDialog<Void> {
 
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-        buttonParse.setTooltip(new Tooltip());
         buttonParse.setOnAction(event -> textViewModel.startParsing());
-        buttonExtract.setTooltip(new Tooltip((Localization.lang("Starts the extraction of the BibTeX entry"))));
         buttonExtract.setOnAction(e -> viewModel.startExtraction());
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());

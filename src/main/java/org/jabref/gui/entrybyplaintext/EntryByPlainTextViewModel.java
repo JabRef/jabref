@@ -2,6 +2,7 @@ package org.jabref.gui.entrybyplaintext;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.jabref.gui.bibtexextractor.FailedToExtractDialog;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class EntryByPlainTextViewModel {
@@ -26,10 +27,8 @@ public class EntryByPlainTextViewModel {
 
   }
 
-
-
-
-
-
-
+  public void parsingFail(String input){
+      FailedToExtractDialog dlg = new FailedToExtractDialog(input);
+      dlg.showAndWait();
+  }
 }

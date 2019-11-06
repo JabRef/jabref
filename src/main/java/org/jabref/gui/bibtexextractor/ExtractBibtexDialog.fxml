@@ -11,8 +11,6 @@
     <content>
         <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
         <children>
-            <!--TODO: add localization (%) evtl als verschwindender background vom input textarea?-->
-            <Label text="Please enter the text to extract from:" />
             <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0"/>
         </children>
         </VBox>
