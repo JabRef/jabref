@@ -172,12 +172,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            dialogService.notify(Localization.lang("File '%0' is already open.",
-                                                   toRaise.getBibDatabaseContext().getDatabasePath().get().getFileName().toString()));
             frame.showBasePanel(toRaise);
         }
-
-        dialogService.notify(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
     }
 
     /**
@@ -237,13 +233,6 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         if (result.hasWarnings()) {
             ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-        }
-
-        if (Objects.nonNull(file)) {
-            dialogService.notify(Localization.lang("Opened library") + " '" + file.toString() + "' "
-                                            + Localization.lang("with")
-                                            + " "
-                                            + database.getEntryCount() + " " + Localization.lang("entries") + ".");
         }
 
         BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
