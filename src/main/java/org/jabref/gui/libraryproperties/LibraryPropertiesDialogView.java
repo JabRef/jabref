@@ -23,6 +23,7 @@ import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -33,6 +34,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     @FXML private VBox contentVbox;
     @FXML private ComboBox<Charset> encoding;
+    @FXML private ComboBox<String> databaseMode;
     @FXML private TextField generalFileDirectory;
     @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
@@ -79,6 +81,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         encoding.disableProperty().bind(viewModel.encodingDisableProperty());
         protect.disableProperty().bind(viewModel.protectDisableProperty());
 
+        databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
+        databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
+
         saveOrderConfigDisplayView = new SaveOrderConfigDisplayView();
         Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
         oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
@@ -123,6 +128,13 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
                                       .orElse(preferencesService.getDefaultEncoding());
         Charset newEncoding = viewModel.selectedEncodingProperty().getValue();
         metaData.setEncoding(newEncoding);
+
+        BibDatabaseMode newMode = BibDatabaseMode.parse(viewModel.selectedDatabaseModeProperty().getValue());
+        BibDatabaseMode oldMode = metaData.getMode().orElse(null);
+        if (newMode != null && oldMode != newMode) {
+            // Only set, when mode really has changed to avoid propagation of change events
+            metaData.setMode(newMode);
+        }
 
         String text = viewModel.generalFileDirectoryPropertyProperty().getValue().trim();
         if (text.isEmpty()) {

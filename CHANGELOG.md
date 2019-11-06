@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The entry editor is now open by default when JabRef starts up. [#5460](https://github.com/JabRef/jabref/issues/5460)
 - We added a new ADS fetcher to use the new ADS API [#4949](https://github.com/JabRef/jabref/issues/4949)
 - We added support of the [X11 primary selection](https://unix.stackexchange.com/a/139193/18033) [#2389](https://github.com/JabRef/jabref/issues/2389)
+- We added support to switch between biblatex and bibtex library types. [#5550](https://github.com/JabRef/jabref/issues/5550)
 
 ### Fixed
 

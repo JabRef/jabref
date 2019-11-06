@@ -115,7 +115,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
 
         BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
-        recommendButton = new Button(Localization.lang("Recommended for %0", databaseContext.getMode().getFormattedName()));
+        recommendButton = new Button(Localization.lang("Reset to recommended", databaseContext.getMode().getFormattedName()));
         boolean isBiblatex = databaseContext.isBiblatexMode();
 
         recommendButton.setOnAction(e -> {
