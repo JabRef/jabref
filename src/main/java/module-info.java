@@ -56,6 +56,7 @@ open module org.jabref {
     requires reactfx;
     requires commons.cli;
     requires httpclient;
+    requires httpcore;//TODO: Include dependency properly
     requires com.github.tomtung.latex2unicode;
     requires jbibtex;
     requires citeproc.java;

@@ -1,19 +1,15 @@
 package org.jabref.logic.plaintextparser;
 
 
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * This class is used to help making new entries faster by parsing a string.
- * An external parser called anystyle is being used for that.
+ * An external parser called grobid is being used for that.
  */
 public class ParserPipeline {
 
-  //private BibEntry bibEntry;
-  //private BibDatabase bibDatabase;
-  private static String referenceText;
-  private static String parserResults;
-  private static StandardField[] fields; // contains the fields which the parser filtered.
+  private static BibEntry bibEntry;
 
   /**
    * Takes a whole String and filters the specific fields for the entry which is done
@@ -21,7 +17,8 @@ public class ParserPipeline {
    * @param plainText Reference text to be parsed.
    */
   public static void parseRefText(String plainText) {
-
+    GrobidClient gc = new GrobidClient();
+    System.out.println(gc.sendReference(plainText));
     /*
     TODO: IMPLEMENT PARSER METHOD // IMPORT PARSER
      */
@@ -49,8 +46,9 @@ public class ParserPipeline {
 
   }
 
-
-
+  public static BibEntry getBibEntry() {
+    return bibEntry;
+  }
 
 
 }
