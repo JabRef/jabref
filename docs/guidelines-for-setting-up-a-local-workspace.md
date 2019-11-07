@@ -81,8 +81,8 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 6. Use the provided run configuration: Run -> Run "JabRef Main"
 
 ### Set-up Eclipse
-1. Run `./gradlew run` to generate all resources and to check if jabref runs.
-2. Run `./gradlew eclipse`
+1. Run `./gradlew run` to generate all resources and to check if jabref runs. (This step is only required once)
+2. Run `./gradlew eclipse` (This has to be always execute, when there are new upstream changes)
 7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
 8. Create a run/debug configuration for main class `org.jabref.JabRefLauncher` 
 9. In the arguments tab enter the same runtime arguments as above for intellij.
