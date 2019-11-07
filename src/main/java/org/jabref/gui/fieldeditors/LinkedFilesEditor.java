@@ -45,6 +45,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
+/**
+ * Without customization of JabRef, this contains the "File" field in the "General" tab.
+ */
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML private final LinkedFilesEditorViewModel viewModel;

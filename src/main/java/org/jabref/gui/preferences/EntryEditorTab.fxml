@@ -63,5 +63,5 @@
     <Label styleClass="sectionHeader" text="%Default drag &amp; drop action"/>
     <RadioButton fx:id="dndCopyFile" text="%Copy file to default file folder" toggleGroup="$dnd"/>
     <RadioButton fx:id="dndLinkFile" text="%Link file (without copying)" toggleGroup="$dnd"/>
-    <RadioButton fx:id="dndCopyRenameLinkFile" text="%Copy, rename and link file" toggleGroup="$dnd"/>
+    <RadioButton fx:id="dndMoveFile" text="%Move file" toggleGroup="$dnd"/>
 </fx:root>

@@ -35,7 +35,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
     private final BooleanProperty dndCopyFileProperty = new SimpleBooleanProperty();
     private final BooleanProperty dndLinkFileProperty = new SimpleBooleanProperty();
-    private final BooleanProperty dndCopyRenameLinkFileProperty = new SimpleBooleanProperty();
+    private final BooleanProperty dndMoveFileProperty = new SimpleBooleanProperty();
 
     private AutoCompletePreferences autoCompletePreferences;
 
@@ -80,12 +80,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         }
 
         FileDragDropPreferenceType dragDropPreferenceType = preferences.getEntryEditorFileLinkPreference();
-        if (dragDropPreferenceType == FileDragDropPreferenceType.COPY) {
-            dndCopyFileProperty.setValue(true);
-        } else if (dragDropPreferenceType == FileDragDropPreferenceType.LINK) {
-            dndLinkFileProperty.setValue(true);
-        } else {
-            dndCopyRenameLinkFileProperty.setValue(true);
+        switch (dragDropPreferenceType) {
+            case COPY:
+                dndCopyFileProperty.setValue(true);
+                break;
+            case LINK:
+                dndLinkFileProperty.setValue(true);
+                break;
+            default:
+                dndMoveFileProperty.setValue(true);
         }
     }
 
@@ -103,12 +106,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         if (autoCompleteBothProperty.getValue()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
             autoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else if (autoCompleteFirstLastProperty.getValue()) {
+        } else if (autoCompleteFirstLastProperty.getValue()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(true);
             autoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else {
+        } else {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
             autoCompletePreferences.setOnlyCompleteLastFirst(true);
         }
@@ -142,37 +143,71 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public BooleanProperty openOnNewEntryProperty() { return openOnNewEntryProperty; }
+    public BooleanProperty openOnNewEntryProperty() {
+        return openOnNewEntryProperty;
+    }
 
-    public BooleanProperty defaultSourceProperty() { return defaultSourceProperty; }
+    public BooleanProperty defaultSourceProperty() {
+        return defaultSourceProperty;
+    }
 
-    public BooleanProperty enableRelatedArticlesTabProperty() { return enableRelatedArticlesTabProperty; }
+    public BooleanProperty enableRelatedArticlesTabProperty() {
+        return enableRelatedArticlesTabProperty;
+    }
 
-    public BooleanProperty acceptRecommendationsProperty() { return acceptRecommendationsProperty; }
+    public BooleanProperty acceptRecommendationsProperty() {
+        return acceptRecommendationsProperty;
+    }
 
-    public BooleanProperty enableLatexCitationsTabProperty() { return enableLatexCitationsTabProperty; }
+    public BooleanProperty enableLatexCitationsTabProperty() {
+        return enableLatexCitationsTabProperty;
+    }
 
-    public BooleanProperty enableValidationProperty() { return enableValidationProperty; }
+    public BooleanProperty enableValidationProperty() {
+        return enableValidationProperty;
+    }
 
-    public BooleanProperty enableAutoCompleteProperty() { return enableAutoCompleteProperty; }
+    public BooleanProperty enableAutoCompleteProperty() {
+        return enableAutoCompleteProperty;
+    }
 
-    public StringProperty autoCompleteFieldsProperty() { return autoCompleteFieldsProperty; }
+    public StringProperty autoCompleteFieldsProperty() {
+        return autoCompleteFieldsProperty;
+    }
 
-    public BooleanProperty autoCompleteFirstLastProperty() { return autoCompleteFirstLastProperty; }
+    public BooleanProperty autoCompleteFirstLastProperty() {
+        return autoCompleteFirstLastProperty;
+    }
 
-    public BooleanProperty autoCompleteLastFirstProperty() { return autoCompleteLastFirstProperty; }
+    public BooleanProperty autoCompleteLastFirstProperty() {
+        return autoCompleteLastFirstProperty;
+    }
 
-    public BooleanProperty autoCompleteBothProperty() { return autoCompleteBothProperty; }
+    public BooleanProperty autoCompleteBothProperty() {
+        return autoCompleteBothProperty;
+    }
 
-    public BooleanProperty firstNameModeAbbreviatedProperty() { return firstNameModeAbbreviatedProperty; }
+    public BooleanProperty firstNameModeAbbreviatedProperty() {
+        return firstNameModeAbbreviatedProperty;
+    }
 
-    public BooleanProperty firstNameModeFullProperty() { return firstNameModeFullProperty; }
+    public BooleanProperty firstNameModeFullProperty() {
+        return firstNameModeFullProperty;
+    }
 
-    public BooleanProperty firstNameModeBothProperty() { return firstNameModeBothProperty; }
+    public BooleanProperty firstNameModeBothProperty() {
+        return firstNameModeBothProperty;
+    }
 
-    public BooleanProperty dndCopyFileProperty() { return dndCopyFileProperty; }
+    public BooleanProperty dndCopyFileProperty() {
+        return dndCopyFileProperty;
+    }
 
-    public BooleanProperty dndLinkFileProperty() { return dndLinkFileProperty; }
+    public BooleanProperty dndLinkFileProperty() {
+        return dndLinkFileProperty;
+    }
 
-    public BooleanProperty dndCopyRenameLinkFileProperty() { return dndCopyRenameLinkFileProperty; }
+    public BooleanProperty dndMoveFileProperty() {
+        return dndMoveFileProperty;
+    }
 }

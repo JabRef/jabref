@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final JournalAbbreviationLoader journalAbbreviationLoader;
     private PreviewPanel previewPanel;
     private UndoManager undoManager;
-    private Collection<Field> fields = new ArrayList<>();
+    private Collection<Field> fields = Collections.emptyList();
     private GridPane gridPane;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {

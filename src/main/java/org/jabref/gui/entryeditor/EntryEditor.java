@@ -79,6 +79,7 @@ public class EntryEditor extends BorderPane {
     private Subscription typeSubscription;
     private BibEntry entry;  // A reference to the entry this editor works on.
     private SourceTab sourceTab;
+    private boolean dragDropModifierPressed = false;
     @FXML private TabPane tabbed;
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
@@ -121,6 +122,14 @@ public class EntryEditor extends BorderPane {
 
         this.tabs = createTabs();
 
+        this.setOnMouseEntered(event -> {
+            // When registering using this.setOnDragDetected, the code is never called. Thus, using the workaround on "mouseEntered"
+            LOGGER.debug("event.isAltDown(): {}", event.isAltDown());
+            LOGGER.debug("event.isShiftDown(): {}", event.isShiftDown());
+            LOGGER.debug("event.isControlDown(): {}", event.isControlDown());
+            dragDropModifierPressed = event.isAltDown() || event.isShiftDown() || event.isControlDown();
+        });
+
         this.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
@@ -136,60 +145,49 @@ public class EntryEditor extends BorderPane {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
-                    if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                // determine transfer mode -- JabRef's preferences are the default; modifier keys override the default
+                TransferMode determinedTransferMode;
+                if (this.dragDropModifierPressed) {
+                    LOGGER.debug("Modifier pressed");
+                    determinedTransferMode = event.getTransferMode();
+                } else {
+                    LOGGER.debug("No modifier pressed");
+                    switch (dragDropPreferencesType) {
+                        case LINK:
+                            determinedTransferMode = TransferMode.LINK;
+                            break;
+                        case MOVE:
+                            determinedTransferMode = TransferMode.MOVE;
+                            break;
+                        case COPY:
+                        default:
+                            determinedTransferMode = TransferMode.COPY;
+                            break;
                     }
-                    success = true;
                 }
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
-                    if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
+                // obey the determined transfer mode and take action accordingly
+                switch (determinedTransferMode) {
+                    case LINK:
                         LOGGER.debug("Mode LINK");
                         fileLinker.addFilesToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
+                        break;
+                    case COPY:
                         LOGGER.debug("Mode COPY");
                         fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    }
-                    success = true;
+                        break;
+                    default:
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                        break;
                 }
 
-                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
-                    if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
-                    }
-                    success = true;
-                }
+                success = true;
             }
 
             event.setDropCompleted(success);
             event.consume();
+            dragDropModifierPressed = false;
         });
     }
 
@@ -278,6 +276,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, entryEditorPreferences.getCustomTabFieldNames(), dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
 
         // General fields from preferences
+        // Examples: "General", "Abstract", and "Comments"
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
             entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
         }

@@ -151,11 +151,11 @@ public class FileUtil {
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
         if (!Files.exists(pathToSourceFile)) {
-            LOGGER.error("Path to the source file doesn't exist.");
+            LOGGER.error("Path {} to the source file doesn't exist.", pathToSourceFile);
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
-            LOGGER.error("Path to the destination file exists but the file shouldn't be replaced.");
+            LOGGER.error("Path {} to the destination file exists but the file shouldn't be replaced.", pathToDestinationFile);
             return false;
         }
         try {
