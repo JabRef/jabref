@@ -4,6 +4,6 @@
   "path": "/opt/jabref/lib/jabrefHost.py",
   "type": "stdio",
   "allowed_extensions": [
-    "@jabfox"
+    "browserextension@jabref.org"
   ]
 }
