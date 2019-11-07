@@ -20,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -79,7 +78,9 @@ public class EntryEditor extends BorderPane {
     private Subscription typeSubscription;
     private BibEntry entry;  // A reference to the entry this editor works on.
     private SourceTab sourceTab;
-    private boolean dragDropModifierPressed = false;
+    private List<Path> draggedfiles;
+    private boolean inDragDropMode = false;
+    private TransferMode transferMode;
     @FXML private TabPane tabbed;
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
@@ -124,32 +125,19 @@ public class EntryEditor extends BorderPane {
 
         this.setOnMouseEntered(event -> {
             // When registering using this.setOnDragDetected, the code is never called. Thus, using the workaround on "mouseEntered"
-            LOGGER.debug("event.isAltDown(): {}", event.isAltDown());
-            LOGGER.debug("event.isShiftDown(): {}", event.isShiftDown());
-            LOGGER.debug("event.isControlDown(): {}", event.isControlDown());
-            dragDropModifierPressed = event.isAltDown() || event.isShiftDown() || event.isControlDown();
-        });
+            // onMouseEntered is called AFTER onDragDropped. We need it BEFORE. So we do this workaround with inDragDropMode
+            if (this.inDragDropMode) {
+                boolean dragDropModifierPressed = event.isAltDown() || event.isShiftDown() || event.isControlDown();
 
-        this.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
-            }
-            event.consume();
-        });
+                BibEntry entry = this.getEntry();
 
-        this.setOnDragDropped(event -> {
-            BibEntry entry = this.getEntry();
-            boolean success = false;
-
-            if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
 
                 // determine transfer mode -- JabRef's preferences are the default; modifier keys override the default
                 TransferMode determinedTransferMode;
-                if (this.dragDropModifierPressed) {
+                if (dragDropModifierPressed) {
                     LOGGER.debug("Modifier pressed");
-                    determinedTransferMode = event.getTransferMode();
+                    determinedTransferMode = transferMode;
                 } else {
                     LOGGER.debug("No modifier pressed");
                     switch (dragDropPreferencesType) {
@@ -170,24 +158,34 @@ public class EntryEditor extends BorderPane {
                 switch (determinedTransferMode) {
                     case LINK:
                         LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
+                        fileLinker.addFilesToEntry(entry, this.draggedfiles);
                         break;
                     case COPY:
                         LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, this.draggedfiles);
                         break;
                     default:
                         LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, this.draggedfiles);
                         break;
                 }
-
-                success = true;
+                inDragDropMode = false;
             }
+        });
 
-            event.setDropCompleted(success);
+        this.setOnDragOver(event -> {
+            if (event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
+                this.draggedfiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                this.inDragDropMode = true;
+                this.transferMode = event.getTransferMode();
+            }
             event.consume();
-            dragDropModifierPressed = false;
+        });
+
+        this.setOnDragDropped(event -> {
+            event.setDropCompleted(true);
+            event.consume();
         });
     }
 
