@@ -139,7 +139,10 @@ dependencies {
 
     compile 'org.postgresql:postgresql:42.2.8'
 
-    compile 'com.oracle.ojdbc:ojdbc10:19.3.0.0'
+    compile ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
+        // causing module issues
+        exclude module: 'oraclepki'
+    }
 
     compile ('com.google.guava:guava:28.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
