@@ -4,6 +4,6 @@
   "path": "JabRefHost.bat",
   "type": "stdio",
   "allowed_extensions": [
-    "@jabfox"
+    "browserextension@jabref.org"
   ]
 }
