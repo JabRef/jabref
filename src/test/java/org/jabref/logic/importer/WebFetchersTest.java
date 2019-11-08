@@ -70,6 +70,8 @@ class WebFetchersTest {
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
             expected.remove(SearchBasedParserFetcher.class);
+            expected.remove(PagedSearchBasedParserFetcher.class);
+            expected.remove(PagedSearchBasedFetcher.class);
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
     }
