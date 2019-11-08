@@ -8,9 +8,11 @@ For a complete step-by-step guide (using IntellJ as the IDE), have a look at the
 ## Prerequisites
 
 ### Java Development Kit 12
+
 A working Java 12 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 12 (e.g `javac 12.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
 
 ### git
+
 It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
 * In Debian-based distros: `sudo apt-get install git`
 * In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
@@ -45,13 +47,14 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 ## Configure your IDE
 
 ### IntelliJ
+
 1. Open `jabref/build.gradle` as a project
 2. Enable annotation processors:
-   * Settings -> Compiler -> Annotation processors -> Check "Enable annotation processing"
+   * File -> Settings -> Compiler -> Annotation processors -> Check "Enable annotation processing"
 3. Configure module settings: Right click on project -> Open Module Settings
    * Ensure that the projects SDK is Java 12: Project Settings -> Project -> Project SDK: Choose Java 12
    * Ensure that standard SDK is Java 12: Platform Settings -> SDK -> Choose Java 12
-4. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
+4. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
    ```batch
    --patch-module test=fastparse_2.12-1.0.0.jar
    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
@@ -77,10 +80,11 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Browse repositories).
    2. Go to File > Settings > Editor > Code Style, choose a code style (or create a new one) 
    3. Click on the settings wheel (next to the scheme chooser), then Import scheme and choose "CheckStyle Configuration". Select the CheckStyle configuration file `config\checkstyle\checkstyle.xml`. Click OK and restart IntelliJ.
-   4. Go to File > Settings > Checkstyle and import the above CheckStyle configuration file. Activate it.
+   4. Go to File -> Settings -> Checkstyle and import the above CheckStyle configuration file. Activate it.
 6. Use the provided run configuration: Run -> Run "JabRef Main"
 
 ### Set-up Eclipse
+
 1. Run `./gradlew run` to generate all resources and to check if jabref runs. (This step is only required once)
 2. Run `./gradlew eclipse` (This has to be always execute, when there are new upstream changes)
 7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
@@ -94,9 +98,10 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 ## Common issues
 
 ### Java installation
+
 An indication that `JAVA_HOME` is not correctly set or no JDK 11 is installed is following error message:
 
-```
+```text
 compileJava FAILED
 
 FAILURE: Build failed with an exception.
@@ -111,4 +116,5 @@ Another indication is following output
     java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 
 ### Problems with generated source files
- In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
+
+In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
