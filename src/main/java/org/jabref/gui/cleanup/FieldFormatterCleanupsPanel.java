@@ -42,7 +42,6 @@ public class FieldFormatterCleanupsPanel extends GridPane {
 
     private static final String DESCRIPTION = Localization.lang("Description") + ": ";
     private final CheckBox cleanupEnabled;
-    private final FieldFormatterCleanups defaultFormatters;
     private final List<Formatter> availableFormatters;
     private FieldFormatterCleanups fieldFormatterCleanups;
     private ListView<FieldFormatterCleanup> actionsList;
@@ -50,13 +49,12 @@ public class FieldFormatterCleanupsPanel extends GridPane {
     private ComboBox<String> selectFieldCombobox;
     private Button addButton;
     private Label descriptionAreaText;
-    private Button removeButton;
-    private Button resetButton;
+    private Button removeSelectedButton;
+    private Button removeAllButton;
     private Button recommendButton;
     private ObservableList<FieldFormatterCleanup> actions;
 
-    public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
-        this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
+    public FieldFormatterCleanupsPanel(String description) {
         cleanupEnabled = new CheckBox(description);
         availableFormatters = Cleanups.getBuiltInFormatters();
         availableFormatters.add(new ProtectTermsFormatter(Globals.protectedTermsLoader));
@@ -110,12 +108,12 @@ public class FieldFormatterCleanupsPanel extends GridPane {
                 .install(actionsList);
         add(actionsList, 1, 1, 3, 1);
 
-        resetButton = new Button(Localization.lang("Reset"));
-        resetButton.setOnAction(e -> actions.setAll(defaultFormatters.getConfiguredActions()));
+        removeAllButton = new Button(Localization.lang("Remove all"));
+        removeAllButton.setOnAction(e -> actions.clear());
 
         BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
-        recommendButton = new Button(Localization.lang("Reset to recommended", databaseContext.getMode().getFormattedName()));
+        recommendButton = new Button(Localization.lang("Reset to recommended"));
         boolean isBiblatex = databaseContext.isBiblatexMode();
 
         recommendButton.setOnAction(e -> {
@@ -126,14 +124,14 @@ public class FieldFormatterCleanupsPanel extends GridPane {
             }
         });
 
-        removeButton = new Button(Localization.lang("Remove selected"));
-        removeButton.setOnAction(e -> actions.remove(actionsList.getSelectionModel().getSelectedItem()));
+        removeSelectedButton = new Button(Localization.lang("Remove selected"));
+        removeSelectedButton.setOnAction(e -> actions.remove(actionsList.getSelectionModel().getSelectedItem()));
         descriptionAreaText = new Label(DESCRIPTION);
         descriptionAreaText.setWrapText(true);
 
-        add(removeButton, 3, 2, 1, 1);
-        add(resetButton, 1, 2, 1, 1);
-        add(recommendButton, 2, 2, 1, 1);
+        add(recommendButton, 1, 2, 1, 1);
+        add(removeSelectedButton, 2, 2, 1, 1);
+        add(removeAllButton, 3, 2, 1, 1);
         add(getSelectorPanel(), 1, 3, 3, 1);
         add(descriptionAreaText, 1, 4, 3, 1);
 
@@ -234,8 +232,8 @@ public class FieldFormatterCleanupsPanel extends GridPane {
             selectFieldCombobox.setDisable(!status);
             formattersCombobox.setDisable(!status);
             addButton.setDisable(!status);
-            removeButton.setDisable(!status);
-            resetButton.setDisable(!status);
+            removeSelectedButton.setDisable(!status);
+            removeAllButton.setDisable(!status);
             recommendButton.setDisable(!status);
         }
 

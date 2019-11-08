@@ -21,7 +21,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.SaveOrderConfigDisplayView;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
@@ -89,8 +88,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
 
         saveOrderConfigDisplayView.changeExportDescriptionToSave();
-        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
-                                                                      Cleanups.DEFAULT_SAVE_ACTIONS);
+        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"));
         Label saveActions = new Label(Localization.lang("Save actions"));
         saveActions.getStyleClass().add("sectionHeader");
 
