@@ -78,7 +78,7 @@ public class EntryEditor extends BorderPane {
     private Subscription typeSubscription;
     private BibEntry entry;  // A reference to the entry this editor works on.
     private SourceTab sourceTab;
-    private List<Path> draggedfiles;
+    private List<Path> draggedFiles;
     private boolean inDragDropMode = false;
     private TransferMode transferMode;
     @FXML private TabPane tabbed;
@@ -158,15 +158,15 @@ public class EntryEditor extends BorderPane {
                 switch (determinedTransferMode) {
                     case LINK:
                         LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, this.draggedfiles);
+                        fileLinker.addFilesToEntry(entry, this.draggedFiles);
                         break;
                     case COPY:
                         LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, this.draggedfiles);
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, this.draggedFiles);
                         break;
                     default:
                         LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, this.draggedfiles);
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, this.draggedFiles);
                         break;
                 }
                 inDragDropMode = false;
@@ -176,7 +176,7 @@ public class EntryEditor extends BorderPane {
         this.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
-                this.draggedfiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                this.draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 this.inDragDropMode = true;
                 this.transferMode = event.getTransferMode();
             }
