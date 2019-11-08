@@ -19,6 +19,6 @@ public class NormalizeMonthFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals("dec", formatter.format(formatter.getExampleInput()));
+        assertEquals("#dec#", formatter.format(formatter.getExampleInput()));
     }
 }

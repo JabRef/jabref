@@ -589,7 +589,6 @@ public class BibtexParser implements Parser {
         int character;
 
         while (((character = peek()) != ',') && (character != '}') && (character != ')')) {
-
             if (eof) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
             }
@@ -602,7 +601,6 @@ public class BibtexParser implements Parser {
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
                 value.append(fieldContentParser.format(text, field));
-
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
                 value.append(number);
@@ -614,16 +612,11 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
                 }
-                if (field != StandardField.MONTH) {
-                    value.append('#').append(textToken).append('#');
-                } else {
-                    value.append(textToken);
-                }
+                value.append('#').append(textToken).append('#');
             }
             skipWhitespace();
         }
         return value.toString();
-
     }
 
     /**

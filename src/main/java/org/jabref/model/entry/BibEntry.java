@@ -614,7 +614,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public String toString() {
-        return CanonicalBibtexEntry.getCanonicalRepresentation(this);
+        return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
     /**

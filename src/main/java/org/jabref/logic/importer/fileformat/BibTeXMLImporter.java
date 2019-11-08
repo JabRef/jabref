@@ -179,7 +179,7 @@ public class BibTeXMLImporter extends Importer {
                     putNumber(fields, (BigInteger) method.invoke(entryType));
                     continue;
                 } else if (method.getName().equals("getMonth")) {
-                    putMonth(fields, Month.parse((String)method.invoke(entryType)));
+                    putMonth(fields, Month.parse((String) method.invoke(entryType)));
                     continue;
                 } else if (isMethodToIgnore(method.getName())) {
                     continue;

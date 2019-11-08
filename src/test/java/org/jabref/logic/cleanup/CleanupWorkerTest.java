@@ -183,7 +183,7 @@ class CleanupWorkerTest {
         entry.setField(StandardField.MONTH, "01");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("jan"), entry.getField(StandardField.MONTH));
+        assertEquals(Optional.of("#jan#"), entry.getField(StandardField.MONTH));
     }
 
     @Test

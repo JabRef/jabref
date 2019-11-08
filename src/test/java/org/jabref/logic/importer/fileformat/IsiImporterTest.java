@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -24,9 +25,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test cases for the IsiImporter
- */
 public class IsiImporterTest {
 
     private static final String FILE_ENDING = ".isi";
@@ -191,7 +189,7 @@ public class IsiImporterTest {
                 first.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Applied Physics Letters"), first.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("2006"), first.getField(StandardField.YEAR));
-        assertEquals(Optional.of("jul"), first.getField(StandardField.MONTH));
+        assertEquals(Optional.of(Month.JULY), first.getMonth());
         assertEquals(Optional.of("89"), first.getField(StandardField.VOLUME));
         assertEquals(Optional.of("4"), first.getField(StandardField.NUMBER));
         assertEquals(Optional.of("Lorem ipsum abstract"), first.getField(StandardField.ABSTRACT));
@@ -235,14 +233,14 @@ public class IsiImporterTest {
 
     @Test
     public void testMonthConvert() {
-        assertEquals("jun", IsiImporter.parseMonth("06"));
-        assertEquals("jun", IsiImporter.parseMonth("JUN"));
-        assertEquals("jun", IsiImporter.parseMonth("jUn"));
-        assertEquals("may", IsiImporter.parseMonth("MAY-JUN"));
-        assertEquals("jun", IsiImporter.parseMonth("2006 06"));
-        assertEquals("jun", IsiImporter.parseMonth("2006 06-07"));
-        assertEquals("jul", IsiImporter.parseMonth("2006 07 03"));
-        assertEquals("may", IsiImporter.parseMonth("2006 May-Jun"));
+        assertEquals("#jun#", IsiImporter.parseMonth("06"));
+        assertEquals("#jun#", IsiImporter.parseMonth("JUN"));
+        assertEquals("#jun#", IsiImporter.parseMonth("jUn"));
+        assertEquals("#may#", IsiImporter.parseMonth("MAY-JUN"));
+        assertEquals("#jun#", IsiImporter.parseMonth("2006 06"));
+        assertEquals("#jun#", IsiImporter.parseMonth("2006 06-07"));
+        assertEquals("#jul#", IsiImporter.parseMonth("2006 07 03"));
+        assertEquals("#may#", IsiImporter.parseMonth("2006 May-Jun"));
     }
 
     @Test
@@ -334,7 +332,7 @@ public class IsiImporterTest {
                         "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A."),
                 second.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("2006"), second.getField(StandardField.YEAR));
-        assertEquals(Optional.of("may"), second.getField(StandardField.MONTH));
+        assertEquals(Optional.of(Month.MAY), second.getMonth());
         assertEquals(Optional.of("13"), second.getField(StandardField.VOLUME));
         assertEquals(Optional.of("3"), second.getField(StandardField.NUMBER));
         assertEquals(Optional.of("411--22"), second.getField(StandardField.PAGES));

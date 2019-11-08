@@ -1784,4 +1784,11 @@ class BibtexParserTest {
 
         assertEquals("#apr#", result.get().getField(StandardField.MONTH).get());
     }
+
+    @Test
+    void bibTeXConstantAprilIsParsedAsStringMonthAprilWhenReadingTheField() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+
+        assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
+    }
 }
