@@ -62,7 +62,7 @@ for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref
                              "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
                              "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"; do
     if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
-        echo $NATIVE_MESSAGING_JSON
+        rm $NATIVE_MESSAGING_JSON
     fi
 done
 UTILITY_SCRIPTS
