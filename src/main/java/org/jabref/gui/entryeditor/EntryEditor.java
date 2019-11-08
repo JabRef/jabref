@@ -140,18 +140,7 @@ public class EntryEditor extends BorderPane {
                     determinedTransferMode = transferMode;
                 } else {
                     LOGGER.debug("No modifier pressed");
-                    switch (dragDropPreferencesType) {
-                        case LINK:
-                            determinedTransferMode = TransferMode.LINK;
-                            break;
-                        case MOVE:
-                            determinedTransferMode = TransferMode.MOVE;
-                            break;
-                        case COPY:
-                        default:
-                            determinedTransferMode = TransferMode.COPY;
-                            break;
-                    }
+                    determinedTransferMode = dragDropPreferencesType.getTransferMode();
                 }
 
                 // obey the determined transfer mode and take action accordingly
