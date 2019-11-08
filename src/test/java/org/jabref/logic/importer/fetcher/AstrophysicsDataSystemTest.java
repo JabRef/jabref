@@ -208,10 +208,18 @@ public class AstrophysicsDataSystemTest {
     }
 
     @Test
+    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
+        Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
+        assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
+        assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
+    }
+
+    @Test
     public void performSearchByQueryPaged_twoPagesNotEqual() throws Exception {
         Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
         Page<BibEntry> page2 = fetcher.performSearchPaged("author:\"A\"", 1);
-        //This tests if the fetcher actually performs paging
-        assertNotEquals(page.getContent(), page2.getContent(), "Two conseecutive pages shouldn't be equal");
+        // This tests if the fetcher actually performs paging
+        assertNotEquals(page.getContent(), page2.getContent(), "Two consecutive pages shouldn't be equal");
     }
 }
