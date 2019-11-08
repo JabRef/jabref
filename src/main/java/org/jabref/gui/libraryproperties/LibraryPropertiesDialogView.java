@@ -130,11 +130,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         metaData.setEncoding(newEncoding);
 
         BibDatabaseMode newMode = BibDatabaseMode.parse(viewModel.selectedDatabaseModeProperty().getValue());
-        BibDatabaseMode oldMode = metaData.getMode().orElse(null);
-        if (newMode != null && oldMode != newMode) {
-            // Only set, when mode really has changed to avoid propagation of change events
-            metaData.setMode(newMode);
-        }
+        metaData.setMode(newMode);
 
         String text = viewModel.generalFileDirectoryPropertyProperty().getValue().trim();
         if (text.isEmpty()) {
