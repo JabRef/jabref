@@ -12,7 +12,7 @@ public class Page<T> {
     public Page(String query, int pageNumber, Collection<T> content) {
         this.query = query;
         this.pageNumber = pageNumber;
-        this.content = content;
+        this.content = Collections.unmodifiableCollection(content);
     }
 
     public Page(String query, int pageNumber) {
@@ -21,10 +21,6 @@ public class Page<T> {
 
     public Collection<T> getContent() {
         return content;
-    }
-
-    public void setContent(Collection<T> content) {
-        this.content = content;
     }
 
     public int getPageNumber() {
