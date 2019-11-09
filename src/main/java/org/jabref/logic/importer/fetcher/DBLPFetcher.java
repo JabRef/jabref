@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
-import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -15,6 +14,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -64,8 +64,10 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         FieldFormatterCleanup clearTimestampFormatter = new FieldFormatterCleanup(InternalField.TIMESTAMP, new ClearFormatter());
         clearTimestampFormatter.cleanup(entry);
 
-        FieldFormatterCleanup cleanUpUrlFormatter = new FieldFormatterCleanup(StandardField.URL, new CleanupUrlFormatter());
-        cleanUpUrlFormatter.cleanup(entry);
+        // unescape the the contents of the URL field
+        entry.getField(StandardField.URL)
+             .map(url -> new RemoveLatexCommandsFormatter().format(url))
+             .ifPresent(url -> entry.setField(StandardField.URL, url));
     }
 
     @Override

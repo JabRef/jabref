@@ -35,6 +35,12 @@ class CleanupUrlFormatterTest {
     }
 
     @Test
+    void urlencodedSlashesAreAlsoConverted() {
+        // the caller has to pay attention that this does not happen
+        assertEquals("jabref.org/test/test", formatter.format("jabref.org/test%2Ftest"));
+    }
+
+    @Test
     void formatExample() {
         assertEquals("http://www.focus.de/" +
                         "gesundheit/ratgeber/herz/test/lebenserwartung-werden-sie-100-jahre-alt_aid_363828.html",
