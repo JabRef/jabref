@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     public static final String MAIN_CSS = "Base.css";
+    public static final String MAIN_DESCRIPTION = "Light theme";
+    public static final String DARK_DESCRIPTION = "Dark theme";
     public static final String DARK_CSS = "Dark.css";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
