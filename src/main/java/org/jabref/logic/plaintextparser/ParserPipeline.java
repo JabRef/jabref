@@ -2,10 +2,13 @@ package org.jabref.logic.plaintextparser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.jabref.Globals;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.HttpPostService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +39,7 @@ public class ParserPipeline {
      */
     public static Optional<BibEntry> parsePlainRefCit(String plainText) {
         try {
-            return Optional.of(parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(plainText))));
+            return parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(plainText)));
         } catch (ParserPipelineException e) {
         LOGGER.error("ParserPipeline Failed. Reason: "+e.getMessage());
         return Optional.empty();
@@ -45,6 +48,7 @@ public class ParserPipeline {
 
     /**
      * Passes request to grobid server, using consolidateCitations option to improve result.
+     * Takes a while, since the server has to look up the entry.
      */
     private static String parseUsingGrobid(String plainText) throws ParserPipelineException {
         if (grobidPostService == null) {
@@ -77,12 +81,13 @@ public class ParserPipeline {
                 "}";
     }
 
-    private static BibEntry parseBibToBibEntry(String bibtexString) {
-        //TODO: THIS IS A DUMMY METHOD RIGHT NOW, SHOULD BE IMPLEMENTED
-        //return BibtexParser.singleFromString(bibtexString, importFormatPreferences, fileMonitor);
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.AUTHOR, "WHATEVER AUTHOR");
-        return bibEntry;
+    private static Optional<BibEntry> parseBibToBibEntry(String bibtexString) throws ParserPipelineException {
+        try {
+            return BibtexParser.singleFromString(bibtexString,
+                    JabRefPreferences.getInstance().getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        } catch (ParseException e) {
+            throw new ParserPipelineException("Jabref failed to extract a BibEntry form bibtexString.");
+        }
     }
 
 }
