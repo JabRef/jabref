@@ -16,7 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-public class GrobidClient {
+public class GrobidRequester {
 
   //private final HttpClient
 
@@ -33,8 +33,11 @@ public class GrobidClient {
       httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
 //Execute and get the response.
+        System.out.println("now requesting");
       HttpResponse response = httpclient.execute(httppost);
+        System.out.println("Getting entity");
       HttpEntity entity = response.getEntity();
+      System.out.println("Done");
 
       String result = "Fail";
       if (entity != null) {

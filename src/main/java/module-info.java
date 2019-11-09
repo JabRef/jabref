@@ -66,4 +66,6 @@ open module org.jabref {
     requires unirest.java;
     requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.httpclient;
+    //requires org.apache.httpcomponents.httpasyncclient;
+    requires org.apache.commons.io;
 }

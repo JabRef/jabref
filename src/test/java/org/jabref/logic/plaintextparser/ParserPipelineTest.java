@@ -17,7 +17,7 @@ public class ParserPipelineTest {
      */
     @Test
     public void singleTextResourceParseTest() {
-      ParserPipeline.parseRefText("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.");
+      ParserPipeline.parsePlainRefCit("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.");
     }
 
     /**
