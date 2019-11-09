@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
+/**
+ * Simplifies LaTeX syntax. {@see org.jabref.logic.layout.format.RemoveLatexCommandsFormatter} for a formatter removing LaTeX commands completely.
+ */
 public class LatexCleanupFormatter extends Formatter {
 
     private static final Pattern REMOVE_REDUNDANT = Pattern
