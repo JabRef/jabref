@@ -10,6 +10,7 @@ import org.jabref.Globals;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexextractor.BibtexExtractor;
 import org.jabref.gui.bibtexextractor.FailedToExtractDialog;
+import org.jabref.logic.plaintextparser.ParserPipeline;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
@@ -36,10 +37,14 @@ public class EntryByPlainTextViewModel {
 
   public void startParsing(){
     //TODO: Add method to start the parsing of the text
-    BibtexExtractor bibtexExtractor = new BibtexExtractor();
-    BibEntry bibEntry = bibtexExtractor.extract(inputText.getValue()); //TODO: Replace with our methods
+
+    if(ParserPipeline.parsePlainRefCit(inputText.getValue()).isPresent()){
+    BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
     this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
     trackNewEntry(StandardEntryType.Article);
+    } else{
+      parsingFail(inputTextProperty().getValue());
+    }
   }
 
   public void parsingFail(String input){

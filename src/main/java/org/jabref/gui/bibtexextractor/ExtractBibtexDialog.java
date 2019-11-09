@@ -55,5 +55,6 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         this.viewModel = new BibtexExtractorViewModel(database);
         this.textViewModel = new EntryByPlainTextViewModel(database);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
+        input.textProperty().bindBidirectional(textViewModel.inputTextProperty());
     }
 }

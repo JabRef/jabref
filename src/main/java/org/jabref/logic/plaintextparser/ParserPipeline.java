@@ -65,6 +65,7 @@ public class ParserPipeline {
                 throw new ParserPipelineException("The server response does not contain anything.");
             }
             InputStream serverResponseAsStream = serverResponse.getContent();
+            LOGGER.info(IOUtils.toString(serverResponseAsStream, StandardCharsets.UTF_8));
             return IOUtils.toString(serverResponseAsStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new ParserPipelineException("Something went wrong requesting parsing results from grobid server.");
