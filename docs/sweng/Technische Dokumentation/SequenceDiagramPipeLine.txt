@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+participant ExtractBibtexDialog order 10
+participant ParsePipeline order 20
+participant HttpPostService order 30
+participant BibTexParser order 40
+
+activate ExtractBibtexDialog
+ExtractBibtexDialog -> ParsePipeline: referenceText
+
+activate ParsePipeline
+ParsePipeline -> HttpPostService: send referenceText
+
+activate HttpPostService
+HttpPostService -> HttpPostService: send server request
+HttpPostService -> ParsePipeline: return Tei
+deactivate HttpPostService
+
+ParsePipeline -> ParsePipeline: Tei to Bib
+ParsePipeline -> BibTexParser: send Bib
+
+
+activate BibTexParser
+BibTexParser -> BibTexParser: Bib to BibEntry
+BibTexParser -> ParsePipeline: return BibEntry
+deactivate BibTexParser
+
+
+
+
+
+
+ParsePipeline -> ExtractBibtexDialog: Return BibEntry
+
+
+@enduml

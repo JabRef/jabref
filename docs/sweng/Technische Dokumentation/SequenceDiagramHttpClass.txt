@@ -1,0 +1,21 @@
+@startuml
+hide footbox
+Participant ParserPipeline order 1
+Participant HttpPostService order 2
+Participant HttpClient order 3
+
+
+activate HttpClient
+activate ParserPipeline
+ParserPipeline -> HttpPostService: sendReferenceText
+activate HttpPostService
+HttpPostService -> HttpPostService: create HttpPost
+HttpPostService -> HttpPostService: Add parameters to HttpPost
+HttpPostService -> HttpClient: send Post
+HttpClient -> HttpClient: execute Post
+HttpClient -> HttpPostService: return httpResponse
+HttpPostService -> ParserPipeline: return Tei
+
+
+
+@enduml

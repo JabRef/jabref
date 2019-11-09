@@ -1,0 +1,26 @@
+@startuml
+
+[*] --> DialogWithParser : Pressed "Extract from Plain Text"
+DialogWithParser: TextArea: I am a plain text
+state ParserPipelineGUI{
+DialogWithParser --> FailedToParseDialog : Failed To Parse
+FailedToParseDialog: ErrorMsg: Failed to Parse
+FailedToParseDialog: TextArea: You can change your plain text
+FailedToParseDialog --> FailedToParseDialog : failed again
+DialogWithParser --> EntryValidateScreen : successfully parsed
+EntryValidateScreen: Standardfields
+EntryValidateScreen: EntryEditor
+EntryValidateScreen --> EntryValidateScreen
+FailedToParseDialog --> EntryValidateScreen : successfully parsed
+EntryValidateScreen --> [*] : Added Entry
+}
+DialogWithParser --> Extractor : BibtexExtractor from Jabref
+Extractor: BibEntry
+Extractor --> [*] : Added new BibEntry
+
+
+
+
+
+
+@enduml
