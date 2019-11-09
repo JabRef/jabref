@@ -1,4 +1,4 @@
-package org.jabref.logic.externalParser;
+package org.jabref.logic.plaintextparser;
 
 import org.junit.Test;
 
@@ -8,7 +8,7 @@ import org.junit.Test;
  * tested in this class.
  */
 
-public class externalParserTest {
+public class ParserPipelineTest {
 
     /**
      * Tests the base functionality of the parser is working by taking some example
@@ -17,7 +17,7 @@ public class externalParserTest {
      */
     @Test
     public void singleTextResourceParseTest() {
-
+      ParserPipeline.parsePlainRefCit("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.");
     }
 
     /**
