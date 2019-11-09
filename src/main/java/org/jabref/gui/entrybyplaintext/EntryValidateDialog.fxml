@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+
+
+<?import javafx.scene.control.TabPane?>
+<DialogPane prefHeight="430.0" prefWidth="586.0" xmlns="http://javafx.com/javafx/8.0.171"
+        xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entrybyplaintext.EntryValidateDialog">
+  <content>
+    <TabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
+
+    </TabPane>
+  </content>
+  <ButtonType fx:id="validateButton" buttonData="OK_DONE" text="Add"/>
+  <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

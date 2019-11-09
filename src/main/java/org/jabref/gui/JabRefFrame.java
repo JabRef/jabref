@@ -61,6 +61,7 @@ import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.entrybyplaintext.EntryByPlainTextAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
@@ -776,7 +777,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
-
                 new SeparatorMenuItem(),
 
                 lookupIdentifiers,
