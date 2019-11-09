@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -119,27 +121,77 @@ public class Text2BibFetcher implements SearchBasedFetcher {
         conversionRequest.setHeader("Referer", "https://text2bib.economics.utoronto.ca/index.php/index");
         conversionRequest.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         conversionRequest.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0");
-        conversionRequest.setHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.5,en;q=0.3/20100101 Firefox/70.0");
+        conversionRequest.setHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.5,en;q=0.3");
+        conversionRequest.setHeader("Accept-Encoding", "gzip, deflate, br");
+        conversionRequest.setHeader("Content-Type", "multipart/form-data; boundary=---------------------------28467309196147");
+        conversionRequest.setHeader("Pragma", "no-cache");
+        conversionRequest.setHeader("Cache-Control", "no-cache");
 
-        File file = new File("C:/temp/test.txt");
+        //File file = new File("C:/temp/test.txt");
+        String requestBody = "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"index\"\n" +
+                "\n" +
+                "0\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"uploadFile\"; filename=\"test.txt\"\n" +
+                "Content-Type: text/plain\n" +
+                "\n" +
+                "Kopp, O.; Martin, D.; Wutke, D. & Leymann, F. The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages Enterprise Modelling and Information Systems, Gesellschaft für Informatik e.V. (GI), 2009, 4, 3-13\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"labelStyle\"\n" +
+                "\n" +
+                "long\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"lineEndings\"\n" +
+                "\n" +
+                "l\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"charEncoding\"\n" +
+                "\n" +
+                "utf8\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"language\"\n" +
+                "\n" +
+                "en\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"firstComponent\"\n" +
+                "\n" +
+                "authors\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"itemSeparator\"\n" +
+                "\n" +
+                "line\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"percentComment\"\n" +
+                "\n" +
+                "0\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"incremental\"\n" +
+                "\n" +
+                "0\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"citationUserGroupId\"\n" +
+                "\n" +
+                "0\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"debug\"\n" +
+                "\n" +
+                "0\n" +
+                "-----------------------------28467309196147\n" +
+                "Content-Disposition: form-data; name=\"B1\"\n" +
+                "\n" +
+                "Convert to BibTeX\n" +
+                "-----------------------------28467309196147--\n";
 
-        MultipartEntityBuilder requestBodyMultipartBuilder = MultipartEntityBuilder.create();
-        requestBodyMultipartBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        requestBodyMultipartBuilder.addPart("index", new StringBody("0", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("uploadFile", new FileBody(file, ContentType.DEFAULT_TEXT));
-        requestBodyMultipartBuilder.addPart("labelStyle", new StringBody("long", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("lineEndings", new StringBody("l", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("charEncoding", new StringBody("utf8leave", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("language", new StringBody("en", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("firstComponent", new StringBody("authors", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("itemSeparator", new StringBody("cr", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("percentComment", new StringBody("0", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("incremental", new StringBody("0", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("citationUserGroupId", new StringBody("0", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("debug", new StringBody("0", ContentType.MULTIPART_FORM_DATA));
-        requestBodyMultipartBuilder.addPart("B1", new StringBody("Convert to BibTeX", ContentType.MULTIPART_FORM_DATA));
-        HttpEntity entity = requestBodyMultipartBuilder.build();
+        HttpEntity entity = null;
+        try {
+            entity = new ByteArrayEntity(requestBody.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Could not create request body");
+            throw new FetcherException("Could not create request body");
+        }
         conversionRequest.setEntity(entity);
+
         org.apache.http.HttpResponse conversionResponse;
         try {
             conversionResponse = client.execute(conversionRequest);
