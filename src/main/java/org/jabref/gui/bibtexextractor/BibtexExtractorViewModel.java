@@ -7,9 +7,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.Globals;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.entrybyplaintext.EntryByPlainTextAction;
-import org.jabref.gui.entrybyplaintext.EntryValidateDialog;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;

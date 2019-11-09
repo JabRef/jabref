@@ -6,10 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entrybyplaintext.EntryByPlainTextAction;
 import org.jabref.gui.entrybyplaintext.EntryByPlainTextViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -35,8 +33,6 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        //TODO: hört sich mad scheiße an so
-
         this.setTitle(Localization.lang("Jabref Parser"));
         input.setPromptText(Localization.lang("Please enter the text to extract from."));
         input.selectAll();

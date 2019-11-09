@@ -7,9 +7,6 @@ import javafx.beans.property.StringProperty;
 
 
 import org.jabref.Globals;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.bibtexextractor.BibtexExtractor;
-import org.jabref.gui.bibtexextractor.FailedToExtractDialog;
 import org.jabref.logic.plaintextparser.ParserPipeline;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +45,7 @@ public class EntryByPlainTextViewModel {
   }
 
   public void parsingFail(String input){
-      FailedToExtractDialog dlg = new FailedToExtractDialog(input);
+      FailedToParseDialog dlg = new FailedToParseDialog(input);
       dlg.showAndWait();
   }
 

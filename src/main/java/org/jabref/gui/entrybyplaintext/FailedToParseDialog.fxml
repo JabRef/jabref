@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 
 <DialogPane prefHeight="430.0" prefWidth="586.0" xmlns="http://javafx.com/javafx/8.0.171"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.bibtexextractor.FailedToExtractDialog">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entrybyplaintext.FailedToParseDialog">
     <content>
         <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
             <children>

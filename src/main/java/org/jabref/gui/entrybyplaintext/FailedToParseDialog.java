@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexextractor;
+package org.jabref.gui.entrybyplaintext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexextractor.BibtexExtractorViewModel;
 import org.jabref.gui.entrybyplaintext.EntryByPlainTextViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -14,7 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import javax.inject.Inject;
 
-public class FailedToExtractDialog extends BaseDialog<Void> {
+public class FailedToParseDialog extends BaseDialog<Void> {
 
     private final Button buttonExtract;
     private final Button buttonParse;
@@ -27,7 +28,7 @@ public class FailedToExtractDialog extends BaseDialog<Void> {
     @Inject
     private StateManager stateManager;
 
-    public FailedToExtractDialog(String oldInput){
+    public FailedToParseDialog(String oldInput){
 
         ViewLoader.view(this)
                  .load()
@@ -50,5 +51,6 @@ public class FailedToExtractDialog extends BaseDialog<Void> {
         this.viewModel = new BibtexExtractorViewModel(database);
         this.textViewModel = new EntryByPlainTextViewModel(database);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
+        input.textProperty().bindBidirectional(textViewModel.inputTextProperty());
     }
 }
