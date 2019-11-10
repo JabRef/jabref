@@ -178,7 +178,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
-    compile 'de.undercouch:citeproc-java:1.0.1'
+    compile 'de.undercouch:citeproc-java:2.0.0'
 
     compile group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
@@ -411,14 +411,16 @@ run {
             "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
             "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix"
+            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix",
+            '--add-exports', 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle'
 
     // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
     // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
         ]
 
         addOpens = [
