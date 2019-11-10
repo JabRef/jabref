@@ -13,7 +13,7 @@ import logging
 import shutil
 from pathlib import Path
 
-# We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
+# We assume that this python script is located in 'jabref/lib' while the executable is 'jabref/bin/JabRef'
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
 if not JABREF_PATH.exists():
@@ -28,14 +28,14 @@ logging.basicConfig(filename=logging_dir / "jabref_browser_extension.log")
 def get_message():
     raw_length = sys.stdin.buffer.read(4)
     if not raw_length:
-        logging.error("Raw_length \n")
+        logging.error("Raw_length null")
         sys.exit(0)
     message_length = struct.unpack("=I", raw_length)[0]
-    logging.info("Got length: {} bytes to be read\n".format(message_length))
+    logging.info(f"Got length: {message_length} bytes to be read")
     message = sys.stdin.buffer.read(message_length).decode("utf-8")
-    logging.info("Got message of {} chars\n".format(len(message)))
+    logging.info(f"Got message of {len(message)} chars")
     data = json.loads(message)
-    logging.info("Successfully retrieved JSON\n")
+    logging.info("Successfully retrieved JSON")
     return data
 
 
@@ -63,7 +63,7 @@ def add_jabref_entry(data):
     try:
         response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
-        logging.error("Failed to call JabRef: %s %s", exc.returncode, exc.output)
+        logging.error(f"Failed to call JabRef: {exc.returncode} {exc.output}")
     else:
         logging.info(f"Called JabRef and got: {response}")
     return response
@@ -82,7 +82,7 @@ if "status" in message and message["status"] == "validate":
     try:
         response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
-        logging.error("Failed to call JabRef: %s %s", exc.returncode, exc.output)
+        logging.error(f"Failed to call JabRef: {exc.returncode} {exc.output}")
         send_message({"message": "jarNotFound", "path": JABREF_PATH})
     else:
         logging.info(f"{response}")
