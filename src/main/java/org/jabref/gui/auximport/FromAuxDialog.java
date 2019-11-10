@@ -62,7 +62,6 @@ public class FromAuxDialog extends BaseDialog<Void> {
                 Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                 BasePanel bp = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(auxParserResult.getGeneratedBibDatabase(), defaults), ExternalFileTypes.getInstance());
                 frame.addTab(bp, true);
-                dialogService.notify(Localization.lang("New library created."));
             }
             return null;
         });

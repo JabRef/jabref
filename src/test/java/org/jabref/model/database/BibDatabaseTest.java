@@ -174,8 +174,19 @@ public class BibDatabaseTest {
         TestEventListener tel = new TestEventListener();
         database.registerListener(tel);
         database.insertEntry(expectedEntry);
-        BibEntry actualEntry = tel.getBibEntry();
-        assertEquals(expectedEntry, actualEntry);
+        assertEquals(expectedEntry, tel.getAddedEntry());
+        assertEquals(expectedEntry, tel.getFirstInsertedEntry());
+    }
+
+    @Test
+    public void insertMultipleEntriesPostsAddedEntryEvent() {
+        BibEntry firstEntry = new BibEntry();
+        BibEntry secondEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.registerListener(tel);
+        database.insertEntries(firstEntry, secondEntry);
+        assertEquals(firstEntry, tel.getFirstInsertedEntry());
+        assertEquals(secondEntry, tel.getAddedEntry());
     }
 
     @Test
@@ -185,7 +196,7 @@ public class BibDatabaseTest {
         database.insertEntry(expectedEntry);
         database.registerListener(tel);
         database.removeEntry(expectedEntry);
-        BibEntry actualEntry = tel.getBibEntry();
+        BibEntry actualEntry = tel.getRemovedEntry();
         assertEquals(expectedEntry, actualEntry);
     }
 
@@ -198,7 +209,7 @@ public class BibDatabaseTest {
 
         entry.setField(new UnknownField("test"), "some value");
 
-        assertEquals(entry, tel.getBibEntry());
+        assertEquals(entry, tel.getChangedEntry());
     }
 
     @Test

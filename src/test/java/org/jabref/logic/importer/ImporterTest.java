@@ -9,7 +9,6 @@ import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
-import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -114,7 +113,6 @@ public class ImporterTest {
                 new BibTeXMLImporter(),
                 new CopacImporter(),
                 new EndnoteImporter(importFormatPreferences),
-                new FreeCiteImporter(importFormatPreferences),
                 new InspecImporter(),
                 new IsiImporter(),
                 new MedlineImporter(),

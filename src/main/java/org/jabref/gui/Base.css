@@ -87,8 +87,8 @@
     -jr-sidepane-header-color: -jr-theme-text;
 
     /* Specs for the scrollbars */
-    -jr-scrollbar-thumb: -fx-outer-border;
-    -jr-scrollbar-track: -fx-control-inner-background;
+    -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
+    -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
 
     -jr-separator: derive(-fx-color, -5%);
 
@@ -698,13 +698,13 @@
 
 .scroll-bar {
     -fx-background-color: transparent;
-    -fx-opacity: 0;
+    -fx-opacity: 0.3;
 }
 
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
     -fx-background-color: -jr-scrollbar-track;
-    -fx-opacity: 0.2;
+    -fx-opacity: 0.6;
     -fx-background-radius: 0em;
 }
 
@@ -718,7 +718,7 @@
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: derive(-jr-scrollbar-thumb, -20%);
+    -fx-background-color: derive(-jr-scrollbar-thumb, -30%);
 }
 
 /* Hide increment and decrement buttons */
@@ -751,7 +751,7 @@
     -fx-padding: 0em 0.333em 0em 0.333em; /* 2 4 2 4 */
 }
 
-/* Only show scrollbars for hovered elements */
+/* Restore full visibility of scrollbars for active elements */
 .list-view:hover .scroll-bar,
 .tree-view:hover .scroll-bar,
 .table-view:hover .scroll-bar,
@@ -869,6 +869,10 @@
 .mainToolbar .search-field .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
+}
+
+.mainToolbar .search-field .label {
+    -fx-padding: 0em 1.8em 0em 0em;
 }
 
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
@@ -1058,8 +1062,4 @@ We want to have a look that matches our icons in the tool-bar */
 
 .dialog-pane {
     -fx-background-color: -fx-control-inner-background;
-}
-
-.preference-sidepane {
-    -fx-background-color: -jr-sidepane-background;
 }

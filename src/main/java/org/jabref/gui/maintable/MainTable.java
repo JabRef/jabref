@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -37,13 +36,16 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +55,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final BasePanel panel;
 
-    private final ScrollPane pane;
     private final BibDatabaseContext database;
     private final UndoManager undoManager;
 
@@ -68,6 +69,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
+
         this.undoManager = panel.getUndoManager();
 
         importHandler = new ImportHandler(
@@ -114,11 +116,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.panel = panel;
 
-        pane = new ScrollPane(this);
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-
-        this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
+        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
@@ -127,6 +125,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
+
+        database.getDatabase().registerListener(this);
+    }
+
+    @Subscribe
+    public void listen(AllInsertsFinishedEvent event) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getBibEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
@@ -195,7 +200,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
     }
 
-    private void clearAndSelectFirst() {
+    public void clearAndSelectFirst() {
         getSelectionModel().clearSelection();
         getSelectionModel().selectFirst();
         scrollTo(0);
@@ -223,8 +228,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
             ce.end();
             undoManager.addEdit(ce);
-
-            panel.output(panel.formatOutputMessage(Localization.lang("Pasted"), entriesToAdd.size()));
 
             // Show editor if user want us to do this
             BibEntry firstNewEntry = entriesToAdd.get(0);
@@ -322,10 +325,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
-    }
-
-    public ScrollPane getPane() {
-        return pane;
     }
 
     public MainTableDataModel getTableModel() {

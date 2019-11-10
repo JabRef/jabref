@@ -11,6 +11,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import org.jabref.gui.ClipBoardManager;
+
 public class EditorTextField extends javafx.scene.control.TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -25,6 +27,8 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
         // Always fill out all the available space
         setPrefHeight(Double.POSITIVE_INFINITY);
         HBox.setHgrow(this, Priority.ALWAYS);
+
+        ClipBoardManager.addX11Support(this);
     }
 
     @Override

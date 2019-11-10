@@ -51,13 +51,13 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExternalTabView(preferences, frame),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
-                new BibtexKeyPatternPrefTab(preferences, frame.getCurrentBasePanel()),
+                new BibtexKeyPatternTabView(preferences),
                 new ImportTabView(preferences),
                 new ExportSortingTabView(preferences),
                 new NameFormatterTabView(preferences),
                 new XmpPrivacyTabView(preferences),
                 new AdvancedTabView(preferences),
-                new AppearancePrefsTab(dialogService, preferences)
+                new AppearanceTabView(preferences)
         );
     }
 

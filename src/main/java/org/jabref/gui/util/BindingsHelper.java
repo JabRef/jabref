@@ -24,6 +24,7 @@ import javafx.scene.Node;
 
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.PreboundBinding;
+import org.fxmisc.easybind.Subscription;
 
 /**
  * Helper methods for javafx binding.
@@ -43,12 +44,13 @@ public class BindingsHelper {
         return Bindings.createBooleanBinding(() -> !source.isEmpty() && source.stream().allMatch(predicate), source);
     }
 
-    public static void includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
+    public static Subscription includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
         Consumer<Boolean> changePseudoClass = value -> node.pseudoClassStateChanged(pseudoClass, value);
-        EasyBind.subscribe(condition, changePseudoClass);
+        Subscription subscription = EasyBind.subscribe(condition, changePseudoClass);
 
         // Put the pseudo class there depending on the current value
         changePseudoClass.accept(condition.getValue());
+        return subscription;
     }
 
     /**
@@ -200,6 +202,20 @@ public class BindingsHelper {
                 return other;
             }
         });
+    }
+
+    /**
+     * Invokes {@code subscriber} for the every new value of {@code observable}, but not for the current value.
+     *
+     * @param observable observable value to subscribe to
+     * @param subscriber action to invoke for values of {@code observable}.
+     * @return a subscription that can be used to stop invoking subscriber for any further {@code observable} changes.
+     * @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the {@code subscriber} for the current value
+     */
+    public static <T> Subscription subscribeFuture(ObservableValue<T> observable, Consumer<? super T> subscriber) {
+        ChangeListener<? super T> listener = (obs, oldValue, newValue) -> subscriber.accept(newValue);
+        observable.addListener(listener);
+        return () -> observable.removeListener(listener);
     }
 
     private static class BidirectionalBinding<A, B> {

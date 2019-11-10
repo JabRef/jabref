@@ -30,7 +30,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -41,8 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Synchronizes the shared or local databases with their opposite side.
- * Local changes are pushed by {@link EntryEvent} using Google's Guava EventBus.
+ * Synchronizes the shared or local databases with their opposite side. Local changes are pushed by {@link EntryEvent}
+ * using Google's Guava EventBus.
  */
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
@@ -135,11 +134,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Sets the table structure of shared database if needed and pulls all shared entries
-     * to the new local database.
+     * Sets the table structure of shared database if needed and pulls all shared entries to the new local database.
      *
-     * @throws DatabaseNotSupportedException if the version of shared database does not match
-     *          the version of current shared database support ({@link DBMSProcessor}).
+     * @throws DatabaseNotSupportedException if the version of shared database does not match the version of current
+     *                                       shared database support ({@link DBMSProcessor}).
      */
     public void initializeDatabases() throws DatabaseNotSupportedException {
         try {
@@ -163,8 +161,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Synchronizes the local database with shared one.
-     * Possible update types are removal, update or insert of a {@link BibEntry}.
+     * Synchronizes the local database with shared one. Possible update types are removal, update or insert of a {@link
+     * BibEntry}.
      */
     @Override
     public void synchronizeLocalDatabase() {
@@ -191,17 +189,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
-                            for (Field field : sharedEntry.get().getFields()) {
-                                localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
-                            }
+                            // copy remote values to local entry
+                            sharedEntry.get().getFieldMap().forEach(
+                                    (field, value) -> localEntry.setField(field, value, EntryEventSource.SHARED)
+                            );
 
-                            Set<Field> redundantLocalEntryFields = localEntry.getFields();
-                            redundantLocalEntryFields.removeAll(sharedEntry.get().getFields());
-
-                            // remove not existing fields
-                            for (Field redundantField : redundantLocalEntryFields) {
-                                localEntry.clearField(redundantField, EntryEventSource.SHARED);
-                            }
+                            // locally remove not existing fields
+                            localEntry.getFields().stream()
+                                      .filter(field -> !sharedEntry.get().hasField(field))
+                                      .forEach(
+                                              field -> localEntry.clearField(field, EntryEventSource.SHARED)
+                                      );
                         }
                     }
                 }
@@ -220,7 +218,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Removes all local entries which are not present on shared database.
      *
      * @param localEntries List of {@link BibEntry} the entries should be removed from
-     * @param sharedIDs Set of all IDs which are present on shared database
+     * @param sharedIDs    Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         for (int i = 0; i < localEntries.size(); i++) {
@@ -325,8 +323,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Checks whether the current SQL connection is valid.
-     * In case that the connection is not valid a new {@link ConnectionLostEvent} is going to be sent.
+     * Checks whether the current SQL connection is valid. In case that the connection is not valid a new {@link
+     * ConnectionLostEvent} is going to be sent.
      *
      * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
@@ -334,10 +332,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             boolean isValid = currentConnection.isValid(0);
             if (!isValid) {
+                LOGGER.warn("Lost SQL connection.");
                 eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
             }
             return isValid;
-
         } catch (SQLException e) {
             LOGGER.error("SQL Error:", e);
             return false;
@@ -348,7 +346,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
      *
      * @param event An {@link EntryEvent}
-     * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
+     * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else
+     * <code>false</code>
      */
     public boolean isEventSourceAccepted(EntryEvent event) {
         EntryEventSource eventSource = event.getEntryEventSource();

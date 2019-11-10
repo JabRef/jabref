@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.ParseException;
 
-import org.json.JSONObject;
+import kong.unirest.json.JSONObject;
 
 /**
  * Converts an {@link InputStream} into a {@link JSONObject}.

@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -68,7 +69,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jfoenix.controls.JFXColorPicker;
+// import com.jfoenix.controls.JFXColorPicker;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -85,7 +86,8 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
     // for all types
     private final TextField nameField = new TextField();
     private final TextField descriptionField = new TextField();
-    private final JFXColorPicker colorField = new JFXColorPicker();
+    //private final JFXColorPicker colorField = new JFXColorPicker();
+    private final ColorPicker colorField = new ColorPicker();
     private final TextField iconField = new TextField();
     private final RadioButton explicitRadioButton = new RadioButton(Localization.lang("Statically group entries by manual assignment"));
     private final RadioButton keywordsRadioButton = new RadioButton(Localization.lang("Dynamically group entries by searching a field for a keyword"));

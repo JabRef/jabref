@@ -1,7 +1,5 @@
 name: jabref
-# adopt-info: jabref
-version: 'master'
-version-script: cat build.gradle | grep "^version =" | cut -d'"' -f2
+adopt-info: jabref
 icon: snap/gui/jabref.png
 license: MIT
 summary: Bibliography manager
@@ -18,24 +16,37 @@ apps:
   jabref:
     command: bin/JabRef
     extensions: [gnome-3-28]
-    environment:
-      _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
-    plugs:
-      - desktop
-      - desktop-legacy
-      - wayland
-      - unity7
-      - home
-      - opengl
-      - network-bind
-      - removable-media
+  browser-proxy:
+    command: lib/jabrefHost.py
+    extensions: [gnome-3-28]
+
+environment:
+  _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
+plugs:
+  desktop:
+  desktop-legacy:
+  wayland:
+  unity7:
+  home:
+  opengl:
+  network-bind:
+  removable-media:
+  browser-extension:
+    interface: system-files
+    read:
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts
+    write:
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
 
 parts:
   jabref:
     plugin: dump
     source: build/distribution/JabRef-portable_linux.tar.gz
-    # override-pull: |
-    #   snapcraftctl pull
-    #   snapcraftctl set-version "$(cat app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+    # Use this source for debug purposes:
+    # source: https://builds.jabref.org/master/JabRef-portable_linux.tar.gz
     stage-packages:
       - x11-utils
+    override-build: |
+      snapcraftctl build
+      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+      sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/org.jabref.jabref.json

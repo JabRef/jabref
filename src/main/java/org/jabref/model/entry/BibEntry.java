@@ -36,26 +36,40 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents a BibTex / BibLaTeX entry.
+ *
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCiteKey(String)} and {@link #withField(Field, String)}.
+ */
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
+
     /**
      * Map to store the words in every field
      */
     private final Map<Field, Set<String>> fieldsAsWords = new HashMap<>();
+
     /**
      * Cache that stores latex free versions of fields.
      */
     private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
+
+    /**
+     * Cache that stores the field as keyword lists (format <Field, Separator, Keyword list>)
+     */
+    private MultiKeyMap<Field, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>();
+
     private final EventBus eventBus = new EventBus();
     private String id;
     private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(DEFAULT_TYPE);
@@ -63,6 +77,7 @@ public class BibEntry implements Cloneable {
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     private String parsedSerialization = "";
     private String commentsBeforeEntry = "";
+
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
@@ -75,7 +90,6 @@ public class BibEntry implements Cloneable {
      */
     public BibEntry() {
         this(IdGenerator.next(), DEFAULT_TYPE);
-
     }
 
     /**
@@ -266,8 +280,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField.KEY_FIELD}.
+     *
+     * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
      */
@@ -523,13 +538,6 @@ public class BibEntry implements Cloneable {
         return Optional.of(change);
     }
 
-    public Optional<FieldChange> setField(Field field, Optional<String> value, EntryEventSource eventSource) {
-        if (value.isPresent()) {
-            return setField(field, value.get(), eventSource);
-        }
-        return Optional.empty();
-    }
-
     /**
      * Set a field, and notify listeners about the change.
      *
@@ -721,8 +729,7 @@ public class BibEntry implements Cloneable {
     }
 
     public KeywordList getKeywords(Character delimiter) {
-        Optional<String> keywordsContent = getField(StandardField.KEYWORDS);
-        return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
+        return getFieldAsKeywords(StandardField.KEYWORDS, delimiter);
     }
 
     public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
@@ -825,6 +832,19 @@ public class BibEntry implements Cloneable {
         }
     }
 
+    public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
+        Optional<KeywordList> storedList = fieldsAsKeywords.get(field, keywordSeparator);
+        if (storedList.isPresent()) {
+            return storedList.get();
+        } else {
+            KeywordList keywords = getField(field)
+                    .map(content -> KeywordList.parse(content, keywordSeparator))
+                    .orElse(new KeywordList());
+            fieldsAsKeywords.put(field, keywordSeparator, keywords);
+            return keywords;
+        }
+    }
+
     public Optional<FieldChange> clearCiteKey() {
         return clearField(InternalField.KEY_FIELD);
     }
@@ -832,26 +852,26 @@ public class BibEntry implements Cloneable {
     private void invalidateFieldCache(Field field) {
         latexFreeFields.remove(field);
         fieldsAsWords.remove(field);
+        fieldsAsKeywords.remove(field);
     }
 
     public Optional<String> getLatexFreeField(Field field) {
-        if (!hasField(field) && !InternalField.TYPE_HEADER.equals(field)) {
-            return Optional.empty();
+        if (InternalField.KEY_FIELD.equals(field)) {
+            // the key field should not be converted
+            return getCiteKeyOptional();
+        } else if (InternalField.TYPE_HEADER.equals(field)) {
+            return Optional.of(type.get().getDisplayName());
         } else if (latexFreeFields.containsKey(field)) {
             return Optional.ofNullable(latexFreeFields.get(field));
-        } else if (InternalField.KEY_FIELD.equals(field)) {
-            // the key field should not be converted
-            Optional<String> citeKey = getCiteKeyOptional();
-            latexFreeFields.put(field, citeKey.get());
-            return citeKey;
-        } else if (InternalField.TYPE_HEADER.equals(field)) {
-            String typeName = type.get().getDisplayName();
-            latexFreeFields.put(field, typeName);
-            return Optional.of(typeName);
         } else {
-            String latexFreeField = LatexToUnicodeAdapter.format(getField(field).get()).intern();
-            latexFreeFields.put(field, latexFreeField);
-            return Optional.of(latexFreeField);
+            Optional<String> fieldValue = getField(field);
+            if (fieldValue.isPresent()) {
+                String latexFreeField = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                latexFreeFields.put(field, latexFreeField);
+                return Optional.of(latexFreeField);
+            } else {
+                return Optional.empty();
+            }
         }
     }
 

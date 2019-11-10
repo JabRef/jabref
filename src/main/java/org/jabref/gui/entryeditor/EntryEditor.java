@@ -25,6 +25,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
@@ -136,53 +137,20 @@ public class EntryEditor extends BorderPane {
                 FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
-                    if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    }
+                    LOGGER.debug("Mode MOVE");
+                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
-                    if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    }
+                    LOGGER.debug("Mode COPY");
+                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }
 
                 if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
-                    if (event.getTransferMode() == TransferMode.COPY) {
-                        // Ctrl on Windows, no modifier on Xubuntu
-                        LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    } else if (event.getTransferMode() == TransferMode.LINK) {
-                        // Alt on Windows
-                        LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    } else {
-                        // Shift on Windows or no modifier
-                        LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
-                    }
+                    LOGGER.debug("Mode LINK");
+                    fileLinker.addFilesToEntry(entry, files);
                     success = true;
                 }
             }
@@ -262,22 +230,23 @@ public class EntryEditor extends BorderPane {
     }
 
     private List<EntryEditorTab> createTabs() {
+        // Preview tab
+        entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, Globals.prefs, ExternalFileTypes.getInstance()));
 
         // Required fields
-        entryEditorTabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
 
         // Optional fields
-        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
-        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
-        entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+        entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
 
         // Other fields
-        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager,
-                entryEditorPreferences.getCustomTabFieldNames(), dialogService));
+        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, entryEditorPreferences.getCustomTabFieldNames(), dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
 
         // General fields from preferences
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
-            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService));
+            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
         }
 
         // Special tabs

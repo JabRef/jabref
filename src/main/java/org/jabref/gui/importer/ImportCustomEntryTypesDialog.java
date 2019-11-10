@@ -45,13 +45,13 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
         });
 
         setTitle(Localization.lang("Custom entry types"));
-
     }
 
     @FXML
     public void initialize() {
         viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
 
+        boxDifferentCustomization.visibleProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());
         differentCustomizationCheckList.setItems(viewModel.differentCustomizations());
