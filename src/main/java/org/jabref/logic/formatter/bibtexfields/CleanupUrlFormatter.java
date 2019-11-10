@@ -15,9 +15,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Cleanup URL link
  */
-public class CleanupURLFormatter extends Formatter {
+public class CleanupUrlFormatter extends Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(CleanupURLFormatter.class);
+    private static final Log LOGGER = LogFactory.getLog(CleanupUrlFormatter.class);
     // This regexp find "url=" or "to=" parameter in full link and get text after them
     private static final Pattern PATTERN_URL = Pattern.compile("(?:url|to)=([^&]*)");
 
@@ -38,15 +38,14 @@ public class CleanupURLFormatter extends Formatter {
 
         Matcher matcher = PATTERN_URL.matcher(value);
         if (matcher.find()) {
-        toDecode = matcher.group(1);
-
+            toDecode = matcher.group(1);
         }
         try {
             decodedLink = URLDecoder.decode(toDecode, StandardCharsets.UTF_8.name());
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             LOGGER.warn("Used unsupported character encoding", e);
         }
+
         return decodedLink;
     }
 
@@ -61,6 +60,5 @@ public class CleanupURLFormatter extends Formatter {
                 "rja&uact=8&ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&url=" +
                 "http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2" +
                 "Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html" + "&usg=AOvVaw1G6m2jf-pTHYkXceii4hXU";
-  }
-
+    }
 }

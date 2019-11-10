@@ -62,7 +62,7 @@ public class FieldFormatterCleanups {
         if (enabled) {
             return applyAllActions(entry);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
