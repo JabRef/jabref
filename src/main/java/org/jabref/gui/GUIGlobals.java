@@ -22,10 +22,6 @@ public class GUIGlobals {
 
     public static CustomLocalDragboard localDragboard = new CustomLocalDragboard();
 
-    public static final int WIDTH_ICON_COL = 16 + 12; // add some additional space to improve appearance
-
-    public static final int WIDTH_ICON_COL_RANKING = 5 * 16; // Width of Ranking Icon Column
-
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
 
     private GUIGlobals() {
