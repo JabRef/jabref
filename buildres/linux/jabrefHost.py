@@ -58,10 +58,11 @@ def send_message(message):
 
 
 def add_jabref_entry(data):
-    cmd = f'{str(JABREF_PATH)} --importBibtex """{data}"""'
+    """Send string via cli as literal to preserve special characters"""
+    cmd = [str(JABREF_PATH), "--importBibtex", r"{}".format(data)]
     logging.info(f"Try to execute command {cmd}")
     try:
-        response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
+        response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         logging.error(f"Failed to call JabRef: {exc.returncode} {exc.output}")
     else:
@@ -78,9 +79,9 @@ except Exception as e:
 logging.info(str(message))
 
 if "status" in message and message["status"] == "validate":
-    cmd = str(JABREF_PATH) + " -version"
+    cmd = [str(JABREF_PATH), "--version"]
     try:
-        response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
+        response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         logging.error(f"Failed to call JabRef: {exc.returncode} {exc.output}")
         send_message({"message": "jarNotFound", "path": JABREF_PATH})
