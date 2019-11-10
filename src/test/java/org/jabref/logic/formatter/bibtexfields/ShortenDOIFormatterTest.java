@@ -20,8 +20,8 @@ class ShortenDOIFormatterTest {
     @Test
     public void formatDoi() {
         assertEquals("10/adc", formatter.format("10.1006/jmbi.1998.2354"));
-
     }
+
     @Test
     public void invalidDoiIsKept() {
         assertEquals("invalid-doi", formatter.format("invalid-doi"));
