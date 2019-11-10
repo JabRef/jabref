@@ -162,8 +162,8 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), new ArrayList<>(result.getToRemove())));
-            panel.getDatabase().removeEntries(new ArrayList<>(result.getToRemove()));
+            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove()));
+            panel.getDatabase().removeEntries((result.getToRemove());
             panel.markBaseChanged();
         }
         // and adding merged entries:
@@ -194,8 +194,8 @@ public class DuplicateSearch extends SimpleCommand {
 
         private int duplicates = 0;
 
-        public synchronized Collection<BibEntry> getToRemove() {
-            return toRemove.values();
+        public synchronized List<BibEntry> getToRemove() {
+            return new ArrayList<>(toRemove.values());
         }
 
         public synchronized List<BibEntry> getToAdd() {
