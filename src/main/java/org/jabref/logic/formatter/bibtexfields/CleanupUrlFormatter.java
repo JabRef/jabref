@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.Formatter;
 
 import org.apache.commons.logging.Log;
@@ -47,8 +46,7 @@ public class CleanupUrlFormatter extends Formatter {
             LOGGER.warn("Used unsupported character encoding", e);
         }
 
-        String result = new RemoveLatexCommandsFormatter().format(decodedLink);
-        return result;
+        return decodedLink;
     }
 
     @Override
