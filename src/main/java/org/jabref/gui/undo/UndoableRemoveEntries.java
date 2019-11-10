@@ -45,22 +45,19 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
         if (cut) {
             if (entries.size() > 1) {
                 return Localization.lang("cut entries");
-            }
-            else if (entries.size() == 1) {
+            } else if (entries.size() == 1) {
                 return Localization.lang("cut entry %0",
                         StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-            } else  {
+            } else {
                 return null;
             }
         } else {
             if (entries.size() > 1) {
                 return Localization.lang("remove entries");
-            }
-            else if (entries.size() == 1) {
+            } else if (entries.size() == 1) {
                 return Localization.lang("remove entry %0",
                         StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-            }
-            else {
+            } else {
                 return null;
             }
         }
