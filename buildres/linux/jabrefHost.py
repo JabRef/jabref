@@ -13,7 +13,7 @@ import logging
 import shutil
 from pathlib import Path
 
-# We assume that this python script is located in 'jabref/lib' while the executable is 'jabref/bin/JabRef'
+# We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
 if not JABREF_PATH.exists():
@@ -59,7 +59,7 @@ def send_message(message):
 
 def add_jabref_entry(data):
     cmd = f'{str(JABREF_PATH)} --importBibtex """{data}"""'
-    logger.error(f"Try to execute command {cmd}")
+    logging.info(f"Try to execute command {cmd}")
     try:
         response = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
