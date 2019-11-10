@@ -52,6 +52,7 @@ public class MergeEntriesAction extends SimpleCommand {
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dlg.showAndWait();
         if (mergedEntry.isPresent()) {
+            // Should this be basePanel.getDatabase().insertEntry(mergedEntry.get());?
             basePanel.insertEntry(mergedEntry.get());
 
             // Create a new entry and add it to the undo stack
