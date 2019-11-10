@@ -168,10 +168,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
-            for (BibEntry entry : result.getToAdd()) {
-                panel.getDatabase().insertEntry(entry);
-                compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
-            }
+            compoundEdit.addEdit(new UndoableInsertEntries(panel.getDatabase(), result.getToAdd()));
+            panel.getDatabase().insertEntries(result.getToAdd());
             panel.markBaseChanged();
         }
 
