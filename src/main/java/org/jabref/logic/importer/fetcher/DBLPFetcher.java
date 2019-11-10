@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -14,8 +15,10 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -61,13 +64,13 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         DoiCleanup doiCleaner = new DoiCleanup();
         doiCleaner.cleanup(entry);
 
-        FieldFormatterCleanup clearTimestampFormatter = new FieldFormatterCleanup(InternalField.TIMESTAMP, new ClearFormatter());
-        clearTimestampFormatter.cleanup(entry);
-
-        // unescape the the contents of the URL field
-        entry.getField(StandardField.URL)
-             .map(url -> new RemoveLatexCommandsFormatter().format(url))
-             .ifPresent(url -> entry.setField(StandardField.URL, url));
+        FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
+                List.of(
+                        new FieldFormatterCleanup(InternalField.TIMESTAMP, new ClearFormatter()),
+                        // unescape the the contents of the URL field, e.g., some\_url\_part becomes some_url_part
+                        new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
+                ));
+        cleanups.applySaveActions(entry);
     }
 
     @Override
