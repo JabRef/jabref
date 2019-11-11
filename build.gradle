@@ -197,11 +197,8 @@ dependencies {
     }
     */
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    compile (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.5.1') {
-        exclude module: "log4j-core"
-    }
-
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.5.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.5.1'
 
     testCompile 'io.github.classgraph:classgraph:4.8.52'
     testCompile 'junit:junit:4.12'
