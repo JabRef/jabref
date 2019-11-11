@@ -51,6 +51,8 @@ In the follwing the Design of the system is fully represented in UML-Diagrams. A
 
 ### **5.1 Static**
 
+![image](classDiagram.png)
+
 ### **5.2 Dynamic**
 To get a better understanding about the dynamic processes of the main classes / objects of the system, view the following Diagrams: <br>
 
