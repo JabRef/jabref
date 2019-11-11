@@ -372,7 +372,7 @@ public class BibEntry implements Cloneable {
      * @return a set of existing field names
      */
     public Set<Field> getFields() {
-        return fields.keySet();
+        return Collections.unmodifiableSet(fields.keySet());
     }
 
     /**

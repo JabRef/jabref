@@ -440,7 +440,7 @@ localization.script = 'scripts/syncLang.py'
 // Test tasks
 test {
     useJUnitPlatform {
-        excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
+        excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
     testLogging {
@@ -454,7 +454,8 @@ task databaseTest(type: Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
     }
-       testLogging {
+
+    testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
         exceptionFormat "full"
@@ -465,6 +466,7 @@ task fetcherTest(type: Test) {
     useJUnitPlatform {
         includeTags 'FetcherTest'
     }
+
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
@@ -476,6 +478,7 @@ task guiTest(type: Test) {
     useJUnitPlatform {
         includeTags 'GUITest'
     }
+
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]

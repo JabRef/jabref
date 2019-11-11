@@ -3,15 +3,12 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -41,20 +38,9 @@ public class DBMSSynchronizerTest {
     private BibDatabase bibDatabase;
     private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
-    private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
-        Collection<Object[]> result = new ArrayList<>();
-        for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-            result.add(new Object[] {
-                                     dbmsType,
-                                     TestConnector.getTestDBMSConnection(dbmsType),
-                                     DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
-        }
-        return result.stream();
-    }
-
     public void setUp(DBMSConnection dbmsConnection) throws Exception {
         clear(dbmsConnection);
-        
+
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
@@ -65,12 +51,10 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testEntryAddedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
-        System.out.println("dbmstype" + dbmsType);
-
         setUp(dbmsConnection);
+
         BibEntry expectedEntry = getBibEntryExample(1);
         BibEntry furtherEntry = getBibEntryExample(1);
 
@@ -87,31 +71,28 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testFieldChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
         setUp(dbmsConnection);
 
         BibEntry expectedEntry = getBibEntryExample(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
-        bibDatabase.insertEntry(expectedEntry); 
+        bibDatabase.insertEntry(expectedEntry);
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntriesEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
-        assertEquals(1, actualEntries.size());
-        assertEquals(expectedEntry.getField(StandardField.AUTHOR), actualEntries.get(0).getField(StandardField.AUTHOR));
-        assertEquals("The nano processor1", actualEntries.get(0).getField(StandardField.TITLE).get());
- //somehow the field stable is not filled
+        assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+
         clear(dbmsConnection);
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
-  
+
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -135,10 +116,10 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testMetaDataChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        
         setUp(dbmsConnection);
+
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -148,11 +129,12 @@ public class DBMSSynchronizerTest {
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMap, actualMap);
+
         clear(dbmsConnection);
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testInitializeDatabases(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 
@@ -165,7 +147,7 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testSynchronizeLocalDatabaseWithEntryRemoval(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 
@@ -193,7 +175,7 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testSynchronizeLocalDatabaseWithEntryUpdate(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 
@@ -215,7 +197,7 @@ public class DBMSSynchronizerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void testApplyMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 

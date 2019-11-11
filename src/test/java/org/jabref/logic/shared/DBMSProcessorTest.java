@@ -2,17 +2,13 @@ package org.jabref.logic.shared;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
@@ -34,19 +30,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 @DatabaseTest
 class DBMSProcessorTest {
 
-    private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
-        Collection<Object[]> result = new ArrayList<>();
-        for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-            result.add(new Object[] {
-                                     dbmsType,
-                                     TestConnector.getTestDBMSConnection(dbmsType),
-                                     DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
-        }
-        return result.stream();
-    }
-
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testCheckBaseIntegrity(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
@@ -57,7 +42,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testSetUpSharedDatabase(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         clear(dbmsConnection);
@@ -68,7 +53,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testInsertEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
@@ -102,28 +87,26 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testUpdateEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
-
         dbmsProcessor.insertEntry(expectedEntry);
 
         expectedEntry.setType(StandardEntryType.Book);
         expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
         expectedEntry.setField(new UnknownField("customField"), "custom value");
         expectedEntry.clearField(StandardField.BOOKTITLE);
-
         dbmsProcessor.updateEntry(expectedEntry);
 
-        Optional<BibEntry> actualEntryOptional = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(expectedEntry, actualEntry.get());
 
-        assertEquals(expectedEntry, actualEntryOptional.get());
         clear(dbmsConnection);
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
@@ -144,7 +127,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testUpdateNewerEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry bibEntry = getBibEntryExample();
@@ -161,7 +144,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testUpdateEqualEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedBibEntry = getBibEntryExample();
@@ -180,7 +163,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testRemoveEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry bibEntry = getBibEntryExample();
@@ -194,7 +177,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetSharedEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
@@ -209,7 +192,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetSharedEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
@@ -223,7 +206,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetNotExistingSharedEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
@@ -233,7 +216,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetSharedIDVersionMapping(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
@@ -255,7 +238,7 @@ class DBMSProcessorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetSharedMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);

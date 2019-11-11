@@ -1,11 +1,7 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
 
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,21 +31,7 @@ public class SynchronizationTestSimulator {
     private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
     private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
-    private static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
-        Collection<Object[]> result = new ArrayList<>();
-        for (DBMSType dbmsType : TestManager.getDBMSTypeTestParameter()) {
-            result.add(new Object[] {
-                                     dbmsType,
-                                     TestConnector.getTestDBMSConnection(dbmsType),
-                                     DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
-        }
-        return result.stream();
-    }
-
     public void setUp(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
-        System.out.println("dbmstype before each" + dbmsType);
-
         clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
@@ -64,7 +46,7 @@ public class SynchronizationTestSimulator {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void simulateEntryInsertionAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsType, dbmsConnection, dbmsProcessor);
         //client A inserts an entry
@@ -80,7 +62,7 @@ public class SynchronizationTestSimulator {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void simulateEntryUpdateAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsType, dbmsConnection, dbmsProcessor);
 
@@ -100,7 +82,7 @@ public class SynchronizationTestSimulator {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void simulateEntryDelitionAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsType, dbmsConnection, dbmsProcessor);
 
@@ -126,7 +108,7 @@ public class SynchronizationTestSimulator {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void simulateUpdateOnNoLongerExistingEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsType, dbmsConnection, dbmsProcessor);
 
@@ -157,7 +139,7 @@ public class SynchronizationTestSimulator {
     }
 
     @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     public void simulateEntryChangeConflicts(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsType, dbmsConnection, dbmsProcessor);
 
@@ -200,5 +182,4 @@ public class SynchronizationTestSimulator {
     public void clear(DBMSConnection dbmsConnection) throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
-
 }
