@@ -37,7 +37,6 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.jbibtex.BibTeXString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -317,7 +316,7 @@ public class BibDatabase {
 
     /**
      * Replaces the existing lists of BibTexString with the given one
-     * No Duplicate checks are performed
+     * Duplicates throw KeyCollisionException
      * @param stringsToAdd The collection of strings to set
      */
     public void setStrings(List<BibtexString> stringsToAdd) {
