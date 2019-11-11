@@ -3,8 +3,8 @@
 ## Table of Contents
 1. [Introduction](#1-Introduction) <br>
 1.1 [Objective](#1.1-Objective) <br>
-1.2 [Related Documents](#1.2-Related-Documents)
-2. [System Overview](#2-System-Overview)
+1.2 [Related documents](#1.2-Related-documents)
+2. [Project overview](#2-Project-overview)
 3. [Design Goals](#3-Design-Goals)
 4. [System Behaviour](#4-System-Behaviour)
 5. [Design](#5-Design) <br>
@@ -13,15 +13,15 @@
 5.3 [Logic](#5.3-Logic)
 
 ## **1 Introduction** 
-This document focuses on showing the basic design and system of the project and should help any user and participant of the project to get a little deeper into the details. After reading this document anyone has a better understanding of how the system and design are built with the focus on the most important tasks.
-
 ### **1.1 Objective**
+This document should help all developers of JabRef and the project by explaining the design and functionality of the feature. After reading this document, the reader should have a better understanding of how the design and functionality of the feature are justified, focusing on the most important concepts.
 
-### **1.2 Related Documents**
-- Specification Book
+### **1.2 Related documents**
+- Specification Book with Glossary
+- MockUp
 
-## **2 System Overview**
-The system is an expansion to an existing open source bibliography reference manager called **Jabref**. Basically the main goal of the system is that an user of jabref is able to copy a text reference into a popup-window which is accessible over the GUI. After the user pasted the text reference into the box, the user can click on a parse-button. Following points should be fullfilled:
+## **2 Project overview**
+The feature is an expansion to the existing open source reference manager called **JabRef**. The main goal of the feature is that an user of JabRef is able to copy a text reference into a popup-window which is accessible over the GUI. After the user pasted the text reference into the box, the user can click on a parse-button. Following points should be fullfilled:
 - The user has the option to also parse multiple text references
 - The parser filters all relevant references from the text reference
 - An appropriate Bibentry with re results of the parser should be created
@@ -73,3 +73,4 @@ To get a better understanding about the dynamic processes of the main classes / 
 ![image](ActivityDiagramTrackPlainEntry.png)
 
 ### **5.3 Logic**
+
