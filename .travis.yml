@@ -31,6 +31,7 @@ matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
+      - env: TEST_SUITE=databaseTest
       - env: TEST_SUITE=guiTest
       - env: DEPENDENCY_UPDATES=check
 
