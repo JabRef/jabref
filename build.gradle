@@ -498,7 +498,6 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    ignoreFailures = true
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
