@@ -7,9 +7,9 @@ For a complete step-by-step guide (using IntellJ as the IDE), have a look at the
 
 ## Prerequisites
 
-### Java Development Kit 12
+### Java Development Kit 13
 
-A working Java 12 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 12 (e.g `javac 12.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
+A working Java 13 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 13 (e.g `javac 13.0.1`). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent JDK.
 
 ### git
 
@@ -85,6 +85,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ### Set-up Eclipse
 
+0. Install the [Eclipse Java 13 marketplace addon](https://marketplace.eclipse.org/content/java-13-support-eclipse-2019-09-413)
 1. Run `./gradlew run` to generate all resources and to check if jabref runs. (This step is only required once)
 2. Run `./gradlew eclipse` (This has to be always execute, when there are new upstream changes)
 7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
