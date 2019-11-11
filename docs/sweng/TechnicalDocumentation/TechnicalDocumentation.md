@@ -92,4 +92,13 @@ The following diagrams allow some deeper insights into the working principle of 
 ![image](ActivityDiagramTrackPlainEntry.png)
 
 ### **5.3 Logic**
+To explain the logic some further, we formulated some logic constrains:
 
+- **context** ParserPipeline::parseUsingGrobid **post:** self.grobidPostService != null
+- **context** HttpPostService **inv:** self.url != null
+- **context** ParserPipelineException **inv:** self.detailMessage != null
+- **context** ExtractBibtexDialog **inv:** stateManager != null and stateManager.getActiveDatabase() != null
+- **context** ExtractBibtexDialog::initialize **post:** self.viewModel != null and self.textViewModel != null
+- **context** EntryByPlainTextViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
+- **context** EntryByPlainTextViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
+- **context** EntryByPlainTextViewModel::trackNewEntry **pre:** 
