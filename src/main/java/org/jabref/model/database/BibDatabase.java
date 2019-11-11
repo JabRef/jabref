@@ -37,6 +37,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jbibtex.BibTeXString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -319,9 +320,9 @@ public class BibDatabase {
      * No Duplicate checks are performed
      * @param stringsToAdd The collection of strings to set
      */
-    public void setStrings(Collection<BibtexString> stringsToAdd) {
-        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
-        bibtexStrings = strs;
+    public void setStrings(List<BibtexString> stringsToAdd) {
+        bibtexStrings = new ConcurrentHashMap<>();
+        stringsToAdd.forEach(this::addString);
     }
 
     /**

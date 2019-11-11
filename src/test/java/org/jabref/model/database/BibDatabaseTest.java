@@ -162,12 +162,11 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void setStringAsCollectionWithUpdatedContentOverridesString() {
+    public void setStringAsCollectionWithUpdatedContentThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString newContent = new BibtexString("DSP", "ABCD");
         List<BibtexString> strings = Arrays.asList(string, newContent);
-        database.setStrings(strings);
-        assertEquals(Optional.of(newContent), database.getStringByName("DSP"));
+        assertThrows(KeyCollisionException.class, () -> database.setStrings(strings));
     }
 
     @Test
