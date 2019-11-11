@@ -498,8 +498,12 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData file("$buildDir/jacoco/test.exec"), file("$buildDir/jacoco/fetcherTest.exec")
-    dependsOn test, fetcherTest
+    ignoreFailures = true
+    executionData files(
+            "$buildDir/jacoco/test.exec",
+            "$buildDir/jacoco/databaseTest.exec",
+            "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
+    dependsOn test, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
