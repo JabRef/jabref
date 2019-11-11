@@ -101,4 +101,4 @@ To explain the logic some further, we formulated some logic constrains:
 - **context** ExtractBibtexDialog::initialize **post:** self.viewModel != null and self.textViewModel != null
 - **context** EntryByPlainTextViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
 - **context** EntryByPlainTextViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
-- **context** EntryByPlainTextViewModel::trackNewEntry **pre:** 
+- **context** EntryByPlainTextViewModel::inputTextProperty **pre:** self.inputText != null
