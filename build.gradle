@@ -6,7 +6,7 @@ import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
-// ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
+// ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
 buildscript {
     repositories {
@@ -17,7 +17,6 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'com.gradle.build-scan' version '3.0'
     id "com.simonharrer.modernizer" version '1.8.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.8'
     //id 'net.ltgt.errorprone' version '0.8.1'
@@ -27,8 +26,7 @@ plugins {
     id 'org.beryx.jlink' version '2.16.2'
 }
 
-// use the gradle build scan feature: https://scans.gradle.com/get-started
-buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
+gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -141,6 +139,11 @@ dependencies {
 
     compile 'org.postgresql:postgresql:42.2.8'
 
+    compile ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
+        // causing module issues
+        exclude module: 'oraclepki'
+    }
+
     compile ('com.google.guava:guava:28.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
@@ -171,7 +174,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
-    compile 'de.undercouch:citeproc-java:1.0.1'
+    compile 'de.undercouch:citeproc-java:2.0.0'
 
     compile group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
@@ -404,14 +407,16 @@ run {
             "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
             "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
             "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix"
+            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix",
+            '--add-exports', 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle'
 
     // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
     // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
         ]
 
         addOpens = [
@@ -575,7 +580,8 @@ jlink {
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
-                    '--win-dir-chooser',
+                    // temporarily disabled due to conflict with Jpackage update
+                    //'--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows"

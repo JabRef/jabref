@@ -47,13 +47,7 @@ public class StyleSelectDialogViewModel {
         styles.addAll(loadStyles());
 
         String currentStyle = preferences.getCurrentStyle();
-        Optional<StyleSelectItemViewModel> lastUsedStyle = styles.stream().filter(style -> style.getStylePath().equals(currentStyle)).findFirst();
-
-        if (lastUsedStyle.isPresent()) {
-            selectedItem.setValue(lastUsedStyle.get());
-        } else {
-            selectedItem.setValue(styles.get(0));
-        }
+        selectedItem.setValue(getStyleOrDefault(currentStyle));
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
@@ -75,6 +69,7 @@ public class StyleSelectDialogViewModel {
             if (loader.addStyleIfValid(stylePath)) {
                 preferences.setCurrentStyle(stylePath);
                 styles.setAll(loadStyles());
+                selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file."));
             }
@@ -128,5 +123,9 @@ public class StyleSelectDialogViewModel {
     public void storePrefs() {
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
+    }
+
+    private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
+        return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.get(0));
     }
 }

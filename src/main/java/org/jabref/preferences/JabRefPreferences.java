@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -49,11 +48,13 @@ import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -206,10 +207,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
-    public static final String ARXIV_COLUMN = "arxivColumn";
-    public static final String FILE_COLUMN = "fileColumn";
-    public static final String PREFER_URL_DOI = "preferUrlDoi";
-    public static final String URL_COLUMN = "urlColumn";
     // Colors
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
@@ -357,8 +354,11 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
-    //File linking Options for entry editor
+    // File linking Options for entry editor
     public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
+
+    // String delimiter
+    public static final Character STRINGLIST_DELIMITER = ';';
 
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
@@ -525,8 +525,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "entrytype;author/editor;title;year;journal/booktitle;bibtexkey");
-        defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
+        defaults.put(COLUMN_NAMES, "groups;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey");
+        defaults.put(COLUMN_WIDTHS, "28;28;75;300;470;60;130;100");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -598,11 +598,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // default icon colors
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
-
-        defaults.put(URL_COLUMN, Boolean.TRUE);
-        defaults.put(PREFER_URL_DOI, Boolean.FALSE);
-        defaults.put(FILE_COLUMN, Boolean.TRUE);
-        defaults.put(ARXIV_COLUMN, Boolean.FALSE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -782,7 +777,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
     }
 
     /**
@@ -827,7 +822,7 @@ public class JabRefPreferences implements PreferencesService {
         // last character was escape symbol
         boolean escape = false;
 
-        // true if a ";" is found
+        // true if a STRINGLIST_DELIMITER is found
         boolean done = false;
 
         StringBuilder res = new StringBuilder();
@@ -840,9 +835,9 @@ public class JabRefPreferences implements PreferencesService {
                     escape = true;
                 }
             } else {
-                if (c == ';') {
+                if (c == STRINGLIST_DELIMITER) {
                     if (escape) {
-                        res.append(';');
+                        res.append(STRINGLIST_DELIMITER);
                     } else {
                         done = true;
                     }
@@ -968,7 +963,7 @@ public class JabRefPreferences implements PreferencesService {
                 break;
             }
 
-            customFields.addAll(Arrays.stream(fields.split(";")).map(FieldFactory::parseField).collect(Collectors.toList()));
+            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
             defNumber++;
         }
         return customFields;
@@ -977,7 +972,7 @@ public class JabRefPreferences implements PreferencesService {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(";"));
+        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", fieldNames);
 
         // Entry editor tab 1:
@@ -1066,8 +1061,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with ';' into a single string. Escape
-     * characters make the process transparent even if strings contain ';'.
+     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single
+     * string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -1856,65 +1851,69 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
-    private Map<String, Double> createColumnWidths() {
-        List<String> columns = getStringList(COLUMN_NAMES);
-        List<Double> widths = getStringList(COLUMN_WIDTHS)
-                                                          .stream()
-                                                          .map(string -> {
-                                                              try {
-                                                                  return Double.parseDouble(string);
-                                                              } catch (NumberFormatException e) {
-                                                                  LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                                                                  return ColumnPreferences.DEFAULT_FIELD_LENGTH;
-                                                              }
-                                                          })
-                                                          .collect(Collectors.toList());
+    private List<MainTableColumnModel> createMainTableColumns() {
+        List<String> columnNames = getStringList(COLUMN_NAMES);
+        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return ColumnPreferences.DEFAULT_WIDTH;
+                    }
+                })
+                .collect(Collectors.toList());
 
-        Map<String, Double> map = new TreeMap<>();
-        for (int i = 0; i < columns.size(); i++) {
-            map.put(columns.get(i), widths.get(i));
+        List<MainTableColumnModel> columns = new ArrayList<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            if (i < columnWidths.size()) {
+                columns.add(MainTableColumnModel.parse(columnNames.get(i), columnWidths.get(i)));
+            } else {
+                columns.add(MainTableColumnModel.parse(columnNames.get(i)));
+            }
         }
-        return map;
+        return columns;
     }
 
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
-                getBoolean(FILE_COLUMN),
-                getBoolean(URL_COLUMN),
-                getBoolean(PREFER_URL_DOI),
-                getBoolean(ARXIV_COLUMN),
-                getStringList(COLUMN_NAMES),
-                getBoolean(SPECIALFIELDSENABLED),
-                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
-                getBoolean(SERIALIZESPECIALFIELDS),
+                createMainTableColumns(),
                 getBoolean(EXTRA_FILE_COLUMNS),
-                createColumnWidths(),
                 getMainTableColumnSortTypes());
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putBoolean(FILE_COLUMN, columnPreferences.showFileColumn());
-        putBoolean(URL_COLUMN, columnPreferences.showUrlColumn());
-        putBoolean(PREFER_URL_DOI, columnPreferences.preferDoiOverUrl());
-        putBoolean(ARXIV_COLUMN, columnPreferences.showEprintColumn());
-        putStringList(COLUMN_NAMES, columnPreferences.getColumnNames());
 
-        putBoolean(SPECIALFIELDSENABLED, columnPreferences.getSpecialFieldsEnabled());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, columnPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, columnPreferences.getSerializeSpecialFields());
+        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
+                                                     .map(MainTableColumnModel::getName)
+                                                     .collect(Collectors.toList()));
+
         putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
 
         List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumnNames().forEach(name -> columnWidthsInOrder.add(columnPreferences.getColumnWidths().get(name).toString()));
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
         putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
         setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
     }
 
     public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(
-                                        getColumnPreferences(),
+        return new MainTablePreferences(getColumnPreferences(),
                                         getBoolean(AUTO_RESIZE_MODE));
+    }
+
+    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED),
+                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
+                getBoolean(SERIALIZESPECIALFIELDS));
+    }
+
+    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
+        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.getSpecialFieldsEnabled());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.getSerializeSpecialFields());
     }
 
     @Override

@@ -11,7 +11,7 @@
         // Copy additional installer resources
         fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
 
-        var wxsFilePath = installerConfig + "JabRef.wxs";
+        var wxsFilePath = jabRefRoot + "/buildres/windows/JabRef.wxs";
         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);
         var contents = wxsFile.ReadAll();
         wxsFile.Close();

@@ -51,8 +51,6 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(ConnectionLostEvent connectionLostEvent) {
 
-        jabRefFrame.getDialogService().notify(Localization.lang("Connection lost."));
-
         ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
         ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
