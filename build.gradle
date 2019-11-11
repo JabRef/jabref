@@ -497,18 +497,24 @@ tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
-task jacocoMerge(type: JacocoMerge) {
+task jacocoMergePrep() {
     doFirst {
         // Ignore failures of tests
         tasks.withType(Test) {
             ignoreFailures = true
         }
     }
+}
+test.mustRunAfter jacocoMergePrep
+databaseTest.mustRunAfter jacocoMergePrep
+fetcherTest.mustRunAfter jacocoMergePrep
+
+task jacocoMerge(type: JacocoMerge) {
     executionData files(
             "$buildDir/jacoco/test.exec",
             "$buildDir/jacoco/databaseTest.exec",
             "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn test, databaseTest, fetcherTest
+    dependsOn jacocoMergePrep, test, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
