@@ -163,7 +163,7 @@ public class DuplicateSearch extends SimpleCommand {
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
             compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove()));
-            panel.getDatabase().removeEntries((result.getToRemove());
+            panel.getDatabase().removeEntries(result.getToRemove());
             panel.markBaseChanged();
         }
         // and adding merged entries:
