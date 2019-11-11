@@ -24,8 +24,8 @@ This document illustrates the purpose as well as design (both technical and visu
 #### *ProjectPlan.gan*
 This document contains all tasks that have to be done in order to complete the project. It also contains the dependencies of the tasks. All tasks are assigned to one or more developers, who are responsible for the task.
 
-***NOTE:*** In order to maintain overview over all relevant deadlines and dates, we decided to not use the conversion 1 day = 1 hour in GanttProject. Instead, you can find our estimation of time costs for each task in the tasks notes.
-
 #### *readme.md*
 This document. Contains an overview of all documentation files.
 
+#### *TechnicalDocumentation/TechnicalDocumentation.md*
+This file contains the technical documentation. This includes the design of the project, the working principle and some diagrams for deeper insights.
