@@ -22,13 +22,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.database.event.AllInsertsFinishedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -193,7 +193,7 @@ public class BibDatabase {
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntryEventSource.LOCAL);
+        return insertEntry(entry, EntriesEventSource.LOCAL);
     }
 
     /**
@@ -204,20 +204,20 @@ public class BibDatabase {
      * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntriesEventSource eventSource) throws KeyCollisionException {
         insertEntries(Collections.singletonList(entry), eventSource);
         return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
     public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
-        insertEntries(Arrays.asList(entries), EntryEventSource.LOCAL);
+        insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);
     }
 
     public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
-        insertEntries(entries, EntryEventSource.LOCAL);
+        insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
 
         BibEntry firstEntry = null;
@@ -242,29 +242,41 @@ public class BibDatabase {
         }
     }
 
-    /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
-     * @param toBeDeleted Entry to delete
-     */
-    public synchronized void removeEntry(BibEntry toBeDeleted) {
-        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    public synchronized void removeEntry(BibEntry bibEntry) {
+        removeEntries(Collections.singletonList(bibEntry));
+    }
+
+    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
+        removeEntries(Collections.singletonList(bibEntry), eventSource);
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
+     * Removes the given entries.
+     * The entries removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entries to delete
+     */
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
+        removeEntries(toBeDeleted, EntriesEventSource.LOCAL);
+    }
+
+    /**
+     * Removes the given entries.
+     * The entries are removed based on the id {@link BibEntry#id}
      *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        List<String> ids = new ArrayList<>();
+        for (BibEntry entry : toBeDeleted) {
+            ids.add(entry.getId());
+        }
+        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
-            internalIDs.remove(toBeDeleted.getId());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
+            internalIDs.removeAll(ids);
+            eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
 
@@ -304,12 +316,12 @@ public class BibDatabase {
 
     /**
      * Replaces the existing lists of BibTexString with the given one
-     * No Duplicate checks are performed
+     * Duplicates throw KeyCollisionException
      * @param stringsToAdd The collection of strings to set
      */
-    public void setStrings(Collection<BibtexString> stringsToAdd) {
-        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
-        bibtexStrings = strs;
+    public void setStrings(List<BibtexString> stringsToAdd) {
+        bibtexStrings = new ConcurrentHashMap<>();
+        stringsToAdd.forEach(this::addString);
     }
 
     /**

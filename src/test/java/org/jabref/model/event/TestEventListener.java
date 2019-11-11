@@ -1,8 +1,10 @@
 package org.jabref.model.event;
 
+import java.util.List;
+
 import org.jabref.model.database.event.AllInsertsFinishedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
@@ -12,7 +14,7 @@ public class TestEventListener {
 
     private BibEntry addedEntry;
     private BibEntry firstInsertedEntry;
-    private BibEntry removedEntry;
+    private List<BibEntry> removedEntries;
     private BibEntry changedEntry;
 
     @Subscribe
@@ -26,8 +28,8 @@ public class TestEventListener {
     }
 
     @Subscribe
-    public void listen(EntryRemovedEvent event) {
-        this.removedEntry = event.getBibEntry();
+    public void listen(EntriesRemovedEvent event) {
+        this.removedEntries = event.getBibEntries();
     }
 
     @Subscribe
@@ -43,8 +45,8 @@ public class TestEventListener {
         return firstInsertedEntry;
     }
 
-    public BibEntry getRemovedEntry() {
-        return removedEntry;
+    public List<BibEntry> getRemovedEntries() {
+        return removedEntries;
     }
 
     public BibEntry getChangedEntry() {

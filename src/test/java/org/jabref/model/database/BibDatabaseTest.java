@@ -73,6 +73,38 @@ public class BibDatabaseTest {
     }
 
     @Test
+    public void removeSomeEntriesRemovesThoseEntriesFromEntriesList() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        List<BibEntry> allEntries = Arrays.asList(entry1, entry2, entry3);
+        database.insertEntries(allEntries);
+        List<BibEntry> entriesToDelete = Arrays.asList(entry1, entry3);
+        database.removeEntries(entriesToDelete);
+        assertEquals(Collections.singletonList(entry2), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertTrue(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    public void removeAllEntriesRemovesAllEntriesFromEntriesList() {
+        List<BibEntry> allEntries = new ArrayList<>();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        allEntries.add(entry1);
+        allEntries.add(entry2);
+        allEntries.add(entry3);
+
+        database.removeEntries(allEntries);
+        assertEquals(Collections.emptyList(), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertFalse(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
     public void insertNullEntryThrowsException() {
         assertThrows(NullPointerException.class, () -> database.insertEntry(null));
     }
@@ -130,12 +162,11 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void setStringAsCollectionWithUpdatedContentOverridesString() {
+    public void setStringAsCollectionWithUpdatedContentThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString newContent = new BibtexString("DSP", "ABCD");
         List<BibtexString> strings = Arrays.asList(string, newContent);
-        database.setStrings(strings);
-        assertEquals(Optional.of(newContent), database.getStringByName("DSP"));
+        assertThrows(KeyCollisionException.class, () -> database.setStrings(strings));
     }
 
     @Test
@@ -190,14 +221,16 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void removeEntryPostsRemovedEntryEvent() {
-        BibEntry expectedEntry = new BibEntry();
+    public void removeEntriesPostsRemovedEntriesEvent() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        List<BibEntry> expectedEntries = Arrays.asList(entry1, entry2);
         TestEventListener tel = new TestEventListener();
-        database.insertEntry(expectedEntry);
+        database.insertEntries(expectedEntries);
         database.registerListener(tel);
-        database.removeEntry(expectedEntry);
-        BibEntry actualEntry = tel.getRemovedEntry();
-        assertEquals(expectedEntry, actualEntry);
+        database.removeEntries(expectedEntries);
+        List<BibEntry> actualEntry = tel.getRemovedEntries();
+        assertEquals(expectedEntries, actualEntry);
     }
 
     @Test
