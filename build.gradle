@@ -204,7 +204,6 @@ dependencies {
 
 
     testCompile 'io.github.classgraph:classgraph:4.8.53'
-    testCompile 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
@@ -441,31 +440,49 @@ localization.script = 'scripts/syncLang.py'
 // Test tasks
 test {
     useJUnitPlatform {
-        excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
+        excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
     testLogging {
         // set options for log level LIFECYCLE
-        events "failed"
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
         exceptionFormat "full"
     }
 }
 
 task databaseTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.DatabaseTest'
+    useJUnitPlatform {
+        includeTags 'DatabaseTest'
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
     }
 }
 
 task fetcherTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.FetcherTest'
+    useJUnitPlatform {
+        includeTags 'FetcherTest'
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
     }
 }
 
 task guiTest(type: Test) {
-    useJUnit {
-        includeCategories 'org.jabref.testutils.category.GUITest'
+    useJUnitPlatform {
+        includeTags 'GUITest'
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        exceptionFormat "full"
     }
 }
 
@@ -480,9 +497,24 @@ tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
+task jacocoMergePrep() {
+    doFirst {
+        // Ignore failures of tests
+        tasks.withType(Test) {
+            ignoreFailures = true
+        }
+    }
+}
+test.mustRunAfter jacocoMergePrep
+databaseTest.mustRunAfter jacocoMergePrep
+fetcherTest.mustRunAfter jacocoMergePrep
+
 task jacocoMerge(type: JacocoMerge) {
-    executionData file("$buildDir/jacoco/test.exec"), file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec")
-    dependsOn test, databaseTest, fetcherTest
+    executionData files(
+            "$buildDir/jacoco/test.exec",
+            "$buildDir/jacoco/databaseTest.exec",
+            "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
+    dependsOn jacocoMergePrep, test, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
