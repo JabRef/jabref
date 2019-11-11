@@ -92,7 +92,7 @@ The following diagrams allow some deeper insights into the working principle of 
 ![image](ActivityDiagramTrackPlainEntry.png)
 
 ### **5.3 Logic**
-To explain the logic some further, we formulated some logic constrains:
+To explain the logic some further, we formulated 8 logic constrains:
 
 - **context** ParserPipeline::parseUsingGrobid **post:** self.grobidPostService != null
 - **context** HttpPostService **inv:** self.url != null
