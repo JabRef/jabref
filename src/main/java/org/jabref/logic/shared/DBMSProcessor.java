@@ -22,7 +22,7 @@ import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -475,7 +475,7 @@ public abstract class DBMSProcessor {
 
                 String value = selectEntryResultSet.getString("VALUE");
                 if (value != null) {
-                    bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntryEventSource.SHARED);
+                    bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntriesEventSource.SHARED);
                 }
             }
         } catch (SQLException e) {

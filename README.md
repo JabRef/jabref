@@ -1,4 +1,4 @@
-# JabRef Bibliography Management [![Hacktoberfest](https://img.shields.io/github/hacktoberfest/2019/JabRef/jabref?suggestion_label=hacktoberfest)](https://www.jabref.org/hacktoberfest/2019.html)
+# JabRef Bibliography Management
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)

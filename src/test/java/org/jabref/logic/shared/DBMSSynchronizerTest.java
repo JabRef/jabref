@@ -20,7 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -76,7 +76,7 @@ public class DBMSSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry);
         // should not add into shared database.
-        bibDatabase.insertEntry(furtherEntry, EntryEventSource.SHARED);
+        bibDatabase.insertEntry(furtherEntry, EntriesEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
@@ -97,9 +97,7 @@ public class DBMSSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry); 
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
-    
-        //problem is that we somehow now have an empty entry with no fields maybe due to the all entries event?
-        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntryEventSource.SHARED);
+        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntriesEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
@@ -112,9 +110,8 @@ public class DBMSSynchronizerTest {
     @ParameterizedTest
     @MethodSource("getTestingDatabaseSystems")
     public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-
         setUp(dbmsConnection);
-
+  
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -128,7 +125,7 @@ public class DBMSSynchronizerTest {
         assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
-        bibDatabase.removeEntry(bibEntry, EntryEventSource.SHARED);
+        bibDatabase.removeEntry(bibEntry, EntriesEventSource.SHARED);
 
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());

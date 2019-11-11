@@ -47,6 +47,11 @@ import org.slf4j.LoggerFactory;
  * operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction {
+
+    public enum SaveDatabaseMode {
+        SILENT, NORMAL
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
@@ -120,6 +125,7 @@ public class SaveDatabaseAction {
     }
 
     private boolean doSave() {
+        panel.setSaving(true);
         Path targetPath = panel.getBibDatabaseContext().getDatabasePath().get();
         try {
             // Save the database
@@ -143,8 +149,6 @@ public class SaveDatabaseAction {
                 // Reset title of tab
                 frame.setTabTitle(panel, panel.getTabTitle(),
                                   panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                frame.getDialogService().notify(Localization.lang("Saved library") + " '"
-                             + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
                 frame.setWindowTitle();
                 frame.updateAllTabTitles();
             }
@@ -160,9 +164,14 @@ public class SaveDatabaseAction {
     }
 
     public boolean save() {
+        return save(SaveDatabaseMode.NORMAL);
+    }
+
+    public boolean save(SaveDatabaseMode mode) {
         if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
-            panel.setSaving(true);
+            if (mode == SaveDatabaseMode.NORMAL) {
+                panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
+            }
             return doSave();
         } else {
             Optional<Path> savePath = getSavePath();
