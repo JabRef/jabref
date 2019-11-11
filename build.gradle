@@ -23,7 +23,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.16.2'
+    id 'org.beryx.jlink' version '2.16.3'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -42,8 +42,10 @@ apply from: 'eclipse.gradle'
 
 group = "org.jabref"
 version = "5.0.0"
-sourceCompatibility = 12
-targetCompatibility = 12
+
+sourceCompatibility = 13
+targetCompatibility = 13
+
 mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode

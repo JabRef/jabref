@@ -45,7 +45,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 12.0.2
+        java-version: 13
     - uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
