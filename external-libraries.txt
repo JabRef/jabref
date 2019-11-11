@@ -75,6 +75,11 @@ Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
 License: Apache-2.0
 
+Id:      commons-io:commons-io
+Project: Apache Commons IO
+URL:     http://commons.apache.org/io/
+License: Apache-2.0
+
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
@@ -128,6 +133,11 @@ License: BSD-3-Clause
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang
 URL:     https://commons.apache.org/proper/commons-lang/
+License: Apache-2.0
+
+Id:      org.apache.httpcomponents:httpclient
+Project: Apache HttpComponents
+URL:     https://hc.apache.org/
 License: Apache-2.0
 
 Id:      org.apache.logging.log4j
