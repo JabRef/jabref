@@ -127,7 +127,8 @@ dependencies {
     //compile "org.libreoffice:jurt:6.2.3"
     //compile "org.libreoffice:ridl:6.2.3"
     //compile "org.libreoffice:unoil:6.2.3"
-
+ 
+    compile 'io.github.java-diff-utils:java-diff-utils-parent:4.4'
     compile 'io.github.java-diff-utils:java-diff-utils:4.4'
     compile 'info.debatty:java-string-similarity:1.2.1'
 
