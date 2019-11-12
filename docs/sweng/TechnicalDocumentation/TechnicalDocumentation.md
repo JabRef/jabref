@@ -77,19 +77,19 @@ The following diagrams allow some deeper insights into the working principle of 
 
 **The parsing process**: <br>
 
-![image](SequenceDiagramPipeLine.png)
+![image](SequenceDiagramPipeLine.PNG)
 
 **Client-side http POST request**: <br>
 
-![image](SequenceDiagramHttpClass.png)
+![image](SequenceDiagramHttpClass.PNG)
 
 **GUI interaction process**: <br>
 
-![image](StateDiagramGUI.png)
+![image](StateDiagramGUI.PNG)
 
 **Track plain reference to BibEntry**: <br>
 
-![image](ActivityDiagramTrackPlainEntry.png)
+![image](ActivityDiagramTrackPlainEntry.PNG)
 
 ### **5.3 Logic**
 To explain the logic some further, we formulated 8 logic constrains:
