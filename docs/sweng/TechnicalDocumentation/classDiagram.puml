@@ -1,0 +1,129 @@
+@startuml
+
+
+package gui {
+package bibtexparser {
+  class ExtractBibtexDialog{
+    {field} -Button buttonParse
+    {field} -StateManager stateManager
+    {field} -EntryByPlainTextViewModel textViewModel
+    {field} -BibDatabaseContext database
+
+    {method} +buttonParse.setOnAction --> textViewModel.startParsing();
+    {method} +ExtractBibtexDialog()
+    {method} -initialize()
+    {method} +ViewLoader.view
+
+  }
+
+  class ExtractBibtexDialog.fxml
+
+  ExtractBibtexDialog *-- ExtractBibtexDialog.fxml
+
+}
+
+package entrybyplaintext {
+
+    class EntryValidateDialog{
+
+  this class is not in use right now.
+
+  }
+
+  class EntryValidateDialog.fxml
+
+  EntryValidateDialog *-- EntryValidateDialog.fxml
+
+
+  class EntryByPlainTextViewModel{
+
+
+    {field} -BibDatabaseContext bibDatabaseContext
+    {field} -StringProperty inputText
+    {field} -BibEntry bibEntry
+
+    {method} +startParsing()
+    {method} +parsingFail()
+    {method} -trackNewEntry(EntryType type)
+  }
+
+  class FailedToParseDialog{
+
+    {field} -Button buttonParse
+    {field} -StateManager stateManager
+    {field} -EntryByPlainTextViewModel textViewModel
+    {field} -BibDatabaseContext database
+
+    {method} +buttonParse.setOnAction --> textViewModel.startParsing();
+    {method} +FailedToParseDialog()
+    {method} -initialize()
+    {method} +ViewLoader.view
+
+  }
+
+  class FailedToParseDialog.fxml
+
+  FailedToParseDialog *-- FailedToParseDialog.fxml
+
+  EntryByPlainTextViewModel <-- ExtractBibtexDialog
+}
+}
+
+package logic{
+package plaintextparser{
+  class ParserPipeline{
+
+    {field} {static}  -Logger logger
+    {field} {static}  -String GROBID_PROCESS_CITATIONS_URL
+    {field} {static}  -HttpPostService grobidPostService
+    {field} {static}  -BibEntry bibEntry
+
+    {method} {static} +parsePlainRefCit(String plainText)
+    {method} {static} +parseUsingGrobid(String plainText)
+    {method} {static} +parseTeiToBib(String tei)
+    {method} {static} -parseBibToBibEntry(String bibtexString)
+  }
+
+  class ParserPipelineException{
+
+  {method} +ParserPipelineException(String reason)
+
+  }
+}
+
+package net{
+
+  class HttpPostService{
+    
+    {field} {static} -HttpClient httpclient
+    {field}          -URI url
+
+    {method} {static} +HttpPostService(String url)
+    {method}          +HttpPostService(URL url)
+    {method}          -prepareHttpPost(Map<String, String> params)
+
+
+  }
+
+
+}
+
+package importer {
+  package fileformat{
+    package mods{
+      class BibtexParser{
+        {method} {static} +singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
+      }
+    }
+  }
+}
+
+}
+
+ParserPipeline *-- HttpPostService
+ParserPipeline *-- BibtexParser
+ParserPipelineException --- ParserPipeline
+EntryByPlainTextViewModel o-- ParserPipeline
+
+
+@enduml
