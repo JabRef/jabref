@@ -13,6 +13,7 @@
             <children>
                 <!--TODO: add localization (%)-->
                 <Label text="Extraction failed please check the text you tried to parse:" />
+                <CheckBox fx:id="directAddBox" text="Add entry to opened library" />
                 <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0"/>
             </children>
         </VBox>

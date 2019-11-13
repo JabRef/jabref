@@ -20,6 +20,7 @@ public class EntryByPlainTextViewModel {
 
   private final StringProperty inputText = new SimpleStringProperty("");
   private final BibDatabaseContext bibDatabaseContext;
+  private boolean directAdd;
   private final BibDatabaseContext newDatabaseContext;
 
 
@@ -37,23 +38,33 @@ public class EntryByPlainTextViewModel {
 
   }
 
-  public void startParsing(){
-    //TODO: Add method to start the parsing of the text
+  public void startParsing(boolean directAdd){
+    this.directAdd = directAdd;
+    executeParse();
+  }
 
-    if(ParserPipeline.parsePlainRefCit(inputText.getValue()).isPresent()){
-      BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
+  public void executeParse(){
+      if(ParserPipeline.parsePlainRefCit(inputText.getValue()).isPresent()){
+          BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
+          parsingSuccess(bibEntry);
+      } else{
+          parsingFail(inputTextProperty().getValue());
+      }
+  }
 
-      this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-      newDatabaseContext.getDatabase().insertEntry(bibEntry);
-      newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
-      JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
-
-      JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
-      trackNewEntry(StandardEntryType.Article);
+  public void parsingSuccess(BibEntry bibEntry){
+      if(directAdd) {
+          //TODO: add to open library
+          this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+          JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
+          trackNewEntry(StandardEntryType.Article);
+      }else{
+          //TODO: add to parsed (new temporary) library
+          newDatabaseContext.getDatabase().insertEntry(bibEntry);
+          newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+          JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
+      }
       JabRefGUI.getMainFrame().getDialogService().notify("Successfully added a new entry.");
-    } else{
-      parsingFail(inputTextProperty().getValue());
-    }
   }
 
   public void parsingFail(String input){
