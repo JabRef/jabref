@@ -32,7 +32,7 @@
                             </columnConstraints>
                             <Label text="%Library encoding" />
                             <ComboBox fx:id="encoding" prefWidth="250.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                            <Label text="%Database mode" GridPane.rowIndex="2" />
+                            <Label text="%Library mode" GridPane.rowIndex="2" />
                             <ComboBox fx:id="databaseMode" prefWidth="250.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
                      <columnConstraints>
                         <ColumnConstraints />
