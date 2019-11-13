@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -40,6 +41,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
@@ -153,6 +155,13 @@ public class BibTeXMLExporter extends Exporter {
                 JAXBElement<BigInteger> number = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, "number"),
                         BigInteger.class, new BigInteger(value));
                 inbook.getContent().add(number);
+            } else if (StandardField.MONTH.equals(key)) {
+                Optional<Month> month = bibEntry.getMonth();
+                if (month.isPresent()) {
+                    JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key.getName()),
+                            String.class, month.get().getFullName());
+                    inbook.getContent().add(element);
+                }
             } else {
                 JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key.getName()), String.class,
                         value);
@@ -203,6 +212,12 @@ public class BibTeXMLExporter extends Exporter {
                             method.invoke(entryType, new BigInteger(value));
                         } catch (NumberFormatException exception) {
                             LOGGER.warn("The value %s of the 'number' field is not an integer and thus is ignored for the export", value);
+                        }
+                        break;
+                    } else if (StandardField.MONTH.equals(key)) {
+                        Optional<Month> month = bibEntry.getMonth();
+                        if (month.isPresent()) {
+                            method.invoke(entryType, month.get().getFullName());
                         }
                         break;
                     } else {
