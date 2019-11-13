@@ -2,7 +2,9 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -18,6 +20,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
@@ -29,6 +32,7 @@ public class LibraryPropertiesDialogViewModel {
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
     private final ObjectProperty<Charset> selectedEncodingPropety = new SimpleObjectProperty<>(Encodings.getCharsets().get(0));
+    private final SimpleStringProperty selectedDatabaseModeProperty = new SimpleStringProperty(BibDatabaseMode.BIBLATEX.getFormattedName());
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
     private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
     private final BooleanProperty protectDisableProperty = new SimpleBooleanProperty();
@@ -55,6 +59,7 @@ public class LibraryPropertiesDialogViewModel {
 
         Optional<Charset> charset = metaData.getEncoding();
         selectedEncodingPropety.setValue(charset.orElse(preferencesService.getDefaultEncoding()));
+        selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX).getFormattedName());
 
         Optional<String> fileD = metaData.getDefaultFileDirectory();
         fileD.ifPresent(path -> generalFileDirectoryProperty.setValue(path.trim()));
@@ -86,6 +91,18 @@ public class LibraryPropertiesDialogViewModel {
 
     public ListProperty<Charset> encodingsProperty() {
         return this.encodingsProperty;
+    }
+
+    public ListProperty<String> databaseModesProperty() {
+        return new SimpleListProperty<>(FXCollections.observableArrayList(
+                Arrays.stream(BibDatabaseMode.values())
+                        .map(BibDatabaseMode::getFormattedName)
+                        .collect(Collectors.toList())
+        ));
+    }
+
+    public SimpleStringProperty selectedDatabaseModeProperty() {
+        return this.selectedDatabaseModeProperty;
     }
 
     public ObjectProperty<Charset> selectedEncodingProperty() {
