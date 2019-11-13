@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 
 
 import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import org.jabref.logic.plaintextparser.ParserPipeline;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -36,9 +37,10 @@ public class EntryByPlainTextViewModel {
     //TODO: Add method to start the parsing of the text
 
     if(ParserPipeline.parsePlainRefCit(inputText.getValue()).isPresent()){
-    BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
-    this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-    trackNewEntry(StandardEntryType.Article);
+      BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
+      this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+      JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
+      trackNewEntry(StandardEntryType.Article);
     } else{
       parsingFail(inputTextProperty().getValue());
     }
