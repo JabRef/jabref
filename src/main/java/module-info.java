@@ -55,7 +55,6 @@ open module org.jabref {
     requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
-    requires httpclient;
     requires com.github.tomtung.latex2unicode;
     requires jbibtex;
     requires citeproc.java;
@@ -65,4 +64,8 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
+    requires org.apache.httpcomponents.httpcore;
+    requires org.apache.httpcomponents.httpclient;
+    //requires org.apache.httpcomponents.httpasyncclient;
+    requires org.apache.commons.io;
 }
