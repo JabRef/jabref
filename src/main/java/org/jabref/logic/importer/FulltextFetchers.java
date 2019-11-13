@@ -3,11 +3,12 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -34,7 +35,7 @@ public class FulltextFetchers {
     // Timeout in seconds
     private static final int FETCHER_TIMEOUT = 10;
 
-    private final List<FulltextFetcher> finders = new ArrayList<>();
+    private final Set<FulltextFetcher> finders = new HashSet<>();
 
     private final Predicate<String> isPDF = url -> {
         try {
@@ -49,7 +50,7 @@ public class FulltextFetchers {
         this(WebFetchers.getFullTextFetchers(importFormatPreferences));
     }
 
-    FulltextFetchers(List<FulltextFetcher> fetcher) {
+    FulltextFetchers(Set<FulltextFetcher> fetcher) {
         finders.addAll(fetcher);
     }
 
@@ -108,7 +109,7 @@ public class FulltextFetchers {
         };
     }
 
-    private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
+    private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {
         return fetchers.stream()
                 .map(f -> getCallable(entry, f))
                 .collect(Collectors.toList());

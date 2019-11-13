@@ -59,13 +59,14 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires commons.lang3;
+    requires org.graalvm.js;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
     requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.httpclient;
-    //requires org.apache.httpcomponents.httpasyncclient;
     requires org.apache.commons.io;
+    requires org.jsoup;
+    requires commons.csv;
 }

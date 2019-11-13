@@ -10,7 +10,7 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.impl.MutableLogEvent;
 import org.apache.logging.log4j.plugins.Plugin;
-
+import org.apache.logging.log4j.plugins.PluginFactory;
 
 @Plugin(name = "GuiAppender", category = "Core", elementType = "appender", printObject = true)
 @SuppressWarnings("unused") // class is indirectly constructed by log4j
@@ -20,7 +20,7 @@ public class GuiAppender extends AbstractAppender {
         super(name, filter, null, ignoreExceptions, properties);
     }
 
-    @PluginBuilderFactory
+    @PluginFactory
     public static <B extends GuiAppender.Builder<B>> B newBuilder() {
         return new GuiAppender.Builder<B>().asBuilder();
     }

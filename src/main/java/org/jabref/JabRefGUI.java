@@ -54,8 +54,6 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-        applyFontRenderingTweak();
-
         GUIGlobals.init();
 
         LOGGER.debug("Initializing frame");
@@ -90,7 +88,6 @@ public class JabRefGUI {
                 event.consume();
             }
         });
-
         Platform.runLater(this::openDatabases);
     }
 
@@ -177,6 +174,7 @@ public class JabRefGUI {
         for (int i = 0; (i < bibDatabases.size()) && (i < mainFrame.getBasePanelCount()); i++) {
             ParserResult pr = bibDatabases.get(i);
             BasePanel panel = mainFrame.getBasePanelAt(i);
+
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 
@@ -227,15 +225,6 @@ public class JabRefGUI {
             }
         }
         return false;
-    }
-
-    private void applyFontRenderingTweak() {
-        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering setting.
-        // See https://github.com/woky/javafx-hates-linux
-        if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
-            System.setProperty("prism.text", "t2k");
-            System.setProperty("prism.lcdtext", "true");
-        }
     }
 
     public static JabRefFrame getMainFrame() {

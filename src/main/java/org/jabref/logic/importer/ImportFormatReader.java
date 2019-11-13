@@ -15,7 +15,6 @@ import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
-import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -58,7 +57,6 @@ public class ImportFormatReader {
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
-        formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());

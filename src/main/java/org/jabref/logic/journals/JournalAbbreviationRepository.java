@@ -12,7 +12,8 @@ import java.util.Set;
  */
 public class JournalAbbreviationRepository {
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(16000); // We have over 15.000 abbreviations in the built-in lists
+    // We have over 15.000 abbreviations in the built-in lists
+    private final Set<Abbreviation> abbreviations = new HashSet<>(16000);
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
         for (Abbreviation abbreviation : abbreviations) {
@@ -22,13 +23,15 @@ public class JournalAbbreviationRepository {
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
-                || name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+                || name.equalsIgnoreCase(abbreviation.getAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
-        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+        boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         return isAbbreviated && !isExpanded;
     }
@@ -67,10 +70,7 @@ public class JournalAbbreviationRepository {
         Objects.requireNonNull(abbreviation);
 
         // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
-        if (abbreviations.contains(abbreviation)) {
-            abbreviations.remove(abbreviation);
-        }
-
+        abbreviations.remove(abbreviation);
         abbreviations.add(abbreviation);
     }
 
@@ -86,11 +86,15 @@ public class JournalAbbreviationRepository {
         return getAbbreviation(text).map(abbreviation -> abbreviation.getNext(text));
     }
 
+    public Optional<String> getDefaultAbbreviation(String text) {
+        return getAbbreviation(text).map(Abbreviation::getAbbreviation);
+    }
+
     public Optional<String> getMedlineAbbreviation(String text) {
         return getAbbreviation(text).map(Abbreviation::getMedlineAbbreviation);
     }
 
-    public Optional<String> getIsoAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getIsoAbbreviation);
+    public Optional<String> getShortestUniqueAbbreviation(String text) {
+        return getAbbreviation(text).map(Abbreviation::getShortestUniqueAbbreviation);
     }
 }

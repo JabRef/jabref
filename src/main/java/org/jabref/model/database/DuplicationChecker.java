@@ -1,11 +1,12 @@
 package org.jabref.model.database;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
@@ -92,10 +93,13 @@ public class DuplicationChecker {
     }
 
     @Subscribe
-    public void listen(EntryRemovedEvent entryRemovedEvent) {
-        Optional<String> citeKey = entryRemovedEvent.getBibEntry().getCiteKeyOptional();
-        if (citeKey.isPresent()) {
-            removeKeyFromSet(citeKey.get());
+    public void listen(EntriesRemovedEvent entriesRemovedEvent) {
+        List<BibEntry> entries = entriesRemovedEvent.getBibEntries();
+        for (BibEntry entry : entries) {
+            Optional<String> citeKey = entry.getCiteKeyOptional();
+            if (citeKey.isPresent()) {
+                removeKeyFromSet(citeKey.get());
+            }
         }
     }
 

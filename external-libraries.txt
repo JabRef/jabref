@@ -1,7 +1,7 @@
 This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
-One can list all depdencies by using Gradle task `depdencyReport`.
+One can list all dependencies by using Gradle task `dependencyReport`.
 It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
 
 # Legend
@@ -16,7 +16,7 @@ Note that the SPDX license identifiers are different from the ones used by debia
 
 # Fonts and Icons
 
-The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
+The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under license CC0 1.0.
 
 Id:      material-design-icons.font
 Project: Material Design Icons
@@ -50,9 +50,9 @@ Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
 License: BSD-3-Clause
 
-Id:      com.mashape.unirest
+Id:      com.konghq.unirest
 Project: Unirest for Java
-URL:     https://github.com/Mashape/unirest-java
+URL:     https://github.com/Kong/unirest-java
 License: MIT
 
 Id:      com.microsoft.azure:applicationinsights-core
@@ -64,6 +64,11 @@ Id:      com.microsoft.azure:applicationinsights-logging-log4j2
 Project: Application Insights SDK for Java
 URL:     https://github.com/Microsoft/ApplicationInsights-Java
 License: MIT
+
+Id:      com.oracle.ojdbc:ojdbc10
+Project: Oracle's JDBC drivers
+URL:     https://medium.com/oracledevs/oracle-jdbc-drivers-on-maven-central-64fcf724d8b
+License: Proprietary
 
 Id:      com.sibvisions.external.jvxfx:DnDTabPane
 Project: Drag'n'Drop TabPane
@@ -129,6 +134,11 @@ Id:      org.antlr:antlr4
 Project: ANTLR 4
 URL:     http://www.antlr.org/
 License: BSD-3-Clause
+
+Id:      org.apache.commons:commons-csv
+Project: Apache Commons CSV
+URL:     https://commons.apache.org/proper/commons-csv/
+License: Apache-2.0
 
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang

@@ -10,7 +10,6 @@ import java.util.List;
 public enum StandardFileType implements FileType {
     BIBTEXML("bibx", "xml"),
     ENDNOTE("ref", "enw"),
-    FREECITE("txt", "xml"),
     ISI("isi", "txt"),
     MEDLINE("nbib", "xml"),
     MEDLINE_PLAIN("nbib", "txt"),

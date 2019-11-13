@@ -3,8 +3,9 @@ package org.jabref.model.database;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
@@ -32,8 +33,12 @@ public class KeyChangeListener {
     }
 
     @Subscribe
-    public void listen(EntryRemovedEvent event) {
-        event.getBibEntry().getCiteKeyOptional().ifPresent(oldKey -> updateEntryLinks(null, oldKey));
+    public void listen(EntriesRemovedEvent event) {
+        List<BibEntry> entries = event.getBibEntries();
+        for (BibEntry entry : entries) {
+            Optional<String> citeKey = entry.getCiteKeyOptional();
+            citeKey.ifPresent(oldkey -> updateEntryLinks(null, oldkey));
+        }
     }
 
     private void updateEntryLinks(String newKey, String oldKey) {

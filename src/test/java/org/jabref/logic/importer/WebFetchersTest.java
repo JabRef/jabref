@@ -1,6 +1,6 @@
 package org.jabref.logic.importer;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,20 +10,19 @@ import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.reflections.Reflections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-// TODO: Reenable as soon as https://github.com/ronmamo/reflections/issues/202 is fixed
-@Disabled
 class WebFetchersTest {
 
-    private Reflections reflections = new Reflections("org.jabref");
     private ImportFormatPreferences importFormatPreferences;
+    private ClassGraph classGraph = new ClassGraph().enableAllInfo().whitelistPackages("org.jabref");
 
     @BeforeEach
     void setUp() throws Exception {
@@ -32,55 +31,74 @@ class WebFetchersTest {
 
     @Test
     void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws Exception {
-        List<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
+        Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
 
-        Set<Class<? extends IdBasedFetcher>> expected = reflections.getSubTypesOf(IdBasedFetcher.class);
-        expected.remove(AbstractIsbnFetcher.class);
-        expected.remove(IdBasedParserFetcher.class);
-        // Remove special ISBN fetcher since we don't want to expose them to the user
-        expected.remove(IsbnViaChimboriFetcher.class);
-        expected.remove(IsbnViaEbookDeFetcher.class);
-        expected.remove(IsbnViaOttoBibFetcher.class);
-        assertEquals(expected, getClasses(idFetchers));
+        try (ScanResult scanResult = classGraph.scan()) {
+
+            ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
+
+            expected.remove(AbstractIsbnFetcher.class);
+            expected.remove(IdBasedParserFetcher.class);
+            // Remove special ISBN fetcher since we don't want to expose them to the user
+            expected.remove(IsbnViaChimboriFetcher.class);
+            expected.remove(IsbnViaEbookDeFetcher.class);
+            expected.remove(IsbnViaOttoBibFetcher.class);
+            assertEquals(expected, getClasses(idFetchers));
+        }
     }
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        List<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
 
-        Set<Class<? extends EntryBasedFetcher>> expected = reflections.getSubTypesOf(EntryBasedFetcher.class);
-        expected.remove(EntryBasedParserFetcher.class);
-        expected.remove(MrDLibFetcher.class);
-        assertEquals(expected, getClasses(idFetchers));
+        try (ScanResult scanResult = classGraph.scan()) {
+            ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
+
+            expected.remove(EntryBasedParserFetcher.class);
+            expected.remove(MrDLibFetcher.class);
+            assertEquals(expected, getClasses(idFetchers));
+        }
     }
 
     @Test
     void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        List<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        try (ScanResult scanResult = classGraph.scan()) {
+            ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
-        Set<Class<? extends SearchBasedFetcher>> expected = reflections.getSubTypesOf(SearchBasedFetcher.class);
-        expected.remove(SearchBasedParserFetcher.class);
-        assertEquals(expected, getClasses(searchBasedFetchers));
+            expected.remove(SearchBasedParserFetcher.class);
+            assertEquals(expected, getClasses(searchBasedFetchers));
+        }
     }
 
     @Test
     void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
-        List<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
+        Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
 
-        Set<Class<? extends FulltextFetcher>> expected = reflections.getSubTypesOf(FulltextFetcher.class);
-        assertEquals(expected, getClasses(fullTextFetchers));
+        try (ScanResult scanResult = classGraph.scan()) {
+            ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
+            assertEquals(expected, getClasses(fullTextFetchers));
+        }
     }
 
     @Test
     void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
-        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
+        Set<IdFetcher> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
-        Set<Class<? extends IdFetcher>> expected = reflections.getSubTypesOf(IdFetcher.class);
-        expected.remove(IdParserFetcher.class);
-        assertEquals(expected, getClasses(idFetchers));
+        try (ScanResult scanResult = classGraph.scan()) {
+            ClassInfoList controlClasses = scanResult.getClassesImplementing(IdFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
+
+            expected.remove(IdParserFetcher.class);
+            assertEquals(expected, getClasses(idFetchers));
+        }
     }
 
-    private Set<? extends Class<?>> getClasses(List<?> objects) {
+    private Set<? extends Class<?>> getClasses(Collection<?> objects) {
         return objects.stream().map(Object::getClass).collect(Collectors.toSet());
     }
 }
