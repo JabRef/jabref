@@ -6,7 +6,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import org.apache.http.nio.client.HttpAsyncClient;
 
 /**
  * Makes it easy to send http post requests
@@ -24,8 +22,7 @@ import org.apache.http.nio.client.HttpAsyncClient;
  */
 public class HttpPostService {
 
-    private static final HttpClient HTTP_CLIENT = HttpClients.createDefault();
-    private static final HttpAsyncClient ASYNC_HTTP_CLIENT = HttpAsyncClients.createDefault();
+    private static final HttpClient HTTP_CLIENT = HttpClients.createSystem();
 
     public static HttpResponse sendPostAndWait(String url, String subUrl, Map<String, String> params) throws HttpPostServiceException {
         try {
@@ -37,24 +34,6 @@ public class HttpPostService {
 
     public static HttpResponse sendPostAndWait(String url, Map<String, String> params) throws HttpPostServiceException {
         return sendPostAndWait(url, "", params);
-    }
-
-    public static Future<HttpResponse> sendPost(String url,
-                                                String subUrl,
-                                         Map<String, String> params,
-                                         FutureCallback<HttpResponse> httpResponseHandler) throws HttpPostServiceException {
-        try {
-            return ASYNC_HTTP_CLIENT.execute(prepareHttpPost(url, subUrl, params), httpResponseHandler);
-        } catch (IOException e) {
-            throw new HttpPostServiceException();
-        }
-    }
-
-    public static Future<HttpResponse> sendPost(String url,
-                                                String subUrl,
-                                         Map<String, String> params) throws HttpPostServiceException {
-        return sendPost(url, subUrl, params, null);
-
     }
 
     private static HttpPost prepareHttpPost(String url, String urlSubPath, Map<String, String> params) throws UnsupportedEncodingException {
