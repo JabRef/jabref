@@ -9,7 +9,7 @@ The JabRef UI is offered in multiple languages. It should be easy for translator
 * Use [Crowdin](http://crowdin.com/)
 * Use [popeye](https://github.com/JabRef/popeye)
 * Use [Lingohub](https://lingohub.com/)
-* Keep current GitHub flow. See the [Step-by-step guide](https://github.com/JabRef/help.jabref.org/blob/d5569bebdb0e1de5c71401bbfba45311c19c80a8/en/TranslatingGUI.md#step-by-step-guide).
+* Keep current GitHub flow. See the [Step-by-step guide](https://docs.jabref.org/faq/how-to-translate-the-ui).
 
 ## Decision Outcome
 

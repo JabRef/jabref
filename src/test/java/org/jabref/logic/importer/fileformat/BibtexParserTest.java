@@ -1715,7 +1715,7 @@ class BibtexParserTest {
 
     @Test
     void parseEntryUsingStringConstantsForTwoAuthorsWithEtAsStringConstant() throws ParseException {
-        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        // source of the example: https://docs.jabref.org/fields/strings
         Collection<BibEntry> parsed = parser
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
@@ -1731,7 +1731,7 @@ class BibtexParserTest {
 
     @Test
     void parseStringConstantsForTwoAuthorsHasCorrectBibTeXEntry() throws ParseException {
-        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        // source of the example: https://docs.jabref.org/fields/strings
         Collection<BibEntry> parsed = parser
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
@@ -1747,7 +1747,7 @@ class BibtexParserTest {
 
     @Test
     void parseStringConstantsForTwoAuthors() throws ParseException {
-        // source of the example: https://github.com/JabRef/help.jabref.org/blob/gh-pages/en/Strings.md
+        // source of the example: https://docs.jabref.org/fields/strings
         Collection<BibEntry> parsed = parser
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
