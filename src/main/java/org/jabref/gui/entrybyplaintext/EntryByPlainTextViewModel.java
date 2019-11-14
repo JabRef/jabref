@@ -55,14 +55,15 @@ public class EntryByPlainTextViewModel {
   public void parsingSuccess(BibEntry bibEntry){
       if(directAdd) {
           //TODO: add to open library
-          this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-          JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
-          trackNewEntry(StandardEntryType.Article);
-      }else{
-          //TODO: add to parsed (new temporary) library
           newDatabaseContext.getDatabase().insertEntry(bibEntry);
           newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
           JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
+      }else{
+          this.bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+          JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
+          trackNewEntry(StandardEntryType.Article);
+          //TODO: add to parsed (new temporary) library
+
       }
       JabRefGUI.getMainFrame().getDialogService().notify("Successfully added a new entry.");
   }
