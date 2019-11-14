@@ -26,41 +26,38 @@ public class HttpPostService {
 
     private static final HttpClient HTTP_CLIENT = HttpClients.createDefault();
     private static final HttpAsyncClient ASYNC_HTTP_CLIENT = HttpAsyncClients.createDefault();
-    private String url; //The root URL
 
-    public HttpPostService(String url) {
-        this.url = url;
-    }
-
-    public HttpResponse sendPostAndWait(String subUrl, Map<String, String> params) throws HttpPostServiceException {
+    public static HttpResponse sendPostAndWait(String url, String subUrl, Map<String, String> params) throws HttpPostServiceException {
         try {
-            return HTTP_CLIENT.execute(prepareHttpPost(params, subUrl));
+            return HTTP_CLIENT.execute(prepareHttpPost(url, subUrl, params));
         } catch (IOException e) {
             throw new HttpPostServiceException();
         }
     }
 
-    public HttpResponse sendPostAndWait(Map<String, String> params) throws HttpPostServiceException {
-        return sendPostAndWait("", params);
+    public static HttpResponse sendPostAndWait(String url, Map<String, String> params) throws HttpPostServiceException {
+        return sendPostAndWait(url, "", params);
     }
 
-    public Future<HttpResponse> sendPost(String subUrl,
+    public static Future<HttpResponse> sendPost(String url,
+                                                String subUrl,
                                          Map<String, String> params,
                                          FutureCallback<HttpResponse> httpResponseHandler) throws HttpPostServiceException {
         try {
-            return ASYNC_HTTP_CLIENT.execute(prepareHttpPost(params, subUrl), httpResponseHandler);
+            return ASYNC_HTTP_CLIENT.execute(prepareHttpPost(url, subUrl, params), httpResponseHandler);
         } catch (IOException e) {
             throw new HttpPostServiceException();
         }
     }
 
-    public Future<HttpResponse> sendPost(String subUrl,
+    public static Future<HttpResponse> sendPost(String url,
+                                                String subUrl,
                                          Map<String, String> params) throws HttpPostServiceException {
-        return sendPost(subUrl, params, null);
+        return sendPost(url, subUrl, params, null);
 
     }
 
-    private HttpPost prepareHttpPost(Map<String, String> params, String urlSubPath) throws UnsupportedEncodingException {
+    private static HttpPost prepareHttpPost(String url, String urlSubPath, Map<String, String> params) throws UnsupportedEncodingException {
         HttpPost httpPost = new HttpPost(url + urlSubPath);
         List<BasicNameValuePair> parameterList = new ArrayList<>();
         for (Map.Entry<String, String> e: params.entrySet()) {
@@ -70,10 +67,9 @@ public class HttpPostService {
         return httpPost;
     }
 
-    private HttpPost prepareHttpPost(Map<String, String> params) throws UnsupportedEncodingException {
-      return prepareHttpPost(params, "");
+    private static HttpPost prepareHttpPost(String url, Map<String, String> params) throws UnsupportedEncodingException {
+      return prepareHttpPost(url, "", params);
     }
-
 
 
 }
