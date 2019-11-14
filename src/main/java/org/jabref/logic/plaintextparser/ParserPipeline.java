@@ -17,8 +17,11 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeSet;
+import java.util.concurrent.Future;
 
 /**
  * This class is used to help making new entries faster by parsing a String.
@@ -37,12 +40,24 @@ public class ParserPipeline {
      * @param plainText Plain reference citation to be parsed.
      * @return The BibEntry, if creation was possible.
      */
-    public static Optional<BibEntry> parsePlainRefCit(String plainText) {
+    public static List<Future<BibEntry>> parsePlainRefCit(String plainText) {
         try {
+          TreeSet<String> plainReferences = new TreeSet<>();
+          String[] plainReferencesArray = plainText.split(";;;");
+          for (int i = 0; i < plainReferencesArray.length; i++) {
+            plainReferences.add(plainReferencesArray[i].trim());
+          }
+          plainReferences.remove("");
+          if (plainReferences.size() == 0) {
+            throw new ParserPipelineException("Your entered References are empty.");
+          } else if (plainReferences.size() == 1) {
             return parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(plainText)));
+          } else {
+
+          }
         } catch (ParserPipelineException e) {
         LOGGER.error("ParserPipeline Failed. Reason: "+e.getMessage());
-        return Optional.empty();
+        return null;
         }
     }
 
