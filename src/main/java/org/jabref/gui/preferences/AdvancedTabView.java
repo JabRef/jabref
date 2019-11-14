@@ -44,6 +44,9 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
+    @FXML private CheckBox customGrobidServer;
+    @FXML private Label grobidServerAddressLabel;
+    @FXML private TextField grobidServerAddress;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -109,6 +112,12 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
             validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
         });
+
+        customGrobidServer.selectedProperty().bindBidirectional(viewModel.useCustomGrobidServer());
+        customGrobidServer.selectedProperty().addListener(((observable, oldValue, newValue) -> grobidServerReset(newValue)));
+        grobidServerAddress.textProperty().bindBidirectional(viewModel.customGrobidServer());
+        grobidServerAddress.disableProperty().bind(viewModel.useCustomGrobidServer().not());
+        grobidServerAddressLabel.disableProperty().bind(viewModel.useCustomGrobidServer().not());
     }
 
     private void proxyPasswordReveal(MouseEvent event) {
@@ -126,5 +135,11 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
         }
+    }
+
+    private void grobidServerReset(boolean newObservedValue) {
+      if (!newObservedValue) {
+        grobidServerAddress.setText((String) preferences.defaults.get(JabRefPreferences.CUSTOM_GROBID_SERVER));
+      }
     }
 }
