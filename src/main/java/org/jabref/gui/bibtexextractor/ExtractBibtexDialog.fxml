@@ -12,7 +12,7 @@
         <VBox fx:id="contentVbox" minHeight="-Infinity" prefHeight="200.0" prefWidth="100.0">
         <children>
             <!--TODO: localize checkboxtext-->
-            <CheckBox fx:id="directAddBox" text="Add entry to opened library" />
+            <CheckBox fx:id="directAddBox" text="Add entry to new library" />
             <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0"/>
         </children>
         </VBox>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -13,8 +11,8 @@
             <children>
                 <!--TODO: add localization (%)-->
                 <Label text="Extraction failed please check the text you tried to parse:" />
-                <CheckBox fx:id="directAddBox" text="Add entry to opened library" />
-                <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0"/>
+                <CheckBox fx:id="directAddBox" text="Add entry to new library" />
+                <TextArea fx:id="input" minHeight="-Infinity" prefHeight="350.0" prefWidth="586.0" editable="true"/>
             </children>
         </VBox>
     </content>
