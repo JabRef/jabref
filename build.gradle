@@ -445,7 +445,8 @@ test {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        // for debugging tests: add "STANDARD_OUT", "STANDARD_ERROR"
+        events = ["FAILED"]
         exceptionFormat "full"
     }
 }
