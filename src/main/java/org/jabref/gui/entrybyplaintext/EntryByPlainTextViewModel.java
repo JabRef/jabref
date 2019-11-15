@@ -1,12 +1,17 @@
 package org.jabref.gui.entrybyplaintext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.logic.plaintextparser.ParserPipeline;
 import org.jabref.model.Defaults;
@@ -22,7 +27,7 @@ public class EntryByPlainTextViewModel {
   private final BibDatabaseContext bibDatabaseContext;
   private boolean directAdd;
   private final BibDatabaseContext newDatabaseContext;
-
+  private List<BibEntry> extractedEntries;
 
 
   public EntryByPlainTextViewModel(BibDatabaseContext bibDatabaseContext){
@@ -40,13 +45,18 @@ public class EntryByPlainTextViewModel {
 
   public void startParsing(boolean directAdd){
     this.directAdd = directAdd;
-    executeParse();
+    this.extractedEntries = null;
+    JabRefExecutorService.INSTANCE.execute(() -> {
+        this.extractedEntries = ParserPipeline.parsePlainRefCit(inputText.getValue());
+        Platform.runLater(this::executeParse);
+    });
   }
 
   public void executeParse(){
-      if(ParserPipeline.parsePlainRefCit(inputText.getValue()).isPresent()){
-          BibEntry bibEntry = ParserPipeline.parsePlainRefCit(inputText.getValue()).get();
-          parsingSuccess(bibEntry);
+      if(extractedEntries.size() > 0){
+          for (BibEntry bibEntry: extractedEntries) {
+              parsingSuccess(bibEntry);
+          }
       } else{
           parsingFail(inputText.getValue());
       }

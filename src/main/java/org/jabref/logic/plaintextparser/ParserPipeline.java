@@ -29,7 +29,7 @@ public class ParserPipeline {
      * @param plainText Plain reference citation to be parsed.
      * @return The BibEntry, if creation was possible.
      */
-    public static List<Optional<BibEntry>> parsePlainRefCit(String plainText) {
+    public static List<BibEntry> parsePlainRefCit(String plainText) {
         try {
             TreeSet<String> plainReferences = new TreeSet<>();
             String[] plainReferencesArray = plainText.split(";;");
@@ -40,15 +40,15 @@ public class ParserPipeline {
             if (plainReferences.size() == 0) {
                 throw new ParserPipelineException("Your entered References are empty.");
             } else {
-                ArrayList<Optional<BibEntry>> resultsList = new ArrayList<>();
+                ArrayList<BibEntry> resultsList = new ArrayList<>();
                 for (String reference: plainReferences) {
-                    resultsList.add(parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(reference))));
+                    parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(reference))).ifPresent(resultsList::add);
                 }
                 return resultsList;
             }
         } catch (ParserPipelineException e) {
         LOGGER.error("ParserPipeline Failed. Reason: "+e.getMessage());
-        return null;
+        return new ArrayList<>();
         }
     }
 
@@ -65,6 +65,7 @@ public class ParserPipeline {
     }
 
     private static String parseTeiToBib(String tei) {
+        System.out.println(tei);
         //TODO: THIS IS A DUMMY METHOD RIGHT NOW, SHOULD BE IMPLEMENTED
         return "@BOOK{DUMMY:1,\n" +
                 "AUTHOR=\"John Doe\",\n" +

@@ -26,7 +26,7 @@ public class GrobidClient {
             }
             HttpEntity httpResponse = HttpPostService.sendPostAndWait(
                     Globals.prefs.get(JabRefPreferences.CUSTOM_GROBID_SERVER),
-                    "api/processCitation",
+                    "/api/processCitation",
                     Map.of("citations", rawCitation, "consolidateCitations", String.valueOf(consolidateCitations))
                     ).getEntity();
             if (httpResponse == null) {
