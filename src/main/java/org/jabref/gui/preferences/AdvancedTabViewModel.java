@@ -38,6 +38,8 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty proxyUseAuthenticationProperty = new SimpleBooleanProperty();
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
+    private final BooleanProperty customGrobidServerProperty = new SimpleBooleanProperty();
+    private final StringProperty grobidServerProperty = new SimpleStringProperty("");
 
     private FunctionBasedValidator remotePortValidator;
     private FunctionBasedValidator proxyHostnameValidator;
@@ -121,6 +123,9 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
         proxyUseAuthenticationProperty.setValue(proxyPreferences.isUseAuthentication());
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
+
+        customGrobidServerProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_CUSTOM_GROBID_SERVER));
+        grobidServerProperty.setValue(preferences.get(JabRefPreferences.CUSTOM_GROBID_SERVER));
     }
 
     public void storeSettings() {
@@ -137,6 +142,9 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterProperty.getValue());
 
         storeProxySettings();
+
+        preferences.putBoolean(JabRefPreferences.USE_CUSTOM_GROBID_SERVER, customGrobidServerProperty.getValue());
+        preferences.put(JabRefPreferences.CUSTOM_GROBID_SERVER, grobidServerProperty.getValue());
     }
 
     private void storeRemoteSettings() {
@@ -248,4 +256,8 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     public StringProperty proxyUsernameProperty() { return proxyUsernameProperty; }
 
     public StringProperty proxyPasswordProperty() { return proxyPasswordProperty; }
+
+    public BooleanProperty useCustomGrobidServer() { return customGrobidServerProperty; }
+
+    public StringProperty customGrobidServer() { return grobidServerProperty; }
 }

@@ -45,6 +45,8 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
         </rowConstraints>
         <CheckBox fx:id="proxyUse" text="%Use custom proxy configuration" GridPane.columnSpan="3"
                   GridPane.rowIndex="0"/>
@@ -61,5 +63,9 @@
                              GridPane.rowIndex="5"/>
         <Label fx:id="proxyAttentionLabel" styleClass="warning-message"
                text="%Attention: Password is stored in plain text!" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+        <CheckBox fx:id="customGrobidServer" text="%Use custom GROBID server" GridPane.columnSpan="3"
+                  GridPane.rowIndex="6"/>
+        <Label fx:id="grobidServerAddressLabel" text="%Server Address" GridPane.rowIndex="7"/>
+        <TextField fx:id="grobidServerAddress" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
     </GridPane>
 </fx:root>
