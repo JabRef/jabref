@@ -23,7 +23,7 @@ import javafx.collections.ObservableMap;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
@@ -343,13 +343,13 @@ public class BibEntry implements Cloneable {
      * Sets this entry's type.
      */
     public Optional<FieldChange> setType(EntryType type) {
-        return setType(type, EntryEventSource.LOCAL);
+        return setType(type, EntriesEventSource.LOCAL);
     }
 
     /**
      * Sets this entry's type.
      */
-    public Optional<FieldChange> setType(EntryType newType, EntryEventSource eventSource) {
+    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
         Objects.requireNonNull(newType);
 
         EntryType oldType = type.get();
@@ -510,7 +510,7 @@ public class BibEntry implements Cloneable {
      * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
-    public Optional<FieldChange> setField(Field field, String value, EntryEventSource eventSource) {
+    public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
@@ -545,7 +545,7 @@ public class BibEntry implements Cloneable {
      * @param value The value to set.
      */
     public Optional<FieldChange> setField(Field field, String value) {
-        return setField(field, value, EntryEventSource.LOCAL);
+        return setField(field, value, EntriesEventSource.LOCAL);
     }
 
     /**
@@ -555,17 +555,17 @@ public class BibEntry implements Cloneable {
      * @param field The field to clear.
      */
     public Optional<FieldChange> clearField(Field field) {
-        return clearField(field, EntryEventSource.LOCAL);
+        return clearField(field, EntriesEventSource.LOCAL);
     }
 
     /**
      * Remove the mapping for the field name, and notify listeners about
-     * the change including the {@link EntryEventSource}.
+     * the change including the {@link EntriesEventSource}.
      *
      * @param field       the field to clear.
      * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
      */
-    public Optional<FieldChange> clearField(Field field, EntryEventSource eventSource) {
+    public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
         if (!oldValue.isPresent()) {
             return Optional.empty();
@@ -614,7 +614,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public String toString() {
-        return CanonicalBibtexEntry.getCanonicalRepresentation(this);
+        return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
     /**

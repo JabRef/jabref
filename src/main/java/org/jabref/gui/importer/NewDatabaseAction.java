@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -25,6 +24,5 @@ public class NewDatabaseAction extends SimpleCommand {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         bibDatabaseContext.setMode(mode);
         jabRefFrame.addTab(bibDatabaseContext, true);
-        jabRefFrame.getDialogService().notify(Localization.lang("New %0 library created.", mode.getFormattedName()));
     }
 }

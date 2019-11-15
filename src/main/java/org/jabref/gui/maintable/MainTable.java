@@ -229,8 +229,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             ce.end();
             undoManager.addEdit(ce);
 
-            panel.output(panel.formatOutputMessage(Localization.lang("Pasted"), entriesToAdd.size()));
-
             // Show editor if user want us to do this
             BibEntry firstNewEntry = entriesToAdd.get(0);
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {

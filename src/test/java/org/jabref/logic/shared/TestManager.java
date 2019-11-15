@@ -1,9 +1,11 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.database.shared.DBMSType;
@@ -47,5 +49,16 @@ public class TestManager {
                                   + "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
                                   + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;");
         }
+    }
+
+    static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
+        Collection<Object[]> result = new ArrayList<>();
+        for (DBMSType dbmsType : getDBMSTypeTestParameter()) {
+            result.add(new Object[]{
+                    dbmsType,
+                    TestConnector.getTestDBMSConnection(dbmsType),
+                    DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
+        }
+        return result.stream();
     }
 }

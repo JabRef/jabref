@@ -12,6 +12,7 @@ import java.util.prefs.Preferences;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -43,6 +44,7 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
+        upgradeColumnPreferences(Globals.prefs);
     }
 
     /**
@@ -293,5 +295,31 @@ public class PreferencesMigrations {
         String currentPreviewStyle = prefs.getPreviewStyle();
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
         prefs.setPreviewStyle(migratedStyle);
+    }
+
+    /**
+     * The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0
+     * the preferences store the type of the column too, so that the formerly hardwired columns like the graphic groups
+     * column or the other icon columns can be reordered in the main table and behave like any other field column
+     * ("groups;linked_id;field:author;special:readstatus;extrafile:pdf;...").
+     *
+     * Simple strings are by default parsed as a FieldColumn, so there is nothing to do there, but the formerly hard
+     * wired columns need to be added.
+     */
+    static void upgradeColumnPreferences(JabRefPreferences preferences) {
+        String columnNames = preferences.get(JabRefPreferences.COLUMN_NAMES);
+
+        if (!columnNames.isEmpty() &&
+                !columnNames.contains(MainTableColumnModel.Type.NORMALFIELD.getName() // "field:"
+                    + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER)) {
+
+            String columnWidths = preferences.get(JabRefPreferences.COLUMN_WIDTHS);
+
+            columnNames = "groups;linked_id;" + columnNames;
+            columnWidths = "28;28;" + columnWidths;
+
+            preferences.put(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.put(JabRefPreferences.COLUMN_WIDTHS,columnWidths);
+        }
     }
 }

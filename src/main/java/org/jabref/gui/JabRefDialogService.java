@@ -328,7 +328,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException {
-        try (FileSystem zipFile = FileSystems.newFileSystem(archivePath, null)) {
+        try (FileSystem zipFile = FileSystems.newFileSystem(archivePath, (ClassLoader) null)) {
             return new ZipFileChooser(zipFile).showAndWait();
         } catch (NoClassDefFoundError exc) {
             throw new IOException("Could not instantiate ZIP-archive reader.", exc);

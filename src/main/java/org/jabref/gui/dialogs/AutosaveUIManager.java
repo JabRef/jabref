@@ -26,7 +26,7 @@ public class AutosaveUIManager {
     @Subscribe
     public void listen(@SuppressWarnings("unused") AutosaveEvent event) {
         try {
-            new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).save();
+            new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occured while saving.", e);
         }

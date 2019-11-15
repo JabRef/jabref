@@ -115,4 +115,34 @@ class PreferencesMigrationsTest {
 
         verify(prefs).setPreviewStyle(newPreviewStyle);
     }
+
+    @Test
+    void testUpgradeColumnPreferencesAlreadyMigrated() {
+        String columnNames = "groups;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey";
+        String columnWidths = "28;28;75;300;470;60;130;100";
+
+        when(prefs.get(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.get(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(prefs);
+
+        verify(prefs, never()).put(JabRefPreferences.COLUMN_NAMES, "anyString");
+        verify(prefs, never()).put(JabRefPreferences.COLUMN_WIDTHS, "anyString");
+    }
+
+    @Test
+    void testUpgradeColumnPreferencesFromWithoutTypes() {
+        String columnNames = "entrytype;author/editor;title;year;journal/booktitle;bibtexkey";
+        String columnWidths = "75;300;470;60;130;100";
+        String updatedNames = "groups;linked_id;entrytype;author/editor;title;year;journal/booktitle;bibtexkey";
+        String updatedWidths = "28;28;75;300;470;60;130;100";
+
+        when(prefs.get(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.get(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(prefs);
+
+        verify(prefs).put(JabRefPreferences.COLUMN_NAMES, updatedNames);
+        verify(prefs).put(JabRefPreferences.COLUMN_WIDTHS, updatedWidths);
+    }
 }
