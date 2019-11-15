@@ -3,7 +3,7 @@
 ## Context and Problem Statement
 
 JabRef needs to connect to a MySQL database.
-See [Shared SQL Database](https://help.jabref.org/en/SQLDatabase) for more information.
+See [Shared SQL Database](https://docs.jabref.org/collaborative-work/sqldatabase) for more information.
 
 ## Considered Options
 

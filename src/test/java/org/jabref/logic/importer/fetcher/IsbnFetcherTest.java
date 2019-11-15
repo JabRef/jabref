@@ -51,7 +51,7 @@ class IsbnFetcherTest {
 
     @Test
     void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
