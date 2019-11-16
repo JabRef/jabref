@@ -97,10 +97,10 @@ class IsbnFetcherTest {
 
     /**
      * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
-     * not available on ebook.de. The fetcher should something as it falls back to Chimbori
+     * not available on ebook.de. The fetcher should something as it falls back to OttoBib
      */
     @Test
-    void searchForIsbnAvailableAtChimboriButNonOnEbookDe() throws FetcherException {
+    void searchForIsbnAvailableAtOttoBibButNonOnEbookDe() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
         assertNotEquals(Optional.empty(), fetchedEntry);
     }

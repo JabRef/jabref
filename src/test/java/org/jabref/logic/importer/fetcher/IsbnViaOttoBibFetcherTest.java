@@ -65,7 +65,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
-        BibEntry bibEntry = new BibEntry();
+        bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
         bibEntry.setCiteKey("dumas2018fundamentals");
         bibEntry.setField(StandardField.TITLE, "Fundamentals of business process management");
