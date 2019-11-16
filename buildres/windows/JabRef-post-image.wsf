@@ -16,8 +16,8 @@
         var contents = wxsFile.ReadAll();
         wxsFile.Close();
 
-        // Add registry values for JabFox
-        contents = contents.replace("</Product>", "<DirectoryRef Id=\"TARGETDIR\"><Component Id=\"RegistryJabFoxEntries\" Guid=\"b6bc55ad-905c-4258-89b1-8b37abbe559c\" Win64=\"yes\"><RegistryKey Root=\"HKMU\" Key=\"SOFTWARE\\Mozilla\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[APPLICATIONFOLDER]jabref.json\"/></RegistryKey></Component></DirectoryRef><Feature Id=\"JabFox\" Level=\"1\"><ComponentRef Id=\"RegistryJabFoxEntries\" /></Feature></Product>");
+        // Add registry values for JabRef Browser Extension
+        contents = contents.replace("</Product>", "<DirectoryRef Id=\"TARGETDIR\"><Component Id=\"RegistryJabRefBrowserEntries\" Guid=\"b6bc55ad-905c-4258-89b1-8b37abbe559c\" Win64=\"yes\"><RegistryKey Root=\"HKMU\" Key=\"SOFTWARE\\Mozilla\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[APPLICATIONFOLDER]jabref.json\"/></RegistryKey><RegistryKey Root=\"HKMU\" Key=\"Software\\Google\\Chrome\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[APPLICATIONFOLDER]jabref-chrome.json\"/></RegistryKey></Component></DirectoryRef><Feature Id=\"JabFox\" Level=\"1\"><ComponentRef Id=\"RegistryJabFoxEntries\" /></Feature></Product>");
 
         // Specify correct icon in Add/Remove Programs
         contents = contents.replace("</Product>", "<Property Id=\"ARPPRODUCTICON\" Value=\"DesktopIcon.exe\" /></Product>");
