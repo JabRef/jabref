@@ -1,7 +1,12 @@
 package org.jabref.gui.collab;
 
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -18,11 +23,15 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ChangeScanner {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
     private final Path referenceFile;
     private final BibDatabaseContext database;
-    private final List<DatabaseChangeViewModel> changes = new ArrayList<>();
     private BibDatabaseContext referenceDatabase;
 
     public ChangeScanner(BibDatabaseContext database, Path referenceFile) {
@@ -41,7 +50,7 @@ public class ChangeScanner {
     }
 
     public List<DatabaseChangeViewModel> scanForChanges() {
-        database.getDatabasePath().ifPresent(diskdb -> {
+        return database.getDatabasePath().map(diskdb -> {
             // Parse the temporary file.
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
             ParserResult result = OpenDatabase.loadDatabase(referenceFile.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
@@ -52,6 +61,7 @@ public class ChangeScanner {
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
+            List changes = new ArrayList();
             BibDatabaseDiff differences = BibDatabaseDiff.compare(referenceDatabase, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
                 changes.add(new MetaDataChangeViewModel(diff));
@@ -60,8 +70,8 @@ public class ChangeScanner {
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
             differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
-        });
-        return changes;
+            return changes;
+        }).orElse(Collections.emptyList());
     }
 
     private DatabaseChangeViewModel createBibStringDiff(BibStringDiff diff) {

@@ -3,6 +3,7 @@ package org.jabref.gui.collab;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,13 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private Path referenceFile;
     private TaskExecutor taskExecutor;
 
+    /**
+     * An update monitor for a file-based library (.bib file)
+     *
+     * @param database     The BibTeX database
+     * @param fileMonitor  The update monitor where to register to get notified about a change
+     * @param taskExecutor The scan for changes and notification is run with that task executor
+     */
     public DatabaseChangeMonitor(BibDatabaseContext database, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
         this.database = database;
         this.fileMonitor = fileMonitor;
@@ -47,13 +55,27 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
         ChangeScanner scanner = new ChangeScanner(database, referenceFile);
-        BackgroundTask.wrap(scanner::scanForChanges)
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
-                      .executeWith(taskExecutor);
+        BackgroundTask.wrap(() -> {
+            List<DatabaseChangeViewModel> changes;
+            // no two threads may check for changes
+            synchronized (referenceFile) {
+                changes = scanner.scanForChanges();
+                if (!changes.isEmpty()) {
+                    this.database.getDatabasePath().ifPresent(currentFile -> {
+                        try {
+                            Files.copy(currentFile, referenceFile, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            LOGGER.error("Could not copy current database to reference file", e);
+                        }
+                    });
+                }
+            }
+            return changes;
+        }).onSuccess(changes -> {
+            if (!changes.isEmpty()) {
+                listeners.forEach(listener -> listener.databaseChanged(changes));
+            }
+        }).executeWith(taskExecutor);
     }
 
     public void addListener(DatabaseChangeListener listener) {

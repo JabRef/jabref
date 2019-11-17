@@ -14,6 +14,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +28,15 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
-    private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
+    // we are defensive here - ensure that adding and removal to the listeners happens in a serial way
+    private final Multimap<Path, FileUpdateListener> listeners = Multimaps.synchronizedListMultimap(ArrayListMultimap.create(20, 4));
     private WatchService watcher;
 
     @Override
     public void run() {
         try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             this.watcher = watcher;
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 WatchKey key;
                 try {
                     key = watcher.take();
@@ -47,6 +49,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
+                        LOGGER.warn("Overflow at file watching");
                         continue;
                     } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                         // We only handle "ENTRY_MODIFY" here, so the context is always a Path
@@ -65,7 +68,9 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     }
 
     private void notifyAboutChange(Path path) {
-        listeners.get(path).forEach(FileUpdateListener::fileUpdated);
+        synchronized (listeners) {
+            listeners.get(path).forEach(FileUpdateListener::fileUpdated);
+        }
     }
 
     @Override
