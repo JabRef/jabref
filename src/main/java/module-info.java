@@ -67,4 +67,5 @@ open module org.jabref {
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
     requires commons.csv;
+    requires io.github.javadiffutils;
 }
