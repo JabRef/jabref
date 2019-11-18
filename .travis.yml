@@ -24,13 +24,15 @@ env:
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
+    # codecov may fail by itself (see gradle build file)
+    # The codecov test itself fails only in case there is an issue with the codecov update.
+    # Thus, a decrease in the testing coverage does not lead to a failure in Travis
     - TEST_SUITE=codecov
     - DEPENDENCY_UPDATES=check
 
 matrix:
     fast_finish: true
     allow_failures:
-      - env: TEST_SUITE=codecov
       - env: TEST_SUITE=fetcherTest
       - env: TEST_SUITE=databaseTest
       - env: TEST_SUITE=guiTest
