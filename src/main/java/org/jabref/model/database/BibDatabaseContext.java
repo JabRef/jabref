@@ -29,10 +29,12 @@ public class BibDatabaseContext {
     private final BibDatabase database;
     private final Defaults defaults;
     private MetaData metaData;
+
     /**
      * The file where this database was last saved to.
      */
     private Optional<Path> file;
+
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
@@ -115,7 +117,6 @@ public class BibDatabaseContext {
     }
 
     /**
-     *
      * @param file the database file
      * @deprecated use {@link #setDatabaseFile(Path)}
      */
@@ -155,11 +156,11 @@ public class BibDatabaseContext {
     public List<Path> getFileDirectoriesAsPaths(FilePreferences preferences) {
         // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
         return getFileDirectories(preferences).stream()
-                .filter(s -> !s.isEmpty())
-                .map(Paths::get)
-                .map(Path::toAbsolutePath)
-                .map(Path::normalize)
-                .collect(Collectors.toList());
+                                              .filter(s -> !s.isEmpty())
+                                              .map(Paths::get)
+                                              .map(Path::toAbsolutePath)
+                                              .map(Path::normalize)
+                                              .collect(Collectors.toList());
     }
 
     /**
@@ -192,7 +193,7 @@ public class BibDatabaseContext {
      *     <li>BIB file directory</li>
      * </ol>
      *
-     * @param field   The field
+     * @param field       The field
      * @param preferences The fileDirectory preferences
      * @return The default directory for this field type.
      */
@@ -293,5 +294,4 @@ public class BibDatabaseContext {
     public List<BibEntry> getEntries() {
         return database.getEntries();
     }
-
 }
