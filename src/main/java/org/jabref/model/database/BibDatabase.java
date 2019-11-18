@@ -41,27 +41,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A bibliography database.
+ * A bibliography database. This is the "bib" file (or the library stored in a shared SQL database)
  */
 public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
     /**
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+
     /**
      * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
      */
     private final DuplicationChecker duplicationChecker = new DuplicationChecker();
+
     /**
      * contains all entry.getID() of the current database
      */
     private final Set<String> internalIDs = new HashSet<>();
+
     private final EventBus eventBus = new EventBus();
+
     private String preamble;
+
     // All file contents below the last entry in the file
     private String epilog = "";
     private String sharedDatabaseID;

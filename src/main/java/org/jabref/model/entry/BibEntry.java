@@ -317,6 +317,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withCiteKey(String newCiteKey) {
         setCiteKey(newCiteKey);
+        this.setChanged(false);
         return this;
     }
 
@@ -797,6 +798,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withField(Field field, String value) {
         setField(field, value);
+        this.setChanged(false);
         return this;
     }
 
