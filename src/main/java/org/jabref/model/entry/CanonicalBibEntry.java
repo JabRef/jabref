@@ -11,16 +11,19 @@ import java.util.TreeSet;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
-public class CanonicalBibtexEntry {
+public class CanonicalBibEntry {
 
-    private CanonicalBibtexEntry() {
+    private CanonicalBibEntry() {
     }
 
     /**
-     * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
-     * as is
+     * This returns a canonical BibTeX serialization. Serializes all fields, even the JabRef internal ones. Does NOT
+     * serialize "KEY_FIELD" as field, but as key
      *
-     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
+     * <ul>
+     *     <li>Special characters such as "{" or "&" are NOT escaped, but written as</li>
+     *     <li>String constants are not handled. That means, <code>month = apr</code> in a bib file gets <code>month = {#apr#}</code>. This indicates that the month field is correctly stored</li>
+     * </ul>
      */
     public static String getCanonicalRepresentation(BibEntry entry) {
         StringBuilder sb = new StringBuilder();
@@ -50,7 +53,7 @@ public class CanonicalBibtexEntry {
         // generate field entries
         StringJoiner sj = new StringJoiner(",\n", "", "\n");
         for (String fieldName : sortedFields) {
-            String line = String.format("  %s = {%s}", fieldName, String.valueOf(mapFieldToValue.get(fieldName)).replaceAll("\\r\\n","\n"));
+            String line = String.format("  %s = {%s}", fieldName, String.valueOf(mapFieldToValue.get(fieldName)).replaceAll("\\r\\n", "\n"));
             sj.add(line);
         }
         sb.append(sj);
@@ -59,5 +62,4 @@ public class CanonicalBibtexEntry {
         sb.append('}');
         return sb.toString();
     }
-
 }

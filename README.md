@@ -64,9 +64,9 @@ The [latest stable release is available at FossHub](https://www.fosshub.com/JabR
 
 JabRef runs on any system equipped with the Java Virtual Machine (Java 11 or higher), which can be downloaded at no cost from [AdoptOpenDJK](https://adoptopenjdk.net/).
 From JabRef 4.0 onwards, [JavaFX] support has to be installed.
- - Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://help.jabref.org/en/FAQwindows)
- - Linux: Please see our [Installation Guide](http://help.jabref.org/en/Installation).
- - Mac OS X: Please see our [Mac OS X FAQ](https://help.jabref.org/en/FAQosx).
+ - Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://docs.jabref.org/faq/faqwindows)
+ - Linux: Please see our [Installation Guide](https://docs.jabref.org/general/installation).
+ - Mac OS X: Please see our [Mac OS X FAQ](https://docs.jabref.org/faq/faqosx).
 
 In addition, JabRef can be downloaded as an executable `.jar` file. 
 Try to double click the `jar` file or execute the following command:
@@ -78,7 +78,7 @@ Try to double click the `jar` file or execute the following command:
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
-If you need support in using JabRef, please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
+If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first and have a look at our [community forum](https://discourse.jabref.org/c/help).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
 An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
