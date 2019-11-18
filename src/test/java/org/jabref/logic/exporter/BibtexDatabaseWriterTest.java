@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -538,7 +539,7 @@ class BibtexDatabaseWriterTest {
 
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + OS.NEWLINE +
                 OS.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
-                     + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}" + OS.NEWLINE, stringWriter.toString());
+                + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -650,5 +651,88 @@ class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals(fileContent, stringWriter.toString());
+    }
+
+    @Test
+    public void saveAlsoSavesSecondModification() throws Exception {
+        // @formatter:off
+        String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // modify entry
+        entry.setField(StandardField.AUTHOR, "BlaBla");
+
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
+
+        // modify entry a second time
+        entry.setField(StandardField.AUTHOR, "Test");
+
+        // write a second time
+        stringWriter = new StringWriter();
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
+
+        assertEquals(OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  author  = {Test}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "}" + OS.NEWLINE +
+                "" + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    public void saveReturnsToOriginalEntryWhenEntryIsUnchanged() throws Exception {
+        // @formatter:off
+        String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // modify entry
+        entry.setField(StandardField.AUTHOR, "BlaBla");
+
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
+
+        // modify entry a second time
+        entry.setField(StandardField.AUTHOR, "Test");
+
+        entry.setChanged(false);
+
+        // write a second time
+        stringWriter = new StringWriter();
+        databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
+        databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
+
+        assertEquals(bibtexEntry + OS.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
     }
 }

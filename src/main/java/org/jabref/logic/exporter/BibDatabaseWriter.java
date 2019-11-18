@@ -151,8 +151,8 @@ public abstract class BibDatabaseWriter {
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-
         if (sharedDatabaseIDOptional.isPresent()) {
+            // may throw an IOException. Thus, we do not use "ifPresent", but the "old" isPresent way
             writeDatabaseID(sharedDatabaseIDOptional.get());
         }
 
