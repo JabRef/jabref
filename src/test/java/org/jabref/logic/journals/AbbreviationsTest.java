@@ -13,7 +13,7 @@ public class AbbreviationsTest {
     private JournalAbbreviationLoader abbreviations;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         prefs = mock(JournalAbbreviationPreferences.class);
         abbreviations = new JournalAbbreviationLoader();
     }

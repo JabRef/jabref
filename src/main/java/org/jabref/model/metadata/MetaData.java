@@ -149,6 +149,10 @@ public class MetaData {
     }
 
     public void setMode(BibDatabaseMode mode) {
+        if (mode == this.mode) {
+            return;
+        }
+
         this.mode = Objects.requireNonNull(mode);
         postChange();
     }

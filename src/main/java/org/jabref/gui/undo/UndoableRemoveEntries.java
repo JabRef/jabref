@@ -1,5 +1,8 @@
 package org.jabref.gui.undo;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -8,9 +11,6 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This class represents the removal of entries. The constructor needs
@@ -45,22 +45,28 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
         if (cut) {
             if (entries.size() > 1) {
                 return Localization.lang("cut entries");
-            }
-            else if (entries.size() == 1) {
+            } else if (entries.size() == 1) {
                 return Localization.lang("cut entry %0",
                         StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-            } else  {
+            } else {
                 return null;
             }
         } else {
             if (entries.size() > 1) {
                 return Localization.lang("remove entries");
+<<<<<<< HEAD
             }
             else if (entries.size() == 1) {
                 return Localization.lang("remove entry %0",
                         StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             }
             else {
+=======
+            } else if (entries.size() == 1) {
+                return Localization.lang("remove entry %0",
+                        StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            } else {
+>>>>>>> master
                 return null;
             }
         }

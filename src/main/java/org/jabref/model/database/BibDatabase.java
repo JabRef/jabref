@@ -27,8 +27,12 @@ import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.EntryChangedEvent;
+<<<<<<< HEAD
+import org.jabref.model.entry.event.EntriesEventSource;
+=======
+>>>>>>> master
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -317,12 +321,12 @@ public class BibDatabase {
 
     /**
      * Replaces the existing lists of BibTexString with the given one
-     * No Duplicate checks are performed
+     * Duplicates throw KeyCollisionException
      * @param stringsToAdd The collection of strings to set
      */
-    public void setStrings(Collection<BibtexString> stringsToAdd) {
-        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
-        bibtexStrings = strs;
+    public void setStrings(List<BibtexString> stringsToAdd) {
+        bibtexStrings = new ConcurrentHashMap<>();
+        stringsToAdd.forEach(this::addString);
     }
 
     /**

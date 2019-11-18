@@ -1,10 +1,10 @@
 package org.jabref.model.database.event;
 
+import java.util.List;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
-
-import java.util.List;
 
 /**
  * <code>EntriesRemovedEvent</code> is fired when at least one <code>BibEntry</code> is removed
@@ -14,14 +14,14 @@ import java.util.List;
 public class EntriesRemovedEvent extends EntriesEvent {
 
     /**
-     * @param <code>List</List></code> of bibEntry <code>BibEntry</BibEntry></code> object which have been removed.
+     * @param bibEntries <code>List</List></code> of <code>BibEntry</BibEntry></code> object which have been removed.
      */
     public EntriesRemovedEvent(List<BibEntry> bibEntries) {
         super(bibEntries);
     }
 
     /**
-     * @param <code>List</List></code> of bibEntry <code>BibEntry</code> object which have been removed.
+     * @param bibEntries <code>List</List></code> of <code>BibEntry</code> object which have been removed.
      * @param location Location affected by this event
      */
     public EntriesRemovedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {

@@ -81,10 +81,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         }
 
         if (themeLightProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
-            restartWarnings.add(Localization.lang("Theme changed:") + " " + ThemeLoader.MAIN_CSS);
+            restartWarnings.add(Localization.lang("Theme changed to light theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
         } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
-            restartWarnings.add(Localization.lang("Theme changed:") + " " + ThemeLoader.DARK_CSS);
+            restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
         }
     }

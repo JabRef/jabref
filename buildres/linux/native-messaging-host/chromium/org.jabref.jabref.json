@@ -1,0 +1,9 @@
+{
+  "name": "org.jabref.jabref",
+  "description": "JabRef",
+  "path": "/opt/jabref/lib/jabrefHost.py",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/"
+  ]
+}

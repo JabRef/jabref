@@ -46,6 +46,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
+import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -86,8 +87,8 @@ import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -365,8 +366,9 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
-        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
-        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
+        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
+        actions.put(Actions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(this, AbbreviationType.SHORTEST_UNIQUE));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
@@ -618,7 +620,6 @@ public class BasePanel extends StackPane {
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
-                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getDisplayName()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {

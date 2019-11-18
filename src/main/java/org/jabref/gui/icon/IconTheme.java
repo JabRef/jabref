@@ -293,7 +293,12 @@ public class IconTheme {
         LATEX_FILE(MaterialDesignIcon.FILE_OUTLINE),
         LATEX_COMMENT(MaterialDesignIcon.COMMENT_TEXT_OUTLINE),
         LATEX_LINE(MaterialDesignIcon.FORMAT_LINE_SPACING),
-        PASSWORD_REVEALED(MaterialDesignIcon.EYE);
+        PASSWORD_REVEALED(MaterialDesignIcon.EYE),
+        ADD_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_PLUS),
+        OPEN_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_OUTLINE),
+        REMOVE_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_REMOVE),
+        ADD_ABBREVIATION(MaterialDesignIcon.PLAYLIST_PLUS),
+        REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS);
 
         private final JabRefIcon icon;
 

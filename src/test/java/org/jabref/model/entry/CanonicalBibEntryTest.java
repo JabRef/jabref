@@ -7,7 +7,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CanonicalBibEntryTest {
+class CanonicalBibEntryTest {
+
+    @Test
+    void canonicalRepresentationIsCorrectForStringMonth() {
+        BibEntry entry = new BibEntry();
+        entry.setMonth(Month.MAY);
+        assertEquals("@misc{,\n" +
+                "  month = {#may#}\n" +
+                "}", CanonicalBibEntry.getCanonicalRepresentation(entry));
+    }
 
     @Test
     public void simpleCanonicalRepresentation() {
@@ -16,7 +25,7 @@ public class CanonicalBibEntryTest {
         e.setField(StandardField.AUTHOR, "abc");
         e.setField(StandardField.TITLE, "def");
         e.setField(StandardField.JOURNAL, "hij");
-        String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
+        String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
         assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}",
                 canonicalRepresentation);
     }
@@ -26,7 +35,7 @@ public class CanonicalBibEntryTest {
         BibEntry e = new BibEntry(StandardEntryType.Article);
         e.setCiteKey("key");
         e.setField(StandardField.ABSTRACT, "line 1\nline 2");
-        String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
+        String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
         assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
     }
 }

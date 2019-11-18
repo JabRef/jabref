@@ -65,6 +65,11 @@ Project: Application Insights SDK for Java
 URL:     https://github.com/Microsoft/ApplicationInsights-Java
 License: MIT
 
+Id:      com.oracle.ojdbc:ojdbc10
+Project: Oracle's JDBC drivers
+URL:     https://medium.com/oracledevs/oracle-jdbc-drivers-on-maven-central-64fcf724d8b
+License: Proprietary
+
 Id:      com.sibvisions.external.jvxfx:DnDTabPane
 Project: Drag'n'Drop TabPane
 URL:     https://github.com/sibvisions/javafx.DndTabPane
@@ -124,6 +129,11 @@ Id:      org.antlr:antlr4
 Project: ANTLR 4
 URL:     http://www.antlr.org/
 License: BSD-3-Clause
+
+Id:      org.apache.commons:commons-csv
+Project: Apache Commons CSV
+URL:     https://commons.apache.org/proper/commons-csv/
+License: Apache-2.0
 
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang

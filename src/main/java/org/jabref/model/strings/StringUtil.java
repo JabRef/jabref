@@ -28,6 +28,7 @@ public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
+    public static final String EMPTY = "";
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");

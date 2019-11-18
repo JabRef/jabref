@@ -1,11 +1,11 @@
 package org.jabref.logic.shared.event;
 
-import org.jabref.model.entry.BibEntry;
-
 import java.util.List;
 
+import org.jabref.model.entry.BibEntry;
+
 /**
- * A new {@link SharedEntriwaNotPresentEvent} is fired, when the user tries to push changes of one or more obsolete
+ * This event is fired when the user tries to push changes of one or more obsolete
  * {@link BibEntry} to the server.
  */
 public class SharedEntriesNotPresentEvent {

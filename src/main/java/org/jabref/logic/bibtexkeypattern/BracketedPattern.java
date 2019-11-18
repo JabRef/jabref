@@ -843,8 +843,8 @@ public class BracketedPattern {
      * First N chars of the first author's last name.
      */
     public static String authN(String authString, int num, boolean isEnforceLegalKey) {
-        authString = BibtexKeyGenerator.removeUnwantedCharacters(authString, isEnforceLegalKey);
         String fa = firstAuthor(authString);
+        fa = BibtexKeyGenerator.removeUnwantedCharacters(fa, isEnforceLegalKey);
         if (num > fa.length()) {
             num = fa.length();
         }
